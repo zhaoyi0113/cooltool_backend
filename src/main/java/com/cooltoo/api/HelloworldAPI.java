@@ -1,5 +1,8 @@
 package com.cooltoo.api;
 
+import com.cooltoo.entities.HelloEntity;
+import com.cooltoo.repository.HelloRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -15,9 +18,15 @@ import javax.ws.rs.core.Response;
 @Component
 public class HelloworldAPI {
 
+    @Autowired
+    private HelloRepository repository;
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response sayHello(){
+        HelloEntity entity = new HelloEntity();
+        entity.setName("aaaa");
+        repository.save(entity);
         return Response.ok("hello world!").build();
     }
 
