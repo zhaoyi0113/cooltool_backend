@@ -1,0 +1,2 @@
+ALTER TABLE `badge`
+CHANGE COLUMN `point` `point` BIGINT(10) NULL DEFAULT NULL ;

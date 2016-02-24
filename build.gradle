@@ -43,6 +43,9 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-actuator")
     // end::actuator[]
     testCompile("junit:junit")
+    testCompile("org.springframework:spring-test")
+    testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
+    testCompile("org.dbunit:dbunit:2.5.0")
 }
 
 task wrapper(type: Wrapper) {
