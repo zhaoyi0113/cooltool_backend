@@ -16,9 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionDbUnitTestExecutionListener.class})
-public class AbstractCooltooTest {
+public abstract class AbstractCooltooTest {
 }
