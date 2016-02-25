@@ -58,13 +58,10 @@ ext {
     environmentPah = "envs/"+environment
     // read database envs
     Properties props = new Properties()
-    props.load(new FileInputStream(file(environmentPah + "/database.properties")))
-    db_host = props.getProperty("db_host")
-    db_port = props.getProperty("db_port")
-    db_user = props.getProperty("db_user")
-    db_password = props.getProperty("db_password")
-    db_schema = props.getProperty("db_schema")
-    flyway.url = "jdbc:mysql://" + db_host + ":" + db_port + "/" + db_schema + "?characterEncoding=utf8"
+    props.load(new FileInputStream(file(environmentPah + "/application.properties")))
+    db_user = props.getProperty("spring.datasource.username")
+    db_password = props.getProperty("spring.datasource.password")
+    flyway.url = props.getProperty("spring.datasource.url")
     flyway.user = db_user
     flyway.password = db_password
     flyway.encoding = 'UTF-8'
