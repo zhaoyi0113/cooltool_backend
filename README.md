@@ -9,9 +9,12 @@ Cool too backend project
 运行之前需要配置一下文件：
 
 － envs/dev/application.properties
+
 	该文件中记录了数据库的地址和用户名密码
 	
 数据库配置：
+
 － 数据库采用MySQL，安装好后，创建名称为"cooltoo"的数据库
+
 － 然后运行 gradle flywayMigrate，这条语句用来建立数据库的表
 
