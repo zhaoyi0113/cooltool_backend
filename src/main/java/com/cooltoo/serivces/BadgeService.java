@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +30,27 @@ public class BadgeService {
     @Autowired
     private BadgeBeanConverter beanConverter;
 
+    @Autowired
+    private StorageService storageService;
+
     @Transactional
     public int createNewBadge(BadgeBean badgeBean) {
         BadgeEntity entity = entityConverter.convert(badgeBean);
         BadgeEntity saved = repository.save(entity);
         return saved.getId();
+    }
+
+    @Transactional
+    public int createNewBadge(String name, int point, int grade, InputStream fileInputStream, String fileName) {
+        long fileId = storageService.saveFile(fileName, fileInputStream);
+        String fileUrl = storageService.getFileUrl(fileId);
+        BadgeBean bean = new BadgeBean();
+        bean.setName(name);
+        bean.setFileId(fileId);
+        bean.setPoint(point);
+        bean.setGrade(grade);
+        bean.setImageUrl(fileUrl);
+        return createNewBadge(bean);
     }
 
     public List<BadgeBean> getAllBadge() {
@@ -47,12 +64,14 @@ public class BadgeService {
     }
 
     @Transactional
-    public BadgeBean deleteBadge(int id){
+    public BadgeBean deleteBadge(int id) {
         BadgeEntity badge = repository.findOne(id);
-        if(badge == null){
+        if (badge == null) {
             throw new BadRequestException(ErrorCode.BADGE_NOT_EXIST);
         }
         repository.delete(id);
         return beanConverter.convert(badge);
     }
+
+    
 }

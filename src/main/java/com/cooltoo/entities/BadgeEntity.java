@@ -19,6 +19,8 @@ public class BadgeEntity {
 
     private long point;
 
+    private long fileId;
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -64,5 +66,14 @@ public class BadgeEntity {
 
     public void setPoint(long point) {
         this.point = point;
+    }
+
+    @Column(name = "file_id")
+    public long getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(long fileId) {
+        this.fileId = fileId;
     }
 }

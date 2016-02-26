@@ -1,0 +1,5 @@
+CREATE TABLE `file_storage` (
+  `id` BIGINT(64) NOT NULL AUTO_INCREMENT,
+  `file_name` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`))
+DEFAULT CHARACTER SET = utf8;

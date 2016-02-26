@@ -1,0 +1,4 @@
+ALTER TABLE `badge`
+CHANGE COLUMN `grade` `grade` INT(11) NULL DEFAULT 0 ,
+CHANGE COLUMN `point` `point` BIGINT(10) NULL DEFAULT 0 ,
+CHANGE COLUMN `file_id` `file_id` BIGINT(128) NULL DEFAULT 0 ;

@@ -34,6 +34,13 @@ public class BadgeServiceTest extends AbstractCooltooTest{
     }
 
     @Test
+    public void testCreateBadge2(){
+        int id = badgeService.createNewBadge("bbb", 100,100,null,null);
+        List<BadgeBean> allBadge = badgeService.getAllBadge();
+        Assert.assertTrue(allBadge.size()>0);
+    }
+
+    @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/badge_data.xml")
     public void testGetBadget(){
         List<BadgeBean> allBadge = badgeService.getAllBadge();

@@ -1,6 +1,7 @@
 package com.cooltoo.config;
 
-import com.cooltoo.api.HelloworldAPI;
+import com.cooltoo.api.BadgeAPI;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 public class JerseyConfiguration extends ResourceConfig {
 
     public JerseyConfiguration(){
-        register(HelloworldAPI.class);
+        register(BadgeAPI.class);
+        register(MultiPartFeature.class);
+
     }
 }
