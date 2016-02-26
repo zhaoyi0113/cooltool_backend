@@ -2,9 +2,9 @@
 Cool too backend project
 
 
-使用Gradle作为构建工具，运行 gradle build 来编译打包代码。
+使用Gradle作为构建工具，运行 gradle clean build 来编译打包代码。
 
-运行环境采用springboot，打出的jar包放在，build/libs目录下，直接运行 java -jar ***.jar 启动tomcat容器
+运行环境采用springboot，打出的jar包放在，build/libs目录下
 
 运行之前需要配置一下文件：
 
@@ -18,3 +18,6 @@ Cool too backend project
 
 － 然后运行 gradle flywayMigrate，这条语句用来建立数据库的表
 
+如何启动Tomcat,springboot采用内嵌Tomcat容器,
+
+   运行 gradle bootRun 启动tomcat容器
