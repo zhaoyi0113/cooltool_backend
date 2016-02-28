@@ -56,6 +56,7 @@ public class BadgeAPI {
                 result = updateBadge(id,name, point, grade, fileInputStream, disposition);
             }
         }
+
         Response.ResponseBuilder response = null;
         if (null != result) {
             response = Response.ok(result);
