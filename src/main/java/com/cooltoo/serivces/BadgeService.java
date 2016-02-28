@@ -4,6 +4,7 @@ import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.converter.BadgeBeanConverter;
 import com.cooltoo.converter.BadgeEntityConverter;
 import com.cooltoo.entities.BadgeEntity;
+import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.BadgeRepository;
@@ -49,7 +50,7 @@ public class BadgeService {
         bean.setFileId(fileId);
         bean.setPoint(point);
         bean.setGrade(grade);
-        bean.setImageUrl(fileUrl);
+        //bean.setImageUrl(fileUrl);
         return createNewBadge(bean);
     }
 
@@ -63,6 +64,14 @@ public class BadgeService {
         return beanList;
     }
 
+    public BadgeBean getBadgeById(int id) {
+        if (repository.exists(id)) {
+            BadgeEntity entity = repository.findOne(id);
+            return beanConverter.convert(entity);
+        }
+        return null;
+    }
+
     @Transactional
     public BadgeBean deleteBadge(int id) {
         BadgeEntity badge = repository.findOne(id);
@@ -73,5 +82,36 @@ public class BadgeService {
         return beanConverter.convert(badge);
     }
 
-    
+    @Transactional
+    public BadgeBean updateBadge(int id, String name, int point, int grade, InputStream fileInputStream, String fileName) {
+        if (!repository.exists(id)) {
+            throw new BadRequestException(ErrorCode.BADGE_NOT_EXIST);
+        }
+        boolean changed = false;
+        BadgeEntity bean = repository.findOne(id);
+        if (null != fileInputStream) {
+            long fileId = storageService.saveFile(fileName, fileInputStream);
+            String fileUrl = storageService.getFileUrl(fileId);
+            bean.setFileId(fileId);
+            bean.setImageUrl(fileUrl);
+            changed = true;
+        }
+        bean.setId(id);
+        if (null != name && !bean.getName().equals(name)) {
+            bean.setName(name);
+            changed = true;
+        }
+        if (0!=point && bean.getPoint() != point) {
+            bean.setPoint(point);
+            changed = true;
+        }
+        if (0!=grade && bean.getGrade() != grade) {
+            bean.setGrade(grade);
+            changed = true;
+        }
+        if (changed) {
+            bean = repository.save(bean);
+        }
+        return beanConverter.convert(bean);
+    }
 }

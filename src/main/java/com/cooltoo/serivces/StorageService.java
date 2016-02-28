@@ -36,7 +36,7 @@ public class StorageService {
         }
         logger.info("save file " + fileName);
         try {
-            String sha1 = sha1(fileName);
+            String sha1 = sha1(""+System.nanoTime());
             String folderName = sha1.substring(0, 2);
             String name = sha1.substring(2);
             String destFielPath = storagePath + File.separator + folderName;
@@ -55,6 +55,10 @@ public class StorageService {
     }
 
     public String getFileUrl(long id) {
+        if (storageRepository.exists(id)) {
+            FileStorageEntity entity = storageRepository.findOne(id);
+            return entity.getFilePath();
+        }
         return "";
     }
 
@@ -63,6 +67,7 @@ public class StorageService {
         entity.setFileRealname(fileName);
         entity.setFilePath(path);
         FileStorageEntity saved = storageRepository.save(entity);
+        logger.info("FileId"+saved.getId() +", FileName="+saved.getFileRealname() +", FilePath="+saved.getFilePath());
         return saved.getId();
     }
 
