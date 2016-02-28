@@ -35,7 +35,7 @@ public class BadgeAPI {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response crudBadge(
+    public Response cudBadge(
                                     @DefaultValue("null") @FormDataParam("type") String type,
                                     @DefaultValue("0") @FormDataParam("id") int id,
                                     @FormDataParam("name") String name,
