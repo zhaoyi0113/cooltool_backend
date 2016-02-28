@@ -36,7 +36,7 @@ public class StorageService {
         }
         logger.info("save file " + fileName);
         try {
-            String sha1 = sha1(""+System.nanoTime());
+            String sha1 = sha1(String.valueOf(System.nanoTime()));
             String folderName = sha1.substring(0, 2);
             String name = sha1.substring(2);
             String destFielPath = storagePath + File.separator + folderName;
@@ -96,4 +96,5 @@ public class StorageService {
 
         return sb.toString();
     }
+
 }
