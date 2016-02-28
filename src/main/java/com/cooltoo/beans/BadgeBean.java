@@ -70,4 +70,16 @@ public class BadgeBean {
     public void setFileId(long fileId) {
         this.fileId = fileId;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(BadgeBean.class).append("[");
+        msg.append("id=").append(id);
+        msg.append(", name=").append(name);
+        msg.append(", grade=").append(grade);
+        msg.append(", point=").append(point);
+        msg.append("]");
+        return msg.toString();
+    }
 }
