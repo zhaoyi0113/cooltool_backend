@@ -18,6 +18,7 @@ public class BadgeEntityConverter implements Converter<BadgeBean,BadgeEntity> {
         entity.setGrade(source.getGrade());
         entity.setImageUrl(source.getImageUrl());
         entity.setPoint(source.getPoint());
+        entity.setFileId(source.getFileId());
         return entity;
     }
 }

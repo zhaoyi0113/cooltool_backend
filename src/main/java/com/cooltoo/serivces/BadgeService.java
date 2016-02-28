@@ -89,6 +89,7 @@ public class BadgeService {
         }
         boolean changed = false;
         BadgeEntity bean = repository.findOne(id);
+        bean.setId(id);
         if (null != fileInputStream) {
             long fileId = storageService.saveFile(fileName, fileInputStream);
             String fileUrl = storageService.getFileUrl(fileId);
@@ -96,8 +97,7 @@ public class BadgeService {
             bean.setImageUrl(fileUrl);
             changed = true;
         }
-        bean.setId(id);
-        if (null != name && !bean.getName().equals(name)) {
+        if (null != name && !"".equals(name) && !bean.getName().equals(name)) {
             bean.setName(name);
             changed = true;
         }

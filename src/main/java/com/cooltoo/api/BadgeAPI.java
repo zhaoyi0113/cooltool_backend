@@ -32,57 +32,41 @@ public class BadgeAPI {
         return Response.ok(badges).build();
     }
 
-    @POST
+    @Path("/new")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response crudBadge(
-                                    @DefaultValue("null") @FormDataParam("type") String type,
-                                    @DefaultValue("0") @FormDataParam("id") int id,
-                                    @FormDataParam("name") String name,
-                                    @DefaultValue("0") @FormDataParam("grade") int grade,
-                                    @DefaultValue("0") @FormDataParam("point") int point,
-                                    @FormDataParam("file") InputStream fileInputStream,
-                                    @FormDataParam("file") FormDataContentDisposition disposition) {
-        Object result = null;
-        logger.info("post type:" + type + " id="+id +" name="+name +" grade="+grade +" point="+point);
-        if (type instanceof String) {
-            if ("delete".equalsIgnoreCase(type)) {
-                result = deleteBadge(id);
-            }
-            else if ("new".equalsIgnoreCase(type)) {
-                result = (Integer)createBadge(name, point, grade, fileInputStream, disposition);
-            }
-            else if ("update".equalsIgnoreCase(type)) {
-                result = updateBadge(id,name, point, grade, fileInputStream, disposition);
-            }
-        }
-        Response.ResponseBuilder response = null;
-        if (null != result) {
-            response = Response.ok(result);
-        }
-        else {
-            response = Response.ok();
-        }
-        return response.build();
+    public Response createBadge(
+                                @FormDataParam("name") String name,
+                                @DefaultValue("0") @FormDataParam("grade") int grade,
+                                @DefaultValue("0") @FormDataParam("point") int point,
+                                @FormDataParam("file") InputStream fileInputStream,
+                                @FormDataParam("file") FormDataContentDisposition disposition) {
+        int id = badgeService.createNewBadge(name, point, grade, fileInputStream,
+                                                null != disposition ? disposition.getFileName() : null);
+        logger.info("new badge id="+id+" name="+name +" grade="+grade +" point="+point+
+                    "filename="+(null==disposition ? "null" : disposition.getFileName()));
+        return Response.ok(id).build();
     }
 
-    private Integer createBadge(String name, int grade, int point, InputStream fileInputStream, FormDataContentDisposition disposition) {
-        int id = badgeService.createNewBadge(name, point, grade, fileInputStream, null != disposition ? disposition.getFileName() : null);
-        return id;
+    @Path("/delete")
+    public Response deleteBadge(
+                                @DefaultValue("-1") @FormDataParam("id") int id) {
+        BadgeBean bean = badgeService.deleteBadge(id);
+        logger.info("delete badge is " + bean);
+        return Response.ok(bean).build();
     }
 
-    private BadgeBean deleteBadge(int id) {
-        BadgeBean bean = badgeService.getBadgeById(id);
-        logger.info(null==bean?"null":bean.toString());
-        bean = badgeService.deleteBadge(id);
-        return bean;
-    }
-
-
-    private BadgeBean updateBadge(int id, String name, int grade, int point, InputStream fileInputStream, FormDataContentDisposition disposition) {
-        BadgeBean bean = badgeService.getBadgeById(id);
-        logger.info(null==bean?"null":bean.toString());
-        bean = badgeService.updateBadge(id, name, grade, point, fileInputStream, null != disposition ? disposition.getFileName() : null);
-        return bean;
+    @Path("/update")
+    public Response updateBadge(
+                                @DefaultValue("-1") @FormDataParam("id") int id,
+                                @FormDataParam("name") String name,
+                                @DefaultValue("0") @FormDataParam("grade") int grade,
+                                @DefaultValue("0") @FormDataParam("point") int point,
+                                @FormDataParam("file") InputStream fileInputStream,
+                                @FormDataParam("file") FormDataContentDisposition disposition) {
+        BadgeBean bean = badgeService.updateBadge(id, name, grade, point, fileInputStream,
+                                                    null != disposition ? disposition.getFileName() : null);
+        logger.info("update badge is " + bean);
+        return Response.ok(bean).build();
     }
 }

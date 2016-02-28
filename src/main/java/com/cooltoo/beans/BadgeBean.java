@@ -79,6 +79,7 @@ public class BadgeBean {
         msg.append(", name=").append(name);
         msg.append(", grade=").append(grade);
         msg.append(", point=").append(point);
+        msg.append(", file_id=").append(fileId);
         msg.append("]");
         return msg.toString();
     }

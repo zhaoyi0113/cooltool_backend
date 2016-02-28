@@ -53,5 +53,19 @@ public class BadgeServiceTest extends AbstractCooltooTest{
         BadgeBean badgeBean = badgeService.deleteBadge(1000);
         Assert.assertNotNull(badgeBean);
         Assert.assertEquals(1000, badgeBean.getId());
+        badgeBean = badgeService.getBadgeById(1000);
+        Assert.assertNull(badgeBean);
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/badge_data.xml")
+    public void testUpdateBadget(){
+        BadgeBean badgeBean = badgeService.updateBadge(1002, "name222", 22, 22, null, "fileName");
+        Assert.assertNotNull(badgeBean);
+        Assert.assertEquals(1002, badgeBean.getId());
+        Assert.assertEquals("name222", badgeBean.getName());
+        Assert.assertEquals(22, badgeBean.getPoint());
+        Assert.assertEquals(22, badgeBean.getGrade());
+        Assert.assertEquals(null, badgeBean.getImageUrl());
     }
 }

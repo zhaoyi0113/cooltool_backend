@@ -34,21 +34,24 @@ public class StorageService {
             logger.warning("not found inputstream");
             return -1;
         }
-        logger.info("save file " + fileName);
         try {
-            String sha1 = sha1(String.valueOf(System.nanoTime()));
-            String folderName = sha1.substring(0, 2);
-            String name = sha1.substring(2);
+            String sha1         = sha1(String.valueOf(System.nanoTime()));
+            String folderName   = sha1.substring(0, 2);
+            String newFileName  = sha1.substring(2);
             String destFielPath = storagePath + File.separator + folderName;
-            logger.info("save " + fileName + " to " + destFielPath + "/" + name);
+
+            logger.info("save " + fileName + " to " + destFielPath + "/" + newFileName);
             File dir = new File(destFielPath);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            File file = new File(destFielPath, name);
+            File file = new File(destFielPath, newFileName);
             writeToFile(inputStream, file);
-            return saveToDB(fileName, destFielPath + File.separator + name);
+
+            return saveToDB(fileName, destFielPath + File.separator + newFileName);
         } catch (NoSuchAlgorithmException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
         return 0;
@@ -66,35 +69,28 @@ public class StorageService {
         FileStorageEntity entity = new FileStorageEntity();
         entity.setFileRealname(fileName);
         entity.setFilePath(path);
-        FileStorageEntity saved = storageRepository.save(entity);
-        logger.info("FileId"+saved.getId() +", FileName="+saved.getFileRealname() +", FilePath="+saved.getFilePath());
-        return saved.getId();
+        entity = storageRepository.save(entity);
+        logger.info("FileId="+entity.getId() +", FileName="+entity.getFileRealname() +", FilePath="+entity.getFilePath());
+        return entity.getId();
     }
 
-    private static void writeToFile(InputStream inputStream, File file) {
+    private static void writeToFile(InputStream input, File file) throws IOException {
         byte buffer[] = new byte[1024];
-        try {
-            int read = inputStream.read(buffer);
-            FileOutputStream outputStream = new FileOutputStream(file);
-            while (read > 0) {
-                outputStream.write(buffer, 0, read);
-                read = inputStream.read(buffer);
-            }
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+        int  read     = input.read(buffer);
+        FileOutputStream output = new FileOutputStream(file);
+        while (read > 0) {
+            output.write(buffer, 0, read);
+            read = input.read(buffer);
         }
-
     }
 
     private static String sha1(String input) throws NoSuchAlgorithmException {
-        MessageDigest mDigest = MessageDigest.getInstance("SHA1");
-        byte[] result = mDigest.digest(input.getBytes());
+        MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
+        byte[] result = sha1Digest.digest(input.getBytes());
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < result.length; i++) {
             sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
         }
-
         return sb.toString();
     }
-
 }
