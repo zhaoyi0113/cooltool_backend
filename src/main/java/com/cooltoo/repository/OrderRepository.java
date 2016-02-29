@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * Created by lg380357 on 2016/2/29.
  */
-public interface OrderRepository extends CrudRepository<OrderEntity, Long> {
+public interface  OrderRepository extends CrudRepository<OrderEntity, Long> {
 }

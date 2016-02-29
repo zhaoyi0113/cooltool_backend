@@ -87,7 +87,7 @@ public class OrderService {
             entity.setCash(cash);
             changed = true;
         }
-        if (entity.getCount()!=count && count > 0) {
+        if (entity.getCount()!=count && count>0) {
             entity.setCount(count);
             changed = true;
         }

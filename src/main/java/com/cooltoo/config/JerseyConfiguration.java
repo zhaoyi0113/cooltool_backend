@@ -15,6 +15,6 @@ public class JerseyConfiguration extends ResourceConfig {
     public JerseyConfiguration(){
         register(BadgeAPI.class);
         register(MultiPartFeature.class);
-        register(OrderAPI.class);
+        register(OrderAPI.class );
     }
 }

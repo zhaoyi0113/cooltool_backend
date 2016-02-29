@@ -42,7 +42,7 @@ public class OrderAPI {
             return Response.ok().build();
         }
         long id = orderService.newOrder(name, count, cash);
-        logger.info("new badge id="+id+" name="+name +" count="+count +" cash="+cash);
+        logger.info("new badge  id="+id+" name="+name +" count="+count +" cash="+cash);
         return Response.ok(id).build();
     }
 

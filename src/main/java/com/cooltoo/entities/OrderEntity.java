@@ -58,7 +58,7 @@ public class OrderEntity {
         msg.append("name=").append(name).append(" ,");
         msg.append("count=").append(count).append(" ,");
         msg.append("cash=").append(cash);
-        msg.append("]");
+        msg.append(" ]");
         return msg.toString();
     }
 }

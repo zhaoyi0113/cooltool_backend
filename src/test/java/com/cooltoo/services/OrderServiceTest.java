@@ -56,7 +56,7 @@ public class OrderServiceTest extends AbstractCooltooTest {
         Assert.assertNotNull(bean);
         Assert.assertEquals(1, bean.getId());
         Assert.assertEquals("name222222", bean.getName());
-        Assert.assertEquals(22, bean.getCount());
+        Assert.assertEquals(22,  bean.getCount());
         Assert.assertEquals(new BigDecimal("22.22"), bean.getCash());
     }
 }
