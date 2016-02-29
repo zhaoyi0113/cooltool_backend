@@ -71,7 +71,7 @@ ext {
     flyway.password = db_password
     flyway.encoding = 'UTF-8'
     flyway.setBaselineOnMigrate(true);
-    flyway.setValidateOnMigrate(true);
+    flyway.setValidateOnMigrate(false);
 }
 
 sourceSets {
