@@ -49,6 +49,7 @@ public class BadgeAPI {
     }
 
     @Path("/delete")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteBadge(
                                 @DefaultValue("-1") @FormDataParam("id") int id) {
         BadgeBean bean = badgeService.deleteBadge(id);
@@ -57,6 +58,7 @@ public class BadgeAPI {
     }
 
     @Path("/update")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response updateBadge(
                                 @DefaultValue("-1") @FormDataParam("id") int id,
                                 @FormDataParam("name") String name,
