@@ -1,7 +1,6 @@
 package com.cooltoo.entities;
 
 import javax.persistence.*;
-import javax.ws.rs.FormParam;
 import java.math.BigDecimal;
 
 /**
@@ -14,7 +13,7 @@ public class OrderEntity {
     private long id;
     private String name;
     private int count;
-    private BigDecimal cash;
+    private BigDecimal price;
 
     @Id
     @GeneratedValue
@@ -42,12 +41,12 @@ public class OrderEntity {
         this.count = count;
     }
 
-    @Column(name = "cash")
-    public BigDecimal getCash() {
-        return cash;
+    @Column(name = "price")
+    public BigDecimal getPrice() {
+        return price;
     }
-    public void setCash(BigDecimal cash) {
-        this.cash = cash;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     @Override
@@ -57,7 +56,7 @@ public class OrderEntity {
         msg.append("id=").append(id).append(" ,");
         msg.append("name=").append(name).append(" ,");
         msg.append("count=").append(count).append(" ,");
-        msg.append("cash=").append(cash);
+        msg.append("price=").append(price);
         msg.append(" ]");
         return msg.toString();
     }

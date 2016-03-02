@@ -59,7 +59,8 @@ public enum ErrorCode {
     PAY_FAILED(10039, Response.Status.BAD_REQUEST, "支付失败", "Pay Failed"),
     COURSE_ALREADY_EXISTED(10040, Response.Status.BAD_REQUEST, "课程已存在", "Course Already Existed."),
     BADGE_NOT_EXIST(10041, Response.Status.BAD_REQUEST, "徽章不存在", "Badge not exist"),
-    ORDER_NOT_EXIST(10042, Response.Status.BAD_REQUEST,  "订单不存在", "Order not exist");
+    ORDER_NOT_EXIST(10042, Response.Status.BAD_REQUEST,  "订单不存在", "Order not exist"),
+    NURSE_NOT_EXIST(10043, Response.Status.BAD_REQUEST,  "护士不存在", "Nurse not exist");
 
     private final int code;
 

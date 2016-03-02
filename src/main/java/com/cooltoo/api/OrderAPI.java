@@ -1,7 +1,6 @@
 package com.cooltoo.api;
 
 import com.cooltoo.beans.OrderBean;
-import com.cooltoo.repository.OrderRepository;
 import com.cooltoo.serivces.OrderService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,7 @@ public class OrderAPI {
     public Response getOrder(
             @DefaultValue("-1") @FormParam("id") long id) {
         OrderBean bean = orderService.getOrder(id);
-        logger.info("delete order is " + bean);
+        logger.info("get order is " + bean);
         if (null == bean) {
             return Response.ok().build();
         }
@@ -66,7 +65,7 @@ public class OrderAPI {
             @DefaultValue("-1") @FormParam("id") long id,
             @FormParam("name") String name,
             @DefaultValue("1") @FormParam("count") int count,
-            @DefaultValue("99999999.99") @FormParam("cash")BigDecimal cash) {
+            @DefaultValue("-1.00") @FormParam("cash")BigDecimal cash) {
         OrderBean bean = orderService.updateOrder(id, name, count, cash);
         logger.info("update order is " + bean);
         if (null == bean) {

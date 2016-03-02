@@ -16,7 +16,7 @@ public class OrderEntityConverter implements Converter<OrderBean, OrderEntity> {
         entity.setId(bean.getId());
         entity.setName(bean.getName());
         entity.setCount(bean.getCount());
-        entity.setCash(bean.getCash() );
+        entity.setPrice(bean.getCash() );
         return entity;
     }
 }

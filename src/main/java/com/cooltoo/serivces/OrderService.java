@@ -78,16 +78,19 @@ public class OrderService {
         if (null==entity) {
             throw new BadRequestException(ErrorCode.ORDER_NOT_EXIST);
         }
+        if (cash.doubleValue()<0 || count<1){
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
         boolean changed = false;
         if (null!=name && !"".equals(name) && !entity.getName().equals(name)) {
             entity.setName(name);
             changed = true;
         }
-        if (entity.getCash() != cash && cash.doubleValue() > 0.0) {
-            entity.setCash(cash);
+        if (entity.getPrice() != cash) {
+            entity.setPrice(cash);
             changed = true;
         }
-        if (entity.getCount()!=count && count>0) {
+        if (entity.getCount()!=count) {
             entity.setCount(count);
             changed = true;
         }

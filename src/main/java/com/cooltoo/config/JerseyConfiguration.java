@@ -1,6 +1,7 @@
 package com.cooltoo.config;
 
 import com.cooltoo.api.BadgeAPI;
+import com.cooltoo.api.NurseAPI;
 import com.cooltoo.api.OrderAPI;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -16,5 +17,6 @@ public class JerseyConfiguration extends ResourceConfig {
         register(BadgeAPI.class);
         register(MultiPartFeature.class);
         register(OrderAPI.class );
+        register(NurseAPI.class);
     }
 }

@@ -11,9 +11,7 @@ public class NurseEntity {
 
     private long id;
 
-    /**
-     * 身份证号
-     */
+    /** 身份证号 */
     private String identificationId;
 
     private int gender;
