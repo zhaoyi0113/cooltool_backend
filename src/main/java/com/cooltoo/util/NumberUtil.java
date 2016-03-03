@@ -1,5 +1,8 @@
 package com.cooltoo.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 /**
  * Created by lg380357 on 2016/3/2.
  */
@@ -15,5 +18,15 @@ public class NumberUtil {
             return mobile.matches(MobileRegex);
         }
         return false;
+    }
+
+    public static long getTime(String datetime, String pattern) {
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        try {
+            java.util.Date time = sdf.parse(datetime);
+            return time.getTime();
+        } catch (ParseException e) {
+            return -1;
+        }
     }
 }

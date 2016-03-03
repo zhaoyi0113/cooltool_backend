@@ -19,6 +19,9 @@ public class PatientEntityConverter implements Converter<PatientBean, PatientEnt
         entity.setMobile(source.getMobile());
         entity.setNickname(source.getNickname());
         entity.setOfficeId(source.getOfficeId());
+        entity.setAge(source.getAge());
+        entity.setBirthday(source.getBirthday());
+        entity.setUsercol(source.getUsercol());
         return entity;
     }
 }

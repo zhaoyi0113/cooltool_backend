@@ -19,6 +19,9 @@ public class PatientBeanConverter implements Converter<PatientEntity, PatientBea
         bean.setMobile(source.getMobile());
         bean.setCertificateId(source.getCertificateId());
         bean.setId(source.getId());
+        bean.setAge(source.getAge());
+        bean.setBirthday(source.getBirthday());
+        bean.setUsercol(source.getUsercol());
         return bean;
     }
 }

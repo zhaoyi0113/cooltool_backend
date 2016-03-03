@@ -3,6 +3,7 @@ package com.cooltoo.config;
 import com.cooltoo.api.BadgeAPI;
 import com.cooltoo.api.NurseAPI;
 import com.cooltoo.api.OrderAPI;
+import com.cooltoo.api.PatientAPI;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.context.annotation.Configuration;
@@ -18,5 +19,6 @@ public class JerseyConfiguration extends ResourceConfig {
         register(MultiPartFeature.class);
         register(OrderAPI.class );
         register(NurseAPI.class);
+        register(PatientAPI.class);
     }
 }

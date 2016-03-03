@@ -10,7 +10,7 @@ public class NurseBean {
     @FormParam("id")
     private long id;
 
-    @FormParam("identificate_id")
+    @FormParam("identificateId")
     private String identificationId;
 
     @FormParam("name")
