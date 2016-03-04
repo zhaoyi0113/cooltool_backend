@@ -1,5 +1,7 @@
 package com.cooltoo.entities;
 
+import com.cooltoo.constants.UserType;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -13,7 +15,7 @@ public class TokenAccessEntity {
 
     private long userId;
 
-    private int type;
+    private UserType type;
 
     private Date timeCreated;
 
@@ -38,11 +40,12 @@ public class TokenAccessEntity {
     }
 
     @Column(name = "type")
-    public int getType() {
+    @Enumerated
+    public UserType getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(UserType type) {
         this.type = type;
     }
 

@@ -1,5 +1,6 @@
 package com.cooltoo.api;
 
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.serivces.NurseLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +22,13 @@ public class NurseLoginAPI {
     @Autowired
     private NurseLoginService loginService;
 
-
-
     @POST
     public Response login(@Context HttpServletRequest request,
                           @FormParam("mobile") String mobile,
                           @FormParam("password") String password) {
-        loginService.login(mobile, password);
+        NurseBean nurse = loginService.login(mobile, password);
         HttpSession session = request.getSession();
-        session.setAttribute(ContextKeys.NURSE_LOGIN, mobile);
+        session.setAttribute(ContextKeys.NURSE_LOGIN, nurse);
         return Response.ok().build();
     }
 }

@@ -30,16 +30,16 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         LoginAuthentication login = resourceInfo.getResourceClass().getAnnotation(LoginAuthentication.class);
-        logger.info("login auth "+login);
-        if (login == null){
+        logger.info("login auth " + login);
+        if (login == null) {
             return;
         }
-        if(login.requireNurseLogin()) {
-            String nurseName = (String) servletRequest.getSession().getAttribute(ContextKeys.NURSE_LOGIN);
-            if (nurseName == null) {
+        if (login.requireNurseLogin()) {
+            Object nurse = servletRequest.getSession().getAttribute(ContextKeys.NURSE_LOGIN);
+            if (nurse == null) {
                 throw new BadRequestException(ErrorCode.NOT_LOGIN);
             }
-            logger.info("nurse login as "+nurseName);
+            logger.info("nurse login as " + nurse);
         }
     }
 }
