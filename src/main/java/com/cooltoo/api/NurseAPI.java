@@ -88,6 +88,6 @@ public class NurseAPI {
         if (null==one) {
             return Response.ok().build();
         }
-        return Response.ok(id).build();
+        return Response.ok(one).build();
     }
 }

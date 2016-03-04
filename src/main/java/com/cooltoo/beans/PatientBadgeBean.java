@@ -1,13 +1,9 @@
-package com.cooltoo.entities;
-
-import javax.persistence.*;
+package com.cooltoo.beans;
 
 /**
- * Created by yzzhao on 2/29/16.
+ * Created by lg380357 on 2016/3/3.
  */
-@Entity
-@Table(name = "patient_badge")
-public class PatientBadgeEntity {
+public class PatientBadgeBean {
 
     private int id;
 
@@ -15,31 +11,21 @@ public class PatientBadgeEntity {
 
     private int badgeId;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
-
-    @Column(name = "patient_id")
     public long getPatientId() {
         return patientId;
     }
-
     public void setPatientId(long patientId) {
         this.patientId = patientId;
     }
-
-    @Column(name = "badge_id")
     public int getBadgeId() {
         return badgeId;
     }
-
     public void setBadgeId(int badgeId) {
         this.badgeId = badgeId;
     }

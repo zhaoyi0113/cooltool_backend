@@ -1,15 +1,11 @@
 package com.cooltoo.services;
 
-import com.cooltoo.Application;
 import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.serivces.BadgeService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
