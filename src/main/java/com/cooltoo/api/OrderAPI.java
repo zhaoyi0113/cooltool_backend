@@ -37,11 +37,11 @@ public class OrderAPI {
             @DefaultValue("1") @FormParam("count") int count,
             @DefaultValue("99999999.99") @FormParam("cash")BigDecimal cash) {
         if (null == name || "".equals(name.trim()) || count < 0 || cash.doubleValue() < 0.0) {
-            logger.info("new badge name="+name +" count="+count +" cash="+cash);
+            logger.info("new order name="+name +" count="+count +" cash="+cash);
             return Response.ok().build();
         }
         long id = orderService.newOrder(name, count, cash);
-        logger.info("new badge  id="+id+" name="+name +" count="+count +" cash="+cash);
+        logger.info("new order id="+id+" name="+name +" count="+count +" cash="+cash);
         return Response.ok(id).build();
     }
 

@@ -63,7 +63,7 @@ public class PatientAPI {
             date = new Date(time);
         }
         if (null == name || "".equals(name.trim()) || age<0) {
-            logger.info("new badge name="+name +" age="+age);
+            logger.info("new patient name="+name +" age="+age);
             return Response.ok().build();
         }
         long id = service.create(name, nickname, certificateId, officeId, mobile, age, date, usercol);
@@ -75,7 +75,7 @@ public class PatientAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOne(@DefaultValue("-1") @FormParam("id") long id) {
         PatientBean one = service.getOneById(id);
-        logger.info("get nurse is " + one);
+        logger.info("get patient is " + one);
         if (null==one) {
             return Response.ok().build();
         }
@@ -87,7 +87,7 @@ public class PatientAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteOne(@DefaultValue("-1")@FormParam("id") long id) {
         PatientBean one = service.delete(id);
-        logger.info("delete nurse is " + one);
+        logger.info("delete patient is " + one);
         if (null==one) {
             return Response.ok().build();
         }
@@ -114,7 +114,7 @@ public class PatientAPI {
             date = new Date(time);
         }
         PatientBean one = service.update(id, name, nickname, certificateId, officeId, mobile, age, date, usercol);
-        logger.info("update nurse is " + one);
+        logger.info("update patient is " + one);
         if (null==one) {
             return Response.ok().build();
         }

@@ -1,7 +1,8 @@
 package com.cooltoo.api;
 
-import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.serivces.HospitalDepartmentService;
+import com.cooltoo.beans.HospitalDepartmentRelationBean;
+import com.cooltoo.entities.HospitalDepartmentRelationEntity;
+import com.cooltoo.serivces.HospitalDepartmentRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
@@ -13,18 +14,18 @@ import java.util.logging.Logger;
 /**
  * Created by lg380357 on 2016/3/5.
  */
-@Path("/hospital_department")
-public class HospitalDepartmentAPI {
+@Path("/hospital_department_relation")
+public class HospitalDepartmentRelationAPI {
 
-    private static final Logger logger = Logger.getLogger(HospitalDepartmentAPI.class.getName());
+    private static final Logger logger = Logger.getLogger(HospitalDepartmentRelationAPI.class.getName());
 
     @Autowired
-    private HospitalDepartmentService service;
+    private HospitalDepartmentRelationService service;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        List<HospitalDepartmentBean> all = service.getAll();
+        List<HospitalDepartmentRelationBean> all = service.getAll();
         return Response.ok(all).build();
     }
 
@@ -32,8 +33,8 @@ public class HospitalDepartmentAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOneById(@DefaultValue("-1") @FormParam("id") int id) {
-        HospitalDepartmentBean bean = service.getOneById(id);
-        logger.info("get hospital department is " + bean);
+        HospitalDepartmentRelationBean bean = service.getOneById(id);
+        logger.info("get hospital department relation is " + bean);
         if (null == bean) {
             Response.ok().build();
         }
@@ -44,8 +45,8 @@ public class HospitalDepartmentAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteById(@DefaultValue("-1") @FormParam("id") int id) {
-        HospitalDepartmentBean one = service.deleteById(id);
-        logger.info("delete hospital department is " + one);
+        HospitalDepartmentRelationBean one = service.deleteById(id);
+        logger.info("delete hospital department relation is " + one);
         if (null==one) {
             return Response.ok().build();
         }
@@ -57,9 +58,11 @@ public class HospitalDepartmentAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response update(
             @DefaultValue("-1") @FormParam("id") int id,
+            @DefaultValue("-1") @FormParam("hospitalId") int hospitalId,
+            @DefaultValue("-1") @FormParam("departmentId") int departmentId,
             @FormParam("name") String name) {
-        HospitalDepartmentBean one = service.update(id, name);
-        logger.info("update hospital department is " + one);
+        HospitalDepartmentRelationBean one = service.update(id, hospitalId, departmentId);
+        logger.info("update hospital department relation is " + one);
         if (null==one) {
             return Response.ok().build();
         }
@@ -70,10 +73,11 @@ public class HospitalDepartmentAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response newOne(
-            @FormParam("name") String name
+            @DefaultValue("-1") @FormParam("hospitalId") int hospitalId,
+            @DefaultValue("-1") @FormParam("departmentId") int departmentId
     ) {
-        int id = service.newOne(name);
-        logger.info("new hospital department id is " + id);
+        int id = service.newOne(hospitalId, departmentId);
+        logger.info("new hospital department relation id is " + id);
         return Response.ok(id).build();
     }
 }

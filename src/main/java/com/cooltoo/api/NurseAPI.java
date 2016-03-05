@@ -41,7 +41,7 @@ public class NurseAPI {
             @DefaultValue("") @FormParam("identificateId") String identificateId
     ) {
         if (null == name || "".equals(name.trim()) || age<0 || gender<0) {
-            logger.info("new badge name="+name +" age="+age +" gender="+gender);
+            logger.info("new nurse name="+name +" age="+age +" gender="+gender);
             return Response.ok().build();
         }
         long id = service.newNurse(identificateId, name,age, gender, mobile);
