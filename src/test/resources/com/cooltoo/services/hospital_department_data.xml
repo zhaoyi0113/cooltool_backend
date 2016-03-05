@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <hospital_department id="11" name="name1" />
+    <hospital_department id="22" name="name2" />
+    <hospital_department id="33" name="name3" />
+    <hospital_department id="44" name="name4" />
+    <hospital_department id="55" name="name5" />
+</dataset>

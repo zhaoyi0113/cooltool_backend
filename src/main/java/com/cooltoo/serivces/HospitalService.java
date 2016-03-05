@@ -58,7 +58,7 @@ public class HospitalService {
     @Transactional
     public HospitalBean update(HospitalBean bean) {
         if (!repository.exists(bean.getId())) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.HOSPITAL_NOT_EXIST);
         }
         String value = bean.getName();
         if (null==value || "".equals(value)) {

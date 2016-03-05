@@ -20,10 +20,11 @@ public class PatientBadgeServiceTest extends AbstractCooltooTest {
     private PatientBadgeService service;
 
     @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/patient_badge_data.xml")
     public void testNew1() {
         PatientBadgeBean bean = new PatientBadgeBean();
-        bean.setBadgeId(1005);
-        bean.setPatientId(13);
+        bean.setBadgeId(1004);
+        bean.setPatientId(8);
         int id = service.newOne(bean);
         Assert.assertTrue(id>0);
         List<PatientBadgeBean> all = service.getAll();

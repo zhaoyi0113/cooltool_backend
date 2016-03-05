@@ -64,7 +64,8 @@ public enum ErrorCode {
     ORDER_NOT_EXIST(10042, Response.Status.BAD_REQUEST,  "订单不存在", "Order not exist"),
     NURSE_NOT_EXIST(10043, Response.Status.BAD_REQUEST,  "护士不存在", "Nurse not exist"),
     RECORD_NOT_EXIST(10044, Response.Status.BAD_REQUEST,  "记录不存在", "Record not exist"),
-    HOSPITAL_NOT_EXIST(10045, Response.Status.BAD_REQUEST,  "医院不存在", "Hospital not exist");
+    HOSPITAL_NOT_EXIST(10045, Response.Status.BAD_REQUEST,  "医院不存在", "Hospital not exist"),
+    HOSPITAL_DEPARTMENT_NOT_EXIST(10046, Response.Status.BAD_REQUEST,  "科室不存在", "Hospital department not exist");
 
     private final int code;
 
