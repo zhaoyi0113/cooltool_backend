@@ -76,4 +76,17 @@ public class BadgeEntity {
     public void setFileId(long fileId) {
         this.fileId = fileId;
     }
+
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(this.getClass()).append("@").append(hashCode()).append("[");
+        msg.append("id=").append(id).append(" ,");
+        msg.append("name=").append(name).append(" ,");
+        msg.append("grade=").append(grade).append(" ,");
+        msg.append("point=").append(point).append(" ,");
+        msg.append("fileId=").append(fileId).append(" ,");
+        msg.append("imageUrl=").append(imageUrl);
+        msg.append(" ]");
+        return msg.toString();
+    }
 }

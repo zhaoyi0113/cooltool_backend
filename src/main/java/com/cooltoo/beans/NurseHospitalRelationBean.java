@@ -1,22 +1,29 @@
 package com.cooltoo.beans;
 
 /**
- * Created by lg380357 on 2/29/16.
+ * Created by lg380357 on 2016/3/5.
  */
-public class HospitalDepartmentRelationBean {
+public class NurseHospitalRelationBean {
 
-    private int id;
-
+    private long id;
+    private long nurseId;
     private int hospitalId;
-
     private int departmentId;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
+    }
+
+    public long getNurseId() {
+        return nurseId;
+    }
+
+    public void setNurseId(long nurseId) {
+        this.nurseId = nurseId;
     }
 
     public int getHospitalId() {
@@ -27,7 +34,9 @@ public class HospitalDepartmentRelationBean {
         this.hospitalId = hospitalId;
     }
 
-    public int getDepartmentId() { return departmentId; }
+    public int getDepartmentId() {
+        return departmentId;
+    }
 
     public void setDepartmentId(int departmentId) {
         this.departmentId = departmentId;
@@ -36,10 +45,11 @@ public class HospitalDepartmentRelationBean {
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" , ");
-        msg.append("hospitalId=").append(hospitalId).append(" , ");
+        msg.append("id=").append(id).append(" ,");
+        msg.append("nurseId=").append(nurseId).append(" ,");
+        msg.append("hospitalId=").append(hospitalId).append(" ,");
         msg.append("departmentId=").append(departmentId);
-        msg.append("]");
+        msg.append(" ]");
         return msg.toString();
     }
 }

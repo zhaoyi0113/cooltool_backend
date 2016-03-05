@@ -4,7 +4,6 @@ import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.converter.BadgeBeanConverter;
 import com.cooltoo.converter.BadgeEntityConverter;
 import com.cooltoo.entities.BadgeEntity;
-import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.BadgeRepository;

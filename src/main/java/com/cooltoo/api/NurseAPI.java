@@ -1,9 +1,7 @@
 package com.cooltoo.api;
 
 import com.cooltoo.beans.NurseBean;
-import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.serivces.NurseService;
-import org.jboss.logging.annotations.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
@@ -41,7 +39,7 @@ public class NurseAPI {
             @DefaultValue("") @FormParam("identificateId") String identificateId
     ) {
         if (null == name || "".equals(name.trim()) || age<0 || gender<0) {
-            logger.info("new nurse name="+name +" age="+age +" gender="+gender);
+            logger.info("new urse name="+name +" age="+age +" gender="+gender);
             return Response.ok().build();
         }
         long id = service.newNurse(identificateId, name,age, gender, mobile);

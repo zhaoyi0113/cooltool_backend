@@ -1,7 +1,5 @@
 package com.cooltoo.exception;
 
-import com.cooltoo.repository.HospitalRepository;
-
 import javax.ws.rs.core.Response;
 
 public enum ErrorCode {

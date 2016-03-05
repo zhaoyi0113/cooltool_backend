@@ -77,4 +77,17 @@ public class NurseEntity {
     public void setAge(int age) {
         this.age = age;
     }
+
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(this.getClass()).append("@").append(hashCode()).append("[");
+        msg.append("id=").append(id).append(" ,");
+        msg.append("identificationId=").append(identificationId).append(" ,");
+        msg.append("name=").append(name).append(" ,");
+        msg.append("gender=").append(gender).append(" ,");
+        msg.append("mobile=").append(mobile).append(" ,");
+        msg.append("age=").append(age);
+        msg.append(" ]");
+        return msg.toString();
+    }
 }

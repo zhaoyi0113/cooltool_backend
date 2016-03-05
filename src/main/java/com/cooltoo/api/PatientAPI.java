@@ -3,9 +3,6 @@ package com.cooltoo.api;
 import com.cooltoo.beans.PatientBean;
 import com.cooltoo.converter.PatientBeanConverter;
 import com.cooltoo.converter.PatientEntityConverter;
-import com.cooltoo.exception.*;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.repository.PatientRepository;
 import com.cooltoo.serivces.PatientService;
 import com.cooltoo.util.NumberUtil;
 import org.apache.log4j.Logger;
@@ -14,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 
 /**

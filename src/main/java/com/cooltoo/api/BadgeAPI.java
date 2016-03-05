@@ -4,7 +4,6 @@ import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.serivces.BadgeService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;

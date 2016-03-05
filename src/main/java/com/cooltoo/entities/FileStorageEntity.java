@@ -43,4 +43,14 @@ public class FileStorageEntity {
     public void setFileRealname(String fileRealname) {
         this.fileRealname = fileRealname;
     }
+
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(this.getClass()).append("@").append(hashCode()).append("[");
+        msg.append("id=").append(id).append(" , ");
+        msg.append("fileRealname=").append(fileRealname).append(" , ");
+        msg.append("filePath=").append(filePath);
+        msg.append("]");
+        return msg.toString();
+    }
 }

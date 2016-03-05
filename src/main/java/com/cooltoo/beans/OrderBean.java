@@ -1,6 +1,5 @@
 package com.cooltoo.beans;
 
-import javax.validation.constraints.DecimalMax;
 import javax.ws.rs.FormParam;
 import java.math.BigDecimal;
 

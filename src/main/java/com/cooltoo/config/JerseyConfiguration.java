@@ -1,7 +1,6 @@
 package com.cooltoo.config;
 
 import com.cooltoo.api.*;
-import com.cooltoo.filter.LoginAuthentication;
 import com.cooltoo.filter.NurseLoginAuthenticationFilter;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -23,6 +22,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(HospitalAPI.class);
         register(HospitalDepartmentAPI.class);
         register(HospitalDepartmentRelationAPI.class);
+        register(NurseHospitalRelationAPI.class);
         register(NurseLoginAuthenticationFilter.class);
     }
 }

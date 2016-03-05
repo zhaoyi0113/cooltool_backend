@@ -1,9 +1,9 @@
 package com.cooltoo.serivces;
 
 import com.cooltoo.beans.NurseBean;
-import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.converter.NurseBeanConverter;
 import com.cooltoo.converter.NurseEntityConverter;
+import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.NurseRepository;
