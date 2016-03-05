@@ -20,6 +20,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(NurseAPI.class);
         register(PatientAPI.class);
         register(PatientBadgeAPI.class);
+        register(HospitalAPI.class);
         register(NurseLoginAuthenticationFilter.class);
     }
 }

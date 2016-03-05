@@ -1,5 +1,7 @@
 package com.cooltoo.exception;
 
+import com.cooltoo.repository.HospitalRepository;
+
 import javax.ws.rs.core.Response;
 
 public enum ErrorCode {
@@ -61,7 +63,8 @@ public enum ErrorCode {
     BADGE_NOT_EXIST(10041, Response.Status.BAD_REQUEST, "徽章不存在", "Badge not exist"),
     ORDER_NOT_EXIST(10042, Response.Status.BAD_REQUEST,  "订单不存在", "Order not exist"),
     NURSE_NOT_EXIST(10043, Response.Status.BAD_REQUEST,  "护士不存在", "Nurse not exist"),
-    RECORD_NOT_EXIST(10044, Response.Status.BAD_REQUEST,  "记录不存在", "Record not exist");
+    RECORD_NOT_EXIST(10044, Response.Status.BAD_REQUEST,  "记录不存在", "Record not exist"),
+    HOSPITAL_NOT_EXIST(10045, Response.Status.BAD_REQUEST,  "医院不存在", "Hospital not exist");
 
     private final int code;
 
