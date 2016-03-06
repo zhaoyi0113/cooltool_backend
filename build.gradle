@@ -43,6 +43,7 @@ dependencies {
 
     compile("org.springframework.boot:spring-boot-starter-jdbc")
     compile 'mysql:mysql-connector-java:5.1.25'
+    compile ('commons-codec:commons-codec:1.9')
 
     // tag::actuator[]
     compile("org.springframework.boot:spring-boot-starter-actuator")

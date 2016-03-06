@@ -1,6 +1,5 @@
 package com.cooltoo.serivces;
 
-import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.converter.NurseBeanConverter;
 import com.cooltoo.entities.NurseEntity;
@@ -9,6 +8,7 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.repository.TokenAccessRepository;
+import com.cooltoo.util.AccessTokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +31,11 @@ public class NurseLoginService {
     @Autowired
     private NurseBeanConverter beanConverter;
 
+    @Autowired
+    private AccessTokenGenerator tokenGenerator;
+
     @Transactional
-    public NurseBean login(String mobile, String password){
+    public String login(String mobile, String password){
         List<NurseEntity> nurses = nurseRepository.findNurseByMobile(mobile);
         if(nurses == null || nurses.isEmpty()){
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
@@ -44,7 +47,9 @@ public class NurseLoginService {
         entity.setUserId(nurseEntity.getId());
         entity.setType(UserType.NURSE);
         entity.setTimeCreated(Calendar.getInstance().getTime());
+        String token = tokenGenerator.generateAccessToken(mobile, password);
+        entity.setToken(token);
         TokenAccessEntity saved = tokenAccessRepository.save(entity);
-        return beanConverter.convert(nurseEntity);
+        return saved.getToken();
     }
 }

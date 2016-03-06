@@ -25,10 +25,10 @@ public class NurseLoginServiceTest extends AbstractCooltooTest{
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_login_data.xml")
     public void nurseLoginTest(){
-        NurseBean nurse = loginService.login("135232121222", "");
-        Assert.assertNotNull(nurse);
-        List<TokenAccessEntity> tokens = accessRepository.findTokenAccessByUserId(nurse.getId());
+        String token = loginService.login("135232121222", "");
+        Assert.assertNotNull(token);
+        List<TokenAccessEntity> tokens = accessRepository.findTokenAccessByToken(token);
         Assert.assertTrue(tokens.size()>0);
-        Assert.assertEquals(nurse.getId(), tokens.get(0).getUserId());
+        Assert.assertEquals(token, tokens.get(0).getToken());
     }
 }

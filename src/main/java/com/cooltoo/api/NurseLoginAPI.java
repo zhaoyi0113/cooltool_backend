@@ -26,9 +26,9 @@ public class NurseLoginAPI {
     public Response login(@Context HttpServletRequest request,
                           @FormParam("mobile") String mobile,
                           @FormParam("password") String password) {
-        NurseBean nurse = loginService.login(mobile, password);
+        String token = loginService.login(mobile, password);
         HttpSession session = request.getSession();
-        session.setAttribute(ContextKeys.NURSE_LOGIN, nurse);
+        session.setAttribute(ContextKeys.NURSE_LOGIN, token);
         return Response.ok().build();
     }
 }

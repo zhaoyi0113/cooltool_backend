@@ -10,5 +10,7 @@ import java.util.List;
  */
 public interface TokenAccessRepository extends CrudRepository<TokenAccessEntity, Long> {
 
-    public List<TokenAccessEntity> findTokenAccessByUserId(long userId);
+    List<TokenAccessEntity> findTokenAccessByUserId(long userId);
+
+    List<TokenAccessEntity> findTokenAccessByToken(String token);
 }

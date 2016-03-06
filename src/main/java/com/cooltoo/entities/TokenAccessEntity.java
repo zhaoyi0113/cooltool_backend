@@ -19,6 +19,8 @@ public class TokenAccessEntity {
 
     private Date timeCreated;
 
+    private String token;
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -56,5 +58,14 @@ public class TokenAccessEntity {
 
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    @Column(name = "token")
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
