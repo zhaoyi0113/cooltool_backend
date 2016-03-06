@@ -35,7 +35,7 @@ public class NurseLoginService {
     private AccessTokenGenerator tokenGenerator;
 
     @Transactional
-    public String login(String mobile, String password){
+    public TokenAccessEntity login(String mobile, String password){
         List<NurseEntity> nurses = nurseRepository.findNurseByMobile(mobile);
         if(nurses == null || nurses.isEmpty()){
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
@@ -49,7 +49,6 @@ public class NurseLoginService {
         entity.setTimeCreated(Calendar.getInstance().getTime());
         String token = tokenGenerator.generateAccessToken(mobile, password);
         entity.setToken(token);
-        TokenAccessEntity saved = tokenAccessRepository.save(entity);
-        return saved.getToken();
+        return tokenAccessRepository.save(entity);
     }
 }
