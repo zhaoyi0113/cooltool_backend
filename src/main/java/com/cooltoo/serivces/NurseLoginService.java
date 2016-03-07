@@ -1,5 +1,6 @@
 package com.cooltoo.serivces;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.converter.NurseBeanConverter;
 import com.cooltoo.entities.NurseEntity;
@@ -47,6 +48,7 @@ public class NurseLoginService {
         entity.setUserId(nurseEntity.getId());
         entity.setType(UserType.NURSE);
         entity.setTimeCreated(Calendar.getInstance().getTime());
+        entity.setStatus(CommonStatus.ENABLED);
         String token = tokenGenerator.generateAccessToken(mobile, password);
         entity.setToken(token);
         return tokenAccessRepository.save(entity);

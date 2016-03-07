@@ -1,5 +1,6 @@
 package com.cooltoo.entities;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.UserType;
 
 import javax.persistence.*;
@@ -20,6 +21,8 @@ public class TokenAccessEntity {
     private Date timeCreated;
 
     private String token;
+
+    private CommonStatus status;
 
     @Id
     @GeneratedValue
@@ -67,5 +70,15 @@ public class TokenAccessEntity {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    @Column(name = "status")
+    @Enumerated
+    public CommonStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CommonStatus status) {
+        this.status = status;
     }
 }

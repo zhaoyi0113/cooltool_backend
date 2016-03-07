@@ -1,6 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.entities.TokenAccessEntity;
 import com.cooltoo.repository.TokenAccessRepository;
 import com.cooltoo.serivces.NurseLoginService;
@@ -30,5 +31,7 @@ public class NurseLoginServiceTest extends AbstractCooltooTest{
         TokenAccessEntity savedToken = accessRepository.findOne(token.getId());
         Assert.assertNotNull(savedToken);
         Assert.assertEquals(token.getId(), savedToken.getId());
+        Assert.assertEquals(CommonStatus.ENABLED, (token.getStatus()));
+
     }
 }
