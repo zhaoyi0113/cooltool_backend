@@ -41,6 +41,10 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
         LoginAuthentication login = resourceInfo.getResourceClass().getAnnotation(LoginAuthentication.class);
         logger.info("login auth " + login);
         if (login == null) {
+            login = resourceInfo.getResourceMethod().getAnnotation(LoginAuthentication.class);
+            if(login == null){
+                return;
+            }
             return;
         }
         if (login.requireNurseLogin()) {
@@ -63,7 +67,7 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
                 if (tokenEntities.isEmpty()) {
                     throw new BadRequestException(ErrorCode.NOT_LOGIN);
                 }
-                requestContext.setProperty(ContextKeys.NURSE_LOGIN, tokenEntities.get(0).getId());
+                requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, tokenEntities.get(0).getUserId());
             }
 
         }

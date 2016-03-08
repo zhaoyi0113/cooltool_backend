@@ -1,8 +1,8 @@
 package com.cooltoo.api;
 
-import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.entities.TokenAccessEntity;
+import com.cooltoo.filter.LoginAuthentication;
 import com.cooltoo.serivces.NurseLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,7 +29,15 @@ public class NurseLoginAPI {
                           @FormParam("password") String password) {
         TokenAccessEntity token = loginService.login(mobile, password);
         HttpSession session = request.getSession();
-        session.setAttribute(ContextKeys.NURSE_LOGIN, token.getUserId());
+        session.setAttribute(ContextKeys.NURSE_LOGIN_USER_ID, token.getUserId());
+        return Response.ok().build();
+    }
+
+    @POST
+    @LoginAuthentication
+    public Response logout(@Context HttpServletRequest request){
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        loginService.logout(userId);
         return Response.ok().build();
     }
 }

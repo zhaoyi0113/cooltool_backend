@@ -53,4 +53,14 @@ public class NurseLoginService {
         entity.setToken(token);
         return tokenAccessRepository.save(entity);
     }
+
+    @Transactional
+    public void logout(long userId){
+        List<TokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByUserId(userId);
+        if(tokenEntities.isEmpty()){
+            throw new BadRequestException(ErrorCode.NOT_LOGIN);
+        }
+        tokenEntities.get(0).setStatus(CommonStatus.DISABLED);
+        tokenAccessRepository.save(tokenEntities.get(0));
+    }
 }

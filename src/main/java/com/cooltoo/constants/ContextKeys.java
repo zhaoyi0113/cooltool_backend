@@ -5,5 +5,5 @@ package com.cooltoo.constants;
  */
 public class ContextKeys {
 
-    public static final String NURSE_LOGIN = "nurse_login_user_name";
+    public static final String NURSE_LOGIN_USER_ID = "nurse_login_user_name";
 }
