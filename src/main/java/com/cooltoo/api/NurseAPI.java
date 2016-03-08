@@ -23,7 +23,7 @@ public class NurseAPI {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAll() {
+    public Response getAllNurses() {
         List<NurseBean> all = service.getAll();
         return Response.ok(all).build();
     }
@@ -31,7 +31,7 @@ public class NurseAPI {
     @POST
     @Path("/new")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newOne(
+    public Response newNurse(
             @FormParam("name") String name,
             @FormParam("age") int age,
             @FormParam("gender") int gender,
@@ -46,10 +46,10 @@ public class NurseAPI {
         return Response.ok(id).build();
     }
 
-    @POST
+    @GET
     @Path("/get")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOne(@DefaultValue("-1") @FormParam("id") long id) {
+    public Response getNurse(@DefaultValue("-1") @FormParam("id") long id) {
         NurseBean one = service.getNurse(id);
         logger.info("get nurse is " + one);
         if (null==one) {
@@ -61,7 +61,7 @@ public class NurseAPI {
     @POST
     @Path("/delete")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteOne(@DefaultValue("-1")@FormParam("id") long id) {
+    public Response deleteNurse(@DefaultValue("-1")@FormParam("id") long id) {
         NurseBean one = service.deleteNurse(id);
         logger.info("delete nurse is " + one);
         if (null==one) {
@@ -73,7 +73,7 @@ public class NurseAPI {
     @POST
     @Path("/update")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateOne(
+    public Response updateNurse(
             @DefaultValue("-1") @FormParam("id") long id,
             @FormParam("name") String name,
             @FormParam("age") int age,
