@@ -19,6 +19,9 @@ public class NurseEntityConverter implements Converter<NurseBean, NurseEntity> {
         entity.setGender(bean.getGender());
         entity.setAge(bean.getAge());
         entity.setMobile(bean.getMobile());
+        entity.setPassword(bean.getPassword());
+        entity.setProfilePhotoId(bean.getProfilePhotoId());
+        entity.setBackgroundImageId(bean.getBackgroundImageId());
         return entity;
     }
 }

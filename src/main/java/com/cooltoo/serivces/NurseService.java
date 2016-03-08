@@ -6,6 +6,9 @@ import com.cooltoo.converter.NurseEntityConverter;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.repository.HospitalDepartmentRepository;
+import com.cooltoo.repository.HospitalRepository;
+import com.cooltoo.repository.MessageRepository;
 import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.util.NumberUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,12 @@ public class NurseService {
 
     @Autowired
     NurseRepository repository;
+    @Autowired
+    HospitalRepository hospitalRepository;
+    @Autowired
+    HospitalDepartmentRepository departmentRepository;
+    @Autowired
+    MessageRepository messageRepository;
     @Autowired
     NurseBeanConverter beanConverter;
     @Autowired

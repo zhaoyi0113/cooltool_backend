@@ -22,6 +22,12 @@ public class NurseEntity {
 
     private int age;
 
+    private String password;
+
+    private long profilePhotoId;
+
+    private long backgroundImageId;
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -78,6 +84,17 @@ public class NurseEntity {
         this.age = age;
     }
 
+    @Column(name = "pwd")
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    @Column(name = "profile_photo_id")
+    public long getProfilePhotoId() { return profilePhotoId; }
+    public void setProfilePhotoId(long profilePhotoId) { this.profilePhotoId = profilePhotoId; }
+    @Column(name = "background_image_id")
+    public long getBackgroundImageId() { return backgroundImageId; }
+    public void setBackgroundImageId(long backgroundImageId) {this.backgroundImageId = backgroundImageId;}
+
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -86,7 +103,10 @@ public class NurseEntity {
         msg.append("name=").append(name).append(" ,");
         msg.append("gender=").append(gender).append(" ,");
         msg.append("mobile=").append(mobile).append(" ,");
-        msg.append("age=").append(age);
+        msg.append("age=").append(age).append(" , ");
+        msg.append("password=").append(password).append(" , ");
+        msg.append("profilePhotoId=").append(profilePhotoId).append(" , ");
+        msg.append("backgroundImageId=").append(backgroundImageId);
         msg.append(" ]");
         return msg.toString();
     }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <nurse id="1" identificate_id="32143214321432141" name="name1" age="11" gender="1" mobile="1231432143" />
-    <nurse id="2" identificate_id="43214314312432143" name="name2" age="22" gender="2" mobile="14321134" />
-    <nurse id="3" identificate_id="43214314314343214" name="name3" age="33" gender="3" mobile="135232121222" />
-    <nurse id="4" identificate_id="65476576587687665" name="name4" age="44" gender="2" mobile="13811663451" />
-    <nurse id="5" identificate_id="99879587658765898" name="name5" age="55" gender="1" mobile="18527727387" />
-    <nurse id="6" identificate_id="12354465643456543" name="name6" age="66" gender="3" mobile="16811663451" />
-    <nurse id="7" identificate_id="54325675752314665" name="name7" age="77" gender="2" mobile="214321321432" />
-    <nurse id="8" identificate_id="32143254654643244" name="name8" age="88" gender="1" mobile="4321431431" />
+    <nurse id="1" identificate_id="32143214321432141" name="name1" age="11" gender="1" mobile="1231432143" pwd="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="2" identificate_id="43214314312432143" name="name2" age="22" gender="2" mobile="14321134" pwd="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="3" identificate_id="43214314314343214" name="name3" age="33" gender="3" mobile="135232121222" pwd="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="4" identificate_id="65476576587687665" name="name4" age="44" gender="2" mobile="13811663451" pwd="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="5" identificate_id="99879587658765898" name="name5" age="55" gender="1" mobile="18527727387" pwd="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="6" identificate_id="12354465643456543" name="name6" age="66" gender="3" mobile="16811663451" pwd="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="7" identificate_id="54325675752314665" name="name7" age="77" gender="2" mobile="214321321432" pwd="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="8" identificate_id="32143254654643244" name="name8" age="88" gender="1" mobile="4321431431" pwd="aa" profile_photo_id="1" background_image_id="1" />
 </dataset>

@@ -1,0 +1,12 @@
+CREATE TABLE `msg` (
+  `id` BIGINT(64) NOT NULL AUTO_INCREMENT,
+  `nurse_id` BIGINT(11) NOT NULL,
+  `msg_date` BIGINT(64) NOT NULL,
+  `msg_content` VARCHAR(1000) NULL,
+  PRIMARY KEY (`id`)
+)
+DEFAULT CHARACTER SET = utf8;
+ALTER TABLE `nurse` ADD COLUMN `pwd` VARCHAR(128) NULL;
+ALTER TABLE `nurse` ADD COLUMN `profile_photo_id` BIGINT(64) NULL;
+ALTER TABLE `nurse` ADD COLUMN `background_image_id` BIGINT(64) NULL;
+

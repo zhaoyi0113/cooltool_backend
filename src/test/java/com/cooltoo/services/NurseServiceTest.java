@@ -20,6 +20,7 @@ public class NurseServiceTest extends AbstractCooltooTest{
     private NurseService service;
 
     @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testNew() {
         NurseBean bean = new NurseBean();
         bean.setIdentificationId("432154654643123");
