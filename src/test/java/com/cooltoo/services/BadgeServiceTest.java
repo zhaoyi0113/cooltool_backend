@@ -23,7 +23,7 @@ public class BadgeServiceTest extends AbstractCooltooTest{
     public void testCreateBadge(){
         BadgeBean badgeBean = new BadgeBean();
         badgeBean.setPoint(100);
-        badgeBean.setName("aaa");
+        badgeBean.setName("index.html");
         int id = badgeService.createNewBadge(badgeBean);
         List<BadgeBean> allBadge = badgeService.getAllBadge();
         Assert.assertTrue(allBadge.size()>0);

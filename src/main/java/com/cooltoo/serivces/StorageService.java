@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -63,6 +60,19 @@ public class StorageService {
             return entity.getFilePath();
         }
         return "";
+    }
+
+    public InputStream getFileInputStream(long id){
+        if (storageRepository.exists(id)){
+            FileStorageEntity entity = storageRepository.findOne(id);
+            try {
+                logger.info("get resource from path "+entity.getFilePath());
+                return new FileInputStream(entity.getFilePath());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     private long saveToDB(String fileName, String path) {

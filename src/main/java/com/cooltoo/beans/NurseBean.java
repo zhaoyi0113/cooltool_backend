@@ -26,8 +26,8 @@ public class NurseBean {
     private int age;
 
     private String password;
-    private long profilePhotoId;
-    private long backgroundImageId;
+    private String profilePhotoUrl;
+    private String backgroundImageUrl;
 
 
     public long getId() { return this.id; }
@@ -44,12 +44,22 @@ public class NurseBean {
     public void setAge(int age) { this.age = age; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-    public long getProfilePhotoId() { return profilePhotoId; }
-    public void setProfilePhotoId(long profilePhotoId) { this.profilePhotoId = profilePhotoId; }
-    public long getBackgroundImageId() { return backgroundImageId; }
-    public void setBackgroundImageId(long backgroundImageId) {this.backgroundImageId = backgroundImageId;}
 
+    public String getProfilePhotoUrl() {
+        return profilePhotoUrl;
+    }
 
+    public void setProfilePhotoUrl(String profilePhotoUrl) {
+        this.profilePhotoUrl = profilePhotoUrl;
+    }
+
+    public String getBackgroundImageUrl() {
+        return backgroundImageUrl;
+    }
+
+    public void setBackgroundImageUrl(String backgroundImageUrl) {
+        this.backgroundImageUrl = backgroundImageUrl;
+    }
 
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -60,8 +70,8 @@ public class NurseBean {
         msg.append("gender=").append(gender).append(" , ");
         msg.append("age=").append(age).append(" , ");
         msg.append("password=").append(password).append(" , ");
-        msg.append("profilePhotoId=").append(profilePhotoId).append(" , ");
-        msg.append("backgroundImageId=").append(backgroundImageId);
+        msg.append("profilePhotoUrl=").append(profilePhotoUrl).append(" , ");
+        msg.append("backgroundImageUrl=").append(backgroundImageUrl);
         msg.append("]");
         return msg.toString();
     }

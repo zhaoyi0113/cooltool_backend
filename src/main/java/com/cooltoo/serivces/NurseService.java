@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,8 @@ public class NurseService {
     NurseBeanConverter beanConverter;
     @Autowired
     NurseEntityConverter entityConverter;
+    @Autowired
+    StorageService storageService;
 
     @Transactional
     public long newNurse(String identificationId, String name, int age, int gender, String mobile) {
@@ -64,7 +67,7 @@ public class NurseService {
     public NurseBean getNurse(long id) {
         NurseEntity entity = repository.findOne(id);
         if (null == entity) {
-            return null;
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
         return beanConverter.convert(entity);
     }
@@ -126,5 +129,27 @@ public class NurseService {
             entity = repository.save(entity);
         }
         return beanConverter.convert(entity);
+    }
+
+    @Transactional
+    public void addHeadPhoto(long id, String fileName, InputStream inputStream){
+        NurseEntity nurse = repository.findOne(id);
+        long fileId = saveImageFile(id, fileName, inputStream);
+        nurse.setProfilePhotoId(fileId);
+    }
+
+    @Transactional
+    public void addBackgroundImage(long id, String fileName, InputStream inputStream){
+        NurseEntity nurse = repository.findOne(id);
+        long fileId = saveImageFile(id, fileName, inputStream);
+        nurse.setBackgroundImageId(fileId);
+    }
+
+    private long saveImageFile(long id, String fileName, InputStream inputStream){
+        NurseEntity nurse = repository.findOne(id);
+        if(nurse == null){
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
+        }
+        return storageService.saveFile(fileName, inputStream);
     }
 }
