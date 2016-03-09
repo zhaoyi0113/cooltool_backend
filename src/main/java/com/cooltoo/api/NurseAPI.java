@@ -71,9 +71,9 @@ public class NurseAPI {
 
 
     @GET
-    @Path("/get")
+    @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getNurse(@DefaultValue("-1") @QueryParam("id") long id) {
+    public Response getNurse(@DefaultValue("-1") @PathParam("id") long id) {
         NurseBean one = service.getNurse(id);
         logger.info("get nurse is " + one);
         return Response.ok(one).build();

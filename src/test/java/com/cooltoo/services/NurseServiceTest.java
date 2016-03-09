@@ -1,6 +1,11 @@
 package com.cooltoo.services;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.entities.FileStorageEntity;
+import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.repository.FileStorageRepository;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.serivces.NurseService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
@@ -8,6 +13,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -18,6 +27,12 @@ public class NurseServiceTest extends AbstractCooltooTest{
 
     @Autowired
     private NurseService service;
+
+    @Autowired
+    private FileStorageRepository fileStorageRepository;
+
+    @Autowired
+    private NurseRepository nurseRepository;
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
@@ -47,8 +62,13 @@ public class NurseServiceTest extends AbstractCooltooTest{
         NurseBean bean = service.deleteNurse(5);
         Assert.assertNotNull(bean);
         Assert.assertEquals(5, bean.getId());
-        bean = service.getNurse(5);
-        Assert.assertNull(bean);
+        BadRequestException ex = null;
+        try {
+            bean = service.getNurse(5);
+        }catch(BadRequestException e){
+            ex = e;
+        }
+        Assert.assertNotNull(ex);
     }
 
     @Test
@@ -61,5 +81,41 @@ public class NurseServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(22,  bean.getAge());
         Assert.assertEquals(2, bean.getGender());
         Assert.assertNotEquals("4321654312", bean.getMobile());
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
+    public void testAddPhoto(){
+        String filePath = "build/"+System.currentTimeMillis();
+        try {
+            File file = new File(filePath);
+            file.createNewFile();
+            InputStream input = new FileInputStream(filePath);
+            service.addHeadPhoto(1, file.getName(), input);
+            NurseEntity nurse = nurseRepository.findOne(1l);
+            FileStorageEntity fileStorage = fileStorageRepository.findOne(nurse.getProfilePhotoId());
+            Assert.assertNotNull(fileStorage);
+            Assert.assertEquals(file.getName(), fileStorage.getFileRealname());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
+    public void testAddBackgroundImage(){
+        String filePath = "build/"+System.currentTimeMillis();
+        try {
+            File file = new File(filePath);
+            file.createNewFile();
+            InputStream input = new FileInputStream(filePath);
+            service.addBackgroundImage(1, file.getName(), input);
+            NurseEntity nurse = nurseRepository.findOne(1l);
+            FileStorageEntity fileStorage = fileStorageRepository.findOne(nurse.getBackgroundImageId());
+            Assert.assertNotNull(fileStorage);
+            Assert.assertEquals(file.getName(), fileStorage.getFileRealname());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
