@@ -82,20 +82,13 @@ public class HospitalDepartmentService {
     }
 
     @Transactional
-    public Integer newOne(HospitalDepartmentBean bean) {
-        String value = bean.getName();
-        if (null==value || "".equals(value)) {
+    public Integer createHospitalDepartment(String name) {
+        if (null==name || "".equals(name)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        HospitalDepartmentEntity entity = entityConverter.convert(bean);
+        HospitalDepartmentEntity entity = new HospitalDepartmentEntity();
+        entity.setName(name);
         entity = repository.save(entity);
         return entity.getId();
-    }
-
-    @Transactional
-    public Integer newOne(String name) {
-        HospitalDepartmentBean bean = new HospitalDepartmentBean();
-        bean.setName(name);
-        return newOne(bean);
     }
 }

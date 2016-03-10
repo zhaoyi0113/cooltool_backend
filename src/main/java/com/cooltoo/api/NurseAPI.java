@@ -1,6 +1,7 @@
 package com.cooltoo.api;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.filter.LoginAuthentication;
 import com.cooltoo.serivces.NurseService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -17,6 +18,7 @@ import java.util.logging.Logger;
  * Created by lg380357 on 2016/3/2.
  */
 @Path("/nurse")
+//@LoginAuthentication(requireNurseLogin = true)
 public class NurseAPI {
 
     private static final Logger logger = Logger.getLogger(NurseAPI.class.getName());
@@ -39,9 +41,10 @@ public class NurseAPI {
             @FormParam("age") int age,
             @FormParam("gender") int gender,
             @DefaultValue("") @FormParam("mobile") String mobile,
-            @DefaultValue("") @FormParam("identificateId") String identificateId
+            @DefaultValue("") @FormParam("identificateId") String identificateId,
+            @FormParam("password") String password
     ) {
-        long id = service.newNurse(identificateId, name, age, gender, mobile);
+        long id = service.newNurse(identificateId, name, age, gender, mobile, password);
         return Response.ok(id).build();
     }
 
@@ -69,7 +72,6 @@ public class NurseAPI {
         return Response.ok().build();
     }
 
-
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -79,7 +81,7 @@ public class NurseAPI {
         return Response.ok(one).build();
     }
 
-    @POST
+    @DELETE
     @Path("/delete")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteNurse(@DefaultValue("-1") @FormParam("id") long id) {

@@ -8,32 +8,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
  * Created by yzzhao on 3/2/16.
  */
-@Path("/nurse/login")
+@Path("/nurse")
 public class NurseLoginAPI {
 
     @Autowired
     private NurseLoginService loginService;
 
     @POST
+    @Path("login")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response login(@Context HttpServletRequest request,
                           @FormParam("mobile") String mobile,
                           @FormParam("password") String password) {
         TokenAccessEntity token = loginService.login(mobile, password);
         HttpSession session = request.getSession();
         session.setAttribute(ContextKeys.NURSE_LOGIN_USER_ID, token.getUserId());
-        return Response.ok().build();
+        return Response.ok(token.getToken()).build();
     }
 
     @POST
+    @Path("logout")
     @LoginAuthentication
     public Response logout(@Context HttpServletRequest request){
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);

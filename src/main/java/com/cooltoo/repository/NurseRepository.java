@@ -10,5 +10,5 @@ import java.util.List;
  */
 public interface NurseRepository extends CrudRepository<NurseEntity, Long> {
 
-    public List<NurseEntity> findNurseByMobile(String mobile);
+    List<NurseEntity> findNurseByMobile(String mobile);
 }

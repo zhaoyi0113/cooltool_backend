@@ -16,12 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by yzzhao on 3/2/16.
  */
 @Service("NurseLoginService")
 public class NurseLoginService {
+    private static final Logger logger = Logger.getLogger(NurseLoginService.class.getName());
 
     @Autowired
     private TokenAccessRepository tokenAccessRepository;
@@ -37,13 +39,15 @@ public class NurseLoginService {
 
     @Transactional
     public TokenAccessEntity login(String mobile, String password){
+        logger.info("login "+ mobile);
         List<NurseEntity> nurses = nurseRepository.findNurseByMobile(mobile);
         if(nurses == null || nurses.isEmpty()){
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
-        //TODO: verity user password
-
         NurseEntity nurseEntity = nurses.get(0);
+        if(nurseEntity.getPassword()!=null && !nurseEntity.getPassword().equals(password)){
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+        }
         TokenAccessEntity entity = new TokenAccessEntity();
         entity.setUserId(nurseEntity.getId());
         entity.setType(UserType.NURSE);

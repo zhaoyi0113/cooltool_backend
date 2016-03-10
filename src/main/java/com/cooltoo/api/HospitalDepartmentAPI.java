@@ -72,7 +72,7 @@ public class HospitalDepartmentAPI {
     public Response newOne(
             @FormParam("name") String name
     ) {
-        int id = service.newOne(name);
+        int id = service.createHospitalDepartment(name);
         logger.info("new hospital department id is " + id);
         return Response.ok(id).build();
     }

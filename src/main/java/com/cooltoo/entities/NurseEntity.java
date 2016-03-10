@@ -84,7 +84,7 @@ public class NurseEntity {
         this.age = age;
     }
 
-    @Column(name = "pwd")
+    @Column(name = "password")
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     @Column(name = "profile_photo_id")

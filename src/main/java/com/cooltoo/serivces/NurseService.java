@@ -41,13 +41,15 @@ public class NurseService {
     StorageService storageService;
 
     @Transactional
-    public long newNurse(String identificationId, String name, int age, int gender, String mobile) {
+    public long newNurse(String identificationId, String name, int age,
+                         int gender, String mobile, String password) {
         NurseBean bean = new NurseBean();
         bean.setIdentificationId(identificationId);
         bean.setName(name);
         bean.setAge(age);
         bean.setGender(gender);
         bean.setMobile(mobile);
+        bean.setPassword(password);
         return newNurse(bean);
     }
 

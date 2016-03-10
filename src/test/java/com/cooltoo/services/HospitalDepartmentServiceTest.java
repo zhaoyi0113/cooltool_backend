@@ -21,19 +21,10 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testNew1() {
-        HospitalDepartmentBean bean = new  HospitalDepartmentBean();
-        bean.setName("name111");
-        int id = service.newOne(bean);
+        int id = service.createHospitalDepartment("name111");
         Assert.assertTrue(id>0);
         List<HospitalDepartmentBean> all = service.getAll();
         Assert.assertTrue(all.size()>0);
-    }
-
-    @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_department_data.xml")
-    public void testNew2() {
-        int id = service.newOne("name111");
-        Assert.assertTrue(id > 0);
     }
 
     @Test
