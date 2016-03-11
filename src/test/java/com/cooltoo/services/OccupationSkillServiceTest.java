@@ -75,7 +75,6 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
         }
     }
 
-
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml")
     public void testEditOccupationWithoutImage() {
@@ -95,6 +94,5 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
         skillService.deleteOccupationSkill(1000);
         int newNumber = skillService.getOccupationSkillList().size();
         Assert.assertEquals(number - 1, newNumber);
-
     }
 }

@@ -39,13 +39,11 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         LoginAuthentication login = resourceInfo.getResourceClass().getAnnotation(LoginAuthentication.class);
-        logger.info("login auth " + login);
         if (login == null) {
             login = resourceInfo.getResourceMethod().getAnnotation(LoginAuthentication.class);
             if(login == null){
                 return;
             }
-            return;
         }
         if (login.requireNurseLogin()) {
 

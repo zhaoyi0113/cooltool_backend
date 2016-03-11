@@ -1,13 +1,16 @@
 package com.cooltoo.api;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.filter.LoginAuthentication;
 import com.cooltoo.serivces.NurseService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
@@ -77,6 +80,17 @@ public class NurseAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getNurse(@DefaultValue("-1") @PathParam("id") long id) {
         NurseBean one = service.getNurse(id);
+        logger.info("get nurse is " + one);
+        return Response.ok(one).build();
+    }
+
+    @GET
+    @Path("/information")
+    @LoginAuthentication(requireNurseLogin = true)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getNurseInformation(@Context HttpServletRequest request){
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean one = service.getNurse(userId);
         logger.info("get nurse is " + one);
         return Response.ok(one).build();
     }

@@ -42,4 +42,8 @@ public class BadRequestException extends RuntimeException{
         return errorMessages;
     }
 
+    @Override
+    public String getMessage() {
+        return this.errorCode.getEnMsg();
+    }
 }
