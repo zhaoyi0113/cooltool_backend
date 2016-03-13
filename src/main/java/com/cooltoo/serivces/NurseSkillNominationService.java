@@ -1,13 +1,11 @@
 package com.cooltoo.serivces;
 
 import com.cooltoo.entities.NurseSkillNominationEntity;
-import com.cooltoo.entities.NurseSkillRelationEntity;
 import com.cooltoo.entities.OccupationSkillEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.repository.NurseSkillNominationRepository;
-import com.cooltoo.repository.NurseSkillRelationRepository;
 import com.cooltoo.repository.OccupationSkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +33,7 @@ public class NurseSkillNominationService {
 
     public Map<String, Long> getSkillNominationCount(long userId){
         validateNurse(userId);
-        List<OccupationSkillEntity> skills = skillRepository.findSkillEntityByUserId(userId);
+        Iterable<OccupationSkillEntity> skills = skillRepository.findAll();
         Map<String, Long> skillCount = new HashMap<String, Long>();
         for(OccupationSkillEntity entity : skills){
             long count = nominationRepository.countByUserIdAndSkillId(userId, entity.getId());

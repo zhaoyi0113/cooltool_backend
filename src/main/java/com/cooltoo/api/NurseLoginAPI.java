@@ -15,12 +15,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.logging.Logger;
 
 /**
  * Created by yzzhao on 3/2/16.
  */
 @Path("/nurse")
 public class NurseLoginAPI {
+
+    private static final Logger logger = Logger.getLogger(NurseLoginAPI.class.getName());
 
     @Autowired
     private NurseLoginService loginService;
@@ -32,6 +35,7 @@ public class NurseLoginAPI {
                           @FormParam("mobile") String mobile,
                           @FormParam("password") String password) {
         TokenAccessEntity token = loginService.login(mobile, password);
+        logger.info("token:" + token.getToken());
         HttpSession session = request.getSession();
         session.setAttribute(ContextKeys.NURSE_LOGIN_USER_ID, token.getUserId());
         return Response.ok(token.getToken()).build();
@@ -40,8 +44,8 @@ public class NurseLoginAPI {
     @POST
     @Path("logout")
     @LoginAuthentication
-    public Response logout(@Context HttpServletRequest request){
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+    public Response logout(@Context HttpServletRequest request) {
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         loginService.logout(userId);
         return Response.ok().build();
     }

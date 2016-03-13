@@ -117,6 +117,22 @@ public class NurseBean {
         this.properties.put(key, value);
     }
 
+    public static String getSkillNomination() {
+        return SKILL_NOMINATION;
+    }
+
+    public static String getFriendsCount() {
+        return FRIENDS_COUNT;
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");

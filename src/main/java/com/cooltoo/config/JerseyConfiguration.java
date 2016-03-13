@@ -1,6 +1,7 @@
 package com.cooltoo.config;
 
 import com.cooltoo.api.*;
+import com.cooltoo.filter.BadRequestExceptionMapper;
 import com.cooltoo.filter.NurseLoginAuthenticationFilter;
 import io.swagger.jaxrs.config.BeanConfig;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -29,6 +30,8 @@ public class JerseyConfiguration extends ResourceConfig {
         register(NurseLoginAPI.class);
         register(OccupationSkillAPI.class);
         register(NurseFriendsAPI.class);
+        register(NurseSkillAPI.class);
+        register(BadRequestExceptionMapper.class);
 
         configureSwagger();
     }

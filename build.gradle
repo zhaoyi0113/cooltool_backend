@@ -61,6 +61,7 @@ dependencies {
     compile('io.springfox:springfox-petstore:'+springfoxSwaggerVersion)
     compile('io.springfox:springfox-swagger-ui:'+springfoxSwaggerVersion)
     compile('io.swagger:swagger-jersey2-jaxrs:1.5.8')
+    compile('com.google.code.gson:gson:2.6.2')
 
     testCompile("junit:junit")
     testCompile("org.springframework:spring-test")

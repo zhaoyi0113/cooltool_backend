@@ -92,6 +92,7 @@ public class NurseAPI {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean one = service.getNurse(userId);
         logger.info("get nurse is " + one);
+        
         return Response.ok(one).build();
     }
 

@@ -1,6 +1,7 @@
 package com.cooltoo.api;
 
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.filter.LoginAuthentication;
 import com.cooltoo.serivces.NurseSkillNominationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,9 +22,13 @@ public class NurseSkillAPI {
     private NurseSkillNominationService nominationService;
 
     @POST
+    @Path("/nominate")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response nominateSkill(@Context HttpServletRequest request, @FormParam("friend_id") long friendId, @FormParam("skill_id") int skillId) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         nominationService.nominateNurseSkill(userId, skillId, friendId);
         return Response.ok().build();
     }
+
+
 }
