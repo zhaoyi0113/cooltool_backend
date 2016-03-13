@@ -1,13 +1,19 @@
 package com.cooltoo.serivces;
 
+import com.cooltoo.entities.NurseSkillNominationEntity;
 import com.cooltoo.entities.NurseSkillRelationEntity;
 import com.cooltoo.entities.OccupationSkillEntity;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.repository.NurseSkillNominationRepository;
 import com.cooltoo.repository.NurseSkillRelationRepository;
 import com.cooltoo.repository.OccupationSkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +28,13 @@ public class NurseSkillNominationService {
     private NurseSkillNominationRepository nominationRepository;
 
     @Autowired
-    private NurseSkillRelationRepository relationRepository;
-
-    @Autowired
     private OccupationSkillRepository skillRepository;
 
+    @Autowired
+    private NurseRepository nurseRepository;
+
     public Map<String, Long> getSkillNominationCount(long userId){
+        validateNurse(userId);
         List<OccupationSkillEntity> skills = skillRepository.findSkillEntityByUserId(userId);
         Map<String, Long> skillCount = new HashMap<String, Long>();
         for(OccupationSkillEntity entity : skills){
@@ -39,5 +46,39 @@ public class NurseSkillNominationService {
             }
         }
         return skillCount;
+    }
+
+    @Transactional
+    public void nominateNurseSkill(long userId, int skillId, long friendId){
+        validateNurse(userId);
+        validateNurse(friendId);
+        validateSkill(skillId);
+        List<NurseSkillNominationEntity> existed = nominationRepository.findByUserIdAndSkillIdAndNominatedId(userId, skillId, friendId);
+        if(!existed.isEmpty()){
+            nominationRepository.delete(existed.get(0));
+        }else {
+            addNomination(userId, skillId, friendId);
+        }
+    }
+
+    private void addNomination(long userId, int skillId, long friendId) {
+        NurseSkillNominationEntity entity = new NurseSkillNominationEntity();
+        entity.setDateTime(Calendar.getInstance().getTime());
+        entity.setNominatedId(friendId);
+        entity.setUserId(userId);
+        entity.setSkillId(skillId);
+        nominationRepository.save(entity);
+    }
+
+    private void validateNurse(long userId){
+        if(!nurseRepository.exists(userId)){
+            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+        }
+    }
+
+    private void validateSkill(int skillId){
+        if(!skillRepository.exists(skillId)){
+            throw new BadRequestException(ErrorCode.SKILL_NOT_EXIST);
+        }
     }
 }
