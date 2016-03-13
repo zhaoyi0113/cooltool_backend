@@ -1,5 +1,6 @@
 package com.cooltoo.services;
 
+import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.PatientBadgeBean;
 import com.cooltoo.serivces.PatientBadgeService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;

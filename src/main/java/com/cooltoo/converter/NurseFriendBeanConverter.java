@@ -16,6 +16,7 @@ public class NurseFriendBeanConverter implements Converter<NurseFriendsEntity,Nu
         bean.setFriendId(source.getFriendId());
         bean.setUserId(source.getUserId());
         bean.setId(source.getId());
+        bean.setDateTime(source.getDateTime());
         return bean;
     }
 }

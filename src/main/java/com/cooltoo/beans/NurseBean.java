@@ -1,11 +1,17 @@
 package com.cooltoo.beans;
 
 import javax.ws.rs.FormParam;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by lg380357 on 2016/3/2.
  */
 public class NurseBean {
+
+    public static final String SKILL_NOMINATION = "skill_nomination";
+
+    public static final String FRIENDS_COUNT = "friend_count";
 
     @FormParam("id")
     private long id;
@@ -28,22 +34,64 @@ public class NurseBean {
     private String password;
     private String profilePhotoUrl;
     private String backgroundImageUrl;
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
 
-    public long getId() { return this.id; }
-    public void setId(long id) { this.id = id; }
-    public String getIdentificationId() { return identificationId; }
-    public void setIdentificationId(String identificationId) { this.identificationId = identificationId; }
-    public int getGender() { return gender; }
-    public void setGender(int gender) { this.gender = gender; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getMobile() { return mobile; }
-    public void setMobile(String mobile) { this.mobile = mobile; }
-    public int getAge() { return age; }
-    public void setAge(int age) { this.age = age; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public long getId() {
+        return this.id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getIdentificationId() {
+        return identificationId;
+    }
+
+    public void setIdentificationId(String identificationId) {
+        this.identificationId = identificationId;
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public String getProfilePhotoUrl() {
         return profilePhotoUrl;
@@ -59,6 +107,14 @@ public class NurseBean {
 
     public void setBackgroundImageUrl(String backgroundImageUrl) {
         this.backgroundImageUrl = backgroundImageUrl;
+    }
+
+    public Object getProperty(String key){
+        return this.properties.get(key);
+    }
+
+    public void setProperty(String key, Object value){
+        this.properties.put(key, value);
     }
 
     public String toString() {

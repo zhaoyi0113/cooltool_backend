@@ -1,5 +1,7 @@
 package com.cooltoo.beans;
 
+import java.util.Date;
+
 /**
  * Created by yzzhao on 3/10/16.
  */
@@ -7,6 +9,7 @@ public class NurseFriendsBean {
     private long id;
     private long userId;
     private long friendId;
+    private Date dateTime;
 
     public long getId() {
         return id;
@@ -30,5 +33,13 @@ public class NurseFriendsBean {
 
     public void setFriendId(long friendId) {
         this.friendId = friendId;
+    }
+
+    public Date getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(Date dateTime) {
+        this.dateTime = dateTime;
     }
 }

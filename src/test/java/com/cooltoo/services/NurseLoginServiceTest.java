@@ -1,6 +1,6 @@
 package com.cooltoo.services;
 
-import com.cooltoo.beans.NurseBean;
+import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.entities.TokenAccessEntity;
 import com.cooltoo.repository.TokenAccessRepository;
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by yzzhao on 3/4/16.
  */
-public class NurseLoginServiceTest extends AbstractCooltooTest{
+public class NurseLoginServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private NurseLoginService loginService;

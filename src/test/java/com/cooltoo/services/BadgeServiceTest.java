@@ -1,5 +1,6 @@
 package com.cooltoo.services;
 
+import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.serivces.BadgeService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -14,7 +15,7 @@ import java.util.List;
  * Created by yzzhao on 2/24/16.
  */
 @Transactional
-public class BadgeServiceTest extends AbstractCooltooTest{
+public class BadgeServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private BadgeService badgeService;

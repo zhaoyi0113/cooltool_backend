@@ -1,5 +1,6 @@
 package com.cooltoo.services;
 
+import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.OccupationSkillBean;
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.entities.OccupationSkillEntity;

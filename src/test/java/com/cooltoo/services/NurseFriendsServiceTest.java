@@ -1,5 +1,6 @@
 package com.cooltoo.services;
 
+import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.NurseFriendsBean;
 import com.cooltoo.serivces.NurseFriendsService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * Created by yzzhao on 3/10/16.
  */
-public class NurseFriendsServiceTest extends AbstractCooltooTest{
+public class NurseFriendsServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private NurseFriendsService friendsService;
@@ -42,16 +43,14 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest{
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_data.xml")
-    public void testSearch(){
-        List<NurseFriendsBean> friends = friendsService.searchFriends(1, "name");
-        Assert.assertEquals(2, friends.size());
-        friends = friendsService.searchFriends(1, "e");
-        Assert.assertEquals(2, friends.size());
-        friendsService.addFriend(1, 4);
-        friends = friendsService.searchFriends(1, "name");
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_page_data.xml")
+    public void testGetFriends(){
+        List<NurseFriendsBean> friends = friendsService.getFriends(1, 0, 3);
         Assert.assertEquals(3, friends.size());
-//        friends = friendsService.searchFriends(1, "name3");
-//        Assert.assertEquals(2, friends.size());
+        Assert.assertEquals(2, friends.get(0).getFriendId());
+
+        friends = friendsService.getFriends(1, 1, 5);
+        Assert.assertEquals(5, friends.size());
+        Assert.assertEquals(7, friends.get(0).getFriendId());
     }
 }

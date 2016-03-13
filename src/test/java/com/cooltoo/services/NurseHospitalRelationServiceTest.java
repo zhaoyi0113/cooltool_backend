@@ -1,5 +1,6 @@
 package com.cooltoo.services;
 
+import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.serivces.NurseHospitalRelationService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;

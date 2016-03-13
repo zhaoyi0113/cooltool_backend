@@ -1,5 +1,6 @@
 package com.cooltoo.services;
 
+import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.util.NumberUtil;
 import org.junit.Assert;
 import org.junit.Test;

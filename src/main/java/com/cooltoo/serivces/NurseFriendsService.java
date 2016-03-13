@@ -8,6 +8,9 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.NurseFriendsRepository;
 import com.cooltoo.repository.NurseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +72,16 @@ public class NurseFriendsService {
     public List<NurseFriendsBean> searchFriends(long userId, String name){
         List<NurseFriendsEntity> entities = friendsRepository.searchFriends(userId, name);
         return convertToNurseFriendsBeans(entities);
+    }
+
+    public List<NurseFriendsBean> getFriends(long userId, int pageIdx, int number){
+        PageRequest request = new PageRequest(pageIdx, number, Sort.Direction.DESC, "dateTime");
+        Page<NurseFriendsEntity> entities = friendsRepository.findNurseFriendByUserId(userId, request);
+        List<NurseFriendsBean> friends = new ArrayList<NurseFriendsBean>();
+        for(NurseFriendsEntity entity: entities){
+            friends.add(beanConverter.convert(entity));
+        }
+        return friends;
     }
 
     public int getFriendsCount(long userId){

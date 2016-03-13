@@ -4,23 +4,20 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Created by yzzhao on 3/10/16.
+ * Created by yzzhao on 3/13/16.
  */
 @Entity
-@Table(name = "nurse_friends")
-public class NurseFriendsEntity {
-
+@Table(name = "nurse_skill_nomination")
+public class NurseSkillNominationEntity {
     private long id;
-
     private long userId;
-
-    private long friendId;
-
+    private int skillId;
+    private long nominatedId;
     private Date dateTime;
 
     @Id
-    @Column(name = "id")
     @GeneratedValue
+    @Column(name = "id")
     public long getId() {
         return id;
     }
@@ -38,13 +35,22 @@ public class NurseFriendsEntity {
         this.userId = userId;
     }
 
-    @Column(name = "friend_id")
-    public long getFriendId() {
-        return friendId;
+    @Column(name = "skill_id")
+    public int getSkillId() {
+        return skillId;
     }
 
-    public void setFriendId(long friendId) {
-        this.friendId = friendId;
+    public void setSkillId(int skillId) {
+        this.skillId = skillId;
+    }
+
+    @Column(name = "nomiated_user_id")
+    public long getNominatedId() {
+        return nominatedId;
+    }
+
+    public void setNominatedId(long nominatedId) {
+        this.nominatedId = nominatedId;
     }
 
     @Column(name = "date_time")

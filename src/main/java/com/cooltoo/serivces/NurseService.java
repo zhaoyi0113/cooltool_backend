@@ -6,10 +6,7 @@ import com.cooltoo.converter.NurseEntityConverter;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.repository.HospitalDepartmentRepository;
-import com.cooltoo.repository.HospitalRepository;
-import com.cooltoo.repository.MessageRepository;
-import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.repository.*;
 import com.cooltoo.util.NumberUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lg380357 on 2016/3/2.
@@ -26,19 +24,23 @@ import java.util.List;
 public class NurseService {
 
     @Autowired
-    NurseRepository repository;
+    private NurseRepository repository;
     @Autowired
-    HospitalRepository hospitalRepository;
+    private HospitalRepository hospitalRepository;
     @Autowired
-    HospitalDepartmentRepository departmentRepository;
+    private HospitalDepartmentRepository departmentRepository;
     @Autowired
-    MessageRepository messageRepository;
+    private MessageRepository messageRepository;
     @Autowired
-    NurseBeanConverter beanConverter;
+    private NurseBeanConverter beanConverter;
     @Autowired
-    NurseEntityConverter entityConverter;
+    private NurseEntityConverter entityConverter;
     @Autowired
-    StorageService storageService;
+    private StorageService storageService;
+    @Autowired
+    private NurseSkillNominationService nominationService;
+    @Autowired
+    private NurseFriendsService friendsService;
 
     @Transactional
     public long newNurse(String identificationId, String name, int age,
@@ -71,7 +73,13 @@ public class NurseService {
         if (null == entity) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
-        return beanConverter.convert(entity);
+        Map<String, Long> skillCounts = nominationService.getSkillNominationCount(id);
+
+        NurseBean nurse = beanConverter.convert(entity);
+        nurse.setProperty(NurseBean.SKILL_NOMINATION, skillCounts);
+        int friendsCount = friendsService.getFriendsCount(id);
+        nurse.setProperty(NurseBean.FRIENDS_COUNT, friendsCount);
+        return nurse;
     }
 
     public List<NurseBean> getAll() {

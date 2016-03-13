@@ -1,5 +1,6 @@
 package com.cooltoo.services;
 
+import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.entities.NurseEntity;
@@ -23,7 +24,7 @@ import java.util.List;
  * Created by lg380357 on 2016/3/2.
  */
 @Transactional
-public class NurseServiceTest extends AbstractCooltooTest{
+public class NurseServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private NurseService service;
