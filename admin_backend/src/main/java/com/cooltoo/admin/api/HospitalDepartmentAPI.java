@@ -1,7 +1,7 @@
-package com.cooltoo.api;
+package com.cooltoo.admin.api;
 
-import com.cooltoo.beans.PatientBadgeBean;
-import com.cooltoo.serivces.PatientBadgeService;
+import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.serivces.HospitalDepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
@@ -11,20 +11,20 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Created by lg380357 on 2016/3/3.
+ * Created by lg380357 on 2016/3/5.
  */
-@Path("/patient_badge")
-public class PatientBadgeAPI {
+@Path("/hospital_department")
+public class HospitalDepartmentAPI {
 
-    private static final Logger logger = Logger.getLogger(PatientBadgeAPI.class.getName());
+    private static final Logger logger = Logger.getLogger(HospitalDepartmentAPI.class.getName());
 
     @Autowired
-    private PatientBadgeService service;
+    private HospitalDepartmentService service;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        List<PatientBadgeBean> all = service.getAll();
+        List<HospitalDepartmentBean> all = service.getAll();
         return Response.ok(all).build();
     }
 
@@ -32,8 +32,8 @@ public class PatientBadgeAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOneById(@DefaultValue("-1") @FormParam("id") int id) {
-        PatientBadgeBean bean = service.getOneById(id);
-        logger.info("get patient-badge is " + bean);
+        HospitalDepartmentBean bean = service.getOneById(id);
+        logger.info("get hospital department is " + bean);
         if (null == bean) {
             Response.ok().build();
         }
@@ -44,8 +44,8 @@ public class PatientBadgeAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteById(@DefaultValue("-1") @FormParam("id") int id) {
-        PatientBadgeBean one = service.deleteById(id);
-        logger.info("delete patient-badge is " + one);
+        HospitalDepartmentBean one = service.deleteById(id);
+        logger.info("delete hospital department is " + one);
         if (null==one) {
             return Response.ok().build();
         }
@@ -57,10 +57,9 @@ public class PatientBadgeAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response update(
             @DefaultValue("-1") @FormParam("id") int id,
-            @DefaultValue("-1") @FormParam("patientId") long patientId,
-            @DefaultValue("-1") @FormParam("badgeId") int badgeId) {
-        PatientBadgeBean one = service.update(id, patientId, badgeId);
-        logger.info("update patient-badge is " + one);
+            @FormParam("name") String name) {
+        HospitalDepartmentBean one = service.update(id, name);
+        logger.info("update hospital department is " + one);
         if (null==one) {
             return Response.ok().build();
         }
@@ -71,11 +70,10 @@ public class PatientBadgeAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response newOne(
-            @DefaultValue("-1") @FormParam("patientId") long patientId,
-            @DefaultValue("-1") @FormParam("badgeId") int badgeId
+            @FormParam("name") String name
     ) {
-        int id = service.newOne(patientId, badgeId);
-        logger.info("new patient-badge id is " + id);
+        int id = service.createHospitalDepartment(name);
+        logger.info("new hospital department id is " + id);
         return Response.ok(id).build();
     }
 }

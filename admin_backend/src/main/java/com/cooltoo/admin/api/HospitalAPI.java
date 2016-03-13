@@ -1,4 +1,4 @@
-package com.cooltoo.api;
+package com.cooltoo.admin.api;
 
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.serivces.HospitalService;

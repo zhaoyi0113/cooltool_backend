@@ -1,4 +1,4 @@
-package com.cooltoo.api;
+package com.cooltoo.admin.api;
 
 import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.serivces.BadgeService;

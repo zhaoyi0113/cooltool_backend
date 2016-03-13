@@ -1,4 +1,4 @@
-package com.cooltoo.api;
+package com.cooltoo.backend.api;
 
 import com.cooltoo.beans.NurseFriendsBean;
 import com.cooltoo.constants.ContextKeys;

@@ -1,4 +1,4 @@
-package com.cooltoo.api;
+package com.cooltoo.backend.api;
 
 import com.cooltoo.serivces.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;

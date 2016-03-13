@@ -1,6 +1,10 @@
 package com.cooltoo.config;
 
-import com.cooltoo.api.*;
+import com.cooltoo.admin.api.BadgeAPI;
+import com.cooltoo.admin.api.HospitalAPI;
+import com.cooltoo.admin.api.HospitalDepartmentAPI;
+import com.cooltoo.admin.api.OccupationSkillAPI;
+import com.cooltoo.backend.api.*;
 import com.cooltoo.filter.BadRequestExceptionMapper;
 import com.cooltoo.filter.NurseLoginAuthenticationFilter;
 import io.swagger.jaxrs.config.BeanConfig;
@@ -16,10 +20,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class JerseyConfiguration extends ResourceConfig {
 
-    public JerseyConfiguration(){
+    public JerseyConfiguration() {
         register(BadgeAPI.class);
         register(MultiPartFeature.class);
-        register(OrderAPI.class );
+        register(OrderAPI.class);
         register(NurseAPI.class);
         register(PatientAPI.class);
         register(PatientBadgeAPI.class);

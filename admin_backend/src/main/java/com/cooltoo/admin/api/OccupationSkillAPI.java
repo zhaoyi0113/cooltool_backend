@@ -1,4 +1,4 @@
-package com.cooltoo.api;
+package com.cooltoo.admin.api;
 
 import com.cooltoo.serivces.OccupationSkillService;
 import org.glassfish.jersey.media.multipart.FormDataParam;
