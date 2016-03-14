@@ -4,7 +4,7 @@ import com.cooltoo.backend.entities.NurseSkillNominationEntity;
 import com.cooltoo.backend.entities.OccupationSkillEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseSkillNominationRepository;
 import com.cooltoo.backend.repository.OccupationSkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;

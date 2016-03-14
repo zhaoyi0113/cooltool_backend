@@ -1,6 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
+import com.cooltoo.admin.services.HospitalDepartmentRelationService;
 import com.cooltoo.beans.HospitalDepartmentRelationBean;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;

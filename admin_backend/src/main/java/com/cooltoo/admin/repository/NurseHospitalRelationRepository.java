@@ -1,6 +1,6 @@
-package com.cooltoo.repository;
+package com.cooltoo.admin.repository;
 
-import com.cooltoo.entities.NurseHospitalRelationEntity;
+import com.cooltoo.admin.entities.NurseHospitalRelationEntity;
 import org.springframework.data.repository.CrudRepository;
 
 /**

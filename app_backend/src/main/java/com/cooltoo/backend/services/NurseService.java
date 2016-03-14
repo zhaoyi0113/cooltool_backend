@@ -3,8 +3,8 @@ package com.cooltoo.backend.services;
 import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.converter.NurseBeanConverter;
 import com.cooltoo.backend.converter.NurseEntityConverter;
-import com.cooltoo.backend.entities.NurseEntity;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
@@ -26,12 +26,6 @@ public class NurseService {
 
     @Autowired
     private NurseRepository repository;
-//    @Autowired
-//    private HospitalRepository hospitalRepository;
-//    @Autowired
-//    private HospitalDepartmentRepository departmentRepository;
-//    @Autowired
-//    private MessageRepository messageRepository;
     @Autowired
     private NurseBeanConverter beanConverter;
     @Autowired

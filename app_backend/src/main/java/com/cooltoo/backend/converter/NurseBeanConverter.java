@@ -2,7 +2,7 @@ package com.cooltoo.backend.converter;
 
 import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.entities.FileStorageEntity;
-import com.cooltoo.backend.entities.NurseEntity;
+import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.repository.FileStorageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

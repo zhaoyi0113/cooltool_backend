@@ -2,7 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.NurseHospitalRelationBean;
-import com.cooltoo.backend.services.NurseHospitalRelationService;
+import com.cooltoo.admin.services.NurseHospitalRelationService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

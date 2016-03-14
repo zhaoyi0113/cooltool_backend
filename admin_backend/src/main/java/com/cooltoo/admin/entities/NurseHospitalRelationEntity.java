@@ -1,29 +1,37 @@
-package com.cooltoo.entities;
+package com.cooltoo.admin.entities;
 
 import javax.persistence.*;
 
 /**
- * Created by lg380357 on 2/29/16.
+ * Created by lg380357 on 2016/3/5.
  */
 @Entity
-@Table(name = "hospital_department_relation")
-public class HospitalDepartmentRelationEntity {
+@Table(name = "nurse_hospital_relation")
+public class NurseHospitalRelationEntity {
 
-    private int id;
-
+    private long id;
+    private long nurseId;
     private int hospitalId;
-
     private int departmentId;
 
     @Id
     @GeneratedValue
     @Column(name = "id")
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
+    }
+
+    @Column(name = "nurse_id")
+    public long getNurseId() {
+        return nurseId;
+    }
+
+    public void setNurseId(long nurseId) {
+        this.nurseId = nurseId;
     }
 
     @Column(name = "hospital_id")
@@ -47,10 +55,11 @@ public class HospitalDepartmentRelationEntity {
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" , ");
-        msg.append("hospitalId=").append(hospitalId).append(" , ");
+        msg.append("id=").append(id).append(" ,");
+        msg.append("nurseId=").append(nurseId).append(" ,");
+        msg.append("hospitalId=").append(hospitalId).append(" ,");
         msg.append("departmentId=").append(departmentId);
-        msg.append("]");
+        msg.append(" ]");
         return msg.toString();
     }
 }

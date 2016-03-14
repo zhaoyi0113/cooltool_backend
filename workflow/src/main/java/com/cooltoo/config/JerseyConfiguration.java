@@ -3,9 +3,8 @@ package com.cooltoo.config;
 import com.cooltoo.admin.api.BadgeAPI;
 import com.cooltoo.admin.api.PatientAPI;
 import com.cooltoo.admin.api.PatientBadgeAPI;
-import com.cooltoo.api.HospitalAPI;
-import com.cooltoo.api.HospitalDepartmentAPI;
-import com.cooltoo.backend.api.OccupationSkillAPI;
+import com.cooltoo.admin.api.HospitalAPI;
+import com.cooltoo.admin.api.HospitalDepartmentAPI;
 import com.cooltoo.backend.api.*;
 import com.cooltoo.backend.filter.BadRequestExceptionMapper;
 import com.cooltoo.backend.filter.NurseLoginAuthenticationFilter;
@@ -47,8 +46,8 @@ public class JerseyConfiguration extends ResourceConfig {
         beanConfig.setVersion("1.0.2");
         beanConfig.setSchemes(new String[]{"http"});
         beanConfig.setHost("localhost:8080");
-        beanConfig.setBasePath("/");
-        beanConfig.setResourcePackage("com.cooltoo.api");
+        beanConfig.setBasePath("/swagger");
+        beanConfig.setResourcePackage("com.cooltoo.backend.api");
         beanConfig.setPrettyPrint(true);
         beanConfig.setScan(true);
     }
