@@ -1,3 +1,7 @@
+
+group = 'com.cooltoo'
+version = '1.0.0-SNAPSHOT'
+
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'idea'

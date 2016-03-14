@@ -14,10 +14,14 @@ apply plugin: 'spring-boot'
 apply plugin: 'org.flywaydb.flyway'
 apply plugin: 'groovy'
 
-jar {
-    baseName = 'workflow'
-    version =  '0.1.0'
-}
+group = 'com.cooltoo.workflow'
+version = '1.0.0-SNAPSHOT'
+
+
+//jar {
+//    baseName = 'workflow'
+//    version =  '0.1.0'
+//}
 
 ext{
     springfoxSwaggerVersion = '2.4.0'

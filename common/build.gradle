@@ -1,5 +1,9 @@
 apply plugin: 'java'
 
+group = 'com.cooltoo.common'
+version = '1.0.0-SNAPSHOT'
+
+
 repositories {
     mavenCentral()
 }
