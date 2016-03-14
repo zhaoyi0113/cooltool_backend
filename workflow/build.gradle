@@ -90,3 +90,7 @@ sourceSets {
         }
     }
 }
+
+springBoot {
+    executable = true
+}
