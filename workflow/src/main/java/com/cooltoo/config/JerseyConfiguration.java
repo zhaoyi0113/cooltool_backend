@@ -1,12 +1,14 @@
 package com.cooltoo.config;
 
 import com.cooltoo.admin.api.BadgeAPI;
-import com.cooltoo.admin.api.HospitalAPI;
-import com.cooltoo.admin.api.HospitalDepartmentAPI;
-import com.cooltoo.admin.api.OccupationSkillAPI;
+import com.cooltoo.admin.api.PatientAPI;
+import com.cooltoo.admin.api.PatientBadgeAPI;
+import com.cooltoo.api.HospitalAPI;
+import com.cooltoo.api.HospitalDepartmentAPI;
+import com.cooltoo.backend.api.OccupationSkillAPI;
 import com.cooltoo.backend.api.*;
-import com.cooltoo.filter.BadRequestExceptionMapper;
-import com.cooltoo.filter.NurseLoginAuthenticationFilter;
+import com.cooltoo.backend.filter.BadRequestExceptionMapper;
+import com.cooltoo.backend.filter.NurseLoginAuthenticationFilter;
 import io.swagger.jaxrs.config.BeanConfig;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;

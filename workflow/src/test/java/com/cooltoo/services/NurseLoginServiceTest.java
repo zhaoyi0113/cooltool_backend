@@ -2,9 +2,9 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.entities.TokenAccessEntity;
-import com.cooltoo.repository.TokenAccessRepository;
-import com.cooltoo.serivces.NurseLoginService;
+import com.cooltoo.backend.entities.TokenAccessEntity;
+import com.cooltoo.backend.repository.TokenAccessRepository;
+import com.cooltoo.backend.services.NurseLoginService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

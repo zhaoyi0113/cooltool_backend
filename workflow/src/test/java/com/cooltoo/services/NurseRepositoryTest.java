@@ -1,8 +1,8 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.entities.NurseEntity;
-import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.backend.entities.NurseEntity;
+import com.cooltoo.backend.repository.NurseRepository;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

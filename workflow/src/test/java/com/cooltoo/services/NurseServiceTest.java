@@ -1,13 +1,13 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.entities.FileStorageEntity;
-import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.repository.FileStorageRepository;
-import com.cooltoo.repository.NurseRepository;
-import com.cooltoo.serivces.NurseService;
+import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.backend.services.NurseService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

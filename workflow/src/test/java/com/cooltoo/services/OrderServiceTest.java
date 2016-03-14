@@ -1,8 +1,8 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.beans.OrderBean;
-import com.cooltoo.serivces.OrderService;
+import com.cooltoo.backend.beans.OrderBean;
+import com.cooltoo.backend.services.OrderService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

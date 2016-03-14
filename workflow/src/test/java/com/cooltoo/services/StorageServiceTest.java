@@ -3,7 +3,6 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.repository.FileStorageRepository;
-import com.cooltoo.serivces.StorageService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

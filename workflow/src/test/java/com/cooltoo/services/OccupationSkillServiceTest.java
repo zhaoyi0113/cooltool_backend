@@ -1,12 +1,12 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.beans.OccupationSkillBean;
+import com.cooltoo.backend.beans.OccupationSkillBean;
 import com.cooltoo.entities.FileStorageEntity;
-import com.cooltoo.entities.OccupationSkillEntity;
+import com.cooltoo.backend.entities.OccupationSkillEntity;
 import com.cooltoo.repository.FileStorageRepository;
-import com.cooltoo.repository.OccupationSkillRepository;
-import com.cooltoo.serivces.OccupationSkillService;
+import com.cooltoo.backend.repository.OccupationSkillRepository;
+import com.cooltoo.backend.services.OccupationSkillService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

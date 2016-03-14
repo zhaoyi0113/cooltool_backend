@@ -1,8 +1,8 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.beans.NurseFriendsBean;
-import com.cooltoo.serivces.NurseFriendsService;
+import com.cooltoo.backend.beans.NurseFriendsBean;
+import com.cooltoo.backend.services.NurseFriendsService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

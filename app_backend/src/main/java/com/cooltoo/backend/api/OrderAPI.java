@@ -1,7 +1,7 @@
 package com.cooltoo.backend.api;
 
-import com.cooltoo.beans.OrderBean;
-import com.cooltoo.serivces.OrderService;
+import com.cooltoo.backend.beans.OrderBean;
+import com.cooltoo.backend.services.OrderService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 

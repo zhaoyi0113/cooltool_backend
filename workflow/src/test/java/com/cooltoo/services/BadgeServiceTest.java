@@ -1,8 +1,8 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.beans.BadgeBean;
-import com.cooltoo.serivces.BadgeService;
+import com.cooltoo.admin.beans.BadgeBean;
+import com.cooltoo.admin.services.BadgeService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

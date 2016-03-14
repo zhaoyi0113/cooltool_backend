@@ -1,9 +1,9 @@
 package com.cooltoo.backend.api;
 
-import com.cooltoo.beans.NurseFriendsBean;
+import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.filter.LoginAuthentication;
-import com.cooltoo.serivces.NurseFriendsService;
+import com.cooltoo.backend.filter.LoginAuthentication;
+import com.cooltoo.backend.services.NurseFriendsService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;

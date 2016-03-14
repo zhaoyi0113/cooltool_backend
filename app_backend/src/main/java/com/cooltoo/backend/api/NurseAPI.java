@@ -1,9 +1,9 @@
 package com.cooltoo.backend.api;
 
-import com.cooltoo.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.filter.LoginAuthentication;
-import com.cooltoo.serivces.NurseService;
+import com.cooltoo.backend.filter.LoginAuthentication;
+import com.cooltoo.backend.services.NurseService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;

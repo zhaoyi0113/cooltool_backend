@@ -1,8 +1,8 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.repository.NurseSkillNominationRepository;
-import com.cooltoo.serivces.NurseSkillNominationService;
+import com.cooltoo.backend.repository.NurseSkillNominationRepository;
+import com.cooltoo.backend.services.NurseSkillNominationService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

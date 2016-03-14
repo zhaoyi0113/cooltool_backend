@@ -1,7 +1,7 @@
 package com.cooltoo.admin.api;
 
-import com.cooltoo.beans.BadgeBean;
-import com.cooltoo.serivces.BadgeService;
+import com.cooltoo.admin.beans.BadgeBean;
+import com.cooltoo.admin.services.BadgeService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;

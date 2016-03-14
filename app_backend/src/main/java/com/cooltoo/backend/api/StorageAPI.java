@@ -1,6 +1,6 @@
 package com.cooltoo.backend.api;
 
-import com.cooltoo.serivces.StorageService;
+import com.cooltoo.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.GET;
