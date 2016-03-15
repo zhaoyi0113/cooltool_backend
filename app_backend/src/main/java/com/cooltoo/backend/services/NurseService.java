@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lg380357 on 2016/3/2.
@@ -33,7 +32,7 @@ public class NurseService {
     @Autowired
     private StorageService storageService;
     @Autowired
-    private NurseSkillNominationService nominationService;
+    private NurseSkillNorminationService nominationService;
     @Autowired
     private NurseFriendsService friendsService;
 
@@ -68,12 +67,10 @@ public class NurseService {
         if (null == entity) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
-        Map<String, Long> skillCounts = nominationService.getSkillNominationCount(id);
-
         NurseBean nurse = beanConverter.convert(entity);
-        nurse.setProperty(NurseBean.SKILL_NOMINATION, skillCounts);
         int friendsCount = friendsService.getFriendsCount(id);
         nurse.setProperty(NurseBean.FRIENDS_COUNT, friendsCount);
+
         return nurse;
     }
 

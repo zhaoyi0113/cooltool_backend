@@ -65,7 +65,8 @@ public enum ErrorCode {
     HOSPITAL_NOT_EXIST(10045, Response.Status.BAD_REQUEST,  "医院不存在", "Hospital not exist"),
     HOSPITAL_DEPARTMENT_NOT_EXIST(10046, Response.Status.BAD_REQUEST,  "科室不存在", "Hospital department not exist"),
     NO_SUCH_OCCUPATION(10047, Response.Status.BAD_REQUEST, "职业不存在" , "No such occupation"),
-    SKILL_NOT_EXIST(10048, Response.Status.BAD_REQUEST, "技能不存在", "Skill not exist");
+    SKILL_NOT_EXIST(10048, Response.Status.BAD_REQUEST, "技能不存在", "Skill not exist"),
+    NOT_IMPLEMENTATION(10049, Response.Status.BAD_REQUEST, "方法未实现", "Not Implementation");
 
     private final int code;
 

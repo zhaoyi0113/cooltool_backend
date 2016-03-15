@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by yzzhao on 3/13/16.
  */
-public interface NurseSkillNominationRepository extends JpaRepository<NurseSkillNominationEntity, Long>{
+public interface NurseSkillNorminationRepository extends JpaRepository<NurseSkillNominationEntity, Long>{
 
     long countByUserIdAndSkillId(long userId, int skillId);
 

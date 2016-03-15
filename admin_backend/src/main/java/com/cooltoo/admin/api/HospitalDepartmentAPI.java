@@ -1,7 +1,7 @@
 package com.cooltoo.admin.api;
 
+import com.cooltoo.backend.services.HospitalDepartmentService;
 import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.admin.services.HospitalDepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;

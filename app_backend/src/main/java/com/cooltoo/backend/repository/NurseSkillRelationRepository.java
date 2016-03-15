@@ -1,7 +1,6 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.NurseSkillRelationEntity;
-import com.cooltoo.backend.entities.OccupationSkillEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

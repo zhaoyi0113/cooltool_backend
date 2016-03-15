@@ -58,14 +58,16 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
             }
             String token = tokens.get(0);
             logger.info("get token " + token);
-            requestContext.setProperty(HeaderKeys.ACCESS_TOKEN, token);
+//            requestContext.setProperty(HeaderKeys.ACCESS_TOKEN, token);
             if (token != null) {
                 //read user id from token
                 List<TokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByToken(token);
                 if (tokenEntities.isEmpty()) {
                     throw new BadRequestException(ErrorCode.NOT_LOGIN);
                 }
-                requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, tokenEntities.get(0).getUserId());
+                long userId = tokenEntities.get(0).getUserId();
+                logger.info("get user id "+userId);
+                requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, userId);
             }
 
         }

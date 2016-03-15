@@ -34,6 +34,7 @@ public class NurseBean {
     private String password;
     private String profilePhotoUrl;
     private String backgroundImageUrl;
+    private String hospital;
     private Map<String, Object> properties = new HashMap<String, Object>();
 
 
@@ -131,6 +132,14 @@ public class NurseBean {
 
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
+    }
+
+    public String getHospital() {
+        return hospital;
+    }
+
+    public void setHospital(String hospital) {
+        this.hospital = hospital;
     }
 
     public String toString() {

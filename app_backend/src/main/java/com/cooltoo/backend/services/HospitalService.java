@@ -1,12 +1,12 @@
-package com.cooltoo.admin.services;
+package com.cooltoo.backend.services;
 
+import com.cooltoo.backend.converter.HospitalBeanConverter;
+import com.cooltoo.backend.converter.HospitalEntityConverter;
+import com.cooltoo.backend.entities.HospitalEntity;
+import com.cooltoo.backend.repository.HospitalRepository;
 import com.cooltoo.beans.HospitalBean;
-import com.cooltoo.admin.converter.HospitalBeanConverter;
-import com.cooltoo.admin.converter.HospitalEntityConverter;
-import com.cooltoo.admin.entities.HospitalEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.admin.repository.HospitalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

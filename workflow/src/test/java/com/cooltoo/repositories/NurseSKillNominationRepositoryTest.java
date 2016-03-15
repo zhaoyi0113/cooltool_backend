@@ -1,7 +1,7 @@
 package com.cooltoo.repositories;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.repository.NurseSkillNominationRepository;
+import com.cooltoo.backend.repository.NurseSkillNorminationRepository;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class NurseSKillNominationRepositoryTest extends AbstractCooltooTest {
     @Autowired
-    private NurseSkillNominationRepository repository;
+    private NurseSkillNorminationRepository repository;
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/repositories/nurse_skill_nomination_data.xml")

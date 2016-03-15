@@ -1,4 +1,4 @@
-package com.cooltoo.admin.entities;
+package com.cooltoo.backend.entities;
 
 import javax.persistence.*;
 
@@ -6,12 +6,10 @@ import javax.persistence.*;
  * Created by lg380357 on 2016/3/5.
  */
 @Entity
-@Table(name = "hospital")
-public class HospitalEntity {
+@Table(name = "hospital_department")
+public class HospitalDepartmentEntity {
     private int id;
     private String name;
-    private String province;
-    private String city;
 
     @Id
     @GeneratedValue
@@ -33,31 +31,11 @@ public class HospitalEntity {
         this.name = name;
     }
 
-    @Column(name = "province")
-    public String getProvince() {
-        return province;
-    }
-
-    public void setProvince(String province) {
-        this.province = province;
-    }
-
-    @Column(name = "city")
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(" , ");
-        msg.append("name=").append(name).append(" , ");
-        msg.append("province=").append(province).append(" , ");
-        msg.append("city=").append(city);
+        msg.append("name=").append(name);
         msg.append("]");
         return msg.toString();
     }

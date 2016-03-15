@@ -1,6 +1,6 @@
-package com.cooltoo.admin.converter;
+package com.cooltoo.backend.converter;
 
-import com.cooltoo.admin.entities.NurseHospitalRelationEntity;
+import com.cooltoo.backend.entities.NurseHospitalRelationEntity;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
