@@ -15,8 +15,8 @@ import javax.ws.rs.core.Response;
 /**
  * Created by yzzhao on 3/13/16.
  */
-@Path("/skill")
-public class NurseSkillAPI {
+@Path("/nurse/skill")
+public class NurseSkillNominationAPI {
 
     @Autowired
     private NurseSkillNominationService nominationService;
