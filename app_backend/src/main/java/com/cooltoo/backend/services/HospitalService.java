@@ -110,4 +110,5 @@ public class HospitalService {
         bean.setCity(city);
         return newOne(bean);
     }
+
 }

@@ -3,6 +3,8 @@ package com.cooltoo.backend.services;
 import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.converter.NurseBeanConverter;
 import com.cooltoo.backend.converter.NurseEntityConverter;
+import com.cooltoo.backend.entities.HospitalEntity;
+import com.cooltoo.backend.repository.HospitalRepository;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.exception.BadRequestException;
@@ -32,9 +34,9 @@ public class NurseService {
     @Autowired
     private StorageService storageService;
     @Autowired
-    private NurseSkillNorminationService nominationService;
-    @Autowired
     private NurseFriendsService friendsService;
+    @Autowired
+    private HospitalRepository hospitalRepository;
 
     @Transactional
     public long newNurse(String identificationId, String name, int age,
@@ -70,7 +72,10 @@ public class NurseService {
         NurseBean nurse = beanConverter.convert(entity);
         int friendsCount = friendsService.getFriendsCount(id);
         nurse.setProperty(NurseBean.FRIENDS_COUNT, friendsCount);
-
+        List<HospitalEntity> nurseHospitals = hospitalRepository.getNurseHospitals(id);
+        if(!nurseHospitals.isEmpty()){
+            nurse.setHospital(nurseHospitals.get(0).getName());
+        }
         return nurse;
     }
 

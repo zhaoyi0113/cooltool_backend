@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+
+    <nurse id="1" name="user1"/>
+    <nurse id="2" name="user2"/>
+
+    <hospital id="1" name="hos1"/>
+    <hospital id="2" name="hos2"/>
+    <hospital id="3" name="hos3"/>
+    <hospital id="4" name="hos4"/>
+
+    <nurse_hospital_relation id="1" nurse_id="1" hospital_id="1"/>
+    <nurse_hospital_relation id="2" nurse_id="1" hospital_id="2"/>
+    <nurse_hospital_relation id="3" nurse_id="1" hospital_id="3"/>
+    <nurse_hospital_relation id="4" nurse_id="1" hospital_id="4"/>
+</dataset>

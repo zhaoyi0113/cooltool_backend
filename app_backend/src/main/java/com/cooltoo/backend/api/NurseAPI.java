@@ -97,7 +97,6 @@ public class NurseAPI {
     }
 
     @DELETE
-    @Path("/delete")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteNurse(@DefaultValue("-1") @FormParam("id") long id) {
         NurseBean one = service.deleteNurse(id);
