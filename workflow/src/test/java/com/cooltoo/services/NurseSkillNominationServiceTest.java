@@ -50,4 +50,10 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(0, nominationService.getSkillNorminationCount(1, 6));
     }
 
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_nomination_service_data.xml")
+    public void testGetAllSkillCount(){
+        long count = nominationService.getUserAllSkillNorminatedCount(1);
+        Assert.assertEquals(10, count);
+    }
 }

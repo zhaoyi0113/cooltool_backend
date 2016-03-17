@@ -13,4 +13,6 @@ public interface NurseSkillNorminationRepository extends JpaRepository<NurseSkil
     long countByUserIdAndSkillId(long userId, int skillId);
 
     List<NurseSkillNominationEntity> findByUserIdAndSkillIdAndNominatedId(long userId, int skillId, long nominatedId);
+
+    long countByuserId(long userId);
 }

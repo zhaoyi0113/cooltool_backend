@@ -85,4 +85,8 @@ public class NurseSpeakService {
         }
         return bean;
     }
+
+    public long getNurseSpeakCount(long userId){
+        return speakRepository.countNurseSpeakByUserId(userId);
+    }
 }

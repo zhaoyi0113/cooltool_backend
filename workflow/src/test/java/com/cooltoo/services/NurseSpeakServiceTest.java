@@ -71,4 +71,11 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertNotNull(bean.getImageUrl());
         System.out.println(bean);
     }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
+    public void testGetNurseSpeakCount(){
+        long count = speakService.getNurseSpeakCount(1);
+        Assert.assertEquals(11, count);
+    }
 }

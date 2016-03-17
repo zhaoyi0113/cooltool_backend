@@ -28,6 +28,9 @@ public class NurseEntity {
 
     private long backgroundImageId;
 
+    //用户积分
+    private int integral;
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -94,6 +97,14 @@ public class NurseEntity {
     public long getBackgroundImageId() { return backgroundImageId; }
     public void setBackgroundImageId(long backgroundImageId) {this.backgroundImageId = backgroundImageId;}
 
+    @Column(name = "integral")
+    public int getIntegral() {
+        return integral;
+    }
+
+    public void setIntegral(int integral) {
+        this.integral = integral;
+    }
 
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -107,6 +118,7 @@ public class NurseEntity {
         msg.append("password=").append(password).append(" , ");
         msg.append("profilePhotoId=").append(profilePhotoId).append(" , ");
         msg.append("backgroundImageId=").append(backgroundImageId);
+        msg.append("integral=").append(integral).append(" , ");
         msg.append(" ]");
         return msg.toString();
     }

@@ -12,6 +12,8 @@ public class NurseBean {
     public static final String SKILL_NOMINATION = "skill_nomination";
 
     public static final String FRIENDS_COUNT = "friend_count";
+    public static final String SPEAK_COUNT = "speak_count";
+    public static final String NORMINATED_COUNT = "norminated_count";
 
     @FormParam("id")
     private long id;
@@ -30,6 +32,8 @@ public class NurseBean {
 
     @FormParam("age")
     private int age;
+
+    private int integral;
 
     private String password;
     private String profilePhotoUrl;
@@ -142,6 +146,14 @@ public class NurseBean {
         this.hospital = hospital;
     }
 
+    public int getIntegral() {
+        return integral;
+    }
+
+    public void setIntegral(int integral) {
+        this.integral = integral;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -152,7 +164,8 @@ public class NurseBean {
         msg.append("age=").append(age).append(" , ");
         msg.append("password=").append(password).append(" , ");
         msg.append("profilePhotoUrl=").append(profilePhotoUrl).append(" , ");
-        msg.append("backgroundImageUrl=").append(backgroundImageUrl);
+        msg.append("backgroundImageUrl=").append(backgroundImageUrl).append(" , ");
+        msg.append("integral=").append(integral);
         msg.append("]");
         return msg.toString();
     }

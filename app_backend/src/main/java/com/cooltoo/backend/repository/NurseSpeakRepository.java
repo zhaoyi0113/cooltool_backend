@@ -11,4 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Long> {
 
     Page<NurseSpeakEntity> findNurseSpeakByUserId(long userId, Pageable request);
+
+    long countNurseSpeakByUserId(long userId);
 }

@@ -37,6 +37,10 @@ public class NurseService {
     private NurseFriendsService friendsService;
     @Autowired
     private HospitalRepository hospitalRepository;
+    @Autowired
+    private NurseSpeakService speakService;
+    @Autowired
+    private NurseSkillNorminationService norminationService;
 
     @Transactional
     public long newNurse(String identificationId, String name, int age,
@@ -76,6 +80,10 @@ public class NurseService {
         if(!nurseHospitals.isEmpty()){
             nurse.setHospital(nurseHospitals.get(0).getName());
         }
+        long speakCount = speakService.getNurseSpeakCount(id);
+        nurse.setProperty(NurseBean.SPEAK_COUNT, speakCount);
+        long norminated = this.norminationService.getUserAllSkillNorminatedCount(id);
+        nurse.setProperty(NurseBean.NORMINATED_COUNT, norminated);
         return nurse;
     }
 

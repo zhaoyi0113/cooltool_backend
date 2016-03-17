@@ -92,4 +92,8 @@ public class NurseSkillNorminationService {
             throw new BadRequestException(ErrorCode.SKILL_NOT_EXIST);
         }
     }
+
+    public long getUserAllSkillNorminatedCount(long userId){
+        return nominationRepository.countByuserId(userId);
+    }
 }

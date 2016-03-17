@@ -32,6 +32,7 @@ public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
         bean.setAge(entity.getAge());
         bean.setMobile(entity.getMobile());
         bean.setPassword(entity.getPassword());
+        bean.setIntegral(entity.getIntegral());
 
         FileStorageEntity storageEntity = fileStorageRepository.findOne(entity.getBackgroundImageId());
         if(storageEntity != null) {
