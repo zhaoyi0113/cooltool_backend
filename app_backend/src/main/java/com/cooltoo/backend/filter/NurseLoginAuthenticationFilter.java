@@ -39,13 +39,13 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         LoginAuthentication login = resourceInfo.getResourceClass().getAnnotation(LoginAuthentication.class);
-//        if (login == null) {
-//            login = resourceInfo.getResourceMethod().getAnnotation(LoginAuthentication.class);
-//            if(login == null){
-//                return;
-//            }
-//        }
-//        if (login.requireNurseLogin()) {
+        if (login == null) {
+            login = resourceInfo.getResourceMethod().getAnnotation(LoginAuthentication.class);
+            if(login == null){
+                return;
+            }
+        }
+        if (login.requireNurseLogin()) {
             MultivaluedMap<String, String> pathParameters = requestContext.getHeaders();
             List<String> tokens = pathParameters.get(HeaderKeys.ACCESS_TOKEN);
             if (tokens == null || tokens.isEmpty()) {
@@ -63,6 +63,6 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
                 logger.info("get user id "+userId);
                 requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, userId);
             }
-//        }
+        }
     }
 }
