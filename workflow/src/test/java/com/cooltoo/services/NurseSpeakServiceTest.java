@@ -3,6 +3,7 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.services.NurseSpeakService;
+import com.cooltoo.constants.SpeakType;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,7 +52,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         String fileName = "test.txt";
         String fileContent = "file content";
         InputStream inputStream = new ByteArrayInputStream(fileContent.getBytes());
-        NurseSpeakBean bean = speakService.addNurseSpeak(2, content, fileName, inputStream);
+        NurseSpeakBean bean = speakService.addNurseSpeak(2, content, "SMUG", fileName, inputStream);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(2, bean.getUserId());
         Assert.assertEquals(content, bean.getContent());

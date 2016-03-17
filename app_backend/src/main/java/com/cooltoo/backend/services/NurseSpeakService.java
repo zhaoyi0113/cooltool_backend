@@ -4,6 +4,7 @@ import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.converter.NurseSpeakConverter;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
+import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
@@ -60,7 +61,7 @@ public class NurseSpeakService {
         return bean;
     }
 
-    public NurseSpeakBean addNurseSpeak(long userId, String content, String fileName, InputStream fileInputStream) {
+    public NurseSpeakBean addNurseSpeak(long userId, String content, String speakType, String fileName, InputStream fileInputStream) {
         boolean hasImage = false;
         NurseSpeakEntity entity = new NurseSpeakEntity();
         if (null==fileName||"".equals(fileName) || null==fileInputStream) {
@@ -73,6 +74,21 @@ public class NurseSpeakService {
         }
         if (null==content || "".equals(content)) {
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
+        }
+        if (null==speakType || "".equals(speakType)) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (speakType.equalsIgnoreCase(SpeakType.SMUG.toString())) {
+            entity.setSpeakType(SpeakType.SMUG);
+        }
+        else if (speakType.equalsIgnoreCase(SpeakType.CATHART.toString())) {
+            entity.setSpeakType(SpeakType.CATHART);
+        }
+        else if (speakType.equalsIgnoreCase(SpeakType.ASK_QUESTION.toString())) {
+            entity.setSpeakType(SpeakType.ASK_QUESTION);
+        }
+        else {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         entity.setUserId(userId);
         entity.setContent(content);

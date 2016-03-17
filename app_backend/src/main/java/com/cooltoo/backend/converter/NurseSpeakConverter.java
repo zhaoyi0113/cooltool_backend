@@ -18,6 +18,7 @@ public class NurseSpeakConverter implements Converter<NurseSpeakEntity, NurseSpe
         bean.setContent(source.getContent());
         bean.setTime(source.getTime());
         bean.setId(source.getId());
+        bean.setSpeakType(source.getSpeakType());
         return bean;
     }
 }

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <nurse_speak id="1" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="2" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="3" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="4" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="5" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="6" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="7" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="8" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="9" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="10" user_id="1" content="hello" time="2016-01-01" image_id="1" />
-    <nurse_speak id="11" user_id="1" content="hello" time="2016-01-01" image_id="1" />
+    <nurse_speak id="1" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0" />
+    <nurse_speak id="2" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0" />
+    <nurse_speak id="3" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0"  />
+    <nurse_speak id="4" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0" />
+    <nurse_speak id="5" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0"  />
+    <nurse_speak id="6" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0"  />
+    <nurse_speak id="7" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0"  />
+    <nurse_speak id="8" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0" />
+    <nurse_speak id="9" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0" />
+    <nurse_speak id="10" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0"  />
+    <nurse_speak id="11" user_id="1" content="hello" time="2016-01-01" image_id="1" speak_type="0" />
 </dataset>

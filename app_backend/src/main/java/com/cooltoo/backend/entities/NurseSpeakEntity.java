@@ -2,6 +2,7 @@ package com.cooltoo.backend.entities;
 
 import javax.persistence.*;
 import java.util.Date;
+import com.cooltoo.constants.SpeakType;
 
 /**
  * Created by yzzhao on 3/15/16.
@@ -14,6 +15,7 @@ public class NurseSpeakEntity {
     private String content;
     private Date time;
     private long imageId;
+    private SpeakType speakType;
 
 
     @Id
@@ -57,6 +59,12 @@ public class NurseSpeakEntity {
 
     public void setImageId(long imageId) { this.imageId = imageId; }
 
+    @Column(name = "speak_type")
+    @Enumerated
+    public SpeakType getSpeakType() { return speakType; }
+
+    public void setSpeakType(SpeakType speakType) { this.speakType = speakType; }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
@@ -64,7 +72,8 @@ public class NurseSpeakEntity {
         msg.append("userId=").append(userId).append(" , ");
         msg.append("time=").append(time).append(" , ");
         msg.append("content=").append(content).append(" , ");
-        msg.append("imageId=").append(imageId);
+        msg.append("imageId=").append(imageId).append(" , ");
+        msg.append("speakType=").append(speakType);
         msg.append("]");
         return msg.toString();
     }

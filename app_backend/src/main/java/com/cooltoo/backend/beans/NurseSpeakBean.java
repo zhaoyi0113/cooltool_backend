@@ -1,5 +1,7 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.constants.SpeakType;
+
 import java.util.Date;
 
 /**
@@ -11,6 +13,7 @@ public class NurseSpeakBean {
     private String content;
     private Date time;
     private String imageUrl;
+    private SpeakType speakType;
 
     public long getId() {
         return id;
@@ -52,6 +55,10 @@ public class NurseSpeakBean {
         this.imageUrl = imageUrl;
     }
 
+    public SpeakType getSpeakType() { return speakType; }
+
+    public void setSpeakType(SpeakType speakType) { this.speakType = speakType; }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
@@ -59,7 +66,8 @@ public class NurseSpeakBean {
         msg.append("userId=").append(userId).append(" , ");
         msg.append("time=").append(time).append(" , ");
         msg.append("content=").append(content).append(" , ");
-        msg.append("imageUrl=").append(imageUrl);
+        msg.append("imageUrl=").append(imageUrl).append(" , ");
+        msg.append("speakType=").append(speakType);
         msg.append("]");
         return msg.toString();
     }

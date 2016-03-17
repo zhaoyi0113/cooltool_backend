@@ -41,11 +41,12 @@ public class NurseSpeakAPI {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response addSpeak(@Context HttpServletRequest request,
+                             @FormDataParam("speak_type") String speakType,
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
                              @FormDataParam("file") InputStream fileInputStream){
         long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
-        NurseSpeakBean nurseSpeak = speakService.addNurseSpeak(userId, content, fileName, fileInputStream);
+        NurseSpeakBean nurseSpeak = speakService.addNurseSpeak(userId, content, speakType, fileName, fileInputStream);
         return Response.ok(nurseSpeak).build();
     }
 
