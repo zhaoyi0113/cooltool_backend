@@ -16,18 +16,18 @@ import java.util.List;
  * Created by yzzhao on 3/13/16.
  */
 @Transactional
-public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
+public class NurseSkillNorminationServiceTest extends AbstractCooltooTest {
 
     @Autowired
-    private NurseSkillNorminationService nominationService;
+    private NurseSkillNorminationService norminationService;
 
     @Autowired
-    private NurseSkillNorminationRepository nominationRepository;
+    private NurseSkillNorminationRepository norminationRepository;
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_nomination_service_data.xml")
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testGetSkillNominationCount() {
-        List<NurseSkillNorminationBean> countMap = nominationService.getAllSkillsNominationCount(1, 0, 10);
+        List<NurseSkillNorminationBean> countMap = norminationService.getAllSkillsNominationCount(1, 0, 10);
         Assert.assertEquals(6, countMap.size());
         Assert.assertEquals(5, (long) countMap.get(0).getSkillNominateCount());
         Assert.assertEquals(2, (long) countMap.get(1).getSkillNominateCount());
@@ -39,21 +39,21 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
     }
 //
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_nomination_service_data.xml")
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testAddSkillNominationCount() {
-        nominationService.nominateNurseSkill(1, 6, 2);
-        Assert.assertEquals(1, nominationService.getSkillNorminationCount(1, 6));
-        long count = nominationRepository.countByUserIdAndSkillId(1, 6);
+        norminationService.nominateNurseSkill(1, 6, 2);
+        Assert.assertEquals(1, norminationService.getSkillNorminationCount(1, 6));
+        long count = norminationRepository.countByUserIdAndSkillId(1, 6);
         Assert.assertEquals(1, count);
 
-        nominationService.nominateNurseSkill(1, 6, 2);
-        Assert.assertEquals(0, nominationService.getSkillNorminationCount(1, 6));
+        norminationService.nominateNurseSkill(1, 6, 2);
+        Assert.assertEquals(0, norminationService.getSkillNorminationCount(1, 6));
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_nomination_service_data.xml")
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testGetAllSkillCount(){
-        long count = nominationService.getUserAllSkillNorminatedCount(1);
+        long count = norminationService.getUserAllSkillNorminatedCount(1);
         Assert.assertEquals(10, count);
     }
 }

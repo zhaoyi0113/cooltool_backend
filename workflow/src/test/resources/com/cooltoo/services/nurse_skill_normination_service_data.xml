@@ -17,15 +17,15 @@
     <nurse_occupation_skill id="5" user_id="1" skill_id="5"/>
     <nurse_occupation_skill id="6" user_id="1" skill_id="6"/>
 
-    <nurse_skill_nomination id="1" user_id="1" skill_id="1" nomiated_user_id="10" date_time="2016-03-01"/>
-    <nurse_skill_nomination id="2" user_id="1" skill_id="1" nomiated_user_id="11" date_time="2016-03-01"/>
-    <nurse_skill_nomination id="3" user_id="1" skill_id="1" nomiated_user_id="12" date_time="2016-03-01"/>
-    <nurse_skill_nomination id="4" user_id="1" skill_id="1" nomiated_user_id="13" date_time="2016-03-01"/>
-    <nurse_skill_nomination id="5" user_id="1" skill_id="1" nomiated_user_id="14" date_time="2016-03-01"/>
+    <nurse_skill_normination id="1" user_id="1" skill_id="1" nomiated_user_id="10" date_time="2016-03-01"/>
+    <nurse_skill_normination id="2" user_id="1" skill_id="1" nomiated_user_id="11" date_time="2016-03-01"/>
+    <nurse_skill_normination id="3" user_id="1" skill_id="1" nomiated_user_id="12" date_time="2016-03-01"/>
+    <nurse_skill_normination id="4" user_id="1" skill_id="1" nomiated_user_id="13" date_time="2016-03-01"/>
+    <nurse_skill_normination id="5" user_id="1" skill_id="1" nomiated_user_id="14" date_time="2016-03-01"/>
 
-    <nurse_skill_nomination id="6" user_id="1" skill_id="2" nomiated_user_id="10" date_time="2016-03-01"/>
-    <nurse_skill_nomination id="7" user_id="1" skill_id="2" nomiated_user_id="11" date_time="2016-03-01"/>
-    <nurse_skill_nomination id="8" user_id="1" skill_id="3" nomiated_user_id="12" date_time="2016-03-01"/>
-    <nurse_skill_nomination id="9" user_id="1" skill_id="4" nomiated_user_id="13" date_time="2016-03-01"/>
-    <nurse_skill_nomination id="10" user_id="1" skill_id="5" nomiated_user_id="14" date_time="2016-03-01"/>
+    <nurse_skill_normination id="6" user_id="1" skill_id="2" nomiated_user_id="10" date_time="2016-03-01"/>
+    <nurse_skill_normination id="7" user_id="1" skill_id="2" nomiated_user_id="11" date_time="2016-03-01"/>
+    <nurse_skill_normination id="8" user_id="1" skill_id="3" nomiated_user_id="12" date_time="2016-03-01"/>
+    <nurse_skill_normination id="9" user_id="1" skill_id="4" nomiated_user_id="13" date_time="2016-03-01"/>
+    <nurse_skill_normination id="10" user_id="1" skill_id="5" nomiated_user_id="14" date_time="2016-03-01"/>
 </dataset>

@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
  * Created by yzzhao on 3/13/16.
  */
 @Transactional
-public class NurseSKillNominationRepositoryTest extends AbstractCooltooTest {
+public class NurseSKillNorminationRepositoryTest extends AbstractCooltooTest {
     @Autowired
     private NurseSkillNorminationRepository repository;
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/repositories/nurse_skill_nomination_data.xml")
-    public void testGetNurseSkillNomination(){
+    @DatabaseSetup(value = "classpath:/com/cooltoo/repositories/nurse_skill_normination_data.xml")
+    public void testGetNurseSkillNormination(){
         long count = repository.countByUserIdAndSkillId(1, 1);
         Assert.assertEquals(5, count);
 

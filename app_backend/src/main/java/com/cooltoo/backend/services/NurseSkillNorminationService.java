@@ -1,7 +1,7 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseSkillNorminationBean;
-import com.cooltoo.backend.entities.NurseSkillNominationEntity;
+import com.cooltoo.backend.entities.NurseSkillNorminationEntity;
 import com.cooltoo.backend.entities.OccupationSkillEntity;
 import com.cooltoo.backend.repository.NurseSkillNorminationRepository;
 import com.cooltoo.backend.repository.OccupationSkillRepository;
@@ -63,7 +63,7 @@ public class NurseSkillNorminationService {
         validateNurse(userId);
         validateNurse(friendId);
         validateSkill(skillId);
-        List<NurseSkillNominationEntity> existed = nominationRepository.findByUserIdAndSkillIdAndNominatedId(userId, skillId, friendId);
+        List<NurseSkillNorminationEntity> existed = nominationRepository.findByUserIdAndSkillIdAndNominatedId(userId, skillId, friendId);
         if (!existed.isEmpty()) {
             nominationRepository.delete(existed.get(0));
         } else {
@@ -73,7 +73,7 @@ public class NurseSkillNorminationService {
     }
 
     private void addNomination(long userId, int skillId, long friendId) {
-        NurseSkillNominationEntity entity = new NurseSkillNominationEntity();
+        NurseSkillNorminationEntity entity = new NurseSkillNorminationEntity();
         entity.setDateTime(Calendar.getInstance().getTime());
         entity.setNominatedId(friendId);
         entity.setUserId(userId);

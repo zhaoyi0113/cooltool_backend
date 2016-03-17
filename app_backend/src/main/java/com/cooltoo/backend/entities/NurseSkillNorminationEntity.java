@@ -7,8 +7,8 @@ import java.util.Date;
  * Created by yzzhao on 3/13/16.
  */
 @Entity
-@Table(name = "nurse_skill_nomination")
-public class NurseSkillNominationEntity {
+@Table(name = "nurse_skill_normination")
+public class NurseSkillNorminationEntity {
     private long id;
     private long userId;
     private int skillId;
