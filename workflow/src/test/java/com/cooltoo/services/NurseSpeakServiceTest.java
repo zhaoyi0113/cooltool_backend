@@ -9,6 +9,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -39,5 +42,33 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(2, nurseSpeak.size());
         Assert.assertEquals(10, nurseSpeak.get(0).getId());
 
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
+    public void testAddNurseSpeak() {
+        String content = "add speak content";
+        String fileName = "test.txt";
+        String fileContent = "file content";
+        InputStream inputStream = new ByteArrayInputStream(fileContent.getBytes());
+        NurseSpeakBean bean = speakService.addNurseSpeak(2, content, fileName, inputStream);
+        Assert.assertTrue(bean.getId()>0);
+        Assert.assertEquals(2, bean.getUserId());
+        Assert.assertEquals(content, bean.getContent());
+        Assert.assertNotNull(bean.getTime());
+        Assert.assertNotNull(bean.getImageUrl());
+        System.out.println(bean);
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
+    public void testGetNurseSpeakById() {
+        NurseSpeakBean bean = speakService.getNurseSpeak(1, 3);
+        Assert.assertEquals(3, bean.getId());
+        Assert.assertEquals(1, bean.getUserId());
+        Assert.assertEquals("hello", bean.getContent());
+        Assert.assertNotNull(bean.getTime());
+        Assert.assertNotNull(bean.getImageUrl());
+        System.out.println(bean);
     }
 }

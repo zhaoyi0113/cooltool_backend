@@ -51,4 +51,16 @@ public class NurseSpeakBean {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
+        msg.append("id=").append(id).append(" , ");
+        msg.append("userId=").append(userId).append(" , ");
+        msg.append("time=").append(time).append(" , ");
+        msg.append("content=").append(content).append(" , ");
+        msg.append("imageUrl=").append(imageUrl);
+        msg.append("]");
+        return msg.toString();
+    }
 }

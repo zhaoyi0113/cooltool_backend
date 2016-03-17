@@ -39,20 +39,24 @@ public class NurseSpeakAPI {
     }
 
     @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response addSpeak(@Context HttpServletRequest request,
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
                              @FormDataParam("file") InputStream fileInputStream){
-        throw new BadRequestException(ErrorCode.NOT_IMPLEMENTATION);
+        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        NurseSpeakBean nurseSpeak = speakService.addNurseSpeak(userId, content, fileName, fileInputStream);
+        return Response.ok(nurseSpeak).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{index}")
+    @Path("/{id}")
     public Response getNurseSpeakContent(@Context HttpServletRequest request,
                                          @PathParam("id") long id){
-        throw new BadRequestException(ErrorCode.NOT_IMPLEMENTATION);
+        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        NurseSpeakBean nurseSpeak = speakService.getNurseSpeak(userId, id);
+        return Response.ok(nurseSpeak).build();
     }
-
 
 }

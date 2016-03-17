@@ -50,16 +50,22 @@ public class NurseSpeakEntity {
         return time;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
-    }
+    public void setTime(Date time) { this.time = time; }
 
     @Column(name = "image_id")
-    public long getImageId() {
-        return imageId;
-    }
+    public long getImageId() { return imageId; }
 
-    public void setImageId(long imageId) {
-        this.imageId = imageId;
+    public void setImageId(long imageId) { this.imageId = imageId; }
+
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
+        msg.append("id=").append(id).append(" , ");
+        msg.append("userId=").append(userId).append(" , ");
+        msg.append("time=").append(time).append(" , ");
+        msg.append("content=").append(content).append(" , ");
+        msg.append("imageId=").append(imageId);
+        msg.append("]");
+        return msg.toString();
     }
 }

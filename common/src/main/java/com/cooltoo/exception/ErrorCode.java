@@ -66,7 +66,9 @@ public enum ErrorCode {
     HOSPITAL_DEPARTMENT_NOT_EXIST(10046, Response.Status.BAD_REQUEST,  "科室不存在", "Hospital department not exist"),
     NO_SUCH_OCCUPATION(10047, Response.Status.BAD_REQUEST, "职业不存在" , "No such occupation"),
     SKILL_NOT_EXIST(10048, Response.Status.BAD_REQUEST, "技能不存在", "Skill not exist"),
-    NOT_IMPLEMENTATION(10049, Response.Status.BAD_REQUEST, "方法未实现", "Not Implementation");
+    NOT_IMPLEMENTATION(10049, Response.Status.BAD_REQUEST, "方法未实现", "Not Implementation"),
+    SPEAK_CONTENT_IS_EMPTY(10050, Response.Status.BAD_REQUEST, "发言为空", "Speak content is empty"),
+    SPEAK_CONTENT_NOT_EXIST(10051, Response.Status.BAD_REQUEST, "发言不存在", "Speak content not exist");
 
     private final int code;
 

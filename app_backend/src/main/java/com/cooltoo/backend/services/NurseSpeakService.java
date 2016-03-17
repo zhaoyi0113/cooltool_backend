@@ -4,6 +4,8 @@ import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.converter.NurseSpeakConverter;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,7 +13,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -44,5 +48,41 @@ public class NurseSpeakService {
             speaks.add(speak);
         }
         return speaks;
+    }
+
+    public NurseSpeakBean getNurseSpeak(long userId, long id) {
+        NurseSpeakEntity entity = speakRepository.getOne(id);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.SPEAK_CONTENT_NOT_EXIST);
+        }
+        NurseSpeakBean bean = speakConverter.convert(entity);
+        bean.setImageUrl(storageService.getFileUrl(entity.getImageId()));
+        return bean;
+    }
+
+    public NurseSpeakBean addNurseSpeak(long userId, String content, String fileName, InputStream fileInputStream) {
+        boolean hasImage = false;
+        NurseSpeakEntity entity = new NurseSpeakEntity();
+        if (null==fileName||"".equals(fileName) || null==fileInputStream) {
+            logger.info("there is no image file need to insert!");
+        }
+        else {
+            long fileID = storageService.saveFile(fileName, fileInputStream);
+            entity.setImageId(fileID);
+            hasImage = true;
+        }
+        if (null==content || "".equals(content)) {
+            throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
+        }
+        entity.setUserId(userId);
+        entity.setContent(content);
+        entity.setTime(new Date());
+        entity = speakRepository.save(entity);
+
+        NurseSpeakBean bean = speakConverter.convert(entity);
+        if (hasImage) {
+            bean.setImageUrl(storageService.getFileUrl(entity.getImageId()));
+        }
+        return bean;
     }
 }
