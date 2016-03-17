@@ -10,6 +10,8 @@ public class NurseFriendsBean {
     private long userId;
     private long friendId;
     private Date dateTime;
+    private String headPhotoUrl;
+    private String friendName;
 
     public long getId() {
         return id;
@@ -41,5 +43,21 @@ public class NurseFriendsBean {
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public String getHeadPhotoUrl() {
+        return headPhotoUrl;
+    }
+
+    public void setHeadPhotoUrl(String headPhotoUrl) {
+        this.headPhotoUrl = headPhotoUrl;
+    }
+
+    public String getFriendName() {
+        return friendName;
+    }
+
+    public void setFriendName(String friendName) {
+        this.friendName = friendName;
     }
 }

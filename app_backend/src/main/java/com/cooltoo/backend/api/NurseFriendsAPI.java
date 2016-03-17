@@ -32,10 +32,11 @@ public class NurseFriendsAPI {
     }
 
     @GET
-    @Path("/list")
+    @Path("/list/{page_index}/{number}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFriendList(@Context HttpServletRequest request, @QueryParam("page_index") int pageIdx, @QueryParam("number") int number){
-        long userId = Long.valueOf((String) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID));
+    public Response getFriendList(@Context HttpServletRequest request, @PathParam("page_index") int pageIdx, @PathParam("number") int number){
+
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseFriendsBean> friendList = friendsService.getFriends(userId, pageIdx, number);
         return Response.ok(friendList).build();
     }

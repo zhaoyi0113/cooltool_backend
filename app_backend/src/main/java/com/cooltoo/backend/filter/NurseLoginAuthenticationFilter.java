@@ -45,6 +45,7 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
                 return;
             }
         }
+        logger.info("access "+requestContext.getUriInfo().getAbsolutePath());
         if (login.requireNurseLogin()) {
             MultivaluedMap<String, String> pathParameters = requestContext.getHeaders();
             List<String> tokens = pathParameters.get(HeaderKeys.ACCESS_TOKEN);

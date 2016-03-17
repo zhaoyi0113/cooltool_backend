@@ -16,12 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by yzzhao on 3/10/16.
  */
 @Service("NurseFriendsService")
 public class NurseFriendsService {
+
+    private static final Logger logger = Logger.getLogger(NurseFriendsService.class.getName());
 
     @Autowired
     private NurseFriendsRepository friendsRepository;
@@ -75,6 +78,7 @@ public class NurseFriendsService {
     }
 
     public List<NurseFriendsBean> getFriends(long userId, int pageIdx, int number){
+        logger.info("get friends for the user "+userId);
         PageRequest request = new PageRequest(pageIdx, number, Sort.Direction.DESC, "dateTime");
         Page<NurseFriendsEntity> entities = friendsRepository.findNurseFriendByUserId(userId, request);
         List<NurseFriendsBean> friends = new ArrayList<NurseFriendsBean>();
