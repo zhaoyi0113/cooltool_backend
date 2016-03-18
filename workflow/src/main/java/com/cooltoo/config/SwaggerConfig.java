@@ -19,8 +19,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @Configuration
 @EnableSwagger2
-@SpringBootApplication
-@ComponentScan(basePackages = {"com.cooltoo.backend.api"})
 public class SwaggerConfig extends WebMvcConfigurerAdapter {
 
     @Bean
