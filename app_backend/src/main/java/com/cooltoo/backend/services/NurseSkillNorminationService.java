@@ -47,7 +47,7 @@ public class NurseSkillNorminationService {
             bean.setSkillId(entity.getId());
             bean.setSkillName(entity.getName());
             bean.setSkillNominateCount(count);
-            String url = storageService.getFileUrl(entity.getImageId());
+            String url = storageService.getFilePath(entity.getImageId());
             bean.setSkillImageUrl(url);
             norminationBeans.add(bean);
         }

@@ -8,9 +8,14 @@ import com.cooltoo.admin.api.HospitalDepartmentAPI;
 import com.cooltoo.backend.api.*;
 import com.cooltoo.backend.filter.BadRequestExceptionMapper;
 import com.cooltoo.backend.filter.NurseLoginAuthenticationFilter;
-import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.annotations.Api;
+import io.swagger.config.ConfigFactory;
+import io.swagger.config.ScannerFactory;
+import io.swagger.config.SwaggerConfig;
+import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
@@ -19,6 +24,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @Configuration
 @EnableSwagger2
+@EnableAutoConfiguration
+@Api(value = "home", description = "Demo API")
 public class JerseyConfiguration extends ResourceConfig {
 
     public JerseyConfiguration() {
@@ -43,14 +50,15 @@ public class JerseyConfiguration extends ResourceConfig {
     }
 
     private void configureSwagger() {
-        BeanConfig beanConfig = new BeanConfig();
-        beanConfig.setVersion("1.0.2");
-        beanConfig.setSchemes(new String[]{"http"});
-        beanConfig.setHost("localhost:8080");
-        beanConfig.setBasePath("/swagger");
-        beanConfig.setResourcePackage("com.cooltoo.backend.api");
-        beanConfig.setPrettyPrint(true);
-        beanConfig.setScan(true);
+//        BeanConfig beanConfig = new BeanConfig();
+//        beanConfig.setVersion("1.0.2");
+//        beanConfig.setSchemes(new String[]{"http"});
+//        beanConfig.setHost("localhost:8080");
+//        beanConfig.setBasePath("http://localhost:8080/swagger");
+//        beanConfig.setResourcePackage("com.cooltoo.backend.api");
+//        beanConfig.setPrettyPrint(true);
+//        beanConfig.setScan(true);
+
     }
 
 }

@@ -68,6 +68,14 @@ public class StorageService {
         return "";
     }
 
+    public String getFilePath(long id){
+        if(storageRepository.exists(id)){
+            FileStorageEntity entity = storageRepository.findOne(id);
+            return entity.getFilePath();
+        }
+        return "";
+    }
+
     public InputStream getFileInputStream(long id){
         if (storageRepository.exists(id)){
             FileStorageEntity entity = storageRepository.findOne(id);

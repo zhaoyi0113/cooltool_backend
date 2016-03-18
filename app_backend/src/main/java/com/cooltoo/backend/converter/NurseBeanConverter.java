@@ -19,9 +19,6 @@ public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
     @Autowired
     private StorageService storageService;
 
-    @Value("${storage.url}")
-    private String storageUrl;
-
     @Override
     public NurseBean convert(NurseEntity entity) {
         NurseBean bean = new NurseBean();
@@ -34,8 +31,8 @@ public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
         bean.setPassword(entity.getPassword());
         bean.setIntegral(entity.getIntegral());
 
-        bean.setBackgroundImageUrl(storageService.getFileUrl(entity.getBackgroundImageId()));
-        bean.setProfilePhotoUrl(storageService.getFileUrl(entity.getProfilePhotoId()));
+        bean.setBackgroundImageUrl(storageService.getFilePath(entity.getBackgroundImageId()));
+        bean.setProfilePhotoUrl(storageService.getFilePath(entity.getProfilePhotoId()));
         return bean;
     }
 }
