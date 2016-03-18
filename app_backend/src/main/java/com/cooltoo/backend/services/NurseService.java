@@ -151,6 +151,7 @@ public class NurseService {
         NurseEntity nurse = repository.findOne(id);
         long fileId = saveImageFile(id, fileName, inputStream);
         nurse.setProfilePhotoId(fileId);
+        repository.save(nurse);
     }
 
     @Transactional
@@ -158,6 +159,7 @@ public class NurseService {
         NurseEntity nurse = repository.findOne(id);
         long fileId = saveImageFile(id, fileName, inputStream);
         nurse.setBackgroundImageId(fileId);
+        repository.save(nurse);
     }
 
     private long saveImageFile(long id, String fileName, InputStream inputStream){
