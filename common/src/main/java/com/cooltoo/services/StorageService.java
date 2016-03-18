@@ -40,17 +40,17 @@ public class StorageService {
             String sha1         = sha1(String.valueOf(System.nanoTime()));
             String folderName   = sha1.substring(0, 2);
             String newFileName  = sha1.substring(2);
-            String destFielPath = storagePath + File.separator + folderName;
+            String destFilePath = storagePath + File.separator + folderName;
 
-            logger.info("save " + fileName + " to " + destFielPath + "/" + newFileName);
-            File dir = new File(destFielPath);
+            logger.info("save " + fileName + " to " + destFilePath + "/" + newFileName);
+            File dir = new File(destFilePath);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            File file = new File(destFielPath, newFileName);
+            File file = new File(destFilePath, newFileName);
             writeToFile(inputStream, file);
 
-            return saveToDB(fileName, destFielPath + File.separator + newFileName);
+            return saveToDB(fileName, folderName + File.separator + newFileName);
         } catch (NoSuchAlgorithmException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         } catch (IOException e) {
