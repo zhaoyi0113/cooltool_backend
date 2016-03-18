@@ -4,6 +4,7 @@ import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.repository.FileStorageRepository;
+import com.cooltoo.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter;
@@ -16,8 +17,7 @@ import org.springframework.stereotype.Component;
 public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
 
     @Autowired
-    private FileStorageRepository fileStorageRepository;
-
+    private StorageService storageService;
 
     @Value("${storage.url}")
     private String storageUrl;
@@ -34,14 +34,8 @@ public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
         bean.setPassword(entity.getPassword());
         bean.setIntegral(entity.getIntegral());
 
-        FileStorageEntity storageEntity = fileStorageRepository.findOne(entity.getBackgroundImageId());
-        if(storageEntity != null) {
-            String bgImgUrl = storageUrl + storageEntity.getId();
-            FileStorageEntity photoEntity = fileStorageRepository.findOne(entity.getProfilePhotoId());
-            String photoUrl = storageUrl + photoEntity.getId();
-            bean.setProfilePhotoUrl(photoUrl);
-            bean.setBackgroundImageUrl(bgImgUrl);
-        }
+        bean.setBackgroundImageUrl(storageService.getFileUrl(entity.getBackgroundImageId()));
+        bean.setProfilePhotoUrl(storageService.getFileUrl(entity.getProfilePhotoId()));
         return bean;
     }
 }

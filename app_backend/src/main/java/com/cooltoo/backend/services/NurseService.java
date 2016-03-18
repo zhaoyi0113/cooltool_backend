@@ -64,6 +64,9 @@ public class NurseService {
         if (!NumberUtil.isMobileValid(entity.getMobile())) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+        if(!repository.findNurseByMobile(bean.getMobile()).isEmpty()){
+            throw new BadRequestException(ErrorCode.NURSE_ALREADY_EXISTED);
+        }
         entity = repository.save(entity);
         return entity.getId();
     }

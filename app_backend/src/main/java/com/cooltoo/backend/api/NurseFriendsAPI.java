@@ -44,7 +44,7 @@ public class NurseFriendsAPI {
     @DELETE
     @Path("/{friend_id}")
     public Response removeFriend(@Context HttpServletRequest request, @PathParam("friend_id") long friendId){
-        long userId = Long.valueOf((String) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID));
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         friendsService.removeFriend(userId, friendId);
         return Response.ok().build();
     }
@@ -52,8 +52,16 @@ public class NurseFriendsAPI {
     @GET
     @Path("/count")
     public Response getFriendCount(@Context HttpServletRequest request){
-        long userId = Long.valueOf((String) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID));
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         int count = friendsService.getFriendsCount(userId);
         return Response.ok(count).build();
+    }
+
+    @GET
+    @Path("/search/{name}")
+    public Response searchFriend(@Context HttpServletRequest request, @PathParam("name") String name){
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<NurseFriendsBean> friends = friendsService.searchFriends(userId, name);
+        return Response.ok(friends).build();
     }
 }

@@ -53,25 +53,29 @@ public class NurseAPI {
 
     @POST
     @Path("/add_head_photo")
+    @LoginAuthentication(requireNurseLogin = true)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response addHeadPhoto(
-            @FormDataParam("id") long id,
+            @Context HttpServletRequest request,
             @FormDataParam("file_name") String fileName,
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition disposition) {
-        service.addHeadPhoto(id, fileName, fileInputStream);
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        service.addHeadPhoto(userId, fileName, fileInputStream);
         return Response.ok().build();
     }
 
     @POST
     @Path("/add_background_image")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response addBackgroundImage(
-            @FormDataParam("id") long id,
+            @Context HttpServletRequest request,
             @FormDataParam("file_name") String fileName,
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition disposition) {
-        service.addBackgroundImage(id, fileName, fileInputStream);
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        service.addBackgroundImage(userId, fileName, fileInputStream);
         return Response.ok().build();
     }
 
@@ -111,14 +115,15 @@ public class NurseAPI {
     @Path("/update")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateNurse(
-            @DefaultValue("-1") @FormParam("id") long id,
+            @Context HttpServletRequest request,
             @FormParam("name") String name,
             @FormParam("age") int age,
             @FormParam("gender") int gender,
             @DefaultValue("") @FormParam("mobile") String mobile,
             @DefaultValue("") @FormParam("identificateId") String identificateId
     ) {
-        NurseBean one = service.updateNurse(id, identificateId, name, age, gender, mobile);
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean one = service.updateNurse(userId, identificateId, name, age, gender, mobile);
         logger.info("update nurse is " + one);
         if (null == one) {
             return Response.ok().build();

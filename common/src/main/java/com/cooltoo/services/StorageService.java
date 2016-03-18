@@ -26,6 +26,11 @@ public class StorageService {
     @Value("${storage.path}")
     private String storagePath;
 
+
+    @Value("${storage.url}")
+    private String storageUrl;
+
+
     public long saveFile(String fileName, InputStream inputStream) {
         if(inputStream == null){
             logger.warning("not found inputstream");
@@ -57,7 +62,8 @@ public class StorageService {
     public String getFileUrl(long id) {
         if (storageRepository.exists(id)) {
             FileStorageEntity entity = storageRepository.findOne(id);
-            return entity.getFilePath();
+
+            return storageUrl + entity.getId();
         }
         return "";
     }

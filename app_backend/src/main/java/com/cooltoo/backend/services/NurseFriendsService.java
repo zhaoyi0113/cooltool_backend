@@ -37,11 +37,19 @@ public class NurseFriendsService {
 
     @Transactional
     public void addFriend(long userId, long friendId){
+        insertFriendToDB(userId, friendId);
+        insertFriendToDB(friendId, userId);
+    }
+
+    private void insertFriendToDB(long userId, long friendId){
         validateUserId(userId, friendId);
-        NurseFriendsEntity entity = new NurseFriendsEntity();
-        entity.setUserId(userId);
-        entity.setFriendId(friendId);
-        friendsRepository.save(entity);
+        long count = friendsRepository.countByUserIdAndFriendId(userId, friendId);
+        if(count <= 0){
+            NurseFriendsEntity entity = new NurseFriendsEntity();
+            entity.setUserId(userId);
+            entity.setFriendId(friendId);
+            friendsRepository.save(entity);
+        }
     }
 
     private void validateUserId(long userId, long friendId) {

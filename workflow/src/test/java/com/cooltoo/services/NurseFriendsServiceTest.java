@@ -27,6 +27,15 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
         friendList = friendsService.getFriendList(4);
         Assert.assertEquals(1, friendList.size());
         Assert.assertEquals(1, friendList.get(0).getFriendId());
+
+        friendList = friendsService.getFriendList(1);
+        Assert.assertEquals(3, friendList.size());
+
+        friendsService.addFriend(4,1);
+        friendList = friendsService.getFriendList(4);
+        Assert.assertEquals(1, friendList.size());
+        friendList = friendsService.getFriendList(1);
+        Assert.assertEquals(3, friendList.size());
     }
 
     @Test

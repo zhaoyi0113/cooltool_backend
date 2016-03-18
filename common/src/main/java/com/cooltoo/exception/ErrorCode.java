@@ -69,7 +69,8 @@ public enum ErrorCode {
     NOT_IMPLEMENTATION(10049, Response.Status.BAD_REQUEST, "方法未实现", "Not Implementation"),
     SPEAK_CONTENT_IS_EMPTY(10050, Response.Status.BAD_REQUEST, "发言为空", "Speak content is empty"),
     SPEAK_CONTENT_NOT_EXIST(10051, Response.Status.BAD_REQUEST, "发言不存在", "Speak content not exist"),
-    SPEAK_COMMENT_NOT_EXIST(10052, Response.Status.BAD_REQUEST, "评论为空", "Speak comment is empty");
+    SPEAK_COMMENT_NOT_EXIST(10052, Response.Status.BAD_REQUEST, "评论为空", "Speak comment is empty"),
+    NURSE_ALREADY_EXISTED(10053, Response.Status.BAD_REQUEST, "已注册", "Already registered");
 
     private final int code;
 
