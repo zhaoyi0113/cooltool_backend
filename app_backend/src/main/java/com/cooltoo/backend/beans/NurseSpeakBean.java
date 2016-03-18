@@ -3,6 +3,7 @@ package com.cooltoo.backend.beans;
 import com.cooltoo.constants.SpeakType;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by yzzhao on 3/15/16.
@@ -14,6 +15,7 @@ public class NurseSpeakBean {
     private Date time;
     private String imageUrl;
     private SpeakType speakType;
+    List<NurseSpeakCommentBean> comments;
 
     public long getId() {
         return id;
@@ -55,9 +57,21 @@ public class NurseSpeakBean {
         this.imageUrl = imageUrl;
     }
 
-    public SpeakType getSpeakType() { return speakType; }
+    public SpeakType getSpeakType() {
+        return speakType;
+    }
 
-    public void setSpeakType(SpeakType speakType) { this.speakType = speakType; }
+    public void setSpeakType(SpeakType speakType) {
+        this.speakType = speakType;
+    }
+
+    public List<NurseSpeakCommentBean> getComments() {
+        return this.comments;
+    }
+
+    public void setComments(List<NurseSpeakCommentBean> comments) {
+        this.comments = comments;
+    }
 
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -67,8 +81,12 @@ public class NurseSpeakBean {
         msg.append("time=").append(time).append(" , ");
         msg.append("content=").append(content).append(" , ");
         msg.append("imageUrl=").append(imageUrl).append(" , ");
-        msg.append("speakType=").append(speakType);
-        msg.append("]");
+        msg.append("speakType=").append(speakType).append("\r\n");
+        int count = null==comments ? 0 : comments.size();
+        for (int i = 0; i < count; i++) {
+            msg.append(comments.get(i)).append("\r\n");
+        }
+        msg.append("\r\n").append("]");
         return msg.toString();
     }
 }

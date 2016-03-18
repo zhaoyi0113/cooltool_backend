@@ -1,6 +1,7 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseSpeakBean;
+import com.cooltoo.backend.beans.NurseSpeakCommentBean;
 import com.cooltoo.backend.converter.NurseSpeakConverter;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
@@ -37,6 +38,9 @@ public class NurseSpeakService {
     @Autowired
     private StorageService storageService;
 
+    @Autowired
+    private NurseSpeakCommentService speakCommentService;
+
     public List<NurseSpeakBean> getNurseSpeak(long userId, int index, int number) {
         logger.info("get nurse speak at "+index+" number="+number);
         PageRequest request = new PageRequest(index, number, Sort.Direction.DESC, "time");
@@ -46,19 +50,20 @@ public class NurseSpeakService {
             NurseSpeakBean speak = speakConverter.convert(entity);
             String fileUrl = storageService.getFileUrl(entity.getId());
             speak.setImageUrl(fileUrl);
+            List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speak.getId());
+            speak.setComments(comments);
             speaks.add(speak);
         }
         return speaks;
     }
 
     public NurseSpeakBean getNurseSpeak(long userId, long id) {
-        NurseSpeakEntity entity = speakRepository.getOne(id);
-        if (null==entity) {
-            throw new BadRequestException(ErrorCode.SPEAK_CONTENT_NOT_EXIST);
-        }
-        NurseSpeakBean bean = speakConverter.convert(entity);
-        bean.setImageUrl(storageService.getFileUrl(entity.getImageId()));
-        return bean;
+        NurseSpeakEntity entity = speakRepository.findOne(id);
+        NurseSpeakBean speakBean = speakConverter.convert(entity);
+        speakBean.setImageUrl(storageService.getFileUrl(entity.getImageId()));
+        List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speakBean.getId());
+        speakBean.setComments(comments);
+        return speakBean;
     }
 
     public NurseSpeakBean addNurseSpeak(long userId, String content, String speakType, String fileName, InputStream fileInputStream) {
@@ -100,6 +105,11 @@ public class NurseSpeakService {
             bean.setImageUrl(storageService.getFileUrl(entity.getImageId()));
         }
         return bean;
+    }
+
+    public NurseSpeakCommentBean addSpeakComment(long speakId, long commentMakerId, long commentReceiverId, String comment) {
+        NurseSpeakCommentBean commentBean = speakCommentService.addSpeakComment(speakId, commentMakerId, commentReceiverId, comment);
+        return commentBean;
     }
 
     public long getNurseSpeakCount(long userId){

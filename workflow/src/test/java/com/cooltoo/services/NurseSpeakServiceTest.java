@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseSpeakBean;
+import com.cooltoo.backend.beans.NurseSpeakCommentBean;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.SpeakType;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,6 +72,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals("hello", bean.getContent());
         Assert.assertNotNull(bean.getTime());
         Assert.assertNotNull(bean.getImageUrl());
+        Assert.assertEquals(3, bean.getComments().size());
         System.out.println(bean);
     }
 
@@ -78,5 +81,19 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     public void testGetNurseSpeakCount(){
         long count = speakService.getNurseSpeakCount(1);
         Assert.assertEquals(11, count);
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
+    public void testAddNurseSpeakComment() {
+        String comment = "Test ping lun";
+        Date time = new Date();
+        NurseSpeakCommentBean commentBean = speakService.addSpeakComment(1, 1, 0, comment);
+        Assert.assertTrue(commentBean.getId()>0);
+        Assert.assertEquals(1, commentBean.getNurseSpeakId());
+        Assert.assertEquals(1, commentBean.getCommentMakerId());
+        Assert.assertEquals(0, commentBean.getCommentReceiverId());
+        Assert.assertEquals(comment, commentBean.getComment());
+        Assert.assertTrue(commentBean.getTime().getTime() >= time.getTime());
     }
 }

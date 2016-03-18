@@ -1,6 +1,7 @@
 package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.beans.NurseSpeakBean;
+import com.cooltoo.backend.beans.NurseSpeakCommentBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.ContextKeys;
@@ -60,4 +61,17 @@ public class NurseSpeakAPI {
         return Response.ok(nurseSpeak).build();
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/comment")
+    public Response addSpeakComment(
+            @Context HttpServletRequest request,
+            @FormParam("nurseSpeakId") long nurseSpeakId,
+            @FormParam("commentReceiverId") long commentReceiverId,
+            @FormParam("comment") String comment
+    ) {
+        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        NurseSpeakCommentBean commentBean = speakService.addSpeakComment(nurseSpeakId, userId, commentReceiverId, comment);
+        return Response.ok(commentBean).build();
+    }
 }
