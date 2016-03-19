@@ -3,8 +3,10 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakCommentBean;
+import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.SpeakType;
+import com.cooltoo.exception.BadRequestException;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,7 +68,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
     public void testGetNurseSpeakById() {
-        NurseSpeakBean bean = speakService.getNurseSpeak(1, 3);
+        NurseSpeakBean bean = speakService.getNurseSpeak(3);
         Assert.assertEquals(3, bean.getId());
         Assert.assertEquals(1, bean.getUserId());
         Assert.assertEquals("hello", bean.getContent());
@@ -95,5 +97,57 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(0, commentBean.getCommentReceiverId());
         Assert.assertEquals(comment, commentBean.getComment());
         Assert.assertTrue(commentBean.getTime().getTime() >= time.getTime());
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
+    public void testAddNurseSpeakThumbsUp() {
+        Exception throwable = null;
+        try {
+            speakService.addNurseSpeakThumbsUp(5, 3);
+        }
+        catch (Exception ex) {
+            throwable = ex;
+        }
+        Assert.assertNotNull(throwable);
+        Assert.assertTrue(throwable instanceof BadRequestException);
+
+        throwable = null;
+        try {
+            speakService.addNurseSpeakThumbsUp(5, 1);
+        }
+        catch (Exception ex) {
+            throwable = ex;
+        }
+        Assert.assertNotNull(throwable);
+        Assert.assertTrue(throwable instanceof BadRequestException);
+
+        Date time = new Date();
+        NurseSpeakThumbsUpBean thumbsUpBean = speakService.addNurseSpeakThumbsUp(7, 3);
+        Assert.assertEquals(7, thumbsUpBean.getNurseSpeakId());
+        Assert.assertEquals(3, thumbsUpBean.getThumbsUpUserId());
+        Assert.assertTrue(thumbsUpBean.getId()>0);
+        Assert.assertTrue(thumbsUpBean.getTime().getTime() >= time.getTime());
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
+    public void testDeleteNurseSpeakThumbsUp() {
+        NurseSpeakThumbsUpBean thumbsUpBean = speakService.getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(5, 3);
+        Assert.assertNotNull(thumbsUpBean);
+        Assert.assertEquals(5, thumbsUpBean.getNurseSpeakId());
+        Assert.assertEquals(3, thumbsUpBean.getThumbsUpUserId());
+
+        speakService.deleteNurseSpeakThumbsUp(5, 3);
+
+        Exception throwable = null;
+        try {
+            speakService.getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(5, 3);
+        }
+        catch (Exception ex) {
+            throwable = ex;
+        }
+        Assert.assertNotNull(throwable);
+        Assert.assertTrue(throwable instanceof BadRequestException);
     }
 }

@@ -16,6 +16,7 @@ public class NurseSpeakBean {
     private String imageUrl;
     private SpeakType speakType;
     List<NurseSpeakCommentBean> comments;
+    List<NurseSpeakThumbsUpBean> thumbsUps;
 
     public long getId() {
         return id;
@@ -73,6 +74,14 @@ public class NurseSpeakBean {
         this.comments = comments;
     }
 
+    public List<NurseSpeakThumbsUpBean> getThumbsUps() {
+        return this.thumbsUps;
+    }
+
+    public void setThumbsUps(List<NurseSpeakThumbsUpBean> thumbsUps) {
+        this.thumbsUps = thumbsUps;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
@@ -85,6 +94,11 @@ public class NurseSpeakBean {
         int count = null==comments ? 0 : comments.size();
         for (int i = 0; i < count; i++) {
             msg.append(comments.get(i)).append("\r\n");
+        }
+        msg.append("\r\n\r\n");
+        count = null==thumbsUps ? 0 : thumbsUps.size();
+        for (int i = 0; i < count; i++) {
+            msg.append(thumbsUps.get(i)).append("\r\n");
         }
         msg.append("\r\n").append("]");
         return msg.toString();

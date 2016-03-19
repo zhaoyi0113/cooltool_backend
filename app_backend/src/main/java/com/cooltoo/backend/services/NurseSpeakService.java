@@ -2,6 +2,7 @@ package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakCommentBean;
+import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
 import com.cooltoo.backend.converter.NurseSpeakConverter;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
@@ -41,6 +42,9 @@ public class NurseSpeakService {
     @Autowired
     private NurseSpeakCommentService speakCommentService;
 
+    @Autowired
+    private NurseSpeakThumbsUpService thumbsUpService;
+
     public List<NurseSpeakBean> getNurseSpeak(long userId, int index, int number) {
         logger.info("get nurse speak at "+index+" number="+number);
         PageRequest request = new PageRequest(index, number, Sort.Direction.DESC, "time");
@@ -52,17 +56,21 @@ public class NurseSpeakService {
             speak.setImageUrl(fileUrl);
             List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speak.getId());
             speak.setComments(comments);
+            List<NurseSpeakThumbsUpBean> thumbsUps = thumbsUpService.getSpeakThumbsUpByNurseSpeakId(speak.getId());
+            speak.setThumbsUps(thumbsUps);
             speaks.add(speak);
         }
         return speaks;
     }
 
-    public NurseSpeakBean getNurseSpeak(long userId, long id) {
+    public NurseSpeakBean getNurseSpeak(long id) {
         NurseSpeakEntity entity = speakRepository.findOne(id);
         NurseSpeakBean speakBean = speakConverter.convert(entity);
         speakBean.setImageUrl(storageService.getFileUrl(entity.getImageId()));
         List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speakBean.getId());
         speakBean.setComments(comments);
+        List<NurseSpeakThumbsUpBean> thumbsUps = thumbsUpService.getSpeakThumbsUpByNurseSpeakId(id);
+        speakBean.setThumbsUps(thumbsUps);
         return speakBean;
     }
 
@@ -109,10 +117,37 @@ public class NurseSpeakService {
 
     public NurseSpeakCommentBean addSpeakComment(long speakId, long commentMakerId, long commentReceiverId, String comment) {
         NurseSpeakCommentBean commentBean = speakCommentService.addSpeakComment(speakId, commentMakerId, commentReceiverId, comment);
+        //TODO need to transfer the comment to the relative person
+        //... ...
         return commentBean;
     }
 
     public long getNurseSpeakCount(long userId){
         return speakRepository.countNurseSpeakByUserId(userId);
+    }
+
+    public NurseSpeakThumbsUpBean addNurseSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
+        NurseSpeakEntity speakEntity = speakRepository.findOne(nurseSpeakId);
+        if (null==speakEntity) {
+            throw new BadRequestException(ErrorCode.SPEAK_CONTENT_NOT_EXIST);
+        }
+
+        // you could not add thumbs_up for yourself
+        if (thumbsUpUserId==speakEntity.getUserId()) {
+            throw new BadRequestException(ErrorCode.SPEAK_THUMBS_UP_CAN_NOT_FOR_SELF);
+        }
+
+        NurseSpeakThumbsUpBean thumbsUpBean = thumbsUpService.addSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
+        //TODO need to transfer this thumbs_up to the relative person
+
+        return thumbsUpBean;
+    }
+
+    public void deleteNurseSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
+        thumbsUpService.deleteNurseSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
+    }
+
+    public NurseSpeakThumbsUpBean getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(long nurseSpeakId, long thumbsUpUserId) {
+        return thumbsUpService.findNurseSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
     }
 }

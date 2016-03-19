@@ -23,4 +23,12 @@
     <nurse_speak_comment id="8" nurse_speak_id="3" user_make_comment_id="3" user_replied_to_id="0" comment="chou mei 8" time="2016-01-04" />
     <nurse_speak_comment id="9" nurse_speak_id="1" user_make_comment_id="1" user_replied_to_id="0" comment="chou mei 9" time="2016-01-03" />
     <nurse_speak_comment id="10" nurse_speak_id="1" user_make_comment_id="1" user_replied_to_id="0" comment="chou mei 10" time="2016-01-02" />
+
+    <nurse_speak_thumbs_up id="1" nurse_speak_id="1" thumbs_up_user_id="2" time="2016-02-11 23:11:32" />
+    <nurse_speak_thumbs_up id="2" nurse_speak_id="2" thumbs_up_user_id="3" time="2016-02-12 12:11:32" />
+    <nurse_speak_thumbs_up id="3" nurse_speak_id="2" thumbs_up_user_id="4" time="2016-03-11 23:11:32" />
+    <nurse_speak_thumbs_up id="4" nurse_speak_id="3" thumbs_up_user_id="2" time="2016-03-01 15:11:32" />
+    <nurse_speak_thumbs_up id="5" nurse_speak_id="5" thumbs_up_user_id="3" time="2016-03-17 23:11:32" />
+    <nurse_speak_thumbs_up id="6" nurse_speak_id="2" thumbs_up_user_id="7" time="2016-03-15 8:11:32" />
+    <nurse_speak_thumbs_up id="7" nurse_speak_id="4" thumbs_up_user_id="5" time="2016-03-18 9:11:32" />
 </dataset>

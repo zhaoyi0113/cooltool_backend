@@ -70,7 +70,10 @@ public enum ErrorCode {
     SPEAK_CONTENT_IS_EMPTY(10050, Response.Status.BAD_REQUEST, "发言为空", "Speak content is empty"),
     SPEAK_CONTENT_NOT_EXIST(10051, Response.Status.BAD_REQUEST, "发言不存在", "Speak content not exist"),
     SPEAK_COMMENT_NOT_EXIST(10052, Response.Status.BAD_REQUEST, "评论为空", "Speak comment is empty"),
-    NURSE_ALREADY_EXISTED(10053, Response.Status.BAD_REQUEST, "已注册", "Already registered");
+    NURSE_ALREADY_EXISTED(10053, Response.Status.BAD_REQUEST, "已注册", "Already registered"),
+    SPEAK_THUMBS_UP_EXIST(10054, Response.Status.BAD_REQUEST, "点赞已存在", "Thumbs up is exist already"),
+    SPEAK_THUMBS_UP_NOT_EXIST(10055, Response.Status.BAD_REQUEST, "点赞不存在", "Thumbs up not exist"),
+    SPEAK_THUMBS_UP_CAN_NOT_FOR_SELF(10056, Response.Status.BAD_REQUEST, "不可以给自己点赞", "Can not thumbs_up for self");
 
     private final int code;
 
