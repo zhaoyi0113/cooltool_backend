@@ -4,6 +4,7 @@ import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.exception.BadRequestException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class NurseAPI {
     }
 
     @POST
-    @Path("/new")
+    @Path("/register")
     @Produces(MediaType.APPLICATION_JSON)
     public Response newNurse(
             @FormParam("name") String name,
@@ -45,9 +46,16 @@ public class NurseAPI {
             @FormParam("gender") int gender,
             @DefaultValue("") @FormParam("mobile") String mobile,
             @DefaultValue("") @FormParam("identificateId") String identificateId,
-            @FormParam("password") String password
+            @FormParam("password") String password,
+            @FormParam("sms_code") String smsCode
     ) {
-        long id = service.newNurse(identificateId, name, age, gender, mobile, password);
+        long id = -1;
+        try {
+            id = service.registerNurse(identificateId, name, age, gender, mobile, password, smsCode);
+        }catch(BadRequestException e){
+            e.printStackTrace();
+            logger.severe(e.getMessage());
+        }
         return Response.ok(id).build();
     }
 

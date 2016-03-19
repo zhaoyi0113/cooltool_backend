@@ -44,7 +44,8 @@ public class NurseServiceTest extends AbstractCooltooTest {
         bean.setAge(321);
         bean.setGender(1);
         bean.setMobile("15811663430");
-        long id = service.newNurse(bean);
+        bean.setPassword("password");
+        long id = service.registerNurse(bean);
         Assert.assertTrue(id>0);
         List<NurseBean> all = service.getAll();
         Assert.assertTrue(all.size()>0);

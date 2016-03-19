@@ -4,6 +4,7 @@ import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.converter.NurseBeanConverter;
 import com.cooltoo.backend.converter.NurseEntityConverter;
 import com.cooltoo.backend.entities.HospitalEntity;
+import com.cooltoo.backend.leancloud.LeanCloudService;
 import com.cooltoo.backend.repository.HospitalRepository;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.repository.NurseRepository;
@@ -11,6 +12,8 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
 import com.cooltoo.util.NumberUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,8 @@ import java.util.List;
  */
 @Service("NurseService")
 public class NurseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(NurseService.class.getName());
 
     @Autowired
     private NurseRepository repository;
@@ -41,10 +46,14 @@ public class NurseService {
     private NurseSpeakService speakService;
     @Autowired
     private NurseSkillNorminationService norminationService;
+    @Autowired
+    private LeanCloudService leanCloudService;
 
     @Transactional
-    public long newNurse(String identificationId, String name, int age,
-                         int gender, String mobile, String password) {
+    public long registerNurse(String identificationId, String name, int age,
+                              int gender, String mobile, String password, String smsCode) {
+        logger.info("register new nurse "+mobile+", "+smsCode);
+        leanCloudService.verifySmsCode(smsCode, mobile);
         NurseBean bean = new NurseBean();
         bean.setIdentificationId(identificationId);
         bean.setName(name);
@@ -52,16 +61,13 @@ public class NurseService {
         bean.setGender(gender);
         bean.setMobile(mobile);
         bean.setPassword(password);
-        return newNurse(bean);
+        return registerNurse(bean);
     }
 
     @Transactional
-    public long newNurse(NurseBean bean) {
+    public long registerNurse(NurseBean bean) {
         NurseEntity entity = entityConverter.convert(bean);
-        if (null==entity.getName() || "".equals(entity.getName())){
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        if (!NumberUtil.isMobileValid(entity.getMobile())) {
+        if (null==entity.getMobile() || entity.getMobile().isEmpty() || entity.getPassword() == null || entity.getPassword().isEmpty()){
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if(!repository.findNurseByMobile(bean.getMobile()).isEmpty()){
@@ -70,6 +76,7 @@ public class NurseService {
         entity = repository.save(entity);
         return entity.getId();
     }
+
 
     public NurseBean getNurse(long id) {
         NurseEntity entity = repository.findOne(id);

@@ -79,7 +79,7 @@ ext {
     flyway.encoding = 'UTF-8'
     flyway.setBaselineOnMigrate(true);
     flyway.setValidateOnMigrate(false);
-
+    flyway.outOfOrder=true
 
 }
 
