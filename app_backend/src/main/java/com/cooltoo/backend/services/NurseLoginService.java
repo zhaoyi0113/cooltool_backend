@@ -67,4 +67,8 @@ public class NurseLoginService {
         tokenEntities.get(0).setStatus(CommonStatus.DISABLED);
         tokenAccessRepository.save(tokenEntities.get(0));
     }
+
+    public boolean isLogin(long userId){
+        return !tokenAccessRepository.findTokenAccessByUserId(userId).isEmpty();
+    }
 }

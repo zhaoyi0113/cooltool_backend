@@ -50,12 +50,12 @@ public class NurseAPI {
             @FormParam("sms_code") String smsCode
     ) {
         long id = -1;
-        try {
+//        try {
             id = service.registerNurse(identificateId, name, age, gender, mobile, password, smsCode);
-        }catch(BadRequestException e){
-            e.printStackTrace();
-            logger.severe(e.getMessage());
-        }
+//        }catch(BadRequestException e){
+//            e.printStackTrace();
+//            logger.severe(e.getMessage());
+//        }
         return Response.ok(id).build();
     }
 

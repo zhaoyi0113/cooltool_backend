@@ -13,4 +13,5 @@ public interface TokenAccessRepository extends CrudRepository<TokenAccessEntity,
     List<TokenAccessEntity> findTokenAccessByUserId(long userId);
 
     List<TokenAccessEntity> findTokenAccessByToken(String token);
+
 }
