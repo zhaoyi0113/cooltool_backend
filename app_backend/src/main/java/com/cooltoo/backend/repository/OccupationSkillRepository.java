@@ -13,10 +13,10 @@ public interface OccupationSkillRepository extends JpaRepository<OccupationSkill
     List<OccupationSkillEntity> findByName(String name);
 
 
-//    @Query("select skill from OccupationSkillEntity  skill, NurseSkillRelationEntity  relation where relation.userId = :userId and relation.skillId = skill.id")
+//    @Query("select skill from OccupationSkillEntity  skill, NurseOccupationSkillEntity  relation where relation.userId = :userId and relation.skillId = skill.id")
 //    Page<OccupationSkillEntity> findSkillNormation(@Param("userId") long userId, PageRequest request);
 
 
-//    @Query("select skill from OccupationSkillEntity skill, NurseSkillRelationEntity relation where ")
+//    @Query("select skill from OccupationSkillEntity skill, NurseOccupationSkillEntity relation where ")
 //    Page<OccupationSkillEntity> findSkillNormination(@Param("userId") long userId);
 }

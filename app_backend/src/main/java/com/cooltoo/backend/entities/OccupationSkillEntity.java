@@ -1,5 +1,7 @@
 package com.cooltoo.backend.entities;
 
+import com.cooltoo.constants.OccupationSkillType;
+
 import javax.persistence.*;
 
 /**
@@ -11,6 +13,7 @@ public class OccupationSkillEntity {
     private int id;
     private long imageId;
     private String name;
+    private OccupationSkillType type;
 
     @Id
     @GeneratedValue
@@ -38,6 +41,17 @@ public class OccupationSkillEntity {
     }
 
     public void setName(String name) {
+
         this.name = name;
+    }
+
+    @Column(name="type")
+    @Enumerated
+    public OccupationSkillType getType() {
+        return type;
+    }
+
+    public void setType(OccupationSkillType type) {
+        this.type = type;
     }
 }

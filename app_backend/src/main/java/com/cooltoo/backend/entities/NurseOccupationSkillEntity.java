@@ -7,11 +7,12 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "nurse_occupation_skill")
-public class NurseSkillRelationEntity {
+public class NurseOccupationSkillEntity {
 
     private int id;
     private long userId;
     private int skillId;
+    private int point;
 
     @Id
     @GeneratedValue
@@ -40,5 +41,14 @@ public class NurseSkillRelationEntity {
 
     public void setSkillId(int skillId) {
         this.skillId = skillId;
+    }
+
+    @Column(name="point")
+    public int getPoint() {
+        return point;
+    }
+
+    public void setPoint(int point) {
+        this.point = point;
     }
 }
