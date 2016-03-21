@@ -154,7 +154,7 @@ public class NurseService {
     public void addHeadPhoto(long id, String fileName, InputStream inputStream){
         NurseEntity nurse = repository.findOne(id);
         try {
-            long fileId = saveImageFile(nurse.getProfilePhotoId(), fileName, inputStream);
+            long fileId = storageService.saveFile(nurse.getProfilePhotoId(), fileName, inputStream);
             nurse.setProfilePhotoId(fileId);
         }
         catch (BadRequestException ex) {
@@ -170,7 +170,7 @@ public class NurseService {
     public void addBackgroundImage(long id, String fileName, InputStream inputStream){
         NurseEntity nurse = repository.findOne(id);
         try {
-            long fileId = saveImageFile(nurse.getBackgroundImageId(), fileName, inputStream);
+            long fileId = storageService.saveFile(nurse.getBackgroundImageId(), fileName, inputStream);
             nurse.setBackgroundImageId(fileId);
         }
         catch (BadRequestException ex) {
@@ -180,9 +180,5 @@ public class NurseService {
             }
         }
         repository.save(nurse);
-    }
-
-    private long saveImageFile(long fileId, String fileName, InputStream inputStream){
-        return storageService.saveFile(fileId, fileName, inputStream);
     }
 }
