@@ -39,7 +39,6 @@ public class NurseServiceTest extends AbstractCooltooTest {
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testNew() {
         NurseBean bean = new NurseBean();
-        bean.setIdentificationId("432154654643123");
         bean.setName("name_1");
         bean.setAge(321);
         bean.setGender(1);

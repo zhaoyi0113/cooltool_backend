@@ -18,9 +18,6 @@ public class NurseBean {
     @FormParam("id")
     private long id;
 
-    @FormParam("identificateId")
-    private String identificationId;
-
     @FormParam("name")
     private String name;
 
@@ -48,14 +45,6 @@ public class NurseBean {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getIdentificationId() {
-        return identificationId;
-    }
-
-    public void setIdentificationId(String identificationId) {
-        this.identificationId = identificationId;
     }
 
     public int getGender() {
@@ -158,7 +147,6 @@ public class NurseBean {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(" , ");
-        msg.append("iid=").append(identificationId).append(" , ");
         msg.append("name=").append(name).append(" , ");
         msg.append("gender=").append(gender).append(" , ");
         msg.append("age=").append(age).append(" , ");

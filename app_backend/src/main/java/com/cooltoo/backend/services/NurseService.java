@@ -50,12 +50,11 @@ public class NurseService {
     private LeanCloudService leanCloudService;
 
     @Transactional
-    public long registerNurse(String identificationId, String name, int age,
+    public long registerNurse(String name, int age,
                               int gender, String mobile, String password, String smsCode) {
         logger.info("register new nurse "+mobile+", "+smsCode);
         leanCloudService.verifySmsCode(smsCode, mobile);
         NurseBean bean = new NurseBean();
-        bean.setIdentificationId(identificationId);
         bean.setName(name);
         bean.setAge(age);
         bean.setGender(gender);
@@ -128,11 +127,6 @@ public class NurseService {
         }
 
         boolean changed = false;
-        // TODO need to add algorithm to verify the identificationId and encrypt it
-        if (null!=identificationId && !"".equals(identificationId) && !identificationId.equals(entity.getIdentificationId())) {
-            entity.setIdentificationId(identificationId);
-            changed = true;
-        }
         if (!entity.getName().equals(name)) {
             entity.setName(name);
             changed = true;

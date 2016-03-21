@@ -45,13 +45,12 @@ public class NurseAPI {
             @FormParam("age") int age,
             @FormParam("gender") int gender,
             @DefaultValue("") @FormParam("mobile") String mobile,
-            @DefaultValue("") @FormParam("identificateId") String identificateId,
             @FormParam("password") String password,
             @FormParam("sms_code") String smsCode
     ) {
         long id = -1;
 //        try {
-            id = service.registerNurse(identificateId, name, age, gender, mobile, password, smsCode);
+            id = service.registerNurse(name, age, gender, mobile, password, smsCode);
 //        }catch(BadRequestException e){
 //            e.printStackTrace();
 //            logger.severe(e.getMessage());

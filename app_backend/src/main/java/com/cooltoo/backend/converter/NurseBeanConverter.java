@@ -23,7 +23,6 @@ public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
     public NurseBean convert(NurseEntity entity) {
         NurseBean bean = new NurseBean();
         bean.setId(entity.getId());
-        bean.setIdentificationId(entity.getIdentificationId());
         bean.setName(entity.getName());
         bean.setGender(entity.getGender());
         bean.setAge(entity.getAge());

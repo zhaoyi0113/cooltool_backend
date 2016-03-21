@@ -5,11 +5,11 @@
     <nurse_hospital_relation id="33" nurse_id="33" hospital_id="33" department_id="33" />
     <nurse_hospital_relation id="44" nurse_id="44" hospital_id="44" department_id="44" />
     <nurse_hospital_relation id="55" nurse_id="55" hospital_id="55" department_id="55" />
-    <nurse id="11" identificate_id="32143214321432141" name="nurse1" age="11" gender="1" mobile="1231432143" />
-    <nurse id="22" identificate_id="43214314312432143" name="nurse2" age="22" gender="2" mobile="14321134" />
-    <nurse id="33" identificate_id="43214314314343214" name="nurse3" age="33" gender="3" mobile="135232121222" />
-    <nurse id="44" identificate_id="65476576587687665" name="nurse4" age="44" gender="2" mobile="13811663451" />
-    <nurse id="55" identificate_id="99879587658765898" name="nurse5" age="55" gender="1" mobile="18527727387" />
+    <nurse id="11"  name="nurse1" age="11" gender="1" mobile="1231432143" />
+    <nurse id="22" name="nurse2" age="22" gender="2" mobile="14321134" />
+    <nurse id="33"  name="nurse3" age="33" gender="3" mobile="135232121222" />
+    <nurse id="44"  name="nurse4" age="44" gender="2" mobile="13811663451" />
+    <nurse id="55"  name="nurse5" age="55" gender="1" mobile="18527727387" />
     <hospital id="11" name="hospital1" province="province00" city="city00" />
     <hospital id="22" name="hospital2" province="province01" city="city01" />
     <hospital id="33" name="hospital3" province="province02" city="city02" />
