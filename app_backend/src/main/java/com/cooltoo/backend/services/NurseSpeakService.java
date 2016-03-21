@@ -69,8 +69,10 @@ public class NurseSpeakService {
         speakBean.setImageUrl(storageService.getFileUrl(entity.getImageId()));
         List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speakBean.getId());
         speakBean.setComments(comments);
+        speakBean.setCommentsCount(comments.size());
         List<NurseSpeakThumbsUpBean> thumbsUps = thumbsUpService.getSpeakThumbsUpByNurseSpeakId(id);
         speakBean.setThumbsUps(thumbsUps);
+        speakBean.setThumbsUpsCount(thumbsUps.size());
         return speakBean;
     }
 

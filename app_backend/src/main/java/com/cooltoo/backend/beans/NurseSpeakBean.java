@@ -12,11 +12,14 @@ public class NurseSpeakBean {
     private long id;
     private long userId;
     private String content;
+    private String userName;
     private Date time;
     private String imageUrl;
     private SpeakType speakType;
-    List<NurseSpeakCommentBean> comments;
-    List<NurseSpeakThumbsUpBean> thumbsUps;
+    private List<NurseSpeakCommentBean> comments;
+    private List<NurseSpeakThumbsUpBean> thumbsUps;
+    private int commentsCount;
+    private int thumbsUpsCount;
 
     public long getId() {
         return id;
@@ -82,14 +85,41 @@ public class NurseSpeakBean {
         this.thumbsUps = thumbsUps;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(int commentsCount) {
+        this.commentsCount = commentsCount;
+    }
+
+    public int getThumbsUpsCount() {
+        return thumbsUpsCount;
+    }
+
+    public void setThumbsUpsCount(int thumbsUpsCount) {
+        this.thumbsUpsCount = thumbsUpsCount;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
         msg.append("id=").append(id).append(" , ");
         msg.append("userId=").append(userId).append(" , ");
+        msg.append("username=").append(userName).append(" , ");
         msg.append("time=").append(time).append(" , ");
         msg.append("content=").append(content).append(" , ");
         msg.append("imageUrl=").append(imageUrl).append(" , ");
+        msg.append("thumbsUpsCount=").append(thumbsUpsCount).append(" , ");
+        msg.append("commentsCount=").append(commentsCount).append(" , ");
         msg.append("speakType=").append(speakType).append("\r\n");
         int count = null==comments ? 0 : comments.size();
         for (int i = 0; i < count; i++) {
