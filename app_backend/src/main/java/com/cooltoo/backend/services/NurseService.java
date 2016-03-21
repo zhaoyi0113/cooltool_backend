@@ -153,24 +153,36 @@ public class NurseService {
     @Transactional
     public void addHeadPhoto(long id, String fileName, InputStream inputStream){
         NurseEntity nurse = repository.findOne(id);
-        long fileId = saveImageFile(id, fileName, inputStream);
-        nurse.setProfilePhotoId(fileId);
+        try {
+            long fileId = saveImageFile(nurse.getProfilePhotoId(), fileName, inputStream);
+            nurse.setProfilePhotoId(fileId);
+        }
+        catch (BadRequestException ex) {
+            logger.info("Delete file has exception throwing " + ex);
+            if (ex.getErrorCode().equals(ErrorCode.FILE_DELETE_FAILED)) {
+                throw ex;
+            }
+        }
         repository.save(nurse);
     }
 
     @Transactional
     public void addBackgroundImage(long id, String fileName, InputStream inputStream){
         NurseEntity nurse = repository.findOne(id);
-        long fileId = saveImageFile(id, fileName, inputStream);
-        nurse.setBackgroundImageId(fileId);
+        try {
+            long fileId = saveImageFile(nurse.getBackgroundImageId(), fileName, inputStream);
+            nurse.setBackgroundImageId(fileId);
+        }
+        catch (BadRequestException ex) {
+            logger.info("Delete file has exception throwing " + ex);
+            if (ex.getErrorCode().equals(ErrorCode.FILE_DELETE_FAILED)) {
+                throw ex;
+            }
+        }
         repository.save(nurse);
     }
 
-    private long saveImageFile(long id, String fileName, InputStream inputStream){
-        NurseEntity nurse = repository.findOne(id);
-        if(nurse == null){
-            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
-        }
-        return storageService.saveFile(fileName, inputStream);
+    private long saveImageFile(long fileId, String fileName, InputStream inputStream){
+        return storageService.saveFile(fileId, fileName, inputStream);
     }
 }

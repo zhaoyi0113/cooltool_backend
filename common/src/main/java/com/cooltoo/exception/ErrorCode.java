@@ -74,7 +74,8 @@ public enum ErrorCode {
     SPEAK_THUMBS_UP_EXIST(10054, Response.Status.BAD_REQUEST, "点赞已存在", "Thumbs up is exist already"),
     SPEAK_THUMBS_UP_NOT_EXIST(10055, Response.Status.BAD_REQUEST, "点赞不存在", "Thumbs up not exist"),
     SPEAK_THUMBS_UP_CAN_NOT_FOR_SELF(10056, Response.Status.BAD_REQUEST, "不可以给自己点赞", "Can not thumbs_up for self"),
-    SMS_VERIFY_FAILED(10057, Response.Status.BAD_REQUEST, "短信验证码失败", "Verify SMS Code Failed.");
+    SMS_VERIFY_FAILED(10057, Response.Status.BAD_REQUEST, "短信验证码失败", "Verify SMS Code Failed."),
+    FILE_DELETE_FAILED(10058, Response.Status.BAD_REQUEST, "删除文件失败", "Delete file operation failed");
 
     private final int code;
 

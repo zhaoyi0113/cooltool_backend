@@ -53,6 +53,10 @@ public class LeanCloudService {
 //            List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 //            parameters.add(new BasicNameValuePair(""));
 //            httppost.setEntity(new UrlEncodedFormEntity(postParameters));
+//            //Just for debugging
+//            if (!mobile.isEmpty()) {
+//                return;
+//            }
 
             HttpResponse response = httpClient.execute(post);
             String body = EntityUtils.toString(response.getEntity(), "UTF-8");

@@ -1,6 +1,8 @@
 package com.cooltoo.services;
 
 import com.cooltoo.entities.FileStorageEntity;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.FileStorageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,17 +33,20 @@ public class StorageService {
     private String storageUrl;
 
 
-    public long saveFile(String fileName, InputStream inputStream) {
+    public long saveFile(long fileId, String fileName, InputStream inputStream) {
         if(inputStream == null){
             logger.warning("not found inputstream");
             return -1;
         }
+        deleteFileIfExist(fileId);
         try {
+            String storageDirectory = storagePath + File.separator;
             String sha1         = sha1(String.valueOf(System.nanoTime()));
             String folderName   = sha1.substring(0, 2);
             String newFileName  = sha1.substring(2);
-            String destFilePath = storagePath + File.separator + folderName;
+            String relativePath = folderName + File.separator + newFileName;
 
+            String destFilePath = storageDirectory + folderName;
             logger.info("save " + fileName + " to " + destFilePath + "/" + newFileName);
             File dir = new File(destFilePath);
             if (!dir.exists()) {
@@ -50,7 +55,7 @@ public class StorageService {
             File file = new File(destFilePath, newFileName);
             writeToFile(inputStream, file);
 
-            return saveToDB(fileName, folderName + File.separator + newFileName);
+            return saveToDB(fileName, relativePath);
         } catch (NoSuchAlgorithmException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         } catch (IOException e) {
@@ -95,6 +100,27 @@ public class StorageService {
         entity.setFilePath(path);
         entity = storageRepository.save(entity);
         logger.info("FileId="+entity.getId() +", FileName="+entity.getFileRealname() +", FilePath="+entity.getFilePath());
+        return entity.getId();
+    }
+
+    private long deleteFileIfExist(long fileId) {
+        FileStorageEntity entity = storageRepository.findOne(fileId);
+        if (null==entity) {
+            return fileId;
+        }
+        String storageDirectory = storagePath + File.separator;
+        String relativePath = entity.getFilePath();
+        File imageFile = new File(storageDirectory + relativePath);
+        try {
+            if (imageFile.exists()) {
+                imageFile.delete();
+            }
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "failed to delete existing file.", ex);
+            throw new BadRequestException(ErrorCode.FILE_DELETE_FAILED);
+        }
+        storageRepository.delete(entity);
+
         return entity.getId();
     }
 

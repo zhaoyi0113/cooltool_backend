@@ -83,9 +83,14 @@ public class NurseSpeakService {
             logger.info("there is no image file need to insert!");
         }
         else {
-            long fileID = storageService.saveFile(fileName, fileInputStream);
-            entity.setImageId(fileID);
-            hasImage = true;
+            try {
+                long fileID = storageService.saveFile(entity.getImageId(), fileName, fileInputStream);
+                entity.setImageId(fileID);
+                hasImage = true;
+            }
+            catch (BadRequestException ex) {
+                // do nothing
+            }
         }
         if (null==content || "".equals(content)) {
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);

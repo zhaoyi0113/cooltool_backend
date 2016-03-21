@@ -54,7 +54,7 @@ public class OccupationSkillService {
 
     @Transactional
     public void addNewOccupationSkill(String name, InputStream inputStream) {
-        long fileId = storageService.saveFile(name, inputStream);
+        long fileId = storageService.saveFile(0, name, inputStream);
         OccupationSkillEntity entity = new OccupationSkillEntity();
         entity.setName(name);
         entity.setImageId(fileId);
@@ -70,8 +70,13 @@ public class OccupationSkillService {
     public void editOccupationSkill(int id, String name, InputStream inputStream) {
         OccupationSkillEntity entity = editOccupationSkillWithoutImage(id, name);
         if (inputStream != null) {
-            long fileId = storageService.saveFile(entity.getName(), inputStream);
-            entity.setImageId(fileId);
+            try {
+                long fileId = storageService.saveFile(entity.getImageId(), entity.getName(), inputStream);
+                entity.setImageId(fileId);
+            }
+            catch (BadRequestException ex) {
+                // do nothing
+            }
         }
         skillRepository.save(entity);
     }

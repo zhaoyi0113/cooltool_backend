@@ -43,7 +43,7 @@ public class BadgeService {
 
     @Transactional
     public int createNewBadge(String name, int point, int grade, InputStream fileInputStream, String fileName) {
-        long fileId = storageService.saveFile(fileName, fileInputStream);
+        long fileId = storageService.saveFile(0, fileName, fileInputStream);
         String fileUrl = storageService.getFileUrl(fileId);
         BadgeBean bean = new BadgeBean();
         bean.setName(name);
@@ -91,11 +91,16 @@ public class BadgeService {
         BadgeEntity bean = repository.findOne(id);
         bean.setId(id);
         if (null != fileInputStream) {
-            long fileId = storageService.saveFile(fileName, fileInputStream);
-            String fileUrl = storageService.getFileUrl(fileId);
-            bean.setFileId(fileId);
-            bean.setImageUrl(fileUrl);
-            changed = true;
+            try {
+                long fileId = storageService.saveFile(bean.getFileId(), fileName, fileInputStream);
+                String fileUrl = storageService.getFileUrl(fileId);
+                bean.setFileId(fileId);
+                bean.setImageUrl(fileUrl);
+                changed = true;
+            }
+            catch (BadRequestException ex) {
+                // do nothing
+            }
         }
         if (null != name && !"".equals(name) && !bean.getName().equals(name)) {
             bean.setName(name);

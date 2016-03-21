@@ -36,7 +36,7 @@ public class StorageServiceTest extends AbstractCooltooTest {
         FileInputStream inputStream = null;
         try {
             inputStream = new FileInputStream(file);
-            long fileId = storageService.saveFile(fileName, inputStream);
+            long fileId = storageService.saveFile(0, fileName, inputStream);
             FileStorageEntity entity = repository.findOne(fileId);
             Assert.assertNotNull(entity);
             Assert.assertEquals(fileName, entity.getFileRealname());
