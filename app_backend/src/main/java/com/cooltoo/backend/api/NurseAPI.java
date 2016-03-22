@@ -68,7 +68,8 @@ public class NurseAPI {
             @FormDataParam("file") FormDataContentDisposition disposition) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         service.addHeadPhoto(userId, fileName, fileInputStream);
-        return Response.ok().build();
+        logger.info("upload successfully");
+        return Response.ok("success").build();
     }
 
     @POST

@@ -1,5 +1,6 @@
 package com.cooltoo.backend.services;
 
+import com.cooltoo.backend.api.NurseSkillNorminationAPI;
 import com.cooltoo.backend.beans.NurseSkillNorminationBean;
 import com.cooltoo.backend.entities.NurseSkillNorminationEntity;
 import com.cooltoo.backend.entities.OccupationSkillEntity;
@@ -9,6 +10,8 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.services.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +25,8 @@ import java.util.*;
  */
 @Service("NurseSkillNominationService")
 public class NurseSkillNorminationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(NurseSkillNorminationAPI.class);
 
     @Autowired
     private NurseSkillNorminationRepository nominationRepository;
@@ -60,6 +65,7 @@ public class NurseSkillNorminationService {
 
     @Transactional
     public long nominateNurseSkill(long userId, int skillId, long friendId) {
+        logger.info("norminate nurse skill="+skillId+", friend="+friendId);
         validateNurse(userId);
         validateNurse(friendId);
         validateSkill(skillId);

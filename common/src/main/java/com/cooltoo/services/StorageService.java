@@ -134,6 +134,15 @@ public class StorageService {
         }
     }
 
+    public void deleteFile(long id){
+        FileStorageEntity entity = storageRepository.findOne(id);
+        if(entity != null){
+            String filePath = entity.getFilePath();
+            File file = new File(storagePath+"/"+filePath);
+            file.delete();
+        }
+    }
+
     private static String sha1(String input) throws NoSuchAlgorithmException {
         MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
         byte[] result = sha1Digest.digest(input.getBytes());

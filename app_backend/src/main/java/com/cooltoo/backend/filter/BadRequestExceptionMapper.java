@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 /**
  * Created by yzzhao on 1/21/16.
  */
-@Provider
+//@Provider
 public class BadRequestExceptionMapper implements ExceptionMapper<BadRequestException> {
 
     private static final Logger logger = Logger.getLogger(BadRequestExceptionMapper.class.getName());

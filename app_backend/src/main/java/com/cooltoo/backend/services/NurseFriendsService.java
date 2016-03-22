@@ -37,6 +37,9 @@ public class NurseFriendsService {
 
     @Transactional
     public void addFriend(long userId, long friendId){
+        if(userId == friendId){
+            logger.severe("user can't be himself friend.");
+        }
         insertFriendToDB(userId, friendId);
         insertFriendToDB(friendId, userId);
     }

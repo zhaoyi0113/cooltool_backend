@@ -12,6 +12,7 @@ import io.swagger.config.SwaggerConfig;
 import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -46,6 +47,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(AdminUserLoginAPI.class);
         register(AdminUserAuthenticationFilter.class);
 
+        property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
         configureSwagger();
     }
 

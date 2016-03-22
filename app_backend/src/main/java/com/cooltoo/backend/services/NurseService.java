@@ -152,6 +152,7 @@ public class NurseService {
 
     @Transactional
     public void addHeadPhoto(long id, String fileName, InputStream inputStream){
+        logger.info("add head photo for user "+id+", fileName="+fileName);
         NurseEntity nurse = repository.findOne(id);
         try {
             long fileId = storageService.saveFile(nurse.getProfilePhotoId(), fileName, inputStream);
