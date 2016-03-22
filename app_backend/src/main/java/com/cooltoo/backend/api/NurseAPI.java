@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * Created by lg380357 on 2016/3/2.
  */
 @Path("/nurse")
-@LoginAuthentication(requireNurseLogin = true)
+//@LoginAuthentication(requireNurseLogin = true)
 public class NurseAPI {
 
     private static final Logger logger = Logger.getLogger(NurseAPI.class.getName());
@@ -30,6 +30,7 @@ public class NurseAPI {
     NurseService service;
 
     @GET
+    @LoginAuthentication(requireNurseLogin = true)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllNurses() {
         List<NurseBean> all = service.getAll();
@@ -83,6 +84,7 @@ public class NurseAPI {
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getNurse(@DefaultValue("-1") @PathParam("id") long id) {
         NurseBean one = service.getNurse(id);
         logger.info("get nurse is " + one);
@@ -115,6 +117,7 @@ public class NurseAPI {
     @POST
     @Path("/update")
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response updateNurse(
             @Context HttpServletRequest request,
             @FormParam("name") String name,
