@@ -117,7 +117,7 @@ public class NurseService {
     }
 
     @Transactional
-    public NurseBean updateNurse(long id, String identificationId, String name, int age, int gender, String mobile) {
+    public NurseBean updateNurse(long id, String name, int age, int gender, String mobile) {
         NurseEntity entity = repository.findOne(id);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);

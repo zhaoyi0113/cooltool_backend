@@ -132,6 +132,7 @@ public class StorageService {
             output.write(buffer, 0, read);
             read = input.read(buffer);
         }
+        output.close();
     }
 
     public void deleteFile(long id){

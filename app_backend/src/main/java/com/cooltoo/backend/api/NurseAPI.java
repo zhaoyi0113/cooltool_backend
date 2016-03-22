@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * Created by lg380357 on 2016/3/2.
  */
 @Path("/nurse")
-//@LoginAuthentication(requireNurseLogin = true)
+@LoginAuthentication(requireNurseLogin = true)
 public class NurseAPI {
 
     private static final Logger logger = Logger.getLogger(NurseAPI.class.getName());
@@ -47,13 +47,7 @@ public class NurseAPI {
             @FormParam("password") String password,
             @FormParam("sms_code") String smsCode
     ) {
-        long id = -1;
-//        try {
-            id = service.registerNurse(name, age, gender, mobile, password, smsCode);
-//        }catch(BadRequestException e){
-//            e.printStackTrace();
-//            logger.severe(e.getMessage());
-//        }
+        long id = service.registerNurse(name, age, gender, mobile, password, smsCode);
         return Response.ok(id).build();
     }
 
@@ -126,11 +120,10 @@ public class NurseAPI {
             @FormParam("name") String name,
             @FormParam("age") int age,
             @FormParam("gender") int gender,
-            @DefaultValue("") @FormParam("mobile") String mobile,
-            @DefaultValue("") @FormParam("identificateId") String identificateId
+            @DefaultValue("") @FormParam("mobile") String mobile
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseBean one = service.updateNurse(userId, identificateId, name, age, gender, mobile);
+        NurseBean one = service.updateNurse(userId, name, age, gender, mobile);
         logger.info("update nurse is " + one);
         if (null == one) {
             return Response.ok().build();

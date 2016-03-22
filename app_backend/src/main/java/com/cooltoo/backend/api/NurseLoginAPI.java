@@ -40,10 +40,11 @@ public class NurseLoginAPI {
 
     @POST
     @Path("logout")
-    @LoginAuthentication
+    @LoginAuthentication(requireNurseLogin = true)
     public Response logout(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         loginService.logout(userId);
+        logger.info("logout user "+userId);
         return Response.ok().build();
     }
 

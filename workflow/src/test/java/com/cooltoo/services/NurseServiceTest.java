@@ -75,7 +75,7 @@ public class NurseServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testUpdate(){
-        NurseBean bean = service.updateNurse(1, null, "name222222", 22, 2, "4321654312");
+        NurseBean bean = service.updateNurse(1,  "name222222", 22, 2, "4321654312");
         Assert.assertNotNull(bean);
         Assert.assertEquals(1, bean.getId());
         Assert.assertEquals("name222222", bean.getName());
