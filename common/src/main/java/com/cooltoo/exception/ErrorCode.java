@@ -75,7 +75,11 @@ public enum ErrorCode {
     SPEAK_THUMBS_UP_NOT_EXIST(10055, Response.Status.BAD_REQUEST, "点赞不存在", "Thumbs up not exist"),
     SPEAK_THUMBS_UP_CAN_NOT_FOR_SELF(10056, Response.Status.BAD_REQUEST, "不可以给自己点赞", "Can not thumbs_up for self"),
     SMS_VERIFY_FAILED(10057, Response.Status.BAD_REQUEST, "短信验证码失败", "Verify SMS Code Failed."),
-    FILE_DELETE_FAILED(10058, Response.Status.BAD_REQUEST, "删除文件失败", "Delete file operation failed");
+    FILE_DELETE_FAILED(10058, Response.Status.BAD_REQUEST, "删除文件失败", "Delete file operation failed"),
+    AUTHENTICATION_NAME_INVALID(10059, Response.Status.BAD_REQUEST, "账户名无效", "Account name is invalid"),
+    AUTHENTICATION_PASSWORD_INVALID(10060, Response.Status.BAD_REQUEST, "账户密码为空", "Account password is empty"),
+    AUTHENTICATION_AUTHORITY_DENIED(10061, Response.Status.BAD_REQUEST, "账户操作没有权限", "Account operation authority denied"),
+    AUTHENTICATION_DELETE_ADMIN_DENIED(10062, Response.Status.BAD_REQUEST, "不可以删除管理员账户", "Administrator account have not to be deleted");
 
     private final int code;
 

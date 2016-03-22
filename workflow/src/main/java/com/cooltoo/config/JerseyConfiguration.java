@@ -1,10 +1,7 @@
 package com.cooltoo.config;
 
-import com.cooltoo.admin.api.BadgeAPI;
-import com.cooltoo.admin.api.PatientAPI;
-import com.cooltoo.admin.api.PatientBadgeAPI;
-import com.cooltoo.admin.api.HospitalAPI;
-import com.cooltoo.admin.api.HospitalDepartmentAPI;
+import com.cooltoo.admin.api.*;
+import com.cooltoo.admin.filter.AdminUserAuthenticationFilter;
 import com.cooltoo.backend.api.*;
 import com.cooltoo.backend.filter.BadRequestExceptionMapper;
 import com.cooltoo.backend.filter.NurseLoginAuthenticationFilter;
@@ -45,6 +42,9 @@ public class JerseyConfiguration extends ResourceConfig {
         register(NurseSkillNorminationAPI.class);
         register(BadRequestExceptionMapper.class);
         register(NurseSpeakAPI.class);
+        register(AdminUserAPI.class);
+        register(AdminUserLoginAPI.class);
+        register(AdminUserAuthenticationFilter.class);
 
         configureSwagger();
     }

@@ -36,6 +36,7 @@ public class NurseLoginServiceTest extends AbstractCooltooTest {
         loginService.logout(savedToken.getUserId());
         List<TokenAccessEntity> entities = accessRepository.findTokenAccessByUserId(savedToken.getUserId());
         Assert.assertEquals(CommonStatus.DISABLED, entities.get(0).getStatus());
+        Assert.assertFalse(loginService.isLogin(savedToken.getUserId()));
     }
 
 

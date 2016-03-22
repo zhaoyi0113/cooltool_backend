@@ -69,6 +69,11 @@ public class NurseLoginService {
     }
 
     public boolean isLogin(long userId){
-        return !tokenAccessRepository.findTokenAccessByUserId(userId).isEmpty();
+        List<TokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByUserId(userId);
+        if (tokenEntities.isEmpty()) {
+            return false;
+        }
+        CommonStatus status = tokenEntities.get(0).getStatus();
+        return CommonStatus.ENABLED.equals(status);
     }
 }

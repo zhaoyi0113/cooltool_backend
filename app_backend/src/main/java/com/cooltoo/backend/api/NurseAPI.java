@@ -4,7 +4,6 @@ import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.exception.BadRequestException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
