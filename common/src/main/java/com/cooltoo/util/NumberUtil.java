@@ -20,6 +20,14 @@ public class NumberUtil {
         return false;
     }
 
+    private static final String IdentificationRegex="^\\d{15}|\\d{18}|\\d{17}[\\dXx]{1}$";
+    public static boolean isIdentificationValid(String identification) {
+        if (identification instanceof String) {
+            return identification.matches(IdentificationRegex);
+        }
+        return false;
+    }
+
     public static long getTime(String datetime, String pattern) {
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         try {
@@ -28,5 +36,11 @@ public class NumberUtil {
         } catch (ParseException e) {
             return -1;
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(NumberUtil.isIdentificationValid("130431198404041231"));
+        System.out.println(NumberUtil.isIdentificationValid("130431s198404041"));
+        System.out.println(NumberUtil.isIdentificationValid("13043119840404112X"));
     }
 }

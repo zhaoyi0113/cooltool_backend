@@ -30,7 +30,7 @@ public class NurseFriendBeanConverter implements Converter<NurseFriendsEntity,Nu
         bean.setDateTime(source.getDateTime());
         NurseEntity friend = nurseRepository.findOne(source.getFriendId());
         bean.setFriendName(friend.getName());
-        bean.setHeadPhotoUrl(storageService.getFileUrl(friend.getProfilePhotoId()));
+        bean.setHeadPhotoUrl(storageService.getFilePath(friend.getProfilePhotoId()));
         return bean;
     }
 }

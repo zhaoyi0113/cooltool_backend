@@ -28,6 +28,10 @@ public class NurseEntity {
     //用户积分
     private int integral;
 
+    private String realName;
+
+    private String identification;
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -94,6 +98,25 @@ public class NurseEntity {
         this.integral = integral;
     }
 
+    @Column(name = "real_name")
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    @Column(name = "identification")
+    public String getIdentification() {
+        return identification;
+    }
+
+    public void setIdentification(String identification) {
+        this.identification = identification;
+    }
+
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -104,8 +127,10 @@ public class NurseEntity {
         msg.append("age=").append(age).append(" , ");
         msg.append("password=").append(password).append(" , ");
         msg.append("profilePhotoId=").append(profilePhotoId).append(" , ");
-        msg.append("backgroundImageId=").append(backgroundImageId);
+        msg.append("backgroundImageId=").append(backgroundImageId).append(" , ");
         msg.append("integral=").append(integral).append(" , ");
+        msg.append("realName=").append(realName).append(" , ");
+        msg.append("identification=").append(identification);
         msg.append(" ]");
         return msg.toString();
     }

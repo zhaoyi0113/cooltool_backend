@@ -44,7 +44,7 @@ public class BadgeService {
     @Transactional
     public int createNewBadge(String name, int point, int grade, InputStream fileInputStream, String fileName) {
         long fileId = storageService.saveFile(0, fileName, fileInputStream);
-        String fileUrl = storageService.getFileUrl(fileId);
+        String fileUrl = storageService.getFilePath(fileId);
         BadgeBean bean = new BadgeBean();
         bean.setName(name);
         bean.setFileId(fileId);
@@ -93,7 +93,7 @@ public class BadgeService {
         if (null != fileInputStream) {
             try {
                 long fileId = storageService.saveFile(bean.getFileId(), fileName, fileInputStream);
-                String fileUrl = storageService.getFileUrl(fileId);
+                String fileUrl = storageService.getFilePath(fileId);
                 bean.setFileId(fileId);
                 bean.setImageUrl(fileUrl);
                 changed = true;

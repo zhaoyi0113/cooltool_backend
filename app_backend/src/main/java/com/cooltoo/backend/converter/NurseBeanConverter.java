@@ -1,12 +1,9 @@
 package com.cooltoo.backend.converter;
 
 import com.cooltoo.backend.beans.NurseBean;
-import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.entities.NurseEntity;
-import com.cooltoo.repository.FileStorageRepository;
 import com.cooltoo.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +26,8 @@ public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
         bean.setMobile(entity.getMobile());
         bean.setPassword(entity.getPassword());
         bean.setIntegral(entity.getIntegral());
+        bean.setRealName(entity.getRealName());
+        bean.setIdentification(entity.getIdentification());
 
         bean.setBackgroundImageUrl(storageService.getFilePath(entity.getBackgroundImageId()));
         bean.setProfilePhotoUrl(storageService.getFilePath(entity.getProfilePhotoId()));

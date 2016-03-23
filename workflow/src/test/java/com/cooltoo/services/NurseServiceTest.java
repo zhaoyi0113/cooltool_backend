@@ -119,4 +119,18 @@ public class NurseServiceTest extends AbstractCooltooTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
+    public void testUpdateRealNameAndIdentification() {
+        String realname = "TEST";
+        String identifi = "123456198404044561";
+        NurseBean bean = service.getNurse(1);
+        System.out.println(bean);
+        service.setRealNameAndIdentification(bean.getId(), realname, identifi);
+        bean = service.getNurse(1);
+        System.out.println(bean);
+        Assert.assertEquals(realname, bean.getRealName());
+        Assert.assertEquals(identifi, bean.getIdentification());
+    }
 }

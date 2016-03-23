@@ -1,6 +1,7 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.converter.NurseBeanConverter;
 import com.cooltoo.backend.converter.NurseEntityConverter;
 import com.cooltoo.backend.entities.HospitalEntity;
@@ -12,6 +13,7 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
 import com.cooltoo.util.NumberUtil;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,8 @@ public class NurseService {
     private NurseSkillNorminationService norminationService;
     @Autowired
     private LeanCloudService leanCloudService;
+    @Autowired
+    private NurseQualificationService qualificationService;
 
     @Transactional
     public long registerNurse(String name, int age,
@@ -181,5 +185,43 @@ public class NurseService {
             }
         }
         repository.save(nurse);
+    }
+
+    @Transactional
+    public NurseBean setRealNameAndIdentification(long id, String realName, String identification) {
+        NurseEntity nurse = repository.findOne(id);
+        if (null==nurse) {
+            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+        }
+        logger.info("nurse real name is : " + realName);
+        logger.info("nurse identification is : " + identification);
+        if (VerifyUtil.isStringEmpty(realName)) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (!NumberUtil.isIdentificationValid(identification)) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        nurse.setRealName(realName);
+        nurse.setIdentification(identification);
+        nurse = repository.save(nurse);
+        return beanConverter.convert(nurse);
+    }
+
+    @Transactional
+    public NurseQualificationBean addNurseWorkFile(long id, String name, String workFileName, InputStream workFile) {
+        NurseQualificationBean bean = qualificationService.addNurseWorkFile(id, name, workFileName, workFile);
+        return bean;
+    }
+
+    @Transactional
+    public NurseQualificationBean addNurseIdentification(long id, String name, String idFileName, InputStream idFile) {
+        NurseQualificationBean bean = qualificationService.addNurseIdentificationFile(id, name, idFileName, idFile);
+        return bean;
+    }
+
+    @Transactional
+    public List<NurseQualificationBean> getAllNurseQualification(long id) {
+        List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(id);
+        return qualifications;
     }
 }

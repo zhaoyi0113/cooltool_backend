@@ -32,6 +32,10 @@ public class NurseBean {
 
     private int integral;
 
+    private String realName;
+
+    private String identification;
+
     private String password;
     private String profilePhotoUrl;
     private String backgroundImageUrl;
@@ -143,6 +147,23 @@ public class NurseBean {
         this.integral = integral;
     }
 
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public String getIdentification() {
+        return identification;
+    }
+
+    public void setIdentification(String identification) {
+        this.identification = identification;
+    }
+
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -153,7 +174,9 @@ public class NurseBean {
         msg.append("password=").append(password).append(" , ");
         msg.append("profilePhotoUrl=").append(profilePhotoUrl).append(" , ");
         msg.append("backgroundImageUrl=").append(backgroundImageUrl).append(" , ");
-        msg.append("integral=").append(integral);
+        msg.append("integral=").append(integral).append(" , ");
+        msg.append("realName=").append(realName).append(" , ");
+        msg.append("identification=").append(identification).append(" , ");
         msg.append("]");
         return msg.toString();
     }

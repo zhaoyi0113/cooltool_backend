@@ -52,7 +52,7 @@ public class NurseSpeakService {
         List<NurseSpeakBean> speaks = new ArrayList<NurseSpeakBean>();
         for (NurseSpeakEntity entity : entities) {
             NurseSpeakBean speak = speakConverter.convert(entity);
-            String fileUrl = storageService.getFileUrl(entity.getId());
+            String fileUrl = storageService.getFilePath(entity.getId());
             speak.setImageUrl(fileUrl);
             List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speak.getId());
             speak.setComments(comments);
@@ -66,7 +66,7 @@ public class NurseSpeakService {
     public NurseSpeakBean getNurseSpeak(long id) {
         NurseSpeakEntity entity = speakRepository.findOne(id);
         NurseSpeakBean speakBean = speakConverter.convert(entity);
-        speakBean.setImageUrl(storageService.getFileUrl(entity.getImageId()));
+        speakBean.setImageUrl(storageService.getFilePath(entity.getImageId()));
         List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speakBean.getId());
         speakBean.setComments(comments);
         speakBean.setCommentsCount(comments.size());
@@ -117,7 +117,7 @@ public class NurseSpeakService {
 
         NurseSpeakBean bean = speakConverter.convert(entity);
         if (hasImage) {
-            bean.setImageUrl(storageService.getFileUrl(entity.getImageId()));
+            bean.setImageUrl(storageService.getFilePath(entity.getImageId()));
         }
         return bean;
     }

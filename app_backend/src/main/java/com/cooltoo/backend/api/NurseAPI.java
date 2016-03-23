@@ -1,6 +1,7 @@
 package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.ContextKeys;
@@ -128,6 +129,64 @@ public class NurseAPI {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean one = service.updateNurse(userId, name, age, gender, mobile);
         logger.info("update nurse is " + one);
+        if (null == one) {
+            return Response.ok().build();
+        }
+        return Response.ok(one).build();
+    }
+
+    @POST
+    @Path("/qualification/realname_identification")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response setRealNameAndIdentification(
+            @Context HttpServletRequest request,
+            @FormParam("realName") String realName,
+            @FormParam("identification") String identification
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean one = service.setRealNameAndIdentification(userId, realName, identification);
+        logger.info("set real name and identification " + one);
+        if (null == one) {
+            return Response.ok().build();
+        }
+        return Response.ok(one).build();
+    }
+
+    @POST
+    @Path("/qualification/work_file")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response addNurseWorkFile(
+            @Context HttpServletRequest request,
+            @FormDataParam("name") String name,
+            @FormDataParam("file_name") String fileName,
+            @FormDataParam("file") InputStream fileInputStream,
+            @FormDataParam("file") FormDataContentDisposition disposition
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseQualificationBean one = service.addNurseWorkFile(userId, name, fileName, fileInputStream);
+        logger.info("add qualification work file : " + one);
+        if (null == one) {
+            return Response.ok().build();
+        }
+        return Response.ok(one).build();
+    }
+
+    @POST
+    @Path("/qualification/id_file")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response addNurseIdentificationFile(
+            @Context HttpServletRequest request,
+            @FormDataParam("name") String name,
+            @FormDataParam("file_name") String fileName,
+            @FormDataParam("file") InputStream fileInputStream,
+            @FormDataParam("file") FormDataContentDisposition disposition
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseQualificationBean one = service.addNurseIdentification(userId, name, fileName, fileInputStream);
+        logger.info("add identification file : " + one);
         if (null == one) {
             return Response.ok().build();
         }

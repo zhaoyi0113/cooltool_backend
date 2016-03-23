@@ -79,7 +79,10 @@ public enum ErrorCode {
     AUTHENTICATION_NAME_INVALID(10059, Response.Status.BAD_REQUEST, "账户名无效", "Account name is invalid"),
     AUTHENTICATION_PASSWORD_INVALID(10060, Response.Status.BAD_REQUEST, "账户密码为空", "Account password is empty"),
     AUTHENTICATION_AUTHORITY_DENIED(10061, Response.Status.BAD_REQUEST, "账户操作没有权限", "Account operation authority denied"),
-    AUTHENTICATION_DELETE_ADMIN_DENIED(10062, Response.Status.BAD_REQUEST, "不可以删除管理员账户", "Administrator account have not to be deleted");
+    AUTHENTICATION_DELETE_ADMIN_DENIED(10062, Response.Status.BAD_REQUEST, "不可以删除管理员账户", "Administrator account have not to be deleted"),
+    NURSE_QUALIFICATION_NAME_EXIST(10063, Response.Status.BAD_REQUEST, "资质名已存在", "Qualification name exist"),
+    NURSE_QUALIFICATION_NAME_NOT_EXIST(10064, Response.Status.BAD_REQUEST, "资质名不存在", "Qualification name not exist"),
+    NURSE_QUALIFICATION_IDENTIFICATION_EXIST(10065, Response.Status.BAD_REQUEST, "身份证存在", "Identification exist");
 
     private final int code;
 
