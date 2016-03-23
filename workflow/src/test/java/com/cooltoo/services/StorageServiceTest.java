@@ -6,6 +6,7 @@ import com.cooltoo.repository.FileStorageRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +16,7 @@ import java.io.IOException;
 /**
  * Created by yzzhao on 2/26/16.
  */
+@Transactional
 public class StorageServiceTest extends AbstractCooltooTest {
 
     @Autowired
