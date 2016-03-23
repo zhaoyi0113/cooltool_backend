@@ -68,7 +68,7 @@ public class AdminUserAPI {
         return Response.ok(bean).build();
     }
 
-    @POST
+    @DELETE
     @Path("/delete")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
