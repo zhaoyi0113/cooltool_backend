@@ -18,7 +18,7 @@ public class BadRequestExceptionMapper implements ExceptionMapper<BadRequestExce
 
     @Override
     public Response toResponse(BadRequestException exception) {
-        logger.severe("get exception "+exception.getMessage());
+        logger.severe("get exception "+exception.getMessage()+","+exception.getErrorCode().getCode());
         logger.log(Level.SEVERE, exception.getMessage(), exception);
         return Response.status(exception.getErrorCode().getCode()).header("Access-Control-Allow-Origin", "*")
                 .header("Access-Control-Allow-Methods", "*").header("Access-Control-Allow-Headers", "access_token")
