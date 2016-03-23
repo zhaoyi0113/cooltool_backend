@@ -67,14 +67,17 @@ public class AdminUserService {
         if (!isAdmin(adminUserId)) {
             throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
         }
-        AdminUserEntity entity = null;
         boolean isUpdateAdmin = (adminUserId==updatingId);
+        if (updatingId <= 0) {
+            isUpdateAdmin = true;
+        }
+        AdminUserEntity entity = null;
         if (!isUpdateAdmin) {
             entity = adminUserRepository.findOne(updatingId);
-            if (VerifyUtil.isAdminUserNameValid(newUserName)) {
+            if (null!=entity && VerifyUtil.isAdminUserNameValid(newUserName)) {
                 entity.setUserName(newUserName);
             }
-            logger.info("update normal user");
+            logger.info("update normal user. user id is " + updatingId);
         }
         else {
             entity = adminUserRepository.findOne(adminUserId);

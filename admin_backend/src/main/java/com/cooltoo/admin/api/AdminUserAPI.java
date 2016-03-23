@@ -80,7 +80,7 @@ public class AdminUserAPI {
 //        // Just for debug
 //        long loginId = 1;
         adminUserService.deleteUserByAdmin(loginId, userId);
-        return Response.ok().build();
+        return Response.ok(userId).build();
     }
 
     @POST
