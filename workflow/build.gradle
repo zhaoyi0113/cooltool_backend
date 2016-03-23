@@ -94,3 +94,13 @@ sourceSets {
 springBoot {
     executable = true
 }
+
+test {
+    onOutput {
+        descriptor, event
+            -> if( event.destination == TestOutputEvent.Destination.StdErr ) {
+            logger.error(   "Test: "
+                    + descriptor
+                    + ", error: "
+                    + event.message)
+        } } }
