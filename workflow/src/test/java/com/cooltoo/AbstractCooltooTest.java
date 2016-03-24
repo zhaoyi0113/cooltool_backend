@@ -10,6 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -21,5 +22,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionDbUnitTestExecutionListener.class})
+@Transactional
 public abstract class AbstractCooltooTest {
 }
