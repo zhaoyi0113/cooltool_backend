@@ -39,7 +39,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by yzzhao on 3/20/16.
  */
-//@Ignore
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebAppConfiguration
