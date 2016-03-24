@@ -39,14 +39,14 @@ import java.util.concurrent.Executors;
 /**
  * Created by yzzhao on 3/20/16.
  */
-@Ignore
+//@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebAppConfiguration
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionDbUnitTestExecutionListener.class})
-public class MockDataCreator extends AbstractCooltooTest {
+public class MockDataCreator  {
 
     private static final int nurseNumber = 100;
 

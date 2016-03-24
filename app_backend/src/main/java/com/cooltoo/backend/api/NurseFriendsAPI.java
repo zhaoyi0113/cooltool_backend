@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by yzzhao on 3/10/16.
  */
-@Path("/nurse_friends")
+@Path("/nurse/friends")
 @LoginAuthentication(requireNurseLogin = true)
 public class NurseFriendsAPI {
 
