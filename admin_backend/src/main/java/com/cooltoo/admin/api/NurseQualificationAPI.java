@@ -7,6 +7,7 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.util.VerifyUtil;
+import com.sun.org.apache.regexp.internal.RE;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,15 +53,37 @@ public class NurseQualificationAPI {
             @Context HttpServletRequest request,
             @FormParam("id") long id,
             @FormParam("name") String name,
-            @FormParam("file_type") String fileType,
-            @FormParam("status") String status
+            @FormParam("file_type") String fileType
     ) {
         long loginId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
 //        // Just for debug
 //        long loginId = 1;
-        VetStatus vetStatus = VetStatus.parseString(status);
         WorkFileType workFileType = WorkFileType.parseString(fileType);
-        NurseQualificationBean bean = qualificationService.updateNurseQualification(id, name, workFileType, null, null, vetStatus);
+        NurseQualificationBean bean = qualificationService.updateNurseQualification(id, name, workFileType, null, null, null);
+        return Response.ok(bean).build();
+    }
+
+    @POST
+    @Path("/update/approve")
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response approveNurseQualification(
+            @Context HttpServletRequest request,
+            @FormParam("id") long id
+    ) {
+        NurseQualificationBean bean = qualificationService.updateNurseQualification(id, null, null, null, null, VetStatus.COMPLETED);
+        return Response.ok(bean).build();
+    }
+
+    @POST
+    @Path("/update/deny")
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response denyNurseQualification(
+            @Context HttpServletRequest request,
+            @FormParam("id") long id
+    ) {
+        NurseQualificationBean bean = qualificationService.updateNurseQualification(id, null, null, null, null, VetStatus.FAILED);
         return Response.ok(bean).build();
     }
 
