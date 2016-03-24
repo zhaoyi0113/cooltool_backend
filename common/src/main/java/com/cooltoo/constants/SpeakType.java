@@ -9,5 +9,33 @@ public enum SpeakType {
     /* 吐槽 */
     CATHART,
     /* 提问 */
-    ASK_QUESTION
+    ASK_QUESTION;
+
+    public static SpeakType parseString(String speak) {
+        SpeakType retVal = null;
+        if (SMUG.name().equalsIgnoreCase(speak)) {
+            retVal = SMUG;
+        }
+        else if (CATHART.name().equalsIgnoreCase(speak)) {
+            retVal = CATHART;
+        }
+        else if (ASK_QUESTION.name().equalsIgnoreCase(speak)) {
+            retVal = ASK_QUESTION;
+        }
+        return retVal;
+    }
+
+    public static SpeakType parseInt(int speak) {
+        SpeakType retVal = null;
+        if (SMUG.ordinal()==(speak)) {
+            retVal = SMUG;
+        }
+        else if (CATHART.ordinal()==(speak)) {
+            retVal = CATHART;
+        }
+        else if (ASK_QUESTION.ordinal()==(speak)) {
+            retVal = ASK_QUESTION;
+        }
+        return retVal;
+    }
 }

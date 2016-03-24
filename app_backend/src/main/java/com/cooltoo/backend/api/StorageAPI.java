@@ -2,6 +2,7 @@ package com.cooltoo.backend.api;
 
 import com.cooltoo.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,6 +18,7 @@ import java.io.InputStream;
 public class StorageAPI {
 
     @Autowired
+    @Qualifier("StorageService")
     private StorageService storageService;
 
     @GET

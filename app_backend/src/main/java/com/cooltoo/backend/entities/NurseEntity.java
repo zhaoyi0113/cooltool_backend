@@ -1,5 +1,7 @@
 package com.cooltoo.backend.entities;
 
+import com.cooltoo.constants.GenderType;
+
 import javax.persistence.*;
 
 /**
@@ -11,7 +13,7 @@ public class NurseEntity {
 
     private long id;
 
-    private int gender;
+    private GenderType gender;
 
     private String name;
 
@@ -44,11 +46,12 @@ public class NurseEntity {
     }
 
     @Column(name = "gender")
-    public int getGender() {
+    @Enumerated
+    public GenderType getGender() {
         return gender;
     }
 
-    public void setGender(int gender) {
+    public void setGender(GenderType gender) {
         this.gender = gender;
     }
 

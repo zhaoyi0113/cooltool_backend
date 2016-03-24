@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.constants.GenderType;
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
@@ -41,7 +42,7 @@ public class NurseServiceTest extends AbstractCooltooTest {
         NurseBean bean = new NurseBean();
         bean.setName("name_1");
         bean.setAge(321);
-        bean.setGender(1);
+        bean.setGender(GenderType.parseInt(1));
         bean.setMobile("15811663430");
         bean.setPassword("password");
         long id = service.registerNurse(bean);
@@ -80,7 +81,7 @@ public class NurseServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(1, bean.getId());
         Assert.assertEquals("name222222", bean.getName());
         Assert.assertEquals(22,  bean.getAge());
-        Assert.assertEquals(2, bean.getGender());
+        Assert.assertEquals(GenderType.SECRET, bean.getGender());
         Assert.assertNotEquals("4321654312", bean.getMobile());
     }
 

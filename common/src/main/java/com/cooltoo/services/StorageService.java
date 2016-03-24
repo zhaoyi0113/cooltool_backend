@@ -33,6 +33,15 @@ public class StorageService {
     private String storageUrl;
 
 
+    public String getStorageUrl() {
+        return this.storageUrl;
+    }
+
+    public String getStoragePath() {
+        return this.storagePath;
+    }
+
+
     public long saveFile(long fileId, String fileName, InputStream inputStream) {
         if(inputStream == null){
             logger.warning("not found inputstream");
@@ -40,7 +49,7 @@ public class StorageService {
         }
         deleteFileIfExist(fileId);
         try {
-            String storageDirectory = storagePath + File.separator;
+            String storageDirectory = getStoragePath() + File.separator;
             String sha1         = sha1(String.valueOf(System.nanoTime()));
             String folderName   = sha1.substring(0, 2);
             String newFileName  = sha1.substring(2);
@@ -68,7 +77,7 @@ public class StorageService {
         if (storageRepository.exists(id)) {
             FileStorageEntity entity = storageRepository.findOne(id);
 
-            return storageUrl + entity.getId();
+            return getStorageUrl() + entity.getId();
         }
         return "";
     }
@@ -108,7 +117,7 @@ public class StorageService {
         if (null==entity) {
             return fileId;
         }
-        String storageDirectory = storagePath + File.separator;
+        String storageDirectory = getStoragePath() + File.separator;
         String relativePath = entity.getFilePath();
         File imageFile = new File(storageDirectory + relativePath);
         try {
@@ -139,7 +148,7 @@ public class StorageService {
         FileStorageEntity entity = storageRepository.findOne(id);
         if(entity != null){
             String filePath = entity.getFilePath();
-            File file = new File(storagePath+"/"+filePath);
+            File file = new File(getStoragePath()+"/"+filePath);
             file.delete();
         }
     }

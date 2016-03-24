@@ -9,6 +9,7 @@ import com.cooltoo.backend.leancloud.LeanCloudService;
 import com.cooltoo.backend.repository.HospitalRepository;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.constants.GenderType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
@@ -17,6 +18,7 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -40,6 +42,7 @@ public class NurseService {
     @Autowired
     private NurseEntityConverter entityConverter;
     @Autowired
+    @Qualifier("StorageService")
     private StorageService storageService;
     @Autowired
     private NurseFriendsService friendsService;
@@ -62,7 +65,7 @@ public class NurseService {
         NurseBean bean = new NurseBean();
         bean.setName(name);
         bean.setAge(age);
-        bean.setGender(gender);
+        bean.setGender(GenderType.parseInt(gender));
         bean.setMobile(mobile);
         bean.setPassword(password);
         return registerNurse(bean);
@@ -140,10 +143,8 @@ public class NurseService {
             entity.setAge(age);
             changed = true;
         }
-        if (entity.getGender()!=gender && gender>0) {
-            entity.setGender(gender);
-            changed = true;
-        }
+        entity.setGender(GenderType.parseInt(gender));
+
         if (changed) {
             entity = repository.save(entity);
         }

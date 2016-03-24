@@ -13,6 +13,7 @@ import com.cooltoo.services.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class NurseSkillNorminationService {
     private NurseRepository nurseRepository;
 
     @Autowired
+    @Qualifier("StorageService")
     private StorageService storageService;
 
     public List<NurseSkillNorminationBean> getAllSkillsNominationCount(long userId, int index, int number) {

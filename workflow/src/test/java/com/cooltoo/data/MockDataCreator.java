@@ -9,6 +9,7 @@ import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.services.NurseFriendsService;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.backend.services.NurseSpeakService;
+import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -86,7 +87,7 @@ public class MockDataCreator extends AbstractCooltooTest {
                     entity.setName(name + index);
                     logger.info("create nurse "+entity.getName());
                     entity.setAge((int) getRandomInt(18, 50));
-                    entity.setGender((int) getRandomInt(0, 2));
+                    entity.setGender(GenderType.parseInt((int) getRandomInt(0, 2)));
                     entity.setMobile(String.valueOf(getRandomInt(13900000000l, 13999999999l)));
                     entity.setPassword("123456");
                     NurseEntity b = saveNurse(entity);

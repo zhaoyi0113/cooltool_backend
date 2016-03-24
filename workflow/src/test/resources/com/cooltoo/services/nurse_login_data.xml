@@ -2,10 +2,10 @@
 <dataset>
     <nurse id="1" name="name1" age="11" gender="1" mobile="1231432143" />
     <nurse id="2" name="name2" age="22" gender="2" mobile="14321134" />
-    <nurse id="3" name="name3" age="33" gender="3" mobile="135232121222" />
+    <nurse id="3" name="name3" age="33" gender="2" mobile="135232121222" />
     <nurse id="4" name="name4" age="44" gender="2" mobile="13811663451" />
     <nurse id="5" name="name5" age="55" gender="1" mobile="18527727387" />
-    <nurse id="6" name="name6" age="66" gender="3" mobile="16811663451" />
+    <nurse id="6" name="name6" age="66" gender="1" mobile="16811663451" />
     <nurse id="7" name="name7" age="77" gender="2" mobile="214321321432" />
     <nurse id="8" name="name8" age="88" gender="1" mobile="4321431431" />
 </dataset>

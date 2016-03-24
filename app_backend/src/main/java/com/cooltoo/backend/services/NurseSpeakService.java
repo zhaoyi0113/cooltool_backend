@@ -11,6 +11,7 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,6 +38,7 @@ public class NurseSpeakService {
     private NurseSpeakConverter speakConverter;
 
     @Autowired
+    @Qualifier("StorageService")
     private StorageService storageService;
 
     @Autowired

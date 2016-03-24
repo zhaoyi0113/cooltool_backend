@@ -6,6 +6,7 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ public class NurseFriendBeanConverter implements Converter<NurseFriendsEntity,Nu
     private NurseRepository nurseRepository;
 
     @Autowired
+    @Qualifier("StorageService")
     private StorageService storageService;
 
     @Override

@@ -1,5 +1,7 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.constants.GenderType;
+
 import javax.ws.rs.FormParam;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +24,7 @@ public class NurseBean {
     private String name;
 
     @FormParam("gender")
-    private int gender;
+    private GenderType gender;
 
     @FormParam("mobile")
     private String mobile;
@@ -51,11 +53,11 @@ public class NurseBean {
         this.id = id;
     }
 
-    public int getGender() {
+    public GenderType getGender() {
         return gender;
     }
 
-    public void setGender(int gender) {
+    public void setGender(GenderType gender) {
         this.gender = gender;
     }
 

@@ -13,6 +13,7 @@ import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.services.StorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,7 @@ public class NurseQualificationService {
     private NurseRepository nurseRepository;
 
     @Autowired
+    @Qualifier("StorageService")
     private StorageService storageService;
 
     @Autowired

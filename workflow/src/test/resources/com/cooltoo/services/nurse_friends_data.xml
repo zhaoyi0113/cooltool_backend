@@ -3,8 +3,8 @@
 
     <nurse id="1" name="name1" age="11" gender="1" mobile="135232121220" password="aa" profile_photo_id="1" background_image_id="1" />
     <nurse id="2" name="name2" age="22" gender="2" mobile="135232121221" password="aa" profile_photo_id="1" background_image_id="1" />
-    <nurse id="3" name="name3" age="33" gender="3" mobile="135232121222" password="aa" profile_photo_id="1" background_image_id="1" />
-    <nurse id="4" name="name3" age="33" gender="3" mobile="135232121223" password="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="3" name="name3" age="33" gender="2" mobile="135232121222" password="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="4" name="name3" age="33" gender="1" mobile="135232121223" password="aa" profile_photo_id="1" background_image_id="1" />
 
     <nurse_friends id="1000" user_id="1" friend_id="2"></nurse_friends>
     <nurse_friends id="1001" user_id="1" friend_id="3"></nurse_friends>

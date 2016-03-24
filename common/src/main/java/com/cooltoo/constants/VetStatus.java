@@ -8,16 +8,16 @@ public enum VetStatus {
 
     public static VetStatus parseString(String status) {
         VetStatus retVal = null;
-        if (NEED_UPLOAD.toString().equalsIgnoreCase(status)) {
+        if (NEED_UPLOAD.name().equalsIgnoreCase(status)) {
             retVal = NEED_UPLOAD;
         }
-        else if (WAITING.toString().equalsIgnoreCase(status)) {
+        else if (WAITING.name().equalsIgnoreCase(status)) {
             retVal = WAITING;
         }
-        else if (COMPLETED.toString().equalsIgnoreCase(status)) {
+        else if (COMPLETED.name().equalsIgnoreCase(status)) {
             retVal = COMPLETED;
         }
-        else if (FAILED.toString().equalsIgnoreCase(status)) {
+        else if (FAILED.name().equalsIgnoreCase(status)) {
             retVal = FAILED;
         }
         return retVal;
