@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -130,12 +129,9 @@ public class NurseService {
         if (null==entity) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
-        if (null==name || "".equals(name)) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
 
         boolean changed = false;
-        if (!entity.getName().equals(name)) {
+        if (name != null && !entity.getName().equals(name)) {
             entity.setName(name);
             changed = true;
         }
@@ -143,7 +139,9 @@ public class NurseService {
             entity.setAge(age);
             changed = true;
         }
-        entity.setGender(GenderType.parseInt(gender));
+        if(gender >= 0) {
+            entity.setGender(GenderType.parseInt(gender));
+        }
 
         if (changed) {
             entity = repository.save(entity);
@@ -152,11 +150,12 @@ public class NurseService {
     }
 
     @Transactional
-    public void addHeadPhoto(long id, String fileName, InputStream inputStream){
+    public String addHeadPhoto(long id, String fileName, InputStream inputStream){
         logger.info("add head photo for user "+id+", fileName="+fileName);
         NurseEntity nurse = repository.findOne(id);
+        long fileId = 0;
         try {
-            long fileId = storageService.saveFile(nurse.getProfilePhotoId(), fileName, inputStream);
+            fileId = storageService.saveFile(nurse.getProfilePhotoId(), fileName, inputStream);
             nurse.setProfilePhotoId(fileId);
         }
         catch (BadRequestException ex) {
@@ -166,13 +165,15 @@ public class NurseService {
             }
         }
         repository.save(nurse);
+        return storageService.getFilePath(fileId);
     }
 
     @Transactional
-    public void addBackgroundImage(long id, String fileName, InputStream inputStream){
+    public String addBackgroundImage(long id, String fileName, InputStream inputStream){
         NurseEntity nurse = repository.findOne(id);
+        long fileId = 0;
         try {
-            long fileId = storageService.saveFile(nurse.getBackgroundImageId(), fileName, inputStream);
+            fileId = storageService.saveFile(nurse.getBackgroundImageId(), fileName, inputStream);
             nurse.setBackgroundImageId(fileId);
         }
         catch (BadRequestException ex) {
@@ -182,6 +183,7 @@ public class NurseService {
             }
         }
         repository.save(nurse);
+        return storageService.getFilePath(fileId);
     }
 
     @Transactional

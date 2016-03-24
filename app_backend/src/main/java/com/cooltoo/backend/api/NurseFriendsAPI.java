@@ -64,6 +64,7 @@ public class NurseFriendsAPI {
 
     @GET
     @Path("/search/{name}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response searchFriend(@Context HttpServletRequest request, @PathParam("name") String name){
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseFriendsBean> friends = friendsService.searchFriends(userId, name);

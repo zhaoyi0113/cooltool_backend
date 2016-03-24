@@ -64,9 +64,9 @@ public class NurseAPI {
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition disposition) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        service.addHeadPhoto(userId, fileName, fileInputStream);
+        String path = service.addHeadPhoto(userId, fileName, fileInputStream);
         logger.info("upload successfully");
-        return Response.ok("success").build();
+        return Response.ok(path).build();
     }
 
     @POST
@@ -79,8 +79,8 @@ public class NurseAPI {
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition disposition) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        service.addBackgroundImage(userId, fileName, fileInputStream);
-        return Response.ok().build();
+        String path = service.addBackgroundImage(userId, fileName, fileInputStream);
+        return Response.ok(path).build();
     }
 
     @GET
@@ -124,7 +124,7 @@ public class NurseAPI {
             @Context HttpServletRequest request,
             @FormParam("name") String name,
             @FormParam("age") int age,
-            @FormParam("gender") int gender
+            @DefaultValue("-1") @FormParam("gender") int gender
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean one = service.updateNurse(userId, name, age, gender);
