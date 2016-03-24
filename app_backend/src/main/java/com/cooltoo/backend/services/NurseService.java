@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class NurseService {
     @Transactional
     public long registerNurse(NurseBean bean) {
         NurseEntity entity = entityConverter.convert(bean);
-        if (null==entity.getMobile() || entity.getMobile().isEmpty() || entity.getPassword() == null || entity.getPassword().isEmpty()){
+        if (VerifyUtil.isStringEmpty(entity.getMobile()) || VerifyUtil.isStringEmpty(entity.getPassword())){
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if(!repository.findNurseByMobile(bean.getMobile()).isEmpty()){
@@ -121,7 +122,7 @@ public class NurseService {
     }
 
     @Transactional
-    public NurseBean updateNurse(long id, String name, int age, int gender, String mobile) {
+    public NurseBean updateNurse(long id, String name, int age, int gender) {
         NurseEntity entity = repository.findOne(id);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
@@ -141,11 +142,6 @@ public class NurseService {
         }
         if (entity.getGender()!=gender && gender>0) {
             entity.setGender(gender);
-            changed = true;
-        }
-        // TODO need to add algorithm to verify the mobil
-        if (NumberUtil.isMobileValid(mobile) && !mobile.equals(entity.getMobile())) {
-            entity.setMobile(mobile);
             changed = true;
         }
         if (changed) {
@@ -223,5 +219,47 @@ public class NurseService {
     public List<NurseQualificationBean> getAllNurseQualification(long id) {
         List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(id);
         return qualifications;
+    }
+
+    @Transactional
+    public NurseBean updateMobilePassword(long id, String smsCode, String newMobile, String password, String newPassword) {
+        logger.info("modify the password and mobile : [smsCode"+smsCode+", newMobile="+newMobile+", password="+password+", newPassword="+newPassword+"]");
+        leanCloudService.verifySmsCode(smsCode, newMobile);
+        NurseBean bean = new NurseBean();
+        bean.setId(id);
+        bean.setMobile(newMobile);
+        bean.setPassword(newPassword);
+        return updateMobilePassword(bean);
+    }
+
+    @Transactional
+    public NurseBean updateMobilePassword(NurseBean bean) {
+        logger.info("modify the password and mobile : [newMobile="+bean.getMobile()+", newPassword="+bean.getPassword()+"]");
+        // get nurse
+        NurseEntity nurseEntity = repository.findOne(bean.getId());
+        if (null==nurseEntity) {
+            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+        }
+
+        boolean changed = false;
+        String valueChanged = bean.getMobile();
+        // check mobile
+        if (!VerifyUtil.isStringEmpty(valueChanged)) {
+            if (!valueChanged.equals(nurseEntity.getMobile())) {
+                nurseEntity.setMobile(valueChanged);
+                changed = true;
+            }
+        }
+        valueChanged = bean.getPassword();
+        if (!VerifyUtil.isStringEmpty(valueChanged)) {
+            if (!valueChanged.equals(nurseEntity.getPassword())) {
+                nurseEntity.setPassword(valueChanged);
+                changed = true;
+            }
+        }
+        if (changed) {
+            nurseEntity = repository.save(nurseEntity);
+        }
+        return beanConverter.convert(nurseEntity);
     }
 }

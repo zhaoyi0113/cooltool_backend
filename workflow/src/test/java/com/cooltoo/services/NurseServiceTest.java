@@ -75,7 +75,7 @@ public class NurseServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testUpdate(){
-        NurseBean bean = service.updateNurse(1,  "name222222", 22, 2, "4321654312");
+        NurseBean bean = service.updateNurse(1,  "name222222", 22, 2);
         Assert.assertNotNull(bean);
         Assert.assertEquals(1, bean.getId());
         Assert.assertEquals("name222222", bean.getName());
@@ -132,5 +132,27 @@ public class NurseServiceTest extends AbstractCooltooTest {
         System.out.println(bean);
         Assert.assertEquals(realname, bean.getRealName());
         Assert.assertEquals(identifi, bean.getIdentification());
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
+    public void testUpdateMobilePassword() {
+        String mobile = "13423143214";
+        String password = "12fd3a45b61c9840e40f4f45b6d1c";
+
+        NurseBean bean1 = service.getNurse(1);
+        NurseBean bean2 = service.getNurse(1);
+        bean2.setId(1);
+        bean2.setMobile(mobile);
+        bean2.setPassword(password);
+        bean2 = service.updateMobilePassword(bean2);
+
+        Assert.assertEquals(mobile, bean2.getMobile());
+        Assert.assertEquals(password, bean2.getPassword());
+        Assert.assertEquals(1, bean2.getId());
+
+        Assert.assertNotEquals(bean1.getMobile(), bean2.getMobile());
+        Assert.assertNotEquals(bean1.getPassword(), bean2.getPassword());
+        Assert.assertEquals(bean1.getId(), bean2.getId());
     }
 }

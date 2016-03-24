@@ -124,16 +124,33 @@ public class NurseAPI {
             @Context HttpServletRequest request,
             @FormParam("name") String name,
             @FormParam("age") int age,
-            @FormParam("gender") int gender,
-            @DefaultValue("") @FormParam("mobile") String mobile
+            @FormParam("gender") int gender
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseBean one = service.updateNurse(userId, name, age, gender, mobile);
+        NurseBean one = service.updateNurse(userId, name, age, gender);
         logger.info("update nurse is " + one);
         if (null == one) {
             return Response.ok().build();
         }
         return Response.ok(one).build();
+    }
+
+    @POST
+    @Path("/update/mobile_password")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response updateNurse(
+            @Context HttpServletRequest request,
+            @FormParam("smscode") String smsCode,
+            @FormParam("mobile") String newMobile,
+            @FormParam("password") String password,
+            @FormParam("new_password") String newPassword
+
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean bean = service.updateMobilePassword(userId, smsCode, newMobile, password, newPassword);
+        logger.info("update nurse mobile and password is " + bean);
+        return Response.ok(bean).build();
     }
 
     @POST
