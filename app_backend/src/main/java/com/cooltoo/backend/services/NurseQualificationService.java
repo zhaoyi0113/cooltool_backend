@@ -9,7 +9,7 @@ import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.services.StorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +94,7 @@ public class NurseQualificationService {
         logger.info("nurse qualification name is : " + name);
         logger.info("nurse work file type is : " + fileType);
         logger.info("nurse work file name is : " + fileName);
+        logger.info("nurse work file is null : " + (null==file));
 
         // is Qualification exist
         List<NurseQualificationEntity> qualifications = qualificationRepository.findNurseQualificationByUserIdAndName(nurseId, name, sort);
@@ -126,10 +127,13 @@ public class NurseQualificationService {
         qualificationEntity.setWorkFileType(fileType);
 
         // set WorkFileId and Status
-        if (null==file || VerifyUtil.isStringEmpty(fileName)) {
-            qualificationEntity.setStatus(VetStatus.NEED_UPLOAD);
+        if (null==file) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         else {
+            if (VerifyUtil.isStringEmpty(fileName)) {
+                fileName = "tmp"+System.nanoTime();
+            }
             long workFileId = storageService.saveFile(0, fileName, file);
             if (workFileId > 0) {
                 qualificationEntity.setWorkFileId(workFileId);

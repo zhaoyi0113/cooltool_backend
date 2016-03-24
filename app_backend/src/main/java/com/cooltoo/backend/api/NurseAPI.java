@@ -5,6 +5,7 @@ import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +166,9 @@ public class NurseAPI {
             @FormDataParam("file") FormDataContentDisposition disposition
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        if (VerifyUtil.isStringEmpty(fileName)) {
+            fileName = disposition.getFileName();
+        }
         NurseQualificationBean one = service.addNurseWorkFile(userId, name, fileName, fileInputStream);
         logger.info("add qualification work file : " + one);
         if (null == one) {
@@ -185,6 +189,9 @@ public class NurseAPI {
             @FormDataParam("file") FormDataContentDisposition disposition
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        if (VerifyUtil.isStringEmpty(fileName)) {
+            fileName = disposition.getFileName();
+        }
         NurseQualificationBean one = service.addNurseIdentification(userId, name, fileName, fileInputStream);
         logger.info("add identification file : " + one);
         if (null == one) {

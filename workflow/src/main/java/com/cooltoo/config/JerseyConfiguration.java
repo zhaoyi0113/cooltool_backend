@@ -48,6 +48,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(AdminUserLoginAPI.class);
         register(AdminUserAuthenticationFilter.class);
         register(CORSResponseFilter.class);
+        register(NurseQualificationAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
         configureSwagger();

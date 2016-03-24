@@ -37,10 +37,4 @@ public class NumberUtil {
             return -1;
         }
     }
-
-    public static void main(String[] args) {
-        System.out.println(NumberUtil.isIdentificationValid("130431198404041231"));
-        System.out.println(NumberUtil.isIdentificationValid("130431s198404041"));
-        System.out.println(NumberUtil.isIdentificationValid("13043119840404112X"));
-    }
 }

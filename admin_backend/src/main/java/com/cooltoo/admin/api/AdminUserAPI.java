@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by zhaolisong on 16/3/22.
  */
-@Path("/adminuser")
+@Path("/admin/adminuser")
 public class AdminUserAPI {
 
     @Autowired

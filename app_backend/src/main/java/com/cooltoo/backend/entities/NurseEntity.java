@@ -1,4 +1,4 @@
-package com.cooltoo.entities;
+package com.cooltoo.backend.entities;
 
 import javax.persistence.*;
 

@@ -2,8 +2,8 @@ package com.cooltoo.backend.converter;
 
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.entities.NurseFriendsEntity;
-import com.cooltoo.entities.NurseEntity;
-import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.backend.entities.NurseEntity;
+import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;

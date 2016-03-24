@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 /**
  * Created by zhaolisong on 16/3/22.
  */
-@Path("/adminuser")
+@Path("/admin/adminuser")
 public class AdminUserLoginAPI {
 
     @Autowired

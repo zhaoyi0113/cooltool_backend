@@ -6,7 +6,7 @@ import com.cooltoo.backend.entities.NurseFriendsEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.NurseFriendsRepository;
-import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.backend.repository.NurseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

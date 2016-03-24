@@ -9,7 +9,7 @@ import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.backend.repository.NurseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

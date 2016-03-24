@@ -8,7 +8,7 @@ import com.cooltoo.backend.repository.NurseSkillNorminationRepository;
 import com.cooltoo.backend.repository.OccupationSkillRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.services.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
