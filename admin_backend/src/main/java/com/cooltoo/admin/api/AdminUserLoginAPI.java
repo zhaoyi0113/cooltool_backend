@@ -24,7 +24,8 @@ public class AdminUserLoginAPI {
 
     @POST
     @Path("login")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response login(
             @Context HttpServletRequest request,
             @FormParam("name") String userName,
