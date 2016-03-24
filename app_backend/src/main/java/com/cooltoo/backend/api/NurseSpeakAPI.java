@@ -9,6 +9,8 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,8 @@ import java.util.List;
 @LoginAuthentication(requireNurseLogin = true)
 public class NurseSpeakAPI {
 
+    private static final Logger logger = LoggerFactory.getLogger(NurseSpeakAPI.class);
+
     @Autowired
     private NurseSpeakService speakService;
 
@@ -33,10 +37,12 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/{index}/{number}")
     public Response getNurseSpeakContentsList(@Context HttpServletRequest request,
-                                          @PathParam("index") int index,
-                                          @PathParam("number") int number){
+                                              @PathParam("index") int index,
+                                              @PathParam("number") int number) {
         long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        logger.info("get nurse speak for user " + userId+" at index="+index+", number="+number);
         List<NurseSpeakBean> nurseSpeak = speakService.getNurseSpeak(userId, index, number);
+        logger.info("get nurse speak list size "+nurseSpeak.size());
         return Response.ok(nurseSpeak).build();
     }
 
@@ -46,7 +52,7 @@ public class NurseSpeakAPI {
                              @FormDataParam("speak_type") String speakType,
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
-                             @FormDataParam("file") InputStream fileInputStream){
+                             @FormDataParam("file") InputStream fileInputStream) {
         long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
         NurseSpeakBean nurseSpeak = speakService.addNurseSpeak(userId, content, speakType, fileName, fileInputStream);
         return Response.ok(nurseSpeak).build();
@@ -56,7 +62,7 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Response getNurseSpeakContent(@Context HttpServletRequest request,
-                                         @PathParam("id") long id){
+                                         @PathParam("id") long id) {
         long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
         NurseSpeakBean nurseSpeak = speakService.getNurseSpeak(id);
         return Response.ok(nurseSpeak).build();

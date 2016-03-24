@@ -4,6 +4,8 @@ import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseFriendsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +25,8 @@ public class NurseFriendsAPI {
     @Autowired
     private NurseFriendsService friendsService;
 
+    private static final Logger logger = LoggerFactory.getLogger(NurseFriendsAPI.class.getName());
+
     @POST
     @Path("/add/{friend_id}")
     public Response addFriend(@Context HttpServletRequest request, @PathParam("friend_id") long friendId) {
@@ -35,9 +39,10 @@ public class NurseFriendsAPI {
     @Path("/list/{page_index}/{number}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFriendList(@Context HttpServletRequest request, @PathParam("page_index") int pageIdx, @PathParam("number") int number){
-
+        logger.info("search friend list at page="+pageIdx+", number="+number);
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseFriendsBean> friendList = friendsService.getFriends(userId, pageIdx, number);
+        logger.info("get friend list count "+friendList.size());
         return Response.ok(friendList).build();
     }
 
