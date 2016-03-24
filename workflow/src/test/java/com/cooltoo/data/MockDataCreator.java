@@ -31,8 +31,8 @@ import java.util.concurrent.Executors;
 /**
  * Created by yzzhao on 3/20/16.
  */
-//@Ignore
-//@Transactional
+@Ignore
+@Transactional
 public class MockDataCreator extends AbstractCooltooTest {
 
     private static final int nurseNumber = 100;
