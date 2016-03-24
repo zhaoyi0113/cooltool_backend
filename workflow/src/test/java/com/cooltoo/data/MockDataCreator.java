@@ -1,6 +1,7 @@
 package com.cooltoo.data;
 
 import com.cooltoo.AbstractCooltooTest;
+import com.cooltoo.Application;
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.services.NurseFriendsService;
@@ -11,12 +12,20 @@ import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.NurseRepository;
+import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -32,7 +41,12 @@ import java.util.concurrent.Executors;
  * Created by yzzhao on 3/20/16.
  */
 @Ignore
-@Transactional
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(Application.class)
+@WebAppConfiguration
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
+        DirtiesContextTestExecutionListener.class,
+        TransactionDbUnitTestExecutionListener.class})
 public class MockDataCreator extends AbstractCooltooTest {
 
     private static final int nurseNumber = 100;
