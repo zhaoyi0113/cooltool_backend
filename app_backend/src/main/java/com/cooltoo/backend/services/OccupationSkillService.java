@@ -79,6 +79,7 @@ public class OccupationSkillService {
             entity.setType(skillType);
             entity.setImageId(fileId);
             skillRepository.save(entity);
+            return;
         }
         throw new BadRequestException(ErrorCode.SKILL_EXIST);
     }
