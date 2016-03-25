@@ -196,6 +196,29 @@ public class NurseAPI {
     }
 
     @POST
+    @Path("/qualification/edit_work_file")
+    @LoginAuthentication(requireNurseLogin = true)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editNurseWorkFile(
+            @Context HttpServletRequest request,
+            @FormDataParam("id") long id,
+            @FormDataParam("file_name") String fileName,
+            @FormDataParam("file") InputStream fileInputStream,
+            @FormDataParam("file") FormDataContentDisposition disposition
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        if (VerifyUtil.isStringEmpty(fileName)) {
+            fileName = disposition.getFileName();
+        }
+        NurseQualificationBean one = service.updateNurseWorkFile(id, fileName, fileInputStream);
+        logger.info("update qualification work file : " + one);
+        if (null == one) {
+            return Response.ok().build();
+        }
+        return Response.ok(one).build();
+    }
+
+    @POST
     @Path("/qualification/id_file")
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)

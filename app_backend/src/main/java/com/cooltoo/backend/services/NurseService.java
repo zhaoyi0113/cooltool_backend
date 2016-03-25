@@ -10,6 +10,7 @@ import com.cooltoo.backend.repository.HospitalRepository;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.VetStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
@@ -204,6 +205,12 @@ public class NurseService {
         nurse.setIdentification(identification);
         nurse = repository.save(nurse);
         return beanConverter.convert(nurse);
+    }
+
+    @Transactional
+    public NurseQualificationBean updateNurseWorkFile(long id, String fileName, InputStream workFile) {
+        NurseQualificationBean bean = qualificationService.updateNurseWorkFile(id, null, fileName, workFile, VetStatus.WAITING);
+        return bean;
     }
 
     @Transactional
