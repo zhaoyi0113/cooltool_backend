@@ -82,7 +82,11 @@ public enum ErrorCode {
     AUTHENTICATION_DELETE_ADMIN_DENIED(10062, Response.Status.BAD_REQUEST, "不可以删除管理员账户", "Administrator account have not to be deleted"),
     NURSE_QUALIFICATION_NAME_EXIST(10063, Response.Status.BAD_REQUEST, "资质名已存在", "Qualification name exist"),
     NURSE_QUALIFICATION_NAME_NOT_EXIST(10064, Response.Status.BAD_REQUEST, "资质名不存在", "Qualification name not exist"),
-    NURSE_QUALIFICATION_IDENTIFICATION_EXIST(10065, Response.Status.BAD_REQUEST, "身份证存在", "Identification exist");
+    NURSE_QUALIFICATION_IDENTIFICATION_EXIST(10065, Response.Status.BAD_REQUEST, "身份证存在", "Identification exist"),
+    SKILL_EXIST(10066, Response.Status.BAD_REQUEST, "技能已存在", "Skill exist"),
+    SKILL_NAME_IS_NULL(10067, Response.Status.BAD_REQUEST, "技能名称为空字符串", "Skill name is empty"),
+    SKILL_TYPE_INVALID(10068, Response.Status.BAD_REQUEST, "无效的技能类型", "Skill type is invalid"),
+    FILE_UPLOADING_IS_EMPTY(10069, Response.Status.BAD_REQUEST, "上传文件无效", "File uploading is invalid");
 
     private final int code;
 

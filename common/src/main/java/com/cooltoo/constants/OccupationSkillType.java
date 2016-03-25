@@ -1,5 +1,9 @@
 package com.cooltoo.constants;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by yzzhao on 3/21/16.
  */
@@ -34,5 +38,13 @@ public enum OccupationSkillType {
             retVal = OCCUPATION;
         }
         return retVal;
+    }
+
+    public static List<String> getAllValues() {
+        List<String> allEnums = new ArrayList<String>();
+        allEnums.add(COMMUNITY.name());
+        allEnums.add(SKILL.name());
+        allEnums.add(OCCUPATION.name());
+        return allEnums;
     }
 }

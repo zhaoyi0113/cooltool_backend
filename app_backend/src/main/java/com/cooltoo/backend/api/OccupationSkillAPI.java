@@ -24,11 +24,20 @@ public class OccupationSkillAPI {
         return Response.ok(skillService.getOccupationSkillList()).build();
     }
 
+    @GET
+    @Path("/types")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOccupationSkillTypes() {
+        return Response.ok(skillService.getAllSkillTypes()).build();
+    }
+
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response addNewOccupationSkill(@FormDataParam("name") String name,
-                                          @FormDataParam("file") InputStream inputStream) {
-        skillService.addNewOccupationSkill(name, inputStream);
+    public Response addNewOccupationSkill(
+            @FormDataParam("name") String name,
+            @FormDataParam("type") String type,
+            @FormDataParam("file") InputStream inputStream) {
+        skillService.addNewOccupationSkill(name, type, inputStream);
         return Response.ok().build();
     }
 
@@ -40,19 +49,22 @@ public class OccupationSkillAPI {
 
     @POST
     @Path("/edit")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response editOccupationSkill(@FormDataParam("id") int id,
+                                        @FormDataParam("type") String type,
                                         @FormDataParam("name") String name,
                                         @FormDataParam("file") InputStream inputStream) {
-        skillService.editOccupationSkill(id, name, inputStream);
+        skillService.editOccupationSkill(id, name, type, inputStream);
         return Response.ok().build();
     }
 
     @POST
     @Path("/edit_without_image")
-    public Response editOccupationSkill(@FormDataParam("id") int id,
-                                        @FormDataParam("name") String name
+    public Response editOccupationSkill(@FormParam("id") int id,
+                                        @FormParam("name") String name,
+                                        @FormParam("type") String type
                                         ) {
-        skillService.editOccupationSkillWithoutImage(id, name);
+        skillService.editOccupationSkillWithoutImage(id, name, type);
         return Response.ok().build();
     }
 }

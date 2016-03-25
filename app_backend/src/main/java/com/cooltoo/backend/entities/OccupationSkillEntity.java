@@ -41,7 +41,6 @@ public class OccupationSkillEntity {
     }
 
     public void setName(String name) {
-
         this.name = name;
     }
 
