@@ -66,15 +66,15 @@ public class MockDataCreator  {
     @Autowired
     private NurseSpeakService nurseSpeakService;
 
+    public static final String NURSE_NAME_PREFIX = "护士";
+
     @Test
     public void testCreateNurse() {
         List<NurseEntity> nurse = createNurse();
         createFriendRelation(nurse);
-        addNurseSpeak(nurse);
     }
 
     private List<NurseEntity> createNurse() {
-        final  String name = "护士";
         ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
         final CountDownLatch latch = new CountDownLatch(nurseNumber);
         final List<NurseEntity> allNurse = new ArrayList<NurseEntity>();
@@ -84,7 +84,7 @@ public class MockDataCreator  {
                 @Override
                 public void run() {
                     NurseEntity entity = new NurseEntity();
-                    entity.setName(name + index);
+                    entity.setName(NURSE_NAME_PREFIX + index);
                     logger.info("create nurse "+entity.getName());
                     entity.setAge((int) getRandomInt(18, 50));
                     entity.setGender(GenderType.parseInt((int) getRandomInt(0, 2)));
@@ -161,7 +161,8 @@ public class MockDataCreator  {
 
     private NurseEntity saveNurse(NurseEntity entity) {
         List<NurseEntity> found = nurseRepository.findNurseByMobile(entity.getMobile());
-        if (found.isEmpty()) {
+        List<NurseEntity> nurseByName = nurseRepository.findNurseByName(entity.getName());
+        if (found.isEmpty() && nurseByName.isEmpty()) {
             logger.info("create nurse " + entity.getMobile());
             return nurseRepository.save(entity);
         } else {
@@ -170,58 +171,11 @@ public class MockDataCreator  {
         }
     }
 
-    private void addNurseSpeak(List<NurseEntity> nurseEntities) {
-        ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
-        final CountDownLatch latch = new CountDownLatch(nurseEntities.size());
-        for (final NurseEntity entity : nurseEntities) {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    int number = (int) getRandomInt(10, 100);
-                    for(int i=0; i<number; i++) {
-                        String fileName = null;
-                        InputStream inputStream = null;
-                        SpeakType speakType = SpeakType.values()[(int) getRandomInt(0, 3)];
-                        if (speakType.equals(SpeakType.CATHART)) {
-                            fileName = "choumei" + getRandomInt(0, 17) + ".jpg";
-                            inputStream = getResourceAsStream("/com/cooltoo/data/choumei/" + fileName);
-
-                        }
-                        logger.info("add nurse speak ");
-                        NurseSpeakBean nurseSpeakBean = nurseSpeakService.addNurseSpeak(entity.getId(), getRandomString(100),
-                                speakType.name(), fileName, inputStream);
-                        addSpeakCommentsAndThumbUp(nurseSpeakBean);
-                    }
-                    latch.countDown();
-                }
-            });
-        }
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void addSpeakCommentsAndThumbUp(NurseSpeakBean entity){
-        NurseEntity nurse = nurseRepository.findOne(entity.getUserId());
-        List<NurseFriendsBean> friendList =
-                nurseFriendsService.getFriendList(nurse.getId());
-        int number = (int) getRandomInt(5, 10);
-        logger.info("add comments and thumb up "+nurse.getName());
-        for(int i=0; i<number; i++) {
-            nurseSpeakService.addSpeakComment(entity.getId(), friendList.get(i).getId(), nurse.getId(),
-                    getRandomString(40));
-            nurseSpeakService.addNurseSpeakThumbsUp(entity.getId(), friendList.get(i).getId());
-        }
-
-    }
-
-    private static long getRandomInt(long minimum, long maximum) {
+    public static long getRandomInt(long minimum, long maximum) {
         return minimum + (long) (Math.random() * maximum);
     }
 
-    private static String getRandomString(int length) { //length表示生成字符串的长度
+    public static String getRandomString(int length) { //length表示生成字符串的长度
         String base = "abcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
         StringBuffer sb = new StringBuffer();

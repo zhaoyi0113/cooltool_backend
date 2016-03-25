@@ -7,7 +7,6 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.util.VerifyUtil;
-import com.sun.org.apache.regexp.internal.RE;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.FileDescriptor;
 import java.io.InputStream;
 import java.util.List;
 

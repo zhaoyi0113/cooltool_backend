@@ -80,6 +80,7 @@ public class NurseAPI {
             @FormDataParam("file") FormDataContentDisposition disposition) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         String path = service.addBackgroundImage(userId, fileName, fileInputStream);
+        logger.info("return background path "+path);
         return Response.ok(path).build();
     }
 
