@@ -16,4 +16,5 @@ public interface NurseRepository extends CrudRepository<NurseEntity, Long> {
 
     List<NurseEntity> findNurseByName(String name);
 
+    List<NurseEntity> findNurseByIdIn(List<Long> ids);
 }

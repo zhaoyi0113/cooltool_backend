@@ -1,22 +1,15 @@
-package com.cooltoo.backend.entities;
-
-import javax.persistence.*;
+package com.cooltoo.backend.beans;
 
 /**
- * Created by yzzhao on 3/13/16.
+ * Created by zhaolisong on 16/3/25.
  */
-@Entity
-@Table(name = "nurse_occupation_skill")
-public class NurseOccupationSkillEntity {
-
+public class NurseOccupationSkillBean {
     private int id;
     private long userId;
     private int skillId;
     private int point;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
+
     public int getId() {
         return id;
     }
@@ -25,7 +18,6 @@ public class NurseOccupationSkillEntity {
         this.id = id;
     }
 
-    @Column(name = "user_id")
     public long getUserId() {
         return userId;
     }
@@ -34,7 +26,6 @@ public class NurseOccupationSkillEntity {
         this.userId = userId;
     }
 
-    @Column(name = "skill_id")
     public int getSkillId() {
         return skillId;
     }
@@ -43,7 +34,6 @@ public class NurseOccupationSkillEntity {
         this.skillId = skillId;
     }
 
-    @Column(name="point")
     public int getPoint() {
         return point;
     }

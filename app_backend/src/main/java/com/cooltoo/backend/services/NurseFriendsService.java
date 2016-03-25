@@ -2,6 +2,7 @@ package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.converter.NurseFriendBeanConverter;
+import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseFriendsEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -84,8 +85,29 @@ public class NurseFriendsService {
     }
 
     public List<NurseFriendsBean> searchFriends(long userId, String name){
-        List<NurseFriendsEntity> entities = friendsRepository.searchFriends(userId, name);
-        return convertToNurseFriendsBeans(entities);
+        List<NurseFriendsEntity> friendMaps = friendsRepository.findByUserId(userId);
+        logger.info("search nurse friends is : " +friendMaps);
+        List<Long> friendIds = new ArrayList<Long>();
+        for (NurseFriendsEntity friend : friendMaps) {
+            friendIds.add(friend.getFriendId());
+        }
+        List<NurseEntity> friends = nurseRepository.findNurseByIdIn(friendIds);
+        logger.info("search nurse friends is : " +friends);
+        for (NurseEntity friend : friends) {
+            if (friend.getName().contains(name)) {
+            }
+            else {
+                friendIds.remove(friend.getId());
+            }
+        }
+        List<NurseFriendsEntity> friendsFiltered = new ArrayList<NurseFriendsEntity>();
+        for (NurseFriendsEntity friend : friendMaps) {
+            if (friendIds.contains(friend.getFriendId())) {
+                friendsFiltered.add(friend);
+            }
+        }
+
+        return convertToNurseFriendsBeans(friendsFiltered);
     }
 
     public List<NurseFriendsBean> getFriends(long userId, int pageIdx, int number){

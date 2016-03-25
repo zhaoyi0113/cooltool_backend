@@ -58,10 +58,25 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
     public void testGetFriends(){
         List<NurseFriendsBean> friends = friendsService.getFriends(1, 0, 3);
         Assert.assertEquals(3, friends.size());
-        Assert.assertEquals(2, friends.get(0).getFriendId());
+        Assert.assertEquals(1, friends.get(0).getFriendId());
 
         friends = friendsService.getFriends(1, 1, 5);
         Assert.assertEquals(5, friends.size());
-        Assert.assertEquals(7, friends.get(0).getFriendId());
+        Assert.assertEquals(6, friends.get(0).getFriendId());
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_page_data.xml")
+    public void testSearchFriends(){
+        List<NurseFriendsBean> friends = null;
+
+        friends = friendsService.searchFriends(1, "4");
+        System.out.println(friends);
+        Assert.assertEquals(2, friends.size());
+
+        friends = friendsService.searchFriends(1, "护士");
+        System.out.println(friends);
+        Assert.assertEquals(15, friends.size());
+
     }
 }

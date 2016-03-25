@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <nurse id="1" name="name1" age="11" gender="1" mobile="1231432143" password="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="2" name="name2" age="22" gender="2" mobile="14321134" password="aa" profile_photo_id="1" background_image_id="1" />
+
+    <occupation_skill id="1" name="skill1" image_id="1" type="1"/><!-- SKILL -->
+    <occupation_skill id="2" name="skill2" image_id="1" type="2"/><!-- OCCUPATION -->
+    <occupation_skill id="3" name="skill3" image_id="1" type="0"/><!-- COMMUNITY -->
+
+    <nurse_occupation_skill id="1" user_id="1" skill_id="1" point="30" />
+    <nurse_occupation_skill id="2" user_id="1" skill_id="2" point="20" />
+    <nurse_occupation_skill id="3" user_id="1" skill_id="3" point="512" />
+    <nurse_occupation_skill id="4" user_id="2" skill_id="1" point="15" />
+    <nurse_occupation_skill id="5" user_id="2" skill_id="2" point="10" />
+
+    <nurse_skill_normination id="1" user_id="1" skill_id="1" nomiated_user_id="10" date_time="2016-03-01"/>
+    <nurse_skill_normination id="2" user_id="1" skill_id="1" nomiated_user_id="11" date_time="2016-03-01"/>
+    <nurse_skill_normination id="3" user_id="1" skill_id="1" nomiated_user_id="12" date_time="2016-03-01"/>
+    <nurse_skill_normination id="4" user_id="1" skill_id="1" nomiated_user_id="13" date_time="2016-03-01"/>
+    <nurse_skill_normination id="5" user_id="1" skill_id="1" nomiated_user_id="14" date_time="2016-03-01"/>
+
+    <nurse_skill_normination id="6" user_id="2" skill_id="2" nomiated_user_id="10" date_time="2016-03-01"/>
+    <nurse_skill_normination id="7" user_id="2" skill_id="2" nomiated_user_id="11" date_time="2016-03-01"/>
+    <nurse_skill_normination id="8" user_id="2" skill_id="3" nomiated_user_id="12" date_time="2016-03-01"/>
+    <nurse_skill_normination id="9" user_id="2" skill_id="1" nomiated_user_id="13" date_time="2016-03-01"/>
+</dataset>

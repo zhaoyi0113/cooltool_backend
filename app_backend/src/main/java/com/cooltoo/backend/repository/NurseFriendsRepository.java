@@ -18,9 +18,6 @@ public interface NurseFriendsRepository extends JpaRepository<NurseFriendsEntity
 
     List<NurseFriendsEntity> findByUserId(long userId);
 
-    @Query("select friend from NurseFriendsEntity as friend, NurseEntity as nurse where friend.userId = :userId and nurse.id = :userId and nurse.name LIKE %:filter%")
-    List<NurseFriendsEntity> searchFriends(@Param("userId") long userId, @Param("filter") String filter);
-
     Page<NurseFriendsEntity> findNurseFriendByUserId(long userId, Pageable pageable);
 
     long countByUserIdAndFriendId(long userId, long friendId);

@@ -55,4 +55,15 @@ public class NurseFriendsEntity {
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
     }
+
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(this.getClass()).append("@").append(hashCode()).append("[");
+        msg.append("id=").append(id).append(" ,");
+        msg.append("userId=").append(userId).append(" ,");
+        msg.append("friendId=").append(friendId).append(" ,");
+        msg.append("dateTime=").append(dateTime);
+        msg.append(" ]");
+        return msg.toString();
+    }
 }
