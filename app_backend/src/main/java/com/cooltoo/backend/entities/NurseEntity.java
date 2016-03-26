@@ -34,6 +34,8 @@ public class NurseEntity {
 
     private String identification;
 
+    private String shortNote;
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -119,6 +121,14 @@ public class NurseEntity {
         this.identification = identification;
     }
 
+    @Column(name = "short_note")
+    public String getShortNote() {
+        return shortNote;
+    }
+
+    public void setShortNote(String shortNote) {
+        this.shortNote = shortNote;
+    }
 
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -133,7 +143,8 @@ public class NurseEntity {
         msg.append("backgroundImageId=").append(backgroundImageId).append(" , ");
         msg.append("integral=").append(integral).append(" , ");
         msg.append("realName=").append(realName).append(" , ");
-        msg.append("identification=").append(identification);
+        msg.append("identification=").append(identification).append(" , ");
+        msg.append("shortNote=").append(shortNote);
         msg.append(" ]");
         return msg.toString();
     }

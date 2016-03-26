@@ -22,6 +22,7 @@ public class NurseEntityConverter implements Converter<NurseBean, NurseEntity> {
         entity.setIntegral(bean.getIntegral());
         entity.setRealName(bean.getRealName());
         entity.setIdentification(bean.getIdentification());
+        entity.setShortNote(bean.getShortNote());
         return entity;
     }
 }

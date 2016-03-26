@@ -208,6 +208,21 @@ public class NurseService {
     }
 
     @Transactional
+    public NurseBean setShortNote(long id, String shortNote) {
+        NurseEntity nurse = repository.findOne(id);
+        if (null==nurse) {
+            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+        }
+        logger.info("nurse short note is : " + shortNote);
+        if (VerifyUtil.isStringEmpty(shortNote)) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        nurse.setShortNote(shortNote);
+        nurse = repository.save(nurse);
+        return beanConverter.convert(nurse);
+    }
+
+    @Transactional
     public NurseQualificationBean updateNurseWorkFile(long id, String fileName, InputStream workFile) {
         NurseQualificationBean bean = qualificationService.updateNurseWorkFile(id, null, fileName, workFile, VetStatus.WAITING);
         return bean;

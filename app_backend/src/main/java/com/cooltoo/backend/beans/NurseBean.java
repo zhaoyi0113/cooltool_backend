@@ -38,6 +38,8 @@ public class NurseBean {
 
     private String identification;
 
+    private String shortNote;
+
     private String password;
     private String profilePhotoUrl;
     private String backgroundImageUrl;
@@ -165,6 +167,13 @@ public class NurseBean {
         this.identification = identification;
     }
 
+    public String getShortNote() {
+        return shortNote;
+    }
+
+    public void setShortNote(String shortNote) {
+        this.shortNote = shortNote;
+    }
 
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -179,6 +188,7 @@ public class NurseBean {
         msg.append("integral=").append(integral).append(" , ");
         msg.append("realName=").append(realName).append(" , ");
         msg.append("identification=").append(identification).append(" , ");
+        msg.append("shortNote=").append(shortNote);
         msg.append("]");
         return msg.toString();
     }

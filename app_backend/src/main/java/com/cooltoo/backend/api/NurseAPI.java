@@ -155,6 +155,23 @@ public class NurseAPI {
     }
 
     @POST
+    @Path("/short_note")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response setShortNote(
+            @Context HttpServletRequest request,
+            @FormParam("short_note") String shortNote
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean one = service.setShortNote(userId, shortNote);
+        logger.info("set short note " + one);
+        if (null == one) {
+            return Response.ok().build();
+        }
+        return Response.ok(one).build();
+    }
+
+    @POST
     @Path("/qualification/realname_identification")
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
@@ -171,6 +188,7 @@ public class NurseAPI {
         }
         return Response.ok(one).build();
     }
+
 
     @POST
     @Path("/qualification/work_file")

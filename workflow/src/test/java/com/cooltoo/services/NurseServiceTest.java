@@ -156,4 +156,19 @@ public class NurseServiceTest extends AbstractCooltooTest {
         Assert.assertNotEquals(bean1.getPassword(), bean2.getPassword());
         Assert.assertEquals(bean1.getId(), bean2.getId());
     }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
+    public void testNurseShortNote() {
+        String shortNote = "Haahahahahahahha";
+
+        NurseBean bean1 = service.getNurse(1);
+        NurseBean bean2 = service.getNurse(1);
+        bean2.setId(bean1.getId());
+        bean2.setShortNote(shortNote);
+        bean2 = service.setShortNote(bean2.getId(), bean2.getShortNote());
+
+        Assert.assertEquals(shortNote, bean2.getShortNote());
+        Assert.assertEquals(bean1.getId(), bean2.getId());
+    }
 }
