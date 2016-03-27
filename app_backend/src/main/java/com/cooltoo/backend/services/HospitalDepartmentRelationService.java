@@ -51,6 +51,26 @@ public class HospitalDepartmentRelationService {
         return beanConverter.convert(entity);
     }
 
+    public List<HospitalDepartmentRelationBean> getRelationByHospitalId(int hospitalId) {
+        Iterable<HospitalDepartmentRelationEntity> iterable = repository.findRelationByHospitalId(hospitalId);
+        List<HospitalDepartmentRelationBean> all = new ArrayList<HospitalDepartmentRelationBean>();
+        for (HospitalDepartmentRelationEntity entity : iterable) {
+            HospitalDepartmentRelationBean bean = beanConverter.convert(entity);
+            all.add(bean);
+        }
+        return all;
+    }
+
+    public List<HospitalDepartmentRelationBean> getRelationByDepartmentId(int departmentId) {
+        Iterable<HospitalDepartmentRelationEntity> iterable = repository.findRelationByDepartmentId(departmentId);
+        List<HospitalDepartmentRelationBean> all = new ArrayList<HospitalDepartmentRelationBean>();
+        for (HospitalDepartmentRelationEntity entity : iterable) {
+            HospitalDepartmentRelationBean bean = beanConverter.convert(entity);
+            all.add(bean);
+        }
+        return all;
+    }
+
     @Transactional
     public HospitalDepartmentRelationBean deleteById(Integer id) {
         HospitalDepartmentRelationEntity entity = repository.findOne(id);

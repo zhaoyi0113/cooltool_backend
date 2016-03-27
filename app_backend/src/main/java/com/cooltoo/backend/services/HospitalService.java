@@ -2,9 +2,12 @@ package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.converter.HospitalBeanConverter;
 import com.cooltoo.backend.converter.HospitalEntityConverter;
+import com.cooltoo.backend.entities.HospitalDepartmentEntity;
 import com.cooltoo.backend.entities.HospitalEntity;
 import com.cooltoo.backend.repository.HospitalRepository;
 import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.beans.HospitalDepartmentRelationBean;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,10 @@ public class HospitalService {
 
     @Autowired
     private HospitalRepository repository;
+    @Autowired
+    private HospitalDepartmentService departmentService;
+    @Autowired
+    private HospitalDepartmentRelationService relationService;
     @Autowired
     private HospitalBeanConverter beanConverter;
     @Autowired
@@ -111,4 +118,39 @@ public class HospitalService {
         return newOne(bean);
     }
 
+    public List<HospitalDepartmentBean> getAllDepartments(int hospitalId) {
+        List<HospitalDepartmentRelationBean> relationBeans = relationService.getRelationByHospitalId(hospitalId);
+        List<Integer> departmentIds = new ArrayList<Integer>();
+        for (HospitalDepartmentRelationBean relation : relationBeans) {
+            departmentIds.add(relation.getDepartmentId());
+        }
+        return departmentService.getDepartmentsByIds(departmentIds);
+    }
+
+    @Transactional
+    public Integer setHospitalAndDepartmentRelation(int hospitalId, int departId) {
+        HospitalBean hospital = getOneById(hospitalId);
+        if (null==hospital) {
+            throw new BadRequestException(ErrorCode.HOSPITAL_NOT_EXIST);
+        }
+        HospitalDepartmentBean department = departmentService.getOneById(departId);
+        if (null==department) {
+            throw new BadRequestException(ErrorCode.HOSPITAL_DEPARTMENT_NOT_EXIST);
+        }
+        List<HospitalDepartmentRelationBean> relations = relationService.getRelationByHospitalId(hospitalId);
+        // if exist delete
+        HospitalDepartmentRelationBean relationExist = null;
+        for (HospitalDepartmentRelationBean relation : relations) {
+            if (relation.getHospitalId()==hospitalId && relation.getDepartmentId()==departId) {
+                relationExist = relation;
+            }
+        }
+        if (null==relationExist) {
+            return relationService.newOne(hospitalId, departId);
+        }
+        else {
+            relationService.deleteById(relationExist.getId());
+            return relationExist.getId();
+        }
+    }
 }

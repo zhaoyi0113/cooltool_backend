@@ -3,6 +3,7 @@ package com.cooltoo.admin.api;
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.services.HospitalService;
 import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
@@ -27,6 +28,17 @@ public class HospitalAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getAll() {
         List<HospitalBean> all = service.getAll();
+        return Response.ok(all).build();
+    }
+
+    @POST
+    @Path("/department")
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getDepartments(
+            @FormParam("id") @DefaultValue("-1") int id
+    ) {
+        List<HospitalDepartmentBean> all = service.getAllDepartments(id);
         return Response.ok(all).build();
     }
 
@@ -85,5 +97,18 @@ public class HospitalAPI {
         int id = service.newOne(name, province, city);
         logger.info("new hospital id is " + id);
         return Response.ok(id).build();
+    }
+
+    @Path("/set_department")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response setRelation(
+            @DefaultValue("-1") @FormParam("id") int id,
+            @DefaultValue("-1") @FormParam("department_id") int departmentId
+    ) {
+        int ret = service.setHospitalAndDepartmentRelation(id, departmentId);
+        logger.info("set department to hospital is " + ret);
+        return Response.ok().build();
     }
 }

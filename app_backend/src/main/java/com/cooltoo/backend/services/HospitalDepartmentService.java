@@ -1,7 +1,6 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.converter.HospitalDepartmentBeanConverter;
-import com.cooltoo.backend.converter.HospitalDepartmentEntityConverter;
 import com.cooltoo.backend.entities.HospitalDepartmentEntity;
 import com.cooltoo.backend.repository.HospitalDepartmentRepository;
 import com.cooltoo.beans.HospitalDepartmentBean;
@@ -24,8 +23,6 @@ public class HospitalDepartmentService {
     private HospitalDepartmentRepository repository;
     @Autowired
     private HospitalDepartmentBeanConverter beanConverter;
-    @Autowired
-    private HospitalDepartmentEntityConverter entityConverter;
 
     public List<HospitalDepartmentBean> getAll() {
         Iterable<HospitalDepartmentEntity> iterable = repository.findAll();
@@ -43,6 +40,16 @@ public class HospitalDepartmentService {
             return null;
         }
         return beanConverter.convert(entity);
+    }
+
+    public List<HospitalDepartmentBean> getDepartmentsByIds(List<Integer> ids) {
+        Iterable<HospitalDepartmentEntity> iterable = repository.findDepartmentByIdIn(ids);
+        List<HospitalDepartmentBean> all = new ArrayList<HospitalDepartmentBean>();
+        for (HospitalDepartmentEntity entity : iterable) {
+            HospitalDepartmentBean bean = beanConverter.convert(entity);
+            all.add(bean);
+        }
+        return all;
     }
 
     @Transactional
@@ -63,6 +70,13 @@ public class HospitalDepartmentService {
         String value = bean.getName();
         if (null==value || "".equals(value)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        List<HospitalDepartmentBean> all = getAll();
+        for (HospitalDepartmentBean department : all) {
+            if (department.getName().equalsIgnoreCase(bean.getName())) {
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
         }
 
         HospitalDepartmentEntity entity = repository.findOne(bean.getId());
