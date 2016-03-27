@@ -99,7 +99,7 @@ public class NurseService {
         }
         long speakCount = speakService.getNurseSpeakCount(id);
         nurse.setProperty(NurseBean.SPEAK_COUNT, speakCount);
-        long norminated = this.nominationService.getUserAllSkillNorminatedCount(id);
+        long norminated = this.nominationService.getUserAllSkillNominatedCount(id);
         nurse.setProperty(NurseBean.NORMINATED_COUNT, norminated);
         return nurse;
     }

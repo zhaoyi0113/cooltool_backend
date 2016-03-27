@@ -55,14 +55,9 @@ public class NurseOccupationSkillServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(3, skill.getSkillId());
         Assert.assertTrue(skill.getId()>0);
 
-        Throwable ex = null;
-        try {
-            nurseSkillService.addSkill(2, 3);
-        }
-        catch (Exception e) {
-            ex = e;
-        }
-        Assert.assertNotNull(ex);
+        nurseSkillService.addSkill(2, 3);
+        skill = nurseSkillService.getSkill(2, 3);
+        Assert.assertNull(skill);
     }
 
     @Test

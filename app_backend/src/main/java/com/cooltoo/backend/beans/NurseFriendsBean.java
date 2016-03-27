@@ -12,6 +12,7 @@ public class NurseFriendsBean {
     private Date dateTime;
     private String headPhotoUrl;
     private String friendName;
+    private boolean isFriend;
 
     public long getId() {
         return id;
@@ -59,5 +60,13 @@ public class NurseFriendsBean {
 
     public void setFriendName(String friendName) {
         this.friendName = friendName;
+    }
+
+    public boolean getIsFriend() {
+        return isFriend;
+    }
+
+    public void setIsFriend(boolean isFriend) {
+        this.isFriend = isFriend;
     }
 }

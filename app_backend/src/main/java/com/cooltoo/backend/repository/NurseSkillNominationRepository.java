@@ -10,6 +10,8 @@ import java.util.List;
  */
 public interface NurseSkillNominationRepository extends JpaRepository<NurseSkillNominationEntity, Long>{
 
+    List<NurseSkillNominationEntity> findByUserId(long userId);
+
     long countByUserIdAndSkillId(long userId, int skillId);
 
     List<NurseSkillNominationEntity> findByUserIdAndSkillIdAndNominatedId(long userId, int skillId, long nominatedId);

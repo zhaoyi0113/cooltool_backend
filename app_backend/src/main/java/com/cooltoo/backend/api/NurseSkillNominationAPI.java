@@ -32,7 +32,9 @@ public class NurseSkillNominationAPI {
     @POST
     @Path("/nominate")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response nominateSkill(@Context HttpServletRequest request, @FormParam("friend_id") long friendId, @FormParam("skill_id") int skillId) {
+    public Response nominateSkill(@Context HttpServletRequest request,
+                                  @FormParam("friend_id") long friendId,
+                                  @FormParam("skill_id") int skillId) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         long count = nominationService.nominateNurseSkill(userId, skillId, friendId);
         logger.info("get skill nominate count "+count);
@@ -42,13 +44,11 @@ public class NurseSkillNominationAPI {
     }
 
     @GET
-    @Path("/nominate/{index}/{number}")
+    @Path("/nominate")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getNurseAllSkillNomination(@Context HttpServletRequest request,
-                                               @PathParam("index") int index,
-                                               @PathParam("number") int number) {
+    public Response getNurseAllSkillNomination(@Context HttpServletRequest request) {
         long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
-        List<NurseSkillNominationBean> allSkills = nominationService.getAllSkillsNominationCount(userId, index, number);
+        List<NurseSkillNominationBean> allSkills = nominationService.getAllSkillsNominationCount(userId);
         return Response.ok(allSkills).build();
     }
 

@@ -110,14 +110,35 @@ public class NurseFriendsService {
         return convertToNurseFriendsBeans(friendsFiltered);
     }
 
-    public List<NurseFriendsBean> getFriends(long userId, int pageIdx, int number){
+    public List<NurseFriendsBean> getFriends(long userId, long searchId, int pageIdx, int number){
         logger.info("get friends for the user "+userId);
+        boolean searchSelt = userId==searchId;
+
         PageRequest request = new PageRequest(pageIdx, number, Sort.Direction.DESC, "dateTime");
-        Page<NurseFriendsEntity> entities = friendsRepository.findNurseFriendByUserId(userId, request);
+        // search self friends
+        List<NurseFriendsBean> userFriends = new ArrayList<NurseFriendsBean>();
+        if (!searchSelt) {
+            Page<NurseFriendsEntity> entities = friendsRepository.findNurseFriendByUserId(userId, request);
+            for(NurseFriendsEntity entity: entities){
+                userFriends.add(beanConverter.convert(entity));
+            }
+        }
+
+        // search searchId's friends
+        Page<NurseFriendsEntity> entities = friendsRepository.findNurseFriendByUserId(searchId, request);
         List<NurseFriendsBean> friends = new ArrayList<NurseFriendsBean>();
         for(NurseFriendsEntity entity: entities){
-            friends.add(beanConverter.convert(entity));
+            NurseFriendsBean friend = beanConverter.convert(entity);
+            friends.add(friend);
+            // judge is self friends
+            for (NurseFriendsBean userF : userFriends) {
+                if (userF.getFriendId() == friend.getFriendId()) {
+                    friend.setIsFriend(true);
+                    break;
+                }
+            }
         }
+
         return friends;
     }
 

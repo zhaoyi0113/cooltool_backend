@@ -56,11 +56,11 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_page_data.xml")
     public void testGetFriends(){
-        List<NurseFriendsBean> friends = friendsService.getFriends(1, 0, 3);
+        List<NurseFriendsBean> friends = friendsService.getFriends(1, 1, 0, 3);
         Assert.assertEquals(3, friends.size());
         Assert.assertEquals(1, friends.get(0).getFriendId());
 
-        friends = friendsService.getFriends(1, 1, 5);
+        friends = friendsService.getFriends(1, 1, 1, 5);
         Assert.assertEquals(5, friends.size());
         Assert.assertEquals(6, friends.get(0).getFriendId());
     }

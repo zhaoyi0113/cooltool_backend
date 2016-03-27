@@ -1,6 +1,5 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseOccupationSkillBean;
 import com.cooltoo.backend.beans.OccupationSkillBean;
 import com.cooltoo.backend.converter.NurseOccupationSkillBeanConverter;
@@ -8,6 +7,7 @@ import com.cooltoo.backend.entities.NurseOccupationSkillEntity;
 import com.cooltoo.backend.repository.NurseOccupationSkillRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -62,20 +62,63 @@ public class NurseOccupationSkillService {
         // is Skill exist already
         NurseOccupationSkillBean skillExist = getSkill(userId, occupationSkillId);
         if (null!=skillExist) {
-            throw new BadRequestException(ErrorCode.SKILL_EXIST);
+            nurseSkillRepository.delete(skillExist.getId());
         }
-        NurseOccupationSkillEntity newSkill = new NurseOccupationSkillEntity();
-        newSkill.setUserId(userId);
-        newSkill.setSkillId(occupationSkillId);
-        newSkill.setPoint(0);
-        nurseSkillRepository.save(newSkill);
+        else {
+            NurseOccupationSkillEntity newSkill = new NurseOccupationSkillEntity();
+            newSkill.setUserId(userId);
+            newSkill.setSkillId(occupationSkillId);
+            newSkill.setPoint(0);
+            nurseSkillRepository.save(newSkill);
+        }
+    }
+
+    @Transactional
+    public void addSkills(long userId, String occupationSkillIds) {
+        if (!VerifyUtil.isOccupationSkillIds(occupationSkillIds)) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        // judge the skill ids exist
+        List<Integer> ids = new ArrayList<Integer>();
+        String[] idsStr = occupationSkillIds.split(",");
+        List<OccupationSkillBean> allSkill = skillService.getOccupationSkillList();
+        for (String id : idsStr) {
+            int idL = Integer.parseInt(id);
+            boolean exist = false;
+            for (OccupationSkillBean skill : allSkill) {
+                exist = skill.getId()==idL;
+                if (exist) {
+                    break;
+                }
+            }
+            if (!exist) {
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+            ids.add(idL);
+        }
+
+        // is Nurse exist
+        nurseService.getNurse(userId);
+        for (Integer idI : ids) {
+            // is Skill exist already
+            NurseOccupationSkillBean skillExist = getSkill(userId, idI);
+            if (null != skillExist) {
+                nurseSkillRepository.delete(skillExist.getId());
+            } else {
+                NurseOccupationSkillEntity newSkill = new NurseOccupationSkillEntity();
+                newSkill.setUserId(userId);
+                newSkill.setSkillId(idI);
+                newSkill.setPoint(0);
+                nurseSkillRepository.save(newSkill);
+            }
+        }
     }
 
     @Transactional
     public void update(long userId, int occupationSkillId, int skillPoint) {
         NurseOccupationSkillEntity skill = nurseSkillRepository.findSkillRelationByUserIdAndSkillId(userId, occupationSkillId);
         if (null==skill) {
-            throw new BadRequestException(ErrorCode.NURSE_DONT_HAVE_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE_DONT_HAVE_SKILL);
         }
         if (skillPoint>0) {
             skill.setPoint(skillPoint);

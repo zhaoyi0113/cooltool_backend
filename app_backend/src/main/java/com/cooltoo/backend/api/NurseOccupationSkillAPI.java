@@ -58,6 +58,19 @@ public class NurseOccupationSkillAPI {
         return Response.ok(skillId).build();
     }
 
+    @Path("/batch_add")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response addSkills(
+            @Context HttpServletRequest request,
+            @FormParam("skill_ids") String skillIds
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        skillService.addSkills(userId, skillIds);
+        return Response.ok(skillIds).build();
+    }
+
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
