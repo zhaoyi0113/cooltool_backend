@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * Created by lg380357 on 2016/3/5.
  */
-@Path("/hospital_department")
+@Path("/admin/hospital_department")
 public class HospitalDepartmentAPI {
 
     private static final Logger logger = Logger.getLogger(HospitalDepartmentAPI.class.getName());
@@ -30,11 +30,11 @@ public class HospitalDepartmentAPI {
         return Response.ok(all).build();
     }
 
-    @Path("/getone")
-    @POST
+    @Path("/{id}")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getOneById(@DefaultValue("-1") @FormParam("id") int id) {
+    public Response getOneById(@DefaultValue("-1") @PathParam("id") int id) {
         HospitalDepartmentBean bean = service.getOneById(id);
         logger.info("get hospital department is " + bean);
         if (null == bean) {
@@ -43,8 +43,7 @@ public class HospitalDepartmentAPI {
         return Response.ok(bean).build();
     }
 
-    @Path("/delete")
-    @POST
+    @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response deleteById(@DefaultValue("-1") @FormParam("id") int id) {
@@ -56,7 +55,7 @@ public class HospitalDepartmentAPI {
         return Response.ok(one).build();
     }
 
-    @Path("/update")
+    @Path("/edit")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
@@ -71,7 +70,6 @@ public class HospitalDepartmentAPI {
         return Response.ok(one).build();
     }
 
-    @Path("/new")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)

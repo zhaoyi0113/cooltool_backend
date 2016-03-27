@@ -14,6 +14,7 @@ public class OccupationSkillEntity {
     private long imageId;
     private String name;
     private OccupationSkillType type;
+    private int factor;
 
     @Id
     @GeneratedValue
@@ -54,12 +55,22 @@ public class OccupationSkillEntity {
         this.type = type;
     }
 
+    @Column(name = "factor")
+    public int getFactor() {
+        return factor;
+    }
+
+    public void setFactor(int factor) {
+        this.factor = factor;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(", ");
         msg.append("imageId=").append(imageId).append(", ");
         msg.append("name=").append(name).append(", ");
+        msg.append("factor=").append(factor).append(", ");
         msg.append("type=").append(type.name());
         return msg.toString();
     }

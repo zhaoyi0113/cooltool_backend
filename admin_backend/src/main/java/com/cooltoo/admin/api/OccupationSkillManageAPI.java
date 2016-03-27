@@ -36,18 +36,18 @@ public class OccupationSkillManageAPI {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response addNewOccupationSkill(
+    public Response addOccupationSkill(
             @FormDataParam("name") String name,
             @FormDataParam("type") String type,
+            @FormDataParam("factor") int factor,
             @FormDataParam("file") InputStream inputStream) {
-        skillService.addNewOccupationSkill(name, type, inputStream);
+        skillService.addNewOccupationSkill(name, type, factor, inputStream);
         return Response.ok().build();
     }
 
     @DELETE
-    @Path("/{id}")
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response deleteOccupationSkill(@PathParam("id") int id) {
+    public Response deleteOccupationSkill(@FormParam("id") int id) {
         skillService.deleteOccupationSkill(id);
         return Response.ok().build();
     }
@@ -59,8 +59,9 @@ public class OccupationSkillManageAPI {
     public Response editOccupationSkill(@FormDataParam("id") int id,
                                         @FormDataParam("type") String type,
                                         @FormDataParam("name") String name,
+                                        @FormDataParam("factor") int factor,
                                         @FormDataParam("file") InputStream inputStream) {
-        skillService.editOccupationSkill(id, name, type, inputStream);
+        skillService.editOccupationSkill(id, name, type, factor, inputStream);
         return Response.ok().build();
     }
 
@@ -69,9 +70,10 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkill(@FormParam("id") int id,
                                         @FormParam("name") String name,
-                                        @FormParam("type") String type
+                                        @FormParam("type") String type,
+                                        @FormParam("factor") int factor
     ) {
-        skillService.editOccupationSkillWithoutImage(id, name, type);
+        skillService.editOccupationSkillWithoutImage(id, name, type, factor);
         return Response.ok().build();
     }
 }

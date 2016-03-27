@@ -61,7 +61,7 @@ public class NurseSkillNominationService {
         // convert to Bean
         List<NurseSkillNominationBean> nominationBeans = new ArrayList();
         for (OccupationSkillEntity entity : skills) {
-            long count = getSkillNominationCount(userId, entity.getId());
+            long count = nominationRepository.countByUserIdAndSkillId(userId, entity.getId());
             NurseSkillNominationBean bean= new NurseSkillNominationBean();
             bean.setSkillId(entity.getId());
             bean.setSkillName(entity.getName());
@@ -77,10 +77,6 @@ public class NurseSkillNominationService {
         OccupationSkillEntity skill = skillRepository.getOne(skillId);
         if (null == skill) {
             throw new BadRequestException(ErrorCode.SKILL_NOT_EXIST);
-        }
-        Object type = OccupationSkillType.getSkillType(skill.getType());
-        if (type instanceof SpeakType) {
-            return speakService.countNurseSpeakByType(userId, ((SpeakType)type).name());
         }
         return nominationRepository.countByUserIdAndSkillId(userId, skillId);
     }

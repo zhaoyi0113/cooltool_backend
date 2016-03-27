@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * Created by lg380357 on 2016/3/5.
  */
-@Path("/hospital")
+@Path("/admin/hospital")
 public class HospitalAPI {
 
     private static final Logger logger = Logger.getLogger(HospitalAPI.class.getName());
@@ -31,8 +31,21 @@ public class HospitalAPI {
         return Response.ok(all).build();
     }
 
-    @POST
+    @Path("/{id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getOneById(@DefaultValue("-1") @PathParam("id") int id) {
+        HospitalBean bean = service.getOneById(id);
+        logger.info("get hospital is " + bean);
+        if (null == bean) {
+            Response.ok().build();
+        }
+        return Response.ok(bean).build();
+    }
+
     @Path("/department")
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getDepartments(
@@ -42,21 +55,7 @@ public class HospitalAPI {
         return Response.ok(all).build();
     }
 
-    @Path("/getone")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getOneById(@DefaultValue("-1") @FormParam("id") int id) {
-        HospitalBean bean = service.getOneById(id);
-        logger.info("get hospital is " + bean);
-        if (null == bean) {
-            Response.ok().build();
-        }
-        return Response.ok(bean).build();
-    }
-
-    @Path("/delete")
-    @POST
+    @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response deleteById(@DefaultValue("-1") @FormParam("id") int id) {
@@ -68,7 +67,7 @@ public class HospitalAPI {
         return Response.ok(one).build();
     }
 
-    @Path("/update")
+    @Path("/edit")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
@@ -85,11 +84,10 @@ public class HospitalAPI {
         return Response.ok(one).build();
     }
 
-    @Path("/new")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response newOne(
+    public Response addHospital(
             @FormParam("name") String name,
             @DefaultValue("") @FormParam("province") String province,
             @DefaultValue("") @FormParam("city") String city

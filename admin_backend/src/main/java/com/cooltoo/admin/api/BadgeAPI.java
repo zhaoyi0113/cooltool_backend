@@ -1,6 +1,7 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.beans.BadgeBean;
+import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.admin.services.BadgeService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
 /**
  * Created by yzzhao on 2/25/16.
  */
-@Path("/badge")
+@Path("/admin/badge")
 public class BadgeAPI {
 
     private static final Logger logger = Logger.getLogger(BadgeAPI.class.getName());
@@ -26,14 +27,16 @@ public class BadgeAPI {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getAllBadges() {
         List<BadgeBean> badges = badgeService.getAllBadge();
         return Response.ok(badges).build();
     }
 
-    @Path("/new")
+    @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response createBadge(
                                 @FormDataParam("name") String name,
                                 @DefaultValue("0") @FormDataParam("grade") int grade,
@@ -47,8 +50,9 @@ public class BadgeAPI {
         return Response.ok(id).build();
     }
 
-    @Path("/delete")
+    @DELETE
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response deleteBadge(
                                 @DefaultValue("-1") @FormDataParam("id") int id) {
         BadgeBean bean = badgeService.deleteBadge(id);
@@ -56,8 +60,9 @@ public class BadgeAPI {
         return Response.ok(bean).build();
     }
 
-    @Path("/update")
+    @Path("/edit")
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateBadge(
                                 @DefaultValue("-1") @FormDataParam("id") int id,
                                 @FormDataParam("name") String name,

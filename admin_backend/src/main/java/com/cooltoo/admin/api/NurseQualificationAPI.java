@@ -28,23 +28,20 @@ public class NurseQualificationAPI {
     @Autowired
     private NurseQualificationService qualificationService;
 
-    @GET
     @Path("/{nurse_id}")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getAllNurseQualification(
             @Context HttpServletRequest request,
             @PathParam("nurse_id") long nurseId
     ) {
-        long loginId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-//        // Just for debug
-//        long loginId = 1;
         List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(nurseId);
         return Response.ok(qualifications).build();
     }
 
+    @Path("/edit")
     @POST
-    @Path("/update")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateNurseQualification(
@@ -53,16 +50,13 @@ public class NurseQualificationAPI {
             @FormParam("name") String name,
             @FormParam("file_type") String fileType
     ) {
-        long loginId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-//        // Just for debug
-//        long loginId = 1;
         WorkFileType workFileType = WorkFileType.parseString(fileType);
         NurseQualificationBean bean = qualificationService.updateNurseQualification(id, name, workFileType, null, null, null);
         return Response.ok(bean).build();
     }
 
     @POST
-    @Path("/update/approve")
+    @Path("/approve")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response approveNurseQualification(
@@ -74,7 +68,7 @@ public class NurseQualificationAPI {
     }
 
     @POST
-    @Path("/update/deny")
+    @Path("/deny")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response denyNurseQualification(
@@ -86,7 +80,7 @@ public class NurseQualificationAPI {
     }
 
     @POST
-    @Path("/update/id_file")
+    @Path("/edit/id_file")
     @Produces(MediaType.MULTIPART_FORM_DATA)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateNurseIdentificationFile(
@@ -96,9 +90,6 @@ public class NurseQualificationAPI {
             @FormDataParam("file") InputStream file,
             @FormDataParam("file") FormDataContentDisposition disposition
     ) {
-        long loginId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-//        // Just for debug
-//        long loginId = 1;
         if (VerifyUtil.isStringEmpty(fileName)) {
             fileName = disposition.getFileName();
         }
@@ -108,7 +99,7 @@ public class NurseQualificationAPI {
 
 
     @POST
-    @Path("/update/work_file")
+    @Path("/edit/work_file")
     @Produces(MediaType.MULTIPART_FORM_DATA)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateNurseWorkFile(
@@ -118,9 +109,6 @@ public class NurseQualificationAPI {
             @FormDataParam("file") InputStream file,
             @FormDataParam("file") FormDataContentDisposition disposition
     ) {
-        long loginId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-//        // Just for debug
-//        long loginId = 1;
         if (VerifyUtil.isStringEmpty(fileName)) {
             fileName = disposition.getFileName();
         }
@@ -129,16 +117,12 @@ public class NurseQualificationAPI {
     }
 
     @DELETE
-    @Path("/delete")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response deleteNurseQualification(
             @Context HttpServletRequest request,
             @FormParam("id") long id
     ) {
-        long loginId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-//        // Just for debug
-//        long loginId = 1;
         NurseQualificationBean bean = qualificationService.deleteNurseQualification(id);
         return Response.ok(bean).build();
     }

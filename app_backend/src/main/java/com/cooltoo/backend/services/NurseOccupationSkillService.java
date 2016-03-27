@@ -71,6 +71,19 @@ public class NurseOccupationSkillService {
         nurseSkillRepository.save(newSkill);
     }
 
+    @Transactional
+    public void update(long userId, int occupationSkillId, int skillPoint) {
+        NurseOccupationSkillEntity skill = nurseSkillRepository.findSkillRelationByUserIdAndSkillId(userId, occupationSkillId);
+        if (null==skill) {
+            throw new BadRequestException(ErrorCode.NURSE_DONT_HAVE_EXIST);
+        }
+        if (skillPoint>0) {
+            skill.setPoint(skillPoint);
+            nurseSkillRepository.save(skill);
+        }
+        return;
+    }
+
 
     @Transactional
     public void removeSkill(long userId, int skillId) {

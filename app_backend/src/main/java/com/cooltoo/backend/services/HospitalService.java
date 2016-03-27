@@ -58,7 +58,7 @@ public class HospitalService {
         if (null==entity) {
             throw new BadRequestException(ErrorCode.HOSPITAL_NOT_EXIST);
         }
-        repository.delete(id);
+        repository.delete(entity.getId());
         return beanConverter.convert(entity);
     }
 

@@ -11,6 +11,8 @@ public class OccupationSkillBean {
     private String name;
     private OccupationSkillType skillType;
 
+    private int factor;
+
     public int getId() {
         return id;
     }
@@ -43,12 +45,21 @@ public class OccupationSkillBean {
         this.skillType = skillType;
     }
 
+    public int getFactor() {
+        return factor;
+    }
+
+    public void setFactor(int factor) {
+        this.factor = factor;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(", ");
         msg.append("imageId=").append(imageId).append(", ");
         msg.append("name=").append(name).append(", ");
+        msg.append("factor=").append(factor).append(" , ");
         msg.append("skillType=").append(skillType.name());
         return msg.toString();
     }

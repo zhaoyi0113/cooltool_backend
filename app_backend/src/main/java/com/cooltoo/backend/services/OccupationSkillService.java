@@ -61,7 +61,7 @@ public class OccupationSkillService {
     }
 
     @Transactional
-    public void addNewOccupationSkill(String name, String type, InputStream inputStream) {
+    public void addNewOccupationSkill(String name, String type, int factor, InputStream inputStream) {
         if (!isSkillNameExist(name)) {
             if (VerifyUtil.isStringEmpty(name)) {
                 throw new BadRequestException(ErrorCode.SKILL_NAME_IS_NULL);
@@ -73,11 +73,16 @@ public class OccupationSkillService {
             if (null==inputStream) {
                 throw new BadRequestException(ErrorCode.FILE_UPLOADING_IS_EMPTY);
             }
+            if (factor<=0) {
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
             long fileId = storageService.saveFile(0, name, inputStream);
+
             OccupationSkillEntity entity = new OccupationSkillEntity();
             entity.setName(name);
             entity.setType(skillType);
             entity.setImageId(fileId);
+            entity.setFactor(factor);
             skillRepository.save(entity);
             return;
         }
@@ -90,8 +95,8 @@ public class OccupationSkillService {
     }
 
     @Transactional
-    public void editOccupationSkill(int id, String name, String type, InputStream inputStream) {
-        OccupationSkillEntity entity = editOccupationSkillWithoutImage(id, name, type);
+    public void editOccupationSkill(int id, String name, String type, int factor, InputStream inputStream) {
+        OccupationSkillEntity entity = editOccupationSkillWithoutImage(id, name, type, factor);
         if (inputStream != null) {
             try {
                 long fileId = storageService.saveFile(entity.getImageId(), entity.getName(), inputStream);
@@ -105,7 +110,7 @@ public class OccupationSkillService {
     }
 
     @Transactional
-    public OccupationSkillEntity editOccupationSkillWithoutImage(int id, String name, String type) {
+    public OccupationSkillEntity editOccupationSkillWithoutImage(int id, String name, String type, int factor) {
         // get the skill
         OccupationSkillEntity entity = getOccupationSkillEntity(id);
         if (null==entity) {
@@ -128,6 +133,11 @@ public class OccupationSkillService {
         OccupationSkillType skillType = OccupationSkillType.parseString(type);
         if (null!=skillType) {
             entity.setType(skillType);
+        }
+
+        // edit factor
+        if (factor>0) {
+            entity.setFactor(factor);
         }
 
         // save

@@ -1,0 +1,1 @@
+ALTER TABLE `occupation_skill` ADD COLUMN `factor` INTEGER NOT NULL DEFAULT 1;
