@@ -1,0 +1,1 @@
+ALTER TABLE `nurse_skill_normination` RENAME TO `nurse_skill_nomination`;

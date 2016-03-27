@@ -7,8 +7,8 @@ import java.util.Date;
  * Created by yzzhao on 3/13/16.
  */
 @Entity
-@Table(name = "nurse_skill_normination")
-public class NurseSkillNorminationEntity {
+@Table(name = "nurse_skill_nomination")
+public class NurseSkillNominationEntity {
     private long id;
     private long userId;
     private int skillId;
@@ -60,5 +60,16 @@ public class NurseSkillNorminationEntity {
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(getClass()).append("@").append(hashCode()).append("[");
+        msg.append("id=").append(id).append(", ");
+        msg.append("userId=").append(userId).append(", ");
+        msg.append("skillId=").append(skillId).append(", ");
+        msg.append("nominatedId=").append(nominatedId).append(", ");
+        msg.append("dateTime=").append(dateTime);
+        return msg.toString();
     }
 }

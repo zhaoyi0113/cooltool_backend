@@ -11,6 +11,12 @@ public enum SpeakType {
     /* 提问 */
     ASK_QUESTION;
 
+    static {
+        OccupationSkillType.registeSkillType(OccupationSkillType.COMMUNITY_SMUG, SpeakType.SMUG);
+        OccupationSkillType.registeSkillType(OccupationSkillType.COMMUNITY_CATHART, SpeakType.CATHART);
+        OccupationSkillType.registeSkillType(OccupationSkillType.COMMUNITY_ASK_QUESTION, SpeakType.ASK_QUESTION);
+    }
+
     public static SpeakType parseString(String speak) {
         SpeakType retVal = null;
         if (SMUG.name().equalsIgnoreCase(speak)) {

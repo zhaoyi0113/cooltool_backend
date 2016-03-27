@@ -14,6 +14,7 @@ public class NurseSpeakBean {
     private String content;
     private String userName;
     private Date time;
+    private long imageId;
     private String imageUrl;
     private SpeakType speakType;
     private List<NurseSpeakCommentBean> comments;
@@ -51,6 +52,14 @@ public class NurseSpeakBean {
 
     public void setTime(Date time) {
         this.time = time;
+    }
+
+    public long getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(long imageId) {
+        this.imageId = imageId;
     }
 
     public String getImageUrl() {
@@ -120,17 +129,19 @@ public class NurseSpeakBean {
         msg.append("imageUrl=").append(imageUrl).append(" , ");
         msg.append("thumbsUpsCount=").append(thumbsUpsCount).append(" , ");
         msg.append("commentsCount=").append(commentsCount).append(" , ");
-        msg.append("speakType=").append(speakType).append("\r\n");
-        int count = null==comments ? 0 : comments.size();
-        for (int i = 0; i < count; i++) {
+        msg.append("speakType=").append(speakType);
+        int countC = null==comments ? 0 : comments.size();
+        int countT = null==thumbsUps ? 0 : thumbsUps.size();
+        if (countC>0 || countT>0) {
+            msg.append("\r\n");
+        }
+        for (int i = 0; i < countC; i++) {
             msg.append(comments.get(i)).append("\r\n");
         }
-        msg.append("\r\n\r\n");
-        count = null==thumbsUps ? 0 : thumbsUps.size();
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < countT; i++) {
             msg.append(thumbsUps.get(i)).append("\r\n");
         }
-        msg.append("\r\n").append("]");
+        msg.append("]");
         return msg.toString();
     }
 }

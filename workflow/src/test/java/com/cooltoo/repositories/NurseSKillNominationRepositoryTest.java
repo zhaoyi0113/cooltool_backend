@@ -1,7 +1,7 @@
 package com.cooltoo.repositories;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.repository.NurseSkillNorminationRepository;
+import com.cooltoo.backend.repository.NurseSkillNominationRepository;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
  * Created by yzzhao on 3/13/16.
  */
 @Transactional
-public class NurseSKillNorminationRepositoryTest extends AbstractCooltooTest {
+public class NurseSKillNominationRepositoryTest extends AbstractCooltooTest {
     @Autowired
-    private NurseSkillNorminationRepository repository;
+    private NurseSkillNominationRepository repository;
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/repositories/nurse_skill_normination_data.xml")
-    public void testGetNurseSkillNormination(){
+    public void testGetNurseSkillNomination(){
         long count = repository.countByUserIdAndSkillId(1, 1);
         Assert.assertEquals(5, count);
 

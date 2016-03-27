@@ -9,6 +9,7 @@ import com.cooltoo.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +29,7 @@ public class NurseSpeakCommentService {
     @Autowired
     private NurseSpeakCommentBeanConverter beanConverter;
 
+    @Transactional
     public NurseSpeakCommentBean addSpeakComment(long nurseSpeakId, long commentMakerId, long commentReceiverId, String comment) {
         if (nurseSpeakId <= 0) {
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_NOT_EXIST);

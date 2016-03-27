@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Created by yzzhao on 3/15/16.
  */
-public class NurseSkillNorminationBean {
+public class NurseSkillNominationBean {
 
     private int skillId;
     private String skillName;
@@ -42,5 +42,15 @@ public class NurseSkillNorminationBean {
 
     public void setSkillNominateCount(long skillNominateCount) {
         this.skillNominateCount = skillNominateCount;
+    }
+
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(getClass()).append("@").append(hashCode()).append("[");
+        msg.append("skillId=").append(skillId).append(", ");
+        msg.append("skillName=").append(skillName).append(", ");
+        msg.append("skillImageUrl=").append(skillImageUrl).append(", ");
+        msg.append("skillNominateCount=").append(skillNominateCount);
+        return msg.toString();
     }
 }

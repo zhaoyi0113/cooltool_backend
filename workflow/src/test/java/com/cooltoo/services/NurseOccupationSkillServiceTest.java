@@ -75,4 +75,15 @@ public class NurseOccupationSkillServiceTest extends AbstractCooltooTest {
         skill = nurseSkillService.getSkill(1, 3);
         Assert.assertNull(skill);
     }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
+    public void testDeleteNurseSkillByUseIdAndType() {
+        NurseOccupationSkillBean skill = null;
+        skill = nurseSkillService.getSkill(1, 3);
+        Assert.assertNotNull(skill);
+        nurseSkillService.removeSkill(skill.getUserId(), skill.getSkillId());
+        skill = nurseSkillService.getSkill(1, 3);
+        Assert.assertNull(skill);
+    }
 }

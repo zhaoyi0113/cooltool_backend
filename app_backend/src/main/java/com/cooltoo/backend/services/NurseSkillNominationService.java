@@ -1,14 +1,17 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.api.NurseSkillNorminationAPI;
-import com.cooltoo.backend.beans.NurseSkillNorminationBean;
-import com.cooltoo.backend.entities.NurseSkillNorminationEntity;
+import com.cooltoo.backend.api.NurseSkillNominationAPI;
+import com.cooltoo.backend.beans.NurseSkillNominationBean;
+import com.cooltoo.backend.beans.OccupationSkillBean;
+import com.cooltoo.backend.entities.NurseSkillNominationEntity;
 import com.cooltoo.backend.entities.OccupationSkillEntity;
-import com.cooltoo.backend.repository.NurseSkillNorminationRepository;
+import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.backend.repository.NurseSkillNominationRepository;
 import com.cooltoo.backend.repository.OccupationSkillRepository;
+import com.cooltoo.constants.OccupationSkillType;
+import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.services.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,18 +22,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by yzzhao on 3/13/16.
  */
 @Service("NurseSkillNominationService")
-public class NurseSkillNorminationService {
+public class NurseSkillNominationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseSkillNorminationAPI.class);
+    private static final Logger logger = LoggerFactory.getLogger(NurseSkillNominationAPI.class);
 
     @Autowired
-    private NurseSkillNorminationRepository nominationRepository;
+    private NurseSkillNominationRepository nominationRepository;
 
     @Autowired
     private OccupationSkillRepository skillRepository;
@@ -39,39 +44,63 @@ public class NurseSkillNorminationService {
     private NurseRepository nurseRepository;
 
     @Autowired
+    private NurseSpeakService speakService;
+
+    @Autowired
     @Qualifier("StorageService")
     private StorageService storageService;
 
-    public List<NurseSkillNorminationBean> getAllSkillsNominationCount(long userId, int index, int number) {
+    public List<NurseSkillNominationBean> getAllSkillsNominationCount(long userId, int index, int number) {
+        // is Nurse exist
         validateNurse(userId);
+
+        // get Page {index} NumberOfPage {number}
         PageRequest request =new PageRequest(index, number);
         Page<OccupationSkillEntity> skills = skillRepository.findAll(request);
-        List<NurseSkillNorminationBean> norminationBeans = new ArrayList();
 
+        // convert to Bean
+        List<NurseSkillNominationBean> nominationBeans = new ArrayList();
         for (OccupationSkillEntity entity : skills) {
-            long count = nominationRepository.countByUserIdAndSkillId(userId, entity.getId());
-            NurseSkillNorminationBean bean= new NurseSkillNorminationBean();
+            long count = getSkillNominationCount(userId, entity.getId());
+            NurseSkillNominationBean bean= new NurseSkillNominationBean();
             bean.setSkillId(entity.getId());
             bean.setSkillName(entity.getName());
             bean.setSkillNominateCount(count);
             String url = storageService.getFilePath(entity.getImageId());
             bean.setSkillImageUrl(url);
-            norminationBeans.add(bean);
+            nominationBeans.add(bean);
         }
-        return norminationBeans;
+        return nominationBeans;
     }
 
-    public long getSkillNorminationCount(long userId, int skillId){
+    public long getSkillNominationCount(long userId, int skillId) {
+        OccupationSkillEntity skill = skillRepository.getOne(skillId);
+        if (null == skill) {
+            throw new BadRequestException(ErrorCode.SKILL_NOT_EXIST);
+        }
+        Object type = OccupationSkillType.getSkillType(skill.getType());
+        if (type instanceof SpeakType) {
+            return speakService.countNurseSpeakByType(userId, ((SpeakType)type).name());
+        }
         return nominationRepository.countByUserIdAndSkillId(userId, skillId);
     }
 
     @Transactional
     public long nominateNurseSkill(long userId, int skillId, long friendId) {
-        logger.info("norminate nurse skill="+skillId+", friend="+friendId);
+        logger.info("nominate nurse skill="+skillId+", friend="+friendId);
+        // check nurse
         validateNurse(userId);
+        // check nurse friend
         validateNurse(friendId);
+        // check skill
         validateSkill(skillId);
-        List<NurseSkillNorminationEntity> existed = nominationRepository.findByUserIdAndSkillIdAndNominatedId(userId, skillId, friendId);
+        // can not nominate self
+        if (userId==friendId) {
+            throw new BadRequestException(ErrorCode.NOMINATION_CAN_NOT_FOR_SELF);
+        }
+
+        // this is an toggle operation
+        List<NurseSkillNominationEntity> existed = nominationRepository.findByUserIdAndSkillIdAndNominatedId(userId, skillId, friendId);
         if (!existed.isEmpty()) {
             nominationRepository.delete(existed.get(0));
         } else {
@@ -81,7 +110,7 @@ public class NurseSkillNorminationService {
     }
 
     private void addNomination(long userId, int skillId, long friendId) {
-        NurseSkillNorminationEntity entity = new NurseSkillNorminationEntity();
+        NurseSkillNominationEntity entity = new NurseSkillNominationEntity();
         entity.setDateTime(Calendar.getInstance().getTime());
         entity.setNominatedId(friendId);
         entity.setUserId(userId);

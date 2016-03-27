@@ -73,7 +73,19 @@ public class NurseOccupationSkillService {
 
 
     @Transactional
+    public void removeSkill(long userId, int skillId) {
+        NurseOccupationSkillEntity skill = nurseSkillRepository.findSkillRelationByUserIdAndSkillId(userId, skillId);
+        if (null==skill) {
+            throw new BadRequestException(ErrorCode.SKILL_NOT_EXIST);
+        }
+
+        nurseSkillRepository.delete(skill);
+    }
+
+
+    @Transactional
     public void removeSkill(int id) {
         nurseSkillRepository.delete(id);
     }
+
 }

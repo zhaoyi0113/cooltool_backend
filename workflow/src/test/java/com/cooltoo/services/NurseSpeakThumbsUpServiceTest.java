@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +46,28 @@ public class NurseSpeakThumbsUpServiceTest extends AbstractCooltooTest {
         for (NurseSpeakThumbsUpBean thumbsUpBean : thumbsUpBeans) {
             Assert.assertEquals(nurseSpeakId, thumbsUpBean.getNurseSpeakId());
         }
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_thumbs_up_data.xml")
+    public void testGetNurseSpeakThumbsUpByNurseSpeakIds() {
+        List<Long> nurseSpeakIds = new ArrayList<Long>();
+        nurseSpeakIds.add(1L);
+        nurseSpeakIds.add(3L);
+        nurseSpeakIds.add(5L);
+        nurseSpeakIds.add(7L);
+        List<NurseSpeakThumbsUpBean> thumbsUpBeans = thumbsUpService.getSpeakThumbsUpByNurseSpeakIds(nurseSpeakIds);
+        Assert.assertEquals(3, thumbsUpBeans.size());
+
+        nurseSpeakIds.clear();
+        for (NurseSpeakThumbsUpBean thumbsUpBean : thumbsUpBeans) {
+            nurseSpeakIds.add(thumbsUpBean.getNurseSpeakId());
+        }
+
+        Assert.assertTrue(nurseSpeakIds.contains(1L));
+        Assert.assertTrue(nurseSpeakIds.contains(3L));
+        Assert.assertTrue(nurseSpeakIds.contains(5L));
+        Assert.assertTrue(!nurseSpeakIds.contains(7L));
     }
 
     @Test

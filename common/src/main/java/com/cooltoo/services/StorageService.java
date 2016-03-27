@@ -6,11 +6,15 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.FileStorageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,6 +93,21 @@ public class StorageService {
         }
         return "";
     }
+
+    public Map<Long, String> getFilePath(List<Long> ids) {
+        Map<Long, String> ret = new HashMap<Long, String>();
+        if (null == ids) {
+            return ret;
+        }
+
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        List<FileStorageEntity> fileEntites =  storageRepository.findStorageByIdIn(ids, sort);
+        for (FileStorageEntity entity : fileEntites) {
+            ret.put(entity.getId(), entity.getFilePath());
+        }
+        return ret;
+    }
+
 
     public InputStream getFileInputStream(long id){
         if (storageRepository.exists(id)){

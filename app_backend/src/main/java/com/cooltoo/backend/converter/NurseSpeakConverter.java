@@ -14,17 +14,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class NurseSpeakConverter implements Converter<NurseSpeakEntity, NurseSpeakBean> {
 
-    @Autowired
-    private NurseRepository nurseRepository;
-
     @Override
     public NurseSpeakBean convert(NurseSpeakEntity source) {
         NurseSpeakBean bean = new NurseSpeakBean();
         bean.setUserId(source.getUserId());
-        NurseEntity entity = nurseRepository.findOne(source.getUserId());
-        if(entity != null){
-            bean.setUserName(entity.getName());
-        }
+        bean.setImageId(source.getImageId());
         bean.setContent(source.getContent());
         bean.setTime(source.getTime());
         bean.setId(source.getId());

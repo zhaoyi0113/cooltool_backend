@@ -7,10 +7,6 @@ import com.cooltoo.backend.api.*;
 import com.cooltoo.backend.filter.BadRequestExceptionMapper;
 import com.cooltoo.backend.filter.NurseLoginAuthenticationFilter;
 import io.swagger.annotations.Api;
-import io.swagger.config.ConfigFactory;
-import io.swagger.config.ScannerFactory;
-import io.swagger.config.SwaggerConfig;
-import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
@@ -41,7 +37,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(NurseLoginAPI.class);
         register(OccupationSkillAPI.class);
         register(NurseFriendsAPI.class);
-        register(NurseSkillNorminationAPI.class);
+        register(NurseSkillNominationAPI.class);
         register(BadRequestExceptionMapper.class);
         register(NurseSpeakAPI.class);
         register(AdminUserAPI.class);
@@ -50,6 +46,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(CORSResponseFilter.class);
         register(NurseQualificationAPI.class);
         register(OccupationSkillManageAPI.class);
+        register(NurseOccupationSkillAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
         configureSwagger();

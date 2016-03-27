@@ -86,7 +86,8 @@ public enum ErrorCode {
     SKILL_EXIST(10066, Response.Status.BAD_REQUEST, "技能已存在", "Skill exist"),
     SKILL_NAME_IS_NULL(10067, Response.Status.BAD_REQUEST, "技能名称为空字符串", "Skill name is empty"),
     SKILL_TYPE_INVALID(10068, Response.Status.BAD_REQUEST, "无效的技能类型", "Skill type is invalid"),
-    FILE_UPLOADING_IS_EMPTY(10069, Response.Status.BAD_REQUEST, "上传文件无效", "File uploading is invalid");
+    FILE_UPLOADING_IS_EMPTY(10069, Response.Status.BAD_REQUEST, "上传文件无效", "File uploading is invalid"),
+    NOMINATION_CAN_NOT_FOR_SELF(10070, Response.Status.BAD_REQUEST, "不可以给自己提名", "Can not nominate for self");
 
     private final int code;
 

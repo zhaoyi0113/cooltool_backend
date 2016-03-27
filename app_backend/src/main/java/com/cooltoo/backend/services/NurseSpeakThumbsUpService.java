@@ -7,6 +7,7 @@ import com.cooltoo.backend.repository.NurseSpeakThumbsUpRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,6 +41,22 @@ public class NurseSpeakThumbsUpService {
 
     public List<NurseSpeakThumbsUpBean> getSpeakThumbsUpByNurseSpeakId(long nurseSpeakId) {
         List<NurseSpeakThumbsUpEntity> thumbsUpEntities = thumbsUpRepository.findNurseSpeakThumbsUpByNurseSpeakId(nurseSpeakId);
+        List<NurseSpeakThumbsUpBean> thumbsUpBeans = new ArrayList<NurseSpeakThumbsUpBean>();
+        for (NurseSpeakThumbsUpEntity thumbsUpEntity : thumbsUpEntities) {
+            NurseSpeakThumbsUpBean thumbsUpBean = beanConverter.convert(thumbsUpEntity);
+            thumbsUpBeans.add(thumbsUpBean);
+        }
+        return thumbsUpBeans;
+    }
+
+    public List<NurseSpeakThumbsUpBean> getSpeakThumbsUpByNurseSpeakIds(List<Long> nurseSpeakIds) {
+        if (null==nurseSpeakIds) {
+            return new ArrayList<NurseSpeakThumbsUpBean>();
+        }
+
+        // get speak thumbsup
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "time"));
+        List<NurseSpeakThumbsUpEntity> thumbsUpEntities = thumbsUpRepository.findThumbsUpByNurseSpeakIdIn(nurseSpeakIds, sort);
         List<NurseSpeakThumbsUpBean> thumbsUpBeans = new ArrayList<NurseSpeakThumbsUpBean>();
         for (NurseSpeakThumbsUpEntity thumbsUpEntity : thumbsUpEntities) {
             NurseSpeakThumbsUpBean thumbsUpBean = beanConverter.convert(thumbsUpEntity);

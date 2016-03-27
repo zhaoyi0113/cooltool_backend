@@ -1,8 +1,8 @@
 package com.cooltoo.backend.api;
 
-import com.cooltoo.backend.beans.NurseSkillNorminationBean;
+import com.cooltoo.backend.beans.NurseSkillNominationBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
-import com.cooltoo.backend.services.NurseSkillNorminationService;
+import com.cooltoo.backend.services.NurseSkillNominationService;
 import com.cooltoo.constants.ContextKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,43 +22,43 @@ import java.util.Map;
  */
 @Path("/nurse/skill")
 @LoginAuthentication(requireNurseLogin = true)
-public class NurseSkillNorminationAPI {
+public class NurseSkillNominationAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseSkillNorminationAPI.class);
+    private static final Logger logger = LoggerFactory.getLogger(NurseSkillNominationAPI.class);
 
     @Autowired
-    private NurseSkillNorminationService norminationService;
+    private NurseSkillNominationService nominationService;
 
     @POST
-    @Path("/norminate")
+    @Path("/nominate")
     @Produces(MediaType.APPLICATION_JSON)
     public Response nominateSkill(@Context HttpServletRequest request, @FormParam("friend_id") long friendId, @FormParam("skill_id") int skillId) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        long count = norminationService.nominateNurseSkill(userId, skillId, friendId);
-        logger.info("get skill norminate count "+count);
+        long count = nominationService.nominateNurseSkill(userId, skillId, friendId);
+        logger.info("get skill nominate count "+count);
         Map<String, String> ret = new Hashtable<String, String>();
         ret.put("count", count+"");
         return Response.ok(ret).build();
     }
 
     @GET
-    @Path("/norminate/{index}/{number}")
+    @Path("/nominate/{index}/{number}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getNurseAllSkillNormination(@Context HttpServletRequest request,
-                                                @PathParam("index") int index,
-                                                @PathParam("number") int number) {
+    public Response getNurseAllSkillNomination(@Context HttpServletRequest request,
+                                               @PathParam("index") int index,
+                                               @PathParam("number") int number) {
         long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
-        List<NurseSkillNorminationBean> allSkills = norminationService.getAllSkillsNominationCount(userId, index, number);
+        List<NurseSkillNominationBean> allSkills = nominationService.getAllSkillsNominationCount(userId, index, number);
         return Response.ok(allSkills).build();
     }
 
     @GET
-    @Path("/norminate/{skill_Id}")
+    @Path("/nominate/{skill_Id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getNurseSkillNormination(@Context HttpServletRequest request,
-                                             @PathParam("skill_id") int skillId) {
+    public Response getNurseSkillNomination(@Context HttpServletRequest request,
+                                            @PathParam("skill_id") int skillId) {
         long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
-        long count = norminationService.getSkillNorminationCount(userId, skillId);
+        long count = nominationService.getSkillNominationCount(userId, skillId);
         return Response.ok(count).build();
     }
 }

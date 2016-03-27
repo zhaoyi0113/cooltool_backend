@@ -1,5 +1,6 @@
 package com.cooltoo.admin.api;
 
+import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.services.HospitalDepartmentService;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class HospitalDepartmentAPI {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getAll() {
         List<HospitalDepartmentBean> all = service.getAll();
         return Response.ok(all).build();
@@ -31,6 +33,7 @@ public class HospitalDepartmentAPI {
     @Path("/getone")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getOneById(@DefaultValue("-1") @FormParam("id") int id) {
         HospitalDepartmentBean bean = service.getOneById(id);
         logger.info("get hospital department is " + bean);
@@ -43,6 +46,7 @@ public class HospitalDepartmentAPI {
     @Path("/delete")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response deleteById(@DefaultValue("-1") @FormParam("id") int id) {
         HospitalDepartmentBean one = service.deleteById(id);
         logger.info("delete hospital department is " + one);
@@ -55,6 +59,7 @@ public class HospitalDepartmentAPI {
     @Path("/update")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response update(
             @DefaultValue("-1") @FormParam("id") int id,
             @FormParam("name") String name) {
@@ -69,6 +74,7 @@ public class HospitalDepartmentAPI {
     @Path("/new")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response newOne(
             @FormParam("name") String name
     ) {
