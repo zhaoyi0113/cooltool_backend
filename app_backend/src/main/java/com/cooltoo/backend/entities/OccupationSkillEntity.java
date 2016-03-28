@@ -12,6 +12,7 @@ import javax.persistence.*;
 public class OccupationSkillEntity {
     private int id;
     private long imageId;
+    private long disableImageId;
     private String name;
     private OccupationSkillType type;
     private int factor;
@@ -34,6 +35,15 @@ public class OccupationSkillEntity {
 
     public void setImageId(long imageId) {
         this.imageId = imageId;
+    }
+
+    @Column(name = "disable_image_id")
+    public long getDisableImageId() {
+        return disableImageId;
+    }
+
+    public void setDisableImageId(long disableImageId) {
+        this.disableImageId = disableImageId;
     }
 
     @Column(name = "name")
@@ -69,6 +79,7 @@ public class OccupationSkillEntity {
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(", ");
         msg.append("imageId=").append(imageId).append(", ");
+        msg.append("disableImageId=").append(disableImageId).append(", ");
         msg.append("name=").append(name).append(", ");
         msg.append("factor=").append(factor).append(", ");
         msg.append("type=").append(type.name());

@@ -17,6 +17,7 @@ public class OccupationSkillBeanConverter implements Converter<OccupationSkillEn
         bean.setId(source.getId());
         bean.setName(source.getName());
         bean.setImageId(source.getImageId());
+        bean.setDisableImageId(source.getDisableImageId());
         bean.setType(source.getType());
         bean.setFactor(source.getFactor());
         return bean;

@@ -61,7 +61,7 @@ public class OccupationSkillService {
     }
 
     @Transactional
-    public void addNewOccupationSkill(String name, String type, int factor, InputStream inputStream) {
+    public void addNewOccupationSkill(String name, String type, int factor, InputStream image, InputStream disableImage) {
         if (!isSkillNameExist(name)) {
             if (VerifyUtil.isStringEmpty(name)) {
                 throw new BadRequestException(ErrorCode.SKILL_NAME_IS_NULL);
@@ -70,18 +70,21 @@ public class OccupationSkillService {
             if (null==type) {
                 throw new BadRequestException(ErrorCode.SKILL_TYPE_INVALID);
             }
-            if (null==inputStream) {
-                throw new BadRequestException(ErrorCode.FILE_UPLOADING_IS_EMPTY);
-            }
             if (factor<=0) {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
-            long fileId = storageService.saveFile(0, name, inputStream);
 
             OccupationSkillEntity entity = new OccupationSkillEntity();
+            if (null!=image) {
+                long fileId = storageService.saveFile(0, name, image);
+                entity.setImageId(fileId);
+            }
+            if (null!=disableImage) {
+                long disableFileId = storageService.saveFile(0, name + "_disable", disableImage);
+                entity.setDisableImageId(disableFileId);
+            }
             entity.setName(name);
             entity.setType(skillType);
-            entity.setImageId(fileId);
             entity.setFactor(factor);
             skillRepository.save(entity);
             return;
@@ -95,22 +98,42 @@ public class OccupationSkillService {
     }
 
     @Transactional
-    public void editOccupationSkill(int id, String name, String type, int factor, InputStream inputStream) {
-        OccupationSkillEntity entity = editOccupationSkillWithoutImage(id, name, type, factor);
-        if (inputStream != null) {
+    public void editOccupationSkill(int id, String name, String type, int factor, InputStream imageStream, InputStream disableImageStream) {
+        boolean               changed = false;
+        OccupationSkillEntity entity  = editOccupationSkillWithoutImage(id, name, type, factor);
+        if (imageStream != null) {
             try {
-                long fileId = storageService.saveFile(entity.getImageId(), entity.getName(), inputStream);
+                long fileId = storageService.saveFile(entity.getImageId(), entity.getName(), imageStream);
                 entity.setImageId(fileId);
+                changed = true;
             }
             catch (BadRequestException ex) {
                 // do nothing
             }
         }
-        skillRepository.save(entity);
+        if (null!=disableImageStream) {
+            try {
+                long disableFileId = storageService.saveFile(entity.getDisableImageId(), entity.getName()+"_disable", disableImageStream);
+                entity.setDisableImageId(disableFileId);
+                changed = true;
+            }
+            catch (BadRequestException ex) {
+                // do nothing
+            }
+        }
+        if (changed) {
+            skillRepository.save(entity);
+            System.out.println("update occupation skill == " + entity);
+        }
+        else {
+            System.out.println("no occupation skill(enable/disable image) upated  == " + entity);
+        }
     }
 
     @Transactional
     public OccupationSkillEntity editOccupationSkillWithoutImage(int id, String name, String type, int factor) {
+        boolean changed = false;
+
         // get the skill
         OccupationSkillEntity entity = getOccupationSkillEntity(id);
         if (null==entity) {
@@ -122,6 +145,7 @@ public class OccupationSkillService {
             if (!name.equals(entity.getName())) {
                 if (!isSkillNameExist(name)) {
                     entity.setName(name);
+                    changed = true;
                 }
                 else {
                     throw new BadRequestException(ErrorCode.SKILL_EXIST);
@@ -131,18 +155,25 @@ public class OccupationSkillService {
 
         // edit skill type
         OccupationSkillType skillType = OccupationSkillType.parseString(type);
-        if (null!=skillType) {
+        if (null!=skillType && !skillType.equals(entity.getType())) {
             entity.setType(skillType);
+            changed = true;
         }
 
         // edit factor
-        if (factor>0) {
+        if (factor>0 && factor!=entity.getFactor()) {
             entity.setFactor(factor);
+            changed = true;
         }
 
         // save
-        entity = skillRepository.save(entity);
-        System.out.println("update occupation skill == " + entity);
+        if (changed) {
+            entity = skillRepository.save(entity);
+            System.out.println("update occupation skill == " + entity);
+        }
+        else {
+            System.out.println("no occupation skill(basic information) upated  == " + entity);
+        }
         return entity;
     }
 

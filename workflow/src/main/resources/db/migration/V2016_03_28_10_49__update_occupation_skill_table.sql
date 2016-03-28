@@ -1,1 +1,0 @@
-ALTER TABLE `occupation_skill` ADD COLUMN `disable_image_id` BIGINT(64) NULL AFTER `image_id`;

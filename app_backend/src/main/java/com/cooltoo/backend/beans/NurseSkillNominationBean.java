@@ -13,6 +13,7 @@ public class NurseSkillNominationBean {
     private OccupationSkillType skillType;
     private String skillName;
     private String skillImageUrl;
+    private String skillDisableImageUrl;
     private long skillNominateCount;
 
     public int getSkillId() {
@@ -47,6 +48,14 @@ public class NurseSkillNominationBean {
         this.skillImageUrl = skillImageUrl;
     }
 
+    public String getSkillDisableImageUrl() {
+        return skillDisableImageUrl;
+    }
+
+    public void setSkillDisableImageUrl(String skillDisableImageUrl) {
+        this.skillDisableImageUrl = skillDisableImageUrl;
+    }
+
     public long getSkillNominateCount() {
         return skillNominateCount;
     }
@@ -59,8 +68,10 @@ public class NurseSkillNominationBean {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("skillId=").append(skillId).append(", ");
+        msg.append("skillType=").append(skillType).append(", ");
         msg.append("skillName=").append(skillName).append(", ");
         msg.append("skillImageUrl=").append(skillImageUrl).append(", ");
+        msg.append("skillDisableImageUrl=").append(skillDisableImageUrl).append(", ");
         msg.append("skillNominateCount=").append(skillNominateCount);
         return msg.toString();
     }

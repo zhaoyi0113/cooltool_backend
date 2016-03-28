@@ -40,8 +40,9 @@ public class OccupationSkillManageAPI {
             @FormDataParam("name") String name,
             @FormDataParam("type") String type,
             @FormDataParam("factor") int factor,
-            @FormDataParam("file") InputStream inputStream) {
-        skillService.addNewOccupationSkill(name, type, factor, inputStream);
+            @FormDataParam("file") InputStream imageStream,
+            @FormDataParam("disable_file") InputStream disableImageStream) {
+        skillService.addNewOccupationSkill(name, type, factor, imageStream, disableImageStream);
         return Response.ok().build();
     }
 
@@ -60,8 +61,9 @@ public class OccupationSkillManageAPI {
                                         @FormDataParam("type") String type,
                                         @FormDataParam("name") String name,
                                         @FormDataParam("factor") int factor,
-                                        @FormDataParam("file") InputStream inputStream) {
-        skillService.editOccupationSkill(id, name, type, factor, inputStream);
+                                        @FormDataParam("file") InputStream imageStream,
+                                        @FormDataParam("disable_file") InputStream disableImageStream) {
+        skillService.editOccupationSkill(id, name, type, factor, imageStream, disableImageStream);
         return Response.ok().build();
     }
 
