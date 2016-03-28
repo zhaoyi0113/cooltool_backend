@@ -37,20 +37,38 @@ public class NurseOccupationSkillService {
     private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "point"));
 
     public List<NurseOccupationSkillBean> getAllSkills(long userId) {
-        List<NurseOccupationSkillEntity> entities = nurseSkillRepository.findSkillRelationByUserId(userId, sort);
-        List<NurseOccupationSkillBean> skills = new ArrayList<NurseOccupationSkillBean>();
-        for (NurseOccupationSkillEntity skill : entities) {
-            skills.add(beanConverter.convert(skill));
+        List<OccupationSkillBean> skillsB = skillService.getOccupationSkillList();
+        List<NurseOccupationSkillEntity> nurseSkillsE = nurseSkillRepository.findSkillRelationByUserId(userId, sort);
+        List<NurseOccupationSkillBean> nurseSkillsB = new ArrayList<NurseOccupationSkillBean>();
+        for (NurseOccupationSkillEntity nurseSkillE : nurseSkillsE) {
+            NurseOccupationSkillBean
+            nurseSkillB = beanConverter.convert(nurseSkillE);
+            nurseSkillsB.add(nurseSkillB);
+
+            for (OccupationSkillBean skillB : skillsB) {
+                if (skillB.getId()==nurseSkillB.getSkillId()) {
+                    nurseSkillB.setSkill(skillB);
+                    break;
+                }
+            }
         }
-        return skills;
+        return nurseSkillsB;
     }
 
     public NurseOccupationSkillBean getSkill(long userId, int occupationSkillId) {
-        NurseOccupationSkillEntity skill = nurseSkillRepository.findSkillRelationByUserIdAndSkillId(userId, occupationSkillId);
-        if (null==skill) {
+        NurseOccupationSkillEntity nurseSkillE = nurseSkillRepository.findSkillRelationByUserIdAndSkillId(userId, occupationSkillId);
+        if (null==nurseSkillE) {
             return null;
         }
-        return beanConverter.convert(skill);
+
+        NurseOccupationSkillBean nurseSkillB = beanConverter.convert(nurseSkillE);
+
+        OccupationSkillBean skillB = skillService.getOccupationSkill(occupationSkillId);
+         if (null!=skillB) {
+            nurseSkillB.setSkill(skillB);
+        }
+
+        return nurseSkillB;
     }
 
     @Transactional

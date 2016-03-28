@@ -8,6 +8,7 @@ public class NurseOccupationSkillBean {
     private long userId;
     private int skillId;
     private int point;
+    private OccupationSkillBean skill;
 
 
     public int getId() {
@@ -42,12 +43,21 @@ public class NurseOccupationSkillBean {
         this.point = point;
     }
 
+    public OccupationSkillBean getSkill() {
+        return this.skill;
+    }
+
+    public void setSkill(OccupationSkillBean factor) {
+        this.skill = skill;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(", ");
         msg.append("userId=").append(userId).append(", ");
         msg.append("skillId=").append(skillId).append(", ");
+        msg.append("skill=").append(skill).append(", ");
         msg.append("point=").append(point);
         msg.append("]");
         return msg.toString();

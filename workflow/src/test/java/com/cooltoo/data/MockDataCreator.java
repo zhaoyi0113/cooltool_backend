@@ -5,12 +5,16 @@ import com.cooltoo.Application;
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.entities.NurseEntity;
+import com.cooltoo.backend.entities.TokenAccessEntity;
 import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.backend.repository.TokenAccessRepository;
 import com.cooltoo.backend.services.NurseFriendsService;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.backend.services.NurseSpeakService;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.SpeakType;
+import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
@@ -30,6 +34,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -65,6 +70,9 @@ public class MockDataCreator  {
 
     @Autowired
     private NurseSpeakService nurseSpeakService;
+
+    @Autowired
+    private TokenAccessRepository tokenRepository;
 
     public static final String NURSE_NAME_PREFIX = "护士";
 
@@ -164,7 +172,9 @@ public class MockDataCreator  {
         List<NurseEntity> nurseByName = nurseRepository.findNurseByName(entity.getName());
         if (found.isEmpty() && nurseByName.isEmpty()) {
             logger.info("create nurse " + entity.getMobile());
-            return nurseRepository.save(entity);
+            entity = nurseRepository.save(entity);
+            addNurseTonken(entity);
+            return entity;
         } else {
             logger.info("nurse " + entity.getMobile() + " alread existed.");
             return null;
@@ -184,5 +194,21 @@ public class MockDataCreator  {
             sb.append(base.charAt(number));
         }
         return sb.toString();
+    }
+
+    private void addNurseTonken(NurseEntity nurse) {
+        TokenAccessEntity entity = new TokenAccessEntity();
+        entity.setUserId(nurse.getId());
+        entity.setType(UserType.NURSE);
+        entity.setTimeCreated(new Date());
+        entity.setStatus(CommonStatus.ENABLED);
+        entity.setToken(nurse.getMobile()+System.nanoTime());
+        List<TokenAccessEntity> all = tokenRepository.findTokenAccessByToken(entity.getToken());
+        if (all.isEmpty()) {
+            tokenRepository.save(entity);
+        }
+        else {
+            tokenRepository.delete(all.get(0));
+        }
     }
 }

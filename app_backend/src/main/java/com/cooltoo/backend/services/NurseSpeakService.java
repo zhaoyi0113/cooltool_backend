@@ -6,6 +6,7 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
+import com.cooltoo.constants.OccupationSkillType;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -49,6 +50,10 @@ public class NurseSpeakService {
 
     @Autowired
     private NurseSpeakThumbsUpService thumbsUpService;
+
+    @Autowired
+    private NurseOccupationSkillService nurseSkillService;
+
 
     public List<NurseSpeakBean> getNurseSpeak(long userId, int index, int number) {
         logger.info("get nurse speak at "+index+" number="+number);
@@ -213,6 +218,38 @@ public class NurseSpeakService {
         NurseSpeakBean bean = speakConverter.convert(entity);
         if (hasImage) {
             bean.setImageUrl(storageService.getFilePath(entity.getImageId()));
+        }
+
+        // update nurse occupation skill point
+        OccupationSkillType skillType = null;
+        if (SpeakType.ASK_QUESTION.equals(speaktype)) {
+            skillType = OccupationSkillType.COMMUNITY_SPEAK_ASK_QUESTION;
+        }
+        else if (SpeakType.CATHART.equals(speaktype)) {
+            skillType = OccupationSkillType.COMMUNITY_SPEAK_CATHART;
+        }
+        else if (SpeakType.SMUG.equals(speaktype)) {
+            skillType = OccupationSkillType.COMMUNITY_SPEAK_SMUG;
+        }
+        if (null==skillType) {
+            logger.warning("Cannot update the point of nurse occupation skill of " + speakType);
+            return bean;
+        }
+
+        List<NurseOccupationSkillBean> nurseSkillsB = nurseSkillService.getAllSkills(userId);
+        for (NurseOccupationSkillBean nurseSkillB : nurseSkillsB) {
+            if (null==nurseSkillB.getSkill()) {
+                continue;
+            }
+            OccupationSkillBean skillB = nurseSkillB.getSkill();
+            if (null==skillB) {
+                continue;
+            }
+            OccupationSkillType tmpSkillType = skillB.getType();
+            if (skillType.equals(tmpSkillType)) {
+                int point = nurseSkillB.getPoint() + (skillB.getFactor() < 0 ? 0 : skillB.getFactor());
+                nurseSkillService.update(userId, nurseSkillB.getSkillId(), point);
+            }
         }
         return bean;
     }

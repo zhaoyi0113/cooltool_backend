@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <nurse_qualification id="1" name="身份证" user_id="1" work_file_type="0" work_file_id="1" status="1" create_time="2016-03-12 14:44:44" />
-    <nurse_qualification id="2" name="工作证" user_id="1" work_file_type="1" work_file_id="2" status="1" create_time="2016-02-12 00:00:00" />
-    <nurse_qualification id="3" name="身份证" user_id="2" work_file_type="0" work_file_id="3" status="0" create_time="2016-01-12 00:00:00" />
-    <nurse_qualification id="4" name="工作证" user_id="2" work_file_type="1" work_file_id="6" status="2" create_time="2016-03-13 03:33:33" />
-    <nurse_qualification id="5" name="身份证" user_id="3" work_file_type="0" work_file_id="4" status="2" create_time="2016-03-12 22:22:22" />
-    <nurse_qualification id="6" name="工作证" user_id="3" work_file_type="1" work_file_id="5" status="2" create_time="2015-11-11 11:11:11" />
-    <nurse_qualification id="7" name="工作证" user_id="2" work_file_type="1" work_file_id="7" status="2" create_time="2015-12-12 12:12:12" />
+    <nurse_qualification id="1" name="身份证" user_id="1" work_file_type="1" work_file_id="1" status="1" create_time="2016-03-12 14:44:44" />
+    <nurse_qualification id="2" name="工作证" user_id="1" work_file_type="2" work_file_id="2" status="1" create_time="2016-02-12 00:00:00" />
+    <nurse_qualification id="3" name="身份证" user_id="2" work_file_type="1" work_file_id="3" status="0" create_time="2016-01-12 00:00:00" />
+    <nurse_qualification id="4" name="工作证" user_id="2" work_file_type="2" work_file_id="6" status="2" create_time="2016-03-13 03:33:33" />
+    <nurse_qualification id="5" name="身份证" user_id="3" work_file_type="1" work_file_id="4" status="2" create_time="2016-03-12 22:22:22" />
+    <nurse_qualification id="6" name="工作证" user_id="3" work_file_type="2" work_file_id="5" status="2" create_time="2015-11-11 11:11:11" />
+    <nurse_qualification id="7" name="工作证" user_id="2" work_file_type="2" work_file_id="7" status="2" create_time="2015-12-12 12:12:12" />
 
     <nurse id="1"  name="name1" age="11" gender="1" mobile="1231432143" password="aa" profile_photo_id="1" background_image_id="1" />
     <nurse id="2" name="name2" age="22" gender="2" mobile="14321134" password="aa" profile_photo_id="1" background_image_id="1" />
