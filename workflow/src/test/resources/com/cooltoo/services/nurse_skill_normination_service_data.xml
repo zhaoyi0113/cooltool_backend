@@ -3,12 +3,12 @@
     <nurse id="1" name="name1" age="11" gender="1" mobile="1231432143" password="aa" profile_photo_id="1" background_image_id="1" />
     <nurse id="2" name="name2" age="22" gender="2" mobile="14321134" password="aa" profile_photo_id="1" background_image_id="1" />
 
-    <occupation_skill id="1" name="skill1" image_id="1" factor="1" />
-    <occupation_skill id="2" name="skill2" image_id="1" factor="1"/>
-    <occupation_skill id="3" name="skill3" image_id="1" factor="1"/>
-    <occupation_skill id="4" name="skill4" image_id="1" factor="1"/>
-    <occupation_skill id="5" name="skill5" image_id="1" factor="1"/>
-    <occupation_skill id="6" name="skill6" image_id="1" factor="1"/>
+    <occupation_skill id="1" name="skill1" image_id="1" type="0" factor="1" />
+    <occupation_skill id="2" name="skill2" image_id="1" type="1" factor="1"/>
+    <occupation_skill id="3" name="skill3" image_id="1" type="2" factor="1"/>
+    <occupation_skill id="4" name="skill4" image_id="1" type="0" factor="1"/>
+    <occupation_skill id="5" name="skill5" image_id="1" type="1" factor="1"/>
+    <occupation_skill id="6" name="skill6" image_id="1" type="2" factor="1"/>
 
     <nurse_occupation_skill id="0" user_id="1" skill_id="1" point="50" />
     <nurse_occupation_skill id="1" user_id="1" skill_id="2" point="50" />

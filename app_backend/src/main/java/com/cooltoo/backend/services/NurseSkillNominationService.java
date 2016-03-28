@@ -7,6 +7,7 @@ import com.cooltoo.backend.beans.OccupationSkillBean;
 import com.cooltoo.backend.entities.NurseSkillNominationEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseSkillNominationRepository;
+import com.cooltoo.constants.OccupationSkillType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +44,7 @@ public class NurseSkillNominationService {
     @Qualifier("StorageService")
     private StorageService storageService;
 
-    public List<NurseSkillNominationBean> getAllSkillsNominationCount(long userId) {
+    public List<NurseSkillNominationBean> getAllNominationBeans(long userId) {
         // is Nurse exist
         validateNurse(userId);
 
@@ -77,6 +77,7 @@ public class NurseSkillNominationService {
             skill    = skillIdAndSkillMap.get(nurseSkill.getSkillId());
             imageUrl = imageIdAndUrlMap.get(skill.getImageId());
             nomin_count.setSkillId(skill.getId());
+            nomin_count.setSkillType(skill.getType());
             nomin_count.setSkillName(skill.getName());
             nomin_count.setSkillImageUrl(imageUrl);
             nomin_count.setSkillNominateCount(0);
@@ -108,6 +109,18 @@ public class NurseSkillNominationService {
         return nominationCount;
     }
 
+    public List<NurseSkillNominationBean> getSkillNominationBeans(long userId) {
+        List<NurseSkillNominationBean> all = getAllNominationBeans(userId);
+        List<NurseSkillNominationBean> skills = new ArrayList<NurseSkillNominationBean>();
+        for (NurseSkillNominationBean skill : all) {
+            if (!OccupationSkillType.SKILL.equals(skill.getSkillType())) {
+                continue;
+            }
+            skills.add(skill);
+        }
+        return skills;
+    }
+
     public long getSkillNominationCount(long userId, int skillId) {
         OccupationSkillBean skill = skillService.getOccupationSkill(skillId);
         if (null == skill) {
@@ -133,8 +146,10 @@ public class NurseSkillNominationService {
         if (null==friendSkill) {
             throw new BadRequestException(ErrorCode.NURSE_DONT_HAVE_SKILL);
         }
-
         OccupationSkillBean skill = skillService.getOccupationSkill(skillId);
+        if (null==skill) {
+            throw new BadRequestException(ErrorCode.SKILL_NOT_EXIST);
+        }
         // this is an toggle operation
         // the userId enable friend's skill
         List<NurseSkillNominationEntity> existed = nominationRepository.findByUserIdAndSkillIdAndNominatedId(friendId, skillId, userId);
@@ -147,10 +162,12 @@ public class NurseSkillNominationService {
             addNomination(userId, skillId, friendId);
             point = skill.getFactor();
         }
-        nurseSkillService.update(friendSkill.getUserId(), skill.getId(), point);
+        if (point!=0) {
+            point += friendSkill.getPoint();
+            nurseSkillService.update(friendSkill.getUserId(), skill.getId(), point);
+        }
 
-
-        return nominationRepository.countByUserIdAndSkillId(userId, skillId);
+        return nominationRepository.countByUserIdAndSkillId(friendSkill.getUserId(), skillId);
     }
 
     private void addNomination(long userId, int skillId, long friendId) {

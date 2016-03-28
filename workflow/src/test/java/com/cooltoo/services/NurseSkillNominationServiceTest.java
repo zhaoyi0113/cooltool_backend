@@ -4,6 +4,7 @@ import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseSkillNominationBean;
 import com.cooltoo.backend.repository.NurseSkillNominationRepository;
 import com.cooltoo.backend.services.NurseSkillNominationService;
+import com.cooltoo.constants.OccupationSkillType;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,8 +27,8 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
-    public void testGetSkillNominationCount() {
-        List<NurseSkillNominationBean> countMap = nominationService.getAllSkillsNominationCount(1);
+    public void testGetAllNominationCount() {
+        List<NurseSkillNominationBean> countMap = nominationService.getAllNominationBeans(1);
         Assert.assertEquals(6, countMap.size());
         for (NurseSkillNominationBean nm : countMap) {
             if (nm.getSkillId() == 1) {
@@ -49,7 +50,16 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
                 Assert.assertEquals(0, (long) nm.getSkillNominateCount());
             }
         }
+    }
 
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
+    public void testGetSkillNominationCount() {
+        List<NurseSkillNominationBean> countMap = nominationService.getSkillNominationBeans(1);
+        Assert.assertEquals(2, countMap.size());
+        for (NurseSkillNominationBean nm : countMap) {
+            Assert.assertEquals(OccupationSkillType.SKILL, nm.getSkillType());
+        }
     }
 
     @Test
@@ -57,9 +67,6 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
     public void testAddSkillNominationCount() {
         nominationService.nominateNurseSkill(1, 6, 2);
         long count = nominationService.getSkillNominationCount(2, 6);
-        count = nominationRepository.countByUserIdAndSkillId(2, 6);
-        Assert.assertEquals(1, nominationService.getSkillNominationCount(2, 6));
-        count = nominationRepository.countByUserIdAndSkillId(2, 6);
         Assert.assertEquals(1, count);
 
         nominationService.nominateNurseSkill(1, 6, 2);

@@ -142,7 +142,7 @@ public class OccupationSkillService {
 
         // save
         entity = skillRepository.save(entity);
-
+        System.out.println("update occupation skill == " + entity);
         return entity;
     }
 

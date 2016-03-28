@@ -62,6 +62,41 @@ public class NurseOccupationSkillServiceTest extends AbstractCooltooTest {
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
+    public void testAddNurseSkills() {
+        List<NurseOccupationSkillBean> skills = null;
+
+        long userId = 3;
+
+        nurseSkillService.addSkills(userId, "1,2,3");
+        skills = nurseSkillService.getAllSkills(userId);
+        Assert.assertNotNull(skills);
+        Assert.assertEquals(3, skills.size());
+
+        nurseSkillService.addSkills(userId, "1,2,3");
+        skills = nurseSkillService.getAllSkills(userId);
+        Assert.assertNotNull(skills);
+        Assert.assertEquals(0, skills.size());
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
+    public void testUpdateNurseSkill() {
+        long userId = 2;
+        int skillId = 2;
+        NurseOccupationSkillBean skill = nurseSkillService.getSkill(userId, skillId);
+        Assert.assertNotNull(skill);
+        Assert.assertEquals(userId, skill.getUserId());
+        Assert.assertEquals(skillId, skill.getSkillId());
+
+        int point = skill.getPoint();
+
+        nurseSkillService.update(userId, skillId, point+5);
+        skill = nurseSkillService.getSkill(userId, skillId);
+        Assert.assertEquals(point+5, skill.getPoint());
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testDeleteNurseSkill() {
         NurseOccupationSkillBean skill = null;
         skill = nurseSkillService.getSkill(1, 3);

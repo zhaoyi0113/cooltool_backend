@@ -1,5 +1,7 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.constants.OccupationSkillType;
+
 import java.util.Date;
 
 /**
@@ -8,6 +10,7 @@ import java.util.Date;
 public class NurseSkillNominationBean {
 
     private int skillId;
+    private OccupationSkillType skillType;
     private String skillName;
     private String skillImageUrl;
     private long skillNominateCount;
@@ -18,6 +21,14 @@ public class NurseSkillNominationBean {
 
     public void setSkillId(int skillId) {
         this.skillId = skillId;
+    }
+
+    public OccupationSkillType getSkillType() {
+        return skillType;
+    }
+
+    public void setSkillType(OccupationSkillType skillType) {
+        this.skillType = skillType;
     }
 
     public String getSkillName() {
