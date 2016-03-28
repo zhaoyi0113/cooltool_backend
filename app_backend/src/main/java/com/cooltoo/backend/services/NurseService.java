@@ -132,7 +132,7 @@ public class NurseService {
         }
 
         boolean changed = false;
-        if (name != null && !entity.getName().equals(name)) {
+        if (name != null) {
             entity.setName(name);
             changed = true;
         }
