@@ -40,11 +40,26 @@ public class NurseFriendsAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFriendList(@Context HttpServletRequest request,
                                   @PathParam("page_index") int pageIdx,
-                                  @PathParam("number") int number){
-        logger.info("search friend list at page="+pageIdx+", number="+number);
+                                  @PathParam("number") int number) {
+        logger.info("search friend list at page=" + pageIdx + ", number=" + number);
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseFriendsBean> friendList = friendsService.getFriends(userId, userId, pageIdx, number);
-        logger.info("get friend list count "+friendList.size());
+        logger.info("get friend list count " + friendList.size());
+        return Response.ok(friendList).build();
+    }
+
+    @GET
+    @Path("/list_by_id/{search_id}/{page_index}/{number}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFriendListByID(
+            @Context HttpServletRequest request,
+            @PathParam("search_id") long searchId,
+            @PathParam("page_index") int pageIdx,
+            @PathParam("number") int number) {
+        logger.info("search friend list at page=" + pageIdx + ", number=" + number + ", search id=" + searchId);
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<NurseFriendsBean> friendList = friendsService.getFriends(userId, searchId, pageIdx, number);
+        logger.info("get friend list count " + friendList.size());
         return Response.ok(friendList).build();
     }
 
@@ -54,11 +69,11 @@ public class NurseFriendsAPI {
     public Response getFriendList(@Context HttpServletRequest request,
                                   @FormParam("id") long searId,
                                   @FormParam("page_index") int pageIdx,
-                                  @FormParam("number") int number){
-        logger.info("search friend list at page="+pageIdx+", number="+number);
+                                  @FormParam("number") int number) {
+        logger.info("search friend list at page=" + pageIdx + ", number=" + number);
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseFriendsBean> friendList = friendsService.getFriends(userId, searId, pageIdx, number);
-        logger.info("get friend list count "+friendList.size());
+        logger.info("get friend list count " + friendList.size());
         return Response.ok(friendList).build();
     }
 
@@ -75,16 +90,16 @@ public class NurseFriendsAPI {
 
     @DELETE
     @Path("/{friend_id}")
-    public Response removeFriend(@Context HttpServletRequest request, @PathParam("friend_id") long friendId){
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+    public Response removeFriend(@Context HttpServletRequest request, @PathParam("friend_id") long friendId) {
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         friendsService.removeFriend(userId, friendId);
         return Response.ok().build();
     }
 
     @GET
     @Path("/count")
-    public Response getFriendCount(@Context HttpServletRequest request){
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+    public Response getFriendCount(@Context HttpServletRequest request) {
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         int count = friendsService.getFriendsCount(userId);
         return Response.ok(count).build();
     }
@@ -92,8 +107,8 @@ public class NurseFriendsAPI {
     @GET
     @Path("/search/{name}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response searchFriend(@Context HttpServletRequest request, @PathParam("name") String name){
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+    public Response searchFriend(@Context HttpServletRequest request, @PathParam("name") String name) {
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseFriendsBean> friends = friendsService.searchFriends(userId, name);
         return Response.ok(friends).build();
     }
