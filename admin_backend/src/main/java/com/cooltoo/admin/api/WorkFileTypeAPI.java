@@ -52,17 +52,17 @@ public class WorkFileTypeAPI {
         return Response.ok().build();
     }
 
-    @POST
-    @Path("/edit_image")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response editImage(@Context HttpServletRequest request,
-                                        @FormParam("id") @DefaultValue("-1") int id,
-                                        @FormParam("image") InputStream image,
-                                        @FormParam("disable_image") InputStream disableImage) {
-        long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        logger.info("user : " + userId +" edit work file type enable image : " + (image!=null) + "  disable image: " + (disableImage!=null));
-        workfileTypeService.updateSpeakType(id, null, -1, -1, -1, image, disableImage);
-        return Response.ok().build();
-    }
+//    @POST
+//    @Path("/edit_image")
+//    @Consumes(MediaType.MULTIPART_FORM_DATA)
+//    @AdminUserLoginAuthentication(requireUserLogin = true)
+//    public Response editImage(@Context HttpServletRequest request,
+//                                        @FormParam("id") @DefaultValue("-1") int id,
+//                                        @FormParam("image") InputStream image,
+//                                        @FormParam("disable_image") InputStream disableImage) {
+//        long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+//        logger.info("user : " + userId +" edit work file type enable image : " + (image!=null) + "  disable image: " + (disableImage!=null));
+//        workfileTypeService.updateSpeakType(id, null, -1, -1, -1, image, disableImage);
+//        return Response.ok().build();
+//    }
 }
