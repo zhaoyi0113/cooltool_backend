@@ -15,7 +15,8 @@ public class NurseQualificationEntity {
     private long id;
     private String name;
     private long userId;
-    private WorkFileType workFileType;
+    /** the id of workfile_type  */
+    private int workFileType;
     /* this id is in storage_file key id */
     private long workFileId;
     private VetStatus status;
@@ -51,12 +52,11 @@ public class NurseQualificationEntity {
     }
 
     @Column(name = "work_file_type")
-    @Enumerated
-    public WorkFileType getWorkFileType() {
+    public int getWorkFileType() {
         return workFileType;
     }
 
-    public void setWorkFileType(WorkFileType workFileType) {
+    public void setWorkFileType(int workFileType) {
         this.workFileType = workFileType;
     }
 

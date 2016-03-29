@@ -15,7 +15,8 @@ public class NurseSpeakEntity {
     private String content;
     private Date time;
     private long imageId;
-    private SpeakType speakType;
+    /** the id of speak_type */
+    private int speakType;
 
 
     @Id
@@ -60,10 +61,9 @@ public class NurseSpeakEntity {
     public void setImageId(long imageId) { this.imageId = imageId; }
 
     @Column(name = "speak_type")
-    @Enumerated
-    public SpeakType getSpeakType() { return speakType; }
+    public int getSpeakType() { return speakType; }
 
-    public void setSpeakType(SpeakType speakType) { this.speakType = speakType; }
+    public void setSpeakType(int speakType) { this.speakType = speakType; }
 
     public String toString() {
         StringBuilder msg = new StringBuilder();

@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseQualificationBean;
+import com.cooltoo.backend.beans.WorkFileTypeBean;
 import com.cooltoo.backend.services.NurseQualificationService;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
@@ -47,23 +48,26 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         ByteArrayInputStream byteInput = new ByteArrayInputStream(content.getBytes());
         Date time = new Date();
 
+        WorkFileTypeBean workFileType = qualService.getWorkFileTypeBean(WorkFileType.WORK_FILE.name());
+
         NurseQualificationBean bean = null;
         bean = qualService.addNurseWorkFile(4, name, "aaa.png", byteInput);
         System.out.println("add work file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
         Assert.assertEquals(name, bean.getName());
-        Assert.assertEquals(WorkFileType.WORK_FILE, bean.getWorkFileType());
+        Assert.assertEquals(workFileType.getId(), bean.getWorkFileType());
         Assert.assertTrue(bean.getWorkFileId() > 0);
         Assert.assertTrue(bean.getTimeCreated().getTime()>=time.getTime());
 
+        workFileType = qualService.getWorkFileTypeBean(WorkFileType.IDENTIFICATION.name());
         name = "Identi2";
         bean = qualService.addNurseIdentificationFile(4, name, "aaa.png", byteInput);
         System.out.println("add identification file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
         Assert.assertEquals(name, bean.getName());
-        Assert.assertEquals(WorkFileType.IDENTIFICATION, bean.getWorkFileType());
+        Assert.assertEquals(workFileType.getId(), bean.getWorkFileType());
         Assert.assertTrue(bean.getWorkFileId() > 0);
         Assert.assertTrue(bean.getTimeCreated().getTime()>=time.getTime());
     }
@@ -75,12 +79,14 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(1);
         boolean isOk = false;
 
+        WorkFileTypeBean workFileType = qualService.getWorkFileTypeBean(WorkFileType.WORK_FILE.name());
+
         isOk = qualService.isNurseQualificationOk(1);
         Assert.assertFalse(isOk);
         for (NurseQualificationBean bean : qualifications) {
             System.out.println(bean);
             if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
-                if (WorkFileType.WORK_FILE.equals(bean.getWorkFileType())) {
+                if (workFileType.getId() == bean.getWorkFileType()) {
                     qualService.updateNurseWorkFile(bean.getId(), bean.getName(), null, null, VetStatus.COMPLETED);
                 }
                 else {

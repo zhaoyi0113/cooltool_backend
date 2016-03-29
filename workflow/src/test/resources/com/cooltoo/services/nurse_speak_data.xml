@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <nurse_speak id="1" user_id="1" content="hello1" time="2016-01-01" image_id="1" speak_type="0" />
-    <nurse_speak id="2" user_id="1" content="hello2" time="2016-01-01" image_id="2" speak_type="0" />
-    <nurse_speak id="3" user_id="1" content="hello3" time="2016-01-01" image_id="3" speak_type="0"  />
-    <nurse_speak id="4" user_id="1" content="hello4" time="2016-01-01" image_id="4" speak_type="0" />
-    <nurse_speak id="5" user_id="1" content="hello5" time="2016-01-01" image_id="1" speak_type="0"  />
-    <nurse_speak id="6" user_id="1" content="hello6" time="2016-01-01" image_id="2" speak_type="0"  />
-    <nurse_speak id="7" user_id="1" content="hello7" time="2016-01-01" image_id="3" speak_type="0"  />
-    <nurse_speak id="8" user_id="1" content="hello8" time="2016-01-01" image_id="4" speak_type="0" />
-    <nurse_speak id="9" user_id="1" content="hello9" time="2016-01-01" image_id="1" speak_type="0" />
-    <nurse_speak id="10" user_id="1" content="hello10" time="2016-01-01" image_id="2" speak_type="0"  />
-    <nurse_speak id="11" user_id="1" content="hello11" time="2016-01-01" image_id="3" speak_type="0" />
+    <nurse_speak id="1" user_id="1" content="hello1" time="2016-01-01" image_id="1" speak_type="1" />
+    <nurse_speak id="2" user_id="1" content="hello2" time="2016-01-01" image_id="2" speak_type="1" />
+    <nurse_speak id="3" user_id="1" content="hello3" time="2016-01-01" image_id="3" speak_type="1"  />
+    <nurse_speak id="4" user_id="1" content="hello4" time="2016-01-01" image_id="4" speak_type="1" />
+    <nurse_speak id="5" user_id="1" content="hello5" time="2016-01-01" image_id="1" speak_type="1"  />
+    <nurse_speak id="6" user_id="1" content="hello6" time="2016-01-01" image_id="2" speak_type="1"  />
+    <nurse_speak id="7" user_id="1" content="hello7" time="2016-01-01" image_id="3" speak_type="1"  />
+    <nurse_speak id="8" user_id="1" content="hello8" time="2016-01-01" image_id="4" speak_type="1" />
+    <nurse_speak id="9" user_id="1" content="hello9" time="2016-01-01" image_id="1" speak_type="1" />
+    <nurse_speak id="10" user_id="1" content="hello10" time="2016-01-01" image_id="2" speak_type="1"  />
+    <nurse_speak id="11" user_id="1" content="hello11" time="2016-01-01" image_id="3" speak_type="1" />
 
+    <speak_type id="1" name="SMUG"         type="0" factor="10" image_id="1" disable_image_id="2" />
+    <speak_type id="2" name="CATHART"      type="1" factor="15" image_id="1" disable_image_id="2" />
+    <speak_type id="3" name="ASK_QUESTION" type="2" factor="20" image_id="1" disable_image_id="2" />
 
     <nurse_speak_comment id="1" nurse_speak_id="1" user_make_comment_id="1" user_replied_to_id="0" comment="chou mei 1" time="2016-01-01" />
     <nurse_speak_comment id="2" nurse_speak_id="1" user_make_comment_id="1" user_replied_to_id="0" comment="chou mei 2" time="2016-01-02" />

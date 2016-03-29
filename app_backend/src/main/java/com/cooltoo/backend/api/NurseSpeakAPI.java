@@ -46,6 +46,31 @@ public class NurseSpeakAPI {
         return Response.ok(nurseSpeak).build();
     }
 
+    @Path("/smug")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response addSmugSpeak(@Context HttpServletRequest request,
+                             @FormDataParam("content") String content,
+                             @FormDataParam("file_name") String fileName,
+                             @FormDataParam("file") InputStream fileInputStream) {
+        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        NurseSpeakBean nurseSpeak = speakService.addSmug(userId, content, fileName, fileInputStream);
+        return Response.ok(nurseSpeak).build();
+    }
+
+    @Path("/cathart")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response addCathartSpeak(@Context HttpServletRequest request,
+                             @FormDataParam("content") String content,
+                             @FormDataParam("file_name") String fileName,
+                             @FormDataParam("file") InputStream fileInputStream) {
+        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        NurseSpeakBean nurseSpeak = speakService.addCathart(userId, content, fileName, fileInputStream);
+        return Response.ok(nurseSpeak).build();
+    }
+
+    @Path("/ask_question")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response addSpeak(@Context HttpServletRequest request,
@@ -54,7 +79,7 @@ public class NurseSpeakAPI {
                              @FormDataParam("file_name") String fileName,
                              @FormDataParam("file") InputStream fileInputStream) {
         long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
-        NurseSpeakBean nurseSpeak = speakService.addNurseSpeak(userId, content, speakType, fileName, fileInputStream);
+        NurseSpeakBean nurseSpeak = speakService.addAskQuestion(userId, content, fileName, fileInputStream);
         return Response.ok(nurseSpeak).build();
     }
 

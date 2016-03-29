@@ -2,6 +2,7 @@ package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.NurseQualificationBean;
+import com.cooltoo.backend.beans.WorkFileTypeBean;
 import com.cooltoo.backend.services.NurseQualificationService;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.VetStatus;
@@ -50,7 +51,7 @@ public class NurseQualificationAPI {
             @FormParam("name") String name,
             @FormParam("file_type") String fileType
     ) {
-        WorkFileType workFileType = WorkFileType.parseString(fileType);
+        WorkFileTypeBean workFileType = qualificationService.getWorkFileTypeBean(fileType);
         NurseQualificationBean bean = qualificationService.updateNurseQualification(id, name, workFileType, null, null, null);
         return Response.ok(bean).build();
     }

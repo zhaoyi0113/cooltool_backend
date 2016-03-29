@@ -15,7 +15,7 @@ public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Lo
 
     long countNurseSpeakByUserId(long userId);
 
-    Page<NurseSpeakEntity> findNurseSpeakByUserIdAndSpeakType(long userId, SpeakType speakType, Pageable request);
+    Page<NurseSpeakEntity> findNurseSpeakByUserIdAndSpeakType(long userId, int speakTypeId, Pageable request);
 
-    long countNurseSpeakByUserIdAndSpeakType(long userId, SpeakType speakType);
+    long countNurseSpeakByUserIdAndSpeakType(long userId, int speakTypeId);
 }

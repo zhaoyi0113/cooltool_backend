@@ -16,7 +16,8 @@ public class NurseSpeakBean {
     private Date time;
     private long imageId;
     private String imageUrl;
-    private SpeakType speakType;
+    /** the id of speak_type */
+    private int speakType;
     private List<NurseSpeakCommentBean> comments;
     private List<NurseSpeakThumbsUpBean> thumbsUps;
     private int commentsCount;
@@ -70,11 +71,11 @@ public class NurseSpeakBean {
         this.imageUrl = imageUrl;
     }
 
-    public SpeakType getSpeakType() {
+    public int getSpeakType() {
         return speakType;
     }
 
-    public void setSpeakType(SpeakType speakType) {
+    public void setSpeakType(int speakType) {
         this.speakType = speakType;
     }
 

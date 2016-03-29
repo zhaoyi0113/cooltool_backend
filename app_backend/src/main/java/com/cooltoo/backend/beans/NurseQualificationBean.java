@@ -13,7 +13,9 @@ public class NurseQualificationBean {
     private long id;
     private String name;
     private long userId;
-    private WorkFileType workFileType;
+    /** the id of workfile_type */
+    private int workFileType;
+    private WorkFileTypeBean workFileTypeBean;
     /* this id is in storage_file key id */
     private long workFileId;
     private String workFileURL;
@@ -36,12 +38,20 @@ public class NurseQualificationBean {
         this.userId = userId;
     }
 
-    public WorkFileType getWorkFileType() {
+    public int getWorkFileType() {
         return workFileType;
     }
 
-    public void setWorkFileType(WorkFileType workFileType) {
+    public void setWorkFileType(int workFileType) {
         this.workFileType = workFileType;
+    }
+
+    public WorkFileTypeBean getWorkFileTypeBean() {
+        return workFileTypeBean;
+    }
+
+    public void setWorkFileTypeBean(WorkFileTypeBean workFileTypeBean) {
+        this.workFileTypeBean = workFileTypeBean;
     }
 
     public String getName() {

@@ -1,10 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.NurseOccupationSkillBean;
-import com.cooltoo.backend.beans.NurseSpeakBean;
-import com.cooltoo.backend.beans.NurseSpeakCommentBean;
-import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
+import com.cooltoo.backend.beans.*;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
@@ -57,7 +54,23 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         String fileName = "test.txt";
         String fileContent = "file content";
         InputStream inputStream = new ByteArrayInputStream(fileContent.getBytes());
-        NurseSpeakBean bean = speakService.addNurseSpeak(2, content, SpeakType.SMUG.name(), fileName, inputStream);
+        NurseSpeakBean bean = speakService.addSmug(2, content, fileName, inputStream);
+        Assert.assertTrue(bean.getId()>0);
+        Assert.assertEquals(2, bean.getUserId());
+        Assert.assertEquals(content, bean.getContent());
+        Assert.assertNotNull(bean.getTime());
+        Assert.assertNotNull(bean.getImageUrl());
+        System.out.println(bean);
+
+        bean = speakService.addCathart(2, content, fileName, inputStream);
+        Assert.assertTrue(bean.getId()>0);
+        Assert.assertEquals(2, bean.getUserId());
+        Assert.assertEquals(content, bean.getContent());
+        Assert.assertNotNull(bean.getTime());
+        Assert.assertNotNull(bean.getImageUrl());
+        System.out.println(bean);
+
+        bean = speakService.addAskQuestion(2, content, fileName, inputStream);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(2, bean.getUserId());
         Assert.assertEquals(content, bean.getContent());

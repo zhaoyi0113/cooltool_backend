@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SpeakTypeBeanConverter implements Converter<SpeakTypeEntity, SpeakTypeBean> {
+
     @Override
     public SpeakTypeBean convert(SpeakTypeEntity source) {
         SpeakTypeBean speakType = new SpeakTypeBean();

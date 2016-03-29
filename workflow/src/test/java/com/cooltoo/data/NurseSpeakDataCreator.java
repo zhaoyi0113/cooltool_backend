@@ -81,9 +81,20 @@ public class NurseSpeakDataCreator {
 
                         }
                         logger.info("add nurse speak ");
-                        NurseSpeakBean nurseSpeakBean = nurseSpeakService.addNurseSpeak(entity.getId(), MockDataCreator.getRandomString(100),
-                                speakType.name(), fileName, inputStream);
-                        addSpeakCommentsAndThumbUp(nurseSpeakBean);
+                        NurseSpeakBean nurseSpeakBean = null;
+                        if (speakType.equals(SpeakType.ASK_QUESTION)) {
+                            nurseSpeakBean = nurseSpeakService.addAskQuestion(entity.getId(), MockDataCreator.getRandomString(100), fileName, inputStream);
+                        }
+                        else if (speakType.equals(SpeakType.CATHART)) {
+                            nurseSpeakBean = nurseSpeakService.addCathart(entity.getId(), MockDataCreator.getRandomString(100), fileName, inputStream);
+                        }
+                        else if (speakType.equals(SpeakType.SMUG)) {
+                            nurseSpeakBean = nurseSpeakService.addSmug(entity.getId(), MockDataCreator.getRandomString(100), fileName, inputStream);
+                        }
+
+                        if (null!=nurseSpeakBean) {
+                            addSpeakCommentsAndThumbUp(nurseSpeakBean);
+                        }
                     }
                     latch.countDown();
                 }

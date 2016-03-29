@@ -1,10 +1,10 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.SpeakTypeBean;
-import com.cooltoo.backend.converter.SpeakTypeBeanConverter;
-import com.cooltoo.backend.entities.SpeakTypeEntity;
-import com.cooltoo.backend.repository.SpeakTypeRepository;
-import com.cooltoo.constants.SpeakType;
+import com.cooltoo.backend.beans.WorkFileTypeBean;
+import com.cooltoo.backend.converter.WorkFileTypeBeanConverter;
+import com.cooltoo.backend.entities.WorkFileTypeEntity;
+import com.cooltoo.backend.repository.WorkFileTypeRepository;
+import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
@@ -18,31 +18,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
 /**
- * Created by zhaolisong on 16/3/28.
+ * Created by zhaolisong on 16/3/29.
  */
-@Service("SpeakTypeService")
-public class SpeakTypeService {
+@Service("WorkFileTypeService")
+public class WorkFileTypeService {
 
     @Autowired
-    private SpeakTypeRepository speakTypeRepository;
+    private WorkFileTypeRepository workFileTypeRepository;
+
+    @Autowired
+    private WorkFileTypeBeanConverter beanConverter;
 
     @Autowired
     @Qualifier("StorageService")
     private StorageService storageService;
 
-    @Autowired
-    private SpeakTypeBeanConverter beanConverter;
 
-
-    public List<SpeakTypeBean> getAllSpeakType() {
-        SpeakTypeBean       bean    = null;
+    public List<WorkFileTypeBean> getAllWorkFileType() {
+        WorkFileTypeBean       bean    = null;
         List<Long>          imageIds = new ArrayList<Long>();
-        List<SpeakTypeBean> beans   = new ArrayList<SpeakTypeBean>();
+        List<WorkFileTypeBean> beans   = new ArrayList<WorkFileTypeBean>();
 
-        Iterable<SpeakTypeEntity> speakTypes = speakTypeRepository.findAll();
-        for (SpeakTypeEntity speakType : speakTypes) {
-            bean = beanConverter.convert(speakType);
+        Iterable<WorkFileTypeEntity> workfileTypes = workFileTypeRepository.findAll();
+        for (WorkFileTypeEntity workfileType : workfileTypes) {
+            bean = beanConverter.convert(workfileType);
             if (bean.getImageId()>0) {
                 imageIds.add(bean.getImageId());
             }
@@ -54,7 +55,7 @@ public class SpeakTypeService {
 
         Map<Long, String> idToPath = storageService.getFilePath(imageIds);
 
-        for (SpeakTypeBean tmp : beans) {
+        for (WorkFileTypeBean tmp : beans) {
             if (tmp.getImageId()>0) {
                 tmp.setImageUrl(idToPath.get(tmp.getImageId()));
             }
@@ -65,23 +66,34 @@ public class SpeakTypeService {
         return beans;
     }
 
-    public SpeakTypeBean getSpeakTypeByType(SpeakType speakType) {
-        List<SpeakTypeBean> all = getAllSpeakType();
-        for (SpeakTypeBean one : all) {
-            if (one.getType().equals(speakType)) {
+    public WorkFileTypeBean getWorkFileTypeByType(WorkFileType workfileType) {
+        List<WorkFileTypeBean> all = getAllWorkFileType();
+        for (WorkFileTypeBean one : all) {
+            if (one.getType().equals(workfileType)) {
                 return one;
             }
         }
         return null;
     }
 
-    public SpeakTypeBean updateSpeakType(int id, String name, int factor, InputStream image, InputStream disableImage) {
-        SpeakTypeEntity speakType = speakTypeRepository.findOne(id);
+    public WorkFileTypeBean updateSpeakType(int id, String name, int factor, int maxFileCount, int minFileCount, InputStream image, InputStream disableImage) {
+        WorkFileTypeEntity speakType = workFileTypeRepository.findOne(id);
         if (null==speakType) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
         boolean changed = false;
+        if (minFileCount>0 || maxFileCount>0) {
+            int oldMax = speakType.getMaxFileCount();
+            int oldMin = speakType.getMinFileCount();
+            int newMax = (maxFileCount > 0) ? maxFileCount : oldMax;
+            int newMin = (minFileCount > 0) ? minFileCount : oldMin;
+            if (newMin <= newMax) {
+                speakType.setMaxFileCount(newMax);
+                speakType.setMinFileCount(newMin);
+                changed = true;
+            }
+        }
         if (!VerifyUtil.isStringEmpty(name)) {
             speakType.setName(name);
             changed=true;
@@ -102,7 +114,7 @@ public class SpeakTypeService {
         }
 
         if (changed) {
-            speakType = speakTypeRepository.save(speakType);
+            speakType = workFileTypeRepository.save(speakType);
         }
         return beanConverter.convert(speakType);
     }

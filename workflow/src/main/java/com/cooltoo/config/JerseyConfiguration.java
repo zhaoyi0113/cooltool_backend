@@ -6,6 +6,7 @@ import com.cooltoo.admin.filter.CORSResponseFilter;
 import com.cooltoo.backend.api.*;
 import com.cooltoo.backend.filter.BadRequestExceptionMapper;
 import com.cooltoo.backend.filter.NurseLoginAuthenticationFilter;
+import com.cooltoo.constants.SpeakType;
 import io.swagger.annotations.Api;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -47,6 +48,8 @@ public class JerseyConfiguration extends ResourceConfig {
         register(NurseQualificationAPI.class);
         register(OccupationSkillManageAPI.class);
         register(NurseOccupationSkillAPI.class);
+        register(SpeakTypeAPI.class);
+        register(WorkFileTypeAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
         configureSwagger();
