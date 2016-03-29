@@ -118,7 +118,7 @@ public class NurseFriendsService {
         // search self friends
         List<NurseFriendsBean> userFriends = new ArrayList<NurseFriendsBean>();
         if (!searchSelt) {
-            Page<NurseFriendsEntity> entities = friendsRepository.findNurseFriendByUserId(userId, request);
+            List<NurseFriendsEntity> entities = friendsRepository.findByUserId(userId);
             for(NurseFriendsEntity entity: entities){
                 userFriends.add(beanConverter.convert(entity));
             }

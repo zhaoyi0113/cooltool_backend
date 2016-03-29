@@ -50,6 +50,8 @@ public class JerseyConfiguration extends ResourceConfig {
         register(NurseOccupationSkillAPI.class);
         register(SpeakTypeAPI.class);
         register(WorkFileTypeAPI.class);
+        register(RegionAPI.class);
+        register(NurseHospitalAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
         configureSwagger();

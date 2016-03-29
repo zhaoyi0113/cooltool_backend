@@ -6,8 +6,14 @@ package com.cooltoo.beans;
 public class HospitalBean {
     private int id;
     private String name;
-    private String province;
-    private String city;
+    private int province;
+    private RegionBean provinceB;
+    private int city;
+    private RegionBean cityB;
+    private int district;
+    private RegionBean districtB;
+    private String address;
+    private int enable;
 
     public int getId() {
         return id;
@@ -25,20 +31,68 @@ public class HospitalBean {
         this.name = name;
     }
 
-    public String getProvince() {
+    public int getProvince() {
         return province;
     }
 
-    public void setProvince(String province) {
+    public void setProvince(int province) {
         this.province = province;
     }
 
-    public String getCity() {
+    public int getCity() {
         return city;
     }
 
-    public void setCity(String city) {
+    public void setCity(int city) {
         this.city = city;
+    }
+
+    public int getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(int district) {
+        this.district = district;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getEnable() {
+        return enable;
+    }
+
+    public void setEnable(int enable) {
+        this.enable = enable;
+    }
+
+    public RegionBean getProvinceBean() {
+        return this.provinceB;
+    }
+
+    public void setProvinceBean(RegionBean provinceB) {
+        this.provinceB = provinceB;
+    }
+
+    public RegionBean getCityBean() {
+        return this.cityB;
+    }
+
+    public void setCityBean(RegionBean cityB) {
+        this.cityB = cityB;
+    }
+
+    public RegionBean getDistrictBean() {
+        return this.districtB;
+    }
+
+    public void setDistrictBean(RegionBean districtB) {
+        this.districtB = districtB;
     }
 
     public String toString() {
@@ -47,8 +101,10 @@ public class HospitalBean {
         msg.append("id=").append(id).append(" , ");
         msg.append("name=").append(name).append(" , ");
         msg.append("province=").append(province).append(" , ");
-        msg.append("city=").append(city);
-        msg.append("]");
+        msg.append("city=").append(city).append(" , ");
+        msg.append("district=").append(district).append(", ");
+        msg.append("address=").append(address).append(" , ");
+        msg.append("enable=").append(enable).append("]");
         return msg.toString();
     }
 }

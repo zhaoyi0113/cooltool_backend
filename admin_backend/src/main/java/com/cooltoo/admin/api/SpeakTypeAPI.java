@@ -4,6 +4,7 @@ import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.SpeakTypeBean;
 import com.cooltoo.backend.services.SpeakTypeService;
 import com.cooltoo.constants.ContextKeys;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,17 +51,29 @@ public class SpeakTypeAPI {
         return Response.ok().build();
     }
 
-//    @POST
-//    @Path("/edit_image")
-//    @Consumes(MediaType.MULTIPART_FORM_DATA)
-//    @AdminUserLoginAuthentication(requireUserLogin = true)
-//    public Response editBaseInformation(@Context HttpServletRequest request,
-//                                        @FormParam("id") @DefaultValue("-1") int id,
-//                                        @FormParam("image") InputStream image,
-//                                        @FormParam("disable_image") InputStream disableImage) {
-//        long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-//        logger.info("user : " + userId +" edit speak type enable image : " + (image!=null) + "  disable image: " + (disableImage!=null));
-//        speakTypeService.updateSpeakType(id, null, -1, image, disableImage);
-//        return Response.ok().build();
-//    }
+    @POST
+    @Path("/edit_image")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editImage(@Context HttpServletRequest request,
+                              @FormDataParam("id") @DefaultValue("-1") int id,
+                              @FormDataParam("image") InputStream image) {
+        long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+        logger.info("user : " + userId +" edit speak type enable image : " + (image!=null));
+        speakTypeService.updateSpeakType(id, null, -1, image, null);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/edit_disable_image")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editDisableImage(@Context HttpServletRequest request,
+                                        @FormDataParam("id") @DefaultValue("-1") int id,
+                                        @FormDataParam("image") InputStream image) {
+        long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+        logger.info("user : " + userId +" edit speak type disable image: " + (image!=null));
+        speakTypeService.updateSpeakType(id, null, -1, null, image);
+        return Response.ok().build();
+    }
 }

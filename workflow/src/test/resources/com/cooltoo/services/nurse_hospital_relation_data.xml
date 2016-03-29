@@ -10,11 +10,11 @@
     <nurse id="33"  name="nurse3" age="33" gender="3" mobile="135232121222" />
     <nurse id="44"  name="nurse4" age="44" gender="2" mobile="13811663451" />
     <nurse id="55"  name="nurse5" age="55" gender="1" mobile="18527727387" />
-    <hospital id="11" name="hospital1" province="province00" city="city00" />
-    <hospital id="22" name="hospital2" province="province01" city="city01" />
-    <hospital id="33" name="hospital3" province="province02" city="city02" />
-    <hospital id="44" name="hospital4" province="province03" city="city03" />
-    <hospital id="55" name="hospital5" province="province04" city="city04" />
+    <hospital id="11" name="hospital1" province="2" city="3" />
+    <hospital id="22" name="hospital2" province="2" city="3" />
+    <hospital id="33" name="hospital3" province="2" city="3" />
+    <hospital id="44" name="hospital4" province="2" city="3" />
+    <hospital id="55" name="hospital5" province="2" city="3" />
     <hospital_department id="11" name="department1" />
     <hospital_department id="22" name="department2" />
     <hospital_department id="33" name="department3" />

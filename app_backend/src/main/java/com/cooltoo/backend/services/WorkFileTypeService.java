@@ -76,46 +76,46 @@ public class WorkFileTypeService {
         return null;
     }
 
-    public WorkFileTypeBean updateSpeakType(int id, String name, int factor, int maxFileCount, int minFileCount, InputStream image, InputStream disableImage) {
-        WorkFileTypeEntity speakType = workFileTypeRepository.findOne(id);
-        if (null==speakType) {
+    public WorkFileTypeBean updateWorkfileType(int id, String name, int factor, int maxFileCount, int minFileCount, InputStream image, InputStream disableImage) {
+        WorkFileTypeEntity workfileType = workFileTypeRepository.findOne(id);
+        if (null==workfileType) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
         boolean changed = false;
         if (minFileCount>0 || maxFileCount>0) {
-            int oldMax = speakType.getMaxFileCount();
-            int oldMin = speakType.getMinFileCount();
+            int oldMax = workfileType.getMaxFileCount();
+            int oldMin = workfileType.getMinFileCount();
             int newMax = (maxFileCount > 0) ? maxFileCount : oldMax;
             int newMin = (minFileCount > 0) ? minFileCount : oldMin;
             if (newMin <= newMax) {
-                speakType.setMaxFileCount(newMax);
-                speakType.setMinFileCount(newMin);
+                workfileType.setMaxFileCount(newMax);
+                workfileType.setMinFileCount(newMin);
                 changed = true;
             }
         }
         if (!VerifyUtil.isStringEmpty(name)) {
-            speakType.setName(name);
+            workfileType.setName(name);
             changed=true;
         }
         if (factor>0) {
-            speakType.setFactor(factor);
+            workfileType.setFactor(factor);
             changed = true;
         }
         if (null!=image) {
-            long fileId = storageService.saveFile(speakType.getImageId(), speakType.getName(), image);
-            speakType.setImageId(fileId);
+            long fileId = storageService.saveFile(workfileType.getImageId(), workfileType.getName(), image);
+            workfileType.setImageId(fileId);
             changed = true;
         }
         if (null!=disableImage) {
-            long fileId = storageService.saveFile(speakType.getImageId(), speakType.getName(), disableImage);
-            speakType.setDisableImageId(fileId);
+            long fileId = storageService.saveFile(workfileType.getImageId(), workfileType.getName(), disableImage);
+            workfileType.setDisableImageId(fileId);
             changed=true;
         }
 
         if (changed) {
-            speakType = workFileTypeRepository.save(speakType);
+            workfileType = workFileTypeRepository.save(workfileType);
         }
-        return beanConverter.convert(speakType);
+        return beanConverter.convert(workfileType);
     }
 }

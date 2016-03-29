@@ -47,7 +47,7 @@ public class WorkFileTypeServiceTest extends AbstractCooltooTest {
         int         maxFileCount = 29;
         int         minFileCount = 10;
 
-        WorkFileTypeBean newType = workFileTypeService.updateSpeakType(speakType.getId(), name, factor, maxFileCount, minFileCount, image, disableImage);
+        WorkFileTypeBean newType = workFileTypeService.updateWorkfileType(speakType.getId(), name, factor, maxFileCount, minFileCount, image, disableImage);
 
         Assert.assertEquals(newType.getId(), speakType.getId());
         Assert.assertNotEquals(newType.getName(), speakType.getName());

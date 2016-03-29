@@ -74,9 +74,12 @@ public class HospitalAPI {
     public Response update(
             @DefaultValue("-1") @FormParam("id") int id,
             @FormParam("name") String name,
-            @DefaultValue("") @FormParam("province") String province,
-            @DefaultValue("") @FormParam("city") String city) {
-        HospitalBean one = service.update(id, name, province, city);
+            @DefaultValue("-1") @FormParam("province") int province,
+            @DefaultValue("-1") @FormParam("city") int city,
+            @DefaultValue("-1") @FormParam("district") int district,
+            @DefaultValue("") @FormParam("address") String address,
+            @DefaultValue("-1") @FormParam("enable") int enable) {
+        HospitalBean one = service.update(id, name, province, city, district, address, enable);
         logger.info("update hospital is " + one);
         if (null==one) {
             return Response.ok().build();
@@ -89,10 +92,13 @@ public class HospitalAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addHospital(
             @FormParam("name") String name,
-            @DefaultValue("") @FormParam("province") String province,
-            @DefaultValue("") @FormParam("city") String city
+            @DefaultValue("-1") @FormParam("province") int province,
+            @DefaultValue("-1") @FormParam("city") int city,
+            @DefaultValue("-1") @FormParam("district") int district,
+            @DefaultValue("") @FormParam("address") String address,
+            @DefaultValue("-1") @FormParam("enable") int enable
     ) {
-        int id = service.newOne(name, province, city);
+        int id = service.newOne(name, province, city, district, address, enable);
         logger.info("new hospital id is " + id);
         return Response.ok(id).build();
     }

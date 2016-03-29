@@ -24,8 +24,9 @@ public class HospitalServiceTest extends AbstractCooltooTest {
     public void testNew1() {
         HospitalBean bean = new HospitalBean();
         bean.setName("name111");
-        bean.setProvince("province111");
-        bean.setCity("city111");
+        bean.setProvince(2);
+        bean.setCity(33);
+        bean.setDistrict(382);
         int id = service.newOne(bean);
         Assert.assertTrue(id>0);
         List<HospitalBean> all = service.getAll();
@@ -35,7 +36,7 @@ public class HospitalServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml")
     public void testNew2() {
-        int id = service.newOne("name111", "province111", "city111");
+        int id = service.newOne("name111", 2, 33, 382, null, -1);
         Assert.assertTrue(id > 0);
     }
 
@@ -63,19 +64,19 @@ public class HospitalServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml")
     public void testDeleteByUpdate() {
-        HospitalBean bean = service.update(22, "name123", "province123", "city123");
+        HospitalBean bean = service.update(22, "name123", 2, 3, -1, null, -1);
         Assert.assertEquals(22, bean.getId());
         Assert.assertEquals("name123", bean.getName());
-        Assert.assertEquals("province123", bean.getProvince());
-        Assert.assertEquals("city123", bean.getCity());
+        Assert.assertEquals(2, bean.getProvince());
+        Assert.assertEquals(3, bean.getCity());
 
         bean.setName("name789");
-        bean.setProvince("province789");
-        bean.setCity("city789");
+        bean.setProvince(3);
+        bean.setCity(4);
         bean =  service.update(bean);
         Assert.assertEquals(22, bean.getId());
         Assert.assertEquals("name789", bean.getName());
-        Assert.assertEquals("province789", bean.getProvince());
-        Assert.assertEquals("city789", bean.getCity());
+        Assert.assertEquals(3, bean.getProvince());
+        Assert.assertEquals(4, bean.getCity());
     }
 }

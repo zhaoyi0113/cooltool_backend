@@ -10,8 +10,11 @@ import javax.persistence.*;
 public class HospitalEntity {
     private int id;
     private String name;
-    private String province;
-    private String city;
+    private int province;
+    private int city;
+    private int district;
+    private String address;
+    private int enable;
 
     @Id
     @GeneratedValue
@@ -34,21 +37,48 @@ public class HospitalEntity {
     }
 
     @Column(name = "province")
-    public String getProvince() {
+    public int getProvince() {
         return province;
     }
 
-    public void setProvince(String province) {
+    public void setProvince(int province) {
         this.province = province;
     }
 
     @Column(name = "city")
-    public String getCity() {
+    public int getCity() {
         return city;
     }
 
-    public void setCity(String city) {
+    public void setCity(int city) {
         this.city = city;
+    }
+
+    @Column(name = "district")
+    public int getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(int district) {
+        this.district = district;
+    }
+
+    @Column(name = "address")
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    @Column(name = "enable")
+    public int getEnable() {
+        return enable;
+    }
+
+    public void setEnable(int enable) {
+        this.enable = enable;
     }
 
     public String toString() {
@@ -57,8 +87,10 @@ public class HospitalEntity {
         msg.append("id=").append(id).append(" , ");
         msg.append("name=").append(name).append(" , ");
         msg.append("province=").append(province).append(" , ");
-        msg.append("city=").append(city);
-        msg.append("]");
+        msg.append("city=").append(city).append(" , ");
+        msg.append("district=").append(district).append(", ");
+        msg.append("address=").append(address).append(" , ");
+        msg.append("enable=").append(enable).append("]");
         return msg.toString();
     }
 }
