@@ -47,7 +47,7 @@ public class NurseOccupationSkillBean {
         return this.skill;
     }
 
-    public void setSkill(OccupationSkillBean factor) {
+    public void setSkill(OccupationSkillBean skill) {
         this.skill = skill;
     }
 

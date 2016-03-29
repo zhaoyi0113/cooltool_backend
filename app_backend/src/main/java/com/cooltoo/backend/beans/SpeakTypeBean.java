@@ -19,7 +19,7 @@ public class SpeakTypeBean {
     /** 该类型未点亮的图片 ID */
     private long disableImageId;
     /** 该类型未点亮的图片 ID */
-    private long disableImageUrl;
+    private String disableImageUrl;
 
     public int getId() {
         return id;
@@ -77,11 +77,11 @@ public class SpeakTypeBean {
         this.imageUrl = imageUrl;
     }
 
-    public long getDisableImageUrl() {
+    public String getDisableImageUrl() {
         return disableImageUrl;
     }
 
-    public void setDisableImageUrl(long disableImageUrl) {
+    public void setDisableImageUrl(String disableImageUrl) {
         this.disableImageUrl = disableImageUrl;
     }
 

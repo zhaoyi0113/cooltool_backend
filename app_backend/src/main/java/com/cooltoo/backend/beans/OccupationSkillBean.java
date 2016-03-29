@@ -11,6 +11,8 @@ public class OccupationSkillBean {
     private long disableImageId;
     private String name;
     private OccupationSkillType skillType;
+    private String imageUrl;
+    private String disableImageUrl;
 
     private int factor;
 
@@ -30,12 +32,28 @@ public class OccupationSkillBean {
         this.imageId = imageId;
     }
 
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public long getDisableImageId() {
         return disableImageId;
     }
 
     public void setDisableImageId(long disableImageId) {
         this.disableImageId = disableImageId;
+    }
+
+    public String getDisableImageUrl() {
+        return this.disableImageUrl;
+    }
+
+    public void setDisableImageUrl(String disableImageUrl) {
+        this.disableImageUrl = disableImageUrl;
     }
 
     public String getName() {

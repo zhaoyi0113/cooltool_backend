@@ -32,13 +32,13 @@ public class NurseSkillNominationService {
     private NurseSkillNominationRepository nominationRepository;
 
     @Autowired
-    private OccupationSkillService skillService;
-
-    @Autowired
     private NurseOccupationSkillService nurseSkillService;
 
     @Autowired
     private NurseRepository nurseRepository;
+
+    @Autowired
+    private OccupationSkillService skillService;
 
     @Autowired
     @Qualifier("StorageService")
@@ -47,22 +47,6 @@ public class NurseSkillNominationService {
     public List<NurseSkillNominationBean> getAllNominationBeans(long userId) {
         // is Nurse exist
         validateNurse(userId);
-
-        // get all skill
-        Map<Integer, OccupationSkillBean> skillIdAndSkillMap = new Hashtable<Integer, OccupationSkillBean>();
-        List<OccupationSkillBean>         skills             = skillService.getOccupationSkillList();
-        List<Long>                        imgIds             = new ArrayList<Long>();
-        List<Long>                        disableImgIds      = new ArrayList<Long>();
-        for (OccupationSkillBean skill : skills) {
-            skillIdAndSkillMap.put(skill.getId(), skill);
-            imgIds.add(skill.getImageId());
-            disableImgIds.add(skill.getDisableImageId());
-        }
-
-        // cache skill's images
-        Map<Long, String> imageIdAndUrlMap         = storageService.getFilePath(imgIds);
-        Map<Long, String> disableImageIdAndUrlMap  = storageService.getFilePath(disableImgIds);
-
 
         // get user's skill
         List<NurseOccupationSkillBean> nurseSkills = nurseSkillService.getAllSkills(userId);
@@ -73,25 +57,18 @@ public class NurseSkillNominationService {
         // construct all user's skill nomination count
         List<NurseSkillNominationBean> nominationCount = new ArrayList<NurseSkillNominationBean>();
         NurseSkillNominationBean       nomin_count     = null;
-        OccupationSkillBean            skill           = null;
-        String                         imageUrl        = null;
-        String                         disableImageUrl = null;
         for (NurseOccupationSkillBean nurseSkill : nurseSkills) {
             nomin_count     = new NurseSkillNominationBean();
-            skill           = skillIdAndSkillMap.get(nurseSkill.getSkillId());
-            imageUrl        = imageIdAndUrlMap.get(skill.getImageId());
-            disableImageUrl = disableImageIdAndUrlMap.get(skill.getDisableImageId());
-
-            nomin_count.setSkillId(skill.getId());
-            nomin_count.setSkillType(skill.getType());
-            nomin_count.setSkillName(skill.getName());
-            nomin_count.setSkillImageUrl(imageUrl);
-            nomin_count.setSkillDisableImageUrl(disableImageUrl);
+            nomin_count.setSkillId(nurseSkill.getSkill().getId());
+            nomin_count.setSkillType(nurseSkill.getSkill().getType());
+            nomin_count.setSkillName(nurseSkill.getSkill().getName());
+            nomin_count.setSkillImageUrl(nurseSkill.getSkill().getImageUrl());
+            nomin_count.setSkillDisableImageUrl(nurseSkill.getSkill().getDisableImageUrl());
             nomin_count.setSkillNominateCount(0);
 
             int count = 0;
             for (NurseSkillNominationEntity nomin : allNoms) {
-                if (nomin.getSkillId() != skill.getId()){
+                if (nomin.getSkillId() != nurseSkill.getSkill().getId()){
                     continue;
                 }
                 count++;
@@ -129,11 +106,7 @@ public class NurseSkillNominationService {
     }
 
     public long getSkillNominationCount(long userId, int skillId) {
-        OccupationSkillBean skill = skillService.getOccupationSkill(skillId);
-        if (null == skill) {
-            throw new BadRequestException(ErrorCode.SKILL_NOT_EXIST);
-        }
-        return nominationRepository.countByUserIdAndSkillId(userId, skillId);
+         return nominationRepository.countByUserIdAndSkillId(userId, skillId);
     }
 
     @Transactional

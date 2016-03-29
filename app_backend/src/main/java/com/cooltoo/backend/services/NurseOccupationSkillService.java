@@ -22,6 +22,8 @@ import java.util.List;
 @Service("NurseOccupationSkillService")
 public class NurseOccupationSkillService {
 
+    private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "point"));
+
     @Autowired
     private NurseOccupationSkillRepository nurseSkillRepository;
 
@@ -34,7 +36,10 @@ public class NurseOccupationSkillService {
     @Autowired
     private NurseOccupationSkillBeanConverter beanConverter;
 
-    private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "point"));
+
+    //===============================================================
+    //           get nurse skill
+    //===============================================================
 
     public List<NurseOccupationSkillBean> getAllSkills(long userId) {
         List<OccupationSkillBean> skillsB = skillService.getOccupationSkillList();
@@ -70,6 +75,11 @@ public class NurseOccupationSkillService {
 
         return nurseSkillB;
     }
+
+
+    //===============================================================
+    //           add/delete nurse skill
+    //===============================================================
 
     @Transactional
     public void addSkill(long userId, int occupationSkillId) {
@@ -133,20 +143,6 @@ public class NurseOccupationSkillService {
     }
 
     @Transactional
-    public void update(long userId, int occupationSkillId, int skillPoint) {
-        NurseOccupationSkillEntity skill = nurseSkillRepository.findSkillRelationByUserIdAndSkillId(userId, occupationSkillId);
-        if (null==skill) {
-            throw new BadRequestException(ErrorCode.NURSE_DONT_HAVE_SKILL);
-        }
-        if (skillPoint>0) {
-            skill.setPoint(skillPoint);
-            nurseSkillRepository.save(skill);
-        }
-        return;
-    }
-
-
-    @Transactional
     public void removeSkill(long userId, int skillId) {
         NurseOccupationSkillEntity skill = nurseSkillRepository.findSkillRelationByUserIdAndSkillId(userId, skillId);
         if (null==skill) {
@@ -162,4 +158,21 @@ public class NurseOccupationSkillService {
         nurseSkillRepository.delete(id);
     }
 
+
+    //===============================================================
+    //           update nurse skill's point
+    //===============================================================
+
+    @Transactional
+    public void update(long userId, int occupationSkillId, int skillPoint) {
+        NurseOccupationSkillEntity skill = nurseSkillRepository.findSkillRelationByUserIdAndSkillId(userId, occupationSkillId);
+        if (null==skill) {
+            throw new BadRequestException(ErrorCode.NURSE_DONT_HAVE_SKILL);
+        }
+        if (skillPoint>0) {
+            skill.setPoint(skillPoint);
+            nurseSkillRepository.save(skill);
+        }
+        return;
+    }
 }

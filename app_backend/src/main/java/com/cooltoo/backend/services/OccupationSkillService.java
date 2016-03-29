@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yzzhao on 3/10/16.
@@ -34,22 +35,30 @@ public class OccupationSkillService {
     @Qualifier("StorageService")
     private StorageService storageService;
 
+    //=========================================================
+    //           get all type
+    //=========================================================
     public List<String> getAllSkillTypes() {
         return OccupationSkillType.getAllValues();
     }
 
+    //=========================================================
+    //           get skills type
+    //=========================================================
     public List<OccupationSkillBean> getOccupationSkillList() {
-        Iterable<OccupationSkillEntity> skillList = skillRepository.findAll();
-        List<OccupationSkillBean> beanList = new ArrayList<OccupationSkillBean>();
-        for (OccupationSkillEntity entity : skillList) {
-            beanList.add(beanConverter.convert(entity));
-        }
-        return beanList;
+        List<OccupationSkillEntity> skillList = skillRepository.findAll();
+        return parseEntity(skillList);
     }
 
     public OccupationSkillBean getOccupationSkill(int id) {
         OccupationSkillEntity entity = getOccupationSkillEntity(id);
-        return beanConverter.convert(entity);
+        if (null == entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        List<OccupationSkillEntity> skillList = new ArrayList<OccupationSkillEntity>();
+        skillList.add(entity);
+        List<OccupationSkillBean> skill = parseEntity(skillList);
+        return skill.get(0);
     }
 
     private OccupationSkillEntity getOccupationSkillEntity(int id) {
@@ -59,6 +68,51 @@ public class OccupationSkillService {
         }
         return entity;
     }
+
+    @Transactional
+    private boolean isSkillNameExist(String name) {
+        if (VerifyUtil.isStringEmpty(name)) {
+            return false;
+        }
+        List<OccupationSkillEntity> skills = skillRepository.findByName(name);
+        return !skills.isEmpty();
+    }
+
+    private List<OccupationSkillBean> parseEntity(List<OccupationSkillEntity> entities) {
+
+        String                    imageUrl = null;
+        OccupationSkillBean       bean     = null;
+        List<Long>                imageIds = new ArrayList<Long>();
+        List<OccupationSkillBean> beans    = new ArrayList<OccupationSkillBean>();
+
+        for (OccupationSkillEntity entity : entities) {
+            bean = beanConverter.convert(entity);
+            if (bean.getImageId()>0) {
+                imageIds.add(bean.getImageId());
+            }
+            if (bean.getDisableImageId()>0) {
+                imageIds.add(bean.getDisableImageId());
+            }
+            beans.add(bean);
+        }
+
+        Map<Long, String> idToPath = storageService.getFilePath(imageIds);
+        for (OccupationSkillBean tmp : beans) {
+            if (tmp.getImageId()>0) {
+                tmp.setImageUrl(idToPath.get(tmp.getImageId()));
+            }
+            if (tmp.getDisableImageId()>0) {
+                tmp.setDisableImageUrl(idToPath.get(tmp.getDisableImageId()));
+            }
+        }
+
+        return beans;
+    }
+
+
+    //=========================================================
+    //           add skill type
+    //=========================================================
 
     @Transactional
     public void addNewOccupationSkill(String name, String type, int factor, InputStream image, InputStream disableImage) {
@@ -92,10 +146,20 @@ public class OccupationSkillService {
         throw new BadRequestException(ErrorCode.SKILL_EXIST);
     }
 
+
+    //=========================================================
+    //           delete skill type
+    //=========================================================
+
     @Transactional
     public void deleteOccupationSkill(int id) {
         skillRepository.delete(id);
     }
+
+
+    //=========================================================
+    //           update skill type
+    //=========================================================
 
     @Transactional
     public void editOccupationSkill(int id, String name, String type, int factor, InputStream imageStream, InputStream disableImageStream) {
@@ -176,14 +240,4 @@ public class OccupationSkillService {
         }
         return entity;
     }
-
-    @Transactional
-    private boolean isSkillNameExist(String name) {
-        if (VerifyUtil.isStringEmpty(name)) {
-            return false;
-        }
-        List<OccupationSkillEntity> skills = skillRepository.findByName(name);
-        return !skills.isEmpty();
-    }
-
 }

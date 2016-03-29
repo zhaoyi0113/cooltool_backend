@@ -62,6 +62,17 @@ public class NurseFriendsAPI {
         return Response.ok(friendList).build();
     }
 
+    @POST
+    @Path("/list/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllFriends(@Context HttpServletRequest request){
+        logger.info("get all friend list ");
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<NurseFriendsBean> friendList = friendsService.getFriendList(userId);
+        logger.info("get friend list count "+friendList.size());
+        return Response.ok(friendList).build();
+    }
+
     @DELETE
     @Path("/{friend_id}")
     public Response removeFriend(@Context HttpServletRequest request, @PathParam("friend_id") long friendId){

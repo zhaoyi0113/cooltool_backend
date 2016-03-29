@@ -60,7 +60,7 @@ public class WorkFileTypeService {
                 tmp.setImageUrl(idToPath.get(tmp.getImageId()));
             }
             if (tmp.getDisableImageId()>0) {
-                tmp.setImageUrl(idToPath.get(tmp.getDisableImageId()));
+                tmp.setDisableImageUrl(idToPath.get(tmp.getDisableImageId()));
             }
         }
         return beans;
