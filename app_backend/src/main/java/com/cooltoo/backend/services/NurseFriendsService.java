@@ -131,10 +131,14 @@ public class NurseFriendsService {
             NurseFriendsBean friend = beanConverter.convert(entity);
             friends.add(friend);
             // judge is self friends
-            for (NurseFriendsBean userF : userFriends) {
-                if (userF.getFriendId() == friend.getFriendId()) {
-                    friend.setIsFriend(true);
-                    break;
+            if(searchSelt){
+                friend.setIsFriend(true);
+            }else {
+                for (NurseFriendsBean userF : userFriends) {
+                    if (userF.getFriendId() == friend.getFriendId()) {
+                        friend.setIsFriend(true);
+                        break;
+                    }
                 }
             }
         }
