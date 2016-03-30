@@ -111,39 +111,66 @@ public class NurseFriendsService {
     }
 
     public List<NurseFriendsBean> getFriends(long userId, long searchId, int pageIdx, int number){
-        logger.info("get friends for the user "+userId);
-        boolean searchSelt = userId==searchId;
+        logger.info("get friends for the user " + searchId);
+        boolean                  searchSelf         = userId==searchId;
+        PageRequest              pageSort           = new PageRequest(pageIdx, number, Sort.Direction.DESC, "dateTime");
+        List<Long>               friendIds          = new ArrayList<Long>();
+        List<Long>               friendNotExistIds  = new ArrayList<Long>();
+        List<NurseFriendsBean>   userFriends        = new ArrayList<NurseFriendsBean>();
+        List<NurseFriendsBean>   searchFriends      = new ArrayList<NurseFriendsBean>();
+        Page<NurseFriendsEntity> searchFriendsE     = null;
 
-        PageRequest request = new PageRequest(pageIdx, number, Sort.Direction.DESC, "dateTime");
         // search self friends
-        List<NurseFriendsBean> userFriends = new ArrayList<NurseFriendsBean>();
-        if (!searchSelt) {
-            List<NurseFriendsEntity> entities = friendsRepository.findByUserId(userId);
-            for(NurseFriendsEntity entity: entities){
-                userFriends.add(beanConverter.convert(entity));
+        if (!searchSelf) {
+            List<NurseFriendsEntity> userFriendsE = friendsRepository.findByUserId(userId);
+            for(NurseFriendsEntity userFriend: userFriendsE){
+                userFriends.add(beanConverter.convert(userFriend));
             }
         }
 
         // search searchId's friends
-        Page<NurseFriendsEntity> entities = friendsRepository.findNurseFriendByUserId(searchId, request);
-        List<NurseFriendsBean> friends = new ArrayList<NurseFriendsBean>();
-        for(NurseFriendsEntity entity: entities){
-            NurseFriendsBean friend = beanConverter.convert(entity);
-            friends.add(friend);
+        searchFriendsE = friendsRepository.findNurseFriendByUserId(searchId, pageSort);
+        for(NurseFriendsEntity searchFriendE: searchFriendsE){
+            NurseFriendsBean searchFriend = beanConverter.convert(searchFriendE);
+            searchFriends.add(searchFriend);
+            friendIds.add(searchFriend.getFriendId());
             // judge is self friends
-            if(searchSelt){
-                friend.setIsFriend(true);
+            if(searchSelf){
+                searchFriend.setIsFriend(true);
             }else {
                 for (NurseFriendsBean userF : userFriends) {
-                    if (userF.getFriendId() == friend.getFriendId()) {
-                        friend.setIsFriend(true);
+                    if (userF.getFriendId() == searchFriend.getFriendId()) {
+                        searchFriend.setIsFriend(true);
                         break;
                     }
                 }
             }
         }
 
-        return friends;
+        List<NurseEntity> friendExist = nurseRepository.findNurseByIdIn(friendIds);
+        boolean exist = false;
+        for (int i=0, count=searchFriends.size(); i < count; i ++) {
+            exist = false;
+            NurseFriendsBean friend = searchFriends.get(i);
+            for (NurseEntity nurseExist : friendExist) {
+                if (nurseExist.getId()==friend.getFriendId()) {
+                    exist = true;
+                    break;
+                }
+            }
+            if (!exist) {
+                searchFriends.remove(friend);
+                count --;
+                i     --;
+                friendNotExistIds.add(friend.getFriendId());
+            }
+        }
+        if (!friendNotExistIds.isEmpty()) {
+            friendsRepository.deleteByFriendIdIn(friendNotExistIds);
+            friendsRepository.deleteByUserIdIn(friendNotExistIds);
+        }
+
+        return searchFriends;
     }
 
     public int getFriendsCount(long userId){

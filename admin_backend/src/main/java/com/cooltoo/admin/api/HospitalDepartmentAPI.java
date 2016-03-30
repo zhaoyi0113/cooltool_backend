@@ -3,11 +3,15 @@ package com.cooltoo.admin.api;
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.services.HospitalDepartmentService;
 import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.util.VerifyUtil;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -59,10 +63,12 @@ public class HospitalDepartmentAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response update(
-            @DefaultValue("-1") @FormParam("id") int id,
-            @FormParam("name") String name) {
-        HospitalDepartmentBean one = service.update(id, name);
+    public Response update(@DefaultValue("-1") @FormParam("id")          int id,
+                           @DefaultValue("")   @FormParam("name")        String name,
+                           @DefaultValue("")   @FormParam("description") String description,
+                           @DefaultValue("-1") @FormParam("enable")      int enable,
+                           @DefaultValue("-1") @FormParam("parent_id")   int parentId) {
+        HospitalDepartmentBean one = service.update(id, name, description, enable, parentId, null, null);
         logger.info("update hospital department is " + one);
         if (null==one) {
             return Response.ok().build();
@@ -70,13 +76,38 @@ public class HospitalDepartmentAPI {
         return Response.ok(one).build();
     }
 
+    @Path("/edit_image")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response updateImage(@FormDataParam("id")       int                        id,
+                                @FormDataParam("file")     InputStream                file) {
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, file, null);
+        logger.info("update hospital department is " + one);
+        return Response.ok(one).build();
+    }
+
+    @Path("/edit_disable_image")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response updateDisableImage(@FormDataParam("id")       int                        id,
+                                       @FormDataParam("file")     InputStream                file) {
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, file);
+        logger.info("update hospital department is " + one);
+        return Response.ok(one).build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response newOne(
-            @FormParam("name") String name
-    ) {
-        int id = service.createHospitalDepartment(name);
+    public Response newOne(@DefaultValue("")   @FormParam("name")        String name,
+                           @DefaultValue("")   @FormParam("description") String description,
+                           @DefaultValue("-1") @FormParam("enable")      int enable,
+                           @DefaultValue("-1") @FormParam("parent_id")   int parentId) {
+        int id = service.createHospitalDepartment(name, description, enable, parentId, null, null);
         logger.info("new hospital department id is " + id);
         return Response.ok(id).build();
     }

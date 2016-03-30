@@ -22,4 +22,8 @@ public interface NurseFriendsRepository extends JpaRepository<NurseFriendsEntity
 
     long countByUserIdAndFriendId(long userId, long friendId);
 
+    void deleteByUserIdIn(List<Long> userIds);
+
+    void deleteByFriendIdIn(List<Long> friendIds);
+
 }

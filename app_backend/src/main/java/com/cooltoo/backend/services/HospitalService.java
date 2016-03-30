@@ -11,6 +11,7 @@ import com.cooltoo.beans.RegionBean;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.RegionService;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,26 +80,30 @@ public class HospitalService {
             throw new BadRequestException(ErrorCode.HOSPITAL_NOT_EXIST);
         }
         String value = bean.getName();
-        if (null==value || "".equals(value)) {
+        if (VerifyUtil.isStringEmpty(bean.getName())) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
         HospitalEntity entity = repository.findOne(bean.getId());
         if (!value.equals(entity.getName())) {
+            List<HospitalEntity> hospitals = repository.findByName(value);
+            if (!hospitals.isEmpty()) {
+                logger.severe("hospital name has been used!");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
             entity.setName(value);
         }
-        int iValue = bean.getProvince();
-        if (iValue>0 && iValue != entity.getProvince()) {
-            entity.setProvince(iValue);
+        entity.setProvince(bean.getProvince());
+        entity.setCity(bean.getCity());
+        entity.setDistrict(bean.getDistrict());
+        entity.setAddress(bean.getAddress());
+
+        int enable = bean.getEnable();
+        enable = enable<0 ? enable : (enable>1 ? 1 : enable);
+        if (enable>=0) {
+            entity.setEnable(bean.getEnable());
         }
-        iValue = bean.getCity();
-        if (iValue>0 && iValue != entity.getCity()) {
-            entity.setCity(iValue);
-        }
-        iValue = bean.getDistrict();
-        if (iValue>0 && iValue != entity.getDistrict()) {
-            entity.setDistrict(iValue);
-        }
+
         logger.info("update hospital == " + bean);
         entity = repository.save(entity);
         return beanConverter.convert(entity);
@@ -114,6 +119,9 @@ public class HospitalService {
         bean.setDistrict(district);
         bean.setAddress(address);
         bean.setEnable(enable);
+        if (!checkRegion(bean)) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
         return update(bean);
     }
 
@@ -121,6 +129,11 @@ public class HospitalService {
     public Integer newOne(HospitalBean bean) {
         String value = bean.getName();
         if (null==value || "".equals(value)) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        List<HospitalEntity> hospitals = repository.findByName(value);
+        if (!hospitals.isEmpty()) {
+            logger.severe("hospital name has been used!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         HospitalEntity entity = entityConverter.convert(bean);
@@ -192,12 +205,20 @@ public class HospitalService {
         RegionBean district = hospital.getDistrictBean();
         logger.info("provice="+province+" city="+city+" district="+district);
         // do not check when one of they is null
-        if (null==province || null==city || null==district) {
+        if (null==province || null==city) {
             return true;
         }
-        if(city.getParentId()==province.getId() && district.getParentId()==city.getId()) {
-            return true;
+        if (null==district) {
+            if (city.getParentId() == province.getId()) {
+                return true;
+            }
         }
+        else {
+            if (city.getParentId() == province.getId() && district.getParentId() == city.getId()) {
+                return true;
+            }
+        }
+
         return false;
     }
 

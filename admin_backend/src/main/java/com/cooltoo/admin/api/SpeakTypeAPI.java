@@ -76,4 +76,5 @@ public class SpeakTypeAPI {
         speakTypeService.updateSpeakType(id, null, -1, null, image);
         return Response.ok().build();
     }
+
 }

@@ -4,6 +4,7 @@ import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.services.HospitalService;
 import com.cooltoo.beans.HospitalBean;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,11 @@ import java.util.List;
  * Created by lg380357 on 2016/3/5.
  */
 @Transactional
+@DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_department_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/region_data.xml")
+})
 public class HospitalServiceTest extends AbstractCooltooTest {
 
     @Autowired
@@ -34,35 +40,30 @@ public class HospitalServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml")
     public void testNew2() {
         int id = service.newOne("name111", 2, 33, 382, null, -1);
         Assert.assertTrue(id > 0);
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml")
     public void testGetAll() {
         List<HospitalBean> all = service.getAll();
         Assert.assertEquals(5, all.size());
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml")
     public void testGetOne() {
         HospitalBean one = service.getOneById(33);
         Assert.assertEquals(33, one.getId());
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml")
     public void testDeleteById() {
         HospitalBean bean = service.deleteById(22);
         Assert.assertEquals(22, bean.getId());
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml")
     public void testDeleteByUpdate() {
         HospitalBean bean = service.update(22, "name123", 2, 3, -1, null, -1);
         Assert.assertEquals(22, bean.getId());
@@ -71,12 +72,10 @@ public class HospitalServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(3, bean.getCity());
 
         bean.setName("name789");
-        bean.setProvince(3);
         bean.setCity(4);
         bean =  service.update(bean);
         Assert.assertEquals(22, bean.getId());
         Assert.assertEquals("name789", bean.getName());
-        Assert.assertEquals(3, bean.getProvince());
         Assert.assertEquals(4, bean.getCity());
     }
 }

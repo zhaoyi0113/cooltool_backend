@@ -1,6 +1,7 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.HospitalDepartmentEntity;
+import com.cooltoo.backend.services.HospitalService;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -10,4 +11,5 @@ import java.util.List;
  */
 public interface HospitalDepartmentRepository extends CrudRepository<HospitalDepartmentEntity, Integer> {
     List<HospitalDepartmentEntity> findDepartmentByIdIn(List<Integer> ids);
+    List<HospitalDepartmentEntity> findByName(String name);
 }
