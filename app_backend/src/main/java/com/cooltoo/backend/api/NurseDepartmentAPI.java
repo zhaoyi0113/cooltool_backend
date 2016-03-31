@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -27,8 +28,17 @@ public class NurseDepartmentAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getAll() {
-        List<HospitalDepartmentBean> all = service.getAll();
+    public Response getAllTopLevelDepartment() {
+        List<HospitalDepartmentBean> all = service.getAllTopLevelDepartmentEnable();
+        return Response.ok(all).build();
+    }
+
+    @Path("/{parent_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response getSecondLevelDepartment(@PathParam("parent_id") int parentId) {
+        List<HospitalDepartmentBean> all = service.getSecondLevelDepartmentEnable(parentId);
         return Response.ok(all).build();
     }
 }

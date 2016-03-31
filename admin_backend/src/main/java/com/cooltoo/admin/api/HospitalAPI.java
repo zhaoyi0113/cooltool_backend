@@ -44,6 +44,24 @@ public class HospitalAPI {
         return Response.ok(bean).build();
     }
 
+    @Path("/search")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response searchHospital(@DefaultValue("true") @FormParam("and_or")  boolean andOrOr,
+                                   @DefaultValue("")     @FormParam("name")     String  name,
+                                   @DefaultValue("-1")   @FormParam("province") int     province,
+                                   @DefaultValue("-1")   @FormParam("city")     int     city,
+                                   @DefaultValue("-1")   @FormParam("district") int     district,
+                                   @DefaultValue("")     @FormParam("address")  String  address) {
+        List<HospitalBean> hospitals = service.searchHospital(andOrOr, name, province, city, district, address);
+        logger.info("get hospital is " + hospitals);
+        if (null == hospitals) {
+            Response.ok().build();
+        }
+        return Response.ok(hospitals).build();
+    }
+
     @Path("/department")
     @POST
     @Produces(MediaType.APPLICATION_JSON)

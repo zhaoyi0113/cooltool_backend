@@ -47,6 +47,26 @@ public class HospitalDepartmentAPI {
         return Response.ok(bean).build();
     }
 
+    @Path("/top_level")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getTopLevelDepartment() {
+        List<HospitalDepartmentBean> topLevels = service.getAllTopLevelDepartment();
+        logger.info("get all top level hospital " + topLevels);
+        return Response.ok(topLevels).build();
+    }
+
+    @Path("/second_level/{parent_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getSecondLevelDepartment(@PathParam("parent_id") int parentId) {
+        List<HospitalDepartmentBean> topLevels = service.getSecondLevelDepartment(parentId);
+        logger.info("get second level hospital " + topLevels);
+        return Response.ok(topLevels).build();
+    }
+
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)

@@ -14,6 +14,7 @@ public class HospitalDepartmentBean {
     private long disableImageId;
     private String disableImageUrl;
     private int parentId;
+    private boolean parentValid;
 
     public int getId() {
         return id;
@@ -85,6 +86,14 @@ public class HospitalDepartmentBean {
 
     public void setParentId(int parentId) {
         this.parentId = parentId;
+    }
+
+    public boolean getParentValid() {
+        return this.parentValid;
+    }
+
+    public void setParentValid(boolean parentValid) {
+        this.parentValid = parentValid;
     }
 
     public String toString() {

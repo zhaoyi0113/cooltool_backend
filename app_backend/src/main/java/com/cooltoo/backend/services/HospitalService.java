@@ -41,6 +41,9 @@ public class HospitalService {
     @Autowired
     private RegionService regionService;
 
+    //=======================================================
+    //        get department
+    //=======================================================
     public List<HospitalBean> getAll() {
         Iterable<HospitalEntity> iterable = repository.findAll();
         List<HospitalBean> all = new ArrayList<HospitalBean>();
@@ -50,6 +53,66 @@ public class HospitalService {
         }
         addRegion(all);
         return all;
+    }
+
+    public List<HospitalBean> searchHospital(boolean andOrOr, String name, int province, int city, int district, String address) {
+        List<HospitalBean> allHospitals     = getAll();
+        List<HospitalBean> allHospitalMatch = new ArrayList<HospitalBean>();
+
+        boolean matchName     = !VerifyUtil.isStringEmpty(name);
+        boolean matchAddress  = !VerifyUtil.isStringEmpty(address);
+        boolean matchProvince = (province>0);
+        boolean matchCity     = (city    >0);
+        boolean matchDistrict = (district>0);
+        boolean matchRegion   = (matchProvince || matchCity || matchDistrict);
+        boolean condition1    = true;
+        boolean condition2    = true;
+        boolean condition3    = true;
+        if (null==allHospitals || allHospitals.isEmpty()) {
+            return allHospitals;
+        }
+        for (HospitalBean hospital : allHospitals) {
+            condition1 = (!matchName)    || (matchName    && hospital.getName().contains(name));
+            condition2 = (!matchAddress) || (matchAddress && hospital.getAddress().contains(address));
+            if (matchRegion) {
+                if (!matchProvince) { province = hospital.getProvince(); }
+                if (!matchCity    ) { city     = hospital.getCity();     }
+                if (!matchDistrict) { district = hospital.getDistrict(); }
+
+                condition3 = ((hospital.getProvince() == province)
+                           && (hospital.getCity()     == city)
+                           && (hospital.getDistrict() == district));
+            }
+            else {
+                condition3 = true;
+            }
+
+            if (( andOrOr && (condition1 && condition2 && condition3))
+             || (!andOrOr && (condition1 || condition2 || condition3))) {
+                allHospitalMatch.add(hospital);
+            }
+        }
+        return allHospitalMatch;
+    }
+
+    public List<HospitalBean> getAllHospitalEnable() {
+        List<HospitalBean> allHospitals      = getAll();
+        List<HospitalBean> allHospitalEnable = new ArrayList<HospitalBean>();
+        for (HospitalBean hospital : allHospitals) {
+            if (hospital.getEnable()>0) {
+                allHospitalEnable.add(hospital);
+            }
+        }
+        return allHospitalEnable;
+    }
+
+    public List<HospitalDepartmentBean> getAllDepartments(int hospitalId) {
+        List<HospitalDepartmentRelationBean> relationBeans = relationService.getRelationByHospitalId(hospitalId);
+        List<Integer> departmentIds = new ArrayList<Integer>();
+        for (HospitalDepartmentRelationBean relation : relationBeans) {
+            departmentIds.add(relation.getDepartmentId());
+        }
+        return departmentService.getDepartmentsByIds(departmentIds);
     }
 
     public HospitalBean getOneById(Integer id) {
@@ -64,6 +127,9 @@ public class HospitalService {
         return one.get(0);
     }
 
+    //=======================================================
+    //        delete department
+    //=======================================================
     @Transactional
     public HospitalBean deleteById(Integer id) {
         HospitalEntity entity = repository.findOne(id);
@@ -73,6 +139,10 @@ public class HospitalService {
         repository.delete(entity.getId());
         return beanConverter.convert(entity);
     }
+
+    //=======================================================
+    //        update department
+    //=======================================================
 
     @Transactional
     public HospitalBean update(HospitalBean bean) {
@@ -125,10 +195,14 @@ public class HospitalService {
         return update(bean);
     }
 
+    //=======================================================
+    //        create department
+    //=======================================================
+
     @Transactional
     public Integer newOne(HospitalBean bean) {
         String value = bean.getName();
-        if (null==value || "".equals(value)) {
+        if (VerifyUtil.isStringEmpty(value)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         List<HospitalEntity> hospitals = repository.findByName(value);
@@ -157,14 +231,9 @@ public class HospitalService {
         return newOne(bean);
     }
 
-    public List<HospitalDepartmentBean> getAllDepartments(int hospitalId) {
-        List<HospitalDepartmentRelationBean> relationBeans = relationService.getRelationByHospitalId(hospitalId);
-        List<Integer> departmentIds = new ArrayList<Integer>();
-        for (HospitalDepartmentRelationBean relation : relationBeans) {
-            departmentIds.add(relation.getDepartmentId());
-        }
-        return departmentService.getDepartmentsByIds(departmentIds);
-    }
+    //=======================================================
+    //        set relation of hospital and department
+    //=======================================================
 
     @Transactional
     public Integer setHospitalAndDepartmentRelation(int hospitalId, int departId) {

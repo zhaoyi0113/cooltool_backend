@@ -28,7 +28,7 @@ public class NurseHospitalAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response getAll() {
-        List<HospitalBean> all = service.getAll();
+        List<HospitalBean> all = service.getAllHospitalEnable();
         return Response.ok(all).build();
     }
 }

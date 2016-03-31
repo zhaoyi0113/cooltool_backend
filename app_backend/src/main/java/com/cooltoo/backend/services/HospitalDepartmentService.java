@@ -41,10 +41,17 @@ public class HospitalDepartmentService {
     public List<HospitalDepartmentBean> getAll() {
         Iterable<HospitalDepartmentEntity> departments  = repository.findAll();
         List<HospitalDepartmentBean>       departmentsB = new ArrayList<HospitalDepartmentBean>();
-        HospitalDepartmentBean             bean = null;
+        HospitalDepartmentBean             bean         = null;
+        List<Integer>                      topLevelIds  = new ArrayList<Integer>();
         for (HospitalDepartmentEntity department : departments) {
             bean = beanConverter.convert(department);
             departmentsB.add(bean);
+            if (bean.getParentId()<=0) {
+                topLevelIds.add(bean.getId());
+            }
+        }
+        for (HospitalDepartmentBean department : departmentsB) {
+            department.setParentValid(topLevelIds.contains(department.getParentId()));
         }
         addImageUrl(departmentsB);
         return departmentsB;
@@ -68,6 +75,50 @@ public class HospitalDepartmentService {
 
         addImageUrl(departmentsB);
         return departmentsB;
+    }
+
+    public List<HospitalDepartmentBean> getAllTopLevelDepartment() {
+        List<HospitalDepartmentBean> allDepartments = getAll();
+        List<HospitalDepartmentBean> allTopLevels   = new ArrayList<HospitalDepartmentBean>();
+        for(HospitalDepartmentBean department : allDepartments) {
+            if (department.getParentId() <= 0) {
+                allTopLevels.add(department);
+            }
+        }
+        return allTopLevels;
+    }
+
+    public List<HospitalDepartmentBean> getSecondLevelDepartment(int parentId) {
+        List<HospitalDepartmentBean> allDepartments = getAll();
+        List<HospitalDepartmentBean> secondLevels   = new ArrayList<HospitalDepartmentBean>();
+        for(HospitalDepartmentBean department : allDepartments) {
+            if (department.getParentId() == parentId) {
+                secondLevels.add(department);
+            }
+        }
+        return secondLevels;
+    }
+
+    public List<HospitalDepartmentBean> getAllTopLevelDepartmentEnable() {
+        List<HospitalDepartmentBean> topLevelDepartments = getAllTopLevelDepartment();
+        List<HospitalDepartmentBean> allTopLevelEnable   = new ArrayList<HospitalDepartmentBean>();
+        for(HospitalDepartmentBean department : topLevelDepartments) {
+            if (department.getEnable() > 0) {
+                allTopLevelEnable.add(department);
+            }
+        }
+        return allTopLevelEnable;
+    }
+
+    public List<HospitalDepartmentBean> getSecondLevelDepartmentEnable(int parentId) {
+        List<HospitalDepartmentBean> allSecondLevelDepartment = getSecondLevelDepartment(parentId);
+        List<HospitalDepartmentBean> allSecondLevenEnable     = new ArrayList<HospitalDepartmentBean>();
+        for(HospitalDepartmentBean department : allSecondLevelDepartment) {
+            if (department.getEnable() > 0) {
+                allSecondLevenEnable.add(department);
+            }
+        }
+        return allSecondLevenEnable;
     }
 
     private HospitalDepartmentBean addImageUrl(HospitalDepartmentBean department) {
