@@ -57,6 +57,7 @@ dependencies {
     // togglz
     compile('org.togglz:togglz-servlet:'+togglzVersion)
     compile('org.togglz:togglz-cdi:'+togglzVersion)
+    compile('javax.enterprise:cdi-api:2.0-EDR1')
     compile('org.togglz:togglz-spring-web:'+togglzVersion)
     compile("org.togglz:togglz-spring-boot-starter:"+togglzVersion)
     compile("org.togglz:togglz-console:"+togglzVersion)

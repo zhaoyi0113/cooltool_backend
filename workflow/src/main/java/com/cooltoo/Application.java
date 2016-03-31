@@ -9,8 +9,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.togglz.core.manager.EnumBasedFeatureProvider;
+import org.togglz.core.repository.FeatureState;
+import org.togglz.core.repository.StateRepository;
+import org.togglz.core.repository.mem.InMemoryStateRepository;
 import org.togglz.core.spi.FeatureProvider;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -19,6 +24,7 @@ import java.util.logging.Logger;
 @EnableAutoConfiguration
 @Configuration
 @ComponentScan
+@EnableSwagger2
 public class Application {
 
     private static final Logger logger = Logger.getLogger(Application.class.getName());
@@ -26,6 +32,13 @@ public class Application {
     @Bean
     public FeatureProvider featureProvider() {
         return new EnumBasedFeatureProvider(AppFeatures.class);
+    }
+
+    @Bean
+    public StateRepository stateRepository() throws IOException {
+        final InMemoryStateRepository stateRepository = new InMemoryStateRepository();
+        stateRepository.setFeatureState(new FeatureState(AppFeatures.SMS_CODE, true));
+        return stateRepository;
     }
 
     public static void main(String[] args) {

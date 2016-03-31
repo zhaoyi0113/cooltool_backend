@@ -58,19 +58,6 @@ public class JerseyConfiguration extends ResourceConfig {
         register(NurseDepartmentAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
-        configureSwagger();
-    }
-
-    private void configureSwagger() {
-//        BeanConfig beanConfig = new BeanConfig();
-//        beanConfig.setVersion("1.0.2");
-//        beanConfig.setSchemes(new String[]{"http"});
-//        beanConfig.setHost("localhost:8080");
-//        beanConfig.setBasePath("http://localhost:8080/swagger");
-//        beanConfig.setResourcePackage("com.cooltoo.backend.api");
-//        beanConfig.setPrettyPrint(true);
-//        beanConfig.setScan(true);
-
     }
 
 }
