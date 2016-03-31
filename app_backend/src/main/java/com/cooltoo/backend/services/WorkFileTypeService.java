@@ -108,7 +108,7 @@ public class WorkFileTypeService {
             changed = true;
         }
         if (null!=disableImage) {
-            long fileId = storageService.saveFile(workfileType.getImageId(), workfileType.getName(), disableImage);
+            long fileId = storageService.saveFile(workfileType.getDisableImageId(), workfileType.getName(), disableImage);
             workfileType.setDisableImageId(fileId);
             changed=true;
         }

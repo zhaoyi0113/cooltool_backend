@@ -96,7 +96,7 @@ public class SpeakTypeService {
             changed = true;
         }
         if (null!=disableImage) {
-            long fileId = storageService.saveFile(speakType.getImageId(), speakType.getName(), disableImage);
+            long fileId = storageService.saveFile(speakType.getDisableImageId(), speakType.getName(), disableImage);
             speakType.setDisableImageId(fileId);
             changed=true;
         }

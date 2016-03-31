@@ -58,11 +58,15 @@ public class HospitalDepartmentService {
     }
 
     public HospitalDepartmentBean getOneById(Integer id) {
+        HospitalDepartmentBean   bean       = null;
         HospitalDepartmentEntity department = repository.findOne(id);
         if (null == department) {
             return null;
         }
-        return addImageUrl(beanConverter.convert(department));
+        bean = beanConverter.convert(department);
+        department = repository.findOne(bean.getParentId());
+        bean.setParentValid(null!=department);
+        return addImageUrl(bean);
     }
 
     public List<HospitalDepartmentBean> getDepartmentsByIds(List<Integer> ids) {
@@ -231,8 +235,9 @@ public class HospitalDepartmentService {
         }
         logger.info("update department is == " + entity);
         entity = repository.save(entity);
-
-        return addImageUrl(beanConverter.convert(entity));
+        bean = beanConverter.convert(entity);
+        bean.setParentValid(null!=repository.findOne(bean.getParentId()));
+        return addImageUrl(bean);
     }
 
     @Transactional

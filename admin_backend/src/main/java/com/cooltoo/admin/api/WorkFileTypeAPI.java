@@ -59,11 +59,10 @@ public class WorkFileTypeAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editImage(@Context HttpServletRequest request,
                                         @FormDataParam("id") @DefaultValue("-1") int id,
-                                        @FormDataParam("image") InputStream image,
-                                        @FormDataParam("disable_image") InputStream disableImage) {
+                                        @FormDataParam("image") InputStream image) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        logger.info("user : " + userId +" edit work file type enable image : " + (image!=null) + "  disable image: " + (disableImage!=null));
-        workfileTypeService.updateWorkfileType(id, null, -1, -1, -1, image, disableImage);
+        logger.info("user : " + userId +" edit work file type enable image : " + (image!=null));
+        workfileTypeService.updateWorkfileType(id, null, -1, -1, -1, image, null);
         return Response.ok().build();
     }
 
