@@ -15,6 +15,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import javax.ws.rs.ApplicationPath;
+
 /**
  * Created by yzzhao on 2/22/16.
  */
@@ -22,6 +24,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableAutoConfiguration
 @Api(value = "home", description = "Demo API")
+@ApplicationPath("/nursego")
 public class JerseyConfiguration extends ResourceConfig {
 
     public JerseyConfiguration() {
