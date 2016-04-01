@@ -61,18 +61,19 @@ public class JerseyConfiguration extends ResourceConfig {
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 
-//        configureSwagger();
+        configureSwagger();
     }
 
     private void configureSwagger() {
-        register(ApiListingResource.class);
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setVersion("1.0.2");
         beanConfig.setSchemes(new String[]{"http"});
         beanConfig.setHost("localhost:8080");
-        beanConfig.setBasePath("/");
+        beanConfig.setBasePath("/nursego");
         beanConfig.setResourcePackage("com.cooltoo.backend.api");
         beanConfig.setPrettyPrint(true);
         beanConfig.setScan(true);
+        register( io.swagger.jaxrs.listing.ApiListingResource.class );
+        register( io.swagger.jaxrs.listing.SwaggerSerializers.class );
     }
 }

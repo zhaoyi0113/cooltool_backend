@@ -20,7 +20,8 @@ idea.project {
 
 project.ext {
 	springBootVersion = '1.3.2.RELEASE'
-        springfoxSwaggerVersion = '2.4.0'
+    springfoxSwaggerVersion = '2.4.0'
+    togglzVersion = '2.3.0.RC1'
 }
 
 buildscript {

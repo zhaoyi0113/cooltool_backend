@@ -1,7 +1,6 @@
 package com.cooltoo;
 
-import com.cooltoo.config.AppFeatures;
-import io.swagger.jaxrs.config.BeanConfig;
+import com.cooltoo.backend.features.AppFeatures;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,11 +10,19 @@ import org.springframework.context.annotation.Configuration;
 import org.togglz.core.manager.EnumBasedFeatureProvider;
 import org.togglz.core.repository.FeatureState;
 import org.togglz.core.repository.StateRepository;
+import org.togglz.core.repository.file.FileBasedStateRepository;
 import org.togglz.core.repository.mem.InMemoryStateRepository;
+import org.togglz.core.repository.property.PropertyBasedStateRepository;
+import org.togglz.core.repository.property.PropertySource;
 import org.togglz.core.spi.FeatureProvider;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -35,6 +42,14 @@ public class Application {
 
     @Bean
     public StateRepository stateRepository() throws IOException {
+        URL url= getClass().getResource("/application.properties");
+        File file = null;
+        try {
+            file = new File(url.toURI());
+            return new FileBasedStateRepository(file);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         final InMemoryStateRepository stateRepository = new InMemoryStateRepository();
         stateRepository.setFeatureState(new FeatureState(AppFeatures.SMS_CODE, true));
         return stateRepository;
@@ -52,6 +67,7 @@ public class Application {
 //        beanConfig.setScan(true);
 //        return beanConfig;
 //    }
+
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(Application.class, args);
 

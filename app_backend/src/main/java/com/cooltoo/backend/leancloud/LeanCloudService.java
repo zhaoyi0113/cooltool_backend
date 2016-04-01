@@ -1,5 +1,6 @@
 package com.cooltoo.backend.leancloud;
 
+import com.cooltoo.backend.features.AppFeatures;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import org.apache.http.HttpResponse;
@@ -44,7 +45,11 @@ public class LeanCloudService {
 
 
     public void verifySmsCode(String code, String mobile){
-
+        if(!AppFeatures.SMS_CODE.isSMSCodeVerificationEnabled()){
+            logger.info("sms code verify is disabled ");
+            return;
+        }
+        logger.info("sms code verify is enabled");
         HttpClient httpClient = HttpClients.createDefault();
         HttpPost post = new HttpPost(getVerifySmsUrl()+"/"+code+"?"+mobile);
         post.setHeader("X-LC-Id", appId);

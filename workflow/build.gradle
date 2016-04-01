@@ -23,10 +23,7 @@ version = '1.0.0-SNAPSHOT'
 //    version =  '0.1.0'
 //}
 
-ext{
-    springfoxSwaggerVersion = '2.4.0'
-    togglzVersion = '2.3.0.RC1'
-}
+
 dependencies {
 
 
@@ -54,15 +51,7 @@ dependencies {
     // end::actuator[]
     compile("org.flywaydb:flyway-core")
 
-    // togglz
-    compile('org.togglz:togglz-servlet:'+togglzVersion)
-    compile('org.togglz:togglz-cdi:'+togglzVersion)
-    compile('javax.enterprise:cdi-api:2.0-EDR1')
-    compile('org.togglz:togglz-spring-web:'+togglzVersion)
-    compile("org.togglz:togglz-spring-boot-starter:"+togglzVersion)
-    compile("org.togglz:togglz-console:"+togglzVersion)
-    compile("org.togglz:togglz-spring-security:"+togglzVersion)
-    compile("com.github.heneke.thymeleaf:thymeleaf-extras-togglz:1.0.1.RELEASE")
+
 //
     testCompile("junit:junit")
     testCompile("org.springframework:spring-test")
