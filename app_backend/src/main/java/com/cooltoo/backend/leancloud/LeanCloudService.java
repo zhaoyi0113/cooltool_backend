@@ -4,9 +4,7 @@ import com.cooltoo.backend.features.AppFeatures;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +15,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.client.HttpClient;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by yzzhao on 3/19/16.
@@ -45,7 +41,7 @@ public class LeanCloudService {
 
 
     public void verifySmsCode(String code, String mobile){
-        if(!AppFeatures.SMS_CODE.isSMSCodeVerificationEnabled()){
+        if(!AppFeatures.SMS_CODE.isActive()){
             logger.info("sms code verify is disabled ");
             return;
         }

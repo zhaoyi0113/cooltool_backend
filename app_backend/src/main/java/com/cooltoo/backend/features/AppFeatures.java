@@ -18,7 +18,7 @@ public enum AppFeatures implements Feature {
     SMS_CODE;
 
 
-    public boolean isSMSCodeVerificationEnabled(){
+    public boolean isActive(){
         return FeatureContext.getFeatureManager().isActive(this);
     }
 }
