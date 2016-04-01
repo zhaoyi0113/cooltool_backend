@@ -51,6 +51,21 @@ public class NurseSkillNominationService {
         // get user's skill
         List<NurseOccupationSkillBean> nurseSkills = nurseSkillService.getAllSkills(userId);
 
+        List<NurseSkillNominationBean> retVal = getAllNominationBeans(userId, nurseSkills);
+
+        return retVal;
+    }
+
+
+    public List<NurseSkillNominationBean> getAllNominationBeans(long userId, List<NurseOccupationSkillBean> nurseSkills) {
+        // is Nurse exist
+        validateNurse(userId);
+
+        // check user's skill
+        if (null==nurseSkills) {
+            nurseSkills=new ArrayList<NurseOccupationSkillBean>();
+        }
+
         // get all user's skill nomination
         List<NurseSkillNominationEntity> allNoms   = nominationRepository.findByUserId(userId);
 
@@ -91,6 +106,51 @@ public class NurseSkillNominationService {
         }
 
         return nominationCount;
+    }
+
+    public NurseSkillNominationBean getNominationBean(long userId, int skillId) {
+
+        // is Nurse exist
+        validateNurse(userId);
+
+        // get user's skill
+        NurseOccupationSkillBean nurseSkill = nurseSkillService.getSkill(userId, skillId);
+
+        NurseSkillNominationBean nomination = getNominationBean(userId, skillId, nurseSkill);
+        return nomination;
+    }
+
+    public NurseSkillNominationBean getNominationBean(long userId, int skillId, NurseOccupationSkillBean nurseSkill) {
+
+        // is Nurse exist
+        validateNurse(userId);
+
+        // get all user's skill nomination
+        List<NurseSkillNominationEntity> allNoms   = nominationRepository.findByUserId(userId);
+
+        // construct all user's skill nomination count
+
+        NurseSkillNominationBean nomination     = null;
+        nomination     = new NurseSkillNominationBean();
+        if (null!=nurseSkill) {
+            nomination.setSkillId(nurseSkill.getSkill().getId());
+            nomination.setSkillType(nurseSkill.getSkill().getType());
+            nomination.setSkillName(nurseSkill.getSkill().getName());
+            nomination.setSkillImageUrl(nurseSkill.getSkill().getImageUrl());
+            nomination.setSkillDisableImageUrl(nurseSkill.getSkill().getDisableImageUrl());
+            nomination.setSkillNominateCount(0);
+
+            int count = 0;
+            for (NurseSkillNominationEntity nomin : allNoms) {
+                if (nomin.getSkillId() != nurseSkill.getSkill().getId()){
+                    continue;
+                }
+                count++;
+            }
+            nomination.setSkillNominateCount(count);
+        }
+
+        return nomination;
     }
 
     public List<NurseSkillNominationBean> getSkillNominationBeans(long userId) {

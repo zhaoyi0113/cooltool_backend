@@ -22,6 +22,7 @@ public class NurseQualificationBean {
     private VetStatus status;
     private String statusDescr;
     private Date timeCreated;
+    private Date timeExpiry;
 
     public long getId() {
         return id;
@@ -101,6 +102,14 @@ public class NurseQualificationBean {
 
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    public Date getTimeExpiry() {
+        return this.timeExpiry;
+    }
+
+    public void setTimeExpiry(Date timeExpiry) {
+        this.timeExpiry = timeExpiry;
     }
 
     public String toString() {

@@ -22,6 +22,7 @@ public class NurseQualificationBeanConverter implements Converter<NurseQualifica
         bean.setStatus(source.getStatus());
         bean.setStatusDescr(source.getStatusDesc());
         bean.setTimeCreated(source.getTimeCreated());
+        bean.setTimeExpiry(source.getTimeExpiry());
         return bean;
 
     }

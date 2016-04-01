@@ -9,7 +9,7 @@ public class NurseOccupationSkillBean {
     private int skillId;
     private int point;
     private OccupationSkillBean skill;
-
+    private NurseSkillNominationBean nomination;
 
     public int getId() {
         return id;
@@ -49,6 +49,14 @@ public class NurseOccupationSkillBean {
 
     public void setSkill(OccupationSkillBean skill) {
         this.skill = skill;
+    }
+
+    public NurseSkillNominationBean getNomination() {
+        return this.nomination;
+    }
+
+    public void setNomination(NurseSkillNominationBean nomination) {
+        this.nomination = nomination;
     }
 
     public String toString() {

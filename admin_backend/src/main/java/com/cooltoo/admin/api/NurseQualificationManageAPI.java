@@ -95,7 +95,9 @@ public class NurseQualificationManageAPI {
             expiryTime = new Date(millisecond);
         }
         if (VerifyUtil.isStringEmpty(fileName)) {
-            fileName = disposition.getFileName();
+            if (null!=disposition) {
+                fileName = disposition.getFileName();
+            }
         }
         NurseQualificationBean bean = qualificationService.updateNurseQualification(id, null, null, fileName, file, null, null, expiryTime);
         return Response.ok(bean).build();

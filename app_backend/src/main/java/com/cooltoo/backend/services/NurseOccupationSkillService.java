@@ -1,6 +1,7 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseOccupationSkillBean;
+import com.cooltoo.backend.beans.NurseSkillNominationBean;
 import com.cooltoo.backend.beans.OccupationSkillBean;
 import com.cooltoo.backend.converter.NurseOccupationSkillBeanConverter;
 import com.cooltoo.backend.entities.NurseOccupationSkillEntity;
@@ -26,13 +27,12 @@ public class NurseOccupationSkillService {
 
     @Autowired
     private NurseOccupationSkillRepository nurseSkillRepository;
-
     @Autowired
     private NurseService nurseService;
-
     @Autowired
     private OccupationSkillService skillService;
-
+    @Autowired
+    private NurseSkillNominationService nominationService;
     @Autowired
     private NurseOccupationSkillBeanConverter beanConverter;
 
@@ -42,6 +42,7 @@ public class NurseOccupationSkillService {
     //===============================================================
 
     public List<NurseOccupationSkillBean> getAllSkills(long userId) {
+
         List<OccupationSkillBean> skillsB = skillService.getOccupationSkillList();
         List<NurseOccupationSkillEntity> nurseSkillsE = nurseSkillRepository.findSkillRelationByUserId(userId, sort);
         List<NurseOccupationSkillBean> nurseSkillsB = new ArrayList<NurseOccupationSkillBean>();
@@ -57,6 +58,17 @@ public class NurseOccupationSkillService {
                 }
             }
         }
+
+        List<NurseSkillNominationBean> allSkillNominations = nominationService.getAllNominationBeans(userId, nurseSkillsB);
+        for (NurseOccupationSkillBean nurseSkillB : nurseSkillsB) {
+            for (NurseSkillNominationBean nomination : allSkillNominations) {
+                if (nomination.getSkillId()==nurseSkillB.getSkillId()) {
+                    nurseSkillB.setNomination(nomination);
+                    break;
+                }
+            }
+        }
+
         return nurseSkillsB;
     }
 
@@ -72,6 +84,9 @@ public class NurseOccupationSkillService {
          if (null!=skillB) {
             nurseSkillB.setSkill(skillB);
         }
+
+        NurseSkillNominationBean nomination = nominationService.getNominationBean(userId, occupationSkillId, nurseSkillB);
+        nurseSkillB.setNomination(nomination);
 
         return nurseSkillB;
     }

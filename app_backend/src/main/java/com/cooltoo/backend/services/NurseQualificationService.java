@@ -262,9 +262,6 @@ public class NurseQualificationService {
 
     public NurseQualificationBean updateNurseQualification(long id, String name, WorkFileTypeBean fileType, String fileName, InputStream file, VetStatus status, String statusDescr, Date expiryTime) {
         logger.info("update nurse qualification file type is : " + fileType);
-        if (null==fileType) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
-        }
 
         NurseQualificationEntity entity = workfileRepository.findOne(id);
         if (null==entity) {
@@ -282,8 +279,13 @@ public class NurseQualificationService {
         String fileUrl = null;
         if (null!=file && !VerifyUtil.isStringEmpty(fileName)) {
             long fileId = storageService.saveFile(entity.getWorkFileId(), fileName, file);
-            fileUrl = storageService.getFilePath(fileId);
-            entity.setWorkFileId(fileId);
+            if (fileId>0) {
+                fileUrl = storageService.getFilePath(fileId);
+                entity.setWorkFileId(fileId);
+            }
+            else {
+                throw new BadRequestException(ErrorCode.WORK_FILE_UPLOAD_FAILED);
+            }
         }
         if (!VerifyUtil.isStringEmpty(statusDescr)) {
             entity.setStatusDesc(statusDescr);
