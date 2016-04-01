@@ -53,26 +53,4 @@ public class NurseHospitalRelationServiceTest extends AbstractCooltooTest {
         NurseHospitalRelationBean one = service.getOneById(33L);
         Assert.assertEquals(33, one.getId());
     }
-
-    @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_hospital_relation_data.xml")
-    public void testDeleteById() {
-        NurseHospitalRelationBean bean = service.deleteById(22L);
-        Assert.assertEquals(22, bean.getId());
-    }
-
-    @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_hospital_relation_data.xml")
-    public void testDeleteByUpdate() {
-        NurseHospitalRelationBean bean = service.update(11, 22, 33, 44);
-        Assert.assertEquals(11, bean.getId());
-        Assert.assertEquals(22, bean.getNurseId());
-        Assert.assertEquals(33, bean.getHospitalId());
-        Assert.assertEquals(44, bean.getDepartmentId());
-
-        bean.setDepartmentId(22);
-        bean =  service.update(bean);
-        Assert.assertEquals(11, bean.getId());
-        Assert.assertEquals(22, bean.getDepartmentId());
-    }
 }

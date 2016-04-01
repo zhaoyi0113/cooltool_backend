@@ -1,11 +1,14 @@
 package com.cooltoo.backend.services;
 
+import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.converter.NurseHospitalRelationBeanConverter;
 import com.cooltoo.backend.converter.NurseHospitalRelationEntityConverter;
 import com.cooltoo.backend.entities.NurseHospitalRelationEntity;
 import com.cooltoo.backend.repository.HospitalDepartmentRepository;
 import com.cooltoo.backend.repository.HospitalRepository;
 import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -26,11 +29,11 @@ public class NurseHospitalRelationService {
     @Autowired
     private NurseHospitalRelationRepository repository;
     @Autowired
-    private NurseRepository nurseRepository;
+    private NurseService nurseService;
     @Autowired
-    private HospitalRepository hospitalRepository;
+    private HospitalService hospitalService;
     @Autowired
-    private HospitalDepartmentRepository departmentRepository;
+    private HospitalDepartmentService departmentService;
     @Autowired
     private NurseHospitalRelationBeanConverter beanConverter;
     @Autowired
@@ -54,56 +57,59 @@ public class NurseHospitalRelationService {
         return beanConverter.convert(entity);
     }
 
-    @Transactional
-    public NurseHospitalRelationBean deleteById(Long id) {
-        NurseHospitalRelationEntity entity = repository.findOne(id);
-        if (null==entity) {
+    public NurseHospitalRelationBean getRelationByNurseId(Long nurseId) {
+        NurseHospitalRelationBean relation = null;
+        HospitalBean              hospital     = null;
+        HospitalDepartmentBean    department   = null;
+        HospitalDepartmentBean    parentDepart = null;
+
+        List<NurseHospitalRelationEntity> relations = repository.findByNurseId(nurseId);
+        if (null==relations || relations.isEmpty()) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        repository.delete(id);
-        return beanConverter.convert(entity);
-    }
+        if (relations.size()>1) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
 
-    @Transactional
-    public NurseHospitalRelationBean update(NurseHospitalRelationBean bean) {
-        if (!repository.exists(bean.getId())) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        relation = beanConverter.convert(relations.get(0));
+        if (relation.getHospitalId()>0) {
+            hospital = hospitalService.getOneById(relation.getHospitalId());
+            relation.setHospital(hospital);
         }
-        if (!nurseRepository.exists(bean.getNurseId())) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+        if (relation.getDepartmentId()>0) {
+            department = departmentService.getOneById(relation.getDepartmentId());
+            relation.setDepartment(department);
+            if (department.getParentValid()) {
+                parentDepart = departmentService.getOneById(relation.getDepartmentId());
+                relation.setParentDepart(parentDepart);
+            }
         }
-        if (!hospitalRepository.exists(bean.getHospitalId())) {
-            throw new BadRequestException(ErrorCode.HOSPITAL_NOT_EXIST);
-        }
-        if (!departmentRepository.exists(bean.getDepartmentId())) {
-            throw new BadRequestException(ErrorCode.HOSPITAL_DEPARTMENT_NOT_EXIST);
-        }
-        NurseHospitalRelationEntity entity = entityConverter.convert(bean);
-        entity = repository.save(entity);
-        return beanConverter.convert(entity);
-    }
 
-    @Transactional
-    public NurseHospitalRelationBean update(long id, long nurseId, int hospitalId, int departmentId) {
-        NurseHospitalRelationBean bean = new NurseHospitalRelationBean();
-        bean.setId(id);
-        bean.setNurseId(nurseId);
-        bean.setHospitalId(hospitalId);
-        bean.setDepartmentId(departmentId);
-        return update(bean);
+        return relation;
     }
 
     @Transactional
     public Long newOne(NurseHospitalRelationBean bean) {
-        if (!nurseRepository.exists(bean.getNurseId())) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+        HospitalBean           hospital     = null;
+        HospitalDepartmentBean department   = null;
+        HospitalDepartmentBean parentDepart = null;
+
+        nurseService.getNurse(bean.getNurseId());
+        if (bean.getHospitalId()>0) {
+            hospitalService.getOneById(bean.getHospitalId());
         }
-        if (!hospitalRepository.exists(bean.getHospitalId())) {
-            throw new BadRequestException(ErrorCode.HOSPITAL_NOT_EXIST);
+        if (bean.getDepartmentId()>0) {
+            department = departmentService.getOneById(bean.getDepartmentId());
+            if (department.getParentValid()) {
+                parentDepart = departmentService.getOneById(bean.getDepartmentId());
+            }
         }
-        if (!departmentRepository.exists(bean.getDepartmentId())) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+
+        List<NurseHospitalRelationEntity> relations = repository.findByNurseId(bean.getNurseId());
+        if (!relations.isEmpty()) {
+            repository.delete(relations);
         }
+
         NurseHospitalRelationEntity entity = entityConverter.convert(bean);
         entity = repository.save(entity);
         return entity.getId();

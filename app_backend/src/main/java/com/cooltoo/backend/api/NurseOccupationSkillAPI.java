@@ -70,28 +70,4 @@ public class NurseOccupationSkillAPI {
         skillService.addSkills(userId, skillIds);
         return Response.ok(skillIds).build();
     }
-
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
-    public Response deleteSkill(
-            @Context HttpServletRequest request,
-            @FormParam("skill_id") int skillId
-    ) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        skillService.removeSkill(userId, skillId);
-        return Response.ok(skillId).build();
-    }
-
-    @DELETE
-    @Path("/{id}")
-    @LoginAuthentication(requireNurseLogin = true)
-    public Response deleteSkillById(
-            @Context HttpServletRequest request,
-            @PathParam("id") int id
-    ) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        skillService.removeSkill(id);
-        return Response.ok(id).build();
-    }
 }

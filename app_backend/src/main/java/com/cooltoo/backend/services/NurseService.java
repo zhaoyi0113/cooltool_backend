@@ -88,7 +88,7 @@ public class NurseService {
     public NurseBean getNurse(long id) {
         NurseEntity entity = repository.findOne(id);
         if (null == entity) {
-            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
+            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
         NurseBean nurse = beanConverter.convert(entity);
         int friendsCount = friendsService.getFriendsCount(id);
@@ -223,20 +223,8 @@ public class NurseService {
     }
 
     @Transactional
-    public NurseQualificationBean updateNurseWorkFile(long id, String fileName, InputStream workFile) {
-        NurseQualificationBean bean = qualificationService.updateNurseWorkFile(id, null, fileName, workFile, VetStatus.WAITING);
-        return bean;
-    }
-
-    @Transactional
-    public NurseQualificationBean addNurseWorkFile(long id, String name, String workFileName, InputStream workFile) {
-        NurseQualificationBean bean = qualificationService.addNurseWorkFile(id, name, workFileName, workFile);
-        return bean;
-    }
-
-    @Transactional
-    public NurseQualificationBean addNurseIdentification(long id, String name, String idFileName, InputStream idFile) {
-        NurseQualificationBean bean = qualificationService.addNurseIdentificationFile(id, name, idFileName, idFile);
+    public NurseQualificationBean addWorkFile(long id, String name, String workFileType, String idFileName, InputStream idFile) {
+        NurseQualificationBean bean = qualificationService.addWorkFile(id, name, workFileType, idFileName, idFile);
         return bean;
     }
 

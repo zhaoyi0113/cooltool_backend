@@ -5,6 +5,7 @@ import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.util.VerifyUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +26,6 @@ import java.util.logging.Logger;
  * Created by lg380357 on 2016/3/2.
  */
 @Path("/nurse")
-//@LoginAuthentication(requireNurseLogin = true)
 public class NurseAPI {
 
     private static final Logger logger = Logger.getLogger(NurseAPI.class.getName());
@@ -174,7 +174,7 @@ public class NurseAPI {
     }
 
     @POST
-    @Path("/qualification/realname_identification")
+    @Path("/realname_identification")
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response setRealNameAndIdentification(
@@ -185,76 +185,6 @@ public class NurseAPI {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean one = service.setRealNameAndIdentification(userId, realName, identification);
         logger.info("set real name and identification " + one);
-        if (null == one) {
-            return Response.ok().build();
-        }
-        return Response.ok(one).build();
-    }
-
-
-    @POST
-    @Path("/qualification/work_file")
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
-    public Response addNurseWorkFile(
-            @Context HttpServletRequest request,
-            @FormDataParam("name") String name,
-            @FormDataParam("file_name") String fileName,
-            @FormDataParam("file") InputStream fileInputStream,
-            @FormDataParam("file") FormDataContentDisposition disposition
-    ) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        if (VerifyUtil.isStringEmpty(fileName)) {
-            fileName = disposition.getFileName();
-        }
-        NurseQualificationBean one = service.addNurseWorkFile(userId, name, fileName, fileInputStream);
-        logger.info("add qualification work file : " + one);
-        if (null == one) {
-            return Response.ok().build();
-        }
-        return Response.ok(one).build();
-    }
-
-    @POST
-    @Path("/qualification/edit_work_file")
-    @LoginAuthentication(requireNurseLogin = true)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response editNurseWorkFile(
-            @Context HttpServletRequest request,
-            @FormDataParam("id") long id,
-            @FormDataParam("file_name") String fileName,
-            @FormDataParam("file") InputStream fileInputStream,
-            @FormDataParam("file") FormDataContentDisposition disposition
-    ) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        if (VerifyUtil.isStringEmpty(fileName)) {
-            fileName = disposition.getFileName();
-        }
-        NurseQualificationBean one = service.updateNurseWorkFile(id, fileName, fileInputStream);
-        logger.info("update qualification work file : " + one);
-        if (null == one) {
-            return Response.ok().build();
-        }
-        return Response.ok(one).build();
-    }
-
-    @POST
-    @Path("/qualification/id_file")
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
-    public Response addNurseIdentificationFile(
-            @Context HttpServletRequest request,
-            @FormDataParam("name") String name,
-            @FormDataParam("file_name") String fileName,
-            @FormDataParam("file") InputStream fileInputStream,
-            @FormDataParam("file") FormDataContentDisposition disposition
-    ) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        if (VerifyUtil.isStringEmpty(fileName)) {
-            fileName = disposition.getFileName();
-        }
-        NurseQualificationBean one = service.addNurseIdentification(userId, name, fileName, fileInputStream);
-        logger.info("add identification file : " + one);
         if (null == one) {
             return Response.ok().build();
         }

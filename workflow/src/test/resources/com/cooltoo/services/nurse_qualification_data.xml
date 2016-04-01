@@ -11,7 +11,7 @@
     <nurse_qualification id="7" name="工作证" user_id="2" work_file_type="3" work_file_id="7" status="2" create_time="2015-12-12 12:12:12" />
 
     <nurse id="1"  name="name1" age="11" gender="1" mobile="1231432143" password="aa" profile_photo_id="1" background_image_id="1" />
-    <nurse id="2" name="name2" age="22" gender="2" mobile="14321134" password="aa" profile_photo_id="1" background_image_id="1" />
+    <nurse id="2"  name="name2" age="22" gender="2" mobile="14321134" password="aa" profile_photo_id="1" background_image_id="1" />
     <nurse id="3"  name="name3" age="33" gender="1" mobile="135232121222" password="aa" profile_photo_id="1" background_image_id="1" />
     <nurse id="4"  name="name4" age="44" gender="2" mobile="13811663451" password="aa" profile_photo_id="1" background_image_id="1" />
     <nurse id="5"  name="name5" age="55" gender="1" mobile="18527727387" password="aa" profile_photo_id="1" background_image_id="1" />
@@ -30,5 +30,5 @@
 
     <workfile_type id="1" name="UNKNOW"         type="0" factor="10" max_file_count="20" min_file_count="0" image_id="1" disable_image_id="2" />
     <workfile_type id="2" name="IDENTIFICATION" type="1" factor="15" max_file_count="2"  min_file_count="2" image_id="1" disable_image_id="2" />
-    <workfile_type id="3" name="WORK_FILE"      type="2" factor="20" max_file_count="20" min_file_count="1" image_id="1" disable_image_id="2" />
+    <workfile_type id="3" name="EMPLOYEES_CARD" type="2" factor="20" max_file_count="20" min_file_count="1" image_id="1" disable_image_id="2" />
 </dataset>

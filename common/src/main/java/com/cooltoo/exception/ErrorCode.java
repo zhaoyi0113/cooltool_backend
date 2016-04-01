@@ -58,7 +58,8 @@ public enum ErrorCode {
     SKILL_NAME_IS_NULL(247, Response.Status.BAD_REQUEST, "技能名称为空字符串", "Skill name is empty"),
     SKILL_TYPE_INVALID(248, Response.Status.BAD_REQUEST, "无效的技能类型", "Skill type is invalid"),
     NOMINATION_CAN_NOT_FOR_SELF(249, Response.Status.BAD_REQUEST, "不可以给自己提名", "Can not nominate for self"),
-    NURSE_DONT_HAVE_SKILL(250, Response.Status.BAD_REQUEST, "护士没有此技能", "Nurse do not have this skill");
+    NURSE_DONT_HAVE_SKILL(250, Response.Status.BAD_REQUEST, "护士没有此技能", "Nurse do not have this skill"),
+    WORK_FILE_UPLOAD_FAILED(251, Response.Status.BAD_REQUEST, "工作证上传失败", "Upload work file Nurse do not have this skill");
 
     private final int code;
 

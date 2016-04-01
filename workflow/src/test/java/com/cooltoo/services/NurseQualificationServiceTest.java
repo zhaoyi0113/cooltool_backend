@@ -31,12 +31,33 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_qualification_data.xml")
     public void testNurseQualificationOK() {
-        boolean isOk = false;
-        isOk = qualService.isNurseQualificationOk(3);
+        boolean isOk;
+        isOk = true;
+        List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(3);
+        for (NurseQualificationBean bean : qualifications) {
+            if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
+                isOk = false;
+                break;
+            }
+        }
         Assert.assertTrue(isOk);
-        isOk = qualService.isNurseQualificationOk(2);
+        isOk = true;
+        qualifications = qualService.getAllNurseQualifications(2);
+        for (NurseQualificationBean bean : qualifications) {
+            if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
+                isOk = false;
+                break;
+            }
+        }
         Assert.assertFalse(isOk);
-        isOk = qualService.isNurseQualificationOk(1);
+        isOk = true;
+        qualifications = qualService.getAllNurseQualifications(1);
+        for (NurseQualificationBean bean : qualifications) {
+            if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
+                isOk = false;
+                break;
+            }
+        }
         Assert.assertFalse(isOk);
     }
 
@@ -48,10 +69,10 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         ByteArrayInputStream byteInput = new ByteArrayInputStream(content.getBytes());
         Date time = new Date();
 
-        WorkFileTypeBean workFileType = qualService.getWorkFileTypeBean(WorkFileType.WORK_FILE.name());
+        WorkFileTypeBean workFileType = qualService.getWorkFileTypeBean(WorkFileType.EMPLOYEES_CARD.name());
 
         NurseQualificationBean bean = null;
-        bean = qualService.addNurseWorkFile(4, name, "aaa.png", byteInput);
+        bean = qualService.addWorkFile(4, name, WorkFileType.EMPLOYEES_CARD.name(), "aaa.png", byteInput);
         System.out.println("add work file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
@@ -62,7 +83,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
         workFileType = qualService.getWorkFileTypeBean(WorkFileType.IDENTIFICATION.name());
         name = "Identi2";
-        bean = qualService.addNurseIdentificationFile(4, name, "aaa.png", byteInput);
+        bean = qualService.addWorkFile(4, name, workFileType.getName(), "aaa.png", byteInput);
         System.out.println("add identification file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
@@ -77,29 +98,32 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_qualification_data.xml")
     public void testUpdateNurseQualification() {
         List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(1);
-        boolean isOk = false;
-
-        WorkFileTypeBean workFileType = qualService.getWorkFileTypeBean(WorkFileType.WORK_FILE.name());
-
-        isOk = qualService.isNurseQualificationOk(1);
+        boolean isOk = true;
+        for (NurseQualificationBean bean : qualifications) {
+            if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
+                isOk = false;
+                break;
+            }
+        }
         Assert.assertFalse(isOk);
+
         for (NurseQualificationBean bean : qualifications) {
             System.out.println(bean);
             if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
-                if (workFileType.getId() == bean.getWorkFileType()) {
-                    qualService.updateNurseWorkFile(bean.getId(), bean.getName(), null, null, VetStatus.COMPLETED);
-                }
-                else {
-                    qualService.updateNurseIdentificationFile(bean.getId(), bean.getName(), null, null, VetStatus.COMPLETED);
-                }
+                qualService.updateWorkFile(bean.getId(), null, bean.getName(), null, null, VetStatus.COMPLETED, null, null);
             }
         }
+        System.out.println();
+        System.out.println();
         qualifications = qualService.getAllNurseQualifications(1);
+        isOk = true;
         for (NurseQualificationBean bean : qualifications) {
             System.out.println(bean);
+            if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
+                isOk = false;
+                break;
+            }
         }
-
-        isOk = qualService.isNurseQualificationOk(1);
         Assert.assertTrue(isOk);
     }
 

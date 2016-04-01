@@ -78,4 +78,24 @@ public class OccupationSkillManageAPI {
         skillService.editOccupationSkillWithoutImage(id, name, type, factor);
         return Response.ok().build();
     }
+
+    @POST
+    @Path("/edit_image")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editOccupationSkillEnableImage(@FormDataParam("id") int id,
+                                                   @FormDataParam("file") InputStream image) {
+        skillService.editOccupationSkill(id, null, null, -1, image, null);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/edit_disable_image")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editOccupationSkillDisableImage(@FormDataParam("id") int id,
+                                                    @FormDataParam("file") InputStream image) {
+        skillService.editOccupationSkill(id, null, null, -1, null, image);
+        return Response.ok().build();
+    }
 }

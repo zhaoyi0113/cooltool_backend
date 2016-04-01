@@ -9,6 +9,9 @@ public class NurseHospitalRelationBean {
     private long nurseId;
     private int hospitalId;
     private int departmentId;
+    private HospitalBean hospital;
+    private HospitalDepartmentBean department;
+    private HospitalDepartmentBean parentDepart;
 
     public long getId() {
         return id;
@@ -40,6 +43,30 @@ public class NurseHospitalRelationBean {
 
     public void setDepartmentId(int departmentId) {
         this.departmentId = departmentId;
+    }
+
+    public HospitalBean getHospital() {
+        return this.hospital;
+    }
+
+    public void setHospital(HospitalBean hospital) {
+        this.hospital = hospital;
+    }
+
+    public HospitalDepartmentBean getDepartment() {
+        return this.department;
+    }
+
+    public void setDepartment(HospitalDepartmentBean department) {
+        this.department = department;
+    }
+
+    public HospitalDepartmentBean getParentDepart() {
+        return this.parentDepart;
+    }
+
+    public void setParentDepart(HospitalDepartmentBean parentDepart) {
+        this.parentDepart = parentDepart;
     }
 
     public String toString() {

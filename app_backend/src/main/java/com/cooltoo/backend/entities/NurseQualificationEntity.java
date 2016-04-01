@@ -12,15 +12,17 @@ import java.util.Date;
 @Entity
 @Table(name = "nurse_qualification")
 public class NurseQualificationEntity {
-    private long id;
-    private String name;
-    private long userId;
+    private long      id;
+    private String    name;
+    private long      userId;
     /** the id of workfile_type  */
-    private int workFileType;
+    private int       workFileType;
     /* this id is in storage_file key id */
-    private long workFileId;
+    private long      workFileId;
     private VetStatus status;
-    private Date timeCreated;
+    private String    statusDesc;
+    private Date      timeCreated;
+    private Date      timeExpiry;
 
     @Id
     @GeneratedValue
@@ -79,6 +81,15 @@ public class NurseQualificationEntity {
         this.status = status;
     }
 
+    @Column(name = "status_description")
+    public String getStatusDesc() {
+        return this.statusDesc;
+    }
+
+    public void setStatusDesc(String statusDesc) {
+        this.statusDesc = statusDesc;
+    }
+
     @Column(name = "create_time")
     public Date getTimeCreated() {
         return timeCreated;
@@ -86,6 +97,15 @@ public class NurseQualificationEntity {
 
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    @Column(name = "expiry_time")
+    public Date getTimeExpiry() {
+        return this.timeExpiry;
+    }
+
+    public void setTimeExpiry(Date timeExpiry) {
+        this.timeExpiry = timeExpiry;
     }
 
     public String toString() {
@@ -97,6 +117,8 @@ public class NurseQualificationEntity {
         msg.append("workFileType=").append(workFileType).append(" , ");
         msg.append("workFileId=").append(workFileId).append(" , ");
         msg.append("status=").append(status).append(" , ");
+        msg.append("statusDesc=").append(statusDesc).append(" , ");
+        msg.append("timeExpiry=").append(timeExpiry).append(" , ");
         msg.append("timeCreated=").append(timeCreated);
         msg.append("]");
         return msg.toString();

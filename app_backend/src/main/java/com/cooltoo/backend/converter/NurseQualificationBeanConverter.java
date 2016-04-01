@@ -20,6 +20,7 @@ public class NurseQualificationBeanConverter implements Converter<NurseQualifica
         bean.setWorkFileType(source.getWorkFileType());
         bean.setWorkFileId(source.getWorkFileId());
         bean.setStatus(source.getStatus());
+        bean.setStatusDescr(source.getStatusDesc());
         bean.setTimeCreated(source.getTimeCreated());
         return bean;
 

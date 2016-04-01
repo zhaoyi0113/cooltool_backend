@@ -118,7 +118,7 @@ public class HospitalService {
     public HospitalBean getOneById(Integer id) {
         HospitalEntity entity = repository.findOne(id);
         if (null == entity) {
-            return null;
+            throw new BadRequestException(ErrorCode.HOSPITAL_NOT_EXIST);
         }
         HospitalBean bean = beanConverter.convert(entity);
         List<HospitalBean> one = new ArrayList<HospitalBean>();

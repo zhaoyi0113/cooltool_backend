@@ -20,6 +20,7 @@ public class NurseQualificationBean {
     private long workFileId;
     private String workFileURL;
     private VetStatus status;
+    private String statusDescr;
     private Date timeCreated;
 
     public long getId() {
@@ -84,6 +85,14 @@ public class NurseQualificationBean {
 
     public void setStatus(VetStatus status) {
         this.status = status;
+    }
+
+    public String getStatusDescr() {
+        return this.statusDescr;
+    }
+
+    public void setStatusDescr(String statusDescr) {
+        this.statusDescr = statusDescr;
     }
 
     public Date getTimeCreated() {

@@ -61,7 +61,7 @@ public class HospitalDepartmentService {
         HospitalDepartmentBean   bean       = null;
         HospitalDepartmentEntity department = repository.findOne(id);
         if (null == department) {
-            return null;
+            throw new BadRequestException(ErrorCode.HOSPITAL_DEPARTMENT_NOT_EXIST);
         }
         bean = beanConverter.convert(department);
         department = repository.findOne(bean.getParentId());

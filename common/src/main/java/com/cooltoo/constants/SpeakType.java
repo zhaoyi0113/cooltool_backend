@@ -1,6 +1,9 @@
 package com.cooltoo.constants;
 
 /**
+ * 该枚举是 speak_type 数据表的映射.
+ * 数据表中的 type 字段的值与该枚举的值一一对应.
+ *
  * Created by Test111 on 2016/3/17.
  */
 public enum SpeakType {
