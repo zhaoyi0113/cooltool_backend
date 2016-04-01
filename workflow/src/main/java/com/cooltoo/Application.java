@@ -1,12 +1,12 @@
 package com.cooltoo;
 
 import com.cooltoo.config.AppFeatures;
+import io.swagger.jaxrs.config.BeanConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.togglz.core.manager.EnumBasedFeatureProvider;
 import org.togglz.core.repository.FeatureState;
@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 @SpringBootApplication
 @EnableAutoConfiguration
 @Configuration
-@ComponentScan
 @EnableSwagger2
 public class Application {
 
@@ -41,6 +40,18 @@ public class Application {
         return stateRepository;
     }
 
+
+//    @Bean
+//    public BeanConfig beanConfig(){
+//        BeanConfig beanConfig = new BeanConfig();
+//        beanConfig.setVersion("1.0.2");
+//        beanConfig.setSchemes(new String[]{"http"});
+//        beanConfig.setHost("localhost:8080");
+//        beanConfig.setBasePath("/nursego");
+//        beanConfig.setResourcePackage("com.cooltoo");
+//        beanConfig.setScan(true);
+//        return beanConfig;
+//    }
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(Application.class, args);
 
