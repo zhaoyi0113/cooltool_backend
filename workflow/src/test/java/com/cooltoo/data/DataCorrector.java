@@ -5,6 +5,7 @@ import com.cooltoo.backend.entities.NurseFriendsEntity;
 import com.cooltoo.backend.repository.NurseFriendsRepository;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import java.util.List;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebAppConfiguration
+@Ignore
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionDbUnitTestExecutionListener.class})
