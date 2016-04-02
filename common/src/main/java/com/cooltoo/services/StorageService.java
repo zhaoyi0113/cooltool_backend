@@ -158,6 +158,7 @@ public class StorageService {
         FileOutputStream output = new FileOutputStream(file);
         while (read > 0) {
             output.write(buffer, 0, read);
+            logger.info("write buffer "+read);
             read = input.read(buffer);
         }
         output.close();
