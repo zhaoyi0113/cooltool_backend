@@ -237,7 +237,7 @@ public class NurseService {
     @Transactional
     public NurseBean updateMobilePassword(long id, String smsCode, String newMobile, String password, String newPassword) {
         logger.info("modify the password and mobile : [smsCode"+smsCode+", newMobile="+newMobile+", password="+password+", newPassword="+newPassword+"]");
-        leanCloudService.verifySmsCode(smsCode, newMobile);
+        //leanCloudService.verifySmsCode(smsCode, newMobile);
         NurseBean bean = new NurseBean();
         bean.setId(id);
         bean.setMobile(newMobile);
