@@ -127,6 +127,30 @@ public class NurseFriendsService {
     //            get friend relation
     //======================================================
 
+    public List<NurseFriendsBean> getFriendsWaitingUserAgree(long userId) {
+        List<NurseFriendsEntity> friendsE         = friendsRepository.findByUserId(userId);
+        List<NurseFriendsBean>   friendsB         = convertToNurseFriendsBeans(friendsE);
+        List<NurseFriendsBean>   friendsWaitPassB = new ArrayList<NurseFriendsBean>();
+        for (NurseFriendsBean friend : friendsB) {
+            if (AgreeType.WAITING==friend.getIsAgreed()) {
+                friendsWaitPassB.add(friend);
+            }
+        }
+        return friendsWaitPassB;
+    }
+
+    public List<NurseFriendsBean> getUserWaitingFriendAgreed(long userId) {
+        List<NurseFriendsEntity> friendsE         = friendsRepository.findByFriendId(userId);
+        List<NurseFriendsBean>   friendsB         = convertToNurseFriendsBeans(friendsE);
+        List<NurseFriendsBean>   friendsNotAgreeB = new ArrayList<NurseFriendsBean>();
+        for (NurseFriendsBean friend : friendsB) {
+            if (AgreeType.WAITING==friend.getIsAgreed()) {
+                friendsNotAgreeB.add(friend);
+            }
+        }
+        return friendsNotAgreeB;
+    }
+
     public List<NurseFriendsBean> getFriendList(long userId){
         List<NurseFriendsEntity> entities = friendsRepository.findByUserId(userId);
         return convertToNurseFriendsBeans(entities);

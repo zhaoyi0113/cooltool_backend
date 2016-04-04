@@ -65,6 +65,26 @@ public class NurseFriendsAPI {
     }
 
     @GET
+    @Path("/waiting_my_agree")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRequestNotPassList(@Context HttpServletRequest request) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<NurseFriendsBean> waitingToPass = friendsService.getFriendsWaitingUserAgree(userId);
+        logger.info("friend's need your promise to become your friends === " + waitingToPass);
+        return Response.ok(waitingToPass).build();
+    }
+
+    @GET
+    @Path("/waiting_friend_agree")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFriendsWaitMyAgree(@Context HttpServletRequest request) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<NurseFriendsBean> waitingToPass = friendsService.getUserWaitingFriendAgreed(userId);
+        logger.info("user need friends promise to become his friend === " + waitingToPass);
+        return Response.ok(waitingToPass).build();
+    }
+
+    @GET
     @Path("/list/{page_index}/{number}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFriendList(@Context HttpServletRequest request,
