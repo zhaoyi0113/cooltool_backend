@@ -16,7 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/3/22.
@@ -24,7 +25,7 @@ import java.util.logging.Logger;
 @Service("AdminUserLoginService")
 public class AdminUserLoginService {
 
-    private static final Logger logger = Logger.getLogger(AdminUserLoginService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AdminUserLoginService.class.getName());
 
     @Autowired
     private AdminUserTokenAccessRepository tokenAccessRepository;

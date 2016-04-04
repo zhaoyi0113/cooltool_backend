@@ -19,7 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/3/23.
@@ -27,7 +28,7 @@ import java.util.logging.Logger;
 @Service("NurseQualificationService")
 public class NurseQualificationService {
 
-    private static final Logger logger = Logger.getLogger(NurseQualificationService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseQualificationService.class.getName());
 
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.ASC,  "name"),
@@ -157,7 +158,7 @@ public class NurseQualificationService {
 
     public void deleteNurseQualification(String qualificationIds) {
         if(!VerifyUtil.isOccupationSkillIds(qualificationIds)) {
-            logger.severe("parameters : " + qualificationIds + "   is error!");
+            logger.info("parameters : " + qualificationIds + "   is error!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         String[]   stringIds = qualificationIds.split(",");

@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/3/23.
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 @Transactional
 public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
-    private static final Logger logger = Logger.getLogger(NurseQualificationServiceTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseQualificationServiceTest.class.getName());
 
     @Autowired
     private NurseQualificationService qualService;
@@ -73,7 +74,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
         NurseQualificationBean bean = null;
         bean = qualService.addWorkFile(4, name, WorkFileType.EMPLOYEES_CARD.name(), "aaa.png", byteInput);
-        System.out.println("add work file : " + bean);
+        logger.info("add work file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
         Assert.assertEquals(name, bean.getName());
@@ -84,7 +85,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         workFileType = qualService.getWorkFileTypeBean(WorkFileType.IDENTIFICATION.name());
         name = "Identi2";
         bean = qualService.addWorkFile(4, name, workFileType.getName(), "aaa.png", byteInput);
-        System.out.println("add identification file : " + bean);
+        logger.info("add identification file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
         Assert.assertEquals(name, bean.getName());
@@ -108,17 +109,15 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         Assert.assertFalse(isOk);
 
         for (NurseQualificationBean bean : qualifications) {
-            System.out.println(bean);
+            logger.info(bean.toString());
             if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
                 qualService.updateWorkFile(bean.getId(), null, bean.getName(), null, null, VetStatus.COMPLETED, null, null);
             }
         }
-        System.out.println();
-        System.out.println();
         qualifications = qualService.getAllNurseQualifications(1);
         isOk = true;
         for (NurseQualificationBean bean : qualifications) {
-            System.out.println(bean);
+            logger.info(bean.toString());
             if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
                 isOk = false;
                 break;
@@ -133,7 +132,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
     public void testDeleteNurseQualification() {
         List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(1);
         for (NurseQualificationBean bean : qualifications) {
-            System.out.println(bean);
+            logger.info(bean.toString());
             qualService.deleteNurseQualification(bean.getId());
         }
         qualifications = qualService.getAllNurseQualifications(1);

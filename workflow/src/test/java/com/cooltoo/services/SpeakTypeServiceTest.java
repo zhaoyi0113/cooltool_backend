@@ -12,12 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/3/29.
  */
 @Transactional
 public class SpeakTypeServiceTest extends AbstractCooltooTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpeakTypeServiceTest.class.getName());
 
     @Autowired
     private SpeakTypeService speakTypeService;
@@ -27,9 +31,9 @@ public class SpeakTypeServiceTest extends AbstractCooltooTest {
     public void testGetAllSpeakType() {
         List<SpeakTypeBean> speakTypes = speakTypeService.getAllSpeakType();
         Assert.assertEquals(3, speakTypes.size());
-        System.out.println(speakTypes.get(0));
-        System.out.println(speakTypes.get(1));
-        System.out.println(speakTypes.get(2));
+        logger.info(speakTypes.get(0).toString());
+        logger.info(speakTypes.get(1).toString());
+        logger.info(speakTypes.get(2).toString());
     }
 
     @Test

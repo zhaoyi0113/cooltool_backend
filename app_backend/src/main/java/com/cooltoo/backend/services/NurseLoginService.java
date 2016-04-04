@@ -16,14 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 3/2/16.
  */
 @Service("NurseLoginService")
 public class NurseLoginService {
-    private static final Logger logger = Logger.getLogger(NurseLoginService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseLoginService.class.getName());
 
     @Autowired
     private TokenAccessRepository tokenAccessRepository;

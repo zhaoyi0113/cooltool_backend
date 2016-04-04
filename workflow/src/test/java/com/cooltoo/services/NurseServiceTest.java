@@ -20,12 +20,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by lg380357 on 2016/3/2.
  */
 @Transactional
 public class NurseServiceTest extends AbstractCooltooTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(NurseServiceTest.class.getName());
 
     @Autowired
     private NurseService service;
@@ -127,10 +131,10 @@ public class NurseServiceTest extends AbstractCooltooTest {
         String realname = "TEST";
         String identifi = "123456198404044561";
         NurseBean bean = service.getNurse(1);
-        System.out.println(bean);
+        logger.info(bean.toString());
         service.setRealNameAndIdentification(bean.getId(), realname, identifi);
         bean = service.getNurse(1);
-        System.out.println(bean);
+        logger.info(bean.toString());
         Assert.assertEquals(realname, bean.getRealName());
         Assert.assertEquals(identifi, bean.getIdentification());
     }

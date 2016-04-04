@@ -41,9 +41,4 @@ public class VerifyUtil {
         }
         return false;
     }
-
-    public static void main(String[] args) {
-        System.out.println(VerifyUtil.isOccupationSkillIds("432,13421,4321,4321,643"));
-        System.out.println(VerifyUtil.isOccupationSkillIds("432,13421,4321,4321.43"));
-    }
 }

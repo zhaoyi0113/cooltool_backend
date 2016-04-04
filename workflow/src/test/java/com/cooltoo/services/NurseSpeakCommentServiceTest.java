@@ -12,12 +12,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Test111 on 2016/3/18.
  */
 @Transactional
 public class NurseSpeakCommentServiceTest extends AbstractCooltooTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(NurseSpeakCommentServiceTest.class.getName());
+
     @Autowired
     NurseSpeakCommentService commentService;
 
@@ -44,7 +49,7 @@ public class NurseSpeakCommentServiceTest extends AbstractCooltooTest {
         for (NurseSpeakCommentBean comment : comments) {
             Assert.assertTrue(comment.getId()>0);
             Assert.assertEquals(3, comment.getNurseSpeakId());
-            System.out.println(comment);
+            logger.info(comment.toString());
         }
     }
 
@@ -58,7 +63,7 @@ public class NurseSpeakCommentServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(10, comments.size());
         for (NurseSpeakCommentBean comment : comments) {
             Assert.assertTrue(comment.getId()>0);
-            System.out.println(comment);
+            logger.info(comment.toString());
         }
     }
 }

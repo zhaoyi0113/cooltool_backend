@@ -17,7 +17,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 3/2/16.
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
 @Provider
 public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
 
-    private static final Logger logger = Logger.getLogger(NurseLoginAuthenticationFilter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseLoginAuthenticationFilter.class.getName());
 
     @Context
     private HttpServletRequest servletRequest;

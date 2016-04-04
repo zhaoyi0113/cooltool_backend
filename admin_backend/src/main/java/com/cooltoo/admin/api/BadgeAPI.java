@@ -12,7 +12,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 2/25/16.
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
 @Path("/admin/badge")
 public class BadgeAPI {
 
-    private static final Logger logger = Logger.getLogger(BadgeAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BadgeAPI.class.getName());
 
     @Autowired
     private BadgeService badgeService;

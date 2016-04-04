@@ -12,12 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/3/29.
  */
 @Transactional
 public class WorkFileTypeServiceTest extends AbstractCooltooTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorkFileTypeServiceTest.class.getName());
 
     @Autowired
     private WorkFileTypeService workFileTypeService;
@@ -27,9 +31,9 @@ public class WorkFileTypeServiceTest extends AbstractCooltooTest {
     public void testGetAllWorkFileType() {
         List<WorkFileTypeBean> workfileTypes = workFileTypeService.getAllWorkFileType();
         Assert.assertEquals(3, workfileTypes.size());
-        System.out.println(workfileTypes.get(0));
-        System.out.println(workfileTypes.get(1));
-        System.out.println(workfileTypes.get(2));
+        logger.info(workfileTypes.get(0).toString());
+        logger.info(workfileTypes.get(1).toString());
+        logger.info(workfileTypes.get(2).toString());
     }
 
     @Test

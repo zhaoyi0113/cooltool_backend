@@ -21,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 3/15/16.
@@ -29,7 +30,7 @@ import java.util.logging.Logger;
 @Service("NurseSpeakService")
 public class NurseSpeakService {
 
-    private static final Logger logger = Logger.getLogger(NurseSpeakService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseSpeakService.class.getName());
 
     @Autowired
     private NurseRepository nurseRepository;

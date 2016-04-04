@@ -13,9 +13,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
-import java.security.interfaces.RSAKey;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/3/29.
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 @Path("/admin/speak_type")
 public class SpeakTypeAPI {
 
-    private static final Logger logger = Logger.getLogger(SpeakTypeAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SpeakTypeAPI.class.getName());
 
     @Autowired
     private SpeakTypeService speakTypeService;

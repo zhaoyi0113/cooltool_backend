@@ -17,7 +17,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by lg380357 on 2016/3/5.
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
 @Service("HospitalDepartmentService")
 public class HospitalDepartmentService {
 
-    private static final Logger logger = Logger.getLogger(HospitalDepartmentService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(HospitalDepartmentService.class.getName());
 
     @Autowired
     private HospitalDepartmentRepository repository;
@@ -229,7 +230,7 @@ public class HospitalDepartmentService {
                 entity.setParentId(bean.getParentId());
             }
             else {
-                logger.severe("department parent id=" + bean.getParentId() + " is not exist");
+                logger.error("department parent id=" + bean.getParentId() + " is not exist");
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
@@ -258,12 +259,12 @@ public class HospitalDepartmentService {
     @Transactional
     public Integer createHospitalDepartment(String name, String description, int enable, int parentId, InputStream image, InputStream disableImage) {
         if (VerifyUtil.isStringEmpty(name)) {
-            logger.severe("new department name is empty!");
+            logger.error("new department name is empty!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         List<HospitalDepartmentEntity> sameName = repository.findByName(name);
         if (!sameName.isEmpty()) {
-            logger.severe("new department name is already exist!");
+            logger.error("new department name is already exist!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 

@@ -12,16 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 3/15/16.
  */
 @Transactional
 public class NurseSpeakServiceTest extends AbstractCooltooTest{
+
+    private static final Logger logger = LoggerFactory.getLogger(NurseSpeakServiceTest.class.getName());
 
     @Autowired
     private NurseSpeakService speakService;
@@ -60,7 +63,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(content, bean.getContent());
         Assert.assertNotNull(bean.getTime());
         Assert.assertNotNull(bean.getImageUrl());
-        System.out.println(bean);
+        logger.info(bean.toString());
 
         bean = speakService.addCathart(2, content, fileName, inputStream);
         Assert.assertTrue(bean.getId()>0);
@@ -68,7 +71,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(content, bean.getContent());
         Assert.assertNotNull(bean.getTime());
         Assert.assertNotNull(bean.getImageUrl());
-        System.out.println(bean);
+        logger.info(bean.toString());
 
         bean = speakService.addAskQuestion(2, content, fileName, inputStream);
         Assert.assertTrue(bean.getId()>0);
@@ -76,7 +79,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(content, bean.getContent());
         Assert.assertNotNull(bean.getTime());
         Assert.assertNotNull(bean.getImageUrl());
-        System.out.println(bean);
+        logger.info(bean.toString());
     }
 
     @Test
@@ -89,7 +92,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertNotNull(bean.getTime());
         Assert.assertNotNull(bean.getImageUrl());
         Assert.assertEquals(3, bean.getComments().size());
-        System.out.println(bean);
+        logger.info(bean.toString());
     }
 
     @Test
@@ -181,7 +184,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(10, speaks.size());
 
         for (NurseSpeakBean speak : speaks) {
-            System.out.println(speak);
+            logger.info(speak.toString());
         }
 
         speakType = SpeakType.CATHART.name();

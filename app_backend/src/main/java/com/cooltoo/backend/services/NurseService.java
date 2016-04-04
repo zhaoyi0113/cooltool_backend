@@ -237,7 +237,31 @@ public class NurseService {
     @Transactional
     public NurseBean updateMobilePassword(long id, String smsCode, String newMobile, String password, String newPassword) {
         logger.info("modify the password and mobile : [smsCode"+smsCode+", newMobile="+newMobile+", password="+password+", newPassword="+newPassword+"]");
+
+        NurseBean nurse = getNurse(id);
+        // if not modify the mobile
+        if (VerifyUtil.isStringEmpty(newMobile)) {
+            newMobile = nurse.getMobile();
+        }
+        /* check the verify code */
         //leanCloudService.verifySmsCode(smsCode, newMobile);
+
+        // check password
+        if (!VerifyUtil.isStringEmpty(password)) {
+            if (!password.equals(nurse.getPassword())) {
+                throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+            }
+            if (VerifyUtil.isStringEmpty(newPassword)) {
+                throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+            }
+            else if (password.equals(newPassword)) {
+                logger.info("the new password is same with old password.");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
+        else {
+            newPassword = null;
+        }
         NurseBean bean = new NurseBean();
         bean.setId(id);
         bean.setMobile(newMobile);

@@ -18,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by lg380357 on 2016/3/5.
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
 @Service("HospitalService")
 public class HospitalService {
 
-    private static final Logger logger = Logger.getLogger(HospitalService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(HospitalService.class.getName());
 
     @Autowired
     private HospitalRepository repository;
@@ -158,7 +159,7 @@ public class HospitalService {
         if (!value.equals(entity.getName())) {
             List<HospitalEntity> hospitals = repository.findByName(value);
             if (!hospitals.isEmpty()) {
-                logger.severe("hospital name has been used!");
+                logger.error("hospital name has been used!");
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
             entity.setName(value);
@@ -207,7 +208,7 @@ public class HospitalService {
         }
         List<HospitalEntity> hospitals = repository.findByName(value);
         if (!hospitals.isEmpty()) {
-            logger.severe("hospital name has been used!");
+            logger.error("hospital name has been used!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         HospitalEntity entity = entityConverter.convert(bean);

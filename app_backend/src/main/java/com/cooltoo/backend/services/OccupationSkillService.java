@@ -18,12 +18,16 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 3/10/16.
  */
 @Service("OccupationSkillService")
 public class OccupationSkillService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OccupationSkillService.class.getName());
 
     @Autowired
     private OccupationSkillBeanConverter beanConverter;
@@ -115,7 +119,7 @@ public class OccupationSkillService {
     //=========================================================
 
     @Transactional
-    public void addNewOccupationSkill(String name, String type, int factor, InputStream image, InputStream disableImage) {
+    public OccupationSkillBean addNewOccupationSkill(String name, String type, int factor, InputStream image, InputStream disableImage) {
         if (!isSkillNameExist(name)) {
             if (VerifyUtil.isStringEmpty(name)) {
                 throw new BadRequestException(ErrorCode.SKILL_NAME_IS_NULL);
@@ -140,8 +144,9 @@ public class OccupationSkillService {
             entity.setName(name);
             entity.setType(skillType);
             entity.setFactor(factor);
-            skillRepository.save(entity);
-            return;
+            entity = skillRepository.save(entity);
+
+            return beanConverter.convert(entity);
         }
         throw new BadRequestException(ErrorCode.SKILL_EXIST);
     }
@@ -187,10 +192,10 @@ public class OccupationSkillService {
         }
         if (changed) {
             skillRepository.save(entity);
-            System.out.println("update occupation skill == " + entity);
+            logger.info("update occupation skill == " + entity);
         }
         else {
-            System.out.println("no occupation skill(enable/disable image) upated  == " + entity);
+            logger.info("no occupation skill(enable/disable image) upated  == " + entity);
         }
     }
 
@@ -233,10 +238,10 @@ public class OccupationSkillService {
         // save
         if (changed) {
             entity = skillRepository.save(entity);
-            System.out.println("update occupation skill == " + entity);
+            logger.info("update occupation skill == " + entity);
         }
         else {
-            System.out.println("no occupation skill(basic information) upated  == " + entity);
+            logger.info("no occupation skill(basic information) upated  == " + entity);
         }
         return entity;
     }

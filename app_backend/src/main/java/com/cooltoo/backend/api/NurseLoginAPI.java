@@ -15,7 +15,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 3/2/16.
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 @Path("/nurse")
 public class NurseLoginAPI {
 
-    private static final Logger logger = Logger.getLogger(NurseLoginAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseLoginAPI.class.getName());
 
     @Autowired
     private NurseLoginService loginService;

@@ -15,8 +15,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 2/26/16.
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 @Service("StorageService")
 public class StorageService {
 
-    private static final Logger logger = Logger.getLogger(StorageService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(StorageService.class.getName());
 
     @Autowired
     private FileStorageRepository storageRepository;
@@ -48,7 +48,7 @@ public class StorageService {
 
     public long saveFile(long fileId, String fileName, InputStream inputStream) {
         if(inputStream == null){
-            logger.warning("not found inputstream");
+            logger.info("not found inputstream");
             return -1;
         }
         deleteFileIfExist(fileId);
@@ -70,9 +70,9 @@ public class StorageService {
 
             return saveToDB(fileName, relativePath);
         } catch (NoSuchAlgorithmException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return 0;
     }
@@ -144,7 +144,7 @@ public class StorageService {
                 imageFile.delete();
             }
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, "failed to delete existing file.", ex);
+            logger.error("failed to delete existing file.", ex);
             throw new BadRequestException(ErrorCode.FILE_DELETE_FAILED);
         }
         storageRepository.delete(entity);

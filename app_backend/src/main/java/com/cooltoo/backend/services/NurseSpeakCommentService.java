@@ -14,14 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Test111 on 2016/3/18.
  */
 @Service("NurseSpeakCommentService")
 public class NurseSpeakCommentService {
-    private static final Logger logger = Logger.getLogger(NurseSpeakCommentService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseSpeakCommentService.class.getName());
 
     @Autowired
     private NurseSpeakCommentRepository commentRepository;

@@ -14,7 +14,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/3/29.
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 public class WorkFileTypeAPI {
 
 
-    private static final Logger logger = Logger.getLogger(WorkFileTypeAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(WorkFileTypeAPI.class.getName());
 
     @Autowired
     private WorkFileTypeService workfileTypeService;

@@ -2,7 +2,6 @@ package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.NurseQualificationBean;
-import com.cooltoo.backend.beans.WorkFileTypeBean;
 import com.cooltoo.backend.services.NurseQualificationService;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.exception.*;
@@ -13,17 +12,16 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.security.DenyAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by hp on 2016/3/24.
@@ -31,7 +29,7 @@ import java.util.logging.Logger;
 @Path("/admin/nurse/qualification")
 public class NurseQualificationManageAPI {
 
-    private static final Logger logger = Logger.getLogger(NurseQualificationManageAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseQualificationManageAPI.class.getName());
 
     @Autowired
     private NurseQualificationService qualificationService;
@@ -39,7 +37,7 @@ public class NurseQualificationManageAPI {
     @Path("/{nurse_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-//    @AdminUserLoginAuthentication(requireUserLogin = true)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getAllNurseQualification(
             @Context HttpServletRequest request,
             @PathParam("nurse_id") long nurseId
@@ -51,7 +49,7 @@ public class NurseQualificationManageAPI {
     @POST
     @Path("/approve")
     @Produces(MediaType.APPLICATION_JSON)
-//    @AdminUserLoginAuthentication(requireUserLogin = true)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response approveNurseQualification(
             @Context HttpServletRequest request,
             @FormParam("id") long id
@@ -63,14 +61,14 @@ public class NurseQualificationManageAPI {
     @POST
     @Path("/deny")
     @Produces(MediaType.APPLICATION_JSON)
-//    @AdminUserLoginAuthentication(requireUserLogin = true)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response denyNurseQualification(
             @Context HttpServletRequest request,
             @FormParam("id") long id,
             @FormParam("reason") String statusDescr
     ) {
         if (VerifyUtil.isStringEmpty(statusDescr)) {
-            logger.severe("The deny reason is empty!");
+            logger.info("The deny reason is empty!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         NurseQualificationBean bean = qualificationService.updateNurseQualification(id, null, null, null, null, VetStatus.FAILED, statusDescr, null);
@@ -80,7 +78,7 @@ public class NurseQualificationManageAPI {
     @POST
     @Path("/edit")
     @Produces(MediaType.MULTIPART_FORM_DATA)
-//    @AdminUserLoginAuthentication(requireUserLogin = true)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateNurseQualification(
             @Context HttpServletRequest request,
             @FormDataParam("id") long id,

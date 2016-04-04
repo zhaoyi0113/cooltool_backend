@@ -3,8 +3,6 @@ package com.cooltoo.admin.api;
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.services.HospitalDepartmentService;
 import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.util.VerifyUtil;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,7 +11,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by lg380357 on 2016/3/5.
@@ -21,7 +20,7 @@ import java.util.logging.Logger;
 @Path("/admin/hospital_department")
 public class HospitalDepartmentAPI {
 
-    private static final Logger logger = Logger.getLogger(HospitalDepartmentAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(HospitalDepartmentAPI.class.getName());
 
     @Autowired
     private HospitalDepartmentService service;

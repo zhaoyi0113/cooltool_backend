@@ -1,14 +1,18 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
+import com.cooltoo.backend.beans.OccupationSkillBean;
 import com.cooltoo.backend.services.OccupationSkillService;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Created by zhaolisong on 16/3/25.
@@ -16,25 +20,33 @@ import java.io.InputStream;
 @Path("/admin/occupation")
 public class OccupationSkillManageAPI {
 
+    private static final Logger logger = LoggerFactory.getLogger(OccupationSkillManageAPI.class.getName());
+
     @Autowired
     private OccupationSkillService skillService;
 
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getOccupationSkillList() {
-        return Response.ok(skillService.getOccupationSkillList()).build();
+        logger.info("get all occupation skills");
+        List<OccupationSkillBean> allSkills = skillService.getOccupationSkillList();
+        logger.info(allSkills.toString());
+        return Response.ok(allSkills).build();
     }
 
     @GET
     @Path("/types")
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getOccupationSkillTypes() {
         return Response.ok(skillService.getAllSkillTypes()).build();
     }
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addOccupationSkill(
             @FormDataParam("name") String name,
@@ -42,8 +54,11 @@ public class OccupationSkillManageAPI {
             @FormDataParam("factor") int factor,
             @FormDataParam("file") InputStream imageStream,
             @FormDataParam("disable_file") InputStream disableImageStream) {
-        skillService.addNewOccupationSkill(name, type, factor, imageStream, disableImageStream);
-        return Response.ok().build();
+
+        logger.info("add new occupation skill parameters is ==== name={}, type={}, factor={}, image={}, disableImage={}.", name, type, factor, null!=imageStream, null!=disableImageStream);
+        OccupationSkillBean skill = skillService.addNewOccupationSkill(name, type, factor, imageStream, disableImageStream);
+        logger.info("add new occupation skill is " + skill.toString());
+        return Response.ok(skill).build();
     }
 
     @DELETE

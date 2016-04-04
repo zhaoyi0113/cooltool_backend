@@ -10,12 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by lg380357 on 2016/3/3.
  */
 @Transactional
 public class PatientServiceTest extends AbstractCooltooTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(PatientServiceTest.class.getName());
 
     @Autowired
     private PatientService service;
@@ -39,7 +43,7 @@ public class PatientServiceTest extends AbstractCooltooTest {
     public void testGetAll() {
         List<PatientBean> all = service.getAll();
         for (PatientBean bean : all) {
-            System.out.println(bean);
+            logger.info(bean.toString());
         }
         Assert.assertEquals(9, all.size());
     }

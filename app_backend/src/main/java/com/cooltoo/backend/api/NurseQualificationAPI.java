@@ -20,7 +20,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/4/1.
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
 @Path("/nurse/qualification")
 public class NurseQualificationAPI {
 
-    private static final Logger logger = Logger.getLogger(NurseQualificationAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseQualificationAPI.class.getName());
 
     @Autowired
     private NurseQualificationService service;

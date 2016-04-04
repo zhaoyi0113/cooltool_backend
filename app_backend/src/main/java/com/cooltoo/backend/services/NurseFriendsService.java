@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 3/10/16.
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
 @Service("NurseFriendsService")
 public class NurseFriendsService {
 
-    private static final Logger logger = Logger.getLogger(NurseFriendsService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseFriendsService.class.getName());
 
     @Autowired
     private NurseFriendsRepository friendsRepository;
@@ -39,7 +40,7 @@ public class NurseFriendsService {
     @Transactional
     public void addFriend(long userId, long friendId){
         if(userId == friendId){
-            logger.severe("user can't be himself friend.");
+            logger.error("user can't be himself friend.");
         }
         insertFriendToDB(userId, friendId);
         insertFriendToDB(friendId, userId);

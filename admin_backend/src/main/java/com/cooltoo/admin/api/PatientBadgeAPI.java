@@ -8,7 +8,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by lg380357 on 2016/3/3.
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
 @Path("/patient_badge")
 public class PatientBadgeAPI {
 
-    private static final Logger logger = Logger.getLogger(PatientBadgeAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(PatientBadgeAPI.class.getName());
 
     @Autowired
     private PatientBadgeService service;

@@ -20,7 +20,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @SpringBootApplication
@@ -29,7 +30,7 @@ import java.util.logging.Logger;
 @EnableSwagger2
 public class Application {
 
-    private static final Logger logger = Logger.getLogger(Application.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Application.class.getName());
 
     @Bean
     public FeatureProvider featureProvider() {

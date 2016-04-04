@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -19,6 +21,8 @@ import java.util.List;
  */
 @Transactional
 public class AdminUserServiceTest extends AbstractCooltooTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminUserServiceTest.class.getName());
 
     @Autowired
     AdminUserService adminUserService;
@@ -40,7 +44,7 @@ public class AdminUserServiceTest extends AbstractCooltooTest {
         List<AdminUserBean> beans = adminUserService.getAllUsersByAdmin(1);
         Assert.assertEquals(8, beans.size());
         for (AdminUserBean bean : beans) {
-            System.out.println(bean);
+            logger.info(bean.toString());
         }
     }
 

@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/3/22.
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 @Service(value = "AdminUserService")
 public class AdminUserService {
 
-    private static final Logger logger = Logger.getLogger(AdminUserService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AdminUserService.class.getName());
 
     @Autowired
     private AdminUserRepository adminUserRepository;

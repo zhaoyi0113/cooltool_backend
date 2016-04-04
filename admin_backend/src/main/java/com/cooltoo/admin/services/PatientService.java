@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 2/29/16.
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 @Service("PatientService")
 public class PatientService {
 
-    private static final Logger logger = Logger.getLogger(PatientService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(PatientService.class.getName());
 
     @Autowired
     private PatientRepository repository;
