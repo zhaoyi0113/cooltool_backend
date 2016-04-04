@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * Created by lg380357 on 2016/3/2.
  */
 @Transactional
+@DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
 public class NurseServiceTest extends AbstractCooltooTest {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseServiceTest.class.getName());
@@ -41,7 +42,6 @@ public class NurseServiceTest extends AbstractCooltooTest {
     private NurseRepository nurseRepository;
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testNew() {
         NurseBean bean = new NurseBean();
         bean.setName("name_1");
@@ -56,14 +56,12 @@ public class NurseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testGetAll(){
         List<NurseBean> all = service.getAll();
-        Assert.assertEquals(8, all.size());
+        Assert.assertEquals(17, all.size());
     }
 
     @Test
-    @DatabaseSetup(value="classpath:/com/cooltoo/services/nurse_data.xml")
     public void testDelete() {
         NurseBean bean = service.deleteNurse(5);
         Assert.assertNotNull(bean);
@@ -78,7 +76,6 @@ public class NurseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testUpdate(){
         NurseBean bean = service.updateNurse(1,  "name222222", 22, 2);
         Assert.assertNotNull(bean);
@@ -90,7 +87,6 @@ public class NurseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testAddPhoto(){
         String filePath = "build/"+System.currentTimeMillis();
         try {
@@ -108,7 +104,6 @@ public class NurseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testAddBackgroundImage(){
         String filePath = "build/"+System.currentTimeMillis();
         try {
@@ -126,7 +121,6 @@ public class NurseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testUpdateRealNameAndIdentification() {
         String realname = "TEST";
         String identifi = "123456198404044561";
@@ -140,7 +134,6 @@ public class NurseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testUpdateMobilePassword() {
         String mobile = "13423143214";
         String password = "12fd3a45b61c9840e40f4f45b6d1c";
@@ -162,7 +155,6 @@ public class NurseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
     public void testNurseShortNote() {
         String shortNote = "Haahahahahahahha";
 

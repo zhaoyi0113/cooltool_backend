@@ -4,6 +4,7 @@ import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.services.NurseFriendsService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,10 @@ import org.slf4j.LoggerFactory;
  * Created by yzzhao on 3/10/16.
  */
 @Transactional
+@DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_page_data.xml")
+})
 public class NurseFriendsServiceTest extends AbstractCooltooTest {
 
     public static final Logger logger = LoggerFactory.getLogger(NurseFriendsServiceTest.class.getName());
@@ -25,40 +30,40 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
     private NurseFriendsService friendsService;
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_data.xml")
     public void testAddFriend(){
-        List<NurseFriendsBean> friendList = friendsService.getFriendList(4);
+        long nurseId = 15;
+        long friendId= 1;
+        List<NurseFriendsBean> friendList = friendsService.getFriendList(nurseId);
         Assert.assertTrue(friendList.isEmpty());
-        friendsService.addFriend(4,1);
-        friendList = friendsService.getFriendList(4);
+        friendsService.addFriend(nurseId,1);
+        friendList = friendsService.getFriendList(nurseId);
         Assert.assertEquals(1, friendList.size());
-        Assert.assertEquals(1, friendList.get(0).getFriendId());
+        Assert.assertEquals(friendId, friendList.get(0).getFriendId());
 
         friendList = friendsService.getFriendList(1);
-        Assert.assertEquals(3, friendList.size());
+        Assert.assertEquals(15, friendList.size());
 
-        friendsService.addFriend(4,1);
-        friendList = friendsService.getFriendList(4);
+        nurseId = 15;
+        friendsService.addFriend(nurseId,1);
+        friendList = friendsService.getFriendList(nurseId);
         Assert.assertEquals(1, friendList.size());
         friendList = friendsService.getFriendList(1);
-        Assert.assertEquals(3, friendList.size());
+        Assert.assertEquals(15, friendList.size());
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_data.xml")
     public void testDeleteFriend(){
         List<NurseFriendsBean> friendList = friendsService.getFriendList(1);
-        Assert.assertEquals(2, friendList.size());
+        Assert.assertEquals(14, friendList.size());
         friendsService.removeFriend(1, 2);
         friendList = friendsService.getFriendList(1);
-        Assert.assertEquals(1, friendList.size());
+        Assert.assertEquals(13, friendList.size());
         friendsService.removeFriend(1, 3);
         friendList = friendsService.getFriendList(1);
-        Assert.assertEquals(0, friendList.size());
+        Assert.assertEquals(12, friendList.size());
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_page_data.xml")
     public void testGetFriends(){
         List<NurseFriendsBean> friends = friendsService.getFriends(1, 1, 0, 3);
         Assert.assertEquals(3, friends.size());
@@ -79,7 +84,6 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_page_data.xml")
     public void testSearchFriends(){
         List<NurseFriendsBean> friends = null;
 

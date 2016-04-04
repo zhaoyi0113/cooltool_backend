@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
-
-    <nurse id="1" name="name1" age="11" gender="1" mobile="135232121220" password="aa" profile_photo_id="1" background_image_id="1" />
-    <nurse id="2" name="name2" age="22" gender="2" mobile="135232121221" password="aa" profile_photo_id="1" background_image_id="1" />
-    <nurse id="3" name="name3" age="33" gender="2" mobile="135232121222" password="aa" profile_photo_id="1" background_image_id="1" />
-    <nurse id="4" name="name3" age="33" gender="1" mobile="135232121223" password="aa" profile_photo_id="1" background_image_id="1" />
-
-    <nurse_friends id="1000" user_id="1" friend_id="2"></nurse_friends>
-    <nurse_friends id="1001" user_id="1" friend_id="3"></nurse_friends>
-    <nurse_friends id="1002" user_id="2" friend_id="3"></nurse_friends>
-    <nurse_friends id="1003" user_id="2" friend_id="1"></nurse_friends>
-
+    <nurse_friends id="1000" user_id="1" friend_id="2" is_agreed="1"></nurse_friends>
+    <nurse_friends id="1001" user_id="1" friend_id="3" is_agreed="1"></nurse_friends>
+    <nurse_friends id="1002" user_id="1" friend_id="3" is_agreed="1"></nurse_friends>
+    <nurse_friends id="1003" user_id="1" friend_id="4" is_agreed="1"></nurse_friends>
+    <nurse_friends id="1004" user_id="1" friend_id="2" is_agreed="1"></nurse_friends>
+    <nurse_friends id="1005" user_id="2" friend_id="1" is_agreed="1"></nurse_friends>
+    <nurse_friends id="1006" user_id="2" friend_id="3" is_agreed="1"></nurse_friends>
+    <nurse_friends id="1007" user_id="3" friend_id="1" is_agreed="1"></nurse_friends>
 </dataset>

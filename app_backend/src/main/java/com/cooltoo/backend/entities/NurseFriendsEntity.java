@@ -1,5 +1,7 @@
 package com.cooltoo.backend.entities;
 
+import com.cooltoo.constants.AgreeType;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -15,6 +17,8 @@ public class NurseFriendsEntity {
     private long userId;
 
     private long friendId;
+
+    private AgreeType isAgreed;
 
     private Date dateTime;
 
@@ -45,6 +49,16 @@ public class NurseFriendsEntity {
 
     public void setFriendId(long friendId) {
         this.friendId = friendId;
+    }
+
+    @Column(name = "is_agreed")
+    @Enumerated
+    public AgreeType getIsAgreed() {
+        return this.isAgreed;
+    }
+
+    public void setIsAgreed(AgreeType isAgreed) {
+        this.isAgreed = isAgreed;
     }
 
     @Column(name = "date_time")

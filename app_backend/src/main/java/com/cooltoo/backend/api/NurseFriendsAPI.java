@@ -1,6 +1,7 @@
 package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.beans.NurseFriendsBean;
+import com.cooltoo.constants.AgreeType;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseFriendsService;
@@ -29,9 +30,37 @@ public class NurseFriendsAPI {
 
     @POST
     @Path("/add/{friend_id}")
-    public Response addFriend(@Context HttpServletRequest request, @PathParam("friend_id") long friendId) {
-        long userId = Long.valueOf((String) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID));
+    public Response addFriend(@Context HttpServletRequest request,
+                              @PathParam("friend_id") long friendId) {
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         friendsService.addFriend(userId, friendId);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/agree")
+    public Response agreeFriendRequest(@Context HttpServletRequest request,
+                                       @FormParam("friend_id") long friendId) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        friendsService.modifyFriendAgreed(userId, friendId, AgreeType.AGREED);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/blacklist")
+    public Response blackListFriend(@Context HttpServletRequest request,
+                                    @FormParam("friend_id") long friendId) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        friendsService.modifyFriendAgreed(userId, friendId, AgreeType.BLACKLIST);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/access_zone_deny")
+    public Response accessZoneDenyFriend(@Context HttpServletRequest request,
+                                         @FormParam("friend_id") long friendId) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        friendsService.modifyFriendAgreed(userId, friendId, AgreeType.ACCESS_ZONE_DENY);
         return Response.ok().build();
     }
 
@@ -51,11 +80,10 @@ public class NurseFriendsAPI {
     @GET
     @Path("/list_by_id/{search_id}/{page_index}/{number}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFriendListByID(
-            @Context HttpServletRequest request,
-            @PathParam("search_id") long searchId,
-            @PathParam("page_index") int pageIdx,
-            @PathParam("number") int number) {
+    public Response getFriendListByID(@Context HttpServletRequest request,
+                                      @PathParam("search_id") long searchId,
+                                      @PathParam("page_index") int pageIdx,
+                                      @PathParam("number") int number) {
         logger.info("search friend list at page=" + pageIdx + ", number=" + number + ", search id=" + searchId);
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseFriendsBean> friendList = friendsService.getFriends(userId, searchId, pageIdx, number);
@@ -90,7 +118,8 @@ public class NurseFriendsAPI {
 
     @DELETE
     @Path("/{friend_id}")
-    public Response removeFriend(@Context HttpServletRequest request, @PathParam("friend_id") long friendId) {
+    public Response removeFriend(@Context HttpServletRequest request,
+                                 @PathParam("friend_id") long friendId) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         friendsService.removeFriend(userId, friendId);
         return Response.ok().build();
@@ -107,7 +136,8 @@ public class NurseFriendsAPI {
     @GET
     @Path("/search/{name}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response searchFriend(@Context HttpServletRequest request, @PathParam("name") String name) {
+    public Response searchFriend(@Context HttpServletRequest request,
+                                 @PathParam("name") String name) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseFriendsBean> friends = friendsService.searchFriends(userId, name);
         return Response.ok(friends).build();

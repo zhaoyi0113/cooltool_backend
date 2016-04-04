@@ -1,5 +1,7 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.constants.AgreeType;
+
 import java.util.Date;
 
 /**
@@ -9,6 +11,7 @@ public class NurseFriendsBean {
     private long id;
     private long userId;
     private long friendId;
+    private AgreeType isAgreed;
     private Date dateTime;
     private String headPhotoUrl;
     private String friendName;
@@ -36,6 +39,14 @@ public class NurseFriendsBean {
 
     public void setFriendId(long friendId) {
         this.friendId = friendId;
+    }
+
+    public AgreeType getIsAgreed() {
+        return this.isAgreed;
+    }
+
+    public void setIsAgreed(AgreeType isAgreed) {
+        this.isAgreed = isAgreed;
     }
 
     public Date getDateTime() {

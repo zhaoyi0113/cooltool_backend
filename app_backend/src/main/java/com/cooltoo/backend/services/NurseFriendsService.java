@@ -4,11 +4,14 @@ import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.converter.NurseFriendBeanConverter;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseFriendsEntity;
+import com.cooltoo.constants.AgreeType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.NurseFriendsRepository;
 import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,39 +35,47 @@ public class NurseFriendsService {
 
     @Autowired
     private NurseFriendsRepository friendsRepository;
-
     @Autowired
     private NurseRepository nurseRepository;
-
+    @Autowired
+    @Qualifier("StorageService")
+    private StorageService storageService;
     @Autowired
     private NurseFriendBeanConverter beanConverter;
 
+    //======================================================
+    //            add friend relation
+    //======================================================
     @Transactional
     public void addFriend(long userId, long friendId){
         if(userId == friendId){
             logger.error("user can't be himself friend.");
         }
-        insertFriendToDB(userId, friendId);
-        insertFriendToDB(friendId, userId);
+        insertFriendToDB(userId, friendId, AgreeType.AGREED);
+        insertFriendToDB(friendId, userId, AgreeType.WAITING);
     }
 
-    private void insertFriendToDB(long userId, long friendId){
+    private void insertFriendToDB(long userId, long friendId, AgreeType agreeType){
         validateUserId(userId, friendId);
         long count = friendsRepository.countByUserIdAndFriendId(userId, friendId);
         if(count <= 0){
             NurseFriendsEntity entity = new NurseFriendsEntity();
             entity.setUserId(userId);
             entity.setFriendId(friendId);
+            entity.setIsAgreed(agreeType);
             friendsRepository.save(entity);
         }
     }
 
     private void validateUserId(long userId, long friendId) {
-        if(!nurseRepository.exists(userId) || !nurseRepository.exists(friendId)){
+        if (!nurseRepository.exists(userId) || !nurseRepository.exists(friendId)) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
     }
 
+    //======================================================
+    //            delete friend relation
+    //======================================================
     @Transactional
     public void removeFriend(long userId, long friendId){
         validateUserId(userId, friendId);
@@ -72,43 +85,68 @@ public class NurseFriendsService {
         }
     }
 
+    //======================================================
+    //            modify friend relation
+    //======================================================
+    @Transactional
+    public void modifyFriendAgreed(long userId, long friend, AgreeType agreeType) {
+        List<NurseFriendsEntity> entities = null;
+        NurseFriendsEntity entity = null;
+        if (null == agreeType) {
+            logger.info("AgreeType is null");
+            return;
+        } else if (AgreeType.WAITING == agreeType) {
+            logger.info("Cannot set to WAITING again");
+            return;
+        } else if (AgreeType.AGREED == agreeType) {
+            entities = friendsRepository.findByUserIdAndFriendId(userId, friend);
+        } else {// AgreeType.ACCESS_ZONE_DENY, AgreeType.BLACKLIST;
+            entities = friendsRepository.findByUserIdAndFriendId(friend, userId);
+        }
+
+        if (null == entities || entities.isEmpty()) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        entity = entities.get(0);
+        boolean isLimit1    = (AgreeType.ACCESS_ZONE_DENY==entity.getIsAgreed()
+                             ||AgreeType.BLACKLIST       ==entity.getIsAgreed());
+        boolean isLimit2    = (AgreeType.ACCESS_ZONE_DENY==agreeType
+                             ||AgreeType.BLACKLIST       ==agreeType);
+        if (isLimit1 && isLimit1) {
+            agreeType = AgreeType.AGREED;
+        }
+        entity.setIsAgreed(agreeType);
+
+        entity = friendsRepository.save(entity);
+        NurseFriendsBean bean = beanConverter.convert(entity);
+        return;
+    }
+
+
+    //======================================================
+    //            get friend relation
+    //======================================================
+
     public List<NurseFriendsBean> getFriendList(long userId){
         List<NurseFriendsEntity> entities = friendsRepository.findByUserId(userId);
         return convertToNurseFriendsBeans(entities);
     }
 
-    private List<NurseFriendsBean> convertToNurseFriendsBeans(List<NurseFriendsEntity> entities) {
-        List<NurseFriendsBean> beans = new ArrayList<NurseFriendsBean>();
-        for(NurseFriendsEntity entity:entities){
-            beans.add(beanConverter.convert(entity));
-        }
-        return beans;
-    }
-
     public List<NurseFriendsBean> searchFriends(long userId, String name){
-        List<NurseFriendsEntity> friendMaps = friendsRepository.findByUserId(userId);
-        logger.info("search nurse friends is : " +friendMaps);
-        List<Long> friendIds = new ArrayList<Long>();
-        for (NurseFriendsEntity friend : friendMaps) {
-            friendIds.add(friend.getFriendId());
-        }
-        List<NurseEntity> friends = nurseRepository.findNurseByIdIn(friendIds);
+        List<NurseFriendsBean>   friendsB        = null;
+        List<NurseFriendsBean>   filteredFriends = new ArrayList<NurseFriendsBean>();
+
+        List<NurseFriendsEntity> friends         = friendsRepository.findByUserId(userId);
         logger.info("search nurse friends is : " +friends);
-        for (NurseEntity friend : friends) {
-            if (friend.getName().contains(name)) {
-            }
-            else {
-                friendIds.remove(friend.getId());
-            }
-        }
-        List<NurseFriendsEntity> friendsFiltered = new ArrayList<NurseFriendsEntity>();
-        for (NurseFriendsEntity friend : friendMaps) {
-            if (friendIds.contains(friend.getFriendId())) {
-                friendsFiltered.add(friend);
+
+        friendsB = convertToNurseFriendsBeans(friends);
+        for (NurseFriendsBean friendB : friendsB) {
+            if (friendB.getFriendName().contains(name)) {
+                filteredFriends.add(friendB);
             }
         }
 
-        return convertToNurseFriendsBeans(friendsFiltered);
+        return filteredFriends;
     }
 
     public List<NurseFriendsBean> getFriends(long userId, long searchId, int pageIdx, int number){
@@ -132,6 +170,11 @@ public class NurseFriendsService {
         // search searchId's friends
         searchFriendsE = friendsRepository.findNurseFriendByUserId(searchId, pageSort);
         for(NurseFriendsEntity searchFriendE: searchFriendsE){
+            // jump over not agreed of user who been searched
+            //if (AgreeType.AGREED!=searchFriendE.getIsAgreed()) {
+            //    continue;
+            //}
+
             NurseFriendsBean searchFriend = beanConverter.convert(searchFriendE);
             searchFriends.add(searchFriend);
             friendIds.add(searchFriend.getFriendId());
@@ -176,5 +219,44 @@ public class NurseFriendsService {
 
     public int getFriendsCount(long userId){
         return getFriendList(userId).size();
+    }
+
+    private List<NurseFriendsBean> convertToNurseFriendsBeans(List<NurseFriendsEntity> entities) {
+        List<Long>             friendIds = new ArrayList<Long>();
+        List<NurseEntity>      nurses    = null;
+        List<Long>             imageIds  = new ArrayList<Long>();
+        Map<Long, String>      img2URLs  = null;
+
+        List<NurseFriendsBean> beans     = new ArrayList<NurseFriendsBean>();
+        for(NurseFriendsEntity entity : entities){
+            NurseFriendsBean bean = beanConverter.convert(entity);
+            beans.add(bean);
+            friendIds.add(bean.getFriendId());
+        }
+
+        nurses = nurseRepository.findNurseByIdIn(friendIds);
+        for (NurseEntity nurse : nurses) {
+            imageIds.add(nurse.getProfilePhotoId());
+        }
+        img2URLs = storageService.getFilePath(imageIds);
+
+        // set friend name and profile photo image url
+        String friendName     = null;
+        String profilePhoto   = null;
+        Long   profilePhotoId = -1L;
+        for (NurseFriendsBean nurseFriend : beans) {
+            for (NurseEntity nurse : nurses) {
+                if (nurseFriend.getFriendId()==nurse.getId()) {
+                    friendName     = nurse.getName();
+                    profilePhotoId = nurse.getProfilePhotoId();
+                    profilePhoto   = img2URLs.get(profilePhotoId);
+
+                    nurseFriend.setFriendName(friendName);
+                    nurseFriend.setHeadPhotoUrl(profilePhoto);
+                    break;
+                }
+            }
+        }
+        return beans;
     }
 }
