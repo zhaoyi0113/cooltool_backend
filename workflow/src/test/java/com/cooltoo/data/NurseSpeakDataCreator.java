@@ -26,6 +26,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -60,7 +61,12 @@ public class NurseSpeakDataCreator {
 
     @Test
     public void testAddNurseSpeak(){
-        addNurseSpeak(nurseRepository.findNurseByNameContaining(MockDataCreator.NURSE_NAME_PREFIX));
+        Iterable<NurseEntity> nurses = nurseRepository.findAll();
+        List<NurseEntity> entities = new ArrayList<NurseEntity>();
+        for(NurseEntity entity : nurses){
+            entities.add(entity);
+        }
+        addNurseSpeak(entities);
     }
 
     private void addNurseSpeak(List<NurseEntity> nurseEntities) {

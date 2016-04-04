@@ -79,7 +79,6 @@ public class MockDataCreator  {
     @Test
     public void testCreateNurse() {
         List<NurseEntity> nurse = createNurse();
-        createFriendRelation(nurse);
     }
 
     private List<NurseEntity> createNurse() {
@@ -140,32 +139,6 @@ public class MockDataCreator  {
         return inputStream;
     }
 
-    private void createFriendRelation(final List<NurseEntity> nurseEntities) {
-        ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
-        final CountDownLatch latch = new CountDownLatch(nurseEntities.size());
-        for (int i = 0; i < nurseEntities.size(); i++) {
-            final int ii = i;
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    int number = (int)getRandomInt(10,100);
-                    for(int j=0; j<number; j++){
-                        int index = (int)getRandomInt(0, nurseEntities.size());
-                        NurseEntity user = nurseEntities.get(ii);
-                        NurseEntity friend = nurseEntities.get(index);
-                        logger.info("add friend between "+user.getName()+", "+friend.getName());
-                        nurseFriendsService.addFriend(user.getId(), friend.getId());
-                    }
-                    latch.countDown();
-                }
-            });
-        }
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
     private NurseEntity saveNurse(NurseEntity entity) {
         List<NurseEntity> found = nurseRepository.findNurseByMobile(entity.getMobile());
