@@ -1,5 +1,7 @@
 package com.cooltoo.beans;
 
+import java.util.List;
+
 /**
  * Created by lg380357 on 2016/3/5.
  */
@@ -15,6 +17,7 @@ public class HospitalDepartmentBean {
     private String disableImageUrl;
     private int parentId;
     private boolean parentValid;
+    private List<HospitalDepartmentBean> subDepartment;
 
     public int getId() {
         return id;
@@ -94,6 +97,14 @@ public class HospitalDepartmentBean {
 
     public void setParentValid(boolean parentValid) {
         this.parentValid = parentValid;
+    }
+
+    public List<HospitalDepartmentBean> getSubDepartment() {
+        return this.subDepartment;
+    }
+
+    public void setSubDepartment(List<HospitalDepartmentBean> subDepartment) {
+        this.subDepartment = subDepartment;
     }
 
     public String toString() {

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -83,13 +84,37 @@ public class HospitalDepartmentService {
     }
 
     public List<HospitalDepartmentBean> getAllTopLevelDepartment() {
-        List<HospitalDepartmentBean> allDepartments = getAll();
-        List<HospitalDepartmentBean> allTopLevels   = new ArrayList<HospitalDepartmentBean>();
+        List<HospitalDepartmentBean>               allDepartments = getAll();
+        List<HospitalDepartmentBean>               allTopLevels   = new ArrayList<HospitalDepartmentBean>();
+        List<HospitalDepartmentBean>               subDepartment  = null;
+        Map<Integer, List<HospitalDepartmentBean>> id2SubDepart   = new Hashtable<Integer, List<HospitalDepartmentBean>>();
+
         for(HospitalDepartmentBean department : allDepartments) {
             if (department.getParentId() <= 0) {
                 allTopLevels.add(department);
+                subDepartment = new ArrayList<HospitalDepartmentBean>();
+                id2SubDepart.put(department.getId(), subDepartment);
             }
         }
+
+        for(HospitalDepartmentBean department : allDepartments) {
+            if (department.getParentId()<=0) {
+                continue;
+            }
+            int parentId = department.getParentId();
+            subDepartment = id2SubDepart.get(parentId);
+            if (null==subDepartment) {
+                continue;
+            }
+            subDepartment.add(department);
+        }
+
+        for (HospitalDepartmentBean department : allTopLevels) {
+            long topLevelId = department.getId();
+            subDepartment   = id2SubDepart.get(topLevelId);
+            department.setSubDepartment(subDepartment);
+        }
+
         return allTopLevels;
     }
 
