@@ -12,7 +12,7 @@ import java.util.Map;
 public class NurseBean {
 
     public static final String SKILL_NOMINATION = "skill_nomination";
-
+    public static final String HOSPITAL_DEPARTMENT= "hospital_department";
     public static final String FRIENDS_COUNT = "friend_count";
     public static final String SPEAK_COUNT = "speak_count";
     public static final String NORMINATED_COUNT = "norminated_count";

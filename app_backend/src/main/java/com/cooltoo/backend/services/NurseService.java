@@ -9,6 +9,7 @@ import com.cooltoo.backend.leancloud.LeanCloudService;
 import com.cooltoo.backend.repository.HospitalRepository;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.exception.BadRequestException;
@@ -56,6 +57,8 @@ public class NurseService {
     private LeanCloudService leanCloudService;
     @Autowired
     private NurseQualificationService qualificationService;
+    @Autowired
+    private NurseHospitalRelationService hospitalRelationService;
 
     @Transactional
     public long registerNurse(String name, int age,
@@ -97,6 +100,15 @@ public class NurseService {
         if(!nurseHospitals.isEmpty()){
             nurse.setHospital(nurseHospitals.get(0).getName());
         }
+        try {
+            NurseHospitalRelationBean relation = hospitalRelationService.getRelationByNurseId(id);
+            if (null != relation) {
+                nurse.setProperty(NurseBean.HOSPITAL_DEPARTMENT, relation);
+            }
+        }
+        catch (Exception ex) {
+        }
+
         long speakCount = speakService.getNurseSpeakCount(id);
         nurse.setProperty(NurseBean.SPEAK_COUNT, speakCount);
         long norminated = this.nominationService.getUserAllSkillNominatedCount(id);

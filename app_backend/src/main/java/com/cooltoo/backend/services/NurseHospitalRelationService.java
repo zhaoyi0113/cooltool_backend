@@ -90,9 +90,14 @@ public class NurseHospitalRelationService {
 
     @Transactional
     public Long newOne(NurseHospitalRelationBean bean) {
-        HospitalBean           hospital     = null;
-        HospitalDepartmentBean department   = null;
-        HospitalDepartmentBean parentDepart = null;
+        HospitalBean                hospital     = null;
+        HospitalDepartmentBean      department   = null;
+        HospitalDepartmentBean      parentDepart = null;
+        NurseHospitalRelationEntity relation     = null;
+        List<NurseHospitalRelationEntity> relations = repository.findByNurseId(bean.getNurseId());
+        if (!relations.isEmpty()) {
+            relation = relations.get(0);
+        }
 
         nurseService.getNurse(bean.getNurseId());
         if (bean.getHospitalId()>0) {
@@ -105,7 +110,15 @@ public class NurseHospitalRelationService {
             }
         }
 
-        List<NurseHospitalRelationEntity> relations = repository.findByNurseId(bean.getNurseId());
+        if (null!=relation) {
+            if (relation.getDepartmentId()>0 && bean.getDepartmentId()<=0) {
+                bean.setDepartmentId(relation.getDepartmentId());
+            }
+            if (relation.getHospitalId()>0 && bean.getHospitalId()<=0) {
+                bean.setHospitalId(relation.getHospitalId());
+            }
+        }
+
         if (!relations.isEmpty()) {
             repository.delete(relations);
         }

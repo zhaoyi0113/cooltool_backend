@@ -181,26 +181,28 @@ public class NurseFriendsService {
         List<Long>               friendNotExistIds  = new ArrayList<Long>();
         List<NurseFriendsBean>   userFriends        = new ArrayList<NurseFriendsBean>();
         List<NurseFriendsBean>   searchFriends      = new ArrayList<NurseFriendsBean>();
-        Page<NurseFriendsEntity> searchFriendsE     = null;
+        Page<NurseFriendsEntity> searchFriendsPE    = null;
+        List<NurseFriendsEntity> searchFriendsE     = new ArrayList<NurseFriendsEntity>();
 
         // search self friends
         if (!searchSelf) {
             List<NurseFriendsEntity> userFriendsE = friendsRepository.findByUserId(userId);
-            for(NurseFriendsEntity userFriend: userFriendsE){
-                userFriends.add(beanConverter.convert(userFriend));
-            }
+            userFriends = convertToNurseFriendsBeans(userFriendsE);
         }
 
         // search searchId's friends
-        searchFriendsE = friendsRepository.findNurseFriendByUserId(searchId, pageSort);
-        for(NurseFriendsEntity searchFriendE: searchFriendsE){
+        searchFriendsPE = friendsRepository.findNurseFriendByUserId(searchId, pageSort);
+        for (NurseFriendsEntity searchFriendE: searchFriendsPE) {
+            searchFriendsE.add(searchFriendE);
+        }
+
+        searchFriends = convertToNurseFriendsBeans(searchFriendsE);
+        for(NurseFriendsBean searchFriend: searchFriends){
             // jump over not agreed of user who been searched
             //if (AgreeType.AGREED!=searchFriendE.getIsAgreed()) {
             //    continue;
             //}
 
-            NurseFriendsBean searchFriend = beanConverter.convert(searchFriendE);
-            searchFriends.add(searchFriend);
             friendIds.add(searchFriend.getFriendId());
             // judge is self friends
             if(searchSelf){
