@@ -250,11 +250,17 @@ public class NurseService {
     }
 
     @Transactional
-    public NurseBean updateMobilePassword(long id, String smsCode, String newMobile, String password, String newPassword) {
-        logger.info("modify the password and mobile : [smsCode"+smsCode+", newMobile="+newMobile+", password="+password+", newPassword="+newPassword+"]");
+    public NurseBean updateMobilePassword(long id, String smsCode, String mobile, String newMobile, String password, String newPassword) {
+        logger.info("modify the password and mobile : [smsCode"+smsCode+", mobile=" +mobile+ ", newMobile="+newMobile+", password="+password+", newPassword="+newPassword+"]");
 
         NurseBean nurse = getNurse(id);
         // if not modify the mobile
+        if (!VerifyUtil.isStringEmpty(mobile)) {
+            if (!mobile.equals(nurse.getMobile())) {
+                logger.error("the mobile is not equals to the user setting");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
         if (VerifyUtil.isStringEmpty(newMobile)) {
             newMobile = nurse.getMobile();
         }
@@ -273,6 +279,9 @@ public class NurseService {
                 logger.info("the new password is same with old password.");
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
+        }
+        else if (!VerifyUtil.isStringEmpty(mobile) && !VerifyUtil.isStringEmpty(newPassword)) {
+            //newPassword = newPassword;
         }
         else {
             newPassword = null;

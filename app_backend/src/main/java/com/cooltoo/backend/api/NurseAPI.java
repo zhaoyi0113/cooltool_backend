@@ -143,16 +143,13 @@ public class NurseAPI {
     @Path("/update/mobile_password")
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response updateNurse(
-            @Context HttpServletRequest request,
-            @FormParam("smscode") String smsCode,
-            @FormParam("mobile") String newMobile,
-            @FormParam("password") String password,
-            @FormParam("new_password") String newPassword
-
-    ) {
+    public Response updateNurse(@Context HttpServletRequest request,
+                                @FormParam("smscode") String smsCode,
+                                @FormParam("mobile") String newMobile,
+                                @FormParam("password") String password,
+                                @FormParam("new_password") String newPassword) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseBean bean = service.updateMobilePassword(userId, smsCode, newMobile, password, newPassword);
+        NurseBean bean = service.updateMobilePassword(userId, smsCode, null, newMobile, password, newPassword);
         logger.info("update nurse mobile and password is " + bean);
         return Response.ok(bean).build();
     }
@@ -161,14 +158,12 @@ public class NurseAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response updatePassword(
-            @Context HttpServletRequest request,
-            @FormParam("smscode") String smsCode,
-            @FormParam("mobile") String newMobile
-    ) {
+    public Response updateMobile(@Context HttpServletRequest request,
+                                 @FormParam("smscode") String smsCode,
+                                 @FormParam("mobile") String newMobile) {
         logger.info("update nurse mobile is {}.", newMobile);
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseBean bean = service.updateMobilePassword(userId, smsCode, newMobile, null, null);
+        NurseBean bean = service.updateMobilePassword(userId, smsCode, null, newMobile, null, null);
         logger.info("update nurse mobile is {}.", bean);
         return Response.ok(bean).build();
     }
@@ -177,16 +172,29 @@ public class NurseAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response updateMobile(
-            @Context HttpServletRequest request,
-            @FormParam("smscode") String smsCode,
-            @FormParam("password") String password,
-            @FormParam("new_password") String newPassword
-    ) {
+    public Response updatePassword(@Context HttpServletRequest request,
+                                   @FormParam("smscode") String smsCode,
+                                   @FormParam("password") String password,
+                                   @FormParam("new_password") String newPassword) {
         logger.info("update nurse password is {}.", newPassword);
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseBean bean = service.updateMobilePassword(userId, smsCode, null, password, newPassword);
-        logger.info("update nurse mobile is {}.", bean);
+        NurseBean bean = service.updateMobilePassword(userId, smsCode, null, null, password, newPassword);
+        logger.info("update nurse password is {}.", bean);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/reset_password")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response resetPassword(@Context HttpServletRequest request,
+                                  @FormParam("smscode") String smsCode,
+                                  @FormParam("mobile") String mobile,
+                                  @FormParam("new_password") String newPassword) {
+        logger.info("reset nurse password is {}.", newPassword);
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean bean = service.updateMobilePassword(userId, smsCode, mobile, null, null, newPassword);
+        logger.info("reset nurse password is {}.", bean);
         return Response.ok(bean).build();
     }
 
@@ -194,10 +202,8 @@ public class NurseAPI {
     @Path("/short_note")
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response setShortNote(
-            @Context HttpServletRequest request,
-            @FormParam("short_note") String shortNote
-    ) {
+    public Response setShortNote(@Context HttpServletRequest request,
+                                 @FormParam("short_note") String shortNote) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean one = service.setShortNote(userId, shortNote);
         logger.info("set short note " + one);
@@ -211,10 +217,9 @@ public class NurseAPI {
     @Path("/realname_identification")
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response setRealNameAndIdentification(
-            @Context HttpServletRequest request,
-            @FormParam("realName") String realName,
-            @FormParam("identification") String identification
+    public Response setRealNameAndIdentification(@Context HttpServletRequest request,
+                                                 @FormParam("realName") String realName,
+                                                 @FormParam("identification") String identification
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean one = service.setRealNameAndIdentification(userId, realName, identification);
