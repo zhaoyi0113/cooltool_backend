@@ -110,8 +110,8 @@ public class HospitalDepartmentService {
         }
 
         for (HospitalDepartmentBean department : allTopLevels) {
-            long topLevelId = department.getId();
-            subDepartment   = id2SubDepart.get(topLevelId);
+            int topLevelId = department.getId();
+            subDepartment  = id2SubDepart.get(topLevelId);
             department.setSubDepartment(subDepartment);
         }
 
