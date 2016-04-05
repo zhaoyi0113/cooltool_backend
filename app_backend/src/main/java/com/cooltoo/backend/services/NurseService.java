@@ -189,21 +189,24 @@ public class NurseService {
 
     @Transactional
     public NurseBean setRealNameAndIdentification(long id, String realName, String identification) {
+        boolean changed = false;
         NurseEntity nurse = repository.findOne(id);
         if (null==nurse) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
         logger.info("nurse real name is : " + realName);
         logger.info("nurse identification is : " + identification);
-        if (VerifyUtil.isStringEmpty(realName)) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        if (!VerifyUtil.isStringEmpty(realName)) {
+            nurse.setRealName(realName);
+            changed = true;
         }
-        if (!NumberUtil.isIdentificationValid(identification)) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        if (NumberUtil.isIdentificationValid(identification)) {
+            nurse.setIdentification(identification);
+            changed = true;
         }
-        nurse.setRealName(realName);
-        nurse.setIdentification(identification);
-        nurse = repository.save(nurse);
+        if (changed) {
+            nurse = repository.save(nurse);
+        }
         return beanConverter.convert(nurse);
     }
 
