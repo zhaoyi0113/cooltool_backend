@@ -183,7 +183,7 @@ public class NurseAPI {
         return Response.ok(bean).build();
     }
 
-    @Path("/reset_password")
+    @Path("/update/reset_password")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
