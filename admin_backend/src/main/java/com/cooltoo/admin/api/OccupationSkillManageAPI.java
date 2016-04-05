@@ -48,15 +48,11 @@ public class OccupationSkillManageAPI {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response addOccupationSkill(
-            @FormDataParam("name") String name,
-            @FormDataParam("type") String type,
-            @FormDataParam("factor") int factor,
-            @FormDataParam("file") InputStream imageStream,
-            @FormDataParam("disable_file") InputStream disableImageStream) {
-
-        logger.info("add new occupation skill parameters is ==== name={}, type={}, factor={}, image={}, disableImage={}.", name, type, factor, null!=imageStream, null!=disableImageStream);
-        OccupationSkillBean skill = skillService.addNewOccupationSkill(name, type, factor, imageStream, disableImageStream);
+    public Response addOccupationSkill(@FormDataParam("name") String name,
+                                       @FormDataParam("type") String type,
+                                       @FormDataParam("factor") int factor) {
+        logger.info("add new occupation skill parameters is ==== name={}, type={}, factor={}, image={}, disableImage={}.", name, type, factor, null, null);
+        OccupationSkillBean skill = skillService.addNewOccupationSkill(name, type, factor, null, null);
         logger.info("add new occupation skill is " + skill.toString());
         return Response.ok(skill).build();
     }
@@ -68,10 +64,10 @@ public class OccupationSkillManageAPI {
         return Response.ok().build();
     }
 
-    @POST
-    @Path("/edit")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
+//    @POST
+//    @Path("/edit")
+//    @Consumes(MediaType.MULTIPART_FORM_DATA)
+//    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkill(@FormDataParam("id") int id,
                                         @FormDataParam("type") String type,
                                         @FormDataParam("name") String name,
