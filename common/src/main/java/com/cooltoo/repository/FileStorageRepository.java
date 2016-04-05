@@ -12,4 +12,7 @@ import java.util.List;
 public interface FileStorageRepository extends CrudRepository<FileStorageEntity, Long>{
 
     public List<FileStorageEntity> findStorageByIdIn(List<Long> ids, Sort sort);
+
+    public void deleteByIdIn(List<Long> ids);
+
 }

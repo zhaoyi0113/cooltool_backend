@@ -173,6 +173,31 @@ public class StorageService {
         }
     }
 
+    public void deleteFiles(List<Long> ids) {
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        List<FileStorageEntity> all = storageRepository.findStorageByIdIn(ids, sort);
+        if (null==all || all.isEmpty()) {
+            return;
+        }
+        for (FileStorageEntity one : all) {
+            deleteFile(one);
+        }
+        storageRepository.deleteByIdIn(ids);
+    }
+
+    private void deleteFile(FileStorageEntity entity) {
+        String storageDirectory = getStoragePath() + File.separator;
+        String relativePath = entity.getFilePath();
+        File imageFile = new File(storageDirectory + relativePath);
+        try {
+            if (imageFile.exists()) {
+                imageFile.delete();
+            }
+        } catch (Exception ex) {
+            logger.error("failed to delete existing file === " + imageFile, ex);
+        }
+    }
+
     private static String sha1(String input) throws NoSuchAlgorithmException {
         MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
         byte[] result = sha1Digest.digest(input.getBytes());

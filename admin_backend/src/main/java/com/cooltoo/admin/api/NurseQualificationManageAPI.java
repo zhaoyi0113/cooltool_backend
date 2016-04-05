@@ -38,9 +38,8 @@ public class NurseQualificationManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getAllNurseQualification(
-            @Context HttpServletRequest request,
-            @PathParam("nurse_id") long nurseId
+    public Response getAllNurseQualification(@Context HttpServletRequest request,
+                                             @PathParam("nurse_id") long nurseId
     ) {
         List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(nurseId);
         return Response.ok(qualifications).build();
@@ -50,11 +49,10 @@ public class NurseQualificationManageAPI {
     @Path("/approve")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response approveNurseQualification(
-            @Context HttpServletRequest request,
-            @FormParam("id") long id
+    public Response approveNurseQualification(@Context HttpServletRequest request,
+                                              @FormParam("id") long qualificationId
     ) {
-        NurseQualificationBean bean = qualificationService.updateNurseQualification(id, null, null, null, null, VetStatus.COMPLETED, null, null);
+        NurseQualificationBean bean = qualificationService.updateQualification(qualificationId, null, VetStatus.COMPLETED, null);
         return Response.ok(bean).build();
     }
 
@@ -62,16 +60,15 @@ public class NurseQualificationManageAPI {
     @Path("/deny")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response denyNurseQualification(
-            @Context HttpServletRequest request,
-            @FormParam("id") long id,
-            @FormParam("reason") String statusDescr
-    ) {
+    public Response denyNurseQualification(@Context HttpServletRequest request,
+                                           @FormParam("id") long qualificationId,
+                                           @FormParam("reason") String statusDescr
+) {
         if (VerifyUtil.isStringEmpty(statusDescr)) {
             logger.info("The deny reason is empty!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        NurseQualificationBean bean = qualificationService.updateNurseQualification(id, null, null, null, null, VetStatus.FAILED, statusDescr, null);
+        NurseQualificationBean bean = qualificationService.updateQualification(qualificationId, null, VetStatus.FAILED, statusDescr);
         return Response.ok(bean).build();
     }
 
@@ -79,13 +76,13 @@ public class NurseQualificationManageAPI {
     @Path("/edit")
     @Produces(MediaType.MULTIPART_FORM_DATA)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response updateNurseQualification(
-            @Context HttpServletRequest request,
-            @FormDataParam("id") long id,
-            @FormDataParam("expiry") String expiry,
-            @FormDataParam("file_name") String fileName,
-            @FormDataParam("file") InputStream file,
-            @FormDataParam("file") FormDataContentDisposition disposition
+    public Response updateNurseQualification(@Context HttpServletRequest request,
+                                             @FormDataParam("qualification_file_id") int fileId,
+                                             @FormDataParam("type") String workfileType,
+                                             @FormDataParam("expiry") String expiry,
+                                             @FormDataParam("file_name") String fileName,
+                                             @FormDataParam("file") InputStream file,
+                                             @FormDataParam("file") FormDataContentDisposition disposition
     ) {
         Date expiryTime = null;
         if (!VerifyUtil.isStringEmpty(expiry)) {
@@ -97,18 +94,17 @@ public class NurseQualificationManageAPI {
                 fileName = disposition.getFileName();
             }
         }
-        NurseQualificationBean bean = qualificationService.updateNurseQualification(id, null, null, fileName, file, null, null, expiryTime);
-        return Response.ok(bean).build();
+        qualificationService.updateQualificationFile(fileId, workfileType, fileName, file, expiryTime);
+        return Response.ok().build();
     }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response deleteNurseQualification(
-            @Context HttpServletRequest request,
-            @FormParam("id") long id
+    public Response deleteNurseQualification(@Context HttpServletRequest request,
+                                             @FormParam("id") long qualificationId
     ) {
-        NurseQualificationBean bean = qualificationService.deleteNurseQualification(id);
+        NurseQualificationBean bean = qualificationService.deleteNurseQualification(qualificationId);
         return Response.ok(bean).build();
     }
 }

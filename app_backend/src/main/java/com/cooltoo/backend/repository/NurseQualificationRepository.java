@@ -17,8 +17,7 @@ public interface NurseQualificationRepository extends JpaRepository<NurseQualifi
 
     List<NurseQualificationEntity> findNurseQualificationByUserIdAndName(long userId, String name, Sort sort);
 
-    List<NurseQualificationEntity> findByUserIdAndWorkFileType(long userId, int workfileType, Sort sort);
-
     List<NurseQualificationEntity> findByIdIn(List<Long> ids);
+
     void deleteByIdIn(List<Long> ids);
 }

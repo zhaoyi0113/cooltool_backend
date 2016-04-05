@@ -1,6 +1,7 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseQualificationBean;
+import com.cooltoo.backend.beans.NurseQualificationFileBean;
 import com.cooltoo.backend.beans.WorkFileTypeBean;
 import com.cooltoo.backend.converter.NurseQualificationBeanConverter;
 import com.cooltoo.backend.entities.NurseQualificationEntity;
@@ -21,6 +22,7 @@ import java.io.InputStream;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by zhaolisong on 16/3/23.
@@ -31,154 +33,74 @@ public class NurseQualificationService {
     private static final Logger logger = LoggerFactory.getLogger(NurseQualificationService.class.getName());
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.ASC,  "name"),
-            new Sort.Order(Sort.Direction.DESC, "timeCreated"));
+            new Sort.Order(Sort.Direction.ASC,  "name"));
 
     @Autowired
-    private NurseQualificationRepository workfileRepository;
-
+    private NurseQualificationRepository qualificationRepository;
     @Autowired
-    private NurseRepository nurseRepository;
-
+    private NurseQualificationBeanConverter beanConverter;
     @Autowired
     private WorkFileTypeService workfileTypeService;
-
+    @Autowired
+    private NurseRepository nurseRepository;
+    @Autowired
+    private NurseQualificationFileService qualificationFileService;
     @Autowired
     @Qualifier("StorageService")
     private StorageService storageService;
-
-    @Autowired
-    private NurseQualificationBeanConverter workfileBeanConverter;
 
     //=======================================================
     //         add qualification file
     //=======================================================
 
+    @Transactional
     public NurseQualificationBean addWorkFile(long nurseId, String name, String workfileType, String fileName, InputStream file) {
-        WorkFileType type = WorkFileType.parseString(workfileType);
-        WorkFileTypeBean workFileTypeB = workfileTypeService.getWorkFileTypeByType(type);
-        NurseQualificationBean retVal = addWorkFile(nurseId, name, workFileTypeB, fileName, file);
-        return retVal;
-    }
+        if (!nurseRepository.exists(nurseId)) {
+            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+        }
 
-    private NurseQualificationBean addWorkFile(long nurseId, String name, WorkFileTypeBean workfileType, String fileName, InputStream file) {
-        NurseQualificationEntity qualificationEntity = new NurseQualificationEntity();
-        logger.info("add nurse id is : " + nurseId);
-        logger.info("add nurse qualification name is : " + name);
-        logger.info("add nurse work file type is : " + workfileType);
-        logger.info("add nurse work file name is : " + fileName);
-        logger.info("add nurse work file is null : " + (null==file));
-
+        WorkFileType                   type           = WorkFileType.parseString(workfileType);
+        WorkFileTypeBean               workFileTypeB  = workfileTypeService.getWorkFileTypeByType(type);
         // check work file type
-        if (null==workfileType) {
+        if (null==workFileTypeB) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
-        List<NurseQualificationEntity> qualifications = workfileRepository.findByUserIdAndWorkFileType(nurseId, workfileType.getId(), sort);
-        if (qualifications.size()>=workfileType.getMaxFileCount()) {
-            logger.info("add nurse qualification file type is reach the max limit number!");
-            throw new BadRequestException(ErrorCode.NURSE_QUALIFICATION_IDENTIFICATION_EXIST);
-        }
-
-        // is Qualification exist
-        //List<NurseQualificationEntity> qualifications = workfileRepository.findNurseQualificationByUserIdAndName(nurseId, name, sort);
-        //if (!qualifications.isEmpty()) {
-        //    throw new BadRequestException(ErrorCode.NURSE_QUALIFICATION_NAME_EXIST);
-        //}
-
-        // set NurseId
-        qualificationEntity.setUserId(nurseId);
-
-        // set QualificationName
-        //if (VerifyUtil.isStringEmpty(name)) {
-        //    throw new BadRequestException(ErrorCode.DATA_ERROR);
-        //}
-        if (!VerifyUtil.isStringEmpty(name)) {
-            qualificationEntity.setName(name);
-        }
-
-        // set QualificationType
-        qualificationEntity.setWorkFileType(workfileType.getId());
-
-        // set WorkFileId and Status
-        if (null==file) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        List<NurseQualificationEntity> qualifications = qualificationRepository.findNurseQualificationByUserId(nurseId, sort);
+        NurseQualificationEntity       qualification  = null;
+        // check nurse qualification record
+        if (null==qualifications || qualifications.isEmpty()) {
+            qualification = new NurseQualificationEntity();
+            if (!VerifyUtil.isStringEmpty(name)) {
+                qualification.setName(name);
+            }
+            qualification.setUserId(nurseId);
         }
         else {
-            if (VerifyUtil.isStringEmpty(fileName)) {
-                fileName = "tmp"+System.nanoTime();
-            }
-            long workFileId = storageService.saveFile(0, fileName, file);
-            if (workFileId > 0) {
-                qualificationEntity.setWorkFileId(workFileId);
-                qualificationEntity.setStatus(VetStatus.NEED_UPLOAD);
-            }
-            else {
-                throw new BadRequestException(ErrorCode.WORK_FILE_UPLOAD_FAILED);
-            }
+            qualification = qualifications.get(0);
         }
+        qualification.setStatus(VetStatus.WAITING);
+        qualification = qualificationRepository.save(qualification);
 
-        // set TimeCreated
-        qualificationEntity.setTimeCreated(new Date());
-
-        // save record
-        qualificationEntity = workfileRepository.save(qualificationEntity);
-
-        // convert to bean
-        NurseQualificationBean retVal = workfileBeanConverter.convert(qualificationEntity);
-        if (qualificationEntity.getWorkFileId() > 0) {
-            String fileURL = storageService.getFilePath(qualificationEntity.getWorkFileId());
-            retVal.setWorkFileURL(fileURL);
-        }
-
-        logger.info("add nurse qualification file is " + retVal);
-        return retVal;
+        qualificationFileService.addQualificationFile(qualification.getId(), workFileTypeB, fileName, file);
+        return beanConverter.convert(qualification);
     }
-
-
 
     //=======================================================
     //     delete qualification file
     //=======================================================
 
+    @Transactional
     public NurseQualificationBean deleteNurseQualification(long qualificationId) {
-        NurseQualificationEntity entity = workfileRepository.findOne(qualificationId);
+        NurseQualificationEntity entity = qualificationRepository.findOne(qualificationId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
-        NurseQualificationBean bean = workfileBeanConverter.convert(entity);
-        if (entity.getWorkFileId() > 0) {
-            storageService.deleteFile(entity.getWorkFileId());
-        }
-
-        workfileRepository.delete(entity);
+        NurseQualificationBean bean = beanConverter.convert(entity);
+        qualificationFileService.deleteFileByQualificationId(bean.getId());
+        qualificationRepository.delete(entity);
         return bean;
-    }
-
-    public void deleteNurseQualification(String qualificationIds) {
-        if(!VerifyUtil.isOccupationSkillIds(qualificationIds)) {
-            logger.info("parameters : " + qualificationIds + "   is error!");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        String[]   stringIds = qualificationIds.split(",");
-        List<Long> qualifIds = new ArrayList<Long>();
-        List<Long> imageIds  = new ArrayList<Long>();
-        for (int i = 0; i < stringIds.length; i ++) {
-            String stringId = stringIds[i];
-            qualifIds.add(Long.parseLong(stringId));
-        }
-
-        List<NurseQualificationEntity> allQualif = workfileRepository.findByIdIn(qualifIds);
-        for (NurseQualificationEntity entity : allQualif) {
-            imageIds.add(entity.getWorkFileId());
-        }
-        workfileRepository.deleteByIdIn(qualifIds);
-
-        for (Long imageId : imageIds) {
-            storageService.deleteFile(imageId);
-        }
-        return;
     }
 
     //=======================================================
@@ -186,68 +108,47 @@ public class NurseQualificationService {
     //=======================================================
 
     public List<NurseQualificationBean> getAllNurseQualifications(long nurseId) {
-        List<NurseQualificationEntity> qualifications = workfileRepository.findNurseQualificationByUserId(nurseId, sort);
+        List<NurseQualificationEntity> qualifications = qualificationRepository.findNurseQualificationByUserId(nurseId, sort);
+        if (null==qualifications || qualifications.isEmpty()) {
+            logger.info("The qualification record is empty!");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (qualifications.size()>1) {
+            logger.info("The qualification record is more than one! " + qualifications);
+        }
         return parseEntities(nurseId, qualifications);
     }
 
     private List<NurseQualificationBean> parseEntities(long userId, List<NurseQualificationEntity> entities) {
 
-        // speak ids/file ids cache
-        List<WorkFileTypeBean> fileTypes  = workfileTypeService.getAllWorkFileType();
-        List<Long>             ids        = new ArrayList<Long>();
-        List<Long>             fileIds    = new ArrayList<Long>();
-        NurseQualificationBean bean       = null;
+        // qualification ids/file ids cache
+        NurseQualificationBean           bean      = null;
+        List<NurseQualificationBean>     beans     = new ArrayList<NurseQualificationBean>();
+        List<NurseQualificationFileBean> files     = null;
 
-        // convert to bean
-        Map<Long, NurseQualificationBean> idToBeanMap = new Hashtable<Long, NurseQualificationBean>();
+
         for (NurseQualificationEntity entity : entities) {
-            bean = workfileBeanConverter.convert(entity);
-
-            // cache the ids and file ids
-            idToBeanMap.put(bean.getId(), bean);
-            ids.add(bean.getId());
-            fileIds.add(bean.getWorkFileId());
-
-            for(WorkFileTypeBean fileType : fileTypes) {
-                if (bean.getWorkFileType() == fileType.getId()) {
-                    bean.setWorkFileTypeBean(fileType);
-                    break;
-                }
-            }
+            bean = beanConverter.convert(entity);
+            files = qualificationFileService.getAllFileByQualificationId(bean.getId());
+            bean.setWorkfiles(files);
+            beans.add(bean);
         }
 
-        // get image url of speak
-        Map<Long, String> idToPath = storageService.getFilePath(fileIds);
-        for (NurseQualificationEntity entity : entities) {
-            long speakId = entity.getId();
-            long imageId = entity.getWorkFileId();
-            String imageUrl = idToPath.get(imageId);
-            if (VerifyUtil.isStringEmpty(imageUrl)) {
-                continue;
-            }
-            bean = idToBeanMap.get(speakId);
-            bean.setWorkFileURL(imageUrl);
-        }
-
-        // construct return values
-        List<NurseQualificationBean> workfileBeans  = new ArrayList<NurseQualificationBean>();
-        for (NurseQualificationEntity entity : entities) {
-            long speakId = entity.getId();
-            bean = idToBeanMap.get(speakId);
-            workfileBeans.add(bean);
-        }
-        return workfileBeans;
+        return beans;
     }
 
-    public WorkFileTypeBean getWorkFileTypeBean(String workFileType) {
-        WorkFileType filetype = WorkFileType.parseString(workFileType);
-        if (null==filetype) {
+    public WorkFileTypeBean getWorkFileTypeBean(String strWorkfileType) {
+        WorkFileType enumType = WorkFileType.parseString(strWorkfileType);
+        if (null==enumType) {
+            logger.info("The workfile type do not have the relative WorkFileType enumeration =={}", strWorkfileType);
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        WorkFileTypeBean workfileType = workfileTypeService.getWorkFileTypeByType(filetype);
+        WorkFileTypeBean workfileType = workfileTypeService.getWorkFileTypeByType(enumType);
         if (null==workfileType) {
+            logger.info("The WorkFileType enumeration do not have the relative WorkFileTypeBean =={}", enumType);
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
+        logger.info("workfiletype {} ===== WorkFileTypeBean {}", strWorkfileType, workfileType);
         return workfileType;
     }
 
@@ -255,51 +156,37 @@ public class NurseQualificationService {
     //   update qualification file
     //=======================================================
 
-    public NurseQualificationBean updateWorkFile(long id, String name, String workFileType, String fileName, InputStream file, VetStatus status, String statusDescr, Date expiryTime) {
-        WorkFileTypeBean workfileType = workfileTypeService.getWorkFileTypeByType(WorkFileType.OTHER);
-        NurseQualificationBean bean = updateNurseQualification(id, name, workfileType, fileName, file, status, statusDescr, expiryTime);
-        return bean;
-    }
-
-    public NurseQualificationBean updateNurseQualification(long id, String name, WorkFileTypeBean fileType, String fileName, InputStream file, VetStatus status, String statusDescr, Date expiryTime) {
-        logger.info("update nurse qualification file type is : " + fileType);
-
-        NurseQualificationEntity entity = workfileRepository.findOne(id);
+    public NurseQualificationBean updateQualification(long qualificatinId, String name, VetStatus status, String statusDescr) {
+        NurseQualificationEntity entity = qualificationRepository.findOne(qualificatinId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (!VerifyUtil.isStringEmpty(name)) {
+
+        boolean changed = false;
+        if(!VerifyUtil.isStringEmpty(name)) {
             entity.setName(name);
-        }
-        if (null!=fileType && fileType.getId()!=(entity.getWorkFileType())) {
-            entity.setWorkFileType(fileType.getId());
+            changed = true;
         }
         if (null!=status && !status.equals(entity.getStatus())) {
             entity.setStatus(status);
-        }
-        String fileUrl = null;
-        if (null!=file && !VerifyUtil.isStringEmpty(fileName)) {
-            long fileId = storageService.saveFile(entity.getWorkFileId(), fileName, file);
-            if (fileId>0) {
-                fileUrl = storageService.getFilePath(fileId);
-                entity.setWorkFileId(fileId);
-            }
-            else {
-                throw new BadRequestException(ErrorCode.WORK_FILE_UPLOAD_FAILED);
-            }
+            changed = true;
         }
         if (!VerifyUtil.isStringEmpty(statusDescr)) {
             entity.setStatusDesc(statusDescr);
-        }
-        if (null!=expiryTime) {
-            entity.setTimeExpiry(expiryTime);
+            changed = true;
         }
 
-        workfileRepository.save(entity);
-        NurseQualificationBean bean = workfileBeanConverter.convert(entity);
-        if (!VerifyUtil.isStringEmpty(fileUrl)) {
-            bean.setWorkFileURL(fileUrl);
+        if (changed) {
+            qualificationRepository.save(entity);
         }
+
+        NurseQualificationBean bean = beanConverter.convert(entity);
         return bean;
+    }
+
+    public void updateQualificationFile(int qualificationFileId, String workfileType, String fileName, InputStream file, Date expiryTime) {
+        WorkFileTypeBean workfileTypeB = getWorkFileTypeBean(workfileType);
+        qualificationFileService.updateQualificationFile(qualificationFileId, workfileTypeB, fileName, file, expiryTime);
+        return;
     }
 }
