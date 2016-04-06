@@ -24,9 +24,9 @@ public enum WorkFileType {
         else if (EMPLOYEES_CARD.name().equalsIgnoreCase(fileType)) {
             return EMPLOYEES_CARD;
         }
-//        else if (QUALIFICATION.name().equalsIgnoreCase(fileType)) {
-//            return QUALIFICATION;
-//        }
+        else if (QUALIFICATION.name().equalsIgnoreCase(fileType)) {
+            return QUALIFICATION;
+        }
         if (OTHER.name().equalsIgnoreCase(fileType)) {
             return OTHER;
         }
@@ -41,9 +41,9 @@ public enum WorkFileType {
         else if (EMPLOYEES_CARD.ordinal()==(fileType)) {
             return EMPLOYEES_CARD;
         }
-//        else if (QUALIFICATION.ordinal()==(fileType)) {
-//            return QUALIFICATION;
-//        }
+        else if (QUALIFICATION.ordinal()==(fileType)) {
+            return QUALIFICATION;
+        }
         else if (OTHER.ordinal()==(fileType)) {
             return OTHER;
         }
@@ -55,7 +55,7 @@ public enum WorkFileType {
         List<String> allEnums = new ArrayList<String>();
         allEnums.add(IDENTIFICATION.name());
         allEnums.add(EMPLOYEES_CARD.name());
-        //allEnums.add(QUALIFICATION.name());
+        allEnums.add(QUALIFICATION.name());
         allEnums.add(OTHER.name());
         return allEnums;
     }
