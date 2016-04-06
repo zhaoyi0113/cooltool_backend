@@ -2,6 +2,7 @@ package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.api.NurseSkillNominationAPI;
 import com.cooltoo.backend.beans.NurseOccupationSkillBean;
+import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.beans.NurseSkillNominationBean;
 import com.cooltoo.backend.beans.OccupationSkillBean;
 import com.cooltoo.backend.entities.NurseSkillNominationEntity;
@@ -55,7 +56,6 @@ public class NurseSkillNominationService {
 
         return retVal;
     }
-
 
     public List<NurseSkillNominationBean> getAllNominationBeans(long userId, List<NurseOccupationSkillBean> nurseSkills) {
         // is Nurse exist
@@ -167,6 +167,25 @@ public class NurseSkillNominationService {
 
     public long getSkillNominationCount(long userId, int skillId) {
          return nominationRepository.countByUserIdAndSkillId(userId, skillId);
+    }
+
+    public List<NurseSkillNominationBean> getNominatedSkill(long userId, long friendId) {
+        logger.info("get user {} nominated friend {} skills", userId, friendId);
+        validateNurse(userId);
+        validateNurse(friendId);
+        if (userId==friendId) {
+            throw new BadRequestException(ErrorCode.NOMINATION_CAN_NOT_FOR_SELF);
+        }
+
+        List<NurseSkillNominationBean>   skillsNomination = new ArrayList<NurseSkillNominationBean>();
+        List<NurseSkillNominationEntity> existed          = nominationRepository.findByUserIdAndNominatedId(friendId, userId);
+        for (NurseSkillNominationEntity entity : existed) {
+            NurseSkillNominationBean bean = new NurseSkillNominationBean();
+            bean.setSkillId(entity.getSkillId());
+            skillsNomination.add(bean);
+        }
+
+        return skillsNomination;
     }
 
     @Transactional
