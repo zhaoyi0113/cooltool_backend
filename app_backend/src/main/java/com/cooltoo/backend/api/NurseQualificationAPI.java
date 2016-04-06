@@ -63,6 +63,7 @@ public class NurseQualificationAPI {
             @FormDataParam("file") FormDataContentDisposition disposition
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("add qualification name={} type={}, file_name={}, fileDisp={}, file={}", name, type, fileName, disposition, Boolean.valueOf(fileInputStream!=null));
         if (VerifyUtil.isStringEmpty(fileName)) {
             fileName = disposition.getFileName();
         }
