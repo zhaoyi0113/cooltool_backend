@@ -143,7 +143,7 @@ public class NurseQualificationFileService {
         }
         else {
             if (VerifyUtil.isStringEmpty(fileName)) {
-                fileName = "upload_qualification_file_"+workFileType.getName()+System.nanoTime();
+                fileName = "tmp_"+workFileType.getName()+System.nanoTime();
             }
             fileId = storageService.saveFile(0, fileName, file);
             if (fileId <= 0) {
