@@ -94,6 +94,7 @@ public class NurseSpeakAPI {
     @Path("/smug")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response addSmugSpeak(@Context HttpServletRequest request,
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
@@ -106,6 +107,7 @@ public class NurseSpeakAPI {
     @Path("/cathart")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response addCathartSpeak(@Context HttpServletRequest request,
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
@@ -118,8 +120,8 @@ public class NurseSpeakAPI {
     @Path("/ask_question")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response addSpeak(@Context HttpServletRequest request,
-                             @FormDataParam("speak_type") String speakType,
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
                              @FormDataParam("file") InputStream fileInputStream) {
