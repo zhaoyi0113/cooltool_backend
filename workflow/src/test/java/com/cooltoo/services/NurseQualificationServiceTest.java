@@ -86,7 +86,8 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         WorkFileTypeBean workFileType = qualService.getWorkFileTypeBean(WorkFileType.EMPLOYEES_CARD.name());
 
         NurseQualificationBean bean = null;
-        bean = qualService.addWorkFile(4, name, WorkFileType.EMPLOYEES_CARD.name(), "aaa.png", byteInput);
+        qualService.addWorkFile(4, name, WorkFileType.EMPLOYEES_CARD.name(), "aaa.png", byteInput);
+        bean = qualService.getAllNurseQualifications(4).get(0);
         logger.info("add work file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
@@ -94,7 +95,8 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
         workFileType = qualService.getWorkFileTypeBean(WorkFileType.IDENTIFICATION.name());
         name = "Identi2";
-        bean = qualService.addWorkFile(4, name, workFileType.getName(), "aaa.png", byteInput);
+        qualService.addWorkFile(4, name, workFileType.getName(), "aaa.png", byteInput);
+        bean = qualService.getAllNurseQualifications(4).get(0);
         logger.info("add identification file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());

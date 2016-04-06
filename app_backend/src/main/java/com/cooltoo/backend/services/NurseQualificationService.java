@@ -54,7 +54,7 @@ public class NurseQualificationService {
     //=======================================================
 
     @Transactional
-    public NurseQualificationBean addWorkFile(long nurseId, String name, String workfileType, String fileName, InputStream file) {
+    public String addWorkFile(long nurseId, String name, String workfileType, String fileName, InputStream file) {
         if (!nurseRepository.exists(nurseId)) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
@@ -82,8 +82,8 @@ public class NurseQualificationService {
         qualification.setStatus(VetStatus.WAITING);
         qualification = qualificationRepository.save(qualification);
 
-        qualificationFileService.addQualificationFile(qualification.getId(), workFileTypeB, fileName, file);
-        return beanConverter.convert(qualification);
+        String qualificationPath = qualificationFileService.addQualificationFile(qualification.getId(), workFileTypeB, fileName, file);
+        return qualificationPath;
     }
 
     //=======================================================

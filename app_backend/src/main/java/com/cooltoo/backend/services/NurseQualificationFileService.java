@@ -122,8 +122,9 @@ public class NurseQualificationFileService {
     //=============================================================
     //       add qualification file
     //=============================================================
-    public void addQualificationFile(long qualificationId, WorkFileTypeBean workFileType, String fileName, InputStream file) {
+    public String addQualificationFile(long qualificationId, WorkFileTypeBean workFileType, String fileName, InputStream file) {
         logger.info("add a qualification file parameters is qualification_id={} type={} fileName={} file={}", qualificationId, workFileType, fileName, file);
+        String filePath = null;
 
         if (qualificationId<=0 || null==workFileType || workFileType.getId()<=0) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -149,6 +150,7 @@ public class NurseQualificationFileService {
             if (fileId <= 0) {
                 throw new BadRequestException(ErrorCode.WORK_FILE_UPLOAD_FAILED);
             }
+            filePath = storageService.getFilePath(fileId);
         }
         NurseQualificationFileEntity entity = new NurseQualificationFileEntity();
         entity.setQualificationId(qualificationId);
@@ -156,6 +158,8 @@ public class NurseQualificationFileService {
         entity.setWorkfileId(fileId);
         entity.setTimeCreated(new Date());
         repository.save(entity);
+
+        return filePath;
     }
 
     public void updateQualificationFile(long id, WorkFileTypeBean workFileType, String fileName, InputStream file, Date expiryTime) {

@@ -67,11 +67,11 @@ public class NurseQualificationAPI {
         if (VerifyUtil.isStringEmpty(fileName)) {
             fileName = disposition.getFileName();
         }
-        NurseQualificationBean one = service.addWorkFile(userId, name, type, fileName, fileInputStream);
-        logger.info("add qualification work file : " + one);
-        if (null == one) {
+        String qualificationPath = service.addWorkFile(userId, name, type, fileName, fileInputStream);
+        logger.info("add qualification work file : " + qualificationPath);
+        if (null == qualificationPath) {
             return Response.ok().build();
         }
-        return Response.ok(one).build();
+        return Response.ok(qualificationPath).build();
     }
 }

@@ -238,18 +238,6 @@ public class NurseService {
     }
 
     @Transactional
-    public NurseQualificationBean addWorkFile(long id, String name, String workFileType, String idFileName, InputStream idFile) {
-        NurseQualificationBean bean = qualificationService.addWorkFile(id, name, workFileType, idFileName, idFile);
-        return bean;
-    }
-
-    @Transactional
-    public List<NurseQualificationBean> getAllNurseQualification(long id) {
-        List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(id);
-        return qualifications;
-    }
-
-    @Transactional
     public NurseBean updateMobilePassword(long id, String smsCode, String mobile, String newMobile, String password, String newPassword) {
         logger.info("modify the password and mobile : [smsCode"+smsCode+", mobile=" +mobile+ ", newMobile="+newMobile+", password="+password+", newPassword="+newPassword+"]");
 
