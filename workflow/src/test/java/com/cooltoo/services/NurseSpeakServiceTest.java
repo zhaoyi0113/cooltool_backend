@@ -176,11 +176,11 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         int index = 0;
         int number = 4;
 
-        List<NurseSpeakBean> speaks = speakService.getNurseSpeakByType(userId, speakType, index, number);
+        List<NurseSpeakBean> speaks = speakService.getSpeakByUserIdAndType(userId, speakType, index, number);
         Assert.assertEquals(4, speaks.size());
 
         number = 10;
-        speaks = speakService.getNurseSpeakByType(userId, speakType, index, number);
+        speaks = speakService.getSpeakByUserIdAndType(userId, speakType, index, number);
         Assert.assertEquals(10, speaks.size());
 
         for (NurseSpeakBean speak : speaks) {
@@ -188,7 +188,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         }
 
         speakType = SpeakType.CATHART.name();
-        speaks = speakService.getNurseSpeakByType(userId, speakType, index, number);
+        speaks = speakService.getSpeakByUserIdAndType(userId, speakType, index, number);
         Assert.assertEquals(0, speaks.size());
     }
 

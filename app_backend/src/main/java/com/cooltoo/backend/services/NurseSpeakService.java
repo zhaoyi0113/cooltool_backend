@@ -86,8 +86,34 @@ public class NurseSpeakService {
         return parseEntities(userId, speakEntities);
     }
 
+    public List<NurseSpeakBean> getSpeakByType(String speakType, int index, int number) {
+        logger.info("get all speak ("+speakType+") at "+index+" number="+number);
+        SpeakType speaktype = SpeakType.parseString(speakType);
+        if (null==speaktype) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        SpeakTypeBean speakTypeBean = speakTypeService.getSpeakTypeByType(speaktype);
+        if (null==speakTypeBean) {
+            logger.error("there is no record for the speak type {}", speaktype);
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        // get speaks
+        PageRequest pagable = new PageRequest(index, number, Sort.Direction.DESC, "time");
+        Page<NurseSpeakEntity> speaks = speakRepository.findNurseSpeakBySpeakType(speakTypeBean.getId(), pagable);
+
+        // move to cache
+        List<NurseSpeakEntity> speakEntities = new ArrayList<NurseSpeakEntity>();
+        for (NurseSpeakEntity entity : speaks) {
+            speakEntities.add(entity);
+        }
+
+        // parse entities to bean
+        return parseEntities(-1, speakEntities);
+    }
+
     @Transactional
-    public List<NurseSpeakBean> getNurseSpeakByType(long userId, String speakType, int index, int number) {
+    public List<NurseSpeakBean> getSpeakByUserIdAndType(long userId, String speakType, int index, int number) {
         logger.info("get nurse speak ("+speakType+") at "+index+" number="+number);
         SpeakType speaktype = SpeakType.parseString(speakType);
         if (null==speaktype) {
@@ -114,10 +140,18 @@ public class NurseSpeakService {
 
     private List<NurseSpeakBean> parseEntities(long userId, List<NurseSpeakEntity> entities) {
         // get username
-        String nurseName = null;
-        NurseEntity nurse = nurseRepository.findOne(userId);
-        if (null!=nurse) {
-            nurseName = nurse.getName();
+        Map<Long, String> userId2Name = new Hashtable<Long, String>();
+        if (userId<0) {
+            Iterable<NurseEntity> all = nurseRepository.findAll();
+            for (NurseEntity user : all) {
+                userId2Name.put(user.getId(), user.getName());
+            }
+        }
+        else {
+            NurseEntity nurse = nurseRepository.findOne(userId);
+            if (null != nurse) {
+                userId2Name.put(userId, nurse.getName());
+            }
         }
 
         // speak ids/file ids cache
@@ -128,6 +162,7 @@ public class NurseSpeakService {
         Map<Long, NurseSpeakBean> speakIdToBeanMap = new Hashtable<Long, NurseSpeakBean>();
         for (NurseSpeakEntity entity : entities) {
             NurseSpeakBean speak = speakConverter.convert(entity);
+            String nurseName = userId2Name.get(speak.getUserId());
             speak.setUserName(nurseName);
             speakIdToBeanMap.put(speak.getId(), speak);
             speakIds.add(speak.getId());

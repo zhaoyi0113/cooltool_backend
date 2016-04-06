@@ -6,6 +6,7 @@ import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -38,13 +39,57 @@ public class NurseSpeakAPI {
     @Path("/query/{index}/{number}")
     public Response getNurseSpeakContentsList(@Context HttpServletRequest request,
                                               @PathParam("index") int index,
-                                              @PathParam("number") int number) {
-        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+                                              @PathParam("number") int number
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("get nurse speak for user " + userId+" at index="+index+", number="+number);
         List<NurseSpeakBean> nurseSpeak = speakService.getNurseSpeak(userId, index, number);
         logger.info("get nurse speak list size "+nurseSpeak.size());
         return Response.ok(nurseSpeak).build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query/smug/{index}/{number}")
+    public Response getSmugContent(@Context HttpServletRequest request,
+                                   @PathParam("index") int index,
+                                   @PathParam("number") int number
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("user {} to get all smugs", userId);
+        List<NurseSpeakBean> smugs = speakService.getSpeakByType(SpeakType.SMUG.name(), index, number);
+        logger.info("user {} to get all smugs, size : {}", userId, smugs.size());
+        return Response.ok(smugs).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query/cathart/{index}/{number}")
+    public Response getCathartContent(@Context HttpServletRequest request,
+                                   @PathParam("index") int index,
+                                   @PathParam("number") int number
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("user {} to get all cathart", userId);
+        List<NurseSpeakBean> smugs = speakService.getSpeakByType(SpeakType.CATHART.name(), index, number);
+        logger.info("user {} to get all cathart, size : {}", userId, smugs.size());
+        return Response.ok(smugs).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query/ask_question/{index}/{number}")
+    public Response getAskQuestionContent(@Context HttpServletRequest request,
+                                   @PathParam("index") int index,
+                                   @PathParam("number") int number
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("user {} to get all ask_questions", userId);
+        List<NurseSpeakBean> smugs = speakService.getSpeakByType(SpeakType.ASK_QUESTION.name(), index, number);
+        logger.info("user {} to get all ask_questions, size : {}", userId, smugs.size());
+        return Response.ok(smugs).build();
+    }
+
 
     @Path("/smug")
     @POST
@@ -53,7 +98,7 @@ public class NurseSpeakAPI {
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
                              @FormDataParam("file") InputStream fileInputStream) {
-        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.addSmug(userId, content, fileName, fileInputStream);
         return Response.ok(nurseSpeak).build();
     }
@@ -65,7 +110,7 @@ public class NurseSpeakAPI {
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
                              @FormDataParam("file") InputStream fileInputStream) {
-        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.addCathart(userId, content, fileName, fileInputStream);
         return Response.ok(nurseSpeak).build();
     }
@@ -78,7 +123,7 @@ public class NurseSpeakAPI {
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
                              @FormDataParam("file") InputStream fileInputStream) {
-        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.addAskQuestion(userId, content, fileName, fileInputStream);
         return Response.ok(nurseSpeak).build();
     }
@@ -88,7 +133,7 @@ public class NurseSpeakAPI {
     @Path("/{id}")
     public Response getNurseSpeakContent(@Context HttpServletRequest request,
                                          @PathParam("id") long id) {
-        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.getNurseSpeak(id);
         return Response.ok(nurseSpeak).build();
     }
@@ -102,7 +147,7 @@ public class NurseSpeakAPI {
             @FormParam("commentReceiverId") long commentReceiverId,
             @FormParam("comment") String comment
     ) {
-        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakCommentBean commentBean = speakService.addSpeakComment(nurseSpeakId, userId, commentReceiverId, comment);
         return Response.ok(commentBean).build();
     }
@@ -114,7 +159,7 @@ public class NurseSpeakAPI {
             @Context HttpServletRequest request,
             @FormParam("nurseSpeakId") long nurseSpeakId
     ) {
-        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakThumbsUpBean thumbsUpBean = speakService.addNurseSpeakThumbsUp(nurseSpeakId, userId);
         return Response.ok(thumbsUpBean).build();
     }
@@ -126,7 +171,7 @@ public class NurseSpeakAPI {
             @Context HttpServletRequest request,
             @FormParam("nurseSpeakId") long nurseSpeakId
     ) {
-        long userId = Long.parseLong(request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID).toString());
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakThumbsUpBean thumbsUpbean = speakService.getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, userId);
         speakService.deleteNurseSpeakThumbsUp(nurseSpeakId, userId);
         return Response.ok(thumbsUpbean).build();
