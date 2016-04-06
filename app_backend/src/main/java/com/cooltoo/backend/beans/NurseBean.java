@@ -11,6 +11,7 @@ import java.util.Map;
  */
 public class NurseBean {
 
+    public static final String QUALIFICATION = "qualification";
     public static final String SKILL_NOMINATION = "skill_nomination";
     public static final String HOSPITAL_DEPARTMENT= "hospital_department";
     public static final String FRIENDS_COUNT = "friend_count";

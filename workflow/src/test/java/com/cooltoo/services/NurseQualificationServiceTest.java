@@ -142,13 +142,5 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
             logger.info(bean.toString());
             qualService.deleteNurseQualification(bean.getId());
         }
-        Throwable ex = null;
-        try {
-            qualifications = qualService.getAllNurseQualifications(1);
-        }
-        catch (Exception e) {
-            ex = e;
-        }
-        Assert.assertNotNull(ex);
     }
 }

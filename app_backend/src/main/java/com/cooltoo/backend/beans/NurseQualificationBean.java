@@ -14,7 +14,7 @@ public class NurseQualificationBean {
     private long id;
     private String name;
     private long userId;
-    private VetStatus status;
+    private VetStatus qualificationStatus;
     private String statusDescr;
     private List<NurseQualificationFileBean> workfiles;
 
@@ -43,11 +43,11 @@ public class NurseQualificationBean {
     }
 
     public VetStatus getStatus() {
-        return status;
+        return qualificationStatus;
     }
 
     public void setStatus(VetStatus status) {
-        this.status = status;
+        this.qualificationStatus = status;
     }
 
     public String getStatusDescr() {
@@ -72,7 +72,7 @@ public class NurseQualificationBean {
         msg.append("id=").append(id).append(" , ");
         msg.append("name=").append(name).append(" , ");
         msg.append("userId=").append(userId).append(" , ");
-        msg.append("status=").append(status).append(" , ");
+        msg.append("status=").append(qualificationStatus).append(" , ");
         msg.append("statusDescr=").append(statusDescr).append(" , ");
         msg.append("workfiles=").append(workfiles).append(" , ");
         msg.append("]");

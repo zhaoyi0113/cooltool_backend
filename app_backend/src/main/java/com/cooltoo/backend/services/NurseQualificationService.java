@@ -111,7 +111,7 @@ public class NurseQualificationService {
         List<NurseQualificationEntity> qualifications = qualificationRepository.findNurseQualificationByUserId(nurseId, sort);
         if (null==qualifications || qualifications.isEmpty()) {
             logger.info("The qualification record is empty!");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            return new ArrayList<>();
         }
         if (qualifications.size()>1) {
             logger.info("The qualification record is more than one! " + qualifications);

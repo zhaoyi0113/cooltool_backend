@@ -108,11 +108,17 @@ public class NurseService {
         }
         catch (Exception ex) {
         }
-
+        // add speak count
         long speakCount = speakService.getNurseSpeakCount(id);
         nurse.setProperty(NurseBean.SPEAK_COUNT, speakCount);
+        // add skill nominated count
         long norminated = this.nominationService.getUserAllSkillNominatedCount(id);
         nurse.setProperty(NurseBean.NORMINATED_COUNT, norminated);
+        // get nurse's qualification
+        List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(id);
+        if (null!=qualifications && !qualifications.isEmpty()) {
+            nurse.setProperty(NurseBean.QUALIFICATION, qualifications.get(0));
+        }
         return nurse;
     }
 

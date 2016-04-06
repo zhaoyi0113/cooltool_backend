@@ -10,6 +10,7 @@ import com.cooltoo.repository.FileStorageRepository;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.services.NurseService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,13 @@ import org.slf4j.LoggerFactory;
  * Created by lg380357 on 2016/3/2.
  */
 @Transactional
-@DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml")
+@DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/work_file_type_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/file_storage_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_qualification_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_qualification_file_data.xml")
+})
 public class NurseServiceTest extends AbstractCooltooTest {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseServiceTest.class.getName());
