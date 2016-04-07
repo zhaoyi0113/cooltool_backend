@@ -299,5 +299,45 @@ public class TagsService {
         throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
     }
 
+    @Transactional
+    public String deleteCategory(String categoryIds) {
+        if (VerifyUtil.isOccupationSkillIds(categoryIds)) {
+
+            List<Long> imgIds         = new ArrayList<>();
+            List<Long> lCategoryIds   = new ArrayList<>();
+            String[]   strCategoryIds = categoryIds.split(",");
+            for (String id : strCategoryIds) {
+                lCategoryIds.add(Long.parseLong(id));
+            }
+
+            List<TagsCategoryEntity> categoriesE = categoryRep.fineByIdIn(lCategoryIds);
+            List<TagsEntity>         tagsE       = tagsRep.findByCategoryIdIn(lCategoryIds);
+
+            if (null!=categoriesE) {
+                for (TagsCategoryEntity categoryE : categoriesE) {
+                    imgIds.add(categoryE.getImageId());
+                }
+            }
+            if (null!=tagsE) {
+                for (TagsEntity tagE : tagsE) {
+                    imgIds.add(tagE.getImageId());
+                }
+            }
+            if (!imgIds.isEmpty()) {
+                storageService.deleteFiles(imgIds);
+            }
+            if (!lCategoryIds.isEmpty()) {
+                tagsRep.deleteByCategoryIdIn(lCategoryIds);
+                categoryRep.deleteByIdIn(lCategoryIds);
+            }
+        }
+        throw new BadRequestException(ErrorCode.DATA_ERROR);
+    }
+
+
+    //=================================================================
+    //         add tag and category
+    //=================================================================
+
 
 }

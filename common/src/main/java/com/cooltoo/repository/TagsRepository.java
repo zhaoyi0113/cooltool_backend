@@ -13,8 +13,9 @@ import java.util.List;
  */
 public interface TagsRepository extends CrudRepository<TagsEntity, Long> {
     List<TagsEntity> findAll(Sort sort);
+    List<TagsEntity> findByCategoryIdIn(List<Long> categoryIds);
     List<TagsEntity> findByCategoryId(long categoryId, Sort sort);
-    List<TagsEntity> findByCategoryIdAndName(long categoryId, String name);
     void deleteByCategoryId(long categoryId);
+    void deleteByCategoryIdIn(List<Long> categoryIds);
 
 }
