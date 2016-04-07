@@ -67,6 +67,7 @@ public class OccupationSkillManageAPI {
     @POST
     @Path("/edit")
 //    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkill2(@FormParam("id") int id,
                                         @FormParam("type") String type,
@@ -82,6 +83,7 @@ public class OccupationSkillManageAPI {
 
     @POST
     @Path("/edit_without_image")
+    @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkill(@FormParam("id") int id,
                                         @FormParam("name") String name,
@@ -95,6 +97,7 @@ public class OccupationSkillManageAPI {
     @POST
     @Path("/edit_image")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillEnableImage(@FormDataParam("id") int id,
                                                    @FormDataParam("file") InputStream image) {
@@ -105,6 +108,7 @@ public class OccupationSkillManageAPI {
     @POST
     @Path("/edit_disable_image")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillDisableImage(@FormDataParam("id") int id,
                                                     @FormDataParam("file") InputStream image) {
