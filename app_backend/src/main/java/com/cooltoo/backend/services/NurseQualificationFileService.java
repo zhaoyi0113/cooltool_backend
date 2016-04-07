@@ -160,9 +160,10 @@ public class NurseQualificationFileService {
         return filePath;
     }
 
-    public void updateQualificationFile(long id, WorkFileTypeBean workFileType, String fileName, InputStream file, Date expiryTime) {
+    public NurseQualificationFileBean updateQualificationFile(long id, WorkFileTypeBean workFileType, String fileName, InputStream file, Date expiryTime) {
         logger.info("update a qualification file parameters is expiryTime={} type={} fileName={} file={}", expiryTime, workFileType, fileName, file);
 
+        String filePath = "";
         boolean changed = false;
 
         // check the record exist
@@ -179,6 +180,7 @@ public class NurseQualificationFileService {
             long fileId = storageService.saveFile(entity.getWorkfileId(), fileName, file);
             if (fileId > 0) {
                 entity.setWorkfileId(fileId);
+                filePath = storageService.getFilePath(fileId);
                 changed = true;
             }
             else {
@@ -196,7 +198,10 @@ public class NurseQualificationFileService {
             changed = true;
         }
         if (changed) {
-            repository.save(entity);
+            entity = repository.save(entity);
         }
+        NurseQualificationFileBean bean = beanConverter.convert(entity);
+        bean.setWorkfileUrl(filePath);
+        return bean;
     }
 }

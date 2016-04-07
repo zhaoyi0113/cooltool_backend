@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +64,7 @@ public class NurseFriendsService {
             entity.setUserId(userId);
             entity.setFriendId(friendId);
             entity.setIsAgreed(agreeType);
+            entity.setDateTime(new Date());
             friendsRepository.save(entity);
         }
     }
@@ -78,10 +80,17 @@ public class NurseFriendsService {
     //======================================================
     @Transactional
     public void removeFriend(long userId, long friendId){
+        List<NurseFriendsEntity> entities = null;
         validateUserId(userId, friendId);
-        List<NurseFriendsEntity> entities = friendsRepository.findByUserIdAndFriendId(userId, friendId);
-        if(!entities.isEmpty()){
-            friendsRepository.delete(entities.get(0).getId());
+
+        entities = friendsRepository.findByUserIdAndFriendId(userId, friendId);
+        if(null!=entities && !entities.isEmpty()){
+            friendsRepository.delete(entities);
+        }
+
+        entities = friendsRepository.findByUserIdAndFriendId(friendId, userId);
+        if(null!=entities && !entities.isEmpty()){
+            friendsRepository.delete(entities);
         }
     }
 
@@ -107,12 +116,13 @@ public class NurseFriendsService {
         if (null == entities || entities.isEmpty()) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
+
         entity = entities.get(0);
         boolean isLimit1    = (AgreeType.ACCESS_ZONE_DENY==entity.getIsAgreed()
                              ||AgreeType.BLACKLIST       ==entity.getIsAgreed());
         boolean isLimit2    = (AgreeType.ACCESS_ZONE_DENY==agreeType
                              ||AgreeType.BLACKLIST       ==agreeType);
-        if (isLimit1 && isLimit1) {
+        if (isLimit1 && isLimit2) {
             agreeType = AgreeType.AGREED;
         }
         entity.setIsAgreed(agreeType);
@@ -121,7 +131,6 @@ public class NurseFriendsService {
         NurseFriendsBean bean = beanConverter.convert(entity);
         return;
     }
-
 
     //======================================================
     //            get friend relation
@@ -179,38 +188,30 @@ public class NurseFriendsService {
         PageRequest              pageSort           = new PageRequest(pageIdx, number, Sort.Direction.DESC, "dateTime");
         List<Long>               friendIds          = new ArrayList<Long>();
         List<Long>               friendNotExistIds  = new ArrayList<Long>();
-        List<NurseFriendsBean>   userFriends        = new ArrayList<NurseFriendsBean>();
-        List<NurseFriendsBean>   searchFriends      = new ArrayList<NurseFriendsBean>();
-        Page<NurseFriendsEntity> searchFriendsPE    = null;
+        List<NurseFriendsBean>   searchFriendsB     = new ArrayList<NurseFriendsBean>();
         List<NurseFriendsEntity> searchFriendsE     = new ArrayList<NurseFriendsEntity>();
+        List<NurseFriendsEntity> userFriendsE       = new ArrayList<NurseFriendsEntity>();
 
         // search self friends
         if (!searchSelf) {
-            List<NurseFriendsEntity> userFriendsE = friendsRepository.findByUserId(userId);
-            userFriends = convertToNurseFriendsBeans(userFriendsE);
+            userFriendsE = getFriendsAgreeStatusNotWaiting(userId);
         }
 
         // search searchId's friends
-        searchFriendsPE = friendsRepository.findNurseFriendByUserId(searchId, pageSort);
-        for (NurseFriendsEntity searchFriendE: searchFriendsPE) {
-            searchFriendsE.add(searchFriendE);
-        }
+        searchFriendsE = getFriendsAgreeStatusNotWaiting(searchId);
+        searchFriendsB = convertToNurseFriendsBeans(searchFriendsE);
 
-        searchFriends = convertToNurseFriendsBeans(searchFriendsE);
-        for(NurseFriendsBean searchFriend: searchFriends){
-            // jump over not agreed of user who been searched
-            //if (AgreeType.AGREED!=searchFriendE.getIsAgreed()) {
-            //    continue;
-            //}
-
-            friendIds.add(searchFriend.getFriendId());
+        // set isFriend
+        for(NurseFriendsBean searchFriendB: searchFriendsB){
+            friendIds.add(searchFriendB.getFriendId());
             // judge is self friends
             if(searchSelf){
-                searchFriend.setIsFriend(true);
-            }else {
-                for (NurseFriendsBean userF : userFriends) {
-                    if (userF.getFriendId() == searchFriend.getFriendId()) {
-                        searchFriend.setIsFriend(true);
+                searchFriendB.setIsFriend(true);
+            }
+            else {
+                for (NurseFriendsEntity userFriendE : userFriendsE) {
+                    if (userFriendE.getFriendId()==searchFriendB.getFriendId()) {
+                        searchFriendB.setIsFriend(true);
                         break;
                     }
                 }
@@ -219,9 +220,9 @@ public class NurseFriendsService {
 
         List<NurseEntity> friendExist = nurseRepository.findNurseByIdIn(friendIds);
         boolean exist = false;
-        for (int i=0, count=searchFriends.size(); i < count; i ++) {
+        for (int i=0, count=searchFriendsB.size(); i < count; i ++) {
             exist = false;
-            NurseFriendsBean friend = searchFriends.get(i);
+            NurseFriendsBean friend = searchFriendsB.get(i);
             for (NurseEntity nurseExist : friendExist) {
                 if (nurseExist.getId()==friend.getFriendId()) {
                     exist = true;
@@ -229,7 +230,7 @@ public class NurseFriendsService {
                 }
             }
             if (!exist) {
-                searchFriends.remove(friend);
+                searchFriendsB.remove(friend);
                 count --;
                 i     --;
                 friendNotExistIds.add(friend.getFriendId());
@@ -240,7 +241,66 @@ public class NurseFriendsService {
             friendsRepository.deleteByUserIdIn(friendNotExistIds);
         }
 
-        return searchFriends;
+        List<NurseFriendsBean> retVal = new ArrayList<>();
+        int offset = pageIdx*number;
+        for (int i=offset, count=searchFriendsB.size(); i<offset+number; i++) {
+            if (i >= count) {
+                break;
+            }
+            NurseFriendsBean bean = searchFriendsB.get(i);
+            retVal.add(bean);
+        }
+
+        return retVal;
+    }
+
+    private List<NurseFriendsEntity> getFriendsAgreeStatusNotWaiting(long userId) {
+        if (!nurseRepository.exists(userId)) {
+            List<Long> userIds = new ArrayList<Long>();
+            friendsRepository.deleteByFriendIdIn(userIds);
+            friendsRepository.deleteByUserIdIn(userIds);
+            return new ArrayList<>();
+        }
+
+        // get userId 's friend relationship
+        Sort                     sort         = new Sort(new Sort.Order(Sort.Direction.DESC, "dateTime"));
+        List<NurseFriendsEntity> friendsMapE  = friendsRepository.findByUserIdOrFriendId(userId, userId, sort);
+        if (null!=friendsMapE && !friendsMapE.isEmpty()) {
+
+            List<NurseFriendsEntity> userFriendsE = new ArrayList<>();
+            List<NurseFriendsEntity> friendsUserE = new ArrayList<>();
+            for (NurseFriendsEntity friendMap : friendsMapE) {
+                if (friendMap.getUserId()==userId) {
+                    userFriendsE.add(friendMap);
+                }
+                else {
+                    friendsUserE.add(friendMap);
+                }
+            }
+
+            // remove friend agree status is WAITING
+            for (NurseFriendsEntity friendUser : friendsUserE) {
+                boolean needRemove = false;
+                if (null==friendUser.getIsAgreed()) {
+                    needRemove = true;
+                }
+                if (!needRemove && AgreeType.WAITING==friendUser.getIsAgreed()) {
+                    needRemove = true;
+                }
+                if (!needRemove) {
+                    continue;
+                }
+                for (int i=0; i<userFriendsE.size(); i++) {
+                    NurseFriendsEntity userFriend = userFriendsE.get(i);
+                    if (userFriend.getFriendId()==friendUser.getUserId()) {
+                        userFriendsE.remove(userFriend);
+                        break;
+                    }
+                }
+            }
+            return userFriendsE;
+        }
+        return new ArrayList<>();
     }
 
     public int getFriendsCount(long userId){

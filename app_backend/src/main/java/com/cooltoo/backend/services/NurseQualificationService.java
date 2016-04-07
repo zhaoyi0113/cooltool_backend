@@ -210,9 +210,9 @@ public class NurseQualificationService {
         return bean;
     }
 
-    public void updateQualificationFile(int qualificationFileId, String workfileType, String fileName, InputStream file, Date expiryTime) {
+    public NurseQualificationFileBean updateQualificationFile(int qualificationFileId, String workfileType, String fileName, InputStream file, Date expiryTime) {
         WorkFileTypeBean workfileTypeB = getWorkFileTypeBean(workfileType);
-        qualificationFileService.updateQualificationFile(qualificationFileId, workfileTypeB, fileName, file, expiryTime);
-        return;
+        NurseQualificationFileBean bean = qualificationFileService.updateQualificationFile(qualificationFileId, workfileTypeB, fileName, file, expiryTime);
+        return bean;
     }
 }

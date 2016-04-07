@@ -2,6 +2,8 @@ package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.NurseQualificationBean;
+import com.cooltoo.backend.beans.NurseQualificationFileBean;
+import com.cooltoo.backend.services.NurseQualificationFileService;
 import com.cooltoo.backend.services.NurseQualificationService;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.exception.*;
@@ -74,7 +76,8 @@ public class NurseQualificationManageAPI {
 
     @POST
     @Path("/edit")
-    @Produces(MediaType.MULTIPART_FORM_DATA)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateNurseQualification(@Context HttpServletRequest request,
                                              @FormDataParam("qualification_file_id") int fileId,
@@ -94,17 +97,17 @@ public class NurseQualificationManageAPI {
                 fileName = disposition.getFileName();
             }
         }
-        qualificationService.updateQualificationFile(fileId, workfileType, fileName, file, expiryTime);
-        return Response.ok().build();
+        NurseQualificationFileBean qualificationFile = qualificationService.updateQualificationFile(fileId, workfileType, fileName, file, expiryTime);
+        return Response.ok(qualificationFile).build();
     }
 
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response deleteNurseQualification(@Context HttpServletRequest request,
-                                             @FormParam("id") long qualificationId
-    ) {
-        NurseQualificationBean bean = qualificationService.deleteNurseQualification(qualificationId);
-        return Response.ok(bean).build();
-    }
+//    @DELETE
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @AdminUserLoginAuthentication(requireUserLogin = true)
+//    public Response deleteNurseQualification(@Context HttpServletRequest request,
+//                                             @FormParam("id") long qualificationId
+//    ) {
+//        NurseQualificationBean bean = qualificationService.deleteNurseQualification(qualificationId);
+//        return Response.ok(bean).build();
+//    }
 }
