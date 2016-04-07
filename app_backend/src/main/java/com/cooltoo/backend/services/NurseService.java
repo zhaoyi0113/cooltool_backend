@@ -256,7 +256,10 @@ public class NurseService {
     public NurseBean updateMobilePassword(long id, String smsCode, String mobile, String newMobile, String password, String newPassword) {
         logger.info("modify the password and mobile : [smsCode"+smsCode+", mobile=" +mobile+ ", newMobile="+newMobile+", password="+password+", newPassword="+newPassword+"]");
 
-        NurseBean nurse = getNurse(id);
+        NurseBean nurse = null;
+        if (repository.exists(id)) {
+            nurse = getNurse(id);
+        }
         if (null==nurse) {
             nurse = getNurse(mobile);
         }

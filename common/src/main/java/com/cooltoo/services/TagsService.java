@@ -259,5 +259,18 @@ public class TagsService {
         return categoryConverter.convert(categoryE);
     }
 
+    //=================================================================
+    //         delete
+    //=================================================================
 
+    public long deleteTag(long tagId) {
+        TagsEntity tagsE = tagsRep.findOne(tagId);
+        if (null!=tagsE) {
+            long       imageId = tagsE.getImageId();
+            List<Long> imgIds  = new ArrayList<>();
+            imgIds.add(imageId);
+            storageService.deleteFiles(imgIds);
+        }
+        throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+    }
 }
