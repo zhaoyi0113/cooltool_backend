@@ -1,6 +1,9 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.*;
+import com.cooltoo.backend.beans.NurseSpeakBean;
+import com.cooltoo.backend.beans.NurseSpeakCommentBean;
+import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
+import com.cooltoo.backend.beans.SpeakTypeBean;
 import com.cooltoo.backend.converter.NurseSpeakConverter;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
@@ -10,7 +13,8 @@ import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
-import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -21,8 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 3/15/16.
@@ -148,8 +150,8 @@ public class NurseSpeakService {
         List<Long> fileIds = new ArrayList<Long>();
 
         // get username
-        Map<Long, String> userId2Name   = new Hashtable<Long, String>();
-        Map<Long, Long>   userId2FileId = new Hashtable<Long, Long>();
+        Map<Long, String> userId2Name   = new HashMap<Long, String>();
+        Map<Long, Long>   userId2FileId = new HashMap<Long, Long>();
         if (userId<0) {
             Iterable<NurseEntity> all = nurseRepository.findAll();
             for (NurseEntity user : all) {
@@ -168,7 +170,7 @@ public class NurseSpeakService {
         }
 
         // convert to bean
-        Map<Long, NurseSpeakBean> speakIdToBeanMap = new Hashtable<Long, NurseSpeakBean>();
+        Map<Long, NurseSpeakBean> speakIdToBeanMap = new HashMap<Long, NurseSpeakBean>();
         for (NurseSpeakEntity entity : entities) {
             NurseSpeakBean speak = speakConverter.convert(entity);
             String nurseName = userId2Name.get(speak.getUserId());

@@ -45,6 +45,9 @@ public class StorageService {
         return this.storagePath;
     }
 
+    public String getNgnixPathPrefix() {
+        return "";
+    }
 
     public long saveFile(long fileId, String fileName, InputStream inputStream) {
         if(inputStream == null){
@@ -77,19 +80,19 @@ public class StorageService {
         return 0;
     }
 
-    public String getFileUrl(long id) {
-        if (storageRepository.exists(id)) {
-            FileStorageEntity entity = storageRepository.findOne(id);
-
-            return getStorageUrl() + entity.getId();
-        }
-        return "";
-    }
+//    public String getFileUrl(long id) {
+//        if (storageRepository.exists(id)) {
+//            FileStorageEntity entity = storageRepository.findOne(id);
+//
+//            return getStorageUrl() + entity.getId();
+//        }
+//        return "";
+//    }
 
     public String getFilePath(long id){
         if(storageRepository.exists(id)){
             FileStorageEntity entity = storageRepository.findOne(id);
-            return entity.getFilePath();
+            return getNgnixPathPrefix()+entity.getFilePath();
         }
         return "";
     }
@@ -99,11 +102,12 @@ public class StorageService {
         if (null == ids) {
             return ret;
         }
+        String pathPrefix = getNgnixPathPrefix();
 
         Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
         List<FileStorageEntity> fileEntites =  storageRepository.findStorageByIdIn(ids, sort);
         for (FileStorageEntity entity : fileEntites) {
-            ret.put(entity.getId(), entity.getFilePath());
+            ret.put(entity.getId(), pathPrefix + entity.getFilePath());
         }
         return ret;
     }
@@ -113,8 +117,9 @@ public class StorageService {
         if (storageRepository.exists(id)){
             FileStorageEntity entity = storageRepository.findOne(id);
             try {
-                logger.info("get resource from path "+entity.getFilePath());
-                return new FileInputStream(entity.getFilePath());
+                String filePath = getNgnixPathPrefix() + entity.getFilePath();
+                logger.info("get resource from path {}", filePath);
+                return new FileInputStream(filePath);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

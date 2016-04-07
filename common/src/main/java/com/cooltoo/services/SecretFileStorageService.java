@@ -25,4 +25,9 @@ public class SecretFileStorageService extends StorageService {
     public String getStoragePath() {
         return this.storagePath;
     }
+
+    @Override
+    public String getNgnixPathPrefix() {
+        return "secret/";
+    }
 }

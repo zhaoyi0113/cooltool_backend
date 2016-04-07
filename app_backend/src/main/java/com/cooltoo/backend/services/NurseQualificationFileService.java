@@ -8,6 +8,7 @@ import com.cooltoo.backend.repository.NurseQualificationFileRepository;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.services.SecretFileStorageService;
 import com.cooltoo.services.StorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class NurseQualificationFileService {
     private NurseQualificationFileRepository repository;
     @Autowired
     @Qualifier("SecretFileStorageService")
-    private StorageService storageService;
+    private SecretFileStorageService storageService;
     @Autowired
     private WorkFileTypeService workfileTypeService;
     @Autowired
