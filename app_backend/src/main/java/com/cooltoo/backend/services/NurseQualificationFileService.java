@@ -5,17 +5,14 @@ import com.cooltoo.backend.beans.WorkFileTypeBean;
 import com.cooltoo.backend.converter.NurseQualificationFileBeanConverter;
 import com.cooltoo.backend.entities.NurseQualificationFileEntity;
 import com.cooltoo.backend.repository.NurseQualificationFileRepository;
-import com.cooltoo.constants.VetStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.SecretFileStorageService;
-import com.cooltoo.services.StorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
