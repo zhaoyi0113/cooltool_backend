@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -184,6 +185,7 @@ public class TagsService {
     //         update
     //=================================================================
 
+    @Transactional
     public TagsBean updateTag(long tagId, long categoryId, String name, String imageName, InputStream image) {
         boolean    changed = false;
         String     imgPath = "";
@@ -222,6 +224,7 @@ public class TagsService {
         return tagsConverter.convert(tagE);
     }
 
+    @Transactional
     public TagsCategoryBean updateCategory(long categoryId, String name, String imageName, InputStream image) {
         boolean    changed = false;
         String     imgPath = "";
@@ -263,6 +266,7 @@ public class TagsService {
     //         delete
     //=================================================================
 
+    @Transactional
     public long deleteTag(long tagId) {
         TagsEntity tagsE = tagsRep.findOne(tagId);
         if (null!=tagsE) {
@@ -273,4 +277,27 @@ public class TagsService {
         }
         throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
     }
+
+    @Transactional
+    public long deleteCategory(long categoryId) {
+        TagsCategoryBean category = getCategoryById(categoryId);
+        if (null!=category) {
+            List<Long> imgIds   = new ArrayList<>();
+            imgIds.add(category.getImageId());
+
+            List<TagsBean> tags = category.getTags();
+            if (null!=tags && !tags.isEmpty()) {
+                for (TagsBean tag : tags) {
+                    imgIds.add(tag.getImageId());
+                }
+            }
+
+            storageService.deleteFiles(imgIds);
+            tagsRep.deleteByCategoryId(categoryId);
+            categoryRep.delete(categoryId);
+        }
+        throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+    }
+
+
 }

@@ -91,7 +91,7 @@ public class NurseService {
         List<NurseEntity> nurses = repository.findNurseByMobile(mobile);
         if (null!=nurses && !nurses.isEmpty() && nurses.size()==1) {
             NurseEntity nurseE = nurses.get(0);
-            return getNurse(nurseE.getId());
+            return beanConverter.convert(nurseE);
         }
         logger.error("Get nurse by mobile is error, result is {}.", nurses);
         throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -262,6 +262,7 @@ public class NurseService {
         }
         if (null==nurse) {
             nurse = getNurse(mobile);
+            id = nurse.getId();
         }
         // if not modify the mobile
         if (!VerifyUtil.isStringEmpty(mobile)) {
