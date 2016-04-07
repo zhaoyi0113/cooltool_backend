@@ -96,11 +96,37 @@ public class NurseQualificationService {
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-
         NurseQualificationBean bean = beanConverter.convert(entity);
+
+        // delete images and file_storage record
+        List<NurseQualificationFileBean> filesB = null;
+        filesB = qualificationFileService.getAllFileByQualificationId(bean.getId());
+        if (null!=filesB && !filesB.isEmpty()) {
+            List<Long> imageIds = new ArrayList<Long>();
+            for (NurseQualificationFileBean fileB : filesB) {
+                imageIds.add(fileB.getWorkfileId());
+            }
+            storageService.deleteFiles(imageIds);
+        }
+
+        // delete qualification file record
         qualificationFileService.deleteFileByQualificationId(bean.getId());
+        // delete qualification record
         qualificationRepository.delete(entity);
         return bean;
+    }
+
+    @Transactional
+    public List<NurseQualificationBean> deletNurseQualificationByUserId(long userId) {
+        List<NurseQualificationBean> qualificationsB = getAllNurseQualifications(userId);
+        if (qualificationsB.isEmpty()) {
+            return qualificationsB;
+        }
+
+        for (NurseQualificationBean qualification : qualificationsB) {
+            deleteNurseQualification(qualification.getId());
+        }
+        return qualificationsB;
     }
 
     //=======================================================

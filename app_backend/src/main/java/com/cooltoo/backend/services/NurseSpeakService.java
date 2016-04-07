@@ -88,19 +88,23 @@ public class NurseSpeakService {
 
     public List<NurseSpeakBean> getSpeakByType(String speakType, int index, int number) {
         logger.info("get all speak ("+speakType+") at "+index+" number="+number);
+        SpeakTypeBean speakTypeBean = null;
         SpeakType speaktype = SpeakType.parseString(speakType);
-        if (null==speaktype) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        SpeakTypeBean speakTypeBean = speakTypeService.getSpeakTypeByType(speaktype);
-        if (null==speakTypeBean) {
-            logger.error("there is no record for the speak type {}", speaktype);
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        if (null!=speaktype) {
+            speakTypeBean = speakTypeService.getSpeakTypeByType(speaktype);
         }
 
         // get speaks
         PageRequest pagable = new PageRequest(index, number, Sort.Direction.DESC, "time");
-        Page<NurseSpeakEntity> speaks = speakRepository.findNurseSpeakBySpeakType(speakTypeBean.getId(), pagable);
+        Page<NurseSpeakEntity> speaks = null;
+        if (null!=speakTypeBean) {
+            logger.info("get speak type's speaks. type is {}", speakTypeBean);
+            speaks = speakRepository.findNurseSpeakBySpeakType(speakTypeBean.getId(), pagable);
+        }
+        else {
+            logger.info("get all speak type's speaks");
+            speaks = speakRepository.findAll(pagable);
+        }
 
         // move to cache
         List<NurseSpeakEntity> speakEntities = new ArrayList<NurseSpeakEntity>();
@@ -139,24 +143,29 @@ public class NurseSpeakService {
     }
 
     private List<NurseSpeakBean> parseEntities(long userId, List<NurseSpeakEntity> entities) {
+        // speak ids/file ids cache
+        List<Long> speakIds = new ArrayList<Long>();
+        List<Long> fileIds = new ArrayList<Long>();
+
         // get username
-        Map<Long, String> userId2Name = new Hashtable<Long, String>();
+        Map<Long, String> userId2Name   = new Hashtable<Long, String>();
+        Map<Long, Long>   userId2FileId = new Hashtable<Long, Long>();
         if (userId<0) {
             Iterable<NurseEntity> all = nurseRepository.findAll();
             for (NurseEntity user : all) {
                 userId2Name.put(user.getId(), user.getName());
+                userId2FileId.put(user.getId(), user.getProfilePhotoId());
+                fileIds.add(user.getProfilePhotoId());
             }
         }
         else {
-            NurseEntity nurse = nurseRepository.findOne(userId);
-            if (null != nurse) {
-                userId2Name.put(userId, nurse.getName());
+            NurseEntity user = nurseRepository.findOne(userId);
+            if (null != user) {
+                userId2Name.put(userId, user.getName());
+                userId2FileId.put(userId, user.getProfilePhotoId());
+                fileIds.add(user.getProfilePhotoId());
             }
         }
-
-        // speak ids/file ids cache
-        List<Long> speakIds = new ArrayList<Long>();
-        List<Long> fileIds = new ArrayList<Long>();
 
         // convert to bean
         Map<Long, NurseSpeakBean> speakIdToBeanMap = new Hashtable<Long, NurseSpeakBean>();
@@ -198,14 +207,15 @@ public class NurseSpeakService {
         // get image url of speak
         Map<Long, String> idToPath = storageService.getFilePath(fileIds);
         for (NurseSpeakEntity entity : entities) {
-            long speakId = entity.getId();
-            long imageId = entity.getImageId();
-            String imageUrl = idToPath.get(imageId);
-            if (VerifyUtil.isStringEmpty(imageUrl)) {
-                continue;
-            }
+            long   speakId    = entity.getId();
+            long   imageId    = entity.getImageId();
+            long   tmpUserId  = entity.getUserId();
+            long   userProfId = userId2FileId.get(tmpUserId);
+            String imageUrl   = idToPath.get(imageId);
+            String userProUrl = idToPath.get(userProfId);
             NurseSpeakBean speakBean = speakIdToBeanMap.get(speakId);
             speakBean.setImageUrl(imageUrl);
+            speakBean.setUserProfilePhotoUrl(userProUrl);
         }
 
         // construct return values

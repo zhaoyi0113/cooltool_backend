@@ -11,10 +11,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -48,19 +45,19 @@ public class NurseQualificationAPI {
     public Response getAllQualification(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseQualificationBean> qualifications = service.getAllNurseQualifications(userId);
+        logger.info("user {} get his qualification is {}.", qualifications);
         return Response.ok(qualifications).build();
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response addQualification(
-            @Context HttpServletRequest        request,
-            @FormDataParam("name")      String name,
-            @FormDataParam("type")      String type,
-            @FormDataParam("file_name") String fileName,
-            @FormDataParam("file") InputStream fileInputStream,
-            @FormDataParam("file") FormDataContentDisposition disposition
+    public Response addQualification(@Context HttpServletRequest        request,
+                                     @FormDataParam("name")      String name,
+                                     @FormDataParam("type")      String type,
+                                     @FormDataParam("file_name") String fileName,
+                                     @FormDataParam("file") InputStream fileInputStream,
+                                     @FormDataParam("file") FormDataContentDisposition disposition
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("add qualification name={} type={}, file_name={}, fileDisp={}, file={}", name, type, fileName, disposition, Boolean.valueOf(fileInputStream!=null));
@@ -73,5 +70,16 @@ public class NurseQualificationAPI {
             return Response.ok().build();
         }
         return Response.ok(qualificationPath).build();
+    }
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response resetQualification(@Context HttpServletRequest request) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("user {} reset his qualification", userId);
+        List<NurseQualificationBean> qualifications = service.deletNurseQualificationByUserId(userId);
+        logger.info("user {} delete qualifications is {}." , userId, qualifications);
+        return Response.ok().build();
     }
 }

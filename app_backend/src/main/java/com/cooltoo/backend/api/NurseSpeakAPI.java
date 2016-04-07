@@ -26,7 +26,6 @@ import java.util.List;
  * Created by yzzhao on 3/15/16.
  */
 @Path("/nurse/speak")
-@LoginAuthentication(requireNurseLogin = true)
 public class NurseSpeakAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseSpeakAPI.class);
@@ -36,7 +35,22 @@ public class NurseSpeakAPI {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query/all/{type}/{index}/{number}")
+    public Response getAllSpeak(@Context HttpServletRequest request,
+                                @PathParam("type") String type,
+                                @PathParam("index") int index,
+                                @PathParam("number") int number
+    ) {
+        logger.info("anonymous user to get all speak content type={} index={} number={}", type, index, number);
+        List<NurseSpeakBean> all = speakService.getSpeakByType(type, index, number);
+        logger.info("anonymous user to get all speak content, size ", all.size());
+        return Response.ok(all).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/{index}/{number}")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getNurseSpeakContentsList(@Context HttpServletRequest request,
                                               @PathParam("index") int index,
                                               @PathParam("number") int number
@@ -51,6 +65,7 @@ public class NurseSpeakAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/smug/{index}/{number}")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getSmugContent(@Context HttpServletRequest request,
                                    @PathParam("index") int index,
                                    @PathParam("number") int number
@@ -65,6 +80,7 @@ public class NurseSpeakAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/cathart/{index}/{number}")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getCathartContent(@Context HttpServletRequest request,
                                    @PathParam("index") int index,
                                    @PathParam("number") int number
@@ -79,6 +95,7 @@ public class NurseSpeakAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/ask_question/{index}/{number}")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getAskQuestionContent(@Context HttpServletRequest request,
                                    @PathParam("index") int index,
                                    @PathParam("number") int number
@@ -95,6 +112,7 @@ public class NurseSpeakAPI {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response addSmugSpeak(@Context HttpServletRequest request,
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
@@ -108,6 +126,7 @@ public class NurseSpeakAPI {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response addCathartSpeak(@Context HttpServletRequest request,
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
@@ -121,6 +140,7 @@ public class NurseSpeakAPI {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response addSpeak(@Context HttpServletRequest request,
                              @FormDataParam("content") String content,
                              @FormDataParam("file_name") String fileName,
@@ -133,6 +153,7 @@ public class NurseSpeakAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getNurseSpeakContent(@Context HttpServletRequest request,
                                          @PathParam("id") long id) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
@@ -143,6 +164,7 @@ public class NurseSpeakAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/comment")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response addSpeakComment(
             @Context HttpServletRequest request,
             @FormParam("nurseSpeakId") long nurseSpeakId,
@@ -157,6 +179,7 @@ public class NurseSpeakAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/thumbs_up")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response addSpeakThumbsUp(
             @Context HttpServletRequest request,
             @FormParam("nurseSpeakId") long nurseSpeakId
@@ -169,6 +192,7 @@ public class NurseSpeakAPI {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/thumbs_up")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response deleteSpeakThumbsUp(
             @Context HttpServletRequest request,
             @FormParam("nurseSpeakId") long nurseSpeakId

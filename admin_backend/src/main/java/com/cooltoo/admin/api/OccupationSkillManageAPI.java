@@ -76,8 +76,8 @@ public class OccupationSkillManageAPI {
 //                                        , @FormDataParam("disable_file") InputStream disableImageStream
     ) {
 //        skillService.editOccupationSkill(id, name, type, factor, imageStream, disableImageStream);
-        skillService.editOccupationSkill(id, name, type, factor, null, null);
-        return Response.ok().build();
+        OccupationSkillBean bean = skillService.editOccupationSkill(id, name, type, factor, null, null);
+        return Response.ok(bean).build();
     }
 
     @POST
@@ -98,8 +98,8 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillEnableImage(@FormDataParam("id") int id,
                                                    @FormDataParam("file") InputStream image) {
-        skillService.editOccupationSkill(id, null, null, -1, image, null);
-        return Response.ok().build();
+        OccupationSkillBean bean = skillService.editOccupationSkill(id, null, null, -1, image, null);
+        return Response.ok(bean).build();
     }
 
     @POST
@@ -108,7 +108,7 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillDisableImage(@FormDataParam("id") int id,
                                                     @FormDataParam("file") InputStream image) {
-        skillService.editOccupationSkill(id, null, null, -1, null, image);
-        return Response.ok().build();
+        OccupationSkillBean bean = skillService.editOccupationSkill(id, null, null, -1, null, image);
+        return Response.ok(bean).build();
     }
 }

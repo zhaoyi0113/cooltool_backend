@@ -13,6 +13,7 @@ public class NurseSpeakBean {
     private long userId;
     private String content;
     private String userName;
+    private String userProfilePhotoUrl;
     private Date time;
     private long imageId;
     private String imageUrl;
@@ -37,6 +38,14 @@ public class NurseSpeakBean {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public String getUserProfilePhotoUrl() {
+        return this.userProfilePhotoUrl;
+    }
+
+    public void setUserProfilePhotoUrl(String userProfilePhotoUrl) {
+        this.userProfilePhotoUrl = userProfilePhotoUrl;
     }
 
     public String getContent() {

@@ -158,6 +158,14 @@ public class OccupationSkillService {
 
     @Transactional
     public void deleteOccupationSkill(int id) {
+        OccupationSkillBean bean = getOccupationSkill(id);
+
+        // delete images and file_storage records;
+        List<Long> imageIds = new ArrayList<>();
+        imageIds.add(bean.getImageId());
+        imageIds.add(bean.getDisableImageId());
+        storageService.deleteFiles(imageIds);
+
         skillRepository.delete(id);
     }
 
@@ -167,14 +175,17 @@ public class OccupationSkillService {
     //=========================================================
 
     @Transactional
-    public void editOccupationSkill(int id, String name, String type, int factor, InputStream imageStream, InputStream disableImageStream) {
-        boolean               changed = false;
-        OccupationSkillEntity entity  = editOccupationSkillWithoutImage(id, name, type, factor);
+    public OccupationSkillBean editOccupationSkill(int id, String name, String type, int factor, InputStream imageStream, InputStream disableImageStream) {
+        boolean               changed        = false;
+        OccupationSkillEntity entity         = editOccupationSkillWithoutImage(id, name, type, factor);
+        String                imgPath        = null;
+        String                disableImgPath = null;
         if (imageStream != null) {
             try {
                 long fileId = storageService.saveFile(entity.getImageId(), entity.getName(), imageStream);
                 entity.setImageId(fileId);
-                changed = true;
+                imgPath     = storageService.getFilePath(fileId);
+                changed     = true;
             }
             catch (BadRequestException ex) {
                 // do nothing
@@ -184,19 +195,24 @@ public class OccupationSkillService {
             try {
                 long disableFileId = storageService.saveFile(entity.getDisableImageId(), entity.getName()+"_disable", disableImageStream);
                 entity.setDisableImageId(disableFileId);
-                changed = true;
+                disableImgPath     = storageService.getFilePath(disableFileId);
+                changed            = true;
             }
             catch (BadRequestException ex) {
                 // do nothing
             }
         }
         if (changed) {
-            skillRepository.save(entity);
+            entity = skillRepository.save(entity);
             logger.info("update occupation skill == " + entity);
         }
         else {
             logger.info("no occupation skill(enable/disable image) upated  == " + entity);
         }
+        OccupationSkillBean bean = beanConverter.convert(entity);
+        bean.setImageUrl(imgPath);
+        bean.setDisableImageUrl(disableImgPath);
+        return bean;
     }
 
     @Transactional
