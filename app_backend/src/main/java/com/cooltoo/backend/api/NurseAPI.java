@@ -186,14 +186,12 @@ public class NurseAPI {
     @Path("/update/reset_password")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     public Response resetPassword(@Context HttpServletRequest request,
                                   @FormParam("smscode") String smsCode,
                                   @FormParam("mobile") String mobile,
                                   @FormParam("new_password") String newPassword) {
         logger.info("reset nurse password is {}.", newPassword);
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseBean bean = service.updateMobilePassword(userId, smsCode, mobile, null, null, newPassword);
+        NurseBean bean = service.updateMobilePassword(-1, smsCode, mobile, null, null, newPassword);
         logger.info("reset nurse password is {}.", bean);
         return Response.ok(bean).build();
     }

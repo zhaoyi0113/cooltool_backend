@@ -87,6 +87,15 @@ public class NurseService {
         return entity.getId();
     }
 
+    public NurseBean getNurse(String mobile) {
+        List<NurseEntity> nurses = repository.findNurseByMobile(mobile);
+        if (null!=nurses && !nurses.isEmpty() && nurses.size()==1) {
+            NurseEntity nurseE = nurses.get(0);
+            return getNurse(nurseE.getId());
+        }
+        logger.error("Get nurse by mobile is error, result is {}.", nurses);
+        throw new BadRequestException(ErrorCode.DATA_ERROR);
+    }
 
     public NurseBean getNurse(long id) {
         NurseEntity entity = repository.findOne(id);
@@ -248,6 +257,9 @@ public class NurseService {
         logger.info("modify the password and mobile : [smsCode"+smsCode+", mobile=" +mobile+ ", newMobile="+newMobile+", password="+password+", newPassword="+newPassword+"]");
 
         NurseBean nurse = getNurse(id);
+        if (null==nurse) {
+            nurse = getNurse(mobile);
+        }
         // if not modify the mobile
         if (!VerifyUtil.isStringEmpty(mobile)) {
             if (!mobile.equals(nurse.getMobile())) {
