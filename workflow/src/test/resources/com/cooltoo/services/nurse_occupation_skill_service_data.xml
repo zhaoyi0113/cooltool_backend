@@ -4,9 +4,9 @@
     <nurse id="2" name="name2" age="22" gender="2" mobile="1432113433" password="aa" profile_photo_id="1" background_image_id="1" />
     <nurse id="3" name="name3" age="33" gender="2" mobile="1432113412" password="aa" profile_photo_id="1" background_image_id="1" />
 
-    <occupation_skill id="1" name="skill1" image_id="1" disable_image_id="1" type="1"/><!-- SKILL -->
-    <occupation_skill id="2" name="skill2" image_id="1" disable_image_id="1" type="2"/><!-- OCCUPATION -->
-    <occupation_skill id="3" name="skill3" image_id="1" disable_image_id="1" type="0"/><!-- COMMUNITY -->
+    <occupation_skill id="1" name="skill1" image_id="1" disable_image_id="1" /><!-- SKILL -->
+    <occupation_skill id="2" name="skill2" image_id="1" disable_image_id="1" /><!-- OCCUPATION -->
+    <occupation_skill id="3" name="skill3" image_id="1" disable_image_id="1" /><!-- COMMUNITY -->
 
     <nurse_occupation_skill id="1" user_id="1" skill_id="1" point="30" />
     <nurse_occupation_skill id="2" user_id="1" skill_id="2" point="20" />

@@ -14,7 +14,6 @@ public class OccupationSkillEntity {
     private long imageId;
     private long disableImageId;
     private String name;
-    private OccupationSkillType type;
     private int factor;
 
     @Id
@@ -55,16 +54,6 @@ public class OccupationSkillEntity {
         this.name = name;
     }
 
-    @Column(name="type")
-    @Enumerated
-    public OccupationSkillType getType() {
-        return type;
-    }
-
-    public void setType(OccupationSkillType type) {
-        this.type = type;
-    }
-
     @Column(name = "factor")
     public int getFactor() {
         return factor;
@@ -81,8 +70,7 @@ public class OccupationSkillEntity {
         msg.append("imageId=").append(imageId).append(", ");
         msg.append("disableImageId=").append(disableImageId).append(", ");
         msg.append("name=").append(name).append(", ");
-        msg.append("factor=").append(factor).append(", ");
-        msg.append("type=").append(type.name());
+        msg.append("factor=").append(factor);
         return msg.toString();
     }
 }

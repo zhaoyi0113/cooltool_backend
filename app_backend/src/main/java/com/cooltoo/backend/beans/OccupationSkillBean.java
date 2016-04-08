@@ -10,7 +10,6 @@ public class OccupationSkillBean {
     private long imageId;
     private long disableImageId;
     private String name;
-    private OccupationSkillType skillType;
     private String imageUrl;
     private String disableImageUrl;
 
@@ -64,14 +63,6 @@ public class OccupationSkillBean {
         this.name = name;
     }
 
-    public OccupationSkillType getType() {
-        return skillType;
-    }
-
-    public void setType(OccupationSkillType skillType) {
-        this.skillType = skillType;
-    }
-
     public int getFactor() {
         return factor;
     }
@@ -87,8 +78,7 @@ public class OccupationSkillBean {
         msg.append("imageId=").append(imageId).append(", ");
         msg.append("disableImageId=").append(disableImageId).append(", ");
         msg.append("name=").append(name).append(", ");
-        msg.append("factor=").append(factor).append(" , ");
-        msg.append("skillType=").append(skillType.name());
+        msg.append("factor=").append(factor);
         return msg.toString();
     }
 }

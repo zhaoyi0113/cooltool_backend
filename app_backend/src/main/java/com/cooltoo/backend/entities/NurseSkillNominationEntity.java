@@ -1,5 +1,7 @@
 package com.cooltoo.backend.entities;
 
+import com.cooltoo.constants.OccupationSkillType;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -14,6 +16,7 @@ public class NurseSkillNominationEntity {
     private int skillId;
     private long nominatedId;
     private Date dateTime;
+    private OccupationSkillType skillType;
 
     @Id
     @GeneratedValue
@@ -62,6 +65,17 @@ public class NurseSkillNominationEntity {
         this.dateTime = dateTime;
     }
 
+
+    @Column(name = "skill_type")
+    @GeneratedValue
+    public OccupationSkillType getSkillType() {
+        return skillType;
+    }
+
+    public void setSkillType(OccupationSkillType skillType) {
+        this.skillType = skillType;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -69,7 +83,8 @@ public class NurseSkillNominationEntity {
         msg.append("userId=").append(userId).append(", ");
         msg.append("skillId=").append(skillId).append(", ");
         msg.append("nominatedId=").append(nominatedId).append(", ");
-        msg.append("dateTime=").append(dateTime);
+        msg.append("dateTime=").append(dateTime).append(", ");
+        msg.append("skillType=").append(skillType);
         return msg.toString();
     }
 }

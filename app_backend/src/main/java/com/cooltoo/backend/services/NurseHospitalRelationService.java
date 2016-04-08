@@ -65,10 +65,10 @@ public class NurseHospitalRelationService {
 
         List<NurseHospitalRelationEntity> relations = repository.findByNurseId(nurseId);
         if (null==relations || relations.isEmpty()) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            return null;
         }
         if (relations.size()>1) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            return null;
         }
 
         relation = beanConverter.convert(relations.get(0));

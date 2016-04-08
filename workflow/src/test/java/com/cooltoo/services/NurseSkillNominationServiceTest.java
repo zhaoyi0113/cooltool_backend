@@ -28,7 +28,7 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testGetAllNominationCount() {
-        List<NurseSkillNominationBean> countMap = nominationService.getAllNominationBeans(1);
+        List<NurseSkillNominationBean> countMap = nominationService.getSpecialTypeNominated(1, OccupationSkillType.SKILL);
         Assert.assertEquals(6, countMap.size());
         for (NurseSkillNominationBean nm : countMap) {
             if (nm.getSkillId() == 1) {
@@ -55,8 +55,8 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testGetSkillNominationCount() {
-        List<NurseSkillNominationBean> countMap = nominationService.getSkillNominationBeans(1);
-        Assert.assertEquals(2, countMap.size());
+        List<NurseSkillNominationBean> countMap = nominationService.getSpecialTypeNominated(1, OccupationSkillType.SKILL);
+        Assert.assertEquals(6, countMap.size());
         for (NurseSkillNominationBean nm : countMap) {
             Assert.assertEquals(OccupationSkillType.SKILL, nm.getSkillType());
         }
@@ -65,12 +65,12 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testAddSkillNominationCount() {
-        nominationService.nominateNurseSkill(1, 6, 2);
-        long count = nominationService.getSkillNominationCount(2, 6);
+        nominationService.nominateNurseSkill(1, 6, OccupationSkillType.SKILL, 2);
+        long count = nominationService.getUserAllSkillNominatedCount(2);
         Assert.assertEquals(1, count);
 
-        nominationService.nominateNurseSkill(1, 6, 2);
-        Assert.assertEquals(0, nominationService.getSkillNominationCount(2, 6));
+        nominationService.nominateNurseSkill(1, 6, OccupationSkillType.SKILL, 2);
+        Assert.assertEquals(0, nominationService.getUserAllSkillNominatedCount(2));
     }
 
     @Test

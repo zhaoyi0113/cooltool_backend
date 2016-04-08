@@ -142,7 +142,6 @@ public class OccupationSkillService {
                 entity.setDisableImageId(disableFileId);
             }
             entity.setName(name);
-            entity.setType(skillType);
             entity.setFactor(factor);
             entity = skillRepository.save(entity);
 
@@ -161,7 +160,7 @@ public class OccupationSkillService {
         OccupationSkillBean bean = getOccupationSkill(id);
 
         // delete images and file_storage records;
-        List<Long> imageIds = new ArrayList<>();
+        List<Long> imageIds = new ArrayList();
         imageIds.add(bean.getImageId());
         imageIds.add(bean.getDisableImageId());
         storageService.deleteFiles(imageIds);
@@ -175,9 +174,9 @@ public class OccupationSkillService {
     //=========================================================
 
     @Transactional
-    public OccupationSkillBean editOccupationSkill(int id, String name, String type, int factor, InputStream imageStream, InputStream disableImageStream) {
+    public OccupationSkillBean editOccupationSkill(int id, String name, int factor, InputStream imageStream, InputStream disableImageStream) {
         boolean               changed        = false;
-        OccupationSkillEntity entity         = editOccupationSkillWithoutImage(id, name, type, factor);
+        OccupationSkillEntity entity         = editOccupationSkillWithoutImage(id, name, factor);
         String                imgPath        = null;
         String                disableImgPath = null;
         if (imageStream != null) {
@@ -216,7 +215,7 @@ public class OccupationSkillService {
     }
 
     @Transactional
-    public OccupationSkillEntity editOccupationSkillWithoutImage(int id, String name, String type, int factor) {
+    public OccupationSkillEntity editOccupationSkillWithoutImage(int id, String name, int factor) {
         boolean changed = false;
 
         // get the skill
@@ -236,13 +235,6 @@ public class OccupationSkillService {
                     throw new BadRequestException(ErrorCode.SKILL_EXIST);
                 }
             }
-        }
-
-        // edit skill type
-        OccupationSkillType skillType = OccupationSkillType.parseString(type);
-        if (null!=skillType && !skillType.equals(entity.getType())) {
-            entity.setType(skillType);
-            changed = true;
         }
 
         // edit factor

@@ -1,11 +1,13 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseOccupationSkillBean;
+import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.backend.beans.NurseSkillNominationBean;
 import com.cooltoo.backend.beans.OccupationSkillBean;
 import com.cooltoo.backend.converter.NurseOccupationSkillBeanConverter;
 import com.cooltoo.backend.entities.NurseOccupationSkillEntity;
 import com.cooltoo.backend.repository.NurseOccupationSkillRepository;
+import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.constants.OccupationSkillType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.VerifyUtil;
@@ -35,22 +37,38 @@ public class NurseOccupationSkillService {
     private NurseSkillNominationService nominationService;
     @Autowired
     private NurseOccupationSkillBeanConverter beanConverter;
+    @Autowired
+    private NurseHospitalRelationService hospitalRelationService;
 
 
     //===============================================================
     //           get nurse skill
     //===============================================================
 
-    public List<NurseOccupationSkillBean> getAllSkills(long userId) {
+    public List<SocialAbilitiesBean> getAllSkills(long userId) {
 
         List<OccupationSkillBean> skillsB = skillService.getOccupationSkillList();
-        List<NurseOccupationSkillEntity> nurseSkillsE = nurseSkillRepository.findSkillRelationByUserId(userId, sort);
-        List<NurseOccupationSkillBean> nurseSkillsB = new ArrayList<NurseOccupationSkillBean>();
-        for (NurseOccupationSkillEntity nurseSkillE : nurseSkillsE) {
-            NurseOccupationSkillBean
-            nurseSkillB = beanConverter.convert(nurseSkillE);
-            nurseSkillsB.add(nurseSkillB);
+        List<SocialAbilitiesBean> nurseSkillsB = new ArrayList<SocialAbilitiesBean>();
 
+        getNurseOccupationNomination(userId, nurseSkillsB);
+        getNurseSkillNomination(userId, skillsB, nurseSkillsB);
+
+        return nurseSkillsB;
+    }
+
+    private void getNurseOccupationNomination(long userId, List<SocialAbilitiesBean> nurseSkillsB){
+        SocialAbilitiesBean occupationSkillBean = nominationService.getAllOccupationNominationBeans(userId);
+        if(occupationSkillBean == null){
+            return;
+        }
+        nurseSkillsB.add(occupationSkillBean);
+    }
+
+    private void getNurseSkillNomination(long userId, List<OccupationSkillBean> skillsB, List<SocialAbilitiesBean> nurseSkillsB) {
+        List<NurseOccupationSkillEntity> nurseSkillsE = nurseSkillRepository.findSkillRelationByUserId(userId, sort);
+        for (NurseOccupationSkillEntity nurseSkillE : nurseSkillsE) {
+            SocialAbilitiesBean nurseSkillB = beanConverter.convert(nurseSkillE);
+            nurseSkillsB.add(nurseSkillB);
             for (OccupationSkillBean skillB : skillsB) {
                 if (skillB.getId()==nurseSkillB.getSkillId()) {
                     nurseSkillB.setSkill(skillB);
@@ -58,9 +76,8 @@ public class NurseOccupationSkillService {
                 }
             }
         }
-
-        List<NurseSkillNominationBean> allSkillNominations = nominationService.getAllNominationBeans(userId, nurseSkillsB);
-        for (NurseOccupationSkillBean nurseSkillB : nurseSkillsB) {
+        List<NurseSkillNominationBean> allSkillNominations = nominationService.getAllSkillNominationBeans(userId, OccupationSkillType.SKILL);
+        for (SocialAbilitiesBean nurseSkillB : nurseSkillsB) {
             for (NurseSkillNominationBean nomination : allSkillNominations) {
                 if (nomination.getSkillId()==nurseSkillB.getSkillId()) {
                     nurseSkillB.setNomination(nomination);
@@ -68,17 +85,15 @@ public class NurseOccupationSkillService {
                 }
             }
         }
-
-        return nurseSkillsB;
     }
 
-    public NurseOccupationSkillBean getSkill(long userId, int occupationSkillId) {
+    public SocialAbilitiesBean getSkill(long userId, int occupationSkillId) {
         NurseOccupationSkillEntity nurseSkillE = nurseSkillRepository.findSkillRelationByUserIdAndSkillId(userId, occupationSkillId);
         if (null==nurseSkillE) {
             return null;
         }
 
-        NurseOccupationSkillBean nurseSkillB = beanConverter.convert(nurseSkillE);
+        SocialAbilitiesBean nurseSkillB = beanConverter.convert(nurseSkillE);
 
         OccupationSkillBean skillB = skillService.getOccupationSkill(occupationSkillId);
          if (null!=skillB) {
@@ -103,7 +118,7 @@ public class NurseOccupationSkillService {
         // is Occupation skill exist
         skillService.getOccupationSkill(occupationSkillId);
         // is Skill exist already
-        NurseOccupationSkillBean skillExist = getSkill(userId, occupationSkillId);
+        SocialAbilitiesBean skillExist = getSkill(userId, occupationSkillId);
         if (null!=skillExist) {
             nurseSkillRepository.delete(skillExist.getId());
         }
@@ -144,7 +159,7 @@ public class NurseOccupationSkillService {
         nurseService.getNurse(userId);
         for (Integer idI : ids) {
             // is Skill exist already
-            NurseOccupationSkillBean skillExist = getSkill(userId, idI);
+            SocialAbilitiesBean skillExist = getSkill(userId, idI);
             if (null != skillExist) {
                 nurseSkillRepository.delete(skillExist.getId());
             } else {

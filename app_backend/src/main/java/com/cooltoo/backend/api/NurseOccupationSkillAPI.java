@@ -1,6 +1,6 @@
 package com.cooltoo.backend.api;
 
-import com.cooltoo.backend.beans.NurseOccupationSkillBean;
+import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseOccupationSkillService;
 import com.cooltoo.constants.ContextKeys;
@@ -32,7 +32,7 @@ public class NurseOccupationSkillAPI {
     public Response getAllSkills(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get all skills.", userId);
-        List<NurseOccupationSkillBean> skills = skillService.getAllSkills(userId);
+        List<SocialAbilitiesBean> skills = skillService.getAllSkills(userId);
         return Response.ok(skills).build();
     }
 
@@ -45,7 +45,7 @@ public class NurseOccupationSkillAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get skill {}.", userId, skillId);
-        NurseOccupationSkillBean skill = skillService.getSkill(userId, skillId);
+        SocialAbilitiesBean skill = skillService.getSkill(userId, skillId);
         return Response.ok(skill).build();
     }
 
@@ -58,7 +58,7 @@ public class NurseOccupationSkillAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get friend {} 's skills.", userId, friendId);
-        List<NurseOccupationSkillBean> skills = skillService.getAllSkills(friendId);
+        List<SocialAbilitiesBean> skills = skillService.getAllSkills(friendId);
         return Response.ok(skills).build();
     }
 

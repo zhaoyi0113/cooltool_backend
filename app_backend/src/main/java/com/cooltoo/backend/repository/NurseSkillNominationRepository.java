@@ -1,6 +1,7 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.NurseSkillNominationEntity;
+import com.cooltoo.constants.OccupationSkillType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,11 +13,13 @@ public interface NurseSkillNominationRepository extends JpaRepository<NurseSkill
 
     List<NurseSkillNominationEntity> findByUserId(long userId);
 
-    long countByUserIdAndSkillId(long userId, int skillId);
+    List<NurseSkillNominationEntity> findByUserIdAndSkillType(long userId, OccupationSkillType skillType);
 
-    List<NurseSkillNominationEntity> findByUserIdAndSkillIdAndNominatedId(long userId, int skillId, long nominatedId);
+    long countByUserIdAndSkillIdAndSkillType(long userId, int skillId, OccupationSkillType type);
+
+    List<NurseSkillNominationEntity> findByUserIdAndSkillIdAndNominatedIdAndSkillType(long userId, int skillId, long nominatedId, OccupationSkillType skillType);
 
     List<NurseSkillNominationEntity> findByUserIdAndNominatedId(long userId, long nominatedId);
 
-    long countByuserId(long userId);
+    long countByUserId(long userId);
 }

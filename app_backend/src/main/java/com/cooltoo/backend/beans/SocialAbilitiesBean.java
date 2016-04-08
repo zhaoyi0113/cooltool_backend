@@ -3,7 +3,7 @@ package com.cooltoo.backend.beans;
 /**
  * Created by zhaolisong on 16/3/25.
  */
-public class NurseOccupationSkillBean {
+public class SocialAbilitiesBean {
     private int id;
     private long userId;
     private int skillId;

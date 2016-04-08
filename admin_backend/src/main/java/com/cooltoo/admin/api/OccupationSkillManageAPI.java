@@ -70,14 +70,13 @@ public class OccupationSkillManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkill2(@FormParam("id") int id,
-                                        @FormParam("type") String type,
                                         @FormParam("name") String name,
                                         @FormParam("factor") int factor
 //                                        , @FormDataParam("file") InputStream imageStream
 //                                        , @FormDataParam("disable_file") InputStream disableImageStream
     ) {
 //        skillService.editOccupationSkill(id, name, type, factor, imageStream, disableImageStream);
-        OccupationSkillBean bean = skillService.editOccupationSkill(id, name, type, factor, null, null);
+        OccupationSkillBean bean = skillService.editOccupationSkill(id, name, factor, null, null);
         return Response.ok(bean).build();
     }
 
@@ -87,10 +86,9 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkill(@FormParam("id") int id,
                                         @FormParam("name") String name,
-                                        @FormParam("type") String type,
                                         @FormParam("factor") int factor
     ) {
-        skillService.editOccupationSkillWithoutImage(id, name, type, factor);
+        skillService.editOccupationSkillWithoutImage(id, name, factor);
         return Response.ok().build();
     }
 
@@ -101,7 +99,7 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillEnableImage(@FormDataParam("id") int id,
                                                    @FormDataParam("file") InputStream image) {
-        OccupationSkillBean bean = skillService.editOccupationSkill(id, null, null, -1, image, null);
+        OccupationSkillBean bean = skillService.editOccupationSkill(id, null, -1, image, null);
         return Response.ok(bean).build();
     }
 
@@ -112,7 +110,7 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillDisableImage(@FormDataParam("id") int id,
                                                     @FormDataParam("file") InputStream image) {
-        OccupationSkillBean bean = skillService.editOccupationSkill(id, null, null, -1, null, image);
+        OccupationSkillBean bean = skillService.editOccupationSkill(id, null, -1, null, image);
         return Response.ok(bean).build();
     }
 }

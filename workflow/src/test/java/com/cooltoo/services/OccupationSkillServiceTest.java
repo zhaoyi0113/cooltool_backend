@@ -65,7 +65,7 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
             file.createNewFile();
             inputStream   = new FileInputStream(file);
             disableStream = new FileInputStream(file);
-            skillService.editOccupationSkill(skill.getId(), name, OccupationSkillType.SKILL.name(), 1, inputStream, disableStream);
+            skillService.editOccupationSkill(skill.getId(), name, 1, inputStream, disableStream);
             OccupationSkillBean editedSkill = skillService.getOccupationSkill(skill.getId());
             Assert.assertNotNull(editedSkill);
             Assert.assertEquals(name, editedSkill.getName());
@@ -85,7 +85,7 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
         OccupationSkillBean skill = skillService.getOccupationSkill(1000);
         Assert.assertNotNull(skill);
         String name = String.valueOf(System.currentTimeMillis());
-        skillService.editOccupationSkillWithoutImage(skill.getId(), name, OccupationSkillType.OCCUPATION.name(), 1);
+        skillService.editOccupationSkillWithoutImage(skill.getId(), name, 1);
         OccupationSkillBean editedSkill = skillService.getOccupationSkill(skill.getId());
         Assert.assertNotNull(editedSkill);
         Assert.assertEquals(name, editedSkill.getName());
