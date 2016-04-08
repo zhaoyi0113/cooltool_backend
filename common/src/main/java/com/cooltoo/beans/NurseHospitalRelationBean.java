@@ -10,8 +10,8 @@ public class NurseHospitalRelationBean {
     private int hospitalId;
     private int departmentId;
     private HospitalBean hospital;
-    private HospitalDepartmentBean department;
     private HospitalDepartmentBean parentDepart;
+    private HospitalDepartmentBean department;
 
     public long getId() {
         return id;

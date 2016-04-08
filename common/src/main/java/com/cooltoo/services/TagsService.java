@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 16/4/6.
@@ -390,6 +387,7 @@ public class TagsService {
     public TagsBean addTags(String name, long categoryId, String imageName, InputStream image) {
         logger.info("add tag : name={} categoryId={} imageName={} image={}", name, categoryId, imageName, (null!=image));
 
+        String imagePath = null;
         TagsEntity entity = new TagsEntity();
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("add tag : name is empty");
@@ -411,9 +409,57 @@ public class TagsService {
             if (VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "tag_tmp_" + System.nanoTime();
             }
+            long fileId = storageService.saveFile(-1, imageName, image);
+            if (fileId>0) {
+                entity.setImageId(fileId);
+                imagePath = storageService.getFilePath(fileId);
+            }
         }
 
-        return null;
+        entity.setTimeCreated(new Date());
+        entity = tagsRep.save(entity);
+
+        TagsBean bean = tagsConverter.convert(entity);
+        bean.setImageUrl(imagePath);
+
+        return bean;
+    }
+
+    public TagsCategoryBean addTagCategory(String name, String imageName, InputStream image) {
+        logger.info("add tag category : name={} imageName={} image={}", name, imageName, (null!=image));
+
+        String imagePath = null;
+        TagsCategoryEntity entity = new TagsCategoryEntity();
+        if (VerifyUtil.isStringEmpty(name)) {
+            logger.error("add tag : name is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        else if (tagsRep.countByName(name)>0) {
+            logger.error("add tag : name is exist");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        else {
+            entity.setName(name);
+        }
+
+        if (null!=image) {
+            if (VerifyUtil.isStringEmpty(imageName)) {
+                imageName = "category_tmp_" + System.nanoTime();
+            }
+            long fileId = storageService.saveFile(-1, imageName, image);
+            if (fileId>0) {
+                entity.setImageId(fileId);
+                imagePath = storageService.getFilePath(fileId);
+            }
+        }
+
+        entity.setTimeCreated(new Date());
+        entity = categoryRep.save(entity);
+
+        TagsCategoryBean bean = categoryConverter.convert(entity);
+        bean.setImageUrl(imagePath);
+
+        return bean;
     }
 
 }
