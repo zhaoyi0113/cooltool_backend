@@ -68,7 +68,8 @@ public class TagsCategoryBean {
         msg.append(" id=").append(id).append(", ");
         msg.append(" name=").append(name).append(", ");
         msg.append(" imageId=").append(imageId).append(", ");
-        msg.append(" timeCreated=").append(timeCreated).append("] ");
+        msg.append(" timeCreated=").append(timeCreated).append(", ");
+        msg.append(" tags=").append(tags).append("] ");
         return msg.toString();
     }
 }

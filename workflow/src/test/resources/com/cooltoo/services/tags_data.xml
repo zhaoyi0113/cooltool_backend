@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <tags id="1"  category_id="1" name="tag-1_1"  image_id="1"  time_created="2016-04-08 00:00:00" />
+    <tags id="2"  category_id="1" name="tag-1_2"  image_id="2"  time_created="2016-04-08 00:00:00" />
+    <tags id="3"  category_id="1" name="tag-1_3"  image_id="3"  time_created="2016-04-08 00:00:00" />
+    <tags id="4"  category_id="1" name="tag-1_4"  image_id="4"  time_created="2016-04-08 00:00:00" />
+    <tags id="5"  category_id="1" name="tag-1_5"  image_id="5"  time_created="2016-04-08 00:00:00" />
+    <tags id="6"  category_id="1" name="tag-1_6"  image_id="6"  time_created="2016-04-08 00:00:00" />
+    <tags id="7"  category_id="1" name="tag-1_7"  image_id="7"  time_created="2016-04-08 00:00:00" />
+    <tags id="8"  category_id="1" name="tag-1_8"  image_id="8"  time_created="2016-04-08 00:00:00" />
+    <tags id="9"  category_id="1" name="tag-1_9"  image_id="9"  time_created="2016-04-08 00:00:00" />
+    <tags id="10" category_id="1" name="tag-1_10" image_id="10" time_created="2016-04-08 00:00:00" />
+    <tags id="11" category_id="2" name="tag-2_1"  image_id="11" time_created="2016-04-08 00:00:00" />
+    <tags id="12" category_id="2" name="tag-2_2"  image_id="12" time_created="2016-04-08 00:00:00" />
+    <tags id="13" category_id="2" name="tag-2_3"  image_id="13" time_created="2016-04-08 00:00:00" />
+    <tags id="14" category_id="2" name="tag-2_4"  image_id="14" time_created="2016-04-08 00:00:00" />
+    <tags id="15" category_id="2" name="tag-2_5"  image_id="15" time_created="2016-04-08 00:00:00" />
+    <tags id="16" category_id="2" name="tag-2_6"  image_id="16" time_created="2016-04-08 00:00:00" />
+    <tags id="17" category_id="2" name="tag-2_7"  image_id="17" time_created="2016-04-08 00:00:00" />
+    <tags id="18" category_id="2" name="tag-2_8"  image_id="17" time_created="2016-04-08 00:00:00" />
+    <tags id="19" category_id="2" name="tag-2_9"  image_id="16" time_created="2016-04-08 00:00:00" />
+    <tags id="20" category_id="3" name="tag-3_1"  image_id="15" time_created="2016-04-08 00:00:00" />
+    <tags id="21" category_id="3" name="tag-3_2"  image_id="14" time_created="2016-04-08 00:00:00" />
+    <tags id="22" category_id="3" name="tag-3_3"  image_id="13" time_created="2016-04-08 00:00:00" />
+    <tags id="23" category_id="3" name="tag-3_4"  image_id="12" time_created="2016-04-08 00:00:00" />
+    <tags id="24" category_id="3" name="tag-3_5"  image_id="11" time_created="2016-04-08 00:00:00" />
+    <tags id="25" category_id="3" name="tag-3_6"  image_id="10" time_created="2016-04-08 00:00:00" />
+    <tags id="26" category_id="3" name="tag-3_7"  image_id="9"  time_created="2016-04-08 00:00:00" />
+    <tags id="27" category_id="3" name="tag-3_8"  image_id="8"  time_created="2016-04-08 00:00:00" />
+    <tags id="28" category_id="3" name="tag-3_9"  image_id="7"  time_created="2016-04-08 00:00:00" />
+    <tags id="29" category_id="3" name="tag-3_10" image_id="6"  time_created="2016-04-08 00:00:00" />
+    <tags id="30" category_id="3" name="tag-3_11" image_id="5"  time_created="2016-04-08 00:00:00" />
+    <tags id="31" category_id="4" name="tag-4_1"  image_id="4"  time_created="2016-04-08 00:00:00" />
+    <tags id="32" category_id="4" name="tag-4_2"  image_id="3"  time_created="2016-04-08 00:00:00" />
+    <tags id="33" category_id="4" name="tag-4_3"  image_id="2"  time_created="2016-04-08 00:00:00" />
+    <tags id="34" category_id="4" name="tag-4_4"  image_id="1"  time_created="2016-04-08 00:00:00" />
+</dataset>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <tags_category id="1" name="category_1" image_id="1" time_created="2016-04-08 00:00:00" />
+    <tags_category id="2" name="category_2" image_id="2" time_created="2016-04-08 00:00:00" />
+    <tags_category id="3" name="category_3" image_id="3" time_created="2016-04-08 00:00:00" />
+    <tags_category id="4" name="category_4" image_id="4" time_created="2016-04-08 00:00:00" />
+    <tags_category id="5" name="category_5" image_id="5" time_created="2016-04-08 00:00:00" />
+    <tags_category id="6" name="category_6" image_id="6" time_created="2016-04-08 00:00:00" />
+    <tags_category id="7" name="category_7" image_id="7" time_created="2016-04-08 00:00:00" />
+    <tags_category id="8" name="category_8" image_id="8" time_created="2016-04-08 00:00:00" />
+    <tags_category id="9" name="category_9" image_id="9" time_created="2016-04-08 00:00:00" />
+</dataset>

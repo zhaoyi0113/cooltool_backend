@@ -13,5 +13,4 @@ public interface TagsCategoryRepository extends CrudRepository<TagsCategoryEntit
     public List<TagsCategoryEntity> findAll(Sort sort);
     public List<TagsCategoryEntity> findByIdIn(List<Long> ids);
     public long                     countByName(String name);
-    public void                     deleteByIdIn(List<Long> ids);
 }

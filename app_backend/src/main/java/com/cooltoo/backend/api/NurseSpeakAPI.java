@@ -33,6 +33,31 @@ public class NurseSpeakAPI {
     @Autowired
     private NurseSpeakService speakService;
 
+    @Path("/query")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response getSpeakContentsList(@Context HttpServletRequest request,
+                                         @FormParam("userId") @DefaultValue("0")   long   userId,
+                                         @FormParam("type")   @DefaultValue("ALL") String type,
+                                         @FormParam("index")  @DefaultValue("0")   int    index,
+                                         @FormParam("number") @DefaultValue("5")   int    number
+    ) {
+        if (userId<=0) {
+            userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        }
+        logger.info("get nurse speak for user={} type={} at index({}) number({}).", userId, type, index, number);
+        List<NurseSpeakBean> nurseSpeak = null;
+        if ("ALL".equalsIgnoreCase(type)) {
+            nurseSpeak = speakService.getSpeakByUserIdAndType(userId, type, index, number);
+        }
+        else {
+            nurseSpeak = speakService.getNurseSpeak(userId, index, number);
+        }
+        logger.info("get nurse speak list size "+nurseSpeak.size());
+        return Response.ok(nurseSpeak).build();
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/all/{type}/{index}/{number}")

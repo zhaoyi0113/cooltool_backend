@@ -11,7 +11,6 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.TagsCategoryRepository;
 import com.cooltoo.repository.TagsRepository;
 import com.cooltoo.util.VerifyUtil;
-import org.apache.catalina.util.StringParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +46,11 @@ public class TagsService {
     //=================================================================
 
     public TagsBean getTag(long tagId) {
-        logger.info("get tag by id {}" + tagId);
+        logger.info("get tag by id {}", tagId);
         TagsEntity tag = tagsRep.findOne(tagId);
         if (null==tag) {
             logger.info("get tag by id, doesn't exist!");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            return null;
         }
         TagsBean tagB = tagsConverter.convert(tag);
         if (tagB.getImageId()>0) {
@@ -60,6 +59,39 @@ public class TagsService {
         }
 
         return tagB;
+    }
+
+    public List<TagsBean> getTagByIds(String tagIds) {
+        if (VerifyUtil.isOccupationSkillIds(tagIds)) {
+            List<TagsEntity> tagsE     = null;
+            List<TagsBean>   tagsB     = new ArrayList<>();
+            List<Long>       imgIds    = new ArrayList<>();
+            Map<Long,String> imgId2Path= null;
+            List<Long>       lTagIds   = new ArrayList<>();
+            String[]         strTagIds = tagIds.split(",");
+            for (String id : strTagIds) {
+                lTagIds.add(Long.parseLong(id));
+            }
+
+            tagsE = tagsRep.findByIdIn(lTagIds);
+            if (null!=tagsE) {
+                TagsBean bean = null;
+                String   path = null;
+                for (TagsEntity tagE : tagsE) {
+                    imgIds.add(tagE.getImageId());
+                }
+                imgId2Path = storageService.getFilePath(imgIds);
+                for (TagsEntity tagE : tagsE) {
+                    bean = tagsConverter.convert(tagE);
+                    path = imgId2Path.get(bean.getImageId());
+                    bean.setImageUrl(path);
+                    tagsB.add(bean);
+                }
+
+                return tagsB;
+            }
+        }
+        return new ArrayList<>();
     }
 
     public List<TagsBean> getTagsByCategoryId(long categoryId) {
@@ -88,10 +120,24 @@ public class TagsService {
         return new ArrayList<>();
     }
 
-    public TagsCategoryBean getCategoryByIdWithTags(long categoryId) {
+    public List<TagsBean> getTagsWithoutCategoryId() {
+        List<TagsBean> all = getAllTag();
+
+        for (int i=0, count=all.size(); i<count; i ++) {
+            TagsBean tag = all.get(i);
+            if (tag.getCategoryId()<=0) {
+                all.remove(i);
+                i --;
+                count --;
+            }
+        }
+        return all;
+    }
+
+    public TagsCategoryBean getCategoryWithTags(long categoryId) {
         TagsCategoryEntity categoryE = categoryRep.findOne(categoryId);
         if (null==categoryE) {
-            return new TagsCategoryBean();
+            return null;
         }
 
         TagsCategoryBean   categoryB = categoryConverter.convert(categoryE);
@@ -104,10 +150,10 @@ public class TagsService {
         return categoryB;
     }
 
-    public TagsCategoryBean getCategoryById(long categoryId) {
+    public TagsCategoryBean getCategory(long categoryId) {
         TagsCategoryEntity categoryE = categoryRep.findOne(categoryId);
         if (null==categoryE) {
-            return new TagsCategoryBean();
+            return null;
         }
 
         TagsCategoryBean   categoryB = categoryConverter.convert(categoryE);
@@ -223,6 +269,52 @@ public class TagsService {
         return new ArrayList<>();
     }
 
+
+    public List<TagsCategoryBean> getCategoryByIds(String categoryIds) {
+        if (VerifyUtil.isOccupationSkillIds(categoryIds)) {
+            List<TagsCategoryBean> categoriesB = new ArrayList<>();
+            List<Long>             lTagIds     = new ArrayList<>();
+            String[]               strTagIds   = categoryIds.split(",");
+            for (String id : strTagIds) {
+                lTagIds.add(Long.parseLong(id));
+            }
+
+            List<TagsCategoryBean> all = getAllCategory();
+            for (TagsCategoryBean categoryB : all) {
+                if(!lTagIds.contains(categoryB.getId())) {
+                    continue;
+                }
+                categoriesB.add(categoryB);
+            }
+
+            return categoriesB;
+        }
+        return new ArrayList<>();
+    }
+
+
+    public List<TagsCategoryBean> getCategoryWithTagsByIds(String categoryIds) {
+        if (VerifyUtil.isOccupationSkillIds(categoryIds)) {
+            List<TagsCategoryBean> categoriesB = new ArrayList<>();
+            List<Long>             lTagIds     = new ArrayList<>();
+            String[]               strTagIds   = categoryIds.split(",");
+            for (String id : strTagIds) {
+                lTagIds.add(Long.parseLong(id));
+            }
+
+            List<TagsCategoryBean> all = getAllCategoryWithTags();
+            for (TagsCategoryBean categoryB : all) {
+                if(!lTagIds.contains(categoryB.getId())) {
+                    continue;
+                }
+                categoriesB.add(categoryB);
+            }
+
+            return categoriesB;
+        }
+        return new ArrayList<>();
+    }
+
     //=================================================================
     //         update
     //=================================================================
@@ -319,13 +411,43 @@ public class TagsService {
             List<Long> imgIds  = new ArrayList<>();
             imgIds.add(imageId);
             storageService.deleteFiles(imgIds);
+            tagsRep.delete(tagId);
+
+            return tagId;
         }
         throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
     }
 
     @Transactional
+    public String deleteTagByIds(String tagIds) {
+        if (VerifyUtil.isOccupationSkillIds(tagIds)) {
+            List<TagsEntity> tagsE     = null;
+            List<Long>       imgIds    = new ArrayList<>();
+            List<Long>       lTagIds   = new ArrayList<>();
+            String[]         strTagIds = tagIds.split(",");
+            for (String id : strTagIds) {
+                lTagIds.add(Long.parseLong(id));
+            }
+
+            tagsE = tagsRep.findByIdIn(lTagIds);
+            if (null!=tagsE) {
+                for (TagsEntity tagE : tagsE) {
+                    imgIds.add(tagE.getImageId());
+                }
+            }
+            if (!imgIds.isEmpty()) {
+                storageService.deleteFiles(imgIds);
+            }
+            tagsRep.delete(tagsE);
+
+            return tagIds;
+        }
+        throw new BadRequestException(ErrorCode.DATA_ERROR);
+    }
+
+    @Transactional
     public long deleteCategory(long categoryId) {
-        TagsCategoryBean category = getCategoryById(categoryId);
+        TagsCategoryBean category = getCategory(categoryId);
         if (null!=category) {
             List<Long> imgIds   = new ArrayList<>();
             imgIds.add(category.getImageId());
@@ -340,12 +462,14 @@ public class TagsService {
             storageService.deleteFiles(imgIds);
             tagsRep.deleteByCategoryId(categoryId);
             categoryRep.delete(categoryId);
+
+            return categoryId;
         }
         throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
     }
 
     @Transactional
-    public String deleteCategory(String categoryIds) {
+    public String deleteCategoryByIds(String categoryIds) {
         if (VerifyUtil.isOccupationSkillIds(categoryIds)) {
 
             List<Long> imgIds         = new ArrayList<>();
@@ -371,10 +495,10 @@ public class TagsService {
             if (!imgIds.isEmpty()) {
                 storageService.deleteFiles(imgIds);
             }
-            if (!lCategoryIds.isEmpty()) {
-                tagsRep.deleteByCategoryIdIn(lCategoryIds);
-                categoryRep.deleteByIdIn(lCategoryIds);
-            }
+            tagsRep.deleteByCategoryIdIn(lCategoryIds);
+            categoryRep.delete(categoriesE);
+
+            return categoryIds;
         }
         throw new BadRequestException(ErrorCode.DATA_ERROR);
     }

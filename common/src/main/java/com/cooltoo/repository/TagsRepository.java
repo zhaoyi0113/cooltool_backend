@@ -13,6 +13,7 @@ import java.util.List;
  */
 public interface TagsRepository extends CrudRepository<TagsEntity, Long> {
     List<TagsEntity> findAll(Sort sort);
+    List<TagsEntity> findByIdIn(List<Long> ids);
     List<TagsEntity> findByCategoryIdIn(List<Long> categoryIds);
     List<TagsEntity> findByCategoryId(long categoryId, Sort sort);
     long countByName(String name);
