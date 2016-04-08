@@ -48,7 +48,7 @@ public class NurseSpeakAPI {
         }
         logger.info("get nurse speak for user={} type={} at index({}) number({}).", userId, type, index, number);
         List<NurseSpeakBean> nurseSpeak = null;
-        if ("ALL".equalsIgnoreCase(type)) {
+        if (!"ALL".equalsIgnoreCase(type)) {
             nurseSpeak = speakService.getSpeakByUserIdAndType(userId, type, index, number);
         }
         else {
