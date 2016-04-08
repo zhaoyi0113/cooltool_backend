@@ -38,7 +38,7 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response getSpeakContentsList(@Context HttpServletRequest request,
-                                         @FormParam("userId") @DefaultValue("0")   long   userId,
+                                         @FormParam("user_id") @DefaultValue("0")   long   userId,
                                          @FormParam("type")   @DefaultValue("ALL") String type,
                                          @FormParam("index")  @DefaultValue("0")   int    index,
                                          @FormParam("number") @DefaultValue("5")   int    number
