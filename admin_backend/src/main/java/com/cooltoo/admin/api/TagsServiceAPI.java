@@ -33,13 +33,12 @@ public class TagsServiceAPI {
     //    get
     //=======================================================================
 
-    @Path("/tag/{tag_ids}")
-    @GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getTag(@Context              HttpServletRequest request,
-                           @PathParam("tag_ids") String             tagIds) {
+                           @FormParam("tag_ids") String             tagIds) {
+        logger.info("get tag by ids={}", tagIds);
         List<TagsBean> tags = tagsService.getTagByIds(tagIds);
         return Response.ok(tags).build();
     }
@@ -47,9 +46,9 @@ public class TagsServiceAPI {
     @Path("/tag_without_category")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getTagWithoutCategoryId(@Context HttpServletRequest request) {
+        logger.info("get tag with no category belong");
         List<TagsBean> tags = tagsService.getTagsWithoutCategoryId();
         return Response.ok(tags).build();
     }
@@ -58,7 +57,6 @@ public class TagsServiceAPI {
     @Path("/tag_by_category/{category_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getTagByCategoryId(@Context                  HttpServletRequest request,
                                        @PathParam("category_id") long               categoryId) {
@@ -66,13 +64,13 @@ public class TagsServiceAPI {
         return Response.ok(tags).build();
     }
 
-    @Path("/category/{category_ids}")
-    @GET
+    @Path("/category")
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getCategory(@Context                   HttpServletRequest request,
-                                @PathParam("category_ids") String             categoryIds) {
+                                @FormParam("category_ids") String             categoryIds) {
+        logger.info("get category by ids={}", categoryIds);
         if ("ALL".equalsIgnoreCase(categoryIds)) {
             List<TagsCategoryBean> categories = tagsService.getAllCategory();
             return Response.ok(categories).build();
@@ -83,19 +81,19 @@ public class TagsServiceAPI {
         }
     }
 
-    @Path("/category_with_tags/{category_ids}")
-    @GET
+    @Path("/category_with_tags")
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getCategoryWithTags(@Context                   HttpServletRequest request,
-                                        @PathParam("category_ids") String             categoriesIds) {
-        if ("ALL".equalsIgnoreCase(categoriesIds)) {
+                                        @FormParam("category_ids") String             categoryIds) {
+        logger.info("get category_with_tag by ids={}", categoryIds);
+        if ("ALL".equalsIgnoreCase(categoryIds)) {
             List<TagsCategoryBean> categories = tagsService.getAllCategoryWithTags();
             return Response.ok(categories).build();
         }
         else {
-            List<TagsCategoryBean> categories = tagsService.getCategoryWithTagsByIds(categoriesIds);
+            List<TagsCategoryBean> categories = tagsService.getCategoryWithTagsByIds(categoryIds);
             return Response.ok(categories).build();
         }
     }
@@ -104,42 +102,67 @@ public class TagsServiceAPI {
     //    update
     //=======================================================================
 
-    @Path("/update_tag")
+    @Path("/update/tag")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response updateTag(@Context                      HttpServletRequest request,
-                              @FormDataParam("id")          long               id,
-                              @FormDataParam("category_id") long               categoryId,
-                              @FormDataParam("name")        String             name,
-                              @FormDataParam("imageName")   String             imageName,
-                              @FormDataParam("image")       InputStream        image,
-                              @FormDataParam("image")       FormDataContentDisposition imageDis) {
-        if (VerifyUtil.isStringEmpty(imageName) && null!=imageDis) {
-            imageName = imageDis.getFileName();
-        }
-        TagsBean bean = tagsService.updateTag(id, categoryId, name, imageName, image);
+    public Response updateTag(@Context                  HttpServletRequest request,
+                              @FormParam("id")          long               id,
+                              @FormParam("category_id") long               categoryId,
+                              @FormParam("name")        String             name) {
+        logger.info("update tag id={} name={} category_id={}, image_name={} image={}", id, name, categoryId);
+        TagsBean bean = tagsService.updateTag(id, categoryId, name, null, null);
         return Response.ok(bean).build();
     }
 
-    @Path("/update_category")
+    @Path("/update/tag_image")
     @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response updateCategory(@Context                      HttpServletRequest request,
-                                   @FormDataParam("id")          long               id,
-                                   @FormDataParam("name")        String             name,
-                                   @FormDataParam("imageName")   String             imageName,
-                                   @FormDataParam("image")       InputStream        image,
-                                   @FormDataParam("image")       FormDataContentDisposition imageDis) {
+    public Response updateTag(@Context                      HttpServletRequest request,
+                              @FormDataParam("id")          long               id,
+                              @FormDataParam("image_name")  String             imageName,
+                              @FormDataParam("image")       InputStream        image,
+                              @FormDataParam("image")       FormDataContentDisposition imageDis) {
+        logger.info("update tag id={} image_name={} image={}", id, imageName, (null!=image));
         if (VerifyUtil.isStringEmpty(imageName) && null!=imageDis) {
             imageName = imageDis.getFileName();
         }
-        TagsCategoryBean bean = tagsService.updateCategory(id, name, imageName, image);
+        TagsBean bean = tagsService.updateTag(id, -1, null, imageName, image);
         return Response.ok(bean).build();
     }
+
+    @Path("/update/category")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response updateCategory(@Context                  HttpServletRequest request,
+                                   @FormParam("id")          long               id,
+                                   @FormParam("name")        String             name) {
+        logger.info("update category id={} name={}", id, name);
+        TagsCategoryBean bean = tagsService.updateCategory(id, name, null, null);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/update/category_image")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response updateCategory(@Context                      HttpServletRequest request,
+                                   @FormDataParam("id")          long               id,
+                                   @FormDataParam("image_name")  String             imageName,
+                                   @FormDataParam("image")       InputStream        image,
+                                   @FormDataParam("image")       FormDataContentDisposition imageDis) {
+        logger.info("update category id={} image_name={} image={}", id, imageName, (null!=image));
+        if (VerifyUtil.isStringEmpty(imageName) && null!=imageDis) {
+            imageName = imageDis.getFileName();
+        }
+        TagsCategoryBean bean = tagsService.updateCategory(id, null, imageName, image);
+        return Response.ok(bean).build();
+    }
+
 
     //=======================================================================
     //    delete
@@ -148,10 +171,9 @@ public class TagsServiceAPI {
     @Path("/tag")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response deleteTag(@Context              HttpServletRequest request,
-                              @FormDataParam("ids") String             ids) {
+    public Response deleteTag(@Context          HttpServletRequest request,
+                              @FormParam("ids") String             ids) {
         String deleteIds = tagsService.deleteTagByIds(ids);
         return Response.ok(ids).build();
     }
@@ -159,11 +181,20 @@ public class TagsServiceAPI {
     @Path("/category")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response deleteCategory(@Context              HttpServletRequest request,
-                                   @FormDataParam("ids") String             ids) {
+    public Response deleteCategory(@Context          HttpServletRequest request,
+                                   @FormParam("ids") String             ids) {
         String deleteIds = tagsService.deleteCategoryByIds(ids);
+        return Response.ok(ids).build();
+    }
+
+    @Path("/category_with_tags")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response deleteCategoryWithTags(@Context          HttpServletRequest request,
+                                           @FormParam("ids") String             ids) {
+        String deleteIds = tagsService.deleteCategoryWithTagsByIds(ids);
         return Response.ok(ids).build();
     }
 
@@ -173,15 +204,16 @@ public class TagsServiceAPI {
 
     @Path("/add_tag")
     @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addTag(@Context                      HttpServletRequest request,
                            @FormDataParam("category_id") long               categoryId,
                            @FormDataParam("name")        String             name,
-                           @FormDataParam("imageName")   String             imageName,
+                           @FormDataParam("image_name")  String             imageName,
                            @FormDataParam("image")       InputStream        image,
                            @FormDataParam("image")       FormDataContentDisposition imageDis) {
+        logger.info("add tag name={} category_id={}, image_name={} image={}", name, categoryId, imageName, (null!=image));
         if (VerifyUtil.isStringEmpty(imageName) && null!=imageDis) {
             imageName = imageDis.getFileName();
         }
@@ -191,14 +223,15 @@ public class TagsServiceAPI {
 
     @Path("/add_category")
     @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addCategory(@Context                      HttpServletRequest request,
                                 @FormDataParam("name")        String             name,
-                                @FormDataParam("imageName")   String             imageName,
+                                @FormDataParam("image_name")  String             imageName,
                                 @FormDataParam("image")       InputStream        image,
                                 @FormDataParam("image")       FormDataContentDisposition imageDis) {
+        logger.info("add category name={} image_name={} image={}", name, imageName, (null!=image));
         if (VerifyUtil.isStringEmpty(imageName) && null!=imageDis) {
             imageName = imageDis.getFileName();
         }

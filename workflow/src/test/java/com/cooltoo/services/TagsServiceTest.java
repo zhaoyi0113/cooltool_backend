@@ -240,4 +240,55 @@ public class TagsServiceTest extends AbstractCooltooTest {
     //=================================================================
     //         add
     //=================================================================
+
+    @Test
+    public void testAddTag() {
+        long   id         = 1;
+        long   categoryId = 100;
+        String name       = "testeaaa";
+        String imageName  = "image.png";
+        InputStream image = new ByteArrayInputStream(name.getBytes());
+
+        TagsBean bean = null;
+        Throwable        excp = null;
+        bean = tagService.getTag(id);
+
+        try { bean = tagService.addTags(bean.getName(), categoryId, imageName, image); }
+        catch (Exception ex) { excp = ex; }
+        Assert.assertNotNull(excp);
+
+        bean = tagService.addTags(name, categoryId, imageName, image);
+        Assert.assertNotNull(bean);
+        Assert.assertTrue(bean.getId()>0);
+        Assert.assertEquals(name, bean.getName());
+        Assert.assertNotEquals(categoryId, bean.getCategoryId());
+
+        categoryId = 3;
+        name = "aaaaaaaa";
+        bean = tagService.addTags(name, categoryId, imageName, image);
+        Assert.assertNotNull(bean);
+        Assert.assertTrue(bean.getId()>0);
+        Assert.assertEquals(name, bean.getName());
+        Assert.assertEquals(categoryId, bean.getCategoryId());
+    }
+
+    @Test
+    public void testAddCategory() {
+        long   id         = 1;
+        String name       = "testeaaa";
+        String imageName  = "image.png";
+        InputStream image = new ByteArrayInputStream(name.getBytes());
+
+        TagsCategoryBean bean = null;
+        Throwable        excp = null;
+        bean = tagService.getCategory(id);
+
+        try { bean = tagService.addTagCategory(bean.getName(), imageName, image); }
+        catch (Exception ex) { excp = ex; }
+        Assert.assertNotNull(excp);
+
+        bean = tagService.addTagCategory(name, imageName, image);
+        Assert.assertNotNull(bean);
+        Assert.assertTrue(bean.getId()>0);
+    }
 }
