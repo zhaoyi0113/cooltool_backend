@@ -91,7 +91,7 @@ public class TagsService {
         return new ArrayList<>();
     }
 
-    public TagsCategoryBean getCategoryById(long categoryId) {
+    public TagsCategoryBean getCategoryByIdWithTags(long categoryId) {
         TagsCategoryEntity categoryE = categoryRep.findOne(categoryId);
         if (null==categoryE) {
             return new TagsCategoryBean();
@@ -104,6 +104,20 @@ public class TagsService {
 
         List<TagsBean> tagsB = getTagsByCategoryId(categoryId);
         categoryB.setTags(tagsB);
+        return categoryB;
+    }
+
+    public TagsCategoryBean getCategoryById(long categoryId) {
+        TagsCategoryEntity categoryE = categoryRep.findOne(categoryId);
+        if (null==categoryE) {
+            return new TagsCategoryBean();
+        }
+
+        TagsCategoryBean   categoryB = categoryConverter.convert(categoryE);
+        long   imageId = categoryB.getImageId();
+        String imgPath = storageService.getFilePath(imageId);
+        categoryB.setImageUrl(imgPath);
+
         return categoryB;
     }
 
@@ -136,7 +150,7 @@ public class TagsService {
         return new ArrayList<>();
     }
 
-    public List<TagsCategoryBean> getAllCategory() {
+    public List<TagsCategoryBean> getAllCategoryWithTags() {
         // get all tags
         List<TagsBean>           allTags      = getAllTag();
 
@@ -181,6 +195,37 @@ public class TagsService {
         return new ArrayList<>();
     }
 
+    public List<TagsCategoryBean> getAllCategory() {
+        // get all category
+        Sort                     sortCategory = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        List<TagsCategoryEntity> allCategory  = categoryRep.findAll(sortCategory);
+
+        // has category
+        if (null!=allCategory && !allCategory.isEmpty()) {
+
+            // cache image path
+            List<Long> imageIds = new ArrayList<>();
+            for (TagsCategoryEntity category : allCategory) {
+                imageIds.add(category.getImageId());
+            }
+            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+
+            // converter entity to bean
+            List<TagsCategoryBean> allCategoryB = new ArrayList<>();
+            for (TagsCategoryEntity category : allCategory) {
+                long imageId = category.getImageId();
+                String imgPath = imgId2Path.get(imageId);
+                TagsCategoryBean bean = categoryConverter.convert(category);
+                bean.setImageUrl(imgPath);
+                allCategoryB.add(bean);
+            }
+
+            return allCategoryB;
+        }
+
+        return new ArrayList<>();
+    }
+
     //=================================================================
     //         update
     //=================================================================
@@ -200,8 +245,11 @@ public class TagsService {
         }
         if (!VerifyUtil.isStringEmpty(name)) {
             if (!name.equals(tagE.getName())) {
-                tagE.setName(name);
-                changed = true;
+                long count = tagsRep.countByCategoryIdAndName(tagE.getCategoryId(), name);
+                if (count<=0) {
+                    tagE.setName(name);
+                    changed = true;
+                }
             }
         }
         if (null!=image) {
@@ -339,5 +387,33 @@ public class TagsService {
     //         add tag and category
     //=================================================================
 
+    public TagsBean addTags(String name, long categoryId, String imageName, InputStream image) {
+        logger.info("add tag : name={} categoryId={} imageName={} image={}", name, categoryId, imageName, (null!=image));
+
+        TagsEntity entity = new TagsEntity();
+        if (VerifyUtil.isStringEmpty(name)) {
+            logger.error("add tag : name is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        else if (tagsRep.countByName(name)>0) {
+            logger.error("add tag : name is exist");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        else {
+            entity.setName(name);
+        }
+
+        if (categoryId>0 && categoryRep.exists(categoryId)) {
+            entity.setCategoryId(categoryId);
+        }
+
+        if (null!=image) {
+            if (VerifyUtil.isStringEmpty(imageName)) {
+                imageName = "tag_tmp_" + System.nanoTime();
+            }
+        }
+
+        return null;
+    }
 
 }

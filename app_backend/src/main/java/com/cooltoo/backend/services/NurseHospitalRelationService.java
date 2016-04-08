@@ -80,7 +80,7 @@ public class NurseHospitalRelationService {
             department = departmentService.getOneById(relation.getDepartmentId());
             relation.setDepartment(department);
             if (department.getParentValid()) {
-                parentDepart = departmentService.getOneById(relation.getDepartmentId());
+                parentDepart = departmentService.getOneById(department.getParentId());
                 relation.setParentDepart(parentDepart);
             }
         }
