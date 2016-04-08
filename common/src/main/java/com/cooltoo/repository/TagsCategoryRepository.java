@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface TagsCategoryRepository extends CrudRepository<TagsCategoryEntity, Long> {
     public List<TagsCategoryEntity> findAll(Sort sort);
-    public List<TagsCategoryEntity> fineByIdIn(List<Long> ids);
+    public List<TagsCategoryEntity> findByIdIn(List<Long> ids);
     public long                     countByName(String name);
     public void                     deleteByIdIn(List<Long> ids);
 }

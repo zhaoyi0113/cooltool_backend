@@ -310,7 +310,7 @@ public class TagsService {
                 lCategoryIds.add(Long.parseLong(id));
             }
 
-            List<TagsCategoryEntity> categoriesE = categoryRep.fineByIdIn(lCategoryIds);
+            List<TagsCategoryEntity> categoriesE = categoryRep.findByIdIn(lCategoryIds);
             List<TagsEntity>         tagsE       = tagsRep.findByCategoryIdIn(lCategoryIds);
 
             if (null!=categoriesE) {
