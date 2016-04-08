@@ -490,17 +490,16 @@ public class TagsService {
                     imgIds.add(categoryE.getImageId());
                 }
             }
-            if (null!=tagsE) {
-                for (TagsEntity tagE : tagsE) {
-                    imgIds.add(tagE.getImageId());
-                    tagE.setCategoryId(0);
-                }
-            }
             if (!imgIds.isEmpty()) {
                 storageService.deleteFiles(imgIds);
             }
             // set category id = 0
-            tagsRep.save(tagsE);
+            if (null!=tagsE) {
+                for (TagsEntity tagE : tagsE) {
+                    tagE.setCategoryId(0);
+                }
+                tagsRep.save(tagsE);
+            }
             // delete category
             categoryRep.delete(categoriesE);
 
