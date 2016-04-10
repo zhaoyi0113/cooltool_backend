@@ -160,6 +160,7 @@ public class NurseOccupationSkillAPI {
     @POST
     @Path("/nominate")
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response nominateSkill(@Context HttpServletRequest request,
                                   @FormParam("friend_id") long friendId,
                                   @FormParam("skill_id") int skillId) {
