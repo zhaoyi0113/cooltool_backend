@@ -73,6 +73,7 @@ public class NurseSocialAbilitiesService {
         if (null!=nurseHospDepart) {
             HospitalDepartmentBean department = nurseHospDepart.getDepartment();
             if (null!=nurseHospDepart.getDepartment()) {
+                boolean hasDepartmentNominate = false;
                 for (NurseSkillNominationBean nomination : skillNominate) {
                     if (nomination.getSkillType() != OccupationSkillType.OCCUPATION) {
                         continue;
@@ -84,6 +85,16 @@ public class NurseSocialAbilitiesService {
                             userId,
                             nomination.getSkillId(), department.getName(), OccupationSkillType.OCCUPATION,
                             1, nomination.getSkillNominateCount(),
+                            department.getImageId(), department.getImageUrl(),
+                            department.getDisableImageId(), department.getDisableImageUrl());
+                    socialAbilities.add(abilityBean);
+                    hasDepartmentNominate = true;
+                }
+                if (!hasDepartmentNominate) {
+                    SocialAbilitiesBean abilityBean = newAbilityBean(
+                            userId,
+                            nurseHospDepart.getDepartmentId(), department.getName(), OccupationSkillType.OCCUPATION,
+                            1, 0,
                             department.getImageId(), department.getImageUrl(),
                             department.getDisableImageId(), department.getDisableImageUrl());
                     socialAbilities.add(abilityBean);
