@@ -174,7 +174,7 @@ public class NurseFriendsService {
 
         friendsB = convertToNurseFriendsBeans(friends);
         for (NurseFriendsBean friendB : friendsB) {
-            if (friendB.getFriendName().contains(name)) {
+            if (friendB.getFriendName()!=null && friendB.getFriendName().contains(name)) {
                 filteredFriends.add(friendB);
             }
         }

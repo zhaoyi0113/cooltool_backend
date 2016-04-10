@@ -147,13 +147,17 @@ public class NurseSpeakService {
     private List<NurseSpeakBean> parseEntities(long userId, List<NurseSpeakEntity> entities) {
         // speak ids/file ids cache
         List<Long> speakIds = new ArrayList<Long>();
+        List<Long> userIds = new ArrayList<Long>();
         List<Long> fileIds = new ArrayList<Long>();
 
         // get username
         Map<Long, String> userId2Name   = new HashMap<Long, String>();
         Map<Long, Long>   userId2FileId = new HashMap<Long, Long>();
         if (userId<0) {
-            Iterable<NurseEntity> all = nurseRepository.findAll();
+            for(NurseSpeakEntity entity: entities){
+                userIds.add(entity.getUserId());
+            }
+            Iterable<NurseEntity> all = nurseRepository.findNurseByIdIn(userIds);
             for (NurseEntity user : all) {
                 userId2Name.put(user.getId(), user.getName());
                 userId2FileId.put(user.getId(), user.getProfilePhotoId());
