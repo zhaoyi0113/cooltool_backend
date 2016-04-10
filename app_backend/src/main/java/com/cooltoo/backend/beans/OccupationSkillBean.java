@@ -12,7 +12,6 @@ public class OccupationSkillBean {
     private String name;
     private String imageUrl;
     private String disableImageUrl;
-
     private int factor;
 
     public int getId() {

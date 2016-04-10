@@ -1,7 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.SocialAbilitiesBean;
+import com.cooltoo.backend.beans.NurseOccupationSkillBean;
 import com.cooltoo.backend.services.NurseOccupationSkillService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
@@ -28,7 +28,7 @@ public class NurseOccupationSkillServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testGetAllNurseSkill() {
-        List<SocialAbilitiesBean> skills = nurseSkillService.getAllSkills(1);
+        List<NurseOccupationSkillBean> skills = nurseSkillService.getAllSkills(1);
         Assert.assertEquals(3, skills.size());
         skills = nurseSkillService.getAllSkills(2);
         Assert.assertEquals(2, skills.size());
@@ -38,7 +38,7 @@ public class NurseOccupationSkillServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testGetNurseSkill() {
-        SocialAbilitiesBean skill = nurseSkillService.getSkill(1, 2);
+        NurseOccupationSkillBean skill = nurseSkillService.getSkill(1, 2);
         Assert.assertNotNull(skill);
         Assert.assertEquals(20, skill.getPoint());
         skill = nurseSkillService.getSkill(3, 2);
@@ -50,7 +50,7 @@ public class NurseOccupationSkillServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testAddNurseSkill() {
-        SocialAbilitiesBean skill = null;
+        NurseOccupationSkillBean skill = null;
         skill = nurseSkillService.getSkill(2, 3);
         Assert.assertNull(skill);
         nurseSkillService.addSkill(2, 3);
@@ -68,7 +68,7 @@ public class NurseOccupationSkillServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testAddNurseSkills() {
-        List<SocialAbilitiesBean> skills = null;
+        List<NurseOccupationSkillBean> skills = null;
 
         long userId = 3;
 
@@ -85,39 +85,11 @@ public class NurseOccupationSkillServiceTest extends AbstractCooltooTest {
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
-    public void testUpdateNurseSkill() {
-        long userId = 2;
-        int skillId = 2;
-        SocialAbilitiesBean skill = nurseSkillService.getSkill(userId, skillId);
-        Assert.assertNotNull(skill);
-        Assert.assertEquals(userId, skill.getUserId());
-        Assert.assertEquals(skillId, skill.getSkillId());
-
-        int point = skill.getPoint();
-
-        nurseSkillService.update(userId, skillId, point+5);
-        skill = nurseSkillService.getSkill(userId, skillId);
-        Assert.assertEquals(point+5, skill.getPoint());
-    }
-
-    @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testDeleteNurseSkill() {
-        SocialAbilitiesBean skill = null;
+        NurseOccupationSkillBean skill = null;
         skill = nurseSkillService.getSkill(1, 3);
         Assert.assertNotNull(skill);
-        nurseSkillService.removeSkill(skill.getId());
-        skill = nurseSkillService.getSkill(1, 3);
-        Assert.assertNull(skill);
-    }
-
-    @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
-    public void testDeleteNurseSkillByUseIdAndType() {
-        SocialAbilitiesBean skill = null;
-        skill = nurseSkillService.getSkill(1, 3);
-        Assert.assertNotNull(skill);
-        nurseSkillService.removeSkill(skill.getUserId(), skill.getSkillId());
+        nurseSkillService.removeSkillBySkillIds(skill.getId()+"");
         skill = nurseSkillService.getSkill(1, 3);
         Assert.assertNull(skill);
     }

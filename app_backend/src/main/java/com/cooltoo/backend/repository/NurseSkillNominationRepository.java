@@ -12,14 +12,13 @@ import java.util.List;
 public interface NurseSkillNominationRepository extends JpaRepository<NurseSkillNominationEntity, Long>{
 
     List<NurseSkillNominationEntity> findByUserId(long userId);
-
     List<NurseSkillNominationEntity> findByUserIdAndSkillType(long userId, OccupationSkillType skillType);
-
-    long countByUserIdAndSkillIdAndSkillType(long userId, int skillId, OccupationSkillType type);
-
+    List<NurseSkillNominationEntity> findByUserIdAndSkillIdAndSkillType(long userId, int skillId, OccupationSkillType skillType);
     List<NurseSkillNominationEntity> findByUserIdAndSkillIdAndNominatedIdAndSkillType(long userId, int skillId, long nominatedId, OccupationSkillType skillType);
-
     List<NurseSkillNominationEntity> findByUserIdAndNominatedId(long userId, long nominatedId);
-
+    List<NurseSkillNominationEntity> findBySkillTypeAndSkillIdIn(OccupationSkillType type, List<Integer> skillIds);
+    long countByUserIdAndSkillIdAndSkillType(long userId, int skillId, OccupationSkillType type);
     long countByUserId(long userId);
+    void deleteByUserIdOrNominatedIdIn(List<Long> userIds, List<Long> nominatedUserIds);
+    void deleteBySkillIdIn(List<Integer> skillIds);
 }

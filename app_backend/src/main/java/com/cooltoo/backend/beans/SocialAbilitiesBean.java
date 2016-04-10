@@ -1,23 +1,22 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.constants.OccupationSkillType;
+
 /**
  * Created by zhaolisong on 16/3/25.
  */
 public class SocialAbilitiesBean {
-    private int id;
     private long userId;
     private int skillId;
+    private String skillName;
+    private OccupationSkillType skillType;
+    private long factor;
+    private long nominatedCount;
     private int point;
-    private OccupationSkillBean skill;
-    private NurseSkillNominationBean nomination;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    private long imageId;
+    private String imageUrl;
+    private long disableImageId;
+    private String disableImagePath;
 
     public long getUserId() {
         return userId;
@@ -35,6 +34,38 @@ public class SocialAbilitiesBean {
         this.skillId = skillId;
     }
 
+    public String getSkillName() {
+        return skillName;
+    }
+
+    public void setSkillName(String skillName) {
+        this.skillName = skillName;
+    }
+
+    public OccupationSkillType getSkillType() {
+        return skillType;
+    }
+
+    public void setSkillType(OccupationSkillType skillType) {
+        this.skillType = skillType;
+    }
+
+    public long getFactor() {
+        return factor;
+    }
+
+    public void setFactor(long factor) {
+        this.factor = factor;
+    }
+
+    public long getNominatedCount() {
+        return nominatedCount;
+    }
+
+    public void setNominatedCount(long nominatedCount) {
+        this.nominatedCount = nominatedCount;
+    }
+
     public int getPoint() {
         return point;
     }
@@ -43,31 +74,52 @@ public class SocialAbilitiesBean {
         this.point = point;
     }
 
-    public OccupationSkillBean getSkill() {
-        return this.skill;
+    public long getImageId() {
+        return imageId;
     }
 
-    public void setSkill(OccupationSkillBean skill) {
-        this.skill = skill;
+    public void setImageId(long imageId) {
+        this.imageId = imageId;
     }
 
-    public NurseSkillNominationBean getNomination() {
-        return this.nomination;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setNomination(NurseSkillNominationBean nomination) {
-        this.nomination = nomination;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public long getDisableImageId() {
+        return disableImageId;
+    }
+
+    public void setDisableImageId(long disableImageId) {
+        this.disableImageId = disableImageId;
+    }
+
+    public String getDisableImagePath() {
+        return disableImagePath;
+    }
+
+    public void setDisableImagePath(String disableImagePath) {
+        this.disableImagePath = disableImagePath;
     }
 
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(", ");
         msg.append("userId=").append(userId).append(", ");
         msg.append("skillId=").append(skillId).append(", ");
-        msg.append("skill=").append(skill).append(", ");
-        msg.append("point=").append(point);
-        msg.append("]");
+        msg.append("skillName=").append(skillName).append(", ");
+        msg.append("skillType=").append(skillType).append(", ");
+        msg.append("factor=").append(factor).append(", ");
+        msg.append("nominatedCount=").append(nominatedCount).append(", ");
+        msg.append("point=").append(point).append(", ");
+        msg.append("imageId=").append(imageId).append(", ");
+        msg.append("imageUrl=").append(imageUrl).append(", ");
+        msg.append("disableImageId=").append(disableImageId).append(", ");
+        msg.append("disableImagePath=").append(disableImagePath).append("] ");
         return msg.toString();
     }
 }

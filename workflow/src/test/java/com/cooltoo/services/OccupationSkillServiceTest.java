@@ -39,7 +39,7 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
         File file = new File("build/" + System.currentTimeMillis());
         try {
             file.createNewFile();
-            skillService.addNewOccupationSkill(skillName, OccupationSkillType.COMMUNITY.name(), 1, new FileInputStream(file), new FileInputStream(file));
+            skillService.addNewOccupationSkill(skillName, 1, new FileInputStream(file), new FileInputStream(file));
             List<OccupationSkillEntity> skillList = repository.findByName(skillName);
             Assert.assertTrue(skillList.size() > 0);
             Assert.assertEquals(skillName, skillList.get(0).getName());

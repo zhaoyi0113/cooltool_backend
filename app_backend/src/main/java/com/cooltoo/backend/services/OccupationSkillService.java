@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -30,25 +31,28 @@ public class OccupationSkillService {
     private static final Logger logger = LoggerFactory.getLogger(OccupationSkillService.class.getName());
 
     @Autowired
-    private OccupationSkillBeanConverter beanConverter;
-
-    @Autowired
     private OccupationSkillRepository skillRepository;
-
     @Autowired
     @Qualifier("StorageService")
     private StorageService storageService;
+    @Autowired
+    private OccupationSkillBeanConverter beanConverter;
 
     //=========================================================
-    //           get all type
+    //           get skills
     //=========================================================
-    public List<String> getAllSkillTypes() {
-        return OccupationSkillType.getAllValues();
+
+    public Map<Integer, OccupationSkillBean> getAllSkillId2BeanMap() {
+        Map<Integer, OccupationSkillBean> id2Skills = new HashMap<Integer, OccupationSkillBean>();
+        List<OccupationSkillBean>         allSkills = getOccupationSkillList();
+        if (null!=allSkills && !allSkills.isEmpty()) {
+            for (OccupationSkillBean skill : allSkills) {
+                id2Skills.put(skill.getId(), skill);
+            }
+        }
+        return id2Skills;
     }
 
-    //=========================================================
-    //           get skills type
-    //=========================================================
     public List<OccupationSkillBean> getOccupationSkillList() {
         List<OccupationSkillEntity> skillList = skillRepository.findAll();
         return parseEntity(skillList);
@@ -119,14 +123,10 @@ public class OccupationSkillService {
     //=========================================================
 
     @Transactional
-    public OccupationSkillBean addNewOccupationSkill(String name, String type, int factor, InputStream image, InputStream disableImage) {
+    public OccupationSkillBean addNewOccupationSkill(String name, int factor, InputStream image, InputStream disableImage) {
         if (!isSkillNameExist(name)) {
             if (VerifyUtil.isStringEmpty(name)) {
                 throw new BadRequestException(ErrorCode.SKILL_NAME_IS_NULL);
-            }
-            OccupationSkillType skillType = OccupationSkillType.parseString(type);
-            if (null==type) {
-                throw new BadRequestException(ErrorCode.SKILL_TYPE_INVALID);
             }
             if (factor<=0) {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);

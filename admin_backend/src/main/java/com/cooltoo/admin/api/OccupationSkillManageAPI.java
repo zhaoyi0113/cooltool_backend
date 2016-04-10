@@ -36,23 +36,14 @@ public class OccupationSkillManageAPI {
         return Response.ok(allSkills).build();
     }
 
-    @GET
-    @Path("/types")
-    @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getOccupationSkillTypes() {
-        return Response.ok(skillService.getAllSkillTypes()).build();
-    }
-
     @POST
 //    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addOccupationSkill(@FormParam("name") String name,
-                                       @FormParam("type") String type,
                                        @FormParam("factor") int factor) {
-        logger.info("add new occupation skill parameters is ==== name={}, type={}, factor={}, image={}, disableImage={}.", name, type, factor, null, null);
-        OccupationSkillBean skill = skillService.addNewOccupationSkill(name, type, factor, null, null);
+        logger.info("add new occupation skill parameters is ==== name={}, factor={}, image={}, disableImage={}.", name, factor, null, null);
+        OccupationSkillBean skill = skillService.addNewOccupationSkill(name, factor, null, null);
         logger.info("add new occupation skill is " + skill.toString());
         return Response.ok(skill).build();
     }
@@ -66,16 +57,12 @@ public class OccupationSkillManageAPI {
 
     @POST
     @Path("/edit")
-//    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkill2(@FormParam("id") int id,
                                         @FormParam("name") String name,
                                         @FormParam("factor") int factor
-//                                        , @FormDataParam("file") InputStream imageStream
-//                                        , @FormDataParam("disable_file") InputStream disableImageStream
     ) {
-//        skillService.editOccupationSkill(id, name, type, factor, imageStream, disableImageStream);
         OccupationSkillBean bean = skillService.editOccupationSkill(id, name, factor, null, null);
         return Response.ok(bean).build();
     }

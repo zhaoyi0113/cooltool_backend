@@ -10,4 +10,6 @@ import java.util.List;
  */
 public interface NurseHospitalRelationRepository extends CrudRepository<NurseHospitalRelationEntity, Long> {
     List<NurseHospitalRelationEntity> findByNurseId(Long userId);
+    void deleteByDepartmentIdIn(List<Integer> departIds);
+    void deleteByHospitalIdIn(List<Integer> hospitalIds);
 }

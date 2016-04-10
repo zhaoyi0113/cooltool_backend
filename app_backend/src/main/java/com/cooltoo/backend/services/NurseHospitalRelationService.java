@@ -1,6 +1,7 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.backend.converter.NurseHospitalRelationBeanConverter;
 import com.cooltoo.backend.converter.NurseHospitalRelationEntityConverter;
 import com.cooltoo.backend.entities.NurseHospitalRelationEntity;
@@ -10,9 +11,12 @@ import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.constants.OccupationSkillType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.NurseRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,20 +30,20 @@ import java.util.List;
 @Service("NurseHospitalRelationService")
 public class NurseHospitalRelationService {
 
-    @Autowired
-    private NurseHospitalRelationRepository repository;
-    @Autowired
-    private NurseService nurseService;
-    @Autowired
-    private HospitalService hospitalService;
-    @Autowired
-    private HospitalDepartmentService departmentService;
-    @Autowired
-    private NurseHospitalRelationBeanConverter beanConverter;
-    @Autowired
-    private NurseHospitalRelationEntityConverter entityConverter;
+    private static final Logger logger = LoggerFactory.getLogger(NurseHospitalRelationService.class.getName());
 
+    @Autowired private NurseHospitalRelationRepository    repository;
+    @Autowired private NurseService                       nurseService;
+    @Autowired private HospitalService                    hospitalService;
+    @Autowired private HospitalDepartmentService          departmentService;
+    @Autowired private NurseHospitalRelationBeanConverter beanConverter;
+    @Autowired private NurseHospitalRelationEntityConverter entityConverter;
+
+    //====================================================================
+    //             get
+    //====================================================================
     public List<NurseHospitalRelationBean> getAll() {
+        logger.info("get all nurse-hospital-department relationship information");
         Iterable<NurseHospitalRelationEntity> iterable = repository.findAll();
         List<NurseHospitalRelationBean> all = new ArrayList<NurseHospitalRelationBean>();
         for (NurseHospitalRelationEntity entity : iterable) {
@@ -50,6 +54,7 @@ public class NurseHospitalRelationService {
     }
 
     public NurseHospitalRelationBean getOneById(Long id) {
+        logger.info("get one nurse-hospital-department relationship information by id={}", id);
         NurseHospitalRelationEntity entity = repository.findOne(id);
         if (null == entity) {
             return null;
@@ -58,6 +63,7 @@ public class NurseHospitalRelationService {
     }
 
     public NurseHospitalRelationBean getRelationByNurseId(Long nurseId) {
+        logger.info("get one nurse-hospital-department relationship information by nurseId={}", nurseId);
         NurseHospitalRelationBean relation = null;
         HospitalBean              hospital     = null;
         HospitalDepartmentBean    department   = null;
@@ -88,8 +94,13 @@ public class NurseHospitalRelationService {
         return relation;
     }
 
+    //====================================================================
+    //     toggle set nurse hospital and department
+    //====================================================================
+
     @Transactional
     public Long newOne(NurseHospitalRelationBean bean) {
+        logger.info("set nurse-hospital-department relationship information by bean={}", bean);
         HospitalBean                hospital     = null;
         HospitalDepartmentBean      department   = null;
         HospitalDepartmentBean      parentDepart = null;
@@ -130,6 +141,7 @@ public class NurseHospitalRelationService {
 
     @Transactional
     public Long newOne(long nurseId, int hospitalId, int departmentId) {
+        logger.info("set nurse={}--hospital={}--department={} relationship", nurseId, hospitalId, departmentId);
         NurseHospitalRelationBean bean = new NurseHospitalRelationBean();
         bean.setNurseId(nurseId);
         bean.setHospitalId(hospitalId);
