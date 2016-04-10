@@ -104,6 +104,7 @@ public class NurseSocialAbilitiesService {
         // skill social abilities
         List<SocialAbilitiesBean> nurseSkillAbilities = new ArrayList<>();
         for (NurseOccupationSkillBean nurseSkill : nurseSkills) {
+            boolean hasNominate = false;
             for (NurseSkillNominationBean nomination : skillNominate) {
                 if (nomination.getSkillType()!=nurseSkill.getType()) {
                     continue;
@@ -119,6 +120,17 @@ public class NurseSocialAbilitiesService {
                         nurseSkill.getUserId(),
                         nomination.getSkillId(), skill.getName(), OccupationSkillType.SKILL,
                         skill.getFactor(), nomination.getSkillNominateCount(),
+                        skill.getImageId(), skill.getImageUrl(),
+                        skill.getDisableImageId(), skill.getDisableImageUrl());
+                nurseSkillAbilities.add(abilityBean);
+                hasNominate = true;
+            }
+            if (!hasNominate) {
+                OccupationSkillBean skill = skillId2Bean.get(nurseSkill.getSkillId());
+                SocialAbilitiesBean abilityBean = newAbilityBean(
+                        nurseSkill.getUserId(),
+                        nurseSkill.getSkillId(), skill.getName(), OccupationSkillType.SKILL,
+                        skill.getFactor(), 0,
                         skill.getImageId(), skill.getImageUrl(),
                         skill.getDisableImageId(), skill.getDisableImageUrl());
                 nurseSkillAbilities.add(abilityBean);
@@ -159,10 +171,12 @@ public class NurseSocialAbilitiesService {
             if (null!=nurseHospDepart) {
                 HospitalDepartmentBean department = nurseHospDepart.getDepartment();
                 if (null!=department) {
+                    int  departId      = nurseHospDepart.getDepartmentId();
+                    long nominateCount = null==skillNominate ? 0 : skillNominate.getSkillNominateCount();
                     SocialAbilitiesBean ability = newAbilityBean(
                             userId,
-                            skillNominate.getSkillId(), department.getName(), OccupationSkillType.OCCUPATION,
-                            1, skillNominate.getSkillNominateCount(),
+                            departId, department.getName(), OccupationSkillType.OCCUPATION,
+                            1, nominateCount,
                             department.getImageId(), department.getImageUrl(),
                             department.getDisableImageId(), department.getDisableImageUrl());
                     return ability;
@@ -172,14 +186,15 @@ public class NurseSocialAbilitiesService {
         else if (OccupationSkillType.SKILL==socialAbilityType) {
 
             Map<Integer, OccupationSkillBean> skillId2Bean   = skillService.getAllSkillId2BeanMap();
-            NurseSkillNominationBean  skillNominate = nominationService.getSpecialTypeSkillNominated(userId, skillId, socialAbilityType);
+            NurseSkillNominationBean          skillNominate = nominationService.getSpecialTypeSkillNominated(userId, skillId, socialAbilityType);
 
             // department social ability
-            OccupationSkillBean skill   = skillId2Bean.get(skillId);
+            OccupationSkillBean skill         = skillId2Bean.get(skillId);
+            long                nominateCount = null==skillNominate ? 0 : skillNominate.getSkillNominateCount();
             SocialAbilitiesBean ability = newAbilityBean(
                     userId,
-                    skillNominate.getSkillId(), skill.getName(), OccupationSkillType.OCCUPATION,
-                    1, skillNominate.getSkillNominateCount(),
+                    skillId, skill.getName(), OccupationSkillType.OCCUPATION,
+                    1, nominateCount,
                     skill.getImageId(), skill.getImageUrl(),
                     skill.getDisableImageId(), skill.getDisableImageUrl());
             return ability;
