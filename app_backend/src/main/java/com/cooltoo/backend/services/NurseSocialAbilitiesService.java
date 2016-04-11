@@ -61,9 +61,6 @@ public class NurseSocialAbilitiesService {
         logger.info("get user {} 's social abilities", userId);
         List<SocialAbilitiesBean> socialAbilities = new ArrayList<SocialAbilitiesBean>();
 
-        // is nurse exist
-        NurseBean                         nurse           = nurseService.getNurse(userId);
-
         Map<Integer, OccupationSkillBean> skillId2Bean   = skillService.getAllSkillId2BeanMap();
         List<NurseOccupationSkillBean>    nurseSkills    = nurseSkillService.getAllSkills(userId);
         List<NurseSkillNominationBean>    skillNominate  = nominationService.getAllTypeNominated(userId);

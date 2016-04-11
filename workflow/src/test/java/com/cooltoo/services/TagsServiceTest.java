@@ -253,7 +253,7 @@ public class TagsServiceTest extends AbstractCooltooTest {
         Throwable        excp = null;
         bean = tagService.getTag(id);
 
-        try { bean = tagService.addTags(bean.getName(), categoryId, imageName, image); }
+        try { bean = tagService.addTags(bean.getName(), categoryId, imageName, null); }
         catch (Exception ex) { excp = ex; }
         Assert.assertNotNull(excp);
 

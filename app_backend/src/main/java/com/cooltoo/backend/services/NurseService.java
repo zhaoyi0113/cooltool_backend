@@ -2,6 +2,7 @@ package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseQualificationBean;
+import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.backend.converter.NurseBeanConverter;
 import com.cooltoo.backend.converter.NurseEntityConverter;
 import com.cooltoo.backend.entities.HospitalEntity;
@@ -11,7 +12,6 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.GenderType;
-import com.cooltoo.constants.VetStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
@@ -52,7 +52,7 @@ public class NurseService {
     @Autowired
     private NurseSpeakService speakService;
     @Autowired
-    private NurseSkillNominationService nominationService;
+    private NurseSocialAbilitiesService abilitiesService;
     @Autowired
     private LeanCloudService leanCloudService;
     @Autowired
@@ -121,8 +121,8 @@ public class NurseService {
         long speakCount = speakService.getNurseSpeakCount(id);
         nurse.setProperty(NurseBean.SPEAK_COUNT, speakCount);
         // add skill nominated count
-        long norminated = this.nominationService.getUserAllSkillNominatedCount(id);
-        nurse.setProperty(NurseBean.NORMINATED_COUNT, norminated);
+        List<SocialAbilitiesBean> norminated = this.abilitiesService.getUserAllTypeAbilites(id);
+        nurse.setProperty(NurseBean.ABILITY_COUNT, null==norminated ? 0 : norminated.size());
         // get nurse's qualification
         List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(id);
         if (null!=qualifications && !qualifications.isEmpty()) {
