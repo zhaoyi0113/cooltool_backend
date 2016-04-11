@@ -36,6 +36,33 @@ public class NurseQualificationManageAPI {
     @Autowired
     private NurseQualificationService qualificationService;
 
+    @Path("/count/{status}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getAllQualificationCount(@Context HttpServletRequest request,
+                                             @PathParam("status") String status
+    ) {
+        logger.info("get all qualification count");
+        long count = qualificationService.getAllQualificationCount(status);
+        return Response.ok(count).build();
+    }
+
+    @Path("/{status}/{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getAllQualification(@Context HttpServletRequest request,
+                                        @PathParam("status") String status,
+                                        @PathParam("index") int index,
+                                        @PathParam("number") int number
+    ) {
+        logger.info("get qualification by status {} at page {} numberOfPage {}", status, index, number);
+        List<NurseQualificationBean> qualifications = qualificationService.getAllQualifications(status, index, number);
+        logger.info("get qualification by status {} at page {} numberOfPage {}, count={}", status, index, number, qualifications.size());
+        return Response.ok(qualifications).build();
+    }
+
     @Path("/{nurse_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

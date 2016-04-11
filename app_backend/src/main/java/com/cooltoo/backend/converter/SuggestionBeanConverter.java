@@ -17,6 +17,7 @@ public class SuggestionBeanConverter implements Converter<SuggestionEntity, Sugg
         bean.setUserId(source.getUserId());
         bean.setSuggestion(source.getSuggestion());
         bean.setTimeCreated(source.getTimeCreated());
+        bean.setStatus(source.getStatus());
         return bean;
     }
 }

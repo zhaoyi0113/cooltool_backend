@@ -1,5 +1,7 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 
@@ -16,6 +18,14 @@ public class NurseQualificationBean {
     private long userId;
     private VetStatus qualificationStatus;
     private String statusDescr;
+    private Date timeCreated;
+    private Date timeProcessed;
+    private String userName;
+    private String realName;
+    private int hospitalId;
+    private String hospitalName;
+    private int deparmentId;
+    private String deparmentName;
     private List<NurseQualificationFileBean> workfiles;
 
     public long getId() {
@@ -58,12 +68,76 @@ public class NurseQualificationBean {
         this.statusDescr = statusDescr;
     }
 
+    public Date getTimeProcessed() {
+        return timeProcessed;
+    }
+
+    public void setTimeProcessed(Date timeProcessed) {
+        this.timeProcessed = timeProcessed;
+    }
+
+    public Date getTimeCreated() {
+        return timeCreated;
+    }
+
+    public void setTimeCreated(Date timeCreated) {
+        this.timeCreated = timeCreated;
+    }
+
     public List<NurseQualificationFileBean> getWorkfiles() {
         return this.workfiles;
     }
 
     public void setWorkfiles(List<NurseQualificationFileBean> workfiles) {
         this.workfiles = workfiles;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public int getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(int hospitalId) {
+        this.hospitalId = hospitalId;
+    }
+
+    public String getHospitalName() {
+        return hospitalName;
+    }
+
+    public void setHospitalName(String hospitalName) {
+        this.hospitalName = hospitalName;
+    }
+
+    public int getDeparmentId() {
+        return deparmentId;
+    }
+
+    public void setDeparmentId(int deparmentId) {
+        this.deparmentId = deparmentId;
+    }
+
+    public String getDeparmentName() {
+        return deparmentName;
+    }
+
+    public void setDeparmentName(String deparmentName) {
+        this.deparmentName = deparmentName;
     }
 
     public String toString() {

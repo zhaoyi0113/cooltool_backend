@@ -14,6 +14,7 @@ import java.util.List;
  */
 public interface HospitalRepository extends CrudRepository<HospitalEntity, Integer> {
     Page<HospitalEntity> findAll(Pageable page);
+    List<HospitalEntity> findByIdIn(List<Integer> ids);
     List<HospitalEntity> findByName(String name);
     @Query("select hospital from HospitalEntity hospital, NurseHospitalRelationEntity relation where relation.nurseId = :userId and relation.hospitalId = hospital.id")
     List<HospitalEntity> getNurseHospitals(@Param("userId") long userId);

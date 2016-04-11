@@ -12,8 +12,7 @@ import java.util.List;
 public interface NurseQualificationFileRepository extends CrudRepository<NurseQualificationFileEntity, Long> {
 
     List<NurseQualificationFileEntity> findByQualificationId(long qualificationId, Sort sort);
-
+    List<NurseQualificationFileEntity> findByQualificationIdIn(List<Long> qualificationIds, Sort sort);
     void deleteByQualificationId(long qualificationId);
-
     long countByQualificationIdAndWorkfileTypeId(long qualificationId, int workfileTypeId);
 }

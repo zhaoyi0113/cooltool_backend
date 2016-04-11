@@ -27,16 +27,6 @@ public class SuggestionAPI {
     @Autowired
     private SuggestionService service;
 
-    @Path("/{index}/{number}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getSuggestions(@Context HttpServletRequest request,
-                                   @PathParam("index") int index,
-                                   @PathParam("number") int number) {
-        List<SuggestionBean> suggestions = service.getSuggestions(index, number);
-        return Response.ok(suggestions).build();
-    }
-
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
@@ -46,11 +36,5 @@ public class SuggestionAPI {
         SuggestionBean suggestionB = service.addSuggestion(userId, suggestion);
         logger.info("add suggestion bean is {}" + suggestionB);
         return Response.ok(suggestion).build();
-    }
-
-    public Response deleteSuggestion(@Context HttpServletRequest request,
-                                     @FormParam("ids") String ids) {
-        service.deleteSuggestion(ids);
-        return Response.ok().build();
     }
 }

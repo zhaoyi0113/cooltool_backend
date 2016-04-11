@@ -72,15 +72,16 @@ public class HospitalDepartmentService {
     }
 
     public List<HospitalDepartmentBean> getDepartmentsByIds(List<Integer> ids) {
-        Iterable<HospitalDepartmentEntity> departments  = repository.findDepartmentByIdIn(ids);
-        List<HospitalDepartmentBean>       departmentsB = new ArrayList<HospitalDepartmentBean>();
-        for (HospitalDepartmentEntity entity : departments) {
-            HospitalDepartmentBean bean = beanConverter.convert(entity);
-            departmentsB.add(bean);
+        List<HospitalDepartmentBean> all = getAll();
+        for (int i=0, count=all.size(); i<count; i++) {
+            HospitalDepartmentBean bean = all.get(i);
+            if (!ids.contains(bean.getId())) {
+                all.remove(i);
+                i --;
+                count --;
+            }
         }
-
-        addImageUrl(departmentsB);
-        return departmentsB;
+        return all;
     }
 
     public List<HospitalDepartmentBean> getAllTopLevelDepartment() {

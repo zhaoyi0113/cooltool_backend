@@ -1,5 +1,7 @@
 package com.cooltoo.backend.entities;
 
+import com.cooltoo.constants.SuggestionStatus;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -13,6 +15,7 @@ public class SuggestionEntity {
     private long   userId;
     private String suggestion;
     private Date   timeCreated;
+    private SuggestionStatus status;
 
     @Id
     @GeneratedValue
@@ -52,12 +55,23 @@ public class SuggestionEntity {
         this.timeCreated = timeCreated;
     }
 
+    @Column(name = "status")
+    @Enumerated
+    public SuggestionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SuggestionStatus status) {
+        this.status = status;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append(" id=").append(id).append(", ");
         msg.append(" userId=").append(userId).append(", ");
         msg.append(" suggestion=").append(suggestion).append(", ");
+        msg.append(" status").append(status).append(", ");
         msg.append(" timeCreated=").append(timeCreated).append("] ");
         return msg.toString();
     }

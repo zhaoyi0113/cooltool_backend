@@ -79,6 +79,20 @@ public class HospitalService {
         return hospital;
     }
 
+    public List<HospitalBean> getHospitalByIds(List<Integer> hospitalIds) {
+        if (null==hospitalIds || hospitalIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<HospitalEntity> resultSet = repository.findByIdIn(hospitalIds);
+        List<HospitalBean>   hospitals = new ArrayList<>();
+        for (HospitalEntity result : resultSet) {
+            HospitalBean bean = beanConverter.convert(result);
+            hospitals.add(bean);
+        }
+        addRegion(hospitals);
+        return hospitals;
+    }
+
     public List<HospitalBean> searchHospital(boolean andOrOr, String name, int province, int city, int district, String address) {
         List<HospitalBean> allHospitals     = getAll();
         List<HospitalBean> allHospitalMatch = new ArrayList<HospitalBean>();

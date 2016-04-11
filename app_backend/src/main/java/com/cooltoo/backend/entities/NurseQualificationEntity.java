@@ -17,6 +17,8 @@ public class NurseQualificationEntity {
     private long      userId;
     private VetStatus status;
     private String    statusDesc;
+    private Date      timeCreated;
+    private Date      timeProcessed;
 
     @Id
     @GeneratedValue
@@ -64,6 +66,24 @@ public class NurseQualificationEntity {
 
     public void setStatusDesc(String statusDesc) {
         this.statusDesc = statusDesc;
+    }
+
+    @Column(name = "create_time")
+    public Date getTimeCreated() {
+        return timeCreated;
+    }
+
+    public void setTimeCreated(Date timeCreated) {
+        this.timeCreated = timeCreated;
+    }
+
+    @Column(name = "process_time")
+    public Date getTimeProcessed() {
+        return timeProcessed;
+    }
+
+    public void setTimeProcessed(Date timeProcessed) {
+        this.timeProcessed = timeProcessed;
     }
 
     public String toString() {

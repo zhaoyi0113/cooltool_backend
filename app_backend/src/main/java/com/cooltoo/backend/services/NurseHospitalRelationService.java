@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lg380357 on 2016/3/5.
@@ -64,34 +66,98 @@ public class NurseHospitalRelationService {
 
     public NurseHospitalRelationBean getRelationByNurseId(Long nurseId) {
         logger.info("get one nurse-hospital-department relationship information by nurseId={}", nurseId);
-        NurseHospitalRelationBean relation = null;
-        HospitalBean              hospital     = null;
-        HospitalDepartmentBean    department   = null;
-        HospitalDepartmentBean    parentDepart = null;
 
-        List<NurseHospitalRelationEntity> relations = repository.findByNurseId(nurseId);
-        if (null==relations || relations.isEmpty()) {
+        List<NurseHospitalRelationEntity> resultSert = repository.findByNurseId(nurseId);
+        if (null==resultSert || resultSert.isEmpty()) {
             return null;
         }
-        if (relations.size()>1) {
+        if (resultSert.size()>1) {
             return null;
         }
 
-        relation = beanConverter.convert(relations.get(0));
-        if (relation.getHospitalId()>0) {
-            hospital = hospitalService.getOneById(relation.getHospitalId());
-            relation.setHospital(hospital);
+        List<NurseHospitalRelationBean> relations = new ArrayList<>();
+        for (NurseHospitalRelationEntity result : resultSert) {
+            NurseHospitalRelationBean bean = beanConverter.convert(result);
+            relations.add(bean);
         }
-        if (relation.getDepartmentId()>0) {
-            department = departmentService.getOneById(relation.getDepartmentId());
-            relation.setDepartment(department);
-            if (department.getParentValid()) {
-                parentDepart = departmentService.getOneById(department.getParentId());
-                relation.setParentDepart(parentDepart);
+
+        fillOtherProperties(relations);
+        return relations.get(0);
+    }
+
+    public List<NurseHospitalRelationBean> getRelationByNurseIds(List<Long> nurseIds) {
+        logger.info("get one nurse-hospital-department relationship information by nurseIds={}", nurseIds);
+
+        List<NurseHospitalRelationEntity> resultSert = repository.findByNurseIdIn(nurseIds);
+        if (null==resultSert || resultSert.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<NurseHospitalRelationBean> relations = new ArrayList<>();
+        for (NurseHospitalRelationEntity result : resultSert) {
+            NurseHospitalRelationBean bean = beanConverter.convert(result);
+            relations.add(bean);
+        }
+
+        fillOtherProperties(relations);
+        return relations;
+    }
+
+    private void fillOtherProperties(List<NurseHospitalRelationBean> relationBeans) {
+        if (null==relationBeans || relationBeans.isEmpty()) {
+            return;
+        }
+        List<Integer> hospitalIds   = new ArrayList<>();
+        List<Integer> departmentIds = new ArrayList<>();
+        for (NurseHospitalRelationBean bean : relationBeans) {
+            if (bean.getHospitalId()>0) {
+                hospitalIds.add(bean.getHospitalId());
+            }
+            if (bean.getDepartmentId()>0) {
+                departmentIds.add(bean.getDepartmentId());
             }
         }
 
-        return relation;
+        // get hospital
+        List<HospitalBean>                  hospitals    = hospitalService.getHospitalByIds(hospitalIds);
+        Map<Integer, HospitalBean>          hospId2Bean  = new HashMap<>();
+        for (HospitalBean bean : hospitals) {
+            hospId2Bean.put(bean.getId(), bean);
+        }
+        // get department
+        List<HospitalDepartmentBean>         departmentes = departmentService.getDepartmentsByIds(departmentIds);
+        Map<Integer, HospitalDepartmentBean> deptId2Bean  = new HashMap<>();
+        for (HospitalDepartmentBean bean : departmentes) {
+            deptId2Bean.put(bean.getId(), bean);
+        }
+
+        // cache parent deparment ids
+        departmentIds.clear();
+        // set hospital and department
+        for (NurseHospitalRelationBean bean : relationBeans) {
+            HospitalBean           tmpHos = hospId2Bean.get(bean.getHospitalId());
+            HospitalDepartmentBean tmpDep = deptId2Bean.get(bean.getDepartmentId());
+            bean.setHospital(tmpHos);
+            bean.setDepartment(tmpDep);
+            if (null!=tmpDep && tmpDep.getParentValid()) {
+                departmentIds.add(tmpDep.getParentId());
+            }
+        }
+
+        // get parent department
+        departmentes.clear();
+        deptId2Bean.clear();
+        departmentes = departmentService.getDepartmentsByIds(departmentIds);
+        for (HospitalDepartmentBean bean : departmentes) {
+            deptId2Bean.put(bean.getId(), bean);
+        }
+        for (NurseHospitalRelationBean bean : relationBeans) {
+            HospitalDepartmentBean tmpDep = bean.getDepartment();
+            if (null!=tmpDep && tmpDep.getParentValid()) {
+                tmpDep = deptId2Bean.get(tmpDep.getParentId());
+                bean.setParentDepart(tmpDep);
+            }
+        }
     }
 
     //====================================================================

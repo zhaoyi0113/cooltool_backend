@@ -4,9 +4,11 @@ import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.beans.NurseQualificationFileBean;
 import com.cooltoo.backend.beans.WorkFileTypeBean;
 import com.cooltoo.backend.converter.NurseQualificationBeanConverter;
+import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseQualificationEntity;
 import com.cooltoo.backend.repository.NurseQualificationRepository;
 import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
@@ -15,6 +17,8 @@ import com.cooltoo.services.StorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -36,13 +40,15 @@ public class NurseQualificationService {
             new Sort.Order(Sort.Direction.ASC,  "name"));
 
     @Autowired
-    private NurseQualificationRepository qualificationRepository;
+    private NurseQualificationRepository repository;
     @Autowired
     private NurseQualificationBeanConverter beanConverter;
     @Autowired
     private WorkFileTypeService workfileTypeService;
     @Autowired
     private NurseRepository nurseRepository;
+    @Autowired
+    private NurseHospitalRelationService hospitalRelationService;
     @Autowired
     private NurseQualificationFileService qualificationFileService;
     @Autowired
@@ -66,7 +72,7 @@ public class NurseQualificationService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
-        List<NurseQualificationEntity> qualifications = qualificationRepository.findNurseQualificationByUserId(nurseId, sort);
+        List<NurseQualificationEntity> qualifications = repository.findNurseQualificationByUserId(nurseId, sort);
         NurseQualificationEntity       qualification  = null;
         // check nurse qualification record
         if (null==qualifications || qualifications.isEmpty()) {
@@ -80,7 +86,9 @@ public class NurseQualificationService {
             qualification = qualifications.get(0);
         }
         qualification.setStatus(VetStatus.WAITING);
-        qualification = qualificationRepository.save(qualification);
+        qualification.setTimeCreated(new Date());
+        qualification.setTimeProcessed(null);
+        qualification = repository.save(qualification);
 
         String qualificationPath = qualificationFileService.addQualificationFile(qualification.getId(), workFileTypeB, fileName, file);
         return qualificationPath;
@@ -92,7 +100,7 @@ public class NurseQualificationService {
 
     @Transactional
     public NurseQualificationBean deleteNurseQualification(long qualificationId) {
-        NurseQualificationEntity entity = qualificationRepository.findOne(qualificationId);
+        NurseQualificationEntity entity = repository.findOne(qualificationId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
@@ -112,12 +120,12 @@ public class NurseQualificationService {
         // delete qualification file record
         qualificationFileService.deleteFileByQualificationId(bean.getId());
         // delete qualification record
-        qualificationRepository.delete(entity);
+        repository.delete(entity);
         return bean;
     }
 
     @Transactional
-    public List<NurseQualificationBean> deletNurseQualificationByUserId(long userId) {
+    public List<NurseQualificationBean> deleteNurseQualificationByUserId(long userId) {
         List<NurseQualificationBean> qualificationsB = getAllNurseQualifications(userId);
         if (qualificationsB.isEmpty()) {
             return qualificationsB;
@@ -133,34 +141,111 @@ public class NurseQualificationService {
     //     get qualification file
     //=======================================================
 
+    public long getAllQualificationCount(String status) {
+        VetStatus   vetStatus   = VetStatus.parseString(status);
+        long resultSet = 0;
+        if ("ALL".equalsIgnoreCase(status)) {
+            resultSet = repository.count();
+        }
+        else if (null!=vetStatus) {
+            resultSet = repository.countByStatus(vetStatus);
+        }
+
+        return resultSet;
+    }
+
     public List<NurseQualificationBean> getAllNurseQualifications(long nurseId) {
-        List<NurseQualificationEntity> qualifications = qualificationRepository.findNurseQualificationByUserId(nurseId, sort);
-        if (null==qualifications || qualifications.isEmpty()) {
+        List<NurseQualificationEntity> resultSet = repository.findNurseQualificationByUserId(nurseId, sort);
+        if (null==resultSet || resultSet.isEmpty()) {
             logger.info("The qualification record is empty!");
             return new ArrayList<>();
         }
-        if (qualifications.size()>1) {
-            logger.info("The qualification record is more than one! " + qualifications);
+        if (resultSet.size()>1) {
+            logger.info("The qualification record is more than one! " + resultSet);
         }
-        return parseEntities(nurseId, qualifications);
+
+        List<NurseQualificationBean> qualifications = new ArrayList<>();
+        for (NurseQualificationEntity result : resultSet) {
+            NurseQualificationBean bean = beanConverter.convert(result);
+            qualifications.add(bean);
+        }
+
+        fillOtherProperties(qualifications);
+        return qualifications;
     }
 
-    private List<NurseQualificationBean> parseEntities(long userId, List<NurseQualificationEntity> entities) {
-
-        // qualification ids/file ids cache
-        NurseQualificationBean           bean      = null;
-        List<NurseQualificationBean>     beans     = new ArrayList<NurseQualificationBean>();
-        List<NurseQualificationFileBean> files     = null;
-
-
-        for (NurseQualificationEntity entity : entities) {
-            bean = beanConverter.convert(entity);
-            files = qualificationFileService.getAllFileByQualificationId(bean.getId());
-            bean.setWorkfiles(files);
-            beans.add(bean);
+    public List<NurseQualificationBean> getAllQualifications(String status, int pageIndex, int number) {
+        logger.info("get qualification by status {} at page {} numberOfPage {}", status, pageIndex, number);
+        VetStatus   vetStatus   = VetStatus.parseString(status);
+        PageRequest pageRequest = new PageRequest(pageIndex, number, Sort.Direction.DESC, "timeCreated");
+        Page<NurseQualificationEntity> resultSet = null;
+        if ("ALL".equalsIgnoreCase(status)) {
+            resultSet = repository.findAll(pageRequest);
+        }
+        if (null!=vetStatus) {
+            resultSet = repository.findByStatus(vetStatus, pageRequest);
+        }
+        if (null==resultSet) {
+            return new ArrayList<>();
         }
 
-        return beans;
+        List<NurseQualificationBean> qualifications = new ArrayList<>();
+        for (NurseQualificationEntity result : resultSet) {
+            NurseQualificationBean bean = beanConverter.convert(result);
+            qualifications.add(bean);
+        }
+
+        fillOtherProperties(qualifications);
+        return qualifications;
+    }
+
+    private void fillOtherProperties(List<NurseQualificationBean> resultSet) {
+        if (null==resultSet || resultSet.isEmpty()) {
+            return;
+        }
+
+        // qualification ids/file ids cache
+        List<Long>  userIds  =  new ArrayList<>();
+        List<Long>  qulfIds  =  new ArrayList<>();
+        for (NurseQualificationBean qualification : resultSet) {
+            userIds.add(qualification.getUserId());
+            qulfIds.add(qualification.getId());
+        }
+
+        List<NurseEntity>                           nurses          = nurseRepository.findNurseByIdIn(userIds);
+        List<NurseHospitalRelationBean>             hospitals       = hospitalRelationService.getRelationByNurseIds(userIds);
+        Map<Long, NurseEntity>                      userId2Bean     = new HashMap<>();
+        Map<Long, NurseHospitalRelationBean>        userId2Hospital = new HashMap<>();
+        Map<Long, List<NurseQualificationFileBean>> qulfId2QulfFile = qualificationFileService.getAllFileByQualificationId(qulfIds);
+
+        for (NurseEntity tmp : nurses) {
+            userId2Bean.put(tmp.getId(), tmp);
+        }
+        for (NurseHospitalRelationBean tmp : hospitals) {
+            userId2Hospital.put(tmp.getNurseId(), tmp);
+        }
+
+        for (NurseQualificationBean tmp : resultSet) {
+            NurseEntity                     user  = userId2Bean.get(tmp.getUserId());
+            NurseHospitalRelationBean       hosp  = userId2Hospital.get(tmp.getUserId());
+            List<NurseQualificationFileBean>files = qulfId2QulfFile.get(tmp.getId());
+
+            tmp.setWorkfiles(files);
+            tmp.setUserName(user.getName());
+            tmp.setRealName(user.getRealName());
+            if (null!=hosp) {
+                if (null!=hosp.getHospital()) {
+                    tmp.setHospitalId(hosp.getHospitalId());
+                    tmp.setHospitalName(hosp.getHospital().getName());
+                }
+                if (null!=hosp.getDepartment()) {
+                    tmp.setDeparmentId(hosp.getDepartmentId());
+                    tmp.setDeparmentName(hosp.getDepartment().getName());
+                }
+            }
+        }
+
+        return;
     }
 
     public WorkFileTypeBean getWorkFileTypeBean(String strWorkfileType) {
@@ -183,27 +268,31 @@ public class NurseQualificationService {
     //=======================================================
 
     public NurseQualificationBean updateQualification(long qualificatinId, String name, VetStatus status, String statusDescr) {
-        NurseQualificationEntity entity = qualificationRepository.findOne(qualificatinId);
+        NurseQualificationEntity entity = repository.findOne(qualificatinId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
-        boolean changed = false;
+        boolean changed       = false;
+        boolean statusChanged = false;
         if(!VerifyUtil.isStringEmpty(name)) {
             entity.setName(name);
             changed = true;
         }
         if (null!=status && !status.equals(entity.getStatus())) {
             entity.setStatus(status);
-            changed = true;
+            statusChanged = true;
         }
         if (!VerifyUtil.isStringEmpty(statusDescr)) {
             entity.setStatusDesc(statusDescr);
-            changed = true;
+            statusChanged = true;
         }
 
-        if (changed) {
-            qualificationRepository.save(entity);
+        if (changed || statusChanged) {
+            if (statusChanged) {
+                entity.setTimeProcessed(new Date());
+            }
+            repository.save(entity);
         }
 
         NurseQualificationBean bean = beanConverter.convert(entity);

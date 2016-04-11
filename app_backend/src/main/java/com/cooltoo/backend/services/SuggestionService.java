@@ -6,9 +6,9 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.SuggestionEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.SuggestionRepository;
+import com.cooltoo.constants.SuggestionStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +40,46 @@ public class SuggestionService {
     //=========================================================
     //           get suggestion
     //=========================================================
+
+    public long getSuggestionCount(String status) {
+        logger.info("get suggestions count by status {}", status);
+        if ("ALL".equalsIgnoreCase(status)) {
+            return repository.count();
+        }
+        SuggestionStatus suggStatus = SuggestionStatus.parseString(status);
+        if (null==suggStatus) {
+            logger.info("suggestions status is invalid");
+            return 0;
+        }
+        return repository.countByStatus(suggStatus);
+    }
+
+    public List<SuggestionBean> getSuggestions(String status, int pageIndex, int number) {
+        logger.info("get suggestions by status {} on page {}, {} records/page", status, pageIndex, number);
+        SuggestionStatus suggStatus = SuggestionStatus.parseString(status);
+        if (null==suggStatus) {
+            logger.info("suggestions status is invalid");
+            return new ArrayList<>();
+        }
+
+        PageRequest page = new PageRequest(pageIndex, number, Sort.Direction.DESC, "timeCreated");
+        List<SuggestionBean> suggestionsB = new ArrayList<SuggestionBean>();
+
+        Page<SuggestionEntity> suggestions = repository.findByStatus(suggStatus, page);
+        for (SuggestionEntity entity : suggestions) {
+            SuggestionBean bean = beanConverter.convert(entity);
+            suggestionsB.add(bean);
+        }
+
+        suggestionsB = fillOtherField(suggestionsB);
+        return suggestionsB;
+    }
+
     public List<SuggestionBean> getSuggestions(int pageIndex, int number) {
         logger.info("get suggestions on page {}, {} records/page", pageIndex, number);
 
         PageRequest page = new PageRequest(pageIndex, number, Sort.Direction.DESC, "timeCreated");
-        List<Long>  ids  = new ArrayList<Long>();
         List<SuggestionBean> suggestionsB = new ArrayList<SuggestionBean>();
-        List<NurseEntity>    users        = null;
 
         Page<SuggestionEntity> suggestions = repository.findAll(page);
         for (SuggestionEntity entity : suggestions) {
@@ -90,6 +123,36 @@ public class SuggestionService {
         return nurseRepository.exists(userId);
     }
 
+
+    //=========================================================
+    //           update suggestion
+    //=========================================================
+
+    public String updateStatus(String ids, String suggestionType) {
+        logger.info("set the suggestion {} status to {}", ids, suggestionType);
+        if (!VerifyUtil.isOccupationSkillIds(ids)) {
+            logger.warn("the suggestion ids are not valid");
+        }
+        SuggestionStatus status = SuggestionStatus.parseString(suggestionType);
+        if (null==status) {
+            logger.warn("the suggestion type is not valid");
+        }
+
+        List<Long> suggestIds = new ArrayList<>();
+        String[]   strArray  = ids.split(",");
+        for (String temp : strArray) {
+            long id = Long.parseLong(temp);
+            suggestIds.add(id);
+        }
+
+        List<SuggestionEntity> entity2Modify = repository.findByIdIn(suggestIds);
+        for (SuggestionEntity entity : entity2Modify) {
+            entity.setStatus(status);
+        }
+        repository.save(entity2Modify);
+        return ids;
+    }
+
     //=========================================================
     //           add suggestion
     //=========================================================
@@ -108,6 +171,7 @@ public class SuggestionService {
         SuggestionEntity entity = new SuggestionEntity();
         entity.setUserId(userId);
         entity.setSuggestion(suggestion);
+        entity.setStatus(SuggestionStatus.UNREAD);
         entity.setTimeCreated(new Date());
         entity = repository.save(entity);
         return beanConverter.convert(entity);

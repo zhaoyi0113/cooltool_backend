@@ -60,6 +60,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(NurseQualificationAPI.class);
         register(NurseQualificationManageAPI.class);
         register(SuggestionAPI.class);
+        register(SuggestionManageAPI.class);
         register(TagsServiceAPI.class);
         register(NurseTagsServiceAPI.class);
 

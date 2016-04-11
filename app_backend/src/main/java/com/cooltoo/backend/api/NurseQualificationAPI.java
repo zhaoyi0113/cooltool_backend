@@ -78,7 +78,7 @@ public class NurseQualificationAPI {
     public Response resetQualification(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("user {} reset his qualification", userId);
-        List<NurseQualificationBean> qualifications = service.deletNurseQualificationByUserId(userId);
+        List<NurseQualificationBean> qualifications = service.deleteNurseQualificationByUserId(userId);
         logger.info("user {} delete qualifications is {}." , userId, qualifications);
         return Response.ok().build();
     }

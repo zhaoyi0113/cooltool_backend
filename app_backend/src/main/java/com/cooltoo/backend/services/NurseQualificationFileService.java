@@ -17,10 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/4/4.
@@ -47,43 +44,66 @@ public class NurseQualificationFileService {
     //=============================================================
     public List<NurseQualificationFileBean> getAllFileByQualificationId(long qualificationId) {
         logger.info("get all qualification file by qualification id =={}", qualificationId);
-        List<NurseQualificationFileEntity> qualificationFiles  = null;
-        List<NurseQualificationFileBean>   qualificationFilesB = null;
-        NurseQualificationFileBean         qualificationFileB  = null;
-        List<Long>                         imageIds            = null;
-        Map<Long, String>                  img2Url             = null;
-        List<WorkFileTypeBean>             workFileTypes       = null;
-
-        workFileTypes       = workfileTypeService.getAllWorkFileType();
-
-        qualificationFiles  = repository.findByQualificationId(qualificationId, sort);
-
-        qualificationFilesB = new ArrayList<NurseQualificationFileBean>();
-        imageIds            = new ArrayList<Long>();
-        for (NurseQualificationFileEntity qualificationFile : qualificationFiles) {
-            qualificationFileB = beanConverter.convert(qualificationFile);
-            qualificationFilesB.add(qualificationFileB);
-            imageIds.add(qualificationFileB.getWorkfileId());
-            for (WorkFileTypeBean workfileType : workFileTypes) {
-                if (qualificationFileB.getWorkfileTypeId() == workfileType.getId()) {
-                    qualificationFileB.setWorkfileType(workfileType);
-                    break;
-                }
-            }
+        List<NurseQualificationFileEntity> fileEntities  = repository.findByQualificationId(qualificationId, sort);
+        List<NurseQualificationFileBean> fileBeans = new ArrayList<NurseQualificationFileBean>();
+        for (NurseQualificationFileEntity file : fileEntities) {
+            NurseQualificationFileBean fileBean = beanConverter.convert(file);
+            fileBeans.add(fileBean);
         }
-
-        img2Url = storageService.getFilePath(imageIds);
-
-        for (NurseQualificationFileBean fileBean : qualificationFilesB) {
-            String url = img2Url.get(fileBean.getWorkfileId());
-            if (!VerifyUtil.isStringEmpty(url)) {
-                fileBean.setWorkfileUrl(url);
-            }
-        }
-
-        return qualificationFilesB;
+        fillOtherProperties(fileBeans);
+        return fileBeans;
     }
 
+
+    public Map<Long, List<NurseQualificationFileBean>> getAllFileByQualificationId(List<Long> qualificationIds) {
+        List<NurseQualificationFileEntity> fileEntity     = repository.findByQualificationIdIn(qualificationIds, sort);
+        List<NurseQualificationFileBean>   fileBeans = new ArrayList<NurseQualificationFileBean>();
+        for (NurseQualificationFileEntity file : fileEntity) {
+            NurseQualificationFileBean bean = beanConverter.convert(file);
+            fileBeans.add(bean);
+        }
+        fillOtherProperties(fileBeans);
+
+        Map<Long, List<NurseQualificationFileBean>> qualificatinoId2Files = new HashMap<>();
+        for (NurseQualificationFileBean bean : fileBeans) {
+            List<NurseQualificationFileBean> files = qualificatinoId2Files.get(bean.getQualificationId());
+            if (null==files) {
+                files = new ArrayList<>();
+                qualificatinoId2Files.put(bean.getQualificationId(), files);
+            }
+            files.add(bean);
+        }
+
+        return qualificatinoId2Files;
+    }
+
+    private void fillOtherProperties(List<NurseQualificationFileBean> qualFiles) {
+        if (null==qualFiles || qualFiles.isEmpty()) {
+            return;
+        }
+        List<WorkFileTypeBean> workFileTypes = workfileTypeService.getAllWorkFileType();
+        Map<Integer, WorkFileTypeBean> workFileTypeId2Bean = new HashMap<>();
+        for (WorkFileTypeBean fileType : workFileTypes) {
+            workFileTypeId2Bean.put(fileType.getId(), fileType);
+        }
+
+        List<Long> imageIds = new ArrayList<Long>();
+        for (NurseQualificationFileBean file : qualFiles) {
+            imageIds.add(file.getWorkfileId());
+        }
+
+        Map<Long, String> imageId2Url = storageService.getFilePath(imageIds);
+        for (NurseQualificationFileBean file : qualFiles) {
+            String url = imageId2Url.get(file.getWorkfileId());
+            if (!VerifyUtil.isStringEmpty(url)) {
+                file.setWorkfileUrl(url);
+            }
+            WorkFileTypeBean fileType = workFileTypeId2Bean.get(file.getWorkfileTypeId());
+            if (null!=fileType) {
+                file.setWorkfileType(fileType);
+            }
+        }
+    }
 
     //=============================================================
     //       delete qualification file
