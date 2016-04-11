@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +46,18 @@ public class TagsService {
     //=================================================================
     //         getter
     //=================================================================
+
+    public long getTagCount() {
+        long count = tagsRep.count();
+        logger.info("tag count is {}", count);
+        return count;
+    }
+
+    public long getCategoryCount() {
+        long count = categoryRep.count();
+        logger.info("tag category count is {}", count);
+        return count;
+    }
 
     public TagsBean getTag(long tagId) {
         logger.info("get tag by id {}", tagId);
@@ -121,17 +135,88 @@ public class TagsService {
     }
 
     public List<TagsBean> getTagsWithoutCategoryId() {
-        List<TagsBean> all = getAllTag();
+        Sort             sort  = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
+        List<TagsEntity> tagsE = tagsRep.findByCategoryIdLessThanEqual(0, sort);
 
-        for (int i=0, count=all.size(); i<count; i ++) {
-            TagsBean tag = all.get(i);
-            if (tag.getCategoryId()>0) {
-                all.remove(i);
-                i --;
-                count --;
+        if (null!=tagsE && !tagsE.isEmpty()) {
+            List<TagsBean> tagsB    = new ArrayList<>();
+            List<Long>     imageIds = new ArrayList<>();
+            for (TagsEntity tagE : tagsE) {
+                TagsBean tagB = tagsConverter.convert(tagE);
+                tagsB.add(tagB);
+                imageIds.add(tagB.getImageId());
             }
+
+            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+            for (TagsBean tagB : tagsB) {
+                long   imgId   = tagB.getImageId();
+                String imgPath = imgId2Path.get(imgId);
+                tagB.setImageUrl(imgPath);
+            }
+
+            return tagsB;
         }
-        return all;
+
+        return new ArrayList<>();
+    }
+
+    public List<TagsBean> getTagsByPage(int pageIndex, int sizeOfPage) {
+        Sort             sort  = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
+        PageRequest      page  = new PageRequest(pageIndex, sizeOfPage, sort);
+        Page<TagsEntity> tagsE = tagsRep.findAll(page);
+
+        if (null!=tagsE && tagsE.getSize()>0) {
+            List<TagsBean> tagsB    = new ArrayList<>();
+            List<Long>     imageIds = new ArrayList<>();
+            for (TagsEntity tagE : tagsE) {
+                TagsBean tagB = tagsConverter.convert(tagE);
+                tagsB.add(tagB);
+                imageIds.add(tagB.getImageId());
+            }
+
+            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+            for (TagsBean tagB : tagsB) {
+                long   imgId   = tagB.getImageId();
+                String imgPath = imgId2Path.get(imgId);
+                tagB.setImageUrl(imgPath);
+            }
+
+            return tagsB;
+        }
+
+        return new ArrayList<>();
+    }
+
+    public List<TagsCategoryBean> getCategoryByPage(int pageIndex, int sizeOfPage) {
+        // get all category
+        Sort                     sortCategory = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        PageRequest              pageCategory = new PageRequest(pageIndex, sizeOfPage, sortCategory);
+        Page<TagsCategoryEntity> allCategory  = categoryRep.findAll(pageCategory);
+
+        // has category
+        if (null!=allCategory && allCategory.getSize()>0) {
+
+            // cache image path
+            List<Long> imageIds = new ArrayList<>();
+            for (TagsCategoryEntity category : allCategory) {
+                imageIds.add(category.getImageId());
+            }
+            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+
+            // converter entity to bean
+            List<TagsCategoryBean> allCategoryB = new ArrayList<>();
+            for (TagsCategoryEntity category : allCategory) {
+                long imageId = category.getImageId();
+                String imgPath = imgId2Path.get(imageId);
+                TagsCategoryBean bean = categoryConverter.convert(category);
+                bean.setImageUrl(imgPath);
+                allCategoryB.add(bean);
+            }
+
+            return allCategoryB;
+        }
+
+        return new ArrayList<>();
     }
 
     public TagsCategoryBean getCategoryWithTags(long categoryId) {
@@ -554,13 +639,13 @@ public class TagsService {
         String imagePath = null;
         TagsEntity entity = new TagsEntity();
         if (VerifyUtil.isStringEmpty(name)) {
-            logger.error("add tag : name is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+//            logger.error("add tag : name is empty");
+//            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        else if (tagsRep.countByName(name)>0) {
-            logger.error("add tag : name is exist");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+//        else if (tagsRep.countByName(name)>0) {
+//            logger.error("add tag : name is exist");
+//            throw new BadRequestException(ErrorCode.DATA_ERROR);
+//        }
         else {
             entity.setName(name);
         }
@@ -578,6 +663,10 @@ public class TagsService {
                 entity.setImageId(fileId);
                 imagePath = storageService.getFilePath(fileId);
             }
+        }
+        else {
+            logger.error("add tag : image is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
         entity.setTimeCreated(new Date());

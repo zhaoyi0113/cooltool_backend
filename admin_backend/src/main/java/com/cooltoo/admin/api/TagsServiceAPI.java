@@ -33,13 +33,69 @@ public class TagsServiceAPI {
     //    get
     //=======================================================================
 
+    @Path("/tag_count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getTagCount(@Context HttpServletRequest request) {
+        logger.info("get all tags count");
+        long count = tagsService.getTagCount();
+        logger.info("get all tags count is {}", count);
+        return Response.ok(count).build();
+    }
+
+    @Path("/category_count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getTagCategoryCount(@Context HttpServletRequest request) {
+        logger.info("get all tags category count");
+        long count = tagsService.getCategoryCount();
+        logger.info("get all tags category count is {}", count);
+        return Response.ok(count).build();
+    }
+
+    @Path("/{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getTagByPage(@Context HttpServletRequest request,
+                                 @PathParam("index") int index,
+                                 @PathParam("number") int number
+    ) {
+        logger.info("get all tags at page {} numberOfPage {}", index, number);
+        List<TagsBean> tags = tagsService.getTagsByPage(index, number);
+        logger.info("get all tags at page {} numberOfPage {}, value is ", index, number, tags);
+        return Response.ok(tags).build();
+    }
+
+    @Path("/category/{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getCategoryByPage(@Context HttpServletRequest request,
+                                      @PathParam("index") int index,
+                                      @PathParam("number") int number
+    ) {
+        logger.info("get all tag category at page {} numberOfPage {}", index, number);
+        List<TagsCategoryBean> tags = tagsService.getCategoryByPage(index, number);
+        logger.info("get all tag category at page {} numberOfPage {}, value is ", index, number, tags);
+        return Response.ok(tags).build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getTag(@Context              HttpServletRequest request,
                            @FormParam("tag_ids") String             tagIds) {
         logger.info("get tag by ids={}", tagIds);
-        List<TagsBean> tags = tagsService.getTagByIds(tagIds);
+        List<TagsBean> tags = null;
+        if (!"ALL".equalsIgnoreCase(tagIds)) {
+            tags = tagsService.getTagByIds(tagIds);
+        }
+        else {
+            tags = tagsService.getAllTag();
+        }
         return Response.ok(tags).build();
     }
 

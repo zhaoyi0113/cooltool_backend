@@ -1,6 +1,8 @@
 package com.cooltoo.repository;
 
 import com.cooltoo.entities.TagsCategoryEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 
@@ -11,6 +13,7 @@ import java.util.List;
  */
 public interface TagsCategoryRepository extends CrudRepository<TagsCategoryEntity, Long> {
     public List<TagsCategoryEntity> findAll(Sort sort);
+    public Page<TagsCategoryEntity> findAll(Pageable page);
     public List<TagsCategoryEntity> findByIdIn(List<Long> ids);
     public long                     countByName(String name);
 }
