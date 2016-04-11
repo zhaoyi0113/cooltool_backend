@@ -358,11 +358,6 @@ public class NurseSpeakService {
         return thumbsUpBean;
     }
 
-    @Transactional
-    public void deleteNurseSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
-        thumbsUpService.deleteNurseSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
-    }
-
     public NurseSpeakThumbsUpBean getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(long nurseSpeakId, long thumbsUpUserId) {
         return thumbsUpService.findNurseSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
     }

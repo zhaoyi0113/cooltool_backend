@@ -69,24 +69,4 @@ public class NurseSpeakThumbsUpServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(nurseSpeakIds.contains(5L));
         Assert.assertTrue(!nurseSpeakIds.contains(7L));
     }
-
-    @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_thumbs_up_data.xml")
-    public void testFindAndDeleteNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId() {
-        long nurseSpeakId = 2;
-        long thumbsUpUserId = 4;
-        NurseSpeakThumbsUpBean bean1 = thumbsUpService.findNurseSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
-        Assert.assertNotNull(bean1);
-
-        thumbsUpService.deleteNurseSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
-        Exception throwable = null;
-        try {
-            thumbsUpService.findNurseSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
-        }
-        catch (Exception ex) {
-            throwable = ex;
-        }
-        Assert.assertNotNull(throwable);
-        Assert.assertTrue(throwable instanceof BadRequestException);
-    }
 }

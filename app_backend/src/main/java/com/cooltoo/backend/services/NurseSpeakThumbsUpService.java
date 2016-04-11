@@ -6,6 +6,8 @@ import com.cooltoo.backend.entities.NurseSpeakThumbsUpEntity;
 import com.cooltoo.backend.repository.NurseSpeakThumbsUpRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import java.util.List;
 @Service("NurseSpeakThumbsUpService")
 public class NurseSpeakThumbsUpService {
 
+    private static final Logger logger = LoggerFactory.getLogger(NurseSpeakThumbsUpService.class.getName());
+
     @Autowired
     NurseSpeakThumbsUpRepository thumbsUpRepository;
 
@@ -29,13 +33,15 @@ public class NurseSpeakThumbsUpService {
     public NurseSpeakThumbsUpBean addSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
         NurseSpeakThumbsUpEntity thumbsUpEntity = thumbsUpRepository.findNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, thumbsUpUserId);
         if (null!=thumbsUpEntity) {
-            throw new BadRequestException(ErrorCode.SPEAK_THUMBS_UP_EXIST);
+            thumbsUpRepository.delete(thumbsUpEntity);
         }
-        thumbsUpEntity = new NurseSpeakThumbsUpEntity();
-        thumbsUpEntity.setNurseSpeakId(nurseSpeakId);
-        thumbsUpEntity.setThumbsUpUserId(thumbsUpUserId);
-        thumbsUpEntity.setTime(new Date());
-        thumbsUpEntity = thumbsUpRepository.save(thumbsUpEntity);
+        else {
+            thumbsUpEntity = new NurseSpeakThumbsUpEntity();
+            thumbsUpEntity.setNurseSpeakId(nurseSpeakId);
+            thumbsUpEntity.setThumbsUpUserId(thumbsUpUserId);
+            thumbsUpEntity.setTime(new Date());
+            thumbsUpEntity = thumbsUpRepository.save(thumbsUpEntity);
+        }
         return beanConverter.convert(thumbsUpEntity);
     }
 
@@ -68,18 +74,9 @@ public class NurseSpeakThumbsUpService {
     public NurseSpeakThumbsUpBean findNurseSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
         NurseSpeakThumbsUpEntity thumbsUpEntity = thumbsUpRepository.findNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, thumbsUpUserId);
         if (null==thumbsUpEntity) {
-            throw new BadRequestException(ErrorCode.SPEAK_THUMBS_UP_NOT_EXIST);
+            logger.info("the user {} not thumbs up the speak {} content.", thumbsUpUserId, nurseSpeakId);
+            return null;
         }
         return beanConverter.convert(thumbsUpEntity);
-    }
-
-    public void deleteNurseSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
-        //Notice: this method will throw Exception when Http testing(But JUnit Testing is passed):
-        //      org.springframework.dao.InvalidDataAccessApiUsageException: No EntityManager with actual transaction available for current thread - cannot reliably process 'remove' call;
-//        thumbsUpRepository.deleteNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, thumbsUpUserId);
-        NurseSpeakThumbsUpEntity thumbsUpEntity = thumbsUpRepository.findNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, thumbsUpUserId);
-        if (null!=thumbsUpEntity) {
-            thumbsUpRepository.delete(thumbsUpEntity);
-        }
     }
 }

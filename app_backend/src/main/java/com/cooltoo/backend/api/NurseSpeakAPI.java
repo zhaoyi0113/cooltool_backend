@@ -213,18 +213,4 @@ public class NurseSpeakAPI {
         NurseSpeakThumbsUpBean thumbsUpBean = speakService.addNurseSpeakThumbsUp(nurseSpeakId, userId);
         return Response.ok(thumbsUpBean).build();
     }
-
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/thumbs_up")
-    @LoginAuthentication(requireNurseLogin = true)
-    public Response deleteSpeakThumbsUp(
-            @Context HttpServletRequest request,
-            @FormParam("nurseSpeakId") long nurseSpeakId
-    ) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseSpeakThumbsUpBean thumbsUpbean = speakService.getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, userId);
-        speakService.deleteNurseSpeakThumbsUp(nurseSpeakId, userId);
-        return Response.ok(thumbsUpbean).build();
-    }
 }
