@@ -121,13 +121,13 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     public void testAddNurseSpeakThumbsUp() {
         NurseSpeakThumbsUpBean thumbsUp = null;
         Exception throwable = null;
-        speakService.addNurseSpeakThumbsUp(5, 3);
+        speakService.setNurseSpeakThumbsUp(5, 3);
         thumbsUp = speakService.getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(5,3);
         Assert.assertNull(thumbsUp);
 
         throwable = null;
         try {
-            speakService.addNurseSpeakThumbsUp(5, 1);
+            speakService.setNurseSpeakThumbsUp(5, 1);
         }
         catch (Exception ex) {
             throwable = ex;
@@ -136,7 +136,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertTrue(throwable instanceof BadRequestException);
 
         Date time = new Date();
-        NurseSpeakThumbsUpBean thumbsUpBean = speakService.addNurseSpeakThumbsUp(7, 3);
+        NurseSpeakThumbsUpBean thumbsUpBean = speakService.setNurseSpeakThumbsUp(7, 3);
         Assert.assertEquals(7, thumbsUpBean.getNurseSpeakId());
         Assert.assertEquals(3, thumbsUpBean.getThumbsUpUserId());
         Assert.assertTrue(thumbsUpBean.getId()>0);

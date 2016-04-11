@@ -124,7 +124,7 @@ public class NurseSpeakDataCreator {
     private void addSpeakCommentsAndThumbUp(NurseSpeakBean entity){
         NurseEntity nurse = nurseRepository.findOne(entity.getUserId());
         List<NurseFriendsBean> friendList =
-                nurseFriendsService.getFriendList(nurse.getId());
+                nurseFriendsService.getFriend(nurse.getId());
         int number = (int) MockDataCreator.getRandomInt(5, 10);
         logger.info("add comments and thumb up "+nurse.getName());
         for(int i=0; i<number; i++) {
@@ -133,7 +133,7 @@ public class NurseSpeakDataCreator {
             }
             nurseSpeakService.addSpeakComment(entity.getId(), friendList.get(i).getId(), nurse.getId(),
                     MockDataCreator.getRandomString(40));
-            nurseSpeakService.addNurseSpeakThumbsUp(entity.getId(), friendList.get(i).getId());
+            nurseSpeakService.setNurseSpeakThumbsUp(entity.getId(), friendList.get(i).getId());
         }
 
     }

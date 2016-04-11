@@ -117,7 +117,7 @@ public class NurseFriendsAPI {
     public Response getAllFriends(@Context HttpServletRequest request){
         logger.info("get all friend list ");
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseFriendsBean> friendList = friendsService.getFriendList(userId);
+        List<NurseFriendsBean> friendList = friendsService.getFriendsAgreeStatusNotWaiting(userId);
         logger.info("get friend list count "+friendList.size());
         return Response.ok(friendList).build();
     }

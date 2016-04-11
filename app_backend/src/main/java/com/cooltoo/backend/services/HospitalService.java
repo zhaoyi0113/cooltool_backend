@@ -13,6 +13,9 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.RegionService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +57,26 @@ public class HospitalService {
         }
         addRegion(all);
         return all;
+    }
+
+    public long getHospitalSize() {
+        long count = repository.count();
+        logger.info("get the number of hospital is {}", count);
+        return count;
+    }
+
+    public List<HospitalBean> getAllByPage(int index, int number) {
+        Sort        sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
+        PageRequest page = new PageRequest(index, number, sort);
+
+        Page<HospitalEntity> pageResult = repository.findAll(page);
+        List<HospitalBean>   hospital = new ArrayList<HospitalBean>();
+        for (HospitalEntity entity : pageResult) {
+            HospitalBean bean = beanConverter.convert(entity);
+            hospital.add(bean);
+        }
+        addRegion(hospital);
+        return hospital;
     }
 
     public List<HospitalBean> searchHospital(boolean andOrOr, String name, int province, int city, int district, String address) {

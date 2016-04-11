@@ -9,6 +9,7 @@ public class NurseSpeakThumbsUpBean {
     private long id;
     private long nurseSpeakId;
     private long thumbsUpUserId;
+    private long speakThumbsUpCount;
     private Date time;
 
     public long getId() {
@@ -33,6 +34,14 @@ public class NurseSpeakThumbsUpBean {
 
     public void setThumbsUpUserId(long thumbsUpUserId) {
         this.thumbsUpUserId = thumbsUpUserId;
+    }
+
+    public long getSpeakThumbsUpCount() {
+        return this.speakThumbsUpCount;
+    }
+
+    public void setSpeakThumbsUpCount(long speakThumbsUpCount) {
+        this.speakThumbsUpCount = speakThumbsUpCount;
     }
 
     public Date getTime() {

@@ -33,33 +33,33 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
     public void testAddFriend(){
         long nurseId = 15;
         long friendId= 1;
-        List<NurseFriendsBean> friendList = friendsService.getFriendList(nurseId);
+        List<NurseFriendsBean> friendList = friendsService.getFriend(nurseId);
         Assert.assertTrue(friendList.isEmpty());
         friendsService.addFriend(nurseId,1);
-        friendList = friendsService.getFriendList(nurseId);
+        friendList = friendsService.getFriend(nurseId);
         Assert.assertEquals(1, friendList.size());
         Assert.assertEquals(friendId, friendList.get(0).getFriendId());
 
-        friendList = friendsService.getFriendList(1);
+        friendList = friendsService.getFriend(1);
         Assert.assertEquals(15, friendList.size());
 
         nurseId = 15;
         friendsService.addFriend(nurseId,1);
-        friendList = friendsService.getFriendList(nurseId);
+        friendList = friendsService.getFriend(nurseId);
         Assert.assertEquals(1, friendList.size());
-        friendList = friendsService.getFriendList(1);
+        friendList = friendsService.getFriend(1);
         Assert.assertEquals(15, friendList.size());
     }
 
     @Test
     public void testDeleteFriend(){
-        List<NurseFriendsBean> friendList = friendsService.getFriendList(1);
+        List<NurseFriendsBean> friendList = friendsService.getFriend(1);
         Assert.assertEquals(14, friendList.size());
         friendsService.removeFriend(1, 2);
-        friendList = friendsService.getFriendList(1);
+        friendList = friendsService.getFriend(1);
         Assert.assertEquals(13, friendList.size());
         friendsService.removeFriend(1, 3);
-        friendList = friendsService.getFriendList(1);
+        friendList = friendsService.getFriend(1);
         Assert.assertEquals(12, friendList.size());
     }
 

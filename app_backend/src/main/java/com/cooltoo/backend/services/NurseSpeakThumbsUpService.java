@@ -4,8 +4,6 @@ import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
 import com.cooltoo.backend.converter.NurseSpeakThumbsUpBeanConverter;
 import com.cooltoo.backend.entities.NurseSpeakThumbsUpEntity;
 import com.cooltoo.backend.repository.NurseSpeakThumbsUpRepository;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +29,10 @@ public class NurseSpeakThumbsUpService {
     NurseSpeakThumbsUpBeanConverter beanConverter;
 
     public NurseSpeakThumbsUpBean addSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
-        NurseSpeakThumbsUpEntity thumbsUpEntity = thumbsUpRepository.findNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, thumbsUpUserId);
-        if (null!=thumbsUpEntity) {
+        NurseSpeakThumbsUpEntity thumbsUpEntity = null;
+        List<NurseSpeakThumbsUpEntity> thumbsUpEntitys = thumbsUpRepository.findByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, thumbsUpUserId);
+        if (null!=thumbsUpEntitys && !thumbsUpEntitys.isEmpty()) {
+            thumbsUpEntity = thumbsUpEntitys.get(0);
             thumbsUpRepository.delete(thumbsUpEntity);
         }
         else {
@@ -42,11 +42,14 @@ public class NurseSpeakThumbsUpService {
             thumbsUpEntity.setTime(new Date());
             thumbsUpEntity = thumbsUpRepository.save(thumbsUpEntity);
         }
-        return beanConverter.convert(thumbsUpEntity);
+        NurseSpeakThumbsUpBean bean = beanConverter.convert(thumbsUpEntity);
+        long count = thumbsUpRepository.countByNurseSpeakId(nurseSpeakId);
+        bean.setSpeakThumbsUpCount(count);
+        return bean;
     }
 
     public List<NurseSpeakThumbsUpBean> getSpeakThumbsUpByNurseSpeakId(long nurseSpeakId) {
-        List<NurseSpeakThumbsUpEntity> thumbsUpEntities = thumbsUpRepository.findNurseSpeakThumbsUpByNurseSpeakId(nurseSpeakId);
+        List<NurseSpeakThumbsUpEntity> thumbsUpEntities = thumbsUpRepository.findUpByNurseSpeakId(nurseSpeakId);
         List<NurseSpeakThumbsUpBean> thumbsUpBeans = new ArrayList<NurseSpeakThumbsUpBean>();
         for (NurseSpeakThumbsUpEntity thumbsUpEntity : thumbsUpEntities) {
             NurseSpeakThumbsUpBean thumbsUpBean = beanConverter.convert(thumbsUpEntity);
@@ -62,7 +65,7 @@ public class NurseSpeakThumbsUpService {
 
         // get speak thumbsup
         Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "time"));
-        List<NurseSpeakThumbsUpEntity> thumbsUpEntities = thumbsUpRepository.findThumbsUpByNurseSpeakIdIn(nurseSpeakIds, sort);
+        List<NurseSpeakThumbsUpEntity> thumbsUpEntities = thumbsUpRepository.findByNurseSpeakIdIn(nurseSpeakIds, sort);
         List<NurseSpeakThumbsUpBean> thumbsUpBeans = new ArrayList<NurseSpeakThumbsUpBean>();
         for (NurseSpeakThumbsUpEntity thumbsUpEntity : thumbsUpEntities) {
             NurseSpeakThumbsUpBean thumbsUpBean = beanConverter.convert(thumbsUpEntity);
@@ -72,11 +75,11 @@ public class NurseSpeakThumbsUpService {
     }
 
     public NurseSpeakThumbsUpBean findNurseSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
-        NurseSpeakThumbsUpEntity thumbsUpEntity = thumbsUpRepository.findNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, thumbsUpUserId);
-        if (null==thumbsUpEntity) {
+        List<NurseSpeakThumbsUpEntity> thumbsUpEntity = thumbsUpRepository.findByNurseSpeakIdAndThumbsUpUserId(nurseSpeakId, thumbsUpUserId);
+        if (null==thumbsUpEntity || thumbsUpEntity.isEmpty()) {
             logger.info("the user {} not thumbs up the speak {} content.", thumbsUpUserId, nurseSpeakId);
             return null;
         }
-        return beanConverter.convert(thumbsUpEntity);
+        return beanConverter.convert(thumbsUpEntity.get(0));
     }
 }

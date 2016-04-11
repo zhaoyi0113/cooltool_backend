@@ -7,8 +7,6 @@ import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.SpeakType;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -210,7 +208,7 @@ public class NurseSpeakAPI {
             @FormParam("nurseSpeakId") long nurseSpeakId
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseSpeakThumbsUpBean thumbsUpBean = speakService.addNurseSpeakThumbsUp(nurseSpeakId, userId);
+        NurseSpeakThumbsUpBean thumbsUpBean = speakService.setNurseSpeakThumbsUp(nurseSpeakId, userId);
         return Response.ok(thumbsUpBean).build();
     }
 }

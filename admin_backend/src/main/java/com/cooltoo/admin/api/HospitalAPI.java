@@ -6,7 +6,9 @@ import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -30,6 +32,31 @@ public class HospitalAPI {
     public Response getAll() {
         List<HospitalBean> all = service.getAll();
         return Response.ok(all).build();
+    }
+
+    @Path("/count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getAllCount(@Context HttpServletRequest request) {
+        logger.info("get all hospital count");
+        long count = service.getHospitalSize();
+        logger.info("get all hospital count is {}", count);
+        return Response.ok(count).build();
+    }
+
+    @Path("/{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getAllByPage(@Context HttpServletRequest request,
+                                 @PathParam("index") int index,
+                                 @PathParam("number") int number
+    ) {
+        logger.info("get hospital at page {} numberOfPage {}", index, number);
+        List<HospitalBean> page = service.getAllByPage(index, number);
+        logger.info("get hospital at page {} numberOfPage {}, value is {}", index, number, page);
+        return Response.ok(page).build();
     }
 
     @Path("/{id}")

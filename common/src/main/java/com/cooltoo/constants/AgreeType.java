@@ -10,6 +10,10 @@ public enum AgreeType {
     , ACCESS_ZONE_DENY //拒绝访问空间
     ;
 
+
+    public static final String WAIT_FOR_FRIEND_AGREE ="WaitingForFriendAgree";
+    public static final String WAIT_FOR_MY_AGREE     ="WaitingForMyAgree";
+
     public static AgreeType parseString(String agreeType) {
         if (WAITING.name().equalsIgnoreCase(agreeType)) {
             return WAITING;

@@ -341,7 +341,7 @@ public class NurseSpeakService {
     //=======================================================
 
     @Transactional
-    public NurseSpeakThumbsUpBean addNurseSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
+    public NurseSpeakThumbsUpBean setNurseSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
         NurseSpeakEntity speakEntity = speakRepository.findOne(nurseSpeakId);
         if (null==speakEntity) {
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_NOT_EXIST);

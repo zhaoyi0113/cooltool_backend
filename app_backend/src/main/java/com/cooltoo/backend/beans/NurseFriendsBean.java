@@ -13,6 +13,7 @@ public class NurseFriendsBean {
     private long friendId;
     private AgreeType isAgreed;
     private Date dateTime;
+    private String waitFor;
     private String headPhotoUrl;
     private String friendName;
     private boolean isFriend;
@@ -39,6 +40,14 @@ public class NurseFriendsBean {
 
     public void setFriendId(long friendId) {
         this.friendId = friendId;
+    }
+
+    public String getWaitFor() {
+        return this.waitFor;
+    }
+
+    public void setWaitFor(String waitFor) {
+        this.waitFor = waitFor;
     }
 
     public AgreeType getIsAgreed() {
