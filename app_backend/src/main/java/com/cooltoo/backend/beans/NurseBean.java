@@ -1,8 +1,8 @@
 package com.cooltoo.backend.beans;
 
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.UserAuthority;
 
-import javax.ws.rs.FormParam;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,29 +18,16 @@ public class NurseBean {
     public static final String SPEAK_COUNT = "speak_count";
     public static final String ABILITY_COUNT = "skill_count";
 
-    @FormParam("id")
     private long id;
-
-    @FormParam("name")
     private String name;
-
-    @FormParam("gender")
     private GenderType gender;
-
-    @FormParam("mobile")
     private String mobile;
-
-    @FormParam("age")
     private int age;
-
     private int integral;
-
     private String realName;
-
     private String identification;
-
     private String shortNote;
-
+    private UserAuthority authority;
     private String password;
     private String profilePhotoUrl;
     private String backgroundImageUrl;
@@ -174,6 +161,14 @@ public class NurseBean {
 
     public void setShortNote(String shortNote) {
         this.shortNote = shortNote;
+    }
+
+    public UserAuthority getAuthority() {
+        return this.authority;
+    }
+
+    public void setAuthority(UserAuthority authority) {
+        this.authority = authority;
     }
 
     public String toString() {

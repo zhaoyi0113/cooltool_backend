@@ -103,7 +103,7 @@ public class SuggestionService {
             ids.add(bean.getUserId());
         }
 
-        users = nurseRepository.findNurseByIdIn(ids);
+        users = nurseRepository.findByIdIn(ids);
         if (null!=users) {
             for (SuggestionBean bean : suggestionsB) {
                 for (NurseEntity user : users) {

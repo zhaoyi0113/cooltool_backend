@@ -63,6 +63,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(SuggestionManageAPI.class);
         register(TagsServiceAPI.class);
         register(NurseTagsServiceAPI.class);
+        register(NurseManageAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 

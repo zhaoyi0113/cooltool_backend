@@ -13,6 +13,7 @@ import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,29 +35,58 @@ public class NurseSpeakService {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseSpeakService.class.getName());
 
-    @Autowired
-    private NurseRepository nurseRepository;
-
-    @Autowired
-    private NurseSpeakRepository speakRepository;
-
-    @Autowired
-    private NurseSpeakConverter speakConverter;
-
+    @Autowired private NurseRepository nurseRepository;
+    @Autowired private NurseSpeakRepository speakRepository;
+    @Autowired private NurseSpeakConverter speakConverter;
+    @Autowired private NurseSpeakCommentService speakCommentService;
+    @Autowired private NurseSpeakThumbsUpService thumbsUpService;
+    @Autowired private SpeakTypeService speakTypeService;
     @Autowired
     @Qualifier("StorageService")
     private StorageService storageService;
 
-    @Autowired
-    private NurseSpeakCommentService speakCommentService;
+    //===============================================================
+    //             get
+    //===============================================================
 
-    @Autowired
-    private NurseSpeakThumbsUpService thumbsUpService;
+    public long countByUserId(long userId){
+        logger.info("get nurse {} speak count", userId);
+        long count = speakRepository.countByUserId(userId);
+        logger.info("get nurse {} speak count {}", userId, count);
+        return count;
+    }
 
-    @Autowired
-    private SpeakTypeService speakTypeService;
+    public Map<Long, Long> countByUserIds(String strUserIds){
+        logger.info("get nurse {} speak count", strUserIds);
+        if (VerifyUtil.isOccupationSkillIds(strUserIds)) {
+            String[]   strIds  = strUserIds.split(",");
+            List<Long> userIds = new ArrayList<>();
+            for (String id : strIds) {
+                long tmpId = Long.parseLong(id);
+                userIds.add(tmpId);
+            }
+            return countByUserIds(userIds);
+        }
+        return new HashMap<>();
+    }
 
-    public long countNurseSpeakByType(long userId, String speakType) {
+    public Map<Long, Long> countByUserIds(List<Long> userIds){
+        if (null==userIds || userIds.isEmpty()) {
+            return new HashMap<>();
+        }
+        logger.info("get nurse {} speak count", userIds);
+        List<Object[]>  count  = speakRepository.countByUserIdIn(userIds);
+        Map<Long, Long> id2num = new HashMap<>();
+        for(int i=0; i<count.size(); i++) {
+            Object[] tmp = count.get(i);
+            logger.info("index {} array is {}--{}", i, tmp[0], tmp[1]);
+            id2num.put((Long)tmp[0], (Long)tmp[1]);
+        }
+        logger.info("get nurse {} speak count {}", userIds, count);
+        return id2num;
+    }
+
+    public long countBySpeakByType(long userId, String speakType) {
         logger.info("get nurse speak ("+speakType+") count");
         SpeakType speaktype = SpeakType.parseString(speakType);
         if (null==speaktype) {
@@ -67,7 +97,7 @@ public class NurseSpeakService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        long count = speakRepository.countNurseSpeakByUserIdAndSpeakType(userId, speakTypeBean.getId());
+        long count = speakRepository.countByUserIdAndSpeakType(userId, speakTypeBean.getId());
         return count;
     }
 
@@ -76,7 +106,7 @@ public class NurseSpeakService {
 
         // get speaks
         PageRequest request = new PageRequest(index, number, Sort.Direction.DESC, "time");
-        Page<NurseSpeakEntity> speaks = speakRepository.findNurseSpeakByUserId(userId, request);
+        Page<NurseSpeakEntity> speaks = speakRepository.findByUserId(userId, request);
 
         // move to cache
         List<NurseSpeakEntity> speakEntities = new ArrayList<NurseSpeakEntity>();
@@ -101,7 +131,7 @@ public class NurseSpeakService {
         Page<NurseSpeakEntity> speaks = null;
         if (null!=speakTypeBean) {
             logger.info("get speak type's speaks. type is {}", speakTypeBean);
-            speaks = speakRepository.findNurseSpeakBySpeakType(speakTypeBean.getId(), pagable);
+            speaks = speakRepository.findBySpeakType(speakTypeBean.getId(), pagable);
         }
         else {
             logger.info("get all speak type's speaks");
@@ -132,7 +162,7 @@ public class NurseSpeakService {
 
         // get speaks
         PageRequest pagable = new PageRequest(index, number, Sort.Direction.DESC, "time");
-        Page<NurseSpeakEntity> speaks = speakRepository.findNurseSpeakByUserIdAndSpeakType(userId, speakTypeBean.getId(), pagable);
+        Page<NurseSpeakEntity> speaks = speakRepository.findByUserIdAndSpeakType(userId, speakTypeBean.getId(), pagable);
 
         // move to cache
         List<NurseSpeakEntity> speakEntities = new ArrayList<NurseSpeakEntity>();
@@ -142,6 +172,19 @@ public class NurseSpeakService {
 
         // parse entities to bean
         return parseEntities(userId, speakEntities);
+    }
+
+    public NurseSpeakBean getNurseSpeak(long speakId) {
+        NurseSpeakEntity resultSet = speakRepository.findOne(speakId);
+        NurseSpeakBean   speak     = speakConverter.convert(resultSet);
+        speak.setImageUrl(storageService.getFilePath(speak.getImageId()));
+        List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speak.getId());
+        speak.setComments(comments);
+        speak.setCommentsCount(comments.size());
+        List<NurseSpeakThumbsUpBean> thumbsUps = thumbsUpService.getSpeakThumbsUpByNurseSpeakId(speakId);
+        speak.setThumbsUps(thumbsUps);
+        speak.setThumbsUpsCount(thumbsUps.size());
+        return speak;
     }
 
     private List<NurseSpeakBean> parseEntities(long userId, List<NurseSpeakEntity> entities) {
@@ -157,7 +200,7 @@ public class NurseSpeakService {
             for(NurseSpeakEntity entity: entities){
                 userIds.add(entity.getUserId());
             }
-            Iterable<NurseEntity> all = nurseRepository.findNurseByIdIn(userIds);
+            Iterable<NurseEntity> all = nurseRepository.findByIdIn(userIds);
             for (NurseEntity user : all) {
                 userId2Name.put(user.getId(), user.getName());
                 userId2FileId.put(user.getId(), user.getProfilePhotoId());
@@ -239,18 +282,10 @@ public class NurseSpeakService {
         return speakBeans;
     }
 
-    public NurseSpeakBean getNurseSpeak(long id) {
-        NurseSpeakEntity entity = speakRepository.findOne(id);
-        NurseSpeakBean speakBean = speakConverter.convert(entity);
-        speakBean.setImageUrl(storageService.getFilePath(entity.getImageId()));
-        List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speakBean.getId());
-        speakBean.setComments(comments);
-        speakBean.setCommentsCount(comments.size());
-        List<NurseSpeakThumbsUpBean> thumbsUps = thumbsUpService.getSpeakThumbsUpByNurseSpeakId(id);
-        speakBean.setThumbsUps(thumbsUps);
-        speakBean.setThumbsUpsCount(thumbsUps.size());
-        return speakBean;
-    }
+
+    //===============================================================
+    //             add
+    //===============================================================
 
     public NurseSpeakBean addSmug(long userId, String content, String fileName, InputStream fileInputStream) {
         logger.info("add SMUG : userId=" + userId + " content="+content+" fileName="+fileName);
@@ -317,10 +352,6 @@ public class NurseSpeakService {
         }
 
         return bean;
-    }
-
-    public long getNurseSpeakCount(long userId){
-        return speakRepository.countNurseSpeakByUserId(userId);
     }
 
 

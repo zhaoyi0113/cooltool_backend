@@ -1,8 +1,11 @@
 package com.cooltoo.backend.filter;
 
+import com.cooltoo.backend.entities.NurseEntity;
+import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.HeaderKeys;
 import com.cooltoo.backend.entities.TokenAccessEntity;
+import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.TokenAccessRepository;
@@ -30,12 +33,12 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
 
     @Context
     private HttpServletRequest servletRequest;
-
     @Context
     private ResourceInfo resourceInfo;
-
     @Autowired
     private TokenAccessRepository tokenAccessRepository;
+    @Autowired
+    private NurseRepository nurseRepository;
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -63,6 +66,13 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
                 }
                 long userId = tokenEntities.get(0).getUserId();
                 logger.info("get user id "+userId);
+                NurseEntity nurseEntity = nurseRepository.findOne(userId);
+                if (null==nurseEntity) {
+                    throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+                }
+                if (UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
+                    throw new BadRequestException(ErrorCode.NOT_PERMITTED);
+                }
                 requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, userId);
             }
         }

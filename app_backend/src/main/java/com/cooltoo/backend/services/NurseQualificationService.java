@@ -212,7 +212,7 @@ public class NurseQualificationService {
             qulfIds.add(qualification.getId());
         }
 
-        List<NurseEntity>                           nurses          = nurseRepository.findNurseByIdIn(userIds);
+        List<NurseEntity>                           nurses          = nurseRepository.findByIdIn(userIds);
         List<NurseHospitalRelationBean>             hospitals       = hospitalRelationService.getRelationByNurseIds(userIds);
         Map<Long, NurseEntity>                      userId2Bean     = new HashMap<>();
         Map<Long, NurseHospitalRelationBean>        userId2Hospital = new HashMap<>();

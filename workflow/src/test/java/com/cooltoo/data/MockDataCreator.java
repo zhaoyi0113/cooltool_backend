@@ -1,9 +1,6 @@
 package com.cooltoo.data;
 
-import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.Application;
-import com.cooltoo.backend.beans.NurseFriendsBean;
-import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.TokenAccessEntity;
 import com.cooltoo.backend.repository.NurseRepository;
@@ -13,7 +10,6 @@ import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.GenderType;
-import com.cooltoo.constants.SpeakType;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -103,7 +99,7 @@ public class MockDataCreator  {
                         String fileName = "background" + getRandomInt(0, 10) + ".jpg";
                         InputStream inputStream = getResourceAsStream("/com/cooltoo/data/background/" + fileName);
 
-                        nurseService.addBackgroundImage(b.getId(), fileName, inputStream);
+                        nurseService.updateBackgroundImage(b.getId(), fileName, inputStream);
                         try {
                             inputStream.close();
                         } catch (IOException e) {
@@ -111,7 +107,7 @@ public class MockDataCreator  {
                         }
                         fileName = "head" + getRandomInt(0, 11) + ".jpg";
                         inputStream = getResourceAsStream("/com/cooltoo/data/heads/" + fileName);
-                        nurseService.addHeadPhoto(b.getId(), fileName, inputStream);
+                        nurseService.updateHeadPhoto(b.getId(), fileName, inputStream);
                         try {
                             inputStream.close();
                         } catch (IOException e) {
@@ -141,8 +137,8 @@ public class MockDataCreator  {
 
 
     private NurseEntity saveNurse(NurseEntity entity) {
-        List<NurseEntity> found = nurseRepository.findNurseByMobile(entity.getMobile());
-        List<NurseEntity> nurseByName = nurseRepository.findNurseByName(entity.getName());
+        List<NurseEntity> found = nurseRepository.findByMobile(entity.getMobile());
+        List<NurseEntity> nurseByName = nurseRepository.findByName(entity.getName());
         if (found.isEmpty() && nurseByName.isEmpty()) {
             logger.info("create nurse " + entity.getMobile());
             entity = nurseRepository.save(entity);

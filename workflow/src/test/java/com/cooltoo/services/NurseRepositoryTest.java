@@ -23,11 +23,11 @@ public class NurseRepositoryTest extends AbstractCooltooTest {
 
     @Test
     public void testSearchName(){
-        List<NurseEntity> entities = nurseRepository.findNurseByNameContaining("name");
+        List<NurseEntity> entities = nurseRepository.findByNameContaining("name");
         Assert.assertEquals(17, entities.size());
-        entities = nurseRepository.findNurseByNameContaining("name1");
+        entities = nurseRepository.findByNameContaining("name1");
         Assert.assertEquals(9, entities.size());
-        entities = nurseRepository.findNurseByNameContaining("e7");
+        entities = nurseRepository.findByNameContaining("e7");
         Assert.assertEquals(1, entities.size());
     }
 }

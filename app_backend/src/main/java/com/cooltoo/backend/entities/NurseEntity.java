@@ -1,6 +1,8 @@
 package com.cooltoo.backend.entities;
 
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.UserAuthority;
+import springfox.petstore.repository.UserRepository;
 
 import javax.persistence.*;
 
@@ -12,29 +14,19 @@ import javax.persistence.*;
 public class NurseEntity {
 
     private long id;
-
     private GenderType gender;
-
     private String name;
-
     private String mobile;
-
     private int age;
-
     private String password;
-
     private long profilePhotoId;
-
     private long backgroundImageId;
-
     //用户积分
     private int integral;
-
     private String realName;
-
     private String identification;
-
     private String shortNote;
+    private UserAuthority authority;
 
     @Id
     @GeneratedValue
@@ -128,6 +120,15 @@ public class NurseEntity {
 
     public void setShortNote(String shortNote) {
         this.shortNote = shortNote;
+    }
+
+    @Column(name = "authority")
+    public UserAuthority getAuthority() {
+        return this.authority;
+    }
+
+    public void setAuthority(UserAuthority authority) {
+        this.authority = authority;
     }
 
     public String toString() {

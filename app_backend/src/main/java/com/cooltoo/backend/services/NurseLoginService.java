@@ -41,7 +41,7 @@ public class NurseLoginService {
     @Transactional
     public TokenAccessEntity login(String mobile, String password){
         logger.info("login "+ mobile +", password:"+password);
-        List<NurseEntity> nurses = nurseRepository.findNurseByMobile(mobile);
+        List<NurseEntity> nurses = nurseRepository.findByMobile(mobile);
         if(nurses == null || nurses.isEmpty()){
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }

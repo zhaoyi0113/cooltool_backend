@@ -31,6 +31,7 @@ public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
         bean.setRealName(entity.getRealName());
         bean.setIdentification(entity.getIdentification());
         bean.setShortNote(entity.getShortNote());
+        bean.setAuthority(entity.getAuthority());
 
         bean.setBackgroundImageUrl(storageService.getFilePath(entity.getBackgroundImageId()));
         bean.setProfilePhotoUrl(storageService.getFilePath(entity.getProfilePhotoId()));

@@ -1,25 +1,17 @@
 package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.beans.NurseBean;
-import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.constants.WorkFileType;
-import com.cooltoo.util.VerifyUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.io.InputStream;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,14 +25,6 @@ public class NurseAPI {
 
     @Autowired
     NurseService service;
-
-    @GET
-    @LoginAuthentication(requireNurseLogin = true)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllNurses() {
-        List<NurseBean> all = service.getAll();
-        return Response.ok(all).build();
-    }
 
     @POST
     @Path("/register")
@@ -67,7 +51,7 @@ public class NurseAPI {
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition disposition) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        String path = service.addHeadPhoto(userId, fileName, fileInputStream);
+        String path = service.updateHeadPhoto(userId, fileName, fileInputStream);
         logger.info("upload successfully");
         return Response.ok(path).build();
     }
@@ -82,7 +66,7 @@ public class NurseAPI {
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition disposition) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        String path = service.addBackgroundImage(userId, fileName, fileInputStream);
+        String path = service.updateBackgroundImage(userId, fileName, fileInputStream);
         logger.info("return background path "+path);
         return Response.ok(path).build();
     }
@@ -203,7 +187,7 @@ public class NurseAPI {
     public Response setShortNote(@Context HttpServletRequest request,
                                  @FormParam("short_note") String shortNote) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseBean one = service.setShortNote(userId, shortNote);
+        NurseBean one = service.updateShortNote(userId, shortNote);
         logger.info("set short note " + one);
         if (null == one) {
             return Response.ok().build();
@@ -220,7 +204,7 @@ public class NurseAPI {
                                                  @FormParam("identification") String identification
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseBean one = service.setRealNameAndIdentification(userId, realName, identification);
+        NurseBean one = service.updateRealNameAndIdentification(userId, realName, identification);
         logger.info("set real name and identification " + one);
         if (null == one) {
             return Response.ok().build();

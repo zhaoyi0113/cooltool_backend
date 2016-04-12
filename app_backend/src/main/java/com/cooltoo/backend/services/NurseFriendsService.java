@@ -232,7 +232,7 @@ public class NurseFriendsService {
             friendIds.add(searchFriendB.getFriendId());
         }
 
-        List<NurseEntity> friendExist = nurseRepository.findNurseByIdIn(friendIds);
+        List<NurseEntity> friendExist = nurseRepository.findByIdIn(friendIds);
         boolean exist = false;
         for (int i=0, count=searchFriendsB.size(); i < count; i ++) {
             exist = false;
@@ -374,7 +374,7 @@ public class NurseFriendsService {
             friendIds.add(bean.getFriendId());
         }
 
-        nurses = nurseRepository.findNurseByIdIn(friendIds);
+        nurses = nurseRepository.findByIdIn(friendIds);
         for (NurseEntity nurse : nurses) {
             imageIds.add(nurse.getProfilePhotoId());
         }

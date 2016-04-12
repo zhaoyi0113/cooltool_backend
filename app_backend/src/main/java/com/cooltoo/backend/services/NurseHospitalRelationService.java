@@ -103,6 +103,17 @@ public class NurseHospitalRelationService {
         return relations;
     }
 
+    public Map<Long, NurseHospitalRelationBean> getRelationMapByNurseIds(List<Long> nurseIds) {
+        logger.info("get one nurse-hospital-department relationship information by nurseIds={}", nurseIds);
+
+        Map<Long, NurseHospitalRelationBean> userId2Hospital = new HashMap<>();
+        List<NurseHospitalRelationBean>      relations       = getRelationByNurseIds(nurseIds);
+        for (NurseHospitalRelationBean result : relations) {
+            userId2Hospital.put(result.getNurseId(), result);
+        }
+        return userId2Hospital;
+    }
+
     private void fillOtherProperties(List<NurseHospitalRelationBean> relationBeans) {
         if (null==relationBeans || relationBeans.isEmpty()) {
             return;

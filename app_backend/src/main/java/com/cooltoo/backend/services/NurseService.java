@@ -12,6 +12,7 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
@@ -21,12 +22,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lg380357 on 2016/3/2.
@@ -60,6 +67,11 @@ public class NurseService {
     @Autowired
     private NurseHospitalRelationService hospitalRelationService;
 
+
+    //==================================================================
+    //         add
+    //==================================================================
+
     @Transactional
     public long registerNurse(String name, int age,
                               int gender, String mobile, String password, String smsCode) {
@@ -80,15 +92,19 @@ public class NurseService {
         if (VerifyUtil.isStringEmpty(entity.getMobile()) || VerifyUtil.isStringEmpty(entity.getPassword())){
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if(!repository.findNurseByMobile(bean.getMobile()).isEmpty()){
+        if(!repository.findByMobile(bean.getMobile()).isEmpty()){
             throw new BadRequestException(ErrorCode.NURSE_ALREADY_EXISTED);
         }
         entity = repository.save(entity);
         return entity.getId();
     }
 
+    //==================================================================
+    //         get
+    //==================================================================
+
     public NurseBean getNurse(String mobile) {
-        List<NurseEntity> nurses = repository.findNurseByMobile(mobile);
+        List<NurseEntity> nurses = repository.findByMobile(mobile);
         if (null!=nurses && !nurses.isEmpty() && nurses.size()==1) {
             NurseEntity nurseE = nurses.get(0);
             return beanConverter.convert(nurseE);
@@ -97,20 +113,20 @@ public class NurseService {
         throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
 
-    public NurseBean getNurse(long id) {
-        NurseEntity entity = repository.findOne(id);
+    public NurseBean getNurse(long userId) {
+        NurseEntity entity = repository.findOne(userId);
         if (null == entity) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
         NurseBean nurse = beanConverter.convert(entity);
-        int friendsCount = friendsService.getFriendsCount(id);
+        int friendsCount = friendsService.getFriendsCount(userId);
         nurse.setProperty(NurseBean.FRIENDS_COUNT, friendsCount);
-        List<HospitalEntity> nurseHospitals = hospitalRepository.getNurseHospitals(id);
+        List<HospitalEntity> nurseHospitals = hospitalRepository.getNurseHospitals(userId);
         if(!nurseHospitals.isEmpty()){
             nurse.setHospital(nurseHospitals.get(0).getName());
         }
         try {
-            NurseHospitalRelationBean relation = hospitalRelationService.getRelationByNurseId(id);
+            NurseHospitalRelationBean relation = hospitalRelationService.getRelationByNurseId(userId);
             if (null != relation) {
                 nurse.setProperty(NurseBean.HOSPITAL_DEPARTMENT, relation);
             }
@@ -118,42 +134,113 @@ public class NurseService {
         catch (Exception ex) {
         }
         // add speak count
-        long speakCount = speakService.getNurseSpeakCount(id);
+        long speakCount = speakService.countByUserId(userId);
         nurse.setProperty(NurseBean.SPEAK_COUNT, speakCount);
         // add skill nominated count
-        List<SocialAbilitiesBean> norminated = this.abilitiesService.getUserAllTypeAbilites(id);
+        List<SocialAbilitiesBean> norminated = this.abilitiesService.getUserAllTypeAbilites(userId);
         nurse.setProperty(NurseBean.ABILITY_COUNT, null==norminated ? 0 : norminated.size());
         // get nurse's qualification
-        List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(id);
+        List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(userId);
         if (null!=qualifications && !qualifications.isEmpty()) {
             nurse.setProperty(NurseBean.QUALIFICATION, qualifications.get(0));
         }
         return nurse;
     }
 
-    public List<NurseBean> getAll() {
-        Iterable<NurseEntity> all = repository.findAll();
+    //==============================================================
+    //             get used by administrator
+    //==============================================================
+
+    public long countByAuthority(String strAuthority) {
+        logger.info("get nurse count by authority={}", strAuthority);
+        if ("ALL".equalsIgnoreCase(strAuthority)) {
+            return repository.count();
+        }
+        UserAuthority authority = UserAuthority.parseString(strAuthority);
+        if (null==authority) {
+            return 0;
+        }
+        return repository.countByAuthority(authority);
+    }
+
+    public List<NurseBean> getAllByAuthority(String strAuthority, int pageIndex, int number) {
+        logger.info("get nurse by authority={} at page {} with number {}", strAuthority, pageIndex, number);
+        PageRequest       page      = new PageRequest(pageIndex, number, Sort.Direction.DESC, "id");
+
+        // get nuser by authority
+        Page<NurseEntity> resultSet = null;
+        if ("ALL".equalsIgnoreCase(strAuthority)) {
+            resultSet = repository.findAll(page);
+        }
+        else {
+            UserAuthority authority = UserAuthority.parseString(strAuthority);
+            if (null == authority) {
+                return new ArrayList<>();
+            }
+            resultSet = repository.findByAuthority(authority, page);
+        }
+
+        // parse to bean
         List<NurseBean> beanList = new ArrayList<NurseBean>();
-        for (NurseEntity entity : all) {
+        for (NurseEntity entity : resultSet) {
             NurseBean bean = beanConverter.convert(entity);
             beanList.add(bean);
         }
+
+        // fill other information
+        fillOtherProperties(beanList);
         return beanList;
     }
 
+    private void fillOtherProperties(List<NurseBean> nurses) {
+        if (null==nurses || nurses.isEmpty()) {
+            return;
+        }
+
+        List<Long> userIds = new ArrayList<>();
+        for (NurseBean bean :nurses) {
+            userIds.add(bean.getId());
+        }
+
+        try {
+            Map<Long, NurseHospitalRelationBean> hospitals  = hospitalRelationService.getRelationMapByNurseIds(userIds);
+            Map<Long, Long>                      speakCount = speakService.countByUserIds(userIds);
+            for (NurseBean bean : nurses) {
+                NurseHospitalRelationBean hospital = hospitals.get(bean.getId());
+                Long speakNum = speakCount.get(bean.getId());
+                speakNum = null == speakNum ? 0L : speakNum;
+                bean.setProperty(NurseBean.SPEAK_COUNT, speakNum);
+                if (null != hospital) {
+                    bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospital);
+                }
+            }
+        }
+        catch (Exception ex) {
+            logger.warn("fill nurse other information throw exception {}", ex);
+        }
+    }
+
+    //==================================================================
+    //         delete
+    //==================================================================
+
     @Transactional
-    public NurseBean deleteNurse(long id) {
-        NurseEntity entity = repository.findOne(id);
+    public NurseBean deleteNurse(long userId) {
+        NurseEntity entity = repository.findOne(userId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
-        repository.delete(id);
+        repository.delete(userId);
         return beanConverter.convert(entity);
     }
 
+    //==================================================================
+    //         update
+    //==================================================================
+
     @Transactional
-    public NurseBean updateNurse(long id, String name, int age, int gender) {
-        NurseEntity entity = repository.findOne(id);
+    public NurseBean updateNurse(long userId, String name, int age, int gender) {
+        NurseEntity entity = repository.findOne(userId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
@@ -178,9 +265,9 @@ public class NurseService {
     }
 
     @Transactional
-    public String addHeadPhoto(long id, String fileName, InputStream inputStream){
-        logger.info("add head photo for user "+id+", fileName="+fileName);
-        NurseEntity nurse = repository.findOne(id);
+    public String updateHeadPhoto(long userId, String fileName, InputStream inputStream){
+        logger.info("add head photo for user "+userId+", fileName="+fileName);
+        NurseEntity nurse = repository.findOne(userId);
         long fileId = 0;
         try {
             fileId = storageService.saveFile(nurse.getProfilePhotoId(), fileName, inputStream);
@@ -197,8 +284,8 @@ public class NurseService {
     }
 
     @Transactional
-    public String addBackgroundImage(long id, String fileName, InputStream inputStream){
-        NurseEntity nurse = repository.findOne(id);
+    public String updateBackgroundImage(long userId, String fileName, InputStream inputStream){
+        NurseEntity nurse = repository.findOne(userId);
         long fileId = 0;
         try {
             fileId = storageService.saveFile(nurse.getBackgroundImageId(), fileName, inputStream);
@@ -215,9 +302,9 @@ public class NurseService {
     }
 
     @Transactional
-    public NurseBean setRealNameAndIdentification(long id, String realName, String identification) {
+    public NurseBean updateRealNameAndIdentification(long userId, String realName, String identification) {
         boolean changed = false;
-        NurseEntity nurse = repository.findOne(id);
+        NurseEntity nurse = repository.findOne(userId);
         if (null==nurse) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
@@ -238,8 +325,8 @@ public class NurseService {
     }
 
     @Transactional
-    public NurseBean setShortNote(long id, String shortNote) {
-        NurseEntity nurse = repository.findOne(id);
+    public NurseBean updateShortNote(long userId, String shortNote) {
+        NurseEntity nurse = repository.findOne(userId);
         if (null==nurse) {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
@@ -253,16 +340,16 @@ public class NurseService {
     }
 
     @Transactional
-    public NurseBean updateMobilePassword(long id, String smsCode, String mobile, String newMobile, String password, String newPassword) {
+    public NurseBean updateMobilePassword(long userId, String smsCode, String mobile, String newMobile, String password, String newPassword) {
         logger.info("modify the password and mobile : [smsCode"+smsCode+", mobile=" +mobile+ ", newMobile="+newMobile+", password="+password+", newPassword="+newPassword+"]");
 
         NurseBean nurse = null;
-        if (repository.exists(id)) {
-            nurse = getNurse(id);
+        if (repository.exists(userId)) {
+            nurse = getNurse(userId);
         }
         if (null==nurse) {
             nurse = getNurse(mobile);
-            id = nurse.getId();
+            userId = nurse.getId();
         }
         // if not modify the mobile
         if (!VerifyUtil.isStringEmpty(mobile)) {
@@ -297,7 +384,7 @@ public class NurseService {
             newPassword = null;
         }
         NurseBean bean = new NurseBean();
-        bean.setId(id);
+        bean.setId(userId);
         bean.setMobile(newMobile);
         bean.setPassword(newPassword);
         return updateMobilePassword(bean);
@@ -332,5 +419,57 @@ public class NurseService {
             nurseEntity = repository.save(nurseEntity);
         }
         return beanConverter.convert(nurseEntity);
+    }
+
+    @Transactional
+    public NurseBean updateAuthority(long userId, String strAuthority) {
+        logger.info("update nurse {} authority to {}", userId, strAuthority);
+        List<NurseBean> results = updateAuthority(""+userId, strAuthority);
+        if (null==results || results.isEmpty()) {
+            return null;
+        }
+        return results.get(0);
+    }
+
+    @Transactional
+    public List<NurseBean> updateAuthority(String strNurseIds, String strAuthority) {
+        logger.info("update nurse {} 's authority property to {}", strNurseIds, strAuthority);
+
+        // check parameters
+        UserAuthority authority = UserAuthority.parseString(strAuthority);
+        if (null==authority) {
+            logger.error("authority is not valid");
+            return new ArrayList<>();
+        }
+        if (!VerifyUtil.isOccupationSkillIds(strNurseIds)) {
+            logger.error("nurse ids is not valid");
+            return new ArrayList<>();
+        }
+
+        // get ids
+        String[]   strArray = strNurseIds.split(",");
+        List<Long> nurseIds = new ArrayList<>();
+        for (String tmp : strArray) {
+            long id = Long.parseLong(tmp);
+            nurseIds.add(id);
+        }
+
+        // get nurses
+        List<NurseEntity> nurses = repository.findByIdIn(nurseIds);
+        if (null==nurses) {
+            return new ArrayList<>();
+        }
+        for (NurseEntity nurse : nurses) {
+            nurse.setAuthority(authority);
+        }
+        Iterable        resultSet = repository.save(nurses);
+        List<NurseBean> results   = new ArrayList<NurseBean>();
+        for (Object obj : resultSet) {
+            if (obj instanceof NurseEntity) {
+                NurseBean bean = beanConverter.convert(((NurseEntity)obj));
+                results.add(bean);
+            }
+        }
+        return results;
     }
 }

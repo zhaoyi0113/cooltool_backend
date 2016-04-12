@@ -3,6 +3,7 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
@@ -58,13 +59,13 @@ public class NurseServiceTest extends AbstractCooltooTest {
         bean.setPassword("password");
         long id = service.registerNurse(bean);
         Assert.assertTrue(id>0);
-        List<NurseBean> all = service.getAll();
+        List<NurseBean> all = service.getAllByAuthority("all", 0, 100);
         Assert.assertTrue(all.size()>0);
     }
 
     @Test
     public void testGetAll(){
-        List<NurseBean> all = service.getAll();
+        List<NurseBean> all = service.getAllByAuthority("all", 0, 100);
         Assert.assertEquals(17, all.size());
     }
 
@@ -100,7 +101,7 @@ public class NurseServiceTest extends AbstractCooltooTest {
             File file = new File(filePath);
             file.createNewFile();
             InputStream input = new FileInputStream(filePath);
-            service.addHeadPhoto(1, file.getName(), input);
+            service.updateHeadPhoto(1, file.getName(), input);
             NurseEntity nurse = nurseRepository.findOne(1l);
             FileStorageEntity fileStorage = fileStorageRepository.findOne(nurse.getProfilePhotoId());
             Assert.assertNotNull(fileStorage);
@@ -117,7 +118,7 @@ public class NurseServiceTest extends AbstractCooltooTest {
             File file = new File(filePath);
             file.createNewFile();
             InputStream input = new FileInputStream(filePath);
-            service.addBackgroundImage(1, file.getName(), input);
+            service.updateBackgroundImage(1, file.getName(), input);
             NurseEntity nurse = nurseRepository.findOne(1l);
             FileStorageEntity fileStorage = fileStorageRepository.findOne(nurse.getBackgroundImageId());
             Assert.assertNotNull(fileStorage);
@@ -133,7 +134,7 @@ public class NurseServiceTest extends AbstractCooltooTest {
         String identifi = "123456198404044561";
         NurseBean bean = service.getNurse(1);
         logger.info(bean.toString());
-        service.setRealNameAndIdentification(bean.getId(), realname, identifi);
+        service.updateRealNameAndIdentification(bean.getId(), realname, identifi);
         bean = service.getNurse(1);
         logger.info(bean.toString());
         Assert.assertEquals(realname, bean.getRealName());
@@ -169,9 +170,33 @@ public class NurseServiceTest extends AbstractCooltooTest {
         NurseBean bean2 = service.getNurse(1);
         bean2.setId(bean1.getId());
         bean2.setShortNote(shortNote);
-        bean2 = service.setShortNote(bean2.getId(), bean2.getShortNote());
+        bean2 = service.updateShortNote(bean2.getId(), bean2.getShortNote());
 
         Assert.assertEquals(shortNote, bean2.getShortNote());
         Assert.assertEquals(bean1.getId(), bean2.getId());
+    }
+
+    @Test
+    public void testCountNurse() {
+        long count = service.countByAuthority("all");
+        Assert.assertEquals(17, count);
+
+        count = service.countByAuthority(UserAuthority.AGREE_ALL.name());
+        Assert.assertEquals(9, count);
+
+        count = service.countByAuthority(UserAuthority.DENY_ALL.name());
+        Assert.assertEquals(8, count);
+    }
+
+    @Test
+    public void testGetNurseByAuthority() {
+        List<NurseBean> count = service.getAllByAuthority("all", 0, 30);
+        Assert.assertEquals(17, count.size());
+
+        count = service.getAllByAuthority(UserAuthority.AGREE_ALL.name(), 0, 30);
+        Assert.assertEquals(9, count.size());
+
+        count = service.getAllByAuthority(UserAuthority.DENY_ALL.name(), 0, 30);
+        Assert.assertEquals(8, count.size());
     }
 }

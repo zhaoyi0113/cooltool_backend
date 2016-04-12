@@ -6,6 +6,7 @@ import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +25,14 @@ import org.slf4j.LoggerFactory;
  * Created by yzzhao on 3/15/16.
  */
 @Transactional
+@DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/speak_type_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_thumbs_up_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_comment_service_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/file_storage_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml"),
+})
 public class NurseSpeakServiceTest extends AbstractCooltooTest{
 
     private static final Logger logger = LoggerFactory.getLogger(NurseSpeakServiceTest.class.getName());
@@ -30,7 +41,6 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     private NurseSpeakService speakService;
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
     public void testGetNurseSpeak(){
         List<NurseSpeakBean> nurseSpeak = speakService.getNurseSpeak(1, 0, 3);
         Assert.assertEquals(3, nurseSpeak.size());
@@ -51,7 +61,6 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
     public void testAddNurseSpeak() {
         String content = "add speak content";
         String fileName = "test.txt";
@@ -83,12 +92,11 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
     public void testGetNurseSpeakById() {
         NurseSpeakBean bean = speakService.getNurseSpeak(3);
         Assert.assertEquals(3, bean.getId());
         Assert.assertEquals(1, bean.getUserId());
-        Assert.assertEquals("hello3", bean.getContent());
+        Assert.assertEquals("hello 3 (@_@)!", bean.getContent());
         Assert.assertNotNull(bean.getTime());
         Assert.assertNotNull(bean.getImageUrl());
         Assert.assertEquals(3, bean.getComments().size());
@@ -96,14 +104,18 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
     public void testGetNurseSpeakCount(){
-        long count = speakService.getNurseSpeakCount(1);
+        long count = speakService.countByUserId(1);
         Assert.assertEquals(11, count);
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
+    public void testGetNurseSpeakCountByUserIds() {
+        Map<Long, Long> id2Count = speakService.countByUserIds("1,2,3");
+        Assert.assertEquals(3, id2Count.size());
+    }
+
+    @Test
     public void testAddNurseSpeakComment() {
         String comment = "Test ping lun";
         Date time = new Date();
@@ -117,7 +129,6 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
     public void testAddNurseSpeakThumbsUp() {
         NurseSpeakThumbsUpBean thumbsUp = null;
         Exception throwable = null;
@@ -144,7 +155,6 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
     public void testGetNurseSpeakByType() {
         long userId = 1L;
         String speakType = SpeakType.SMUG.name();
@@ -168,15 +178,14 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml")
     public void testCountNurseSpeakByType() {
         long userId = 1L;
         String speakType = SpeakType.SMUG.name();
-        long count = speakService.countNurseSpeakByType(userId, speakType);
+        long count = speakService.countBySpeakByType(userId, speakType);
         Assert.assertEquals(11, count);
 
         speakType = SpeakType.ASK_QUESTION.name();
-        count = speakService.countNurseSpeakByType(userId, speakType);
+        count = speakService.countBySpeakByType(userId, speakType);
         Assert.assertEquals(0, count);
     }
 
