@@ -219,8 +219,14 @@ public class NurseFriendsService {
                     }
                 }
                 if (null!=userFriendB) {
-                    searchFriendB.setIsFriend(true);
-                    searchFriendB.setWaitFor(userFriendB.getWaitFor());
+                    if (AgreeType.WAITING.equals(userFriendB.getIsAgreed())) {
+                        searchFriendB.setIsFriend(false);
+                        searchFriendB.setIsAgreed(AgreeType.WAITING);
+                        searchFriendB.setWaitFor(userFriendB.getWaitFor());
+                    }
+                    else {
+                        searchFriendB.setIsFriend(true);
+                    }
                 }
             }
             friendIds.add(searchFriendB.getFriendId());
@@ -324,6 +330,7 @@ public class NurseFriendsService {
                         }
                         else if (AgreeType.WAITING.equals(friendUser.getIsAgreed())){
                             userFriend.setWaitFor(AgreeType.WAIT_FOR_FRIEND_AGREE);
+                            userFriend.setIsAgreed(AgreeType.WAITING);
                         }
                         break;
                     }
