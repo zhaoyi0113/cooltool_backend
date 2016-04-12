@@ -32,7 +32,6 @@ public class NurseManageAPI {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get authority type", userId);
         List<String> allType = UserAuthority.getUserAuthority();
-        allType.add(0, "ALL");
         logger.info("user {} get authority type {}", userId, allType);
         return Response.ok(allType).build();
     }

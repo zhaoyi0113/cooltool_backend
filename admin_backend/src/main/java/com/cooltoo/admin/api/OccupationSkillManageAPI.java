@@ -37,7 +37,6 @@ public class OccupationSkillManageAPI {
     }
 
     @POST
-//    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addOccupationSkill(@FormParam("name") String name,

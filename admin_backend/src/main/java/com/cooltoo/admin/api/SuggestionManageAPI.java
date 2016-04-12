@@ -3,6 +3,7 @@ package com.cooltoo.admin.api;
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.SuggestionBean;
 import com.cooltoo.backend.services.SuggestionService;
+import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.SuggestionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,18 @@ public class SuggestionManageAPI {
 
     @Autowired
     private SuggestionService service;
+
+    @Path("/status_type")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getSuggestionStatusType(@Context HttpServletRequest request) {
+        long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+        logger.info("user {} get suggestion status type", userId);
+        List<String> status = SuggestionStatus.getAllStatus();
+        logger.info("user {} get suggestion all status {}", status);
+        return Response.ok(status).build();
+    }
 
     @Path("/count/{status}")
     @GET

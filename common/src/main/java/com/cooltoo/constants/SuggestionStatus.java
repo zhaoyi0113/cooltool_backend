@@ -1,5 +1,8 @@
 package com.cooltoo.constants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by zhaolisong on 16/4/11.
  */
@@ -16,5 +19,12 @@ public enum SuggestionStatus {
             return READ;
         }
         return null;
+    }
+
+    public static List<String> getAllStatus() {
+        List<String> status = new ArrayList<String>();
+        status.add(UNREAD.name());
+        status.add(READ.name());
+        return status;
     }
 }
