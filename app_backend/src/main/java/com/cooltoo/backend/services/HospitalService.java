@@ -39,6 +39,8 @@ public class HospitalService {
     @Autowired
     private HospitalDepartmentRelationService relationService;
     @Autowired
+    private NurseHospitalRelationService nurseRelationService;
+    @Autowired
     private HospitalBeanConverter beanConverter;
     @Autowired
     private HospitalEntityConverter entityConverter;
@@ -174,8 +176,13 @@ public class HospitalService {
         if (null==entity) {
             throw new BadRequestException(ErrorCode.HOSPITAL_NOT_EXIST);
         }
+
         repository.delete(entity.getId());
-        relationService.deleteByHospitalIds(""+hospitalId);
+        List<Integer> ids = new ArrayList<>();
+        ids.add(hospitalId);
+        relationService.deleteByHospitalIds(ids);
+        nurseRelationService.deleteByHospitalIds(ids);
+
         return beanConverter.convert(entity);
     }
 
@@ -211,6 +218,7 @@ public class HospitalService {
 
         repository.delete(hospitals);
         relationService.deleteByHospitalIds(hospitalIds);
+        nurseRelationService.deleteByHospitalIds(hospitalIds);
 
         List<HospitalBean> retValue = new ArrayList<>();
         for (HospitalEntity tmp : hospitals) {

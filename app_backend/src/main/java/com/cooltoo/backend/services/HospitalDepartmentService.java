@@ -34,6 +34,8 @@ public class HospitalDepartmentService {
     @Autowired
     private HospitalDepartmentRelationService relationService;
     @Autowired
+    private NurseHospitalRelationService nurseRelationService;
+    @Autowired
     @Qualifier("StorageService")
     private StorageService storageService;
     @Autowired
@@ -195,12 +197,18 @@ public class HospitalDepartmentService {
     //        delete department
     //=======================================================
     @Transactional
-    public HospitalDepartmentBean deleteById(Integer id) {
-        HospitalDepartmentEntity entity = repository.findOne(id);
+    public HospitalDepartmentBean deleteById(Integer departmentId) {
+        HospitalDepartmentEntity entity = repository.findOne(departmentId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.HOSPITAL_DEPARTMENT_NOT_EXIST);
         }
-        repository.delete(id);
+        repository.delete(departmentId);
+
+        List<Integer> ids = new ArrayList<>();
+        ids.add(departmentId);
+        relationService.deleteByDepartmentIds(ids);
+        nurseRelationService.deleteByDepartmentIds(ids);
+
         return beanConverter.convert(entity);
     }
 
@@ -237,6 +245,7 @@ public class HospitalDepartmentService {
 
         repository.delete(departments);
         relationService.deleteByDepartmentIds(departmentIds);
+        nurseRelationService.deleteByDepartmentIds(departmentIds);
 
         List<HospitalDepartmentBean> retValue = new ArrayList<>();
         for (HospitalDepartmentEntity tmp : departments) {

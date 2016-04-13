@@ -225,4 +225,62 @@ public class NurseHospitalRelationService {
         bean.setDepartmentId(departmentId);
         return newOne(bean);
     }
+
+    //========================================================
+    //              delete
+    //========================================================
+
+    @Transactional
+    public void deleteByHospitalIds(List<Integer> hospitalIds) {
+        logger.info("delete nurse hospital department relation ship by hospital ids {}", hospitalIds);
+        if (null==hospitalIds || hospitalIds.isEmpty()) {
+            return;
+        }
+
+        List<NurseHospitalRelationEntity> relations = repository.findByHospitalIdIn(hospitalIds);
+        if(null==relations || relations.isEmpty()) {
+            logger.info("delete nothing");
+            return;
+        }
+
+        List<NurseHospitalRelationEntity> needDelete = new ArrayList<>();
+        for (NurseHospitalRelationEntity tmp : relations) {
+            if (tmp.getDepartmentId()<0) {
+                needDelete.add(tmp);
+            }
+            tmp.setHospitalId(-1);
+        }
+        repository.save(relations);
+
+        if (!needDelete.isEmpty()) {
+            repository.delete(needDelete);
+        }
+    }
+
+    @Transactional
+    public void deleteByDepartmentIds(List<Integer> departmentIds) {
+        logger.info("delete nurse hospital department relation ship by department ids {}", departmentIds);
+        if (null==departmentIds || departmentIds.isEmpty()) {
+            return;
+        }
+
+        List<NurseHospitalRelationEntity> relations = repository.findByDepartmentIdIn(departmentIds);
+        if(null==relations || relations.isEmpty()) {
+            logger.info("delete nothing");
+            return;
+        }
+
+        List<NurseHospitalRelationEntity> needDelete = new ArrayList<>();
+        for (NurseHospitalRelationEntity tmp : relations) {
+            if (tmp.getHospitalId()<0) {
+                needDelete.add(tmp);
+            }
+            tmp.setDepartmentId(-1);
+        }
+        repository.save(relations);
+
+        if (!needDelete.isEmpty()) {
+            repository.delete(needDelete);
+        }
+    }
 }
