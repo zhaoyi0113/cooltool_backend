@@ -1,0 +1,1 @@
+ALTER TABLE `occupation_skill` ADD COLUMN `status` INT NULL DEFAULT 1;

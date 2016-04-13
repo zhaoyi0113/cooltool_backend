@@ -76,7 +76,7 @@ public class NurseOccupationSkillService {
         // is Nurse exist
         nurseService.getNurse(userId);
         // is Occupation skill exist
-        skillService.getOccupationSkill(skillId);
+        skillService.getOneSkillById(skillId);
         // is Skill exist already, delete it
         NurseOccupationSkillEntity skillExist = repository.findByUserIdAndSkillId(userId, skillId);
         if (null!=skillExist) {

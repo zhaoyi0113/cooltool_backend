@@ -2,13 +2,14 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.OccupationSkillBean;
-import com.cooltoo.constants.OccupationSkillType;
+import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.backend.entities.OccupationSkillEntity;
 import com.cooltoo.repository.FileStorageRepository;
 import com.cooltoo.backend.repository.OccupationSkillRepository;
 import com.cooltoo.backend.services.OccupationSkillService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ import java.util.List;
  * Created by yzzhao on 3/10/16.
  */
 @Transactional
+@DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml")
+})
 public class OccupationSkillServiceTest extends AbstractCooltooTest {
 
     @Autowired
@@ -33,7 +37,6 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
     private FileStorageRepository storageRepository;
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml")
     public void testAddNewOccupation() {
         String skillName = System.currentTimeMillis() + "";
         File file = new File("build/" + System.currentTimeMillis());
@@ -53,9 +56,8 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml")
     public void testEditOccupation() {
-        OccupationSkillBean skill = skillService.getOccupationSkill(1000);
+        OccupationSkillBean skill = skillService.getOneSkillById(1000);
         Assert.assertNotNull(skill);
         String      name          = String.valueOf(System.currentTimeMillis());
         File        file          = new File("build/" + System.currentTimeMillis());
@@ -65,8 +67,8 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
             file.createNewFile();
             inputStream   = new FileInputStream(file);
             disableStream = new FileInputStream(file);
-            skillService.editOccupationSkill(skill.getId(), name, 1, inputStream, disableStream);
-            OccupationSkillBean editedSkill = skillService.getOccupationSkill(skill.getId());
+            skillService.editOccupationSkill(skill.getId(), name, 1, OccupationSkillStatus.ENABLE.name(), inputStream, disableStream);
+            OccupationSkillBean editedSkill = skillService.getOneSkillById(skill.getId());
             Assert.assertNotNull(editedSkill);
             Assert.assertEquals(name, editedSkill.getName());
             FileStorageEntity fileStorage = storageRepository.findOne(editedSkill.getImageId());
@@ -80,23 +82,21 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml")
     public void testEditOccupationWithoutImage() {
-        OccupationSkillBean skill = skillService.getOccupationSkill(1000);
+        OccupationSkillBean skill = skillService.getOneSkillById(1000);
         Assert.assertNotNull(skill);
         String name = String.valueOf(System.currentTimeMillis());
-        skillService.editOccupationSkillWithoutImage(skill.getId(), name, 1);
-        OccupationSkillBean editedSkill = skillService.getOccupationSkill(skill.getId());
+        skillService.editOccupationSkillWithoutImage(skill.getId(), name, 1, OccupationSkillStatus.ENABLE.name());
+        OccupationSkillBean editedSkill = skillService.getOneSkillById(skill.getId());
         Assert.assertNotNull(editedSkill);
         Assert.assertEquals(name, editedSkill.getName());
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml")
     public void testDeleteOccupation() {
-        int number = skillService.getOccupationSkillList().size();
+        int number = skillService.getAllSkill().size();
         skillService.deleteOccupationSkill(1000);
-        int newNumber = skillService.getOccupationSkillList().size();
+        int newNumber = skillService.getAllSkill().size();
         Assert.assertEquals(number - 1, newNumber);
     }
 }

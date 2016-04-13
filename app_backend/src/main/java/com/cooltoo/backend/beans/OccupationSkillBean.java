@@ -1,5 +1,6 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.constants.OccupationSkillType;
 
 /**
@@ -13,6 +14,7 @@ public class OccupationSkillBean {
     private String imageUrl;
     private String disableImageUrl;
     private int factor;
+    private OccupationSkillStatus status;
 
     public int getId() {
         return id;
@@ -70,6 +72,14 @@ public class OccupationSkillBean {
         this.factor = factor;
     }
 
+    public OccupationSkillStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OccupationSkillStatus status) {
+        this.status = status;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -77,6 +87,7 @@ public class OccupationSkillBean {
         msg.append("imageId=").append(imageId).append(", ");
         msg.append("disableImageId=").append(disableImageId).append(", ");
         msg.append("name=").append(name).append(", ");
+        msg.append("status=").append(status).append(", ");
         msg.append("factor=").append(factor);
         return msg.toString();
     }

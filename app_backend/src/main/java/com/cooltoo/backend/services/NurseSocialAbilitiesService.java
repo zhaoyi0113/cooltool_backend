@@ -3,6 +3,7 @@ package com.cooltoo.backend.services;
 import com.cooltoo.backend.beans.*;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.constants.OccupationSkillType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +102,13 @@ public class NurseSocialAbilitiesService {
         // skill social abilities
         List<SocialAbilitiesBean> nurseSkillAbilities = new ArrayList<>();
         for (NurseOccupationSkillBean nurseSkill : nurseSkills) {
+            OccupationSkillBean skill = skillId2Bean.get(nurseSkill.getSkillId());
+            if (null==skill) {
+                continue;
+            }
+            if (OccupationSkillStatus.DISABLE.equals(skill.getStatus())) {
+                continue;
+            }
             boolean hasNominate = false;
             for (NurseSkillNominationBean nomination : skillNominate) {
                 if (nomination.getSkillType()!=nurseSkill.getType()) {
@@ -112,7 +120,6 @@ public class NurseSocialAbilitiesService {
                 if (nomination.getUserId()!=nurseSkill.getUserId()) {
                     continue;
                 }
-                OccupationSkillBean skill = skillId2Bean.get(nurseSkill.getSkillId());
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         nurseSkill.getUserId(),
                         nomination.getSkillId(), skill.getName(), OccupationSkillType.SKILL,
@@ -123,7 +130,6 @@ public class NurseSocialAbilitiesService {
                 hasNominate = true;
             }
             if (!hasNominate) {
-                OccupationSkillBean skill = skillId2Bean.get(nurseSkill.getSkillId());
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         nurseSkill.getUserId(),
                         nurseSkill.getSkillId(), skill.getName(), OccupationSkillType.SKILL,

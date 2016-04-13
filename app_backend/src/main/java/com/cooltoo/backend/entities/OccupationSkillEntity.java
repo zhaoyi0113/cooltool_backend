@@ -1,5 +1,6 @@
 package com.cooltoo.backend.entities;
 
+import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.constants.OccupationSkillType;
 
 import javax.persistence.*;
@@ -15,6 +16,8 @@ public class OccupationSkillEntity {
     private long disableImageId;
     private String name;
     private int factor;
+    private OccupationSkillStatus status;
+
 
     @Id
     @GeneratedValue
@@ -61,6 +64,15 @@ public class OccupationSkillEntity {
 
     public void setFactor(int factor) {
         this.factor = factor;
+    }
+
+    @Column(name = "status")
+    public OccupationSkillStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OccupationSkillStatus status) {
+        this.status = status;
     }
 
     public String toString() {
