@@ -31,15 +31,40 @@ public class NurseSpeakAPI {
     @Autowired
     private NurseSpeakService speakService;
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query/all/{type}/{index}/{number}")
+    public Response getSpeakByAnonymous(@Context HttpServletRequest request,
+                                        @PathParam("type") String type,
+                                        @PathParam("index") int index,
+                                        @PathParam("number") int number
+    ) {
+        logger.info("anonymous user to get all speak content type={} index={} number={}", type, index, number);
+        List<NurseSpeakBean> all = speakService.getSpeakByType(type, index, number);
+        logger.info("anonymous user to get all speak content, size ", all.size());
+        return Response.ok(all).build();
+    }
+
+    @Path("/{id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response getSpeakById(@Context HttpServletRequest request,
+                                 @PathParam("id") long id) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseSpeakBean nurseSpeak = speakService.getNurseSpeak(id);
+        return Response.ok(nurseSpeak).build();
+    }
+
     @Path("/query")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getSpeakContentsList(@Context HttpServletRequest request,
-                                         @FormParam("user_id") @DefaultValue("0")   long   userId,
-                                         @FormParam("type")   @DefaultValue("ALL") String type,
-                                         @FormParam("index")  @DefaultValue("0")   int    index,
-                                         @FormParam("number") @DefaultValue("5")   int    number
+    public Response getSpeakByUserIdAndType(@Context HttpServletRequest request,
+                                            @FormParam("user_id") @DefaultValue("0") long userId,
+                                            @FormParam("type") @DefaultValue("ALL") String type,
+                                            @FormParam("index") @DefaultValue("0") int index,
+                                            @FormParam("number") @DefaultValue("5") int number
     ) {
         if (userId<=0) {
             userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
@@ -58,25 +83,11 @@ public class NurseSpeakAPI {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/query/all/{type}/{index}/{number}")
-    public Response getAllSpeak(@Context HttpServletRequest request,
-                                @PathParam("type") String type,
-                                @PathParam("index") int index,
-                                @PathParam("number") int number
-    ) {
-        logger.info("anonymous user to get all speak content type={} index={} number={}", type, index, number);
-        List<NurseSpeakBean> all = speakService.getSpeakByType(type, index, number);
-        logger.info("anonymous user to get all speak content, size ", all.size());
-        return Response.ok(all).build();
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/{index}/{number}")
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getNurseSpeakContentsList(@Context HttpServletRequest request,
-                                              @PathParam("index") int index,
-                                              @PathParam("number") int number
+    public Response getSpeakAllType(@Context HttpServletRequest request,
+                                    @PathParam("index") int index,
+                                    @PathParam("number") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("get nurse speak for user " + userId+" at index="+index+", number="+number);
@@ -89,9 +100,9 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/smug/{index}/{number}")
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getSmugContent(@Context HttpServletRequest request,
-                                   @PathParam("index") int index,
-                                   @PathParam("number") int number
+    public Response getSpeakSmugType(@Context HttpServletRequest request,
+                                     @PathParam("index") int index,
+                                     @PathParam("number") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("user {} to get all smugs", userId);
@@ -104,9 +115,9 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/cathart/{index}/{number}")
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getCathartContent(@Context HttpServletRequest request,
-                                   @PathParam("index") int index,
-                                   @PathParam("number") int number
+    public Response getSpeakCathartType(@Context HttpServletRequest request,
+                                        @PathParam("index") int index,
+                                        @PathParam("number") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("user {} to get all cathart", userId);
@@ -119,9 +130,9 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query/ask_question/{index}/{number}")
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getAskQuestionContent(@Context HttpServletRequest request,
-                                   @PathParam("index") int index,
-                                   @PathParam("number") int number
+    public Response getSpeakAskQuestionType(@Context HttpServletRequest request,
+                                            @PathParam("index") int index,
+                                            @PathParam("number") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("user {} to get all ask_questions", userId);
@@ -137,9 +148,9 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response addSmugSpeak(@Context HttpServletRequest request,
-                             @FormDataParam("content") String content,
-                             @FormDataParam("file_name") String fileName,
-                             @FormDataParam("file") InputStream fileInputStream) {
+                                 @FormDataParam("content") String content,
+                                 @FormDataParam("file_name") String fileName,
+                                 @FormDataParam("file") InputStream fileInputStream) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.addSmug(userId, content, fileName, fileInputStream);
         return Response.ok(nurseSpeak).build();
@@ -151,9 +162,9 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response addCathartSpeak(@Context HttpServletRequest request,
-                             @FormDataParam("content") String content,
-                             @FormDataParam("file_name") String fileName,
-                             @FormDataParam("file") InputStream fileInputStream) {
+                                    @FormDataParam("content") String content,
+                                    @FormDataParam("file_name") String fileName,
+                                    @FormDataParam("file") InputStream fileInputStream) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.addCathart(userId, content, fileName, fileInputStream);
         return Response.ok(nurseSpeak).build();
@@ -164,48 +175,66 @@ public class NurseSpeakAPI {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response addSpeak(@Context HttpServletRequest request,
-                             @FormDataParam("content") String content,
-                             @FormDataParam("file_name") String fileName,
-                             @FormDataParam("file") InputStream fileInputStream) {
+    public Response addAskQuestion(@Context HttpServletRequest request,
+                                   @FormDataParam("content") String content,
+                                   @FormDataParam("file_name") String fileName,
+                                   @FormDataParam("file") InputStream fileInputStream) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.addAskQuestion(userId, content, fileName, fileInputStream);
         return Response.ok(nurseSpeak).build();
     }
 
-    @GET
+    @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{id}")
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getNurseSpeakContent(@Context HttpServletRequest request,
-                                         @PathParam("id") long id) {
+    public Response deleteSpeakByIds(@Context HttpServletRequest request,
+                                     @FormParam("id") String speakIds
+    ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseSpeakBean nurseSpeak = speakService.getNurseSpeak(id);
-        return Response.ok(nurseSpeak).build();
+        List<NurseSpeakBean> speaks = speakService.deleteByIds(userId, speakIds);
+        return Response.ok(speaks).build();
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/comment")
     @LoginAuthentication(requireNurseLogin = true)
-    public Response addSpeakComment(
-            @Context HttpServletRequest request,
-            @FormParam("nurseSpeakId") long nurseSpeakId,
-            @FormParam("commentReceiverId") long commentReceiverId,
-            @FormParam("comment") String comment
+    public Response addSpeakComment(@Context HttpServletRequest request,
+                                    @FormParam("nurseSpeakId") long nurseSpeakId,
+                                    @FormParam("commentReceiverId") long commentReceiverId,
+                                    @FormParam("comment") String comment
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakCommentBean commentBean = speakService.addSpeakComment(nurseSpeakId, userId, commentReceiverId, comment);
         return Response.ok(commentBean).build();
     }
 
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/comment")
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response deleteSpeakComment(@Context HttpServletRequest request,
+                                       @FormParam("id") String commentIds
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("user {} delete speak comment by comment ids {}", userId, commentIds);
+
+        List<NurseSpeakCommentBean> comments = speakService.deleteSpeakComment(userId, commentIds);
+        if (null==comments || comments.isEmpty()) {
+            return Response.ok().build();
+        }
+        if (comments.size()==1) {
+            return Response.ok(comments.get(0)).build();
+        }
+        return Response.ok(comments).build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/thumbs_up")
     @LoginAuthentication(requireNurseLogin = true)
-    public Response addSpeakThumbsUp(
-            @Context HttpServletRequest request,
-            @FormParam("nurseSpeakId") long nurseSpeakId
+    public Response setSpeakThumbsUp(@Context HttpServletRequest request,
+                                     @FormParam("nurseSpeakId") long nurseSpeakId
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakThumbsUpBean thumbsUpBean = speakService.setNurseSpeakThumbsUp(nurseSpeakId, userId);

@@ -9,6 +9,8 @@ public class NurseSpeakThumbsUpBean {
     private long id;
     private long nurseSpeakId;
     private long thumbsUpUserId;
+    private String thumbsUpUserName;
+    private String thumbsUpUserHeadImageUrl;
     private long speakThumbsUpCount;
     private Date time;
 
@@ -52,12 +54,30 @@ public class NurseSpeakThumbsUpBean {
         this.time = time;
     }
 
+    public String getThumbsUpUserName() {
+        return thumbsUpUserName;
+    }
+
+    public void setThumbsUpUserName(String thumbsUpUserName) {
+        this.thumbsUpUserName = thumbsUpUserName;
+    }
+
+    public String getThumbsUpUserHeadImageUrl() {
+        return thumbsUpUserHeadImageUrl;
+    }
+
+    public void setThumbsUpUserHeadImageUrl(String thumbsUpUserHeadImageUrl) {
+        this.thumbsUpUserHeadImageUrl = thumbsUpUserHeadImageUrl;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(" ,");
         msg.append("nurseSpeakId=").append(nurseSpeakId).append(" ,");
         msg.append("thumbsUpUserId=").append(thumbsUpUserId).append(" ,");
+        msg.append("thumbsUpUserName=").append(thumbsUpUserName).append(" ,");
+        msg.append("thumbsUpUserHeadImageUrl=").append(thumbsUpUserHeadImageUrl).append(" ,");
         msg.append("time=").append(time);
         msg.append(" ]");
         return msg.toString();

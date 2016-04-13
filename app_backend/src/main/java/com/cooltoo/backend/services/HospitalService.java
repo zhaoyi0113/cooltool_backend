@@ -46,7 +46,7 @@ public class HospitalService {
     private RegionService regionService;
 
     //=======================================================
-    //        get department
+    //        get
     //=======================================================
     public List<HospitalBean> getAll() {
         Iterable<HospitalEntity> iterable = repository.findAll();
@@ -169,13 +169,55 @@ public class HospitalService {
     //        delete department
     //=======================================================
     @Transactional
-    public HospitalBean deleteById(Integer id) {
-        HospitalEntity entity = repository.findOne(id);
+    public HospitalBean deleteById(Integer hospitalId) {
+        HospitalEntity entity = repository.findOne(hospitalId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.HOSPITAL_NOT_EXIST);
         }
         repository.delete(entity.getId());
+        relationService.deleteByHospitalIds(""+hospitalId);
         return beanConverter.convert(entity);
+    }
+
+    @Transactional
+    public List<HospitalBean> deleteByIds(String strHospitalIds) {
+        logger.info("delete hospital by hospital ids {}", strHospitalIds);
+        if (!VerifyUtil.isIds(strHospitalIds)) {
+            logger.warn("hospital ids are invalid");
+            return new ArrayList<>();
+        }
+
+        List<Integer> ids       = new ArrayList<>();
+        String[]      strArrIds = strHospitalIds.split(",");
+        for (String tmp : strArrIds) {
+            Integer id = Integer.parseInt(tmp);
+            ids.add(id);
+        }
+
+        return deleteByIds(ids);
+    }
+
+    @Transactional
+    public List<HospitalBean> deleteByIds(List<Integer> hospitalIds) {
+        logger.info("delete hospital by hospital ids {}", hospitalIds);
+        if (null==hospitalIds || hospitalIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<HospitalEntity> hospitals = repository.findByIdIn(hospitalIds);
+        if (null==hospitals || hospitals.isEmpty()) {
+            logger.info("delete nothing");
+            return new ArrayList<>();
+        }
+
+        repository.delete(hospitals);
+        relationService.deleteByHospitalIds(hospitalIds);
+
+        List<HospitalBean> retValue = new ArrayList<>();
+        for (HospitalEntity tmp : hospitals) {
+            HospitalBean hospital = beanConverter.convert(tmp);
+            retValue.add(hospital);
+        }
+        return retValue;
     }
 
     //=======================================================

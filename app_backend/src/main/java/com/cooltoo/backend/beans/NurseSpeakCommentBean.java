@@ -9,7 +9,11 @@ public class NurseSpeakCommentBean {
     private long id;
     private long nurseSpeakId;
     private long commentMakerId;
+    private String makerName;
+    private String makerHeadImageUrl;
     private long commentReceiverId;
+    private String receiverName;
+    private String receiverHeadImageUrl;
     private String comment;
     private Date time;
 
@@ -61,13 +65,52 @@ public class NurseSpeakCommentBean {
         this.time = time;
     }
 
+    public String getMakerName() {
+        return makerName;
+    }
+
+    public void setMakerName(String makerName) {
+        this.makerName = makerName;
+    }
+
+    public String getMakerHeadImageUrl() {
+        return makerHeadImageUrl;
+    }
+
+    public void setMakerHeadImageUrl(String makerHeadImageUrl) {
+        this.makerHeadImageUrl = makerHeadImageUrl;
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+
+    public String getReceiverHeadImageUrl() {
+        return receiverHeadImageUrl;
+    }
+
+    public void setReceiverHeadImageUrl(String receiverHeadImageUrl) {
+        this.receiverHeadImageUrl = receiverHeadImageUrl;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
         msg.append("id=").append(id).append(" , ");
         msg.append("nurseSpeakId=").append(nurseSpeakId).append(" , ");
+
         msg.append("commentMakerId=").append(commentMakerId).append(" , ");
+        msg.append("makerName=").append(makerName).append(" , ");
+        msg.append("makerHeadImageUrl=").append(makerHeadImageUrl).append(" , ");
+
         msg.append("commentReceiverId=").append(commentReceiverId).append(" , ");
+        msg.append("receiverName=").append(receiverName).append(" , ");
+        msg.append("receiverHeadImageUrl=").append(receiverHeadImageUrl).append(" , ");
+
         msg.append("comment=").append(comment).append(" , ");
         msg.append("time=").append(time);
         msg.append("]");

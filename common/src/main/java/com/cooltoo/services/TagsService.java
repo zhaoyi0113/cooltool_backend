@@ -76,7 +76,7 @@ public class TagsService {
     }
 
     public List<TagsBean> getTagByIds(String tagIds) {
-        if (VerifyUtil.isOccupationSkillIds(tagIds)) {
+        if (VerifyUtil.isIds(tagIds)) {
             List<TagsEntity> tagsE     = null;
             List<TagsBean>   tagsB     = new ArrayList<>();
             List<Long>       imgIds    = new ArrayList<>();
@@ -356,7 +356,7 @@ public class TagsService {
 
 
     public List<TagsCategoryBean> getCategoryByIds(String categoryIds) {
-        if (VerifyUtil.isOccupationSkillIds(categoryIds)) {
+        if (VerifyUtil.isIds(categoryIds)) {
             List<TagsCategoryBean> categoriesB = new ArrayList<>();
             List<Long>             lTagIds     = new ArrayList<>();
             String[]               strTagIds   = categoryIds.split(",");
@@ -379,7 +379,7 @@ public class TagsService {
 
 
     public List<TagsCategoryBean> getCategoryWithTagsByIds(String categoryIds) {
-        if (VerifyUtil.isOccupationSkillIds(categoryIds)) {
+        if (VerifyUtil.isIds(categoryIds)) {
             List<TagsCategoryBean> categoriesB = new ArrayList<>();
             List<Long>             lTagIds     = new ArrayList<>();
             String[]               strTagIds   = categoryIds.split(",");
@@ -508,7 +508,7 @@ public class TagsService {
 
     @Transactional
     public String deleteTagByIds(String tagIds) {
-        if (VerifyUtil.isOccupationSkillIds(tagIds)) {
+        if (VerifyUtil.isIds(tagIds)) {
             List<TagsEntity> tagsE     = null;
             List<Long>       imgIds    = new ArrayList<>();
             List<Long>       lTagIds   = new ArrayList<>();
@@ -558,7 +558,7 @@ public class TagsService {
 
     @Transactional
     public String deleteCategoryByIds(String categoryIds) {
-        if (VerifyUtil.isOccupationSkillIds(categoryIds)) {
+        if (VerifyUtil.isIds(categoryIds)) {
 
             List<Long> imgIds         = new ArrayList<>();
             List<Long> lCategoryIds   = new ArrayList<>();
@@ -595,7 +595,7 @@ public class TagsService {
 
     @Transactional
     public String deleteCategoryWithTagsByIds(String categoryIds) {
-        if (VerifyUtil.isOccupationSkillIds(categoryIds)) {
+        if (VerifyUtil.isIds(categoryIds)) {
 
             List<Long> imgIds         = new ArrayList<>();
             List<Long> lCategoryIds   = new ArrayList<>();

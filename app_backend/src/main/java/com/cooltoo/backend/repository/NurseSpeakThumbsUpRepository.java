@@ -11,8 +11,9 @@ import java.util.List;
  */
 public interface NurseSpeakThumbsUpRepository extends CrudRepository<NurseSpeakThumbsUpEntity, Long> {
 
-    public List<NurseSpeakThumbsUpEntity> findUpByNurseSpeakId(long nurseSpeakId);
-    public List<NurseSpeakThumbsUpEntity> findByNurseSpeakIdIn(List<Long> nurseSpeakIds, Sort sort);
-    public List<NurseSpeakThumbsUpEntity> findByNurseSpeakIdAndThumbsUpUserId(long nurseSpeakId, long thumbsUpUserId);
-    public long countByNurseSpeakId(long nurseSpeakId);
+    List<NurseSpeakThumbsUpEntity> findUpByNurseSpeakId(long nurseSpeakId);
+    List<NurseSpeakThumbsUpEntity> findByNurseSpeakIdIn(List<Long> nurseSpeakIds);
+    List<NurseSpeakThumbsUpEntity> findByNurseSpeakIdIn(List<Long> nurseSpeakIds, Sort sort);
+    List<NurseSpeakThumbsUpEntity> findByNurseSpeakIdAndThumbsUpUserId(long nurseSpeakId, long thumbsUpUserId);
+    long countByNurseSpeakId(long nurseSpeakId);
 }

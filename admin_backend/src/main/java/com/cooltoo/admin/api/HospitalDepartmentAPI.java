@@ -69,13 +69,16 @@ public class HospitalDepartmentAPI {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response deleteById(@DefaultValue("-1") @FormParam("id") int id) {
-        HospitalDepartmentBean one = service.deleteById(id);
-        logger.info("delete hospital department is " + one);
-        if (null==one) {
+    public Response deleteByIds(@FormParam("id") String ids) {
+        List<HospitalDepartmentBean> ones = service.deleteByIds(ids);
+        logger.info("delete hospital department is " + ones);
+        if (null==ones || ones.isEmpty()) {
             return Response.ok().build();
         }
-        return Response.ok(one).build();
+        if (ones.size()==1) {
+            return Response.ok(ones.get(0)).build();
+        }
+        return Response.ok(ones).build();
     }
 
     @Path("/edit")

@@ -10,7 +10,8 @@ import java.util.List;
  */
 public interface HospitalDepartmentRelationRepository extends CrudRepository<HospitalDepartmentRelationEntity, Integer>{
 
-    public List<HospitalDepartmentRelationEntity> findRelationByHospitalId(int hospitalId);
-
-    public List<HospitalDepartmentRelationEntity> findRelationByDepartmentId(int departmentId);
+    List<HospitalDepartmentRelationEntity> findRelationByHospitalId(int hospitalId);
+    List<HospitalDepartmentRelationEntity> findRelationByHospitalIdIn(List<Integer> hospitalIds);
+    List<HospitalDepartmentRelationEntity> findRelationByDepartmentId(int departmentId);
+    List<HospitalDepartmentRelationEntity> findRelationByDepartmentIdIn(List<Integer> departmentIds);
 }

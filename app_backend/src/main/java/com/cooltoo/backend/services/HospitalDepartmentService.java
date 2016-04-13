@@ -32,6 +32,8 @@ public class HospitalDepartmentService {
     @Autowired
     private HospitalDepartmentRepository repository;
     @Autowired
+    private HospitalDepartmentRelationService relationService;
+    @Autowired
     @Qualifier("StorageService")
     private StorageService storageService;
     @Autowired
@@ -202,6 +204,47 @@ public class HospitalDepartmentService {
         return beanConverter.convert(entity);
     }
 
+
+    @Transactional
+    public List<HospitalDepartmentBean> deleteByIds(String strDepartmentIds) {
+        logger.info("delete department by department ids {}", strDepartmentIds);
+        if (!VerifyUtil.isIds(strDepartmentIds)) {
+            logger.warn("department ids are invalid");
+            return new ArrayList<>();
+        }
+
+        List<Integer> ids       = new ArrayList<>();
+        String[]      strArrIds = strDepartmentIds.split(",");
+        for (String tmp : strArrIds) {
+            Integer id = Integer.parseInt(tmp);
+            ids.add(id);
+        }
+
+        return deleteByIds(ids);
+    }
+
+    @Transactional
+    public List<HospitalDepartmentBean> deleteByIds(List<Integer> departmentIds) {
+        logger.info("delete department by department ids {}", departmentIds);
+        if (null==departmentIds || departmentIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<HospitalDepartmentEntity> departments = repository.findByIdIn(departmentIds);
+        if (null==departments || departments.isEmpty()) {
+            logger.info("delete nothing");
+            return new ArrayList<>();
+        }
+
+        repository.delete(departments);
+        relationService.deleteByDepartmentIds(departmentIds);
+
+        List<HospitalDepartmentBean> retValue = new ArrayList<>();
+        for (HospitalDepartmentEntity tmp : departments) {
+            HospitalDepartmentBean hospital = beanConverter.convert(tmp);
+            retValue.add(hospital);
+        }
+        return retValue;
+    }
 
     //=======================================================
     //        update department

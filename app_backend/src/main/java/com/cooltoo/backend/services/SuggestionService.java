@@ -130,7 +130,7 @@ public class SuggestionService {
 
     public String updateStatus(String ids, String suggestionType) {
         logger.info("set the suggestion {} status to {}", ids, suggestionType);
-        if (!VerifyUtil.isOccupationSkillIds(ids)) {
+        if (!VerifyUtil.isIds(ids)) {
             logger.warn("the suggestion ids are not valid");
         }
         SuggestionStatus status = SuggestionStatus.parseString(suggestionType);
@@ -183,7 +183,7 @@ public class SuggestionService {
 
     public void deleteSuggestion(String ids) {
         logger.info("delete suggestion by id. ids = {}", ids);
-        if (!VerifyUtil.isOccupationSkillIds(ids)) {
+        if (!VerifyUtil.isIds(ids)) {
             logger.error("the ids to delete format is wrong(like '121,122,123' or '123')");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

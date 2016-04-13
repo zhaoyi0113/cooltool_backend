@@ -34,7 +34,7 @@ public class VerifyUtil {
         return false;
     }
 
-    public static boolean isOccupationSkillIds(String ids) {
+    public static boolean isIds(String ids) {
         logger.info("get occupation skill ids "+ids);
         if (ids instanceof String) {
             return ids.matches(OCCUPATION_SKILL_ID);

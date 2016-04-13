@@ -24,14 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -441,7 +439,7 @@ public class NurseService {
             logger.error("authority is not valid");
             return new ArrayList<>();
         }
-        if (!VerifyUtil.isOccupationSkillIds(strNurseIds)) {
+        if (!VerifyUtil.isIds(strNurseIds)) {
             logger.error("nurse ids is not valid");
             return new ArrayList<>();
         }

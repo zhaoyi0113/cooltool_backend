@@ -14,6 +14,7 @@ import java.util.List;
  */
 public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Long> {
 
+    List<NurseSpeakEntity> findByIdIn(List<Long> speakIds);
     Page<NurseSpeakEntity> findByUserId(long userId, Pageable request);
     Page<NurseSpeakEntity> findByUserIdAndSpeakType(long userId, int speakTypeId, Pageable request);
     Page<NurseSpeakEntity> findBySpeakType(int speakTypeId, Pageable request);

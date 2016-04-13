@@ -58,7 +58,7 @@ public class NurseSpeakService {
 
     public Map<Long, Long> countByUserIds(String strUserIds){
         logger.info("get nurse {} speak count", strUserIds);
-        if (VerifyUtil.isOccupationSkillIds(strUserIds)) {
+        if (VerifyUtil.isIds(strUserIds)) {
             String[]   strIds  = strUserIds.split(",");
             List<Long> userIds = new ArrayList<>();
             for (String id : strIds) {
@@ -115,7 +115,7 @@ public class NurseSpeakService {
         }
 
         // parse entities to bean
-        return parseEntities(userId, speakEntities);
+        return fillOtherProperties(userId, speakEntities);
     }
 
     public List<NurseSpeakBean> getSpeakByType(String speakType, int index, int number) {
@@ -145,7 +145,7 @@ public class NurseSpeakService {
         }
 
         // parse entities to bean
-        return parseEntities(-1, speakEntities);
+        return fillOtherProperties(-1, speakEntities);
     }
 
     @Transactional
@@ -171,7 +171,7 @@ public class NurseSpeakService {
         }
 
         // parse entities to bean
-        return parseEntities(userId, speakEntities);
+        return fillOtherProperties(userId, speakEntities);
     }
 
     public NurseSpeakBean getNurseSpeak(long speakId) {
@@ -187,7 +187,7 @@ public class NurseSpeakService {
         return speak;
     }
 
-    private List<NurseSpeakBean> parseEntities(long userId, List<NurseSpeakEntity> entities) {
+    private List<NurseSpeakBean> fillOtherProperties(long userId, List<NurseSpeakEntity> entities) {
         // speak ids/file ids cache
         List<Long> speakIds = new ArrayList<Long>();
         List<Long> userIds = new ArrayList<Long>();
@@ -354,6 +354,62 @@ public class NurseSpeakService {
         return bean;
     }
 
+    //===============================================================
+    //             delete
+    //===============================================================
+
+    @Transactional
+    public List<NurseSpeakBean> deleteByIds(long speakMakerId, String strSpeakIds) {
+        logger.info("delete nurse speak by speak ids {}.", strSpeakIds);
+        if (!VerifyUtil.isIds(strSpeakIds)) {
+            logger.warn("speak ids are invalid");
+            return new ArrayList<>();
+        }
+
+        List<Long> ids       = new ArrayList<>();
+        String[]   strArrIds = strSpeakIds.split(",");
+        for (String tmp : strArrIds) {
+            Long id = Long.parseLong(tmp);
+            ids.add(id);
+        }
+
+        return deleteByIds(speakMakerId, ids);
+    }
+
+    @Transactional
+    public List<NurseSpeakBean> deleteByIds(long speakMakerId, List<Long> speakIds) {
+        logger.info("delete nurse speak by speak ids {}.", speakIds);
+        if (null==speakIds || speakIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<NurseSpeakEntity> speaks = speakRepository.findByIdIn(speakIds);
+        if (null==speaks || speaks.isEmpty()) {
+            logger.info("delete nothing");
+        }
+
+        List<Long> imageIds = new ArrayList<>();
+        for (NurseSpeakEntity speak : speaks) {
+            imageIds.add(speak.getImageId());
+            if (speak.getUserId()==speakMakerId) {
+                continue;
+            }
+            logger.warn("can not delete the comment {} not making by yourself {}", speak, speakMakerId);
+            return new ArrayList<>();
+        }
+
+        speakRepository.delete(speaks);
+        speakCommentService.deleteBySpeakIds(speakIds);
+        thumbsUpService.deleteBySpeakIds(speakIds);
+        storageService.deleteFiles(imageIds);
+
+        List<NurseSpeakBean> retValue = new ArrayList<>();
+        for (NurseSpeakEntity tmp : speaks) {
+            NurseSpeakBean comment = speakConverter.convert(tmp);
+            retValue.add(comment);
+        }
+        return retValue;
+    }
 
     //=======================================================
     //          Comment service
@@ -364,6 +420,11 @@ public class NurseSpeakService {
         //TODO need to transfer the comment to the relative person
         //... ...
         return commentBean;
+    }
+
+    public List<NurseSpeakCommentBean> deleteSpeakComment(long commentMakerId, String strCommentIds) {
+        List<NurseSpeakCommentBean> comments = speakCommentService.deleteByIds(commentMakerId, strCommentIds);
+        return comments;
     }
 
 
@@ -383,7 +444,7 @@ public class NurseSpeakService {
             throw new BadRequestException(ErrorCode.SPEAK_THUMBS_UP_CAN_NOT_FOR_SELF);
         }
 
-        NurseSpeakThumbsUpBean thumbsUpBean = thumbsUpService.addSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
+        NurseSpeakThumbsUpBean thumbsUpBean = thumbsUpService.setSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
         //TODO need to transfer this thumbs_up to the relative person
 
         return thumbsUpBean;

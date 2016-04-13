@@ -90,7 +90,7 @@ public class NurseOccupationSkillService {
 
     @Transactional
     public void addSkills(long userId, String skillIds) {
-        if (!VerifyUtil.isOccupationSkillIds(skillIds)) {
+        if (!VerifyUtil.isIds(skillIds)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         // is Nurse exist
@@ -129,7 +129,7 @@ public class NurseOccupationSkillService {
     @Transactional
     public String removeSkillByUserIds(String userIds) {
         logger.info("remove nurse skill by user ids = {}", userIds);
-        if (!VerifyUtil.isOccupationSkillIds(userIds)) {
+        if (!VerifyUtil.isIds(userIds)) {
             logger.error("user ids format is wrong!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -146,7 +146,7 @@ public class NurseOccupationSkillService {
     @Transactional
     public String removeSkillBySkillIds(String skillIds) {
         logger.info("remove nurse skill by skill ids = {}", skillIds);
-        if (!VerifyUtil.isOccupationSkillIds(skillIds)) {
+        if (!VerifyUtil.isIds(skillIds)) {
             logger.error("skill ids format is wrong!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

@@ -174,7 +174,7 @@ public class NurseSkillNominationService {
     @Transactional
     public String deleteByUserIds(String userIds) {
         logger.info("delete skill nomination by userids = {}", userIds);
-        if (!VerifyUtil.isOccupationSkillIds(userIds)) {
+        if (!VerifyUtil.isIds(userIds)) {
             logger.error("user id format is error");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -195,7 +195,7 @@ public class NurseSkillNominationService {
         if (null==ablibityType) {
             logger.info("type is not exist", skillIds);
         }
-        if (!VerifyUtil.isOccupationSkillIds(skillIds)) {
+        if (!VerifyUtil.isIds(skillIds)) {
             logger.error("skill ids format is error");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

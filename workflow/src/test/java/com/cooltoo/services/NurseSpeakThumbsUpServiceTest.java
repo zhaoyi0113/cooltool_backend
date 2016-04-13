@@ -3,7 +3,6 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
 import com.cooltoo.backend.services.NurseSpeakThumbsUpService;
-import com.cooltoo.exception.BadRequestException;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class NurseSpeakThumbsUpServiceTest extends AbstractCooltooTest {
         long nurseSpeakId = 14;
         long thumbsUpUserId = 7;
         Date time = new Date();
-        NurseSpeakThumbsUpBean bean = thumbsUpService.addSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
+        NurseSpeakThumbsUpBean bean = thumbsUpService.setSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
         Assert.assertEquals(14, bean.getNurseSpeakId());
         Assert.assertEquals(7, bean.getThumbsUpUserId());
         Assert.assertTrue(bean.getId()>0);
