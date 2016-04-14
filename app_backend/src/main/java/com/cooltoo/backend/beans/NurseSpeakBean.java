@@ -15,8 +15,7 @@ public class NurseSpeakBean {
     private String userName;
     private String userProfilePhotoUrl;
     private Date time;
-    private long imageId;
-    private String imageUrl;
+    private List<ImagesInSpeakBean> images;
     /** the id of speak_type */
     private int speakType;
     private List<NurseSpeakCommentBean> comments;
@@ -64,20 +63,12 @@ public class NurseSpeakBean {
         this.time = time;
     }
 
-    public long getImageId() {
-        return imageId;
+    public List<ImagesInSpeakBean> getImages() {
+        return images;
     }
 
-    public void setImageId(long imageId) {
-        this.imageId = imageId;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImages(List<ImagesInSpeakBean> images) {
+        this.images = images;
     }
 
     public int getSpeakType() {
@@ -136,12 +127,12 @@ public class NurseSpeakBean {
         msg.append("username=").append(userName).append(" , ");
         msg.append("time=").append(time).append(" , ");
         msg.append("content=").append(content).append(" , ");
-        msg.append("imageUrl=").append(imageUrl).append(" , ");
         msg.append("thumbsUpsCount=").append(thumbsUpsCount).append(" , ");
         msg.append("commentsCount=").append(commentsCount).append(" , ");
         msg.append("speakType=").append(speakType);
-        int countC = null==comments ? 0 : comments.size();
+        int countC = null==comments  ? 0 : comments.size();
         int countT = null==thumbsUps ? 0 : thumbsUps.size();
+        int countI = null==images    ? 0 : images.size();
         if (countC>0 || countT>0) {
             msg.append("\r\n");
         }
@@ -150,6 +141,9 @@ public class NurseSpeakBean {
         }
         for (int i = 0; i < countT; i++) {
             msg.append(thumbsUps.get(i)).append("\r\n");
+        }
+        for (int i = 0; i < countI; i++) {
+            msg.append(images.get(i)).append("\r\n");
         }
         msg.append("]");
         return msg.toString();

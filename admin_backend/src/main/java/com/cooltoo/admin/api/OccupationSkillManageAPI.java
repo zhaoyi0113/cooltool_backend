@@ -61,8 +61,8 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getSkillByStatus(@Context HttpServletRequest request,
                                      @PathParam("status") String status,
-                                     @PathParam("index") int pageIndex,
-                                     @PathParam("number") int number
+                                     @PathParam("index")  @DefaultValue("0")  int pageIndex,
+                                     @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get all occupation skill by status={} page={} number/page={}", status, pageIndex, number);
         List<OccupationSkillBean> allSkills = skillService.getSkillByStatus(status, pageIndex, number);

@@ -54,8 +54,8 @@ public class NurseQualificationManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getAllQualification(@Context HttpServletRequest request,
                                         @PathParam("status") String status,
-                                        @PathParam("index") int index,
-                                        @PathParam("number") int number
+                                        @PathParam("index")  @DefaultValue("0")  int index,
+                                        @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get qualification by status {} at page {} numberOfPage {}", status, index, number);
         List<NurseQualificationBean> qualifications = qualificationService.getAllQualifications(status, index, number);

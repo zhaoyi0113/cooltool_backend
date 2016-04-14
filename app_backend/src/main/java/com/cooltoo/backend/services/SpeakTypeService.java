@@ -9,9 +9,12 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.StorageService;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,6 +27,8 @@ import java.util.Map;
 @Service("SpeakTypeService")
 public class SpeakTypeService {
 
+    private static final Logger logger = LoggerFactory.getLogger(SpeakTypeService.class.getName());
+
     @Autowired
     private SpeakTypeRepository speakTypeRepository;
 
@@ -34,6 +39,23 @@ public class SpeakTypeService {
     @Autowired
     private SpeakTypeBeanConverter beanConverter;
 
+
+    //=============================================================
+    //             get
+    //=============================================================
+
+    public SpeakTypeBean getSpeakType(int speakTypeId) {
+        logger.info("get speak type by id {}", speakTypeId);
+        SpeakTypeEntity speakType = speakTypeRepository.findOne(speakTypeId);
+        if (null==speakType) {
+            logger.error("speak type not exist");
+            return new SpeakTypeBean();
+        }
+        SpeakTypeBean bean = beanConverter.convert(speakType);
+        bean.setImageUrl(storageService.getFilePath(bean.getImageId()));
+        bean.setDisableImageUrl(storageService.getFilePath(bean.getDisableImageId()));
+        return bean;
+    }
 
     public List<SpeakTypeBean> getAllSpeakType() {
         SpeakTypeBean       bean    = null;
@@ -75,6 +97,11 @@ public class SpeakTypeService {
         return null;
     }
 
+    //=============================================================
+    //             update
+    //=============================================================
+
+    @Transactional
     public SpeakTypeBean updateSpeakType(int id, String name, int factor, InputStream image, InputStream disableImage) {
         SpeakTypeEntity speakType = speakTypeRepository.findOne(id);
         if (null==speakType) {

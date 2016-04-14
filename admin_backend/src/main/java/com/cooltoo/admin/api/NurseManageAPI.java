@@ -56,8 +56,8 @@ public class NurseManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getNurseByAuthority(@Context HttpServletRequest request,
                                         @PathParam("authority") String strAuthority,
-                                        @PathParam("index") int index,
-                                        @PathParam("number") int number
+                                        @PathParam("index")  @DefaultValue("0")  int index,
+                                        @PathParam("number") @DefaultValue("10") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get nurse record count by authority {} at page {} with {} record/page", userId, strAuthority, index, number);

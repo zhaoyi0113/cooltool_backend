@@ -1,9 +1,6 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseSpeakBean;
-import com.cooltoo.backend.beans.NurseSpeakCommentBean;
-import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
-import com.cooltoo.backend.beans.SpeakTypeBean;
+import com.cooltoo.backend.beans.*;
 import com.cooltoo.backend.converter.NurseSpeakConverter;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
@@ -41,9 +38,8 @@ public class NurseSpeakService {
     @Autowired private NurseSpeakCommentService speakCommentService;
     @Autowired private NurseSpeakThumbsUpService thumbsUpService;
     @Autowired private SpeakTypeService speakTypeService;
-    @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Autowired private ImagesInSpeakService speakImageService;
+    @Autowired @Qualifier("StorageService") private StorageService storageService;
 
     //===============================================================
     //             get
@@ -86,7 +82,7 @@ public class NurseSpeakService {
         return id2num;
     }
 
-    public long countBySpeakByType(long userId, String speakType) {
+    public long countBySpeakType(long userId, String speakType) {
         logger.info("get nurse speak ("+speakType+") count");
         SpeakType speaktype = SpeakType.parseString(speakType);
         if (null==speaktype) {
@@ -177,7 +173,7 @@ public class NurseSpeakService {
     public NurseSpeakBean getNurseSpeak(long speakId) {
         NurseSpeakEntity resultSet = speakRepository.findOne(speakId);
         NurseSpeakBean   speak     = speakConverter.convert(resultSet);
-        speak.setImageUrl(storageService.getFilePath(speak.getImageId()));
+        speak.setImages(speakImageService.getImagesInSpeak(speak.getId()));
         List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speak.getId());
         speak.setComments(comments);
         speak.setCommentsCount(comments.size());
@@ -224,7 +220,6 @@ public class NurseSpeakService {
             speak.setUserName(nurseName);
             speakIdToBeanMap.put(speak.getId(), speak);
             speakIds.add(speak.getId());
-            fileIds.add(speak.getImageId());
         }
 
         NurseSpeakBean bean = null;
@@ -254,16 +249,22 @@ public class NurseSpeakService {
         }
 
         // get image url of speak
+        Map<Long, List<ImagesInSpeakBean>> idToImage = speakImageService.getImagesInSpeak(speakIds);
+        for (NurseSpeakEntity entity : entities) {
+            long                    speakId   = entity.getId();
+            List<ImagesInSpeakBean> images    = idToImage.get(speakId);
+            NurseSpeakBean          speakBean = speakIdToBeanMap.get(speakId);
+            speakBean.setImages(images);
+        }
+
+        // get user profile photo url
         Map<Long, String> idToPath = storageService.getFilePath(fileIds);
         for (NurseSpeakEntity entity : entities) {
             long   speakId    = entity.getId();
-            long   imageId    = entity.getImageId();
             long   tmpUserId  = entity.getUserId();
             long   userProfId = userId2FileId.get(tmpUserId);
-            String imageUrl   = idToPath.get(imageId);
             String userProUrl = idToPath.get(userProfId);
             NurseSpeakBean speakBean = speakIdToBeanMap.get(speakId);
-            speakBean.setImageUrl(imageUrl);
             speakBean.setUserProfilePhotoUrl(userProUrl);
         }
 
@@ -289,69 +290,99 @@ public class NurseSpeakService {
 
     public NurseSpeakBean addSmug(long userId, String content, String fileName, InputStream fileInputStream) {
         logger.info("add SMUG : userId=" + userId + " content="+content+" fileName="+fileName);
-        // check speak type
-        SpeakTypeBean speakType = speakTypeService.getSpeakTypeByType(SpeakType.SMUG);
-        if (null==speakType) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        return addNurseSpeak(userId, content, speakType.getId(), fileName, fileInputStream);
+        return addNurseSpeak(userId, content, SpeakType.SMUG.name(), fileName, fileInputStream);
     }
 
     public NurseSpeakBean addCathart(long userId, String content, String fileName, InputStream fileInputStream) {
         logger.info("add CATHART : userId=" + userId + " content="+content+" fileName="+fileName);
-        // check speak type
-        SpeakTypeBean speakType = speakTypeService.getSpeakTypeByType(SpeakType.CATHART);
-        if (null==speakType) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        return addNurseSpeak(userId, content, speakType.getId(), fileName, fileInputStream);
+        return addNurseSpeak(userId, content, SpeakType.CATHART.name(), fileName, fileInputStream);
     }
 
     public NurseSpeakBean addAskQuestion(long userId, String content, String fileName, InputStream fileInputStream) {
         logger.info("add ASK_QUESTION : userId=" + userId + " content="+content+" fileName="+fileName);
-        // check speak type
-        SpeakTypeBean speakType = speakTypeService.getSpeakTypeByType(SpeakType.ASK_QUESTION);
-        if (null==speakType) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        return addNurseSpeak(userId, content, speakType.getId(), fileName, fileInputStream);
+        return addNurseSpeak(userId, content, SpeakType.ASK_QUESTION.name(), fileName, fileInputStream);
     }
 
     @Transactional
-    private NurseSpeakBean addNurseSpeak(long userId, String content, int speakTypeId, String fileName, InputStream fileInputStream) {
+    private NurseSpeakBean addNurseSpeak(long userId, String content, String strSpeakType, String imageName, InputStream image) {
+        logger.info("add nurse speak with userId={} speakType={} content={} imageName={} image={}", userId, strSpeakType, content, imageName, (null!=image));
         boolean hasImage = false;
 
+        // check speak type
+        SpeakType     speakType     = SpeakType.parseString(strSpeakType);
+        SpeakTypeBean speakTypeBean = speakTypeService.getSpeakTypeByType(speakType);
+        if (null==speakTypeBean) {
+            logger.error("speak type is invalid");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
         NurseSpeakEntity entity = new NurseSpeakEntity();
-        if (null==fileName||"".equals(fileName) || null==fileInputStream) {
-            logger.info("there is no image file need to insert!");
-        }
-        else {
-            try {
-                long fileID = storageService.saveFile(entity.getImageId(), fileName, fileInputStream);
-                entity.setImageId(fileID);
-                hasImage = true;
-            }
-            catch (BadRequestException ex) {
-                // do nothing
-            }
-        }
         // check speak content
         if (null==content || "".equals(content)) {
+            logger.error("speak content is empty");
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
         }
 
         entity.setUserId(userId);
         entity.setContent(content);
-        entity.setSpeakType(speakTypeId);
+        entity.setSpeakType(speakTypeBean.getId());
         entity.setTime(new Date());
         entity = speakRepository.save(entity);
 
+
+        if (null==imageName||"".equals(imageName) || null==image) {
+            logger.info("there is no image file need to insert!");
+        }
+        else {
+            addImage(userId, entity.getId(), imageName, image);
+        }
+
         NurseSpeakBean bean = speakConverter.convert(entity);
         if (hasImage) {
-            bean.setImageUrl(storageService.getFilePath(entity.getImageId()));
+            List<ImagesInSpeakBean> images = speakImageService.getImagesInSpeak(entity.getId());
+            bean.setImages(images);
         }
 
         return bean;
+    }
+
+    public ImagesInSpeakBean addImage(long userId, long speakId, String imageName, InputStream image) {
+        logger.info("user {} add image to speak={} image name={} image={}", userId, speakId, imageName, (null!=image));
+
+        // check speak
+        NurseSpeakEntity speakEntity   = speakRepository.findOne(speakId);
+        if (null==speakEntity) {
+            logger.error("nurse speak is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (userId!=speakEntity.getUserId()) {
+            logger.error("user can not modify other's speak");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        // check speak type
+        SpeakTypeBean    speakTypeBean = speakTypeService.getSpeakType(speakEntity.getSpeakType());
+        if (null==speakTypeBean) {
+            logger.error("speak type is invalid");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        long count = speakImageService.countImagesInSpeak(speakId);
+        if (count>=0 && SpeakType.CATHART.equals(speakTypeBean.getType())) {
+            logger.warn("the cathart speak do not need a image");
+            return new ImagesInSpeakBean();
+        }
+        else if (count>=1 && SpeakType.SMUG.equals(speakTypeBean.getType())) {
+            logger.warn("the smug speak do not need image more than one");
+            return new ImagesInSpeakBean();
+        }
+        else if (count>=9 && SpeakType.ASK_QUESTION.equals(speakTypeBean.getType())) {
+            logger.warn("the ask_question speak do not need image more than nine");
+            return new ImagesInSpeakBean();
+        }
+
+        ImagesInSpeakBean imageInSpeakBean = speakImageService.addImage(speakId, imageName, image);
+        return imageInSpeakBean;
     }
 
     //===============================================================
@@ -401,7 +432,7 @@ public class NurseSpeakService {
         speakRepository.delete(speaks);
         speakCommentService.deleteBySpeakIds(speakIds);
         thumbsUpService.deleteBySpeakIds(speakIds);
-        storageService.deleteFiles(imageIds);
+        speakImageService.deleteBySpeakIds(speakIds);
 
         List<NurseSpeakBean> retValue = new ArrayList<>();
         for (NurseSpeakEntity tmp : speaks) {
@@ -409,6 +440,10 @@ public class NurseSpeakService {
             retValue.add(comment);
         }
         return retValue;
+    }
+
+    public ImagesInSpeakBean deleteImagesInSpeak(long imagesInSpeakId) {
+        return speakImageService.deleteById(imagesInSpeakId);
     }
 
     //=======================================================
@@ -422,9 +457,57 @@ public class NurseSpeakService {
         return commentBean;
     }
 
-    public List<NurseSpeakCommentBean> deleteSpeakComment(long commentMakerId, String strCommentIds) {
-        List<NurseSpeakCommentBean> comments = speakCommentService.deleteByIds(commentMakerId, strCommentIds);
-        return comments;
+    public List<NurseSpeakCommentBean> deleteSpeakComment(long userId, String strCommentIds) {
+        List<NurseSpeakCommentBean> comments = speakCommentService.getCommentByIds(strCommentIds);
+
+        if (null==comments || comments.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Long> speakIds = new ArrayList<>();
+        List<Long> makerIds = new ArrayList<>();
+        for (NurseSpeakCommentBean comment : comments) {
+            long speakId = comment.getNurseSpeakId();
+            long makerId = comment.getCommentMakerId();
+            if (!speakIds.contains(speakId)) {
+                speakIds.add(speakId);
+            }
+            if (!makerIds.contains(makerId)) {
+                makerIds.add(makerId);
+            }
+        }
+
+        // is comment maker
+        if (makerIds.size()==1 && userId==makerIds.get(0)) {
+            logger.warn("delete by comment maker");
+            comments = speakCommentService.deleteByIds(strCommentIds);
+            return comments;
+        }
+
+        // is speak not exist
+        List<NurseSpeakEntity> speaks = speakRepository.findByIdIn(speakIds);
+        if (null==speaks || speakIds.isEmpty()) {
+            logger.warn("delete as speak not exist");
+            comments = speakCommentService.deleteByIds(strCommentIds);
+            return comments;
+        }
+
+        // is speak maker
+        boolean isSpeakMaker = true;
+        for (NurseSpeakEntity tmp : speaks) {
+            if (tmp.getUserId()==userId) {
+                continue;
+            }
+            isSpeakMaker = false;
+        }
+        if (isSpeakMaker) {
+            logger.warn("delete by speak maker");
+            comments = speakCommentService.deleteByIds(strCommentIds);
+            return comments;
+        }
+        logger.warn("can not delete comment");
+
+        return new ArrayList<>();
     }
 
 

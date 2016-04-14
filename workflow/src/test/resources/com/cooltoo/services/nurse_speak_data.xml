@@ -12,8 +12,8 @@
     <nurse_speak id="10" user_id="1" content="hello 10 (^-^)!" time="2016-01-01" image_id="2" speak_type="1"  />
     <nurse_speak id="11" user_id="1" content="hello 11 (*-*)!" time="2016-01-01" image_id="3" speak_type="1" />
 
-    <nurse_speak id="12" user_id="2" content="hello 12 (^-^)!" time="2016-01-01" image_id="4" speak_type="1" />
-    <nurse_speak id="13" user_id="2" content="hello 13 (@_@)!" time="2016-01-01" image_id="1" speak_type="1" />
-    <nurse_speak id="14" user_id="3" content="hello 14 (^-^)!" time="2016-01-01" image_id="2" speak_type="1"  />
-    <nurse_speak id="15" user_id="3" content="hello 15 (*-*)!" time="2016-01-01" image_id="3" speak_type="1" />
+    <nurse_speak id="12" user_id="2" content="hello 12 (^-^)!" time="2016-01-01" image_id="4" speak_type="2" />
+    <nurse_speak id="13" user_id="2" content="hello 13 (@_@)!" time="2016-01-01" image_id="1" speak_type="3" />
+    <nurse_speak id="14" user_id="3" content="hello 14 (^-^)!" time="2016-01-01" image_id="2" speak_type="2"  />
+    <nurse_speak id="15" user_id="3" content="hello 15 (*-*)!" time="2016-01-01" image_id="3" speak_type="3" />
 </dataset>

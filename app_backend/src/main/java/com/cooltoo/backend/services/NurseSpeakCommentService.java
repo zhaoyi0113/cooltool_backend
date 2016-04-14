@@ -21,6 +21,8 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.Lob;
+
 /**
  * Created by Test111 on 2016/3/18.
  */
@@ -31,16 +33,45 @@ public class NurseSpeakCommentService {
     @Autowired
     private NurseSpeakCommentRepository commentRepository;
     @Autowired
-    private NurseRepository             nurseRepository;
+    private NurseRepository nurseRepository;
     @Autowired
     @Qualifier("StorageService")
-    private StorageService              storageService;
+    private StorageService storageService;
     @Autowired
     private NurseSpeakCommentBeanConverter beanConverter;
 
     //==================================================================
     //              GET
     //==================================================================
+    public List<NurseSpeakCommentBean> getCommentByIds(String ids) {
+        if (!VerifyUtil.isIds(ids)) {
+            return new ArrayList<>();
+        }
+        String[]   strArray   = ids.split(",");
+        List<Long> commentIds = new ArrayList<>();
+        for (String tmp : strArray) {
+            long id = Long.parseLong(tmp);
+            commentIds.add(id);
+        }
+        return getCommentByIds(commentIds);
+    }
+
+    public List<NurseSpeakCommentBean> getCommentByIds(List<Long> commentIds) {
+        if (null==commentIds || commentIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<NurseSpeakCommentEntity> resultSet = commentRepository.findByIdIn(commentIds);
+
+        List<NurseSpeakCommentBean>   comments  = new ArrayList<>();
+        for (NurseSpeakCommentEntity tmp : resultSet) {
+            NurseSpeakCommentBean bean = beanConverter.convert(tmp);
+            comments.add(bean);
+        }
+
+        return comments;
+    }
+
     public List<NurseSpeakCommentBean> getSpeakCommentsByNurseSpeakId(long nurseSpeakId) {
         if (nurseSpeakId < 0) {
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_NOT_EXIST);
@@ -159,7 +190,7 @@ public class NurseSpeakCommentService {
     }
 
     @Transactional
-    public List<NurseSpeakCommentBean> deleteByIds(long commentMakerId, String strCommentIds) {
+    public List<NurseSpeakCommentBean> deleteByIds(String strCommentIds) {
         logger.info("delete nurse speak comment by comment ids {}.", strCommentIds);
         if (!VerifyUtil.isIds(strCommentIds)) {
             logger.warn("comment ids are invalid");
@@ -173,11 +204,11 @@ public class NurseSpeakCommentService {
             ids.add(id);
         }
 
-        return deleteByIds(commentMakerId, ids);
+        return deleteByIds(ids);
     }
 
     @Transactional
-    public List<NurseSpeakCommentBean> deleteByIds(long commentMakerId, List<Long> commentIds) {
+    public List<NurseSpeakCommentBean> deleteByIds(List<Long> commentIds) {
         logger.info("delete nurse speak comment by comment ids {}.", commentIds);
         if (null==commentIds || commentIds.isEmpty()) {
             return new ArrayList<>();
@@ -186,15 +217,6 @@ public class NurseSpeakCommentService {
         List<NurseSpeakCommentEntity> comments = commentRepository.findByIdIn(commentIds);
         if (null==comments || comments.isEmpty()) {
             logger.info("delete nothing");
-        }
-        if (commentMakerId>0) {
-            for (NurseSpeakCommentEntity comment : comments) {
-                if (comment.getCommentMakerId() == commentMakerId) {
-                    continue;
-                }
-                logger.warn("can not delete the comment {} not making by yourself {}", comment, commentMakerId);
-                return new ArrayList<>();
-            }
         }
 
         commentRepository.delete(comments);

@@ -60,8 +60,8 @@ public class TagsServiceAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getTagByPage(@Context HttpServletRequest request,
-                                 @PathParam("index") int index,
-                                 @PathParam("number") int number
+                                 @PathParam("index")  @DefaultValue("0")  int index,
+                                 @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get all tags at page {} numberOfPage {}", index, number);
         List<TagsBean> tags = tagsService.getTagsByPage(index, number);
@@ -74,8 +74,8 @@ public class TagsServiceAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getCategoryByPage(@Context HttpServletRequest request,
-                                      @PathParam("index") int index,
-                                      @PathParam("number") int number
+                                      @PathParam("index")  @DefaultValue("0")  int index,
+                                      @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get all tag category at page {} numberOfPage {}", index, number);
         List<TagsCategoryBean> tags = tagsService.getCategoryByPage(index, number);

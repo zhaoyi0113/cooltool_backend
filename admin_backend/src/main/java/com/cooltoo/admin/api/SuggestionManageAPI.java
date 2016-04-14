@@ -57,8 +57,8 @@ public class SuggestionManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getSuggestions(@Context HttpServletRequest request,
-                                   @PathParam("index") int index,
-                                   @PathParam("number") int number) {
+                                   @PathParam("index")  @DefaultValue("0")  int index,
+                                   @PathParam("number") @DefaultValue("10") int number) {
         List<SuggestionBean> suggestions = service.getSuggestions(index, number);
         return Response.ok(suggestions).build();
     }
@@ -69,8 +69,8 @@ public class SuggestionManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getSuggestions(@Context HttpServletRequest request,
                                    @PathParam("status") String status,
-                                   @PathParam("index") int index,
-                                   @PathParam("number") int number) {
+                                   @PathParam("index")  @DefaultValue("0")  int index,
+                                   @PathParam("number") @DefaultValue("10") int number) {
         if (!"ALL".equalsIgnoreCase(status)) {
             List<SuggestionBean> suggestions = service.getSuggestions(status, index, number);
             return Response.ok(suggestions).build();

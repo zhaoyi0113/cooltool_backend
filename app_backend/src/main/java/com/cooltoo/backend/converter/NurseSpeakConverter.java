@@ -18,7 +18,6 @@ public class NurseSpeakConverter implements Converter<NurseSpeakEntity, NurseSpe
     public NurseSpeakBean convert(NurseSpeakEntity source) {
         NurseSpeakBean bean = new NurseSpeakBean();
         bean.setUserId(source.getUserId());
-        bean.setImageId(source.getImageId());
         bean.setContent(source.getContent());
         bean.setTime(source.getTime());
         bean.setId(source.getId());

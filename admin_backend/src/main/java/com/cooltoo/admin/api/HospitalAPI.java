@@ -50,8 +50,8 @@ public class HospitalAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getAllByPage(@Context HttpServletRequest request,
-                                 @PathParam("index") int index,
-                                 @PathParam("number") int number
+                                 @PathParam("index")  @DefaultValue("0")  int index,
+                                 @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get hospital at page {} numberOfPage {}", index, number);
         List<HospitalBean> page = service.getAllByPage(index, number);
@@ -81,7 +81,9 @@ public class HospitalAPI {
                                    @DefaultValue("-1")   @FormParam("province") int     province,
                                    @DefaultValue("-1")   @FormParam("city")     int     city,
                                    @DefaultValue("-1")   @FormParam("district") int     district,
-                                   @DefaultValue("")     @FormParam("address")  String  address) {
+                                   @DefaultValue("")     @FormParam("address")  String  address,
+                                   @DefaultValue("0")    @FormParam("index")    int     index,
+                                   @DefaultValue("10")   @FormParam("number")   int     number) {
         List<HospitalBean> hospitals = service.searchHospital(andOrOr, name, province, city, district, address);
         logger.info("get hospital is " + hospitals);
         if (null == hospitals) {

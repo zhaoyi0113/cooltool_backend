@@ -49,7 +49,7 @@ public class NurseOccupationSkillAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response getSkillAbility(@Context HttpServletRequest request,
-                              @PathParam("skill_id") int skillId
+                                    @PathParam("skill_id") int skillId
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get skill {} ability.", userId, skillId);
@@ -84,7 +84,7 @@ public class NurseOccupationSkillAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response getFriendAllAbility(@Context HttpServletRequest request,
-                                   @PathParam("friend_id") long friendId
+                                        @PathParam("friend_id") long friendId
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get friend {} 's all social abilities.", userId, friendId);
