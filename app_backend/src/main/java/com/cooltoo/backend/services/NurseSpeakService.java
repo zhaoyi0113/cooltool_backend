@@ -111,7 +111,9 @@ public class NurseSpeakService {
         }
 
         // parse entities to bean
-        return fillOtherProperties(userId, speakEntities);
+        List<NurseSpeakBean> beans = entitiesToBeans(speakEntities);
+        fillOtherProperties(userId, beans);
+        return beans;
     }
 
     public List<NurseSpeakBean> getSpeakByType(String speakType, int index, int number) {
@@ -141,7 +143,9 @@ public class NurseSpeakService {
         }
 
         // parse entities to bean
-        return fillOtherProperties(-1, speakEntities);
+        List<NurseSpeakBean> beans = entitiesToBeans(speakEntities);
+        fillOtherProperties(-1, beans);
+        return beans;
     }
 
     @Transactional
@@ -167,7 +171,9 @@ public class NurseSpeakService {
         }
 
         // parse entities to bean
-        return fillOtherProperties(userId, speakEntities);
+        List<NurseSpeakBean> beans = entitiesToBeans(speakEntities);
+        fillOtherProperties(userId, beans);
+        return beans;
     }
 
     public NurseSpeakBean getNurseSpeak(long speakId) {
@@ -183,7 +189,25 @@ public class NurseSpeakService {
         return speak;
     }
 
-    private List<NurseSpeakBean> fillOtherProperties(long userId, List<NurseSpeakEntity> entities) {
+    private List<NurseSpeakBean> entitiesToBeans(List<NurseSpeakEntity> entities) {
+        if (null==entities || entities.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<NurseSpeakBean> beans = new ArrayList<>();
+        for(NurseSpeakEntity tmp : entities) {
+            NurseSpeakBean bean = speakConverter.convert(tmp);
+            beans.add(bean);
+        }
+
+        return beans;
+    }
+
+    private void fillOtherProperties(long userId, List<NurseSpeakBean> beans) {
+        if (null==beans || beans.isEmpty()) {
+            return;
+        }
+
         // speak ids/file ids cache
         List<Long> speakIds = new ArrayList<Long>();
         List<Long> userIds = new ArrayList<Long>();
@@ -193,14 +217,14 @@ public class NurseSpeakService {
         Map<Long, String> userId2Name   = new HashMap<Long, String>();
         Map<Long, Long>   userId2FileId = new HashMap<Long, Long>();
         if (userId<0) {
-            for(NurseSpeakEntity entity: entities){
-                userIds.add(entity.getUserId());
+            for(NurseSpeakBean tmp : beans){
+                userIds.add(tmp.getUserId());
             }
-            Iterable<NurseEntity> all = nurseRepository.findByIdIn(userIds);
-            for (NurseEntity user : all) {
-                userId2Name.put(user.getId(), user.getName());
-                userId2FileId.put(user.getId(), user.getProfilePhotoId());
-                fileIds.add(user.getProfilePhotoId());
+            Iterable<NurseEntity> users = nurseRepository.findByIdIn(userIds);
+            for (NurseEntity tmp : users) {
+                userId2Name.put(tmp.getId(), tmp.getName());
+                userId2FileId.put(tmp.getId(), tmp.getProfilePhotoId());
+                fileIds.add(tmp.getProfilePhotoId());
             }
         }
         else {
@@ -214,73 +238,76 @@ public class NurseSpeakService {
 
         // convert to bean
         Map<Long, NurseSpeakBean> speakIdToBeanMap = new HashMap<Long, NurseSpeakBean>();
-        for (NurseSpeakEntity entity : entities) {
-            NurseSpeakBean speak = speakConverter.convert(entity);
-            String nurseName = userId2Name.get(speak.getUserId());
-            speak.setUserName(nurseName);
-            speakIdToBeanMap.put(speak.getId(), speak);
-            speakIds.add(speak.getId());
+        for (NurseSpeakBean tmp : beans) {
+            String nurseName = userId2Name.get(tmp.getUserId());
+            tmp.setUserName(nurseName);
+            speakIdToBeanMap.put(tmp.getId(), tmp);
+            speakIds.add(tmp.getId());
         }
 
-        NurseSpeakBean bean = null;
+        NurseSpeakBean speakBean = null;
 
         // get comment of speak
         List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakIds(speakIds);
-        for (NurseSpeakCommentBean comment : comments) {
-            bean = speakIdToBeanMap.get(comment.getNurseSpeakId());
-            List<NurseSpeakCommentBean> nurseComment = bean.getComments();
-            if (null==nurseComment) {
-                nurseComment = new ArrayList<NurseSpeakCommentBean>();
-                bean.setComments(nurseComment);
+        for (NurseSpeakCommentBean tmp : comments) {
+            long speakId = tmp.getNurseSpeakId();
+            speakBean = speakIdToBeanMap.get(speakId);
+
+            List<NurseSpeakCommentBean> mapValue = speakBean.getComments();
+            if (null==mapValue) {
+                mapValue = new ArrayList<>();
+                speakBean.setComments(mapValue);
             }
-            nurseComment.add(comment);
+
+            mapValue.add(tmp);
         }
 
         // get thumbsUp of speak
         List<NurseSpeakThumbsUpBean> thumbsUps = thumbsUpService.getSpeakThumbsUpByNurseSpeakIds(speakIds);
-        for (NurseSpeakThumbsUpBean thumbsUp : thumbsUps) {
-            bean = speakIdToBeanMap.get(thumbsUp.getNurseSpeakId());
-            List<NurseSpeakThumbsUpBean> speakThumbsUp = bean.getThumbsUps();
-            if (null==speakThumbsUp) {
-                speakThumbsUp = new ArrayList<NurseSpeakThumbsUpBean>();
-                bean.setThumbsUps(speakThumbsUp);
+        for (NurseSpeakThumbsUpBean tmp : thumbsUps) {
+            long speakId = tmp.getNurseSpeakId();
+            speakBean = speakIdToBeanMap.get(speakId);
+
+            List<NurseSpeakThumbsUpBean> mapValue = speakBean.getThumbsUps();
+            if (null==mapValue) {
+                mapValue = new ArrayList<>();
+                speakBean.setThumbsUps(mapValue);
             }
-            speakThumbsUp.add(thumbsUp);
+
+            mapValue.add(tmp);
         }
 
         // get image url of speak
         Map<Long, List<ImagesInSpeakBean>> idToImage = speakImageService.getImagesInSpeak(speakIds);
-        for (NurseSpeakEntity entity : entities) {
-            long                    speakId   = entity.getId();
-            List<ImagesInSpeakBean> images    = idToImage.get(speakId);
-            NurseSpeakBean          speakBean = speakIdToBeanMap.get(speakId);
+        for (NurseSpeakBean tmp : beans) {
+            long                    speakId = tmp.getId();
+            List<ImagesInSpeakBean> images  = idToImage.get(speakId);
+            speakBean = speakIdToBeanMap.get(speakId);
             speakBean.setImages(images);
         }
 
         // get user profile photo url
         Map<Long, String> idToPath = storageService.getFilePath(fileIds);
-        for (NurseSpeakEntity entity : entities) {
+        for (NurseSpeakBean entity : beans) {
             long   speakId    = entity.getId();
             long   tmpUserId  = entity.getUserId();
             long   userProfId = userId2FileId.get(tmpUserId);
             String userProUrl = idToPath.get(userProfId);
-            NurseSpeakBean speakBean = speakIdToBeanMap.get(speakId);
+            speakBean = speakIdToBeanMap.get(speakId);
             speakBean.setUserProfilePhotoUrl(userProUrl);
         }
 
         // construct return values
-        List<Object>         countTarget = null;
-        List<NurseSpeakBean> speakBeans  = new ArrayList<NurseSpeakBean>();
-        for (NurseSpeakEntity entity : entities) {
-            long speakId = entity.getId();
-            bean         = speakIdToBeanMap.get(speakId);
-            countTarget  = (List)bean.getComments();
-            bean.setCommentsCount(null==countTarget ? 0 : countTarget.size());
-            countTarget  = (List)bean.getThumbsUps();
-            bean.setThumbsUpsCount(null==countTarget ? 0 : countTarget.size());
-            speakBeans.add(speakIdToBeanMap.get(speakId));
+        List<Object> countTarget = null;
+        for (NurseSpeakBean tmp : beans) {
+            long speakId = tmp.getId();
+            speakBean    = speakIdToBeanMap.get(speakId);
+            countTarget  = (List)speakBean.getComments();
+            speakBean.setCommentsCount(null == countTarget ? 0 : countTarget.size());
+            countTarget  = (List)speakBean.getThumbsUps();
+            speakBean.setThumbsUpsCount(null == countTarget ? 0 : countTarget.size());
         }
-        return speakBeans;
+        return;
     }
 
 
@@ -368,7 +395,7 @@ public class NurseSpeakService {
         }
 
         long count = speakImageService.countImagesInSpeak(speakId);
-        if (count>=0 && SpeakType.CATHART.equals(speakTypeBean.getType())) {
+        if (count>=1 && SpeakType.CATHART.equals(speakTypeBean.getType())) {
             logger.warn("the cathart speak do not need a image");
             return new ImagesInSpeakBean();
         }
