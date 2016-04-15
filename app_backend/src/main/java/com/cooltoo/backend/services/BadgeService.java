@@ -122,7 +122,7 @@ public class BadgeService {
     //=========================================================
 
     @Transactional
-    public String deleteBadge(String ids) {
+    public String deleteBadgeByIds(String ids) {
         logger.info("delete badge by ids={}", ids);
         if (!VerifyUtil.isIds(ids)) {
             logger.error("the ids parameter is invalid");
@@ -193,7 +193,7 @@ public class BadgeService {
         // check social ability type
         SocialAbilityType abilityType = SocialAbilityType.parseString(strAbilityType);
         if (!isAbilityIdAndTypeValid(abilityId, abilityType)) {
-            logger.error("ability type is invalid");
+            logger.error("ability id/type is invalid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
@@ -204,12 +204,14 @@ public class BadgeService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        long imageId = 0;
+        long   imageId  = 0;
+        String imageUrl = null;
         if (null!=image) {
             if (!VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "grade_"+System.nanoTime();
             }
-            imageId = storageService.saveFile(imageId, imageName, image);
+            imageId  = storageService.saveFile(imageId, imageName, image);
+            imageUrl = storageService.getFilePath(imageId);
         }
 
         BadgeEntity entity = new BadgeEntity();
@@ -220,7 +222,10 @@ public class BadgeService {
         entity.setAbilityType(abilityType);
         entity.setImageId(imageId);
         entity = repository.save(entity);
-        return beanConverter.convert(entity);
+
+        BadgeBean badge = beanConverter.convert(entity);
+        badge.setImageUrl(imageUrl);
+        return badge;
     }
 
 
@@ -239,26 +244,37 @@ public class BadgeService {
         boolean     changed = false;
         BadgeEntity entity  = repository.findOne(id);
 
-        // check grade
-        BadgeGrade grade = BadgeGrade.parseString(strGrade);
-        if (null!=grade) {
-            entity.setGrade(grade);
-            changed = true;
-        }
-
-        // check social ability type
+        BadgeGrade        grade       = BadgeGrade.parseString(strGrade);
         SocialAbilityType abilityType = SocialAbilityType.parseString(strAbilityType);
-        if (isAbilityIdAndTypeValid(abilityId, abilityType)) {
-            entity.setAbilityType(abilityType);
-            entity.setAbilityId(abilityId);
-            changed = true;
-        }
 
         // check record is already exist
         List<BadgeEntity> resultSet   = repository.findByAbilityIdAndAbilityTypeAndGrade(abilityId, abilityType, grade);
         if (null!=resultSet && !resultSet.isEmpty()) {
             logger.error("record is exist == {}", resultSet);
             throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        if (!VerifyUtil.isStringEmpty(name)) {
+            entity.setName(name);
+            changed = true;
+        }
+
+        if (point>0 && point!=entity.getPoint()) {
+            entity.setPoint(point);
+            changed = true;
+        }
+
+        // check grade
+        if (null!=grade) {
+            entity.setGrade(grade);
+            changed = true;
+        }
+
+        // check social ability type
+        if (isAbilityIdAndTypeValid(abilityId, abilityType)) {
+            entity.setAbilityType(abilityType);
+            entity.setAbilityId(abilityId);
+            changed = true;
         }
 
         String imageUrl = null;

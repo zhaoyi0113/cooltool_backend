@@ -446,9 +446,7 @@ public class NurseSpeakService {
             logger.info("delete nothing");
         }
 
-        List<Long> imageIds = new ArrayList<>();
         for (NurseSpeakEntity speak : speaks) {
-            imageIds.add(speak.getImageId());
             if (speak.getUserId()==speakMakerId) {
                 continue;
             }

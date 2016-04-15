@@ -1,0 +1,1 @@
+ALTER TABLE `nurse_speak` DROP COLUMN `image_id`;

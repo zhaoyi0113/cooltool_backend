@@ -4,6 +4,7 @@ import com.cooltoo.backend.beans.OccupationSkillBean;
 import com.cooltoo.backend.converter.OccupationSkillBeanConverter;
 import com.cooltoo.backend.entities.OccupationSkillEntity;
 import com.cooltoo.constants.OccupationSkillStatus;
+import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.SkillRepository;
@@ -33,13 +34,12 @@ public class OccupationSkillService {
 
     private static final Logger logger = LoggerFactory.getLogger(OccupationSkillService.class.getName());
 
-    @Autowired
-    private SkillRepository skillRepository;
+    @Autowired private SkillRepository skillRepository;
+    @Autowired private OccupationSkillBeanConverter beanConverter;
+    @Autowired private BadgeService badgeService;
     @Autowired
     @Qualifier("StorageService")
     private StorageService storageService;
-    @Autowired
-    private OccupationSkillBeanConverter beanConverter;
 
     //=========================================================
     //           get skills
@@ -224,6 +224,7 @@ public class OccupationSkillService {
         imageIds.add(bean.getDisableImageId());
         storageService.deleteFiles(imageIds);
         skillRepository.delete(id);
+        badgeService.deleteByAbilityIdAndType(id, SocialAbilityType.SKILL.name());
     }
 
 

@@ -102,7 +102,7 @@ public class BadgeAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response deleteBadge(@Context HttpServletRequest request,
                                 @DefaultValue("-1") @FormDataParam("id") String ids) {
-        String deleteIds = badgeService.deleteBadge(ids);
+        String deleteIds = badgeService.deleteBadgeByIds(ids);
         return Response.ok(deleteIds).build();
     }
 }

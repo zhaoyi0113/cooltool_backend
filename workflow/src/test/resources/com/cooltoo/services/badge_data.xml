@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
-
-    <badge id="1000" name="name1" point="100" grade="0" file_id="1"></badge>
-    <badge id="1001" name="name2" point="101" grade="1" file_id="1"></badge>
-    <badge id="1002" name="name3" point="102" grade="2" file_id="1"></badge>
-    <badge id="1003" name="name4" point="103" grade="0" file_id="1"></badge>
-    <badge id="1004" name="name5" point="104" grade="1" file_id="1"></badge>
-
+    <badge id="1" name="铜 1" point="100" grade="0" file_id="1" ability_id="1" ability_type="0" /><!-- LEVEL1_臭美_COMMUNITY -->
+    <badge id="2" name="银 1" point="200" grade="1" file_id="2" ability_id="1" ability_type="0" /><!-- LEVEL2_臭美_COMMUNITY -->
+    <badge id="3" name="金 1" point="300" grade="2" file_id="3" ability_id="1" ability_type="0" /><!-- LEVEL3_臭美_COMMUNITY -->
+    <badge id="4" name="铜 2" point="10"  grade="0" file_id="4" ability_id="1" ability_type="1" /><!-- LEVEL1_occ1_SKILL -->
+    <badge id="5" name="银 2" point="20"  grade="1" file_id="5" ability_id="1" ability_type="1" /><!-- LEVEL2_occ1_SKILL -->
+    <badge id="6" name="铜 3" point="1"   grade="0" file_id="7" ability_id="2" ability_type="0" /><!-- LEVEL1_吐槽_COMMUNITY -->
+    <badge id="7" name="银 3" point="2"   grade="1" file_id="8" ability_id="2" ability_type="0" /><!-- LEVEL2_吐槽_COMMUNITY -->
+    <badge id="8" name="金 3" point="3"   grade="2" file_id="9" ability_id="2" ability_type="0" /><!-- LEVEL3_吐槽_COMMUNITY -->
 </dataset>

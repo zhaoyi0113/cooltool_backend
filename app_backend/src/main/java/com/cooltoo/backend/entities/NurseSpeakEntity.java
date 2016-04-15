@@ -14,7 +14,6 @@ public class NurseSpeakEntity {
     private long userId;
     private String content;
     private Date time;
-    private long imageId;
     /** the id of speak_type */
     private int speakType;
 
@@ -55,11 +54,6 @@ public class NurseSpeakEntity {
 
     public void setTime(Date time) { this.time = time; }
 
-    @Column(name = "image_id")
-    public long getImageId() { return imageId; }
-
-    public void setImageId(long imageId) { this.imageId = imageId; }
-
     @Column(name = "speak_type")
     public int getSpeakType() { return speakType; }
 
@@ -72,7 +66,6 @@ public class NurseSpeakEntity {
         msg.append("userId=").append(userId).append(" , ");
         msg.append("time=").append(time).append(" , ");
         msg.append("content=").append(content).append(" , ");
-        msg.append("imageId=").append(imageId).append(" , ");
         msg.append("speakType=").append(speakType);
         msg.append("]");
         return msg.toString();
