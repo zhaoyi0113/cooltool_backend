@@ -1,7 +1,6 @@
 package com.cooltoo.backend.entities;
 
 import com.cooltoo.constants.OccupationSkillStatus;
-import com.cooltoo.constants.OccupationSkillType;
 
 import javax.persistence.*;
 

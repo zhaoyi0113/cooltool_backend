@@ -1,6 +1,6 @@
 package com.cooltoo.backend.entities;
 
-import com.cooltoo.constants.OccupationSkillType;
+import com.cooltoo.constants.SocialAbilityType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,7 +16,7 @@ public class NurseSkillNominationEntity {
     private int skillId;
     private long nominatedId;
     private Date dateTime;
-    private OccupationSkillType skillType;
+    private SocialAbilityType skillType;
 
     @Id
     @GeneratedValue
@@ -68,11 +68,11 @@ public class NurseSkillNominationEntity {
 
     @Column(name = "skill_type")
     @GeneratedValue
-    public OccupationSkillType getSkillType() {
+    public SocialAbilityType getSkillType() {
         return skillType;
     }
 
-    public void setSkillType(OccupationSkillType skillType) {
+    public void setSkillType(SocialAbilityType skillType) {
         this.skillType = skillType;
     }
 

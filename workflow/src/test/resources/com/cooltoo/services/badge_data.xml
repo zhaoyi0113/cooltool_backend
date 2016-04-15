@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
 
-    <badge id="1000" name="name1" point="100" grade="8" file_id="1"></badge>
-    <badge id="1001" name="name2" point="101" grade="9" file_id="1"></badge>
-    <badge id="1002" name="name3" point="102" grade="10" file_id="1"></badge>
-    <badge id="1003" name="name4" point="103" grade="11" file_id="1"></badge>
-    <badge id="1004" name="name5" point="104" grade="12" file_id="1"></badge>
+    <badge id="1000" name="name1" point="100" grade="0" file_id="1"></badge>
+    <badge id="1001" name="name2" point="101" grade="1" file_id="1"></badge>
+    <badge id="1002" name="name3" point="102" grade="2" file_id="1"></badge>
+    <badge id="1003" name="name4" point="103" grade="0" file_id="1"></badge>
+    <badge id="1004" name="name5" point="104" grade="1" file_id="1"></badge>
 
 </dataset>

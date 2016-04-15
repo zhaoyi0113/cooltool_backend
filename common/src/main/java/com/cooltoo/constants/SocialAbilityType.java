@@ -1,19 +1,17 @@
 package com.cooltoo.constants;
 
-import com.cooltoo.util.VerifyUtil;
-
 import java.util.*;
 
 /**
  * Created by yzzhao on 3/21/16.
  */
-public enum OccupationSkillType {
+public enum SocialAbilityType {
     COMMUNITY, //社区徽章,包括发图,点赞,评论等
     SKILL, //技能徽章
     OCCUPATION; //职业徽章,比如:医院,科室等关于护士简历方面
 
 
-    public static OccupationSkillType parseString(String skill) {
+    public static SocialAbilityType parseString(String skill) {
         if (COMMUNITY.name().equalsIgnoreCase(skill)) {
             return COMMUNITY;
         }
@@ -26,8 +24,8 @@ public enum OccupationSkillType {
         return null;
     }
 
-    public static OccupationSkillType parseInt(int skill) {
-        OccupationSkillType retVal = null;
+    public static SocialAbilityType parseInt(int skill) {
+        SocialAbilityType retVal = null;
         if (COMMUNITY.ordinal()==(skill)) {
             retVal = COMMUNITY;
         }

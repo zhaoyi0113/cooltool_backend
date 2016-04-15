@@ -6,7 +6,7 @@ import com.cooltoo.backend.entities.OccupationSkillEntity;
 import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.backend.repository.OccupationSkillRepository;
+import com.cooltoo.backend.repository.SkillRepository;
 import com.cooltoo.services.StorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class OccupationSkillService {
     private static final Logger logger = LoggerFactory.getLogger(OccupationSkillService.class.getName());
 
     @Autowired
-    private OccupationSkillRepository skillRepository;
+    private SkillRepository skillRepository;
     @Autowired
     @Qualifier("StorageService")
     private StorageService storageService;

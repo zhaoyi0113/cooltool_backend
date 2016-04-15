@@ -1,8 +1,6 @@
 package com.cooltoo.backend.beans;
 
-import com.cooltoo.constants.OccupationSkillType;
-
-import java.util.Date;
+import com.cooltoo.constants.SocialAbilityType;
 
 /**
  * Created by yzzhao on 3/15/16.
@@ -11,7 +9,7 @@ public class NurseSkillNominationBean {
 
     private long userId;
     private int skillId;
-    private OccupationSkillType skillType;
+    private SocialAbilityType skillType;
     private long skillNominateCount;
 
     public long getUserId() {
@@ -30,11 +28,11 @@ public class NurseSkillNominationBean {
         this.skillId = skillId;
     }
 
-    public OccupationSkillType getSkillType() {
+    public SocialAbilityType getSkillType() {
         return skillType;
     }
 
-    public void setSkillType(OccupationSkillType skillType) {
+    public void setSkillType(SocialAbilityType skillType) {
         this.skillType = skillType;
     }
 

@@ -1,4 +1,7 @@
-package com.cooltoo.admin.entities;
+package com.cooltoo.entities;
+
+import com.cooltoo.constants.BadgeGrade;
+import com.cooltoo.constants.SocialAbilityType;
 
 import javax.persistence.*;
 
@@ -9,17 +12,13 @@ import javax.persistence.*;
 @Table(name = "badge")
 public class BadgeEntity {
 
-    private int id;
-
+    private int    id;
     private String name;
-
-    private int grade;
-
-    private String imageUrl;
-
-    private long point;
-
-    private long fileId;
+    private BadgeGrade grade;
+    private long   point;
+    private long   imageId;
+    private int    abilityId;
+    private SocialAbilityType abilityType;
 
     @Id
     @GeneratedValue
@@ -42,21 +41,13 @@ public class BadgeEntity {
     }
 
     @Column(name = "grade")
-    public int getGrade() {
+    @Enumerated
+    public BadgeGrade getGrade() {
         return grade;
     }
 
-    public void setGrade(int grade) {
+    public void setGrade(BadgeGrade grade) {
         this.grade = grade;
-    }
-
-    @Column(name = "image_url")
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 
     @Column(name = "point")
@@ -69,12 +60,31 @@ public class BadgeEntity {
     }
 
     @Column(name = "file_id")
-    public long getFileId() {
-        return fileId;
+    public long getImageId() {
+        return imageId;
     }
 
-    public void setFileId(long fileId) {
-        this.fileId = fileId;
+    public void setImageId(long imageId) {
+        this.imageId = imageId;
+    }
+
+    @Column(name = "ability_id")
+    public int getAbilityId() {
+        return abilityId;
+    }
+
+    public void setAbilityId(int abilityId) {
+        this.abilityId = abilityId;
+    }
+
+    @Column(name = "ability_type")
+    @Enumerated
+    public SocialAbilityType getAbilityType() {
+        return abilityType;
+    }
+
+    public void setAbilityType(SocialAbilityType abilityType) {
+        this.abilityType = abilityType;
     }
 
     public String toString() {
@@ -84,9 +94,9 @@ public class BadgeEntity {
         msg.append("name=").append(name).append(" ,");
         msg.append("grade=").append(grade).append(" ,");
         msg.append("point=").append(point).append(" ,");
-        msg.append("fileId=").append(fileId).append(" ,");
-        msg.append("imageUrl=").append(imageUrl);
-        msg.append(" ]");
+        msg.append("abilityId=").append(abilityId).append(" ,");
+        msg.append("abilityType=").append(abilityType).append(" ,");
+        msg.append("imageId=").append(imageId).append("]");
         return msg.toString();
     }
 }

@@ -242,7 +242,7 @@ public class NurseSpeakCommentService {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
         if (commentReceiverId < 0) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            commentReceiverId = 0;
         }
         if (null==comment || "".equals(comment)) {
             throw new BadRequestException(ErrorCode.SPEAK_COMMENT_NOT_EXIST);

@@ -1,6 +1,6 @@
 package com.cooltoo.backend.beans;
 
-import com.cooltoo.constants.OccupationSkillType;
+import com.cooltoo.constants.SocialAbilityType;
 
 /**
  * Created by hp on 2016/4/10.
@@ -10,7 +10,7 @@ public class NurseOccupationSkillBean {
     private int id;
     private long userId;
     private int skillId;
-    private OccupationSkillType type = OccupationSkillType.SKILL;
+    private SocialAbilityType type = SocialAbilityType.SKILL;
     private int point;
 
     public int getId() {
@@ -37,7 +37,7 @@ public class NurseOccupationSkillBean {
         this.skillId = skillId;
     }
 
-    public OccupationSkillType getType() {
+    public SocialAbilityType getType() {
         return type;
     }
 

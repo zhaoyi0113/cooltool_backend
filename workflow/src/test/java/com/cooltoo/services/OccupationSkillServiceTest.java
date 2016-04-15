@@ -6,7 +6,7 @@ import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.backend.entities.OccupationSkillEntity;
 import com.cooltoo.repository.FileStorageRepository;
-import com.cooltoo.backend.repository.OccupationSkillRepository;
+import com.cooltoo.backend.repository.SkillRepository;
 import com.cooltoo.backend.services.OccupationSkillService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
@@ -31,7 +31,7 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
     private OccupationSkillService skillService;
 
     @Autowired
-    private OccupationSkillRepository repository;
+    private SkillRepository repository;
 
     @Autowired
     private FileStorageRepository storageRepository;

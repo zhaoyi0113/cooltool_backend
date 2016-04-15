@@ -1,13 +1,15 @@
 package com.cooltoo.admin.api;
 
-import com.cooltoo.admin.beans.BadgeBean;
+import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
-import com.cooltoo.admin.services.BadgeService;
+import com.cooltoo.backend.services.BadgeService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
@@ -26,54 +28,81 @@ public class BadgeAPI {
     @Autowired
     private BadgeService badgeService;
 
+    @Path("/count/{ability_type}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getAllBadges() {
-        List<BadgeBean> badges = badgeService.getAllBadge();
+    public Response countBadgeByAbilityType(@Context HttpServletRequest request,
+                                            @PathParam("ability_type") String ability_type) {
+        long count = badgeService.countByAbilityType(ability_type);
+        return Response.ok(count).build();
+    }
+
+    @Path("/{ability_type}/{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response countBadgeByAbilityType(@Context HttpServletRequest request,
+                                            @PathParam("ability_type") @DefaultValue("ALL") String abilityType,
+                                            @PathParam("index")        @DefaultValue("0")   int    pageIndex,
+                                            @PathParam("number")       @DefaultValue("10")  int    number
+    ) {
+        List<BadgeBean> badges = badgeService.getBadgeByAbilityType(abilityType, pageIndex, number);
         return Response.ok(badges).build();
     }
 
     @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response addBadge(@Context HttpServletRequest request,
+                             @FormParam("name")                                 String name,
+                             @FormParam("grade")        @DefaultValue("LEVEL1") String strGrade,
+                             @FormParam("point")        @DefaultValue("0")      int    point,
+                             @FormParam("ability_id")   @DefaultValue("0")      int    abilityId,
+                             @FormParam("ability_type") @DefaultValue("")       String abilityType) {
+        BadgeBean badge = badgeService.addBadge(name, point, strGrade, abilityId, abilityType, null, null);
+        return Response.ok(badge).build();
+    }
+
+    @Path("/edit")
+    @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response createBadge(
-                                @FormDataParam("name") String name,
-                                @DefaultValue("0") @FormDataParam("grade") int grade,
-                                @DefaultValue("0") @FormDataParam("point") int point,
-                                @FormDataParam("file") InputStream fileInputStream,
-                                @FormDataParam("file") FormDataContentDisposition disposition) {
-        int id = badgeService.createNewBadge(name, point, grade, fileInputStream,
-                                                null != disposition ? disposition.getFileName() : null);
-        logger.info("new badge id="+id+" name="+name +" grade="+grade +" point="+point+
-                    "filename="+(null==disposition ? "null" : disposition.getFileName()));
-        return Response.ok(id).build();
+    public Response editBadgeWithoutImage(@Context HttpServletRequest request,
+                                          @FormParam("id")           @DefaultValue("0")      int    badgeId,
+                                          @FormParam("name")         @DefaultValue("")       String name,
+                                          @FormParam("grade")        @DefaultValue("LEVEL1") String strGrade,
+                                          @FormParam("point")        @DefaultValue("0")      int    point,
+                                          @FormParam("ability_id")   @DefaultValue("0")      int    abilityId,
+                                          @FormParam("ability_type") @DefaultValue("")       String abilityType
+    ) {
+        BadgeBean badge = badgeService.updateBadge(badgeId, name, point, strGrade, abilityId, abilityType, null, null);
+        return Response.ok(badge).build();
     }
+
+
+    @Path("/edit_image")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editBadgeImage(@Context HttpServletRequest request,
+                                   @FormDataParam("id")        @DefaultValue("0") int badgeId,
+                                   @FormDataParam("file_name") @DefaultValue("")  String imageName,
+                                   @FormDataParam("file") InputStream image,
+                                   @FormDataParam("file") FormDataContentDisposition imageDisp
+    ) {
+        BadgeBean badge = badgeService.updateBadge(badgeId, null, -1, null, -1, null, imageName, image);
+        return Response.ok(badge).build();
+    }
+
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response deleteBadge(
-                                @DefaultValue("-1") @FormDataParam("id") int id) {
-        BadgeBean bean = badgeService.deleteBadge(id);
-        logger.info("delete badge is " + bean);
-        return Response.ok(bean).build();
-    }
-
-    @Path("/edit")
-    @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response updateBadge(
-                                @DefaultValue("-1") @FormDataParam("id") int id,
-                                @FormDataParam("name") String name,
-                                @DefaultValue("0") @FormDataParam("grade") int grade,
-                                @DefaultValue("0") @FormDataParam("point") int point,
-                                @FormDataParam("file") InputStream fileInputStream,
-                                @FormDataParam("file") FormDataContentDisposition disposition) {
-        BadgeBean bean = badgeService.updateBadge(id, name, grade, point, fileInputStream,
-                                                    null != disposition ? disposition.getFileName() : null);
-        logger.info("update badge is " + bean);
-        return Response.ok(bean).build();
+    public Response deleteBadge(@Context HttpServletRequest request,
+                                @DefaultValue("-1") @FormDataParam("id") String ids) {
+        String deleteIds = badgeService.deleteBadge(ids);
+        return Response.ok(deleteIds).build();
     }
 }

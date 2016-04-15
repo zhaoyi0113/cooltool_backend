@@ -1,6 +1,6 @@
 package com.cooltoo.backend.beans;
 
-import com.cooltoo.constants.OccupationSkillType;
+import com.cooltoo.constants.SocialAbilityType;
 
 /**
  * Created by zhaolisong on 16/3/25.
@@ -9,7 +9,7 @@ public class SocialAbilitiesBean {
     private long userId;
     private int skillId;
     private String skillName;
-    private OccupationSkillType skillType;
+    private SocialAbilityType skillType;
     private long factor;
     private long nominatedCount;
     private int point;
@@ -42,11 +42,11 @@ public class SocialAbilitiesBean {
         this.skillName = skillName;
     }
 
-    public OccupationSkillType getSkillType() {
+    public SocialAbilityType getSkillType() {
         return skillType;
     }
 
-    public void setSkillType(OccupationSkillType skillType) {
+    public void setSkillType(SocialAbilityType skillType) {
         this.skillType = skillType;
     }
 

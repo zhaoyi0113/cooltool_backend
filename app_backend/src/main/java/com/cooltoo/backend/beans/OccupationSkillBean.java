@@ -1,7 +1,6 @@
 package com.cooltoo.backend.beans;
 
 import com.cooltoo.constants.OccupationSkillStatus;
-import com.cooltoo.constants.OccupationSkillType;
 
 /**
  * Created by yzzhao on 3/10/16.

@@ -1,4 +1,7 @@
-package com.cooltoo.admin.beans;
+package com.cooltoo.beans;
+
+import com.cooltoo.constants.BadgeGrade;
+import com.cooltoo.constants.SocialAbilityType;
 
 import javax.ws.rs.FormParam;
 
@@ -6,22 +9,14 @@ import javax.ws.rs.FormParam;
  * Created by yzzhao on 2/24/16.
  */
 public class BadgeBean {
-
-    @FormParam("id")
     private int id;
-
-    @FormParam("name")
     private String name;
-
-    @FormParam("grade")
-    private int grade;
-
-    private String imageUrl;
-
-    @FormParam("point")
+    private BadgeGrade grade;
     private long point;
-
-    private long fileId;
+    private long imageId;
+    private String imageUrl;
+    private int    abilityId;
+    private SocialAbilityType abilityType;
 
     public int getId() {
         return id;
@@ -39,12 +34,20 @@ public class BadgeBean {
         this.name = name;
     }
 
-    public int getGrade() {
+    public BadgeGrade getGrade() {
         return grade;
     }
 
-    public void setGrade(int grade) {
+    public void setGrade(BadgeGrade grade) {
         this.grade = grade;
+    }
+
+    public long getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(long imageId) {
+        this.imageId = imageId;
     }
 
     public String getImageUrl() {
@@ -63,12 +66,20 @@ public class BadgeBean {
         this.point = point;
     }
 
-    public long getFileId() {
-        return fileId;
+    public int getAbilityId() {
+        return abilityId;
     }
 
-    public void setFileId(long fileId) {
-        this.fileId = fileId;
+    public void setAbilityId(int abilityId) {
+        this.abilityId = abilityId;
+    }
+
+    public SocialAbilityType getAbilityType() {
+        return abilityType;
+    }
+
+    public void setAbilityType(SocialAbilityType abilityType) {
+        this.abilityType = abilityType;
     }
 
     @Override
@@ -79,7 +90,10 @@ public class BadgeBean {
         msg.append(", name=").append(name);
         msg.append(", grade=").append(grade);
         msg.append(", point=").append(point);
-        msg.append(", file_id=").append(fileId);
+        msg.append(", abilityId=").append(abilityId);
+        msg.append(", abilityType=").append(abilityType);
+        msg.append(", imageId=").append(imageId);
+        msg.append(", imageUrl=").append(imageUrl);
         msg.append("]");
         return msg.toString();
     }

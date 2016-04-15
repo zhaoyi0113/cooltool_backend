@@ -3,7 +3,7 @@ import com.cooltoo.admin.beans.PatientBadgeBean;
 import com.cooltoo.admin.converter.PatientBadgeBeanConverter;
 import com.cooltoo.admin.converter.PatientBadgeEntityConverter;
 import com.cooltoo.admin.entities.PatientBadgeEntity;
-import com.cooltoo.admin.repository.BadgeRepository;
+import com.cooltoo.repository.BadgeRepository;
 import com.cooltoo.admin.repository.PatientBadgeRepository;
 import com.cooltoo.admin.repository.PatientRepository;
 import com.cooltoo.exception.BadRequestException;

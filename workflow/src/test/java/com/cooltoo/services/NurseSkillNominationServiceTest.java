@@ -4,7 +4,7 @@ import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseSkillNominationBean;
 import com.cooltoo.backend.repository.NurseSkillNominationRepository;
 import com.cooltoo.backend.services.NurseSkillNominationService;
-import com.cooltoo.constants.OccupationSkillType;
+import com.cooltoo.constants.SocialAbilityType;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testGetAllNominationCount() {
-        List<NurseSkillNominationBean> countMap = nominationService.getSpecialTypeNominated(1, OccupationSkillType.SKILL);
+        List<NurseSkillNominationBean> countMap = nominationService.getSpecialTypeNominated(1, SocialAbilityType.SKILL);
         System.out.println(countMap);
         Assert.assertEquals(5, countMap.size());
         for (NurseSkillNominationBean nm : countMap) {
@@ -56,17 +56,17 @@ public class NurseSkillNominationServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testGetSkillNominationCount() {
-        List<NurseSkillNominationBean> countMap = nominationService.getSpecialTypeNominated(1, OccupationSkillType.SKILL);
+        List<NurseSkillNominationBean> countMap = nominationService.getSpecialTypeNominated(1, SocialAbilityType.SKILL);
         Assert.assertEquals(5, countMap.size());
         for (NurseSkillNominationBean nm : countMap) {
-            Assert.assertEquals(OccupationSkillType.SKILL, nm.getSkillType());
+            Assert.assertEquals(SocialAbilityType.SKILL, nm.getSkillType());
         }
     }
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testAddSkillNominationCount() {
-        String skillType = OccupationSkillType.SKILL.name();
+        String skillType = SocialAbilityType.SKILL.name();
         nominationService.nominateNurseSkill(1, 2, 6, skillType);
         long count = nominationService.getUserAllSkillNominatedCount(2);
         Assert.assertEquals(1, count);

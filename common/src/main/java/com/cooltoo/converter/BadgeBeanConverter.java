@@ -1,7 +1,7 @@
-package com.cooltoo.admin.converter;
+package com.cooltoo.converter;
 
-import com.cooltoo.admin.beans.BadgeBean;
-import com.cooltoo.admin.entities.BadgeEntity;
+import com.cooltoo.beans.BadgeBean;
+import com.cooltoo.entities.BadgeEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -16,9 +16,10 @@ public class BadgeBeanConverter implements Converter<BadgeEntity, BadgeBean> {
         bean.setId(source.getId());
         bean.setName(source.getName());
         bean.setGrade(source.getGrade());
-        bean.setImageUrl(source.getImageUrl());
         bean.setPoint(source.getPoint());
-        bean.setFileId(source.getFileId());
+        bean.setImageId(source.getImageId());
+        bean.setAbilityId(source.getAbilityId());
+        bean.setAbilityType(source.getAbilityType());
         return bean;
     }
 }

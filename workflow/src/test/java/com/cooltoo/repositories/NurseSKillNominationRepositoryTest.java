@@ -2,7 +2,7 @@ package com.cooltoo.repositories;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.repository.NurseSkillNominationRepository;
-import com.cooltoo.constants.OccupationSkillType;
+import com.cooltoo.constants.SocialAbilityType;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class NurseSKillNominationRepositoryTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/repositories/nurse_skill_normination_data.xml")
     public void testGetNurseSkillNomination(){
-        OccupationSkillType skillType = OccupationSkillType.SKILL;
+        SocialAbilityType skillType = SocialAbilityType.SKILL;
         long count = repository.countByUserIdAndSkillIdAndSkillType(1, 1, skillType);
         Assert.assertEquals(5, count);
 

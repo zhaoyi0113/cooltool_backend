@@ -5,7 +5,7 @@ import com.cooltoo.backend.converter.NurseSkillNominationBeanConverter;
 import com.cooltoo.backend.entities.NurseSkillNominationEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseSkillNominationRepository;
-import com.cooltoo.constants.OccupationSkillType;
+import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.VerifyUtil;
@@ -73,7 +73,7 @@ public class NurseSkillNominationService {
     //==========================================================================
     //           get user's special skill type(SKILL | OCCUPATION) nominated
     //==========================================================================
-    public List<NurseSkillNominationBean> getSpecialTypeNominated(long userId, OccupationSkillType type) {
+    public List<NurseSkillNominationBean> getSpecialTypeNominated(long userId, SocialAbilityType type) {
         List<NurseSkillNominationBean> ablibityNominates = new ArrayList<NurseSkillNominationBean>();
 
         List<NurseSkillNominationEntity>       typeNominates = nominationRepository.findByUserIdAndSkillType(userId, type);
@@ -102,7 +102,7 @@ public class NurseSkillNominationService {
     //==========================================================================
     //           get user's special skill nominated
     //==========================================================================
-    public NurseSkillNominationBean getSpecialTypeSkillNominated(long userId, int skillId, OccupationSkillType type) {
+    public NurseSkillNominationBean getSpecialTypeSkillNominated(long userId, int skillId, SocialAbilityType type) {
         NurseSkillNominationBean         id2Nominate   = new NurseSkillNominationBean();
         long count = nominationRepository.countByUserIdAndSkillIdAndSkillType(userId, skillId, type);
         id2Nominate.setUserId(userId);
@@ -115,7 +115,7 @@ public class NurseSkillNominationService {
     //==========================================================================
     //           get friend's special skill type's skill is nominated by user
     //==========================================================================
-    public boolean isNominated(long userId, int skillId, OccupationSkillType type, long friendId) {
+    public boolean isNominated(long userId, int skillId, SocialAbilityType type, long friendId) {
         List<NurseSkillNominationEntity> entities = nominationRepository.findByUserIdAndSkillIdAndNominatedIdAndSkillType(friendId, skillId, userId, type);
         return !(null==entities || entities.isEmpty());
     }
@@ -130,7 +130,7 @@ public class NurseSkillNominationService {
         validateNurse(userId);
         // check nurse friend
         validateNurse(friendId);
-        OccupationSkillType type = OccupationSkillType.parseString(skillType);
+        SocialAbilityType type = SocialAbilityType.parseString(skillType);
         if (null==type) {
             logger.error("the type is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -151,7 +151,7 @@ public class NurseSkillNominationService {
         return nominationRepository.countByUserIdAndSkillIdAndSkillType(friendId, friendSkillId, type);
     }
 
-    private void addNomination(long userId, long friendId, int skillId, OccupationSkillType type) {
+    private void addNomination(long userId, long friendId, int skillId, SocialAbilityType type) {
         NurseSkillNominationEntity entity = new NurseSkillNominationEntity();
         entity.setUserId(friendId);
         entity.setNominatedId(userId);
@@ -191,7 +191,7 @@ public class NurseSkillNominationService {
     @Transactional
     public String deleteBySkillIdsAndType(String skillIds, String type) {
         logger.info("delete skill nomination by skill ids={}  type={}", skillIds, type);
-        OccupationSkillType ablibityType = OccupationSkillType.parseString(type);
+        SocialAbilityType ablibityType = SocialAbilityType.parseString(type);
         if (null==ablibityType) {
             logger.info("type is not exist", skillIds);
         }

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by yzzhao on 3/10/16.
  */
-public interface OccupationSkillRepository extends JpaRepository<OccupationSkillEntity, Integer>{
+public interface SkillRepository extends JpaRepository<OccupationSkillEntity, Integer>{
     List<OccupationSkillEntity> findByName(String name);
     List<OccupationSkillEntity> findByStatus(OccupationSkillStatus status);
     Page<OccupationSkillEntity> findByStatus(OccupationSkillStatus status, Pageable page);

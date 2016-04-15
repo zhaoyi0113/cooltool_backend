@@ -7,7 +7,7 @@ import com.cooltoo.backend.services.NurseOccupationSkillService;
 import com.cooltoo.backend.services.NurseSocialAbilitiesService;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.constants.OccupationSkillType;
+import com.cooltoo.constants.SocialAbilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class NurseOccupationSkillAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get skill {} ability.", userId, skillId);
-        SocialAbilitiesBean ability = abilitiesService.getUserSpecialAbility(userId, skillId, OccupationSkillType.SKILL.name());
+        SocialAbilitiesBean ability = abilitiesService.getUserSpecialAbility(userId, skillId, SocialAbilityType.SKILL.name());
         logger.info("User {} get skill {} ability value={}.", userId, skillId, ability);
         return Response.ok(ability).build();
     }
@@ -73,7 +73,7 @@ public class NurseOccupationSkillAPI {
 
         SocialAbilitiesBean ability = abilitiesService.getUserSpecialAbility(
                                             userId, hospital.getDepartmentId(),
-                                            OccupationSkillType.OCCUPATION.name());
+                                            SocialAbilityType.OCCUPATION.name());
         logger.info("User {} get department social ability. value={}.", userId, ability);
 
         return Response.ok(ability).build();
@@ -103,7 +103,7 @@ public class NurseOccupationSkillAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get friend {} 's skill {} social abilities.", userId, friendId, skillId);
-        SocialAbilitiesBean abilities = abilitiesService.getUserSpecialAbility(friendId, skillId, OccupationSkillType.SKILL.name());
+        SocialAbilitiesBean abilities = abilitiesService.getUserSpecialAbility(friendId, skillId, SocialAbilityType.SKILL.name());
         logger.info("User {} get friend {} 's skill {} social abilities {} .", userId, friendId, skillId, abilities);
         return Response.ok(abilities).build();
     }
@@ -126,7 +126,7 @@ public class NurseOccupationSkillAPI {
 
         SocialAbilitiesBean ability = abilitiesService.getUserSpecialAbility(
                 friendId, hospital.getDepartmentId(),
-                OccupationSkillType.OCCUPATION.name());
+                SocialAbilityType.OCCUPATION.name());
         logger.info("User {} get friend {} department social ability. value={}", userId, friendId, ability);
 
         return Response.ok(ability).build();
@@ -167,7 +167,7 @@ public class NurseOccupationSkillAPI {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} nominate friend {} 's skills {}.", userId, friendId, skillId);
 
-        SocialAbilitiesBean ability = abilitiesService.nominateSocialAbility(userId, friendId, skillId, OccupationSkillType.SKILL.name());
+        SocialAbilitiesBean ability = abilitiesService.nominateSocialAbility(userId, friendId, skillId, SocialAbilityType.SKILL.name());
         logger.info("User {} nominate friend {} 's skills {}. value={}", userId, friendId, skillId, ability);
 
         Map<String, String> ret = new Hashtable<String, String>();
@@ -190,7 +190,7 @@ public class NurseOccupationSkillAPI {
         if (null==relation || relation.getDepartmentId()<=0) {
             return null;
         }
-        SocialAbilitiesBean ability =  abilitiesService.nominateSocialAbility(userId, friendId, relation.getDepartmentId(), OccupationSkillType.OCCUPATION.name());
+        SocialAbilitiesBean ability =  abilitiesService.nominateSocialAbility(userId, friendId, relation.getDepartmentId(), SocialAbilityType.OCCUPATION.name());
         logger.info("user {} thumbs up friend {} 's department. value {}", userId, friendId, ability);
 
         Map<String, String> ret = new Hashtable<String, String>();

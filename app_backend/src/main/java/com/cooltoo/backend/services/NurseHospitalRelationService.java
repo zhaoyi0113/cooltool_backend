@@ -1,20 +1,12 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseBean;
-import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.backend.converter.NurseHospitalRelationBeanConverter;
 import com.cooltoo.backend.converter.NurseHospitalRelationEntityConverter;
 import com.cooltoo.backend.entities.NurseHospitalRelationEntity;
-import com.cooltoo.backend.repository.HospitalDepartmentRepository;
-import com.cooltoo.backend.repository.HospitalRepository;
 import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
-import com.cooltoo.constants.OccupationSkillType;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.backend.repository.NurseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
