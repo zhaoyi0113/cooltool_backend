@@ -66,7 +66,6 @@ public class BadgeAPI {
 
     @Path("/edit")
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editBadgeWithoutImage(@Context HttpServletRequest request,
@@ -84,6 +83,7 @@ public class BadgeAPI {
 
     @Path("/edit_image")
     @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editBadgeImage(@Context HttpServletRequest request,
@@ -101,7 +101,7 @@ public class BadgeAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response deleteBadge(@Context HttpServletRequest request,
-                                @DefaultValue("-1") @FormDataParam("id") String ids) {
+                                @DefaultValue("-1") @FormParam("id") String ids) {
         String deleteIds = badgeService.deleteBadgeByIds(ids);
         return Response.ok(deleteIds).build();
     }
