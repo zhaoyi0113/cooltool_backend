@@ -1,6 +1,7 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.*;
+import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.OccupationSkillStatus;
@@ -21,10 +22,11 @@ public class NurseSocialAbilitiesService {
     private static final Logger logger = LoggerFactory.getLogger(NurseSocialAbilitiesService.class.getName());
 
     @Autowired private NurseService                 nurseService;
-    @Autowired private SkillService skillService;
-    @Autowired private NurseSkillService nurseSkillService;
+    @Autowired private SkillService                 skillService;
+    @Autowired private NurseSkillService            nurseSkillService;
     @Autowired private NurseSkillNominationService  nominationService;
-    @Autowired private NurseHospitalRelationService nurseDepartmentService;
+    @Autowired private NurseHospitalRelationService nurseHospitalService;
+    @Autowired private BadgeService                 badgeService;
 
     //==========================================================================
     //           get all type
@@ -62,10 +64,10 @@ public class NurseSocialAbilitiesService {
         logger.info("get user {} 's social abilities", userId);
         List<SocialAbilitiesBean> socialAbilities = new ArrayList<SocialAbilitiesBean>();
 
-        Map<Integer, SkillBean> skillId2Bean   = skillService.getAllSkillId2BeanMap();
-        List<NurseSkillBean>    nurseSkills    = nurseSkillService.getAllSkills(userId);
-        List<NurseSkillNominationBean>    skillNominate  = nominationService.getAllTypeNominated(userId);
-        NurseHospitalRelationBean         nurseHospDepart= nurseDepartmentService.getRelationByNurseId(userId);
+        Map<Integer, SkillBean>        skillId2Bean   = skillService.getAllSkillId2BeanMap();
+        List<NurseSkillBean>           nurseSkills    = nurseSkillService.getAllSkills(userId);
+        List<NurseSkillNominationBean> skillNominate  = nominationService.getAllTypeNominated(userId);
+        NurseHospitalRelationBean      nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId);
 
         // department social ability
         if (null!=nurseHospDepart) {
@@ -136,6 +138,8 @@ public class NurseSocialAbilitiesService {
                         skill.getFactor(), 0,
                         skill.getImageId(), skill.getImageUrl(),
                         skill.getDisableImageId(), skill.getDisableImageUrl());
+                BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.SKILL.name());
+                abilityBean.setBadge(badge);
                 nurseSkillAbilities.add(abilityBean);
             }
         }
@@ -168,7 +172,7 @@ public class NurseSocialAbilitiesService {
 
         if (SocialAbilityType.OCCUPATION==socialAbilityType) {
             NurseSkillNominationBean  skillNominate  = nominationService.getSpecialTypeSkillNominated(userId, skillId, socialAbilityType);
-            NurseHospitalRelationBean nurseHospDepart= nurseDepartmentService.getRelationByNurseId(userId);
+            NurseHospitalRelationBean nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId);
 
             // department social ability
             if (null!=nurseHospDepart) {

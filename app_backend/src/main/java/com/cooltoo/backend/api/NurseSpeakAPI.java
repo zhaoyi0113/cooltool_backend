@@ -41,7 +41,7 @@ public class NurseSpeakAPI {
                                         @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("anonymous user to get all speak content type={} index={} number={}", type, index, number);
-        List<NurseSpeakBean> all = speakService.getSpeakByType(type, index, number);
+        List<NurseSpeakBean> all = speakService.getSpeakByType(-1, type, index, number);
         logger.info("anonymous user to get all speak content, size ", all.size());
         return Response.ok(all).build();
     }
@@ -53,7 +53,7 @@ public class NurseSpeakAPI {
     public Response getSpeakById(@Context HttpServletRequest request,
                                  @PathParam("id") long id) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseSpeakBean nurseSpeak = speakService.getNurseSpeak(id);
+        NurseSpeakBean nurseSpeak = speakService.getNurseSpeak(userId, id);
         return Response.ok(nurseSpeak).build();
     }
 
@@ -107,7 +107,7 @@ public class NurseSpeakAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("user {} to get all smugs", userId);
-        List<NurseSpeakBean> smugs = speakService.getSpeakByType(SpeakType.SMUG.name(), index, number);
+        List<NurseSpeakBean> smugs = speakService.getSpeakByType(userId, SpeakType.SMUG.name(), index, number);
         logger.info("user {} to get all smugs, size : {}", userId, smugs.size());
         return Response.ok(smugs).build();
     }
@@ -122,7 +122,7 @@ public class NurseSpeakAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("user {} to get all cathart", userId);
-        List<NurseSpeakBean> smugs = speakService.getSpeakByType(SpeakType.CATHART.name(), index, number);
+        List<NurseSpeakBean> smugs = speakService.getSpeakByType(userId, SpeakType.CATHART.name(), index, number);
         logger.info("user {} to get all cathart, size : {}", userId, smugs.size());
         return Response.ok(smugs).build();
     }
@@ -137,7 +137,7 @@ public class NurseSpeakAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("user {} to get all ask_questions", userId);
-        List<NurseSpeakBean> smugs = speakService.getSpeakByType(SpeakType.ASK_QUESTION.name(), index, number);
+        List<NurseSpeakBean> smugs = speakService.getSpeakByType(userId, SpeakType.ASK_QUESTION.name(), index, number);
         logger.info("user {} to get all ask_questions, size : {}", userId, smugs.size());
         return Response.ok(smugs).build();
     }

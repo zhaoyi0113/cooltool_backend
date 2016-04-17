@@ -116,8 +116,8 @@ public class NurseSpeakService {
         return beans;
     }
 
-    public List<NurseSpeakBean> getSpeakByType(String speakType, int index, int number) {
-        logger.info("get all speak ("+speakType+") at "+index+" number="+number);
+    public List<NurseSpeakBean> getSpeakByType(long userId, String speakType, int index, int number) {
+        logger.info("get user={} all speak ({}) at {} number={}", userId, speakType, index, number);
         SpeakTypeBean speakTypeBean = null;
         SpeakType speaktype = SpeakType.parseString(speakType);
         if (null!=speaktype) {
@@ -144,7 +144,7 @@ public class NurseSpeakService {
 
         // parse entities to bean
         List<NurseSpeakBean> beans = entitiesToBeans(speakEntities);
-        fillOtherProperties(-1, beans);
+        fillOtherProperties(userId, beans);
         return beans;
     }
 
@@ -176,11 +176,14 @@ public class NurseSpeakService {
         return beans;
     }
 
-    public NurseSpeakBean getNurseSpeak(long speakId) {
+    public NurseSpeakBean getNurseSpeak(long userId, long speakId) {
         NurseSpeakEntity resultSet = speakRepository.findOne(speakId);
         NurseSpeakBean   speak     = speakConverter.convert(resultSet);
         speak.setImages(speakImageService.getImagesInSpeak(speak.getId()));
         List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speak.getId());
+        for (NurseSpeakCommentBean tmp : comments) {
+            tmp.setIsCurrentUserMade(userId==tmp.getCommentMakerId());
+        }
         speak.setComments(comments);
         speak.setCommentsCount(comments.size());
         List<NurseSpeakThumbsUpBean> thumbsUps = thumbsUpService.getSpeakThumbsUpByNurseSpeakId(speakId);
@@ -216,24 +219,19 @@ public class NurseSpeakService {
         // get username
         Map<Long, String> userId2Name   = new HashMap<Long, String>();
         Map<Long, Long>   userId2FileId = new HashMap<Long, Long>();
-        if (userId<0) {
-            for(NurseSpeakBean tmp : beans){
-                userIds.add(tmp.getUserId());
+        userIds.add(userId);
+        for(NurseSpeakBean tmp : beans){
+            if (userIds.contains(tmp.getUserId())) {
+                continue;
             }
-            Iterable<NurseEntity> users = nurseRepository.findByIdIn(userIds);
-            for (NurseEntity tmp : users) {
-                userId2Name.put(tmp.getId(), tmp.getName());
-                userId2FileId.put(tmp.getId(), tmp.getProfilePhotoId());
-                fileIds.add(tmp.getProfilePhotoId());
-            }
+            userIds.add(tmp.getUserId());
         }
-        else {
-            NurseEntity user = nurseRepository.findOne(userId);
-            if (null != user) {
-                userId2Name.put(userId, user.getName());
-                userId2FileId.put(userId, user.getProfilePhotoId());
-                fileIds.add(user.getProfilePhotoId());
-            }
+
+        Iterable<NurseEntity> users = nurseRepository.findByIdIn(userIds);
+        for (NurseEntity tmp : users) {
+            userId2Name.put(tmp.getId(), tmp.getName());
+            userId2FileId.put(tmp.getId(), tmp.getProfilePhotoId());
+            fileIds.add(tmp.getProfilePhotoId());
         }
 
         // convert to bean
@@ -258,6 +256,8 @@ public class NurseSpeakService {
                 mapValue = new ArrayList<>();
                 speakBean.setComments(mapValue);
             }
+            // is current user made
+            tmp.setIsCurrentUserMade((userId>0 && tmp.getCommentMakerId()==userId));
 
             mapValue.add(tmp);
         }

@@ -1,5 +1,6 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.constants.SocialAbilityType;
 
 /**
@@ -17,6 +18,7 @@ public class SocialAbilitiesBean {
     private String imageUrl;
     private long disableImageId;
     private String disableImagePath;
+    private BadgeBean badge;
 
     public long getUserId() {
         return userId;
@@ -106,6 +108,14 @@ public class SocialAbilitiesBean {
         this.disableImagePath = disableImagePath;
     }
 
+    public BadgeBean getBadge() {
+        return badge;
+    }
+
+    public void setBadge(BadgeBean badge) {
+        this.badge = badge;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -119,7 +129,8 @@ public class SocialAbilitiesBean {
         msg.append("imageId=").append(imageId).append(", ");
         msg.append("imageUrl=").append(imageUrl).append(", ");
         msg.append("disableImageId=").append(disableImageId).append(", ");
-        msg.append("disableImagePath=").append(disableImagePath).append("] ");
+        msg.append("disableImagePath=").append(disableImagePath).append(", ");
+        msg.append("badge=").append(badge).append("] ");
         return msg.toString();
     }
 }

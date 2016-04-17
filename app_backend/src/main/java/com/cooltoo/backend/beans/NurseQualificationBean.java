@@ -1,9 +1,6 @@
 package com.cooltoo.backend.beans;
 
-import com.cooltoo.beans.HospitalBean;
-import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.VetStatus;
-import com.cooltoo.constants.WorkFileType;
 
 import java.util.Date;
 import java.util.List;
@@ -24,8 +21,10 @@ public class NurseQualificationBean {
     private String realName;
     private int hospitalId;
     private String hospitalName;
-    private int deparmentId;
-    private String deparmentName;
+    private int parentDepartmentId;
+    private String parentDepartmentName;
+    private int departmentId;
+    private String departmentName;
     private List<NurseQualificationFileBean> workfiles;
 
     public long getId() {
@@ -124,20 +123,36 @@ public class NurseQualificationBean {
         this.hospitalName = hospitalName;
     }
 
-    public int getDeparmentId() {
-        return deparmentId;
+    public int getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDeparmentId(int deparmentId) {
-        this.deparmentId = deparmentId;
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
     }
 
-    public String getDeparmentName() {
-        return deparmentName;
+    public String getDepartmentName() {
+        return departmentName;
     }
 
-    public void setDeparmentName(String deparmentName) {
-        this.deparmentName = deparmentName;
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public int getParentDepartmentId() {
+        return parentDepartmentId;
+    }
+
+    public void setParentDepartmentId(int parentDepartmentId) {
+        this.parentDepartmentId = parentDepartmentId;
+    }
+
+    public String getParentDepartmentName() {
+        return parentDepartmentName;
+    }
+
+    public void setParentDepartmentName(String parentDepartmentName) {
+        this.parentDepartmentName = parentDepartmentName;
     }
 
     public String toString() {

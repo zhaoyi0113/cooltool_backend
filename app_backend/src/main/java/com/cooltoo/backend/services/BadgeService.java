@@ -86,6 +86,32 @@ public class BadgeService {
         return badges;
     }
 
+    public BadgeBean getBadgeByPointAndAbilityIdAndType(int point, int abilityId, String strAbilityType) {
+        logger.info("get abilityType={} abilityId={} point near {} 's badge", strAbilityType, abilityId, point);
+        if (point<=0) {
+            return null;
+        }
+        BadgeBean       retVal = null;
+        List<BadgeBean> badges = getBadgeByAbilityIdAndType(abilityId, strAbilityType);
+        int             count  = badges.size();
+        for (int i = 0; i < count; i ++) {
+            BadgeBean tmp = badges.get(i);
+            if (tmp.getPoint()>point) {
+                if (i==0) {
+                    retVal = null;
+                }
+                else {
+                    retVal = badges.get(i-1);
+                }
+                break;
+            }
+            if (i+1==count && null==retVal) {
+                retVal = tmp;
+            }
+        }
+        return retVal;
+    }
+
     private List<BadgeBean> entities2Beans(Iterable<BadgeEntity> entities) {
         if (null==entities) {
             return new ArrayList<>();

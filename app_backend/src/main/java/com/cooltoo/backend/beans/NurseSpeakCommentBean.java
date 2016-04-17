@@ -15,6 +15,7 @@ public class NurseSpeakCommentBean {
     private String receiverName;
     private String receiverHeadImageUrl;
     private String comment;
+    private boolean isCurrentUserMade;
     private Date time;
 
     public long getId() {
@@ -97,6 +98,14 @@ public class NurseSpeakCommentBean {
         this.receiverHeadImageUrl = receiverHeadImageUrl;
     }
 
+    public boolean isCurrentUserMade() {
+        return isCurrentUserMade;
+    }
+
+    public void setIsCurrentUserMade(boolean isCurrentUserMade) {
+        this.isCurrentUserMade = isCurrentUserMade;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
@@ -110,6 +119,8 @@ public class NurseSpeakCommentBean {
         msg.append("commentReceiverId=").append(commentReceiverId).append(" , ");
         msg.append("receiverName=").append(receiverName).append(" , ");
         msg.append("receiverHeadImageUrl=").append(receiverHeadImageUrl).append(" , ");
+
+        msg.append("isCurrentUserMade=").append(isCurrentUserMade).append(" , ");
 
         msg.append("comment=").append(comment).append(" , ");
         msg.append("time=").append(time);

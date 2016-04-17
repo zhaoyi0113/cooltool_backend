@@ -67,11 +67,11 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
 
     @Test
     public void testGetSpeakByType() {
-        List<NurseSpeakBean> nurseSpeak = speakService.getSpeakByType("smug", 0, 10);
+        List<NurseSpeakBean> nurseSpeak = speakService.getSpeakByType(-1, "smug", 0, 10);
         Assert.assertNotNull(nurseSpeak);
         Assert.assertEquals(10, nurseSpeak.size());
 
-        nurseSpeak = speakService.getSpeakByType("smug", 0, 20);
+        nurseSpeak = speakService.getSpeakByType(-1, "smug", 0, 20);
         Assert.assertNotNull(nurseSpeak);
         Assert.assertEquals(11, nurseSpeak.size());
     }
@@ -101,7 +101,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
 
     @Test
     public void testGetNurseSpeak() {
-        NurseSpeakBean bean = speakService.getNurseSpeak(3);
+        NurseSpeakBean bean = speakService.getNurseSpeak(-1, 3);
         Assert.assertEquals(3, bean.getId());
         Assert.assertEquals(1, bean.getUserId());
         Assert.assertEquals("hello 3 (@_@)!", bean.getContent());
@@ -142,31 +142,31 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     public void testAddImage() {
         long speakId = 15;
         long userId  = 3;
-        NurseSpeakBean speak = speakService.getNurseSpeak(speakId);
+        NurseSpeakBean speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(2, speak.getImages().size());
         for (int i=15; i > 0; i--) {
             speakService.addImage(userId, speakId, "test", new ByteArrayInputStream("test".getBytes()));
         }
-        speak = speakService.getNurseSpeak(speakId);
+        speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(9, speak.getImages().size());
 
         speakId = 14;
-        speak = speakService.getNurseSpeak(speakId);
+        speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(1, speak.getImages().size());
         for (int i=15; i > 0; i--) {
             speakService.addImage(userId, speakId, "test", new ByteArrayInputStream("test".getBytes()));
         }
-        speak = speakService.getNurseSpeak(speakId);
+        speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(1, speak.getImages().size());
 
         speakId = 1;
         userId  = 1;
-        speak = speakService.getNurseSpeak(speakId);
+        speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(1, speak.getImages().size());
         for (int i=15; i > 0; i--) {
             speakService.addImage(userId, speakId, "test", new ByteArrayInputStream("test".getBytes()));
         }
-        speak = speakService.getNurseSpeak(speakId);
+        speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(1, speak.getImages().size());
     }
 
@@ -206,12 +206,12 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         long   speakId = 1;
         long   userId  = 1;
         String commentIds = "1,2";
-        NurseSpeakBean speak = speakService.getNurseSpeak(speakId);
+        NurseSpeakBean speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(2, speak.getCommentsCount());
 
         speakService.deleteSpeakComment(userId, commentIds);
 
-        speak = speakService.getNurseSpeak(speakId);
+        speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(0, speak.getCommentsCount());
     }
 
