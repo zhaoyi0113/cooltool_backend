@@ -7,7 +7,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "nurse_occupation_skill")
-public class NurseOccupationSkillEntity {
+public class NurseSkillEntity {
 
     private int id;
     private long userId;

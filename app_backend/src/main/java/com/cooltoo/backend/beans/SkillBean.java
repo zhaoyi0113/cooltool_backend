@@ -1,26 +1,20 @@
-package com.cooltoo.backend.entities;
+package com.cooltoo.backend.beans;
 
 import com.cooltoo.constants.OccupationSkillStatus;
-
-import javax.persistence.*;
 
 /**
  * Created by yzzhao on 3/10/16.
  */
-@Entity
-@Table(name = "occupation_skill")
-public class OccupationSkillEntity {
+public class SkillBean {
     private int id;
     private long imageId;
     private long disableImageId;
     private String name;
+    private String imageUrl;
+    private String disableImageUrl;
     private int factor;
     private OccupationSkillStatus status;
 
-
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
     public int getId() {
         return id;
     }
@@ -29,7 +23,6 @@ public class OccupationSkillEntity {
         this.id = id;
     }
 
-    @Column(name = "image_id")
     public long getImageId() {
         return imageId;
     }
@@ -38,7 +31,14 @@ public class OccupationSkillEntity {
         this.imageId = imageId;
     }
 
-    @Column(name = "disable_image_id")
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public long getDisableImageId() {
         return disableImageId;
     }
@@ -47,7 +47,14 @@ public class OccupationSkillEntity {
         this.disableImageId = disableImageId;
     }
 
-    @Column(name = "name")
+    public String getDisableImageUrl() {
+        return this.disableImageUrl;
+    }
+
+    public void setDisableImageUrl(String disableImageUrl) {
+        this.disableImageUrl = disableImageUrl;
+    }
+
     public String getName() {
         return name;
     }
@@ -56,7 +63,6 @@ public class OccupationSkillEntity {
         this.name = name;
     }
 
-    @Column(name = "factor")
     public int getFactor() {
         return factor;
     }
@@ -65,7 +71,6 @@ public class OccupationSkillEntity {
         this.factor = factor;
     }
 
-    @Column(name = "status")
     public OccupationSkillStatus getStatus() {
         return status;
     }
@@ -81,6 +86,7 @@ public class OccupationSkillEntity {
         msg.append("imageId=").append(imageId).append(", ");
         msg.append("disableImageId=").append(disableImageId).append(", ");
         msg.append("name=").append(name).append(", ");
+        msg.append("status=").append(status).append(", ");
         msg.append("factor=").append(factor);
         return msg.toString();
     }

@@ -1,7 +1,7 @@
 package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.filter.LoginAuthentication;
-import com.cooltoo.backend.services.OccupationSkillService;
+import com.cooltoo.backend.services.SkillService;
 import com.cooltoo.constants.OccupationSkillStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 public class OccupationSkillAPI {
 
     @Autowired
-    private OccupationSkillService skillService;
+    private SkillService skillService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

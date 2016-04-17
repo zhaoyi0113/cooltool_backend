@@ -8,7 +8,6 @@ import com.cooltoo.backend.filter.BadRequestExceptionMapper;
 import com.cooltoo.backend.filter.NurseLoginAuthenticationFilter;
 import io.swagger.annotations.Api;
 import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.jaxrs.listing.ApiListingResource;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
@@ -51,7 +50,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(CORSResponseFilter.class);
         register(NurseQualificationManageAPI.class);
         register(OccupationSkillManageAPI.class);
-        register(NurseOccupationSkillAPI.class);
+        register(NurseSocialAbilityAPI.class);
         register(SpeakTypeAPI.class);
         register(WorkFileTypeAPI.class);
         register(RegionAPI.class);

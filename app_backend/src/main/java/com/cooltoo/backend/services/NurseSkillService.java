@@ -1,10 +1,10 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseOccupationSkillBean;
-import com.cooltoo.backend.beans.OccupationSkillBean;
-import com.cooltoo.backend.converter.NurseOccupationSkillBeanConverter;
-import com.cooltoo.backend.entities.NurseOccupationSkillEntity;
-import com.cooltoo.backend.repository.NurseOccupationSkillRepository;
+import com.cooltoo.backend.beans.NurseSkillBean;
+import com.cooltoo.backend.beans.SkillBean;
+import com.cooltoo.backend.converter.NurseSkillBeanConverter;
+import com.cooltoo.backend.entities.NurseSkillEntity;
+import com.cooltoo.backend.repository.NurseSkillRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.VerifyUtil;
@@ -22,39 +22,39 @@ import java.util.Map;
 /**
  * Created by zhaolisong on 16/3/25.
  */
-@Service("NurseOccupationSkillService")
-public class NurseOccupationSkillService {
+@Service("NurseSkillService")
+public class NurseSkillService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseOccupationSkillService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseSkillService.class.getName());
     private static final Sort   sort   = new Sort(new Sort.Order(Sort.Direction.DESC, "point"));
 
-    @Autowired private NurseOccupationSkillRepository    repository;
-    @Autowired private NurseService                      nurseService;
-    @Autowired private OccupationSkillService            skillService;
-    @Autowired private NurseOccupationSkillBeanConverter beanConverter;
+    @Autowired private NurseSkillRepository    repository;
+    @Autowired private NurseService            nurseService;
+    @Autowired private SkillService            skillService;
+    @Autowired private NurseSkillBeanConverter beanConverter;
 
 
     //===============================================================
     //           get nurse skill
     //===============================================================
 
-    public List<NurseOccupationSkillBean> getAllSkills(long userId) {
-        List<NurseOccupationSkillBean>   nurseSkillsB = new ArrayList<NurseOccupationSkillBean>();
-        List<NurseOccupationSkillEntity> nurseSkillsE = repository.findByUserId(userId, sort);
-        for (NurseOccupationSkillEntity nurseSkillE : nurseSkillsE) {
-            NurseOccupationSkillBean nurseSkillB = beanConverter.convert(nurseSkillE);
+    public List<NurseSkillBean> getAllSkills(long userId) {
+        List<NurseSkillBean>   nurseSkillsB = new ArrayList<NurseSkillBean>();
+        List<NurseSkillEntity> nurseSkillsE = repository.findByUserId(userId, sort);
+        for (NurseSkillEntity nurseSkillE : nurseSkillsE) {
+            NurseSkillBean nurseSkillB = beanConverter.convert(nurseSkillE);
             nurseSkillsB.add(nurseSkillB);
         }
         return nurseSkillsB;
     }
 
-    public NurseOccupationSkillBean getSkill(long userId, int occupationSkillId) {
-        NurseOccupationSkillEntity nurseSkillE = repository.findByUserIdAndSkillId(userId, occupationSkillId);
+    public NurseSkillBean getSkill(long userId, int occupationSkillId) {
+        NurseSkillEntity nurseSkillE = repository.findByUserIdAndSkillId(userId, occupationSkillId);
         if (null==nurseSkillE) {
             return null;
         }
 
-        NurseOccupationSkillBean nurseSkillB = beanConverter.convert(nurseSkillE);
+        NurseSkillBean nurseSkillB = beanConverter.convert(nurseSkillE);
         return nurseSkillB;
     }
 
@@ -63,8 +63,8 @@ public class NurseOccupationSkillService {
     //           add/delete nurse skill
     //===============================================================
 
-    private NurseOccupationSkillEntity newNurseSkillEntity(long userId, int skillId, int point) {
-        NurseOccupationSkillEntity newSkill = new NurseOccupationSkillEntity();
+    private NurseSkillEntity newNurseSkillEntity(long userId, int skillId, int point) {
+        NurseSkillEntity newSkill = new NurseSkillEntity();
         newSkill.setUserId(userId);
         newSkill.setSkillId(skillId);
         newSkill.setPoint(point);
@@ -78,12 +78,12 @@ public class NurseOccupationSkillService {
         // is Occupation skill exist
         skillService.getOneSkillById(skillId);
         // is Skill exist already, delete it
-        NurseOccupationSkillEntity skillExist = repository.findByUserIdAndSkillId(userId, skillId);
+        NurseSkillEntity skillExist = repository.findByUserIdAndSkillId(userId, skillId);
         if (null!=skillExist) {
             repository.delete(skillExist);
         }
         else {
-            NurseOccupationSkillEntity newSkill = newNurseSkillEntity(userId, skillId, 0);
+            NurseSkillEntity newSkill = newNurseSkillEntity(userId, skillId, 0);
             repository.save(newSkill);
         }
     }
@@ -97,12 +97,12 @@ public class NurseOccupationSkillService {
         nurseService.getNurse(userId);
 
         // judge the skills exist
-        Map<Integer, OccupationSkillBean> allSkills = skillService.getAllSkillId2BeanMap();
+        Map<Integer, SkillBean> allSkills = skillService.getAllSkillId2BeanMap();
         List<Integer> ids    = new ArrayList<Integer>();
         String[]      idsStr = skillIds.split(",");
         for (String id : idsStr) {
             int iId = Integer.parseInt(id);
-            OccupationSkillBean skillB = allSkills.get(iId);
+            SkillBean skillB = allSkills.get(iId);
             if (!allSkills.containsKey(iId)) {
                 logger.error("The occupation skill {} is not exist!", iId);
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -112,11 +112,11 @@ public class NurseOccupationSkillService {
 
         for (Integer skillId : ids) {
             // Skill is exist already, delete it;
-            NurseOccupationSkillEntity skillExist = repository.findByUserIdAndSkillId(userId, skillId);
+            NurseSkillEntity skillExist = repository.findByUserIdAndSkillId(userId, skillId);
             if (null != skillExist) {
                 repository.delete(skillExist);
             } else {
-                NurseOccupationSkillEntity newSkill = newNurseSkillEntity(userId, skillId, 0);
+                NurseSkillEntity newSkill = newNurseSkillEntity(userId, skillId, 0);
                 repository.save(newSkill);
             }
         }

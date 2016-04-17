@@ -3,7 +3,7 @@ package com.cooltoo.backend.api;
 import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseHospitalRelationService;
-import com.cooltoo.backend.services.NurseOccupationSkillService;
+import com.cooltoo.backend.services.NurseSkillService;
 import com.cooltoo.backend.services.NurseSocialAbilitiesService;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
@@ -25,11 +25,11 @@ import java.util.Map;
  * Created by zhaolisong on 16/3/25.
  */
 @Path("/nurse/skill")
-public class NurseOccupationSkillAPI {
+public class NurseSocialAbilityAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseOccupationSkillAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseSocialAbilityAPI.class.getName());
 
-    @Autowired private NurseOccupationSkillService  skillService;
+    @Autowired private NurseSkillService skillService;
     @Autowired private NurseSocialAbilitiesService  abilitiesService;
     @Autowired private NurseHospitalRelationService hospitalRelationService;
 

@@ -1,8 +1,8 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.OccupationSkillBean;
-import com.cooltoo.backend.converter.OccupationSkillBeanConverter;
-import com.cooltoo.backend.entities.OccupationSkillEntity;
+import com.cooltoo.backend.beans.SkillBean;
+import com.cooltoo.backend.converter.SkillBeanConverter;
+import com.cooltoo.backend.entities.SkillEntity;
 import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.exception.BadRequestException;
@@ -29,13 +29,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by yzzhao on 3/10/16.
  */
-@Service("OccupationSkillService")
-public class OccupationSkillService {
+@Service("SkillService")
+public class SkillService {
 
-    private static final Logger logger = LoggerFactory.getLogger(OccupationSkillService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SkillService.class.getName());
 
     @Autowired private SkillRepository skillRepository;
-    @Autowired private OccupationSkillBeanConverter beanConverter;
+    @Autowired private SkillBeanConverter beanConverter;
     @Autowired private BadgeService badgeService;
     @Autowired
     @Qualifier("StorageService")
@@ -59,13 +59,13 @@ public class OccupationSkillService {
         return  count;
     }
 
-    public List<OccupationSkillBean> getSkillByStatus(String skillStatus, int pageIndex, int number) {
+    public List<SkillBean> getSkillByStatus(String skillStatus, int pageIndex, int number) {
         logger.info("get occupation skill by skill status {} at page {}, {}number/Page", skillStatus, pageIndex, number);
 
         PageRequest page = new PageRequest(pageIndex, number, Sort.Direction.DESC, "name");
 
         OccupationSkillStatus status = OccupationSkillStatus.parseStatus(skillStatus);
-        Page<OccupationSkillEntity> skills = null;
+        Page<SkillEntity> skills = null;
         if ("ALL".equalsIgnoreCase(skillStatus)) {
             skills = skillRepository.findAll(page);
         }
@@ -76,13 +76,13 @@ public class OccupationSkillService {
             return new ArrayList<>();
         }
 
-        List<OccupationSkillBean> beans = entitiesToBeans(skills);
+        List<SkillBean> beans = entitiesToBeans(skills);
         fillOtherProperties(beans);
 
         return beans;
     }
 
-    public List<OccupationSkillBean> getSkillByStatus(String skillStatus) {
+    public List<SkillBean> getSkillByStatus(String skillStatus) {
         logger.info("get occupation skill by skill status {}", skillStatus);
         OccupationSkillStatus status = OccupationSkillStatus.parseStatus(skillStatus);
         if (null==status) {
@@ -90,36 +90,36 @@ public class OccupationSkillService {
             return new ArrayList<>();
         }
 
-        List<OccupationSkillEntity> allSkill = skillRepository.findByStatus(status);
-        List<OccupationSkillBean>   beans    = entitiesToBeans(allSkill);
+        List<SkillEntity> allSkill = skillRepository.findByStatus(status);
+        List<SkillBean>   beans    = entitiesToBeans(allSkill);
         fillOtherProperties(beans);
         return beans;
     }
 
-    public OccupationSkillBean getOneSkillById(int skillId) {
-        OccupationSkillEntity entity = skillRepository.findOne(skillId);
+    public SkillBean getOneSkillById(int skillId) {
+        SkillEntity entity = skillRepository.findOne(skillId);
         if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        List<OccupationSkillEntity> skillList = new ArrayList<>();
+        List<SkillEntity> skillList = new ArrayList<>();
         skillList.add(entity);
-        List<OccupationSkillBean> skills = entitiesToBeans(skillList);
+        List<SkillBean> skills = entitiesToBeans(skillList);
         fillOtherProperties(skills);
         return skills.get(0);
     }
 
-    public List<OccupationSkillBean> getAllSkill() {
-        List<OccupationSkillEntity> allSkill = skillRepository.findAll();
-        List<OccupationSkillBean>   beans    = entitiesToBeans(allSkill);
+    public List<SkillBean> getAllSkill() {
+        List<SkillEntity> allSkill = skillRepository.findAll();
+        List<SkillBean>   beans    = entitiesToBeans(allSkill);
         fillOtherProperties(beans);
         return beans;
     }
 
-    public Map<Integer, OccupationSkillBean> getAllSkillId2BeanMap() {
-        Map<Integer, OccupationSkillBean> id2Skills = new HashMap<Integer, OccupationSkillBean>();
-        List<OccupationSkillBean>         allSkills = getAllSkill();
+    public Map<Integer, SkillBean> getAllSkillId2BeanMap() {
+        Map<Integer, SkillBean> id2Skills = new HashMap<Integer, SkillBean>();
+        List<SkillBean>         allSkills = getAllSkill();
         if (null!=allSkills && !allSkills.isEmpty()) {
-            for (OccupationSkillBean skill : allSkills) {
+            for (SkillBean skill : allSkills) {
                 id2Skills.put(skill.getId(), skill);
             }
         }
@@ -130,25 +130,25 @@ public class OccupationSkillService {
         if (VerifyUtil.isStringEmpty(name)) {
             return false;
         }
-        List<OccupationSkillEntity> skills = skillRepository.findByName(name);
+        List<SkillEntity> skills = skillRepository.findByName(name);
         return !skills.isEmpty();
     }
 
-    private List<OccupationSkillBean> entitiesToBeans(Iterable<OccupationSkillEntity> entities) {
+    private List<SkillBean> entitiesToBeans(Iterable<SkillEntity> entities) {
         if (null==entities) {
             return new ArrayList<>();
         }
 
-        List<OccupationSkillBean> beans = new ArrayList<>();
-        for (OccupationSkillEntity tmp : entities) {
-            OccupationSkillBean bean = beanConverter.convert(tmp);
+        List<SkillBean> beans = new ArrayList<>();
+        for (SkillEntity tmp : entities) {
+            SkillBean bean = beanConverter.convert(tmp);
             beans.add(bean);
         }
 
         return beans;
     }
 
-    private void fillOtherProperties(List<OccupationSkillBean> skills) {
+    private void fillOtherProperties(List<SkillBean> skills) {
         if (null==skills || skills.isEmpty()) {
             return;
         }
@@ -156,7 +156,7 @@ public class OccupationSkillService {
         String                    imageUrl = null;
         List<Long>                imageIds = new ArrayList<Long>();
 
-        for (OccupationSkillBean bean : skills) {
+        for (SkillBean bean : skills) {
             if (bean.getImageId()>0) {
                 imageIds.add(bean.getImageId());
             }
@@ -166,7 +166,7 @@ public class OccupationSkillService {
         }
 
         Map<Long, String> idToPath = storageService.getFilePath(imageIds);
-        for (OccupationSkillBean tmp : skills) {
+        for (SkillBean tmp : skills) {
             if (tmp.getImageId()>0) {
                 tmp.setImageUrl(idToPath.get(tmp.getImageId()));
             }
@@ -182,7 +182,7 @@ public class OccupationSkillService {
     //=========================================================
 
     @Transactional
-    public OccupationSkillBean addNewOccupationSkill(String name, int factor, InputStream image, InputStream disableImage) {
+    public SkillBean addNewOccupationSkill(String name, int factor, InputStream image, InputStream disableImage) {
         if (!isSkillNameExist(name)) {
             if (VerifyUtil.isStringEmpty(name)) {
                 throw new BadRequestException(ErrorCode.SKILL_NAME_IS_NULL);
@@ -191,7 +191,7 @@ public class OccupationSkillService {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
 
-            OccupationSkillEntity entity = new OccupationSkillEntity();
+            SkillEntity entity = new SkillEntity();
             if (null!=image) {
                 long fileId = storageService.saveFile(0, name, image);
                 entity.setImageId(fileId);
@@ -216,7 +216,7 @@ public class OccupationSkillService {
 
     @Transactional
     public void deleteOccupationSkill(int id) {
-        OccupationSkillBean bean = getOneSkillById(id);
+        SkillBean bean = getOneSkillById(id);
 
         // delete images and file_storage records;
         List<Long> imageIds = new ArrayList();
@@ -233,10 +233,10 @@ public class OccupationSkillService {
     //=========================================================
 
     @Transactional
-    public OccupationSkillBean editOccupationSkill(int id, String name, int factor, String status, InputStream imageStream, InputStream disableImageStream) {
+    public SkillBean editOccupationSkill(int id, String name, int factor, String status, InputStream imageStream, InputStream disableImageStream) {
         logger.info("edit occupation skill with image skillId={}, enableImage={} disableImage={}", id, (null!=imageStream), (null!=disableImageStream));
         boolean               changed        = false;
-        OccupationSkillEntity entity         = editOccupationSkillWithoutImage(id, name, factor, status);
+        SkillEntity entity         = editOccupationSkillWithoutImage(id, name, factor, status);
         String                imgPath        = null;
         String                disableImgPath = null;
         if (imageStream != null) {
@@ -268,19 +268,19 @@ public class OccupationSkillService {
         else {
             logger.info("no occupation skill(enable/disable image) upated  == " + entity);
         }
-        OccupationSkillBean bean = beanConverter.convert(entity);
+        SkillBean bean = beanConverter.convert(entity);
         bean.setImageUrl(imgPath);
         bean.setDisableImageUrl(disableImgPath);
         return bean;
     }
 
     @Transactional
-    public OccupationSkillEntity editOccupationSkillWithoutImage(int id, String name, int factor, String status) {
+    public SkillEntity editOccupationSkillWithoutImage(int id, String name, int factor, String status) {
         logger.info("edit occupation skill with skillId={} name={} factor={} status={}", id, name, factor, status);
         boolean changed = false;
 
         // get the skill
-        OccupationSkillEntity entity = skillRepository.findOne(id);
+        SkillEntity entity = skillRepository.findOne(id);
         if (entity == null) {
             throw new BadRequestException(ErrorCode.SKILL_NOT_EXIST);
         }

@@ -1,13 +1,13 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.OccupationSkillBean;
+import com.cooltoo.backend.beans.SkillBean;
 import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.entities.FileStorageEntity;
-import com.cooltoo.backend.entities.OccupationSkillEntity;
+import com.cooltoo.backend.entities.SkillEntity;
 import com.cooltoo.repository.FileStorageRepository;
 import com.cooltoo.backend.repository.SkillRepository;
-import com.cooltoo.backend.services.OccupationSkillService;
+import com.cooltoo.backend.services.SkillService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -25,10 +25,10 @@ import java.util.List;
 @DatabaseSetups({
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml")
 })
-public class OccupationSkillServiceTest extends AbstractCooltooTest {
+public class SkillServiceTest extends AbstractCooltooTest {
 
     @Autowired
-    private OccupationSkillService skillService;
+    private SkillService skillService;
 
     @Autowired
     private SkillRepository repository;
@@ -43,7 +43,7 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
         try {
             file.createNewFile();
             skillService.addNewOccupationSkill(skillName, 1, new FileInputStream(file), new FileInputStream(file));
-            List<OccupationSkillEntity> skillList = repository.findByName(skillName);
+            List<SkillEntity> skillList = repository.findByName(skillName);
             Assert.assertTrue(skillList.size() > 0);
             Assert.assertEquals(skillName, skillList.get(0).getName());
             FileStorageEntity storageEntity = storageRepository.findOne(skillList.get(0).getImageId());
@@ -57,7 +57,7 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testEditOccupation() {
-        OccupationSkillBean skill = skillService.getOneSkillById(1000);
+        SkillBean skill = skillService.getOneSkillById(1000);
         Assert.assertNotNull(skill);
         String      name          = String.valueOf(System.currentTimeMillis());
         File        file          = new File("build/" + System.currentTimeMillis());
@@ -68,7 +68,7 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
             inputStream   = new FileInputStream(file);
             disableStream = new FileInputStream(file);
             skillService.editOccupationSkill(skill.getId(), name, 1, OccupationSkillStatus.ENABLE.name(), inputStream, disableStream);
-            OccupationSkillBean editedSkill = skillService.getOneSkillById(skill.getId());
+            SkillBean editedSkill = skillService.getOneSkillById(skill.getId());
             Assert.assertNotNull(editedSkill);
             Assert.assertEquals(name, editedSkill.getName());
             FileStorageEntity fileStorage = storageRepository.findOne(editedSkill.getImageId());
@@ -83,11 +83,11 @@ public class OccupationSkillServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testEditOccupationWithoutImage() {
-        OccupationSkillBean skill = skillService.getOneSkillById(1000);
+        SkillBean skill = skillService.getOneSkillById(1000);
         Assert.assertNotNull(skill);
         String name = String.valueOf(System.currentTimeMillis());
         skillService.editOccupationSkillWithoutImage(skill.getId(), name, 1, OccupationSkillStatus.ENABLE.name());
-        OccupationSkillBean editedSkill = skillService.getOneSkillById(skill.getId());
+        SkillBean editedSkill = skillService.getOneSkillById(skill.getId());
         Assert.assertNotNull(editedSkill);
         Assert.assertEquals(name, editedSkill.getName());
     }

@@ -21,8 +21,8 @@ public class NurseSocialAbilitiesService {
     private static final Logger logger = LoggerFactory.getLogger(NurseSocialAbilitiesService.class.getName());
 
     @Autowired private NurseService                 nurseService;
-    @Autowired private OccupationSkillService       skillService;
-    @Autowired private NurseOccupationSkillService  nurseSkillService;
+    @Autowired private SkillService skillService;
+    @Autowired private NurseSkillService nurseSkillService;
     @Autowired private NurseSkillNominationService  nominationService;
     @Autowired private NurseHospitalRelationService nurseDepartmentService;
 
@@ -62,8 +62,8 @@ public class NurseSocialAbilitiesService {
         logger.info("get user {} 's social abilities", userId);
         List<SocialAbilitiesBean> socialAbilities = new ArrayList<SocialAbilitiesBean>();
 
-        Map<Integer, OccupationSkillBean> skillId2Bean   = skillService.getAllSkillId2BeanMap();
-        List<NurseOccupationSkillBean>    nurseSkills    = nurseSkillService.getAllSkills(userId);
+        Map<Integer, SkillBean> skillId2Bean   = skillService.getAllSkillId2BeanMap();
+        List<NurseSkillBean>    nurseSkills    = nurseSkillService.getAllSkills(userId);
         List<NurseSkillNominationBean>    skillNominate  = nominationService.getAllTypeNominated(userId);
         NurseHospitalRelationBean         nurseHospDepart= nurseDepartmentService.getRelationByNurseId(userId);
 
@@ -101,8 +101,8 @@ public class NurseSocialAbilitiesService {
         }
         // skill social abilities
         List<SocialAbilitiesBean> nurseSkillAbilities = new ArrayList<>();
-        for (NurseOccupationSkillBean nurseSkill : nurseSkills) {
-            OccupationSkillBean skill = skillId2Bean.get(nurseSkill.getSkillId());
+        for (NurseSkillBean nurseSkill : nurseSkills) {
+            SkillBean skill = skillId2Bean.get(nurseSkill.getSkillId());
             if (null==skill) {
                 continue;
             }
@@ -188,11 +188,11 @@ public class NurseSocialAbilitiesService {
         }
         else if (SocialAbilityType.SKILL==socialAbilityType) {
 
-            Map<Integer, OccupationSkillBean> skillId2Bean   = skillService.getAllSkillId2BeanMap();
+            Map<Integer, SkillBean> skillId2Bean   = skillService.getAllSkillId2BeanMap();
             NurseSkillNominationBean          skillNominate = nominationService.getSpecialTypeSkillNominated(userId, skillId, socialAbilityType);
 
             // department social ability
-            OccupationSkillBean skill         = skillId2Bean.get(skillId);
+            SkillBean skill         = skillId2Bean.get(skillId);
             long                nominateCount = null==skillNominate ? 0 : skillNominate.getSkillNominateCount();
             SocialAbilitiesBean ability = newAbilityBean(
                     userId,

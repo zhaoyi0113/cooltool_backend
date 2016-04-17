@@ -1,20 +1,26 @@
-package com.cooltoo.backend.beans;
+package com.cooltoo.backend.entities;
 
 import com.cooltoo.constants.OccupationSkillStatus;
+
+import javax.persistence.*;
 
 /**
  * Created by yzzhao on 3/10/16.
  */
-public class OccupationSkillBean {
+@Entity
+@Table(name = "occupation_skill")
+public class SkillEntity {
     private int id;
     private long imageId;
     private long disableImageId;
     private String name;
-    private String imageUrl;
-    private String disableImageUrl;
     private int factor;
     private OccupationSkillStatus status;
 
+
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
     public int getId() {
         return id;
     }
@@ -23,6 +29,7 @@ public class OccupationSkillBean {
         this.id = id;
     }
 
+    @Column(name = "image_id")
     public long getImageId() {
         return imageId;
     }
@@ -31,14 +38,7 @@ public class OccupationSkillBean {
         this.imageId = imageId;
     }
 
-    public String getImageUrl() {
-        return this.imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
+    @Column(name = "disable_image_id")
     public long getDisableImageId() {
         return disableImageId;
     }
@@ -47,14 +47,7 @@ public class OccupationSkillBean {
         this.disableImageId = disableImageId;
     }
 
-    public String getDisableImageUrl() {
-        return this.disableImageUrl;
-    }
-
-    public void setDisableImageUrl(String disableImageUrl) {
-        this.disableImageUrl = disableImageUrl;
-    }
-
+    @Column(name = "name")
     public String getName() {
         return name;
     }
@@ -63,6 +56,7 @@ public class OccupationSkillBean {
         this.name = name;
     }
 
+    @Column(name = "factor")
     public int getFactor() {
         return factor;
     }
@@ -71,6 +65,7 @@ public class OccupationSkillBean {
         this.factor = factor;
     }
 
+    @Column(name = "status")
     public OccupationSkillStatus getStatus() {
         return status;
     }
@@ -86,7 +81,6 @@ public class OccupationSkillBean {
         msg.append("imageId=").append(imageId).append(", ");
         msg.append("disableImageId=").append(disableImageId).append(", ");
         msg.append("name=").append(name).append(", ");
-        msg.append("status=").append(status).append(", ");
         msg.append("factor=").append(factor);
         return msg.toString();
     }

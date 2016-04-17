@@ -1,11 +1,10 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
-import com.cooltoo.backend.beans.OccupationSkillBean;
-import com.cooltoo.backend.converter.OccupationSkillBeanConverter;
-import com.cooltoo.backend.entities.OccupationSkillEntity;
-import com.cooltoo.backend.services.OccupationSkillService;
-import com.cooltoo.constants.OccupationSkillStatus;
+import com.cooltoo.backend.beans.SkillBean;
+import com.cooltoo.backend.converter.SkillBeanConverter;
+import com.cooltoo.backend.entities.SkillEntity;
+import com.cooltoo.backend.services.SkillService;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +27,9 @@ public class OccupationSkillManageAPI {
     private static final Logger logger = LoggerFactory.getLogger(OccupationSkillManageAPI.class.getName());
 
     @Autowired
-    private OccupationSkillService skillService;
+    private SkillService skillService;
     @Autowired
-    private OccupationSkillBeanConverter beanConverter;
+    private SkillBeanConverter beanConverter;
 
     @Path("/count/{status}")
     @GET
@@ -50,7 +49,7 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getOccupationSkillList() {
         logger.info("get all occupation skills");
-        List<OccupationSkillBean> allSkills = skillService.getAllSkill();
+        List<SkillBean> allSkills = skillService.getAllSkill();
         logger.info(allSkills.toString());
         return Response.ok(allSkills).build();
     }
@@ -65,7 +64,7 @@ public class OccupationSkillManageAPI {
                                      @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get all occupation skill by status={} page={} number/page={}", status, pageIndex, number);
-        List<OccupationSkillBean> allSkills = skillService.getSkillByStatus(status, pageIndex, number);
+        List<SkillBean> allSkills = skillService.getSkillByStatus(status, pageIndex, number);
         logger.info(allSkills.toString());
         return Response.ok(allSkills).build();
     }
@@ -76,7 +75,7 @@ public class OccupationSkillManageAPI {
     public Response addOccupationSkill(@FormParam("name") String name,
                                        @FormParam("factor") int factor) {
         logger.info("add new occupation skill parameters is ==== name={}, factor={}, image={}, disableImage={}.", name, factor, null, null);
-        OccupationSkillBean skill = skillService.addNewOccupationSkill(name, factor, null, null);
+        SkillBean skill = skillService.addNewOccupationSkill(name, factor, null, null);
         logger.info("add new occupation skill is " + skill.toString());
         return Response.ok(skill).build();
     }
@@ -97,7 +96,7 @@ public class OccupationSkillManageAPI {
                                          @FormParam("factor") int factor,
                                          @FormParam("status") String status
     ) {
-        OccupationSkillBean bean = skillService.editOccupationSkill(id, name, factor, status, null, null);
+        SkillBean bean = skillService.editOccupationSkill(id, name, factor, status, null, null);
         return Response.ok(bean).build();
     }
 
@@ -110,8 +109,8 @@ public class OccupationSkillManageAPI {
                                         @FormParam("factor") int factor,
                                         @FormParam("status") String status
     ) {
-        OccupationSkillEntity skill = skillService.editOccupationSkillWithoutImage(id, name, factor, status);
-        OccupationSkillBean   bean  = beanConverter.convert(skill);
+        SkillEntity skill = skillService.editOccupationSkillWithoutImage(id, name, factor, status);
+        SkillBean bean  = beanConverter.convert(skill);
         return Response.ok(bean).build();
     }
 
@@ -122,7 +121,7 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillEnableImage(@FormDataParam("id") int id,
                                                    @FormDataParam("file") InputStream image) {
-        OccupationSkillBean bean = skillService.editOccupationSkill(id, null, -1, null, image, null);
+        SkillBean bean = skillService.editOccupationSkill(id, null, -1, null, image, null);
         return Response.ok(bean).build();
     }
 
@@ -133,7 +132,7 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillDisableImage(@FormDataParam("id") int id,
                                                     @FormDataParam("file") InputStream image) {
-        OccupationSkillBean bean = skillService.editOccupationSkill(id, null, -1, null, null, image);
+        SkillBean bean = skillService.editOccupationSkill(id, null, -1, null, null, image);
         return Response.ok(bean).build();
     }
 }

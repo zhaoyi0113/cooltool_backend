@@ -44,7 +44,7 @@ public class NurseSkillNominationService {
     //           get user's all skill types(SKILL--OCCUPATION) nominated
     //==========================================================================
     public List<NurseSkillNominationBean> getAllTypeNominated(long userId) {
-        List<NurseSkillNominationBean> ablibityNominates = new ArrayList<NurseSkillNominationBean>();
+        List<NurseSkillNominationBean> abilityNominates = new ArrayList<NurseSkillNominationBean>();
 
         List<NurseSkillNominationEntity>       allNominated = nominationRepository.findByUserId(userId);
         Map<String, NurseSkillNominationBean>  id2Nominate  = new HashMap<String, NurseSkillNominationBean>();
@@ -65,9 +65,9 @@ public class NurseSkillNominationService {
 
         Collection<NurseSkillNominationBean> tmpAbilites = id2Nominate.values();
         for(NurseSkillNominationBean ablility : tmpAbilites) {
-            ablibityNominates.add(ablility);
+            abilityNominates.add(ablility);
         }
-        return ablibityNominates;
+        return abilityNominates;
     }
 
     //==========================================================================

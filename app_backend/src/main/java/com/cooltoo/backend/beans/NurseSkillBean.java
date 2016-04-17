@@ -5,7 +5,7 @@ import com.cooltoo.constants.SocialAbilityType;
 /**
  * Created by hp on 2016/4/10.
  */
-public class NurseOccupationSkillBean {
+public class NurseSkillBean {
 
     private int id;
     private long userId;
