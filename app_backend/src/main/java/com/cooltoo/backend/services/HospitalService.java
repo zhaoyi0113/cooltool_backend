@@ -95,7 +95,9 @@ public class HospitalService {
         return hospitals;
     }
 
-    public List<HospitalBean> searchHospital(boolean andOrOr, String name, int province, int city, int district, String address) {
+    public List<HospitalBean> searchHospital(boolean isCount, boolean andOrOr, String name,
+                                             int province, int city, int district, String address,
+                                             int index, int number) {
         List<HospitalBean> allHospitals     = getAll();
         List<HospitalBean> allHospitalMatch = new ArrayList<HospitalBean>();
 
@@ -132,7 +134,29 @@ public class HospitalService {
                 allHospitalMatch.add(hospital);
             }
         }
-        return allHospitalMatch;
+
+        if (isCount) {
+            return allHospitalMatch;
+        }
+
+        List<HospitalBean> hospitals  = new ArrayList<>();
+        int iIndex   = Math.abs(index);
+        int iNumber  = Math.abs(number);
+        int startIdx = iIndex*iNumber;
+        int endIdx   = startIdx + number;
+        if (startIdx<0) {
+            startIdx = 0;
+        }
+        else if (startIdx>=allHospitalMatch.size()) {
+            return hospitals;
+        }
+
+        for (int i=startIdx, count=allHospitalMatch.size(); i<endIdx && i<count; i++) {
+            HospitalBean tmp = allHospitalMatch.get(i);
+            hospitals.add(tmp);
+        }
+
+        return hospitals;
     }
 
     public List<HospitalBean> getAllHospitalEnable() {
