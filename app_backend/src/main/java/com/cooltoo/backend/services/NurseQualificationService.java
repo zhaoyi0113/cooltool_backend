@@ -239,8 +239,12 @@ public class NurseQualificationService {
                     tmp.setHospitalName(hosp.getHospital().getName());
                 }
                 if (null!=hosp.getDepartment()) {
-                    tmp.setDepartmentId(hosp.getDepartmentId());
+                    tmp.setDepartmentId(hosp.getDepartment().getId());
                     tmp.setDepartmentName(hosp.getDepartment().getName());
+                }
+                if (null!=hosp.getParentDepart()) {
+                    tmp.setParentDepartmentId(hosp.getParentDepart().getId());
+                    tmp.setParentDepartmentName(hosp.getParentDepart().getName());
                 }
             }
         }
