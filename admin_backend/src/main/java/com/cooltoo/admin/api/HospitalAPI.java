@@ -12,6 +12,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +72,17 @@ public class HospitalAPI {
             Response.ok().build();
         }
         return Response.ok(bean).build();
+    }
+
+    @Path("/search/count")
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response countByConditions(@Context HttpServletRequest request,
+                                      @QueryParam("conditions") Map<String, String> conditions) {
+        logger.info("output information: {}", conditions);
+        return Response.ok().build();
     }
 
     @Path("/search")
