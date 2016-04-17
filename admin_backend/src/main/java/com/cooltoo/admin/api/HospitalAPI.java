@@ -80,7 +80,7 @@ public class HospitalAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response countByConditions(@Context HttpServletRequest request,
-                                      @QueryParam("conditions") Map<String, String> conditions) {
+                                      @QueryParam("conditions") String conditions) {
         logger.info("output information: {}", conditions);
         return Response.ok().build();
     }
