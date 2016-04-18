@@ -1,10 +1,10 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseSkillNominationBean;
-import com.cooltoo.backend.converter.NurseSkillNominationBeanConverter;
-import com.cooltoo.backend.entities.NurseSkillNominationEntity;
+import com.cooltoo.backend.beans.NurseAbilityNominationBean;
+import com.cooltoo.backend.converter.NurseAbilityNominationBeanConverter;
+import com.cooltoo.backend.entities.NurseAbilityNominationEntity;
 import com.cooltoo.backend.repository.NurseRepository;
-import com.cooltoo.backend.repository.NurseSkillNominationRepository;
+import com.cooltoo.backend.repository.NurseAbilityNominationRepository;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -20,51 +20,51 @@ import java.util.*;
 /**
  * Created by yzzhao on 3/13/16.
  */
-@Service("NurseSkillNominationService")
-public class NurseSkillNominationService {
+@Service("NurseAbilityNominationService")
+public class NurseAbilityNominationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseSkillNominationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(NurseAbilityNominationService.class);
 
     @Autowired
-    private NurseSkillNominationRepository nominationRepository;
+    private NurseAbilityNominationRepository nominationRepository;
     @Autowired
     private NurseRepository nurseRepository;
     @Autowired
-    private NurseSkillNominationBeanConverter nominationConverter;
+    private NurseAbilityNominationBeanConverter nominationConverter;
 
 
     //==========================================================================
     //           get user's all skill types(SKILL--OCCUPATION) nominated count
     //==========================================================================
-    public long getUserAllSkillNominatedCount(long userId) {
+    public long getUserAllAbilityNominatedCount(long userId) {
         return nominationRepository.countByUserId(userId);
     }
 
     //==========================================================================
     //           get user's all skill types(SKILL--OCCUPATION) nominated
     //==========================================================================
-    public List<NurseSkillNominationBean> getAllTypeNominated(long userId) {
-        List<NurseSkillNominationBean> abilityNominates = new ArrayList<NurseSkillNominationBean>();
+    public List<NurseAbilityNominationBean> getAllTypeNominated(long userId) {
+        List<NurseAbilityNominationBean> abilityNominates = new ArrayList<NurseAbilityNominationBean>();
 
-        List<NurseSkillNominationEntity>       allNominated = nominationRepository.findByUserId(userId);
-        Map<String, NurseSkillNominationBean>  id2Nominate  = new HashMap<String, NurseSkillNominationBean>();
-        for (NurseSkillNominationEntity nominateE : allNominated) {
-            String key = nominateE.getSkillId()+"_"+nominateE.getSkillType().toString();
-            NurseSkillNominationBean tmp  = nominationConverter.convert(nominateE);
-            NurseSkillNominationBean bean = id2Nominate.get(key);
+        List<NurseAbilityNominationEntity>       allNominated = nominationRepository.findByUserId(userId);
+        Map<String, NurseAbilityNominationBean>  id2Nominate  = new HashMap<String, NurseAbilityNominationBean>();
+        for (NurseAbilityNominationEntity nominateE : allNominated) {
+            String key = nominateE.getAbilityId()+"_"+nominateE.getAbilityType().toString();
+            NurseAbilityNominationBean tmp  = nominationConverter.convert(nominateE);
+            NurseAbilityNominationBean bean = id2Nominate.get(key);
             if (null==bean) {
-                tmp.setSkillNominateCount(1);
+                tmp.setAbilityNominateCount(1);
                 id2Nominate.put(key, tmp);
             }
             else {
-                long count = bean.getSkillNominateCount();
+                long count = bean.getAbilityNominateCount();
                 count ++;
-                bean.setSkillNominateCount(count);
+                bean.setAbilityNominateCount(count);
             }
         }
 
-        Collection<NurseSkillNominationBean> tmpAbilites = id2Nominate.values();
-        for(NurseSkillNominationBean ablility : tmpAbilites) {
+        Collection<NurseAbilityNominationBean> tmpAbilities = id2Nominate.values();
+        for(NurseAbilityNominationBean ablility : tmpAbilities) {
             abilityNominates.add(ablility);
         }
         return abilityNominates;
@@ -73,27 +73,27 @@ public class NurseSkillNominationService {
     //==========================================================================
     //           get user's special skill type(SKILL | OCCUPATION) nominated
     //==========================================================================
-    public List<NurseSkillNominationBean> getSpecialTypeNominated(long userId, SocialAbilityType type) {
-        List<NurseSkillNominationBean> ablibityNominates = new ArrayList<NurseSkillNominationBean>();
+    public List<NurseAbilityNominationBean> getSpecialTypeNominated(long userId, SocialAbilityType type) {
+        List<NurseAbilityNominationBean> ablibityNominates = new ArrayList<NurseAbilityNominationBean>();
 
-        List<NurseSkillNominationEntity>       typeNominates = nominationRepository.findByUserIdAndSkillType(userId, type);
-        Map<Integer, NurseSkillNominationBean> id2Nominate   = new HashMap<Integer, NurseSkillNominationBean>();
-        for (NurseSkillNominationEntity nominateE : typeNominates) {
-            NurseSkillNominationBean tmp = nominationConverter.convert(nominateE);
-            NurseSkillNominationBean bean = id2Nominate.get(tmp.getSkillId());
+        List<NurseAbilityNominationEntity>       typeNominates = nominationRepository.findByUserIdAndAbilityType(userId, type);
+        Map<Integer, NurseAbilityNominationBean> id2Nominate   = new HashMap<Integer, NurseAbilityNominationBean>();
+        for (NurseAbilityNominationEntity nominateE : typeNominates) {
+            NurseAbilityNominationBean tmp = nominationConverter.convert(nominateE);
+            NurseAbilityNominationBean bean = id2Nominate.get(tmp.getAbilityId());
             if (null==bean) {
-                tmp.setSkillNominateCount(1);
-                id2Nominate.put(tmp.getSkillId(), tmp);
+                tmp.setAbilityNominateCount(1);
+                id2Nominate.put(tmp.getAbilityId(), tmp);
             }
             else {
-                long count = bean.getSkillNominateCount();
+                long count = bean.getAbilityNominateCount();
                 count ++;
-                bean.setSkillNominateCount(count);
+                bean.setAbilityNominateCount(count);
             }
         }
 
-        Collection<NurseSkillNominationBean> tmpAbilites = id2Nominate.values();
-        for(NurseSkillNominationBean ablility : tmpAbilites) {
+        Collection<NurseAbilityNominationBean> tmpAbilites = id2Nominate.values();
+        for(NurseAbilityNominationBean ablility : tmpAbilites) {
             ablibityNominates.add(ablility);
         }
         return ablibityNominates;
@@ -102,13 +102,13 @@ public class NurseSkillNominationService {
     //==========================================================================
     //           get user's special skill nominated
     //==========================================================================
-    public NurseSkillNominationBean getSpecialTypeSkillNominated(long userId, int skillId, SocialAbilityType type) {
-        NurseSkillNominationBean         id2Nominate   = new NurseSkillNominationBean();
-        long count = nominationRepository.countByUserIdAndSkillIdAndSkillType(userId, skillId, type);
+    public NurseAbilityNominationBean getSpecialAbilityNominated(long userId, int abilityId, SocialAbilityType type) {
+        NurseAbilityNominationBean id2Nominate   = new NurseAbilityNominationBean();
+        long count = nominationRepository.countByUserIdAndAbilityIdAndAbilityType(userId, abilityId, type);
         id2Nominate.setUserId(userId);
-        id2Nominate.setSkillId(skillId);
-        id2Nominate.setSkillType(type);
-        id2Nominate.setSkillNominateCount(count);
+        id2Nominate.setAbilityId(abilityId);
+        id2Nominate.setAbilityType(type);
+        id2Nominate.setAbilityNominateCount(count);
         return id2Nominate;
     }
 
@@ -116,7 +116,7 @@ public class NurseSkillNominationService {
     //           get friend's special skill type's skill is nominated by user
     //==========================================================================
     public boolean isNominated(long userId, int skillId, SocialAbilityType type, long friendId) {
-        List<NurseSkillNominationEntity> entities = nominationRepository.findByUserIdAndSkillIdAndNominatedIdAndSkillType(friendId, skillId, userId, type);
+        List<NurseAbilityNominationEntity> entities = nominationRepository.findByUserIdAndAbilityIdAndNominatedIdAndAbilityType(friendId, skillId, userId, type);
         return !(null==entities || entities.isEmpty());
     }
 
@@ -141,22 +141,22 @@ public class NurseSkillNominationService {
         }
         // this is an toggle operation
         // the userId enable friend's skill
-        List<NurseSkillNominationEntity> existed = nominationRepository.findByUserIdAndSkillIdAndNominatedIdAndSkillType(friendId, friendSkillId, userId, type);
+        List<NurseAbilityNominationEntity> existed = nominationRepository.findByUserIdAndAbilityIdAndNominatedIdAndAbilityType(friendId, friendSkillId, userId, type);
         if (!existed.isEmpty()) {
             nominationRepository.delete(existed);
         } else {
             addNomination(userId, friendId, friendSkillId, type);
         }
 
-        return nominationRepository.countByUserIdAndSkillIdAndSkillType(friendId, friendSkillId, type);
+        return nominationRepository.countByUserIdAndAbilityIdAndAbilityType(friendId, friendSkillId, type);
     }
 
     private void addNomination(long userId, long friendId, int skillId, SocialAbilityType type) {
-        NurseSkillNominationEntity entity = new NurseSkillNominationEntity();
+        NurseAbilityNominationEntity entity = new NurseAbilityNominationEntity();
         entity.setUserId(friendId);
         entity.setNominatedId(userId);
-        entity.setSkillId(skillId);
-        entity.setSkillType(type);
+        entity.setAbilityId(skillId);
+        entity.setAbilityType(type);
         entity.setDateTime(Calendar.getInstance().getTime());
         nominationRepository.save(entity);
     }
@@ -205,7 +205,7 @@ public class NurseSkillNominationService {
             int lSkillId = Integer.parseInt(strSkillId);
             arrSkillIds.add(lSkillId);
         }
-        List<NurseSkillNominationEntity> allSkillsNominations = nominationRepository.findBySkillTypeAndSkillIdIn(ablibityType, arrSkillIds);
+        List<NurseAbilityNominationEntity> allSkillsNominations = nominationRepository.findByAbilityTypeAndAbilityIdIn(ablibityType, arrSkillIds);
         if (null!=allSkillsNominations) {
             nominationRepository.delete(allSkillsNominations);
         }

@@ -10,13 +10,13 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "nurse_skill_nomination")
-public class NurseSkillNominationEntity {
+public class NurseAbilityNominationEntity {
     private long id;
     private long userId;
-    private int skillId;
     private long nominatedId;
+    private int abilityId;
+    private SocialAbilityType abilityType;
     private Date dateTime;
-    private SocialAbilityType skillType;
 
     @Id
     @GeneratedValue
@@ -39,12 +39,12 @@ public class NurseSkillNominationEntity {
     }
 
     @Column(name = "skill_id")
-    public int getSkillId() {
-        return skillId;
+    public int getAbilityId() {
+        return abilityId;
     }
 
-    public void setSkillId(int skillId) {
-        this.skillId = skillId;
+    public void setAbilityId(int abilityId) {
+        this.abilityId = abilityId;
     }
 
     @Column(name = "nomiated_user_id")
@@ -68,12 +68,12 @@ public class NurseSkillNominationEntity {
 
     @Column(name = "skill_type")
     @GeneratedValue
-    public SocialAbilityType getSkillType() {
-        return skillType;
+    public SocialAbilityType getAbilityType() {
+        return abilityType;
     }
 
-    public void setSkillType(SocialAbilityType skillType) {
-        this.skillType = skillType;
+    public void setAbilityType(SocialAbilityType abilityType) {
+        this.abilityType = abilityType;
     }
 
     public String toString() {
@@ -81,10 +81,10 @@ public class NurseSkillNominationEntity {
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(", ");
         msg.append("userId=").append(userId).append(", ");
-        msg.append("skillId=").append(skillId).append(", ");
+        msg.append("abilityId=").append(abilityId).append(", ");
         msg.append("nominatedId=").append(nominatedId).append(", ");
         msg.append("dateTime=").append(dateTime).append(", ");
-        msg.append("skillType=").append(skillType);
+        msg.append("abilityType=").append(abilityType).append("]");
         return msg.toString();
     }
 }

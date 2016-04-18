@@ -39,7 +39,7 @@ public class NurseSocialAbilityAPI {
     public Response getAllAbility(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get all social abilities.", userId);
-        List<SocialAbilitiesBean> abilities = abilitiesService.getUserAllTypeAbilites(userId);
+        List<SocialAbilitiesBean> abilities = abilitiesService.getUserAllTypeAbilities(userId);
         logger.info("User {} get all social abilities {}.", abilities);
         return Response.ok(abilities).build();
     }
@@ -88,7 +88,7 @@ public class NurseSocialAbilityAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get friend {} 's all social abilities.", userId, friendId);
-        List<SocialAbilitiesBean> abilities = abilitiesService.getUserAllTypeAbilites(friendId);
+        List<SocialAbilitiesBean> abilities = abilitiesService.getUserAllTypeAbilities(friendId);
         logger.info("User {} get friend {} 's all social abilities {}.", abilities);
         return Response.ok(abilities).build();
     }

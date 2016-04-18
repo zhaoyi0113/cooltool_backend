@@ -21,12 +21,14 @@ public class NurseSocialAbilitiesService {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseSocialAbilitiesService.class.getName());
 
-    @Autowired private NurseService                 nurseService;
-    @Autowired private SkillService                 skillService;
-    @Autowired private NurseSkillService            nurseSkillService;
-    @Autowired private NurseSkillNominationService  nominationService;
-    @Autowired private NurseHospitalRelationService nurseHospitalService;
-    @Autowired private BadgeService                 badgeService;
+    @Autowired private NurseService                  nurseService;
+    @Autowired private SkillService                  skillService;
+    @Autowired private NurseSkillService             nurseSkillService;
+    @Autowired private NurseAbilityNominationService nominationService;
+    @Autowired private NurseSpeakService             nurseSpeakService;
+    @Autowired private SpeakTypeService              speakTypeService;
+    @Autowired private NurseHospitalRelationService  nurseHospitalService;
+    @Autowired private BadgeService                  badgeService;
 
     //==========================================================================
     //           get all type
@@ -60,31 +62,32 @@ public class NurseSocialAbilitiesService {
         return bean;
     }
 
-    public List<SocialAbilitiesBean> getUserAllTypeAbilites(long userId) {
+    public List<SocialAbilitiesBean> getUserAllTypeAbilities(long userId) {
         logger.info("get user {} 's social abilities", userId);
         List<SocialAbilitiesBean> socialAbilities = new ArrayList<SocialAbilitiesBean>();
 
-        Map<Integer, SkillBean>        skillId2Bean   = skillService.getAllSkillId2BeanMap();
-        List<NurseSkillBean>           nurseSkills    = nurseSkillService.getAllSkills(userId);
-        List<NurseSkillNominationBean> skillNominate  = nominationService.getAllTypeNominated(userId);
-        NurseHospitalRelationBean      nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId);
+        Map<Integer, SkillBean>          skillId2Bean   = skillService.getAllSkillId2BeanMap();
+        List<NurseSkillBean>             nurseSkills    = nurseSkillService.getAllSkills(userId);
+        List<NurseAbilityNominationBean> abilityNominate= nominationService.getAllTypeNominated(userId);
+        NurseHospitalRelationBean        nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId);
+        List<SpeakTypeBean>              speakTypes     = speakTypeService.getAllSpeakType();
 
         // department social ability
         if (null!=nurseHospDepart) {
             HospitalDepartmentBean department = nurseHospDepart.getDepartment();
             if (null!=nurseHospDepart.getDepartment()) {
                 boolean hasDepartmentNominate = false;
-                for (NurseSkillNominationBean nomination : skillNominate) {
-                    if (nomination.getSkillType() != SocialAbilityType.OCCUPATION) {
+                for (NurseAbilityNominationBean nomination : abilityNominate) {
+                    if (nomination.getAbilityType() != SocialAbilityType.OCCUPATION) {
                         continue;
                     }
-                    if (nomination.getSkillId() != nurseHospDepart.getDepartmentId()) {
+                    if (nomination.getAbilityId() != nurseHospDepart.getDepartmentId()) {
                         continue;
                     }
                     SocialAbilitiesBean abilityBean = newAbilityBean(
                             userId,
-                            nomination.getSkillId(), department.getName(), SocialAbilityType.OCCUPATION,
-                            1, nomination.getSkillNominateCount(),
+                            nomination.getAbilityId(), department.getName(), SocialAbilityType.OCCUPATION,
+                            1, nomination.getAbilityNominateCount(),
                             department.getImageId(), department.getImageUrl(),
                             department.getDisableImageId(), department.getDisableImageUrl());
                     socialAbilities.add(abilityBean);
@@ -112,11 +115,11 @@ public class NurseSocialAbilitiesService {
                 continue;
             }
             boolean hasNominate = false;
-            for (NurseSkillNominationBean nomination : skillNominate) {
-                if (nomination.getSkillType()!=nurseSkill.getType()) {
+            for (NurseAbilityNominationBean nomination : abilityNominate) {
+                if (nomination.getAbilityType()!=nurseSkill.getType()) {
                     continue;
                 }
-                if (nomination.getSkillId()!=nurseSkill.getSkillId()) {
+                if (nomination.getAbilityId()!=nurseSkill.getSkillId()) {
                     continue;
                 }
                 if (nomination.getUserId()!=nurseSkill.getUserId()) {
@@ -124,8 +127,8 @@ public class NurseSocialAbilitiesService {
                 }
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         nurseSkill.getUserId(),
-                        nomination.getSkillId(), skill.getName(), SocialAbilityType.SKILL,
-                        skill.getFactor(), nomination.getSkillNominateCount(),
+                        nomination.getAbilityId(), skill.getName(), SocialAbilityType.SKILL,
+                        skill.getFactor(), nomination.getAbilityNominateCount(),
                         skill.getImageId(), skill.getImageUrl(),
                         skill.getDisableImageId(), skill.getDisableImageUrl());
                 nurseSkillAbilities.add(abilityBean);
@@ -143,6 +146,23 @@ public class NurseSocialAbilitiesService {
                 nurseSkillAbilities.add(abilityBean);
             }
         }
+
+        // add nurse speak abilities(smug/cathart/ask_question)
+        for (SpeakTypeBean speakType : speakTypes) {
+            long countOfSpeakType = nurseSpeakService.countBySpeakType(userId, speakType.getType().name());
+            if (countOfSpeakType>0) {
+                SocialAbilitiesBean abilityBean = newAbilityBean(
+                        userId,
+                        speakType.getId(), speakType.getName(), SocialAbilityType.COMMUNITY,
+                        speakType.getFactor(), countOfSpeakType,
+                        speakType.getImageId(), speakType.getImageUrl(),
+                        speakType.getDisableImageId(), speakType.getDisableImageUrl());
+                BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMUNITY.name());
+                abilityBean.setBadge(badge);
+                nurseSkillAbilities.add(abilityBean);
+            }
+        }
+
         // sort skill social abilities by Point
         SocialAbilitiesBean[] arrNurseSkillAbilities = nurseSkillAbilities.toArray(new SocialAbilitiesBean[nurseSkillAbilities.size()]);
         Arrays.sort(arrNurseSkillAbilities, new Comparator<SocialAbilitiesBean>() {
@@ -151,6 +171,8 @@ public class NurseSocialAbilitiesService {
                 return o2.getPoint() - o1.getPoint();
             }
         });
+
+        // add nurse social ability together
         for (SocialAbilitiesBean nurseSocialAbility : arrNurseSkillAbilities) {
             socialAbilities.add(nurseSocialAbility);
         }
@@ -159,10 +181,10 @@ public class NurseSocialAbilitiesService {
         return socialAbilities;
     }
 
-    public SocialAbilitiesBean getUserSpecialAbility(long userId, int skillId, String type){
-        logger.info("get user {} 's special social abilities skill id={} type={}", userId, skillId, type);
+    public SocialAbilitiesBean getUserSpecialAbility(long userId, int abilityId, String type){
+        logger.info("get user {} 's special social abilities id={} type={}", userId, abilityId, type);
         // is nurse exist
-        NurseBean                 nurse           = nurseService.getNurse(userId);
+        NurseBean         nurse             = nurseService.getNurse(userId);
         // is type exist
         SocialAbilityType socialAbilityType = SocialAbilityType.parseString(type);
         if (null==socialAbilityType) {
@@ -171,15 +193,15 @@ public class NurseSocialAbilitiesService {
         }
 
         if (SocialAbilityType.OCCUPATION==socialAbilityType) {
-            NurseSkillNominationBean  skillNominate  = nominationService.getSpecialTypeSkillNominated(userId, skillId, socialAbilityType);
-            NurseHospitalRelationBean nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId);
+            NurseAbilityNominationBean abilityNominate = nominationService.getSpecialAbilityNominated(userId, abilityId, socialAbilityType);
+            NurseHospitalRelationBean  nurseHospDepart = nurseHospitalService.getRelationByNurseId(userId);
 
             // department social ability
             if (null!=nurseHospDepart) {
                 HospitalDepartmentBean department = nurseHospDepart.getDepartment();
                 if (null!=department) {
                     int  departId      = nurseHospDepart.getDepartmentId();
-                    long nominateCount = null==skillNominate ? 0 : skillNominate.getSkillNominateCount();
+                    long nominateCount = null==abilityNominate ? 0 : abilityNominate.getAbilityNominateCount();
                     SocialAbilitiesBean ability = newAbilityBean(
                             userId,
                             departId, department.getName(), SocialAbilityType.OCCUPATION,
@@ -192,19 +214,37 @@ public class NurseSocialAbilitiesService {
         }
         else if (SocialAbilityType.SKILL==socialAbilityType) {
 
-            Map<Integer, SkillBean> skillId2Bean   = skillService.getAllSkillId2BeanMap();
-            NurseSkillNominationBean          skillNominate = nominationService.getSpecialTypeSkillNominated(userId, skillId, socialAbilityType);
+            Map<Integer, SkillBean>    skillId2Bean    = skillService.getAllSkillId2BeanMap();
+            NurseAbilityNominationBean abilityNominate = nominationService.getSpecialAbilityNominated(userId, abilityId, socialAbilityType);
 
-            // department social ability
-            SkillBean skill         = skillId2Bean.get(skillId);
-            long                nominateCount = null==skillNominate ? 0 : skillNominate.getSkillNominateCount();
-            SocialAbilitiesBean ability = newAbilityBean(
+            // skill social ability
+            SkillBean skill         = skillId2Bean.get(abilityId);
+            long      nominateCount = null==abilityNominate ? 0 : abilityNominate.getAbilityNominateCount();
+            SocialAbilitiesBean abilityBean = newAbilityBean(
                     userId,
-                    skillId, skill.getName(), SocialAbilityType.OCCUPATION,
-                    1, nominateCount,
+                    abilityId, skill.getName(), SocialAbilityType.OCCUPATION,
+                    skill.getFactor(), nominateCount,
                     skill.getImageId(), skill.getImageUrl(),
                     skill.getDisableImageId(), skill.getDisableImageUrl());
-            return ability;
+            BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.SKILL.name());
+            abilityBean.setBadge(badge);
+            return abilityBean;
+        }
+        else if (SocialAbilityType.COMMUNITY==socialAbilityType) {
+            SpeakTypeBean speakType        = speakTypeService.getSpeakType(abilityId);
+            long          countOfSpeakType = nurseSpeakService.countBySpeakType(userId, speakType.getType().name());
+            // speak social ability
+            if (countOfSpeakType>0) {
+                SocialAbilitiesBean abilityBean = newAbilityBean(
+                        userId,
+                        speakType.getId(), speakType.getName(), SocialAbilityType.COMMUNITY,
+                        speakType.getFactor(), countOfSpeakType,
+                        speakType.getImageId(), speakType.getImageUrl(),
+                        speakType.getDisableImageId(), speakType.getDisableImageUrl());
+                BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMUNITY.name());
+                abilityBean.setBadge(badge);
+                return abilityBean;
+            }
         }
 
         return null;
@@ -225,7 +265,7 @@ public class NurseSocialAbilitiesService {
     //        delete
     //=============================================================================
 
-    public String deleteSpecialSocialAbilit(String skillIds, String skillType) {
+    public String deleteSpecialSocialAbilities(String skillIds, String skillType) {
         String ids = nominationService.deleteBySkillIdsAndType(skillIds, skillType);
         return ids+"_"+skillType;
     }

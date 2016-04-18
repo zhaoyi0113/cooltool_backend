@@ -18,6 +18,14 @@ public class NurseBean {
     public static final String SPEAK_COUNT = "speak_count";
     public static final String ABILITY_COUNT = "skill_count";
 
+    public static String getSkillNomination() {
+        return SKILL_NOMINATION;
+    }
+
+    public static String getFriendsCount() {
+        return FRIENDS_COUNT;
+    }
+
     private long id;
     private String name;
     private GenderType gender;
@@ -105,14 +113,6 @@ public class NurseBean {
 
     public void setProperty(String key, Object value){
         this.properties.put(key, value);
-    }
-
-    public static String getSkillNomination() {
-        return SKILL_NOMINATION;
-    }
-
-    public static String getFriendsCount() {
-        return FRIENDS_COUNT;
     }
 
     public Map<String, Object> getProperties() {

@@ -135,7 +135,7 @@ public class NurseService {
         long speakCount = speakService.countByUserId(userId);
         nurse.setProperty(NurseBean.SPEAK_COUNT, speakCount);
         // add skill nominated count
-        List<SocialAbilitiesBean> norminated = this.abilitiesService.getUserAllTypeAbilites(userId);
+        List<SocialAbilitiesBean> norminated = this.abilitiesService.getUserAllTypeAbilities(userId);
         nurse.setProperty(NurseBean.ABILITY_COUNT, null==norminated ? 0 : norminated.size());
         // get nurse's qualification
         List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(userId);
