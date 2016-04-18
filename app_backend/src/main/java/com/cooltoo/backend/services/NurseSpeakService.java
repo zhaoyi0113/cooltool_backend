@@ -148,7 +148,6 @@ public class NurseSpeakService {
         return beans;
     }
 
-    @Transactional
     public List<NurseSpeakBean> getSpeakByUserIdAndType(long userId, String speakType, int index, int number) {
         logger.info("get nurse speak ("+speakType+") at "+index+" number="+number);
         SpeakType speaktype = SpeakType.parseString(speakType);
@@ -177,19 +176,46 @@ public class NurseSpeakService {
     }
 
     public NurseSpeakBean getNurseSpeak(long userId, long speakId) {
-        NurseSpeakEntity resultSet = speakRepository.findOne(speakId);
-        NurseSpeakBean   speak     = speakConverter.convert(resultSet);
-        speak.setImages(speakImageService.getImagesInSpeak(speak.getId()));
-        List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakId(speak.getId());
-        for (NurseSpeakCommentBean tmp : comments) {
-            tmp.setIsCurrentUserMade(userId==tmp.getCommentMakerId());
+        logger.info("user {} get speak by id={}", userId, speakId);
+        List<NurseSpeakBean> nurseSpeaks = getNurseSpeak(userId, ""+speakId);
+        if (nurseSpeaks.isEmpty()) {
+            logger.info("there is no record");
+            return null;
         }
-        speak.setComments(comments);
-        speak.setCommentsCount(comments.size());
-        List<NurseSpeakThumbsUpBean> thumbsUps = thumbsUpService.getSpeakThumbsUpByNurseSpeakId(speakId);
-        speak.setThumbsUps(thumbsUps);
-        speak.setThumbsUpsCount(thumbsUps.size());
-        return speak;
+        if (nurseSpeaks.size()!=1) {
+            logger.info("there is more than one record size={}", nurseSpeaks.size());
+            return null;
+        }
+        return nurseSpeaks.get(0);
+    }
+
+    public List<NurseSpeakBean> getNurseSpeak(long userId, String strSpeakIds) {
+        logger.info("user {} get speaks by ids={}", userId, strSpeakIds);
+        if (!VerifyUtil.isIds(strSpeakIds)) {
+            logger.warn("speak ids is invalid");
+            return new ArrayList<>();
+        }
+        String[]   strArray = strSpeakIds.split(",");
+        List<Long> speakIds = new ArrayList<>();
+        for (String tmp : strArray) {
+            Long speakId = Long.parseLong(tmp);
+            speakIds.add(speakId);
+        }
+
+        return getNurseSpeak(userId, speakIds);
+    }
+
+    public List<NurseSpeakBean> getNurseSpeak(long userId, List<Long> speakIds) {
+        if (null==speakIds||speakIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<NurseSpeakEntity> resultSet = speakRepository.findAll(speakIds);
+        if (null==resultSet||resultSet.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<NurseSpeakBean> speaks = entitiesToBeans(resultSet);
+        fillOtherProperties(userId, speaks);
+        return speaks;
     }
 
     private List<NurseSpeakBean> entitiesToBeans(List<NurseSpeakEntity> entities) {
