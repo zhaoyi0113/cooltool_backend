@@ -23,7 +23,7 @@ public interface NurseFriendsRepository extends JpaRepository<NurseFriendsEntity
 
     List<NurseFriendsEntity> findByFriendId(long friendId);
 
-    Page<NurseFriendsEntity> findNurseFriendByUserId(long userId, Pageable pageable);
+    Page<NurseFriendsEntity> findByUserId(long userId, Pageable pageable);
 
     long countByUserIdAndFriendId(long userId, long friendId);
 

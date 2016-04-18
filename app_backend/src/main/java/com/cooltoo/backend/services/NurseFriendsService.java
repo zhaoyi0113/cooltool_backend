@@ -66,6 +66,13 @@ public class NurseFriendsService {
             entity.setDateTime(new Date());
             friendsRepository.save(entity);
         }
+        else {
+            List<NurseFriendsEntity> entity = friendsRepository.findByUserIdAndFriendId(userId, friendId);
+            NurseFriendsEntity friend = entity.get(0);
+            friend.setIsAgreed(agreeType);
+            friend.setDateTime(new Date());
+            friendsRepository.save(friend);
+        }
     }
 
     private void validateUserId(long userId, long friendId) {
@@ -196,6 +203,7 @@ public class NurseFriendsService {
         searchFriendsB = fillOtherProperties(searchFriendsB);
 
         // set isFriend
+        long oneDayAgo = System.currentTimeMillis() - 3600000*24/* one day ago*/;
         for(int i=0, count=searchFriendsB.size(); i < count; i++) {
             NurseFriendsBean searchFriendB = searchFriendsB.get(i);
             // judge is self friends
@@ -220,9 +228,24 @@ public class NurseFriendsService {
                 }
                 if (null!=userFriendB) {
                     if (AgreeType.WAITING.equals(userFriendB.getIsAgreed())) {
+                        /**
+                         "id": 10032,
+                         "userId": 4,
+                         "friendId": 3,
+                         "headPhotoUrl": "b5/d09630d8e8fb6147a1fa4f2971eda390f1454a",
+                         "friendName": "user003",
+                         -reset--"isFriend": false,
+                         -reset--"dateTime": 1460906623000,
+                         -reset--"isAgreed": "WAITING",
+                         -reset--"waitFor": "WaitingForFriendAgree",
+                         -reset--"waitMoreThan1Day": false
+                         */
                         searchFriendB.setIsFriend(false);
+                        searchFriendB.setDateTime(userFriendB.getDateTime());
+                        long requestTime = (null==searchFriendB.getDateTime()) ? 0 : searchFriendB.getDateTime().getTime();
                         searchFriendB.setIsAgreed(AgreeType.WAITING);
                         searchFriendB.setWaitFor(userFriendB.getWaitFor());
+                        searchFriendB.setWaitMoreThan1Day((requestTime-oneDayAgo) < 0);
                     }
                     else {
                         searchFriendB.setIsFriend(true);

@@ -12,11 +12,12 @@ public class NurseFriendsBean {
     private long userId;
     private long friendId;
     private AgreeType isAgreed;
-    private Date dateTime;
     private String waitFor;
     private String headPhotoUrl;
     private String friendName;
     private boolean isFriend;
+    private Date dateTime;
+    private boolean waitMoreThan1Day;
 
     public long getId() {
         return id;
@@ -88,5 +89,13 @@ public class NurseFriendsBean {
 
     public void setIsFriend(boolean isFriend) {
         this.isFriend = isFriend;
+    }
+
+    public boolean isWaitMoreThan1Day() {
+        return waitMoreThan1Day;
+    }
+
+    public void setWaitMoreThan1Day(boolean waitMoreThan1Day) {
+        this.waitMoreThan1Day = waitMoreThan1Day;
     }
 }
