@@ -12,4 +12,5 @@ import java.util.List;
  */
 public interface CathartProfilePhotoRepository extends JpaRepository<CathartProfilePhotoEntity, Long> {
     List<CathartProfilePhotoEntity> findByEnable(CommonStatus enable, Sort sort);
+    long countByEnable(CommonStatus enable);
 }

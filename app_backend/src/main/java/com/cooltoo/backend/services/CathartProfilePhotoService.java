@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/4/18.
@@ -41,14 +38,56 @@ public class CathartProfilePhotoService {
     //                 get
     //=======================================================
 
-    public List<CathartProfilePhotoBean> getAllEnable(CommonStatus status) {
-        logger.info("get all enable {} cathart profile photos");
+    public long countByStatus(String strStatus) {
+        logger.info("count cathart profile photos by status={}", strStatus);
+        long count = 0;
+        if ("ALL".equalsIgnoreCase(strStatus)) {
+            count = repository.count();
+        }
+        else {
+            CommonStatus status = CommonStatus.parseString(strStatus);
+            if (null==status) {
+                logger.error("the status is invalid");
+            }
+            else {
+                count = repository.countByEnable(status);
+            }
+        }
+
+        logger.info("count {} cathart profile photos by status={}", count, strStatus);
+        return count;
+    }
+
+    public Map<Long, CathartProfilePhotoBean> getMapByStatus(String strStatus) {
+        logger.info("get all status {} cathart profile photos", strStatus);
+        List<CathartProfilePhotoBean> allCathartProfileImg = getAllByStatus(strStatus);
+        if (null==allCathartProfileImg || allCathartProfileImg.isEmpty()) {
+            return new HashMap<>();
+        }
+        Map<Long, CathartProfilePhotoBean> map = new HashMap<>();
+        for (CathartProfilePhotoBean tmp : allCathartProfileImg) {
+            map.put(tmp.getId(), tmp);
+        }
+        return map;
+    }
+
+    public List<CathartProfilePhotoBean> getAllByStatus(String strStatus) {
+        logger.info("get all status {} cathart profile photos", strStatus);
         Sort sort = new Sort(
                 new Sort.Order(Sort.Direction.ASC, "enable"),
                 new Sort.Order(Sort.Direction.DESC, "timeCreated")
         );
-        List<CathartProfilePhotoEntity> resultSet    = repository.findByEnable(status, sort);
-        List<CathartProfilePhotoBean>   enablePhotos = entities2Beans(resultSet);
+        if ("ALL".equalsIgnoreCase(strStatus)) {
+            return getAll();
+        }
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null==status) {
+            logger.error("the status is invalid");
+            return new ArrayList<>();
+        }
+
+        List<CathartProfilePhotoEntity> resultSet = repository.findByEnable(status, sort);
+        List<CathartProfilePhotoBean> enablePhotos = entities2Beans(resultSet);
         fillOtherProperties(enablePhotos);
         logger.info("get all enable {} cathart profile photos, size={}", enablePhotos.size());
         return enablePhotos;
@@ -107,6 +146,23 @@ public class CathartProfilePhotoService {
             long imageId = tmp.getImageId();
             String imageUrl = imageId2Url.get(imageId);
             tmp.setImageUrl(imageUrl);
+        }
+    }
+
+    private String list2String(List<Long> longs) {
+        if (null==longs||longs.isEmpty()) {
+            return "";
+        }
+        else if (longs.size()==1) {
+            return ""+longs.get(0);
+        }
+        else {
+            StringBuilder strIds = new StringBuilder("");
+            strIds.append(longs.get(0));
+            for (int i = 1; i < longs.size(); i++) {
+                strIds.append(",").append(longs.get(i));
+            }
+            return strIds.toString();
         }
     }
 
@@ -192,11 +248,11 @@ public class CathartProfilePhotoService {
     }
 
     @Transactional
-    public List<CathartProfilePhotoBean> disableByIds(String strIds) {
+    public String disableByIds(String strIds) {
         logger.info("disable cathart profile photo by ids={}", strIds);
         if (!VerifyUtil.isIds(strIds)) {
             logger.warn("the ids in invalid");
-            return new ArrayList<>();
+            return "";
         }
 
         String[]   strArray  = strIds.split(",");
@@ -206,11 +262,12 @@ public class CathartProfilePhotoService {
             recordIds.add(id);
         }
 
-        return disableByIds(recordIds);
+        recordIds = disableByIds(recordIds);
+        return list2String(recordIds);
     }
 
     @Transactional
-    public List<CathartProfilePhotoBean> disableByIds(List<Long> lIds) {
+    public List<Long> disableByIds(List<Long> lIds) {
         logger.info("disable cathart profile photo by ids={}", lIds);
         List<CathartProfilePhotoEntity> entities = repository.findAll(lIds);
         if (null==entities||entities.isEmpty()) {
@@ -218,13 +275,14 @@ public class CathartProfilePhotoService {
             return new ArrayList<>();
         }
 
+        lIds.clear();
         for (CathartProfilePhotoEntity tmp : entities) {
             tmp.setEnable(CommonStatus.DISABLED);
+            lIds.add(tmp.getId());
         }
         repository.save(entities);
 
-        List<CathartProfilePhotoBean> beans = entities2Beans(entities);
-        return beans;
+        return lIds;
     }
 
     //=============================================================
@@ -232,11 +290,11 @@ public class CathartProfilePhotoService {
     //=============================================================
 
     @Transactional
-    public List<CathartProfilePhotoBean> deleteByIds(String strIds) {
+    public String deleteByIds(String strIds) {
         logger.info("delete cathart profile photo by ids={}", strIds);
         if (!VerifyUtil.isIds(strIds)) {
             logger.warn("the ids in invalid");
-            return new ArrayList<>();
+            return "";
         }
 
         String[]   strArray  = strIds.split(",");
@@ -246,11 +304,12 @@ public class CathartProfilePhotoService {
             recordIds.add(id);
         }
 
-        return deleteByIds(recordIds);
+        recordIds = deleteByIds(recordIds);
+        return list2String(recordIds);
     }
 
     @Transactional
-    public List<CathartProfilePhotoBean> deleteByIds(List<Long> lIds) {
+    public List<Long> deleteByIds(List<Long> lIds) {
         logger.info("delete cathart profile photo by ids={}", lIds);
         List<CathartProfilePhotoEntity> entities = repository.findAll(lIds);
         if (null==entities||entities.isEmpty()) {
@@ -259,15 +318,16 @@ public class CathartProfilePhotoService {
         }
 
         List<Long> imageIds = new ArrayList<>();
+        lIds.clear();
         for (CathartProfilePhotoEntity tmp : entities) {
             imageIds.add(tmp.getImageId());
+            lIds.add(tmp.getId());
         }
 
         storageService.deleteFiles(imageIds);
         repository.delete(entities);
 
-        List<CathartProfilePhotoBean> beans = entities2Beans(entities);
-        return beans;
+        return lIds;
     }
 
 }

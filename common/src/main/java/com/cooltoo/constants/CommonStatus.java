@@ -7,7 +7,7 @@ public enum CommonStatus {
     DISABLED, ENABLED;
 
     public static CommonStatus parseString(String status) {
-        CommonStatus retVal = DISABLED;
+        CommonStatus retVal = null;
         if (ENABLED.name().equalsIgnoreCase(status)) {
             retVal= ENABLED;
         }
@@ -18,7 +18,7 @@ public enum CommonStatus {
     }
 
     public static CommonStatus parseInt(int status) {
-        CommonStatus retVal = DISABLED;
+        CommonStatus retVal = null;
         if (ENABLED.ordinal() == status) {
             retVal = ENABLED;
         }
