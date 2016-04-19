@@ -1,0 +1,1 @@
+ALTER TABLE `platform_activities` CHANGE COLUMN `content` `content` LONGTEXT NULL DEFAULT NULL;
