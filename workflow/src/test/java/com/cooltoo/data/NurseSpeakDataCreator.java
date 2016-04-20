@@ -39,6 +39,7 @@ import java.util.concurrent.Executors;
 @Ignore
 @SpringApplicationConfiguration(Application.class)
 @WebAppConfiguration
+@RunWith(SpringJUnit4ClassRunner.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionDbUnitTestExecutionListener.class})
