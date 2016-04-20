@@ -36,9 +36,7 @@ import java.util.concurrent.Executors;
  * Created by yzzhao on 3/25/16.
  */
 @Service
-
 @Ignore
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebAppConfiguration
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
@@ -69,6 +67,7 @@ public class NurseSpeakDataCreator {
         addNurseSpeak(entities);
     }
 
+
     private void addNurseSpeak(List<NurseEntity> nurseEntities) {
         ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
         final CountDownLatch latch = new CountDownLatch(nurseEntities.size());
@@ -81,10 +80,9 @@ public class NurseSpeakDataCreator {
                         String fileName = null;
                         InputStream inputStream = null;
                         SpeakType speakType = SpeakType.values()[(int) MockDataCreator.getRandomInt(0, 3)];
-                        if (speakType.equals(SpeakType.CATHART)) {
+                        if (!speakType.equals(SpeakType.CATHART)) {
                             fileName = "choumei" + MockDataCreator.getRandomInt(0, 17) + ".jpg";
                             inputStream = getResourceAsStream("/com/cooltoo/data/choumei/" + fileName);
-
                         }
                         logger.info("add nurse speak ");
                         NurseSpeakBean nurseSpeakBean = null;
