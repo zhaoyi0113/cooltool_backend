@@ -1,5 +1,7 @@
 package com.cooltoo.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -28,6 +30,7 @@ public class NumberUtil {
         return false;
     }
 
+    public static final String DATE_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     public static long getTime(String datetime, String pattern) {
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         try {
@@ -35,6 +38,17 @@ public class NumberUtil {
             return time.getTime();
         } catch (ParseException e) {
             return -1;
+        }
+    }
+
+    public static BigDecimal getDecimal(String decimal, int scale) {
+        try {
+            BigDecimal instance = new BigDecimal(decimal);
+            BigDecimal one      = new BigDecimal("1");
+            return instance.divide(one, scale, BigDecimal.ROUND_HALF_UP);
+        }
+        catch (Exception ex) {
+            return null;
         }
     }
 }

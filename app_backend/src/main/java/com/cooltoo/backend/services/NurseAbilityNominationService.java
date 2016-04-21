@@ -178,12 +178,7 @@ public class NurseAbilityNominationService {
             logger.error("user id format is error");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        List<Long> arrUserIds = new ArrayList<>();
-        String[]   strUserIds = userIds.split(",");
-        for (String strUserId : strUserIds) {
-            long lUserId = Long.parseLong(strUserId);
-            arrUserIds.add(lUserId);
-        }
+        List<Long> arrUserIds = VerifyUtil.parseLongIds(userIds);
         nominationRepository.deleteByUserIdOrNominatedIdIn(arrUserIds, arrUserIds);
         return userIds;
     }
@@ -199,12 +194,7 @@ public class NurseAbilityNominationService {
             logger.error("skill ids format is error");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        List<Integer> arrSkillIds = new ArrayList<>();
-        String[]      strSkillIds = skillIds.split(",");
-        for (String strSkillId : strSkillIds) {
-            int lSkillId = Integer.parseInt(strSkillId);
-            arrSkillIds.add(lSkillId);
-        }
+        List<Integer>                      arrSkillIds          = VerifyUtil.parseIntIds(skillIds);
         List<NurseAbilityNominationEntity> allSkillsNominations = nominationRepository.findByAbilityTypeAndAbilityIdIn(ablibityType, arrSkillIds);
         if (null!=allSkillsNominations) {
             nominationRepository.delete(allSkillsNominations);

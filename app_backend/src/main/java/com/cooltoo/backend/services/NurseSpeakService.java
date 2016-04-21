@@ -54,13 +54,9 @@ public class NurseSpeakService {
 
     public Map<Long, Long> countByUserIds(String strUserIds){
         logger.info("get nurse {} speak count", strUserIds);
+
         if (VerifyUtil.isIds(strUserIds)) {
-            String[]   strIds  = strUserIds.split(",");
-            List<Long> userIds = new ArrayList<>();
-            for (String id : strIds) {
-                long tmpId = Long.parseLong(id);
-                userIds.add(tmpId);
-            }
+            List<Long> userIds = VerifyUtil.parseLongIds(strUserIds);
             return countByUserIds(userIds);
         }
         return new HashMap<>();
@@ -195,13 +191,8 @@ public class NurseSpeakService {
             logger.warn("speak ids is invalid");
             return new ArrayList<>();
         }
-        String[]   strArray = strSpeakIds.split(",");
-        List<Long> speakIds = new ArrayList<>();
-        for (String tmp : strArray) {
-            Long speakId = Long.parseLong(tmp);
-            speakIds.add(speakId);
-        }
 
+        List<Long> speakIds = VerifyUtil.parseLongIds(strSpeakIds);
         return getNurseSpeak(userId, speakIds);
     }
 
@@ -450,13 +441,7 @@ public class NurseSpeakService {
             return new ArrayList<>();
         }
 
-        List<Long> ids       = new ArrayList<>();
-        String[]   strArrIds = strSpeakIds.split(",");
-        for (String tmp : strArrIds) {
-            Long id = Long.parseLong(tmp);
-            ids.add(id);
-        }
-
+        List<Long> ids = VerifyUtil.parseLongIds(strSpeakIds);
         return deleteByIds(speakMakerId, ids);
     }
 

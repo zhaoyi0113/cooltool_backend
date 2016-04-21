@@ -47,12 +47,7 @@ public class NurseSpeakCommentService {
         if (!VerifyUtil.isIds(ids)) {
             return new ArrayList<>();
         }
-        String[]   strArray   = ids.split(",");
-        List<Long> commentIds = new ArrayList<>();
-        for (String tmp : strArray) {
-            long id = Long.parseLong(tmp);
-            commentIds.add(id);
-        }
+        List<Long> commentIds = VerifyUtil.parseLongIds(ids);
         return getCommentByIds(commentIds);
     }
 
@@ -197,13 +192,7 @@ public class NurseSpeakCommentService {
             return new ArrayList<>();
         }
 
-        List<Long> ids       = new ArrayList<>();
-        String[]   strArrIds = strCommentIds.split(",");
-        for (String tmp : strArrIds) {
-            Long id = Long.parseLong(tmp);
-            ids.add(id);
-        }
-
+        List<Long> ids = VerifyUtil.parseLongIds(strCommentIds);
         return deleteByIds(ids);
     }
 

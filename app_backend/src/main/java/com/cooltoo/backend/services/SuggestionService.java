@@ -138,13 +138,7 @@ public class SuggestionService {
             logger.warn("the suggestion type is not valid");
         }
 
-        List<Long> suggestIds = new ArrayList<>();
-        String[]   strArray  = ids.split(",");
-        for (String temp : strArray) {
-            long id = Long.parseLong(temp);
-            suggestIds.add(id);
-        }
-
+        List<Long> suggestIds = VerifyUtil.parseLongIds(ids);
         List<SuggestionEntity> entity2Modify = repository.findByIdIn(suggestIds);
         for (SuggestionEntity entity : entity2Modify) {
             entity.setStatus(status);
@@ -188,12 +182,7 @@ public class SuggestionService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        String[]   arrIds = ids.split(",");
-        List<Long> lIds   = new ArrayList<Long>();
-        for (String id : arrIds) {
-            lIds.add(Long.parseLong(id));
-        }
-
+        List<Long> lIds   = VerifyUtil.parseLongIds(ids);
         repository.deleteByIdIn(lIds);
         return;
     }

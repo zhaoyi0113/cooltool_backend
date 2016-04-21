@@ -81,11 +81,7 @@ public class TagsService {
             List<TagsBean>   tagsB     = new ArrayList<>();
             List<Long>       imgIds    = new ArrayList<>();
             Map<Long,String> imgId2Path= null;
-            List<Long>       lTagIds   = new ArrayList<>();
-            String[]         strTagIds = tagIds.split(",");
-            for (String id : strTagIds) {
-                lTagIds.add(Long.parseLong(id));
-            }
+            List<Long>       lTagIds   = VerifyUtil.parseLongIds(tagIds);
 
             tagsE = tagsRep.findByIdIn(lTagIds);
             if (null!=tagsE) {
@@ -358,11 +354,7 @@ public class TagsService {
     public List<TagsCategoryBean> getCategoryByIds(String categoryIds) {
         if (VerifyUtil.isIds(categoryIds)) {
             List<TagsCategoryBean> categoriesB = new ArrayList<>();
-            List<Long>             lTagIds     = new ArrayList<>();
-            String[]               strTagIds   = categoryIds.split(",");
-            for (String id : strTagIds) {
-                lTagIds.add(Long.parseLong(id));
-            }
+            List<Long>             lTagIds     = VerifyUtil.parseLongIds(categoryIds);
 
             List<TagsCategoryBean> all = getAllCategory();
             for (TagsCategoryBean categoryB : all) {
@@ -381,11 +373,7 @@ public class TagsService {
     public List<TagsCategoryBean> getCategoryWithTagsByIds(String categoryIds) {
         if (VerifyUtil.isIds(categoryIds)) {
             List<TagsCategoryBean> categoriesB = new ArrayList<>();
-            List<Long>             lTagIds     = new ArrayList<>();
-            String[]               strTagIds   = categoryIds.split(",");
-            for (String id : strTagIds) {
-                lTagIds.add(Long.parseLong(id));
-            }
+            List<Long>             lTagIds     = VerifyUtil.parseLongIds(categoryIds);
 
             List<TagsCategoryBean> all = getAllCategoryWithTags();
             for (TagsCategoryBean categoryB : all) {
@@ -511,11 +499,7 @@ public class TagsService {
         if (VerifyUtil.isIds(tagIds)) {
             List<TagsEntity> tagsE     = null;
             List<Long>       imgIds    = new ArrayList<>();
-            List<Long>       lTagIds   = new ArrayList<>();
-            String[]         strTagIds = tagIds.split(",");
-            for (String id : strTagIds) {
-                lTagIds.add(Long.parseLong(id));
-            }
+            List<Long>       lTagIds   = VerifyUtil.parseLongIds(tagIds);
 
             tagsE = tagsRep.findByIdIn(lTagIds);
             if (null!=tagsE) {
@@ -561,11 +545,7 @@ public class TagsService {
         if (VerifyUtil.isIds(categoryIds)) {
 
             List<Long> imgIds         = new ArrayList<>();
-            List<Long> lCategoryIds   = new ArrayList<>();
-            String[]   strCategoryIds = categoryIds.split(",");
-            for (String id : strCategoryIds) {
-                lCategoryIds.add(Long.parseLong(id));
-            }
+            List<Long> lCategoryIds   = VerifyUtil.parseLongIds(categoryIds);
 
             List<TagsCategoryEntity> categoriesE = categoryRep.findByIdIn(lCategoryIds);
             List<TagsEntity>         tagsE       = tagsRep.findByCategoryIdIn(lCategoryIds);
@@ -598,11 +578,7 @@ public class TagsService {
         if (VerifyUtil.isIds(categoryIds)) {
 
             List<Long> imgIds         = new ArrayList<>();
-            List<Long> lCategoryIds   = new ArrayList<>();
-            String[]   strCategoryIds = categoryIds.split(",");
-            for (String id : strCategoryIds) {
-                lCategoryIds.add(Long.parseLong(id));
-            }
+            List<Long> lCategoryIds   = VerifyUtil.parseLongIds(categoryIds);
 
             List<TagsCategoryEntity> categoriesE = categoryRep.findByIdIn(lCategoryIds);
             List<TagsEntity>         tagsE       = tagsRep.findByCategoryIdIn(lCategoryIds);

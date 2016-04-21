@@ -154,13 +154,7 @@ public class BadgeService {
             logger.error("the ids parameter is invalid");
         }
 
-        String[]      strArray = ids.split(",");
-        List<Integer> badgeIds = new ArrayList<>();
-        for (String tmp : strArray) {
-            Integer id = Integer.parseInt(tmp);
-            badgeIds.add(id);
-        }
-
+        List<Integer>     badgeIds  = VerifyUtil.parseIntIds(ids);
         List<BadgeEntity> resultSet = repository.findAll(badgeIds);
         if (null!=resultSet) {
             badgeIds.clear();

@@ -221,13 +221,7 @@ public class HospitalDepartmentService {
             return new ArrayList<>();
         }
 
-        List<Integer> ids       = new ArrayList<>();
-        String[]      strArrIds = strDepartmentIds.split(",");
-        for (String tmp : strArrIds) {
-            Integer id = Integer.parseInt(tmp);
-            ids.add(id);
-        }
-
+        List<Integer> ids = VerifyUtil.parseIntIds(strDepartmentIds);
         return deleteByIds(ids);
     }
 

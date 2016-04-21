@@ -149,23 +149,6 @@ public class CathartProfilePhotoService {
         }
     }
 
-    private String list2String(List<Long> longs) {
-        if (null==longs||longs.isEmpty()) {
-            return "";
-        }
-        else if (longs.size()==1) {
-            return ""+longs.get(0);
-        }
-        else {
-            StringBuilder strIds = new StringBuilder("");
-            strIds.append(longs.get(0));
-            for (int i = 1; i < longs.size(); i++) {
-                strIds.append(",").append(longs.get(i));
-            }
-            return strIds.toString();
-        }
-    }
-
     //=============================================================
     //          add      for administrator use
     //=============================================================
@@ -255,15 +238,9 @@ public class CathartProfilePhotoService {
             return "";
         }
 
-        String[]   strArray  = strIds.split(",");
-        List<Long> recordIds = new ArrayList<>();
-        for (String tmp : strArray) {
-            Long id = Long.parseLong(tmp);
-            recordIds.add(id);
-        }
-
+        List<Long> recordIds = VerifyUtil.parseLongIds(strIds);
         recordIds = disableByIds(recordIds);
-        return list2String(recordIds);
+        return VerifyUtil.numList2String(recordIds);
     }
 
     @Transactional
@@ -297,15 +274,9 @@ public class CathartProfilePhotoService {
             return "";
         }
 
-        String[]   strArray  = strIds.split(",");
-        List<Long> recordIds = new ArrayList<>();
-        for (String tmp : strArray) {
-            Long id = Long.parseLong(tmp);
-            recordIds.add(id);
-        }
-
+        List<Long> recordIds = VerifyUtil.parseLongIds(strIds);
         recordIds = deleteByIds(recordIds);
-        return list2String(recordIds);
+        return VerifyUtil.numList2String(recordIds);
     }
 
     @Transactional

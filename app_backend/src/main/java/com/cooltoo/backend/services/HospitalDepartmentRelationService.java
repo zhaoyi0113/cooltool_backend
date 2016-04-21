@@ -98,13 +98,8 @@ public class HospitalDepartmentRelationService {
             logger.warn("hospital ids are invalid");
             return strHospitalIds;
         }
-        List<Integer> hospitalIds = new ArrayList<>();
-        String[]      strArrIds   = strHospitalIds.split(",");
-        for (String tmp : strArrIds) {
-            Integer id = Integer.parseInt(tmp);
-            hospitalIds.add(id);
-        }
 
+        List<Integer> hospitalIds = VerifyUtil.parseIntIds(strHospitalIds);
         deleteByHospitalIds(hospitalIds);
         return strHospitalIds;
     }
@@ -133,13 +128,8 @@ public class HospitalDepartmentRelationService {
             logger.warn("hospital ids are invalid");
             return strDepartmentIds;
         }
-        List<Integer> departmentIds = new ArrayList<>();
-        String[]      strArrIds     = strDepartmentIds.split(",");
-        for (String tmp : strArrIds) {
-            Integer id = Integer.parseInt(tmp);
-            departmentIds.add(id);
-        }
 
+        List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
         deleteByDepartmentIds(departmentIds);
         return strDepartmentIds;
     }

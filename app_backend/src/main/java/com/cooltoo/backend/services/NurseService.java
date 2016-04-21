@@ -445,12 +445,7 @@ public class NurseService {
         }
 
         // get ids
-        String[]   strArray = strNurseIds.split(",");
-        List<Long> nurseIds = new ArrayList<>();
-        for (String tmp : strArray) {
-            long id = Long.parseLong(tmp);
-            nurseIds.add(id);
-        }
+        List<Long> nurseIds = VerifyUtil.parseLongIds(strNurseIds);
 
         // get nurses
         List<NurseEntity> nurses = repository.findByIdIn(nurseIds);

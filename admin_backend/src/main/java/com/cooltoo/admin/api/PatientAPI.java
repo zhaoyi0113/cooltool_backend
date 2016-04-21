@@ -52,7 +52,7 @@ public class PatientAPI {
             @DefaultValue("") @FormParam("usercol") String usercol
     ) {
         Date date = null;
-        long time = NumberUtil.getTime(birthday, "yyyy-MM-dd HH:mm:ss");
+        long time = NumberUtil.getTime(birthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (time > 0) {
             date = new Date(time);
         }
@@ -103,7 +103,7 @@ public class PatientAPI {
             @DefaultValue("") @FormParam("usercol") String usercol
     ) {
         Date date = null;
-        long time = NumberUtil.getTime(birthday, "yyyy-MM-dd HH:mm:ss");
+        long time = NumberUtil.getTime(birthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (time > 0) {
             date = new Date(time);
         }

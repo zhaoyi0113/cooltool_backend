@@ -98,16 +98,13 @@ public class NurseSkillService {
 
         // judge the skills exist
         Map<Integer, SkillBean> allSkills = skillService.getAllSkillId2BeanMap();
-        List<Integer> ids    = new ArrayList<Integer>();
+        List<Integer> ids    = VerifyUtil.parseIntIds(skillIds);
         String[]      idsStr = skillIds.split(",");
-        for (String id : idsStr) {
-            int iId = Integer.parseInt(id);
-            SkillBean skillB = allSkills.get(iId);
+        for (Integer iId : ids) {
             if (!allSkills.containsKey(iId)) {
                 logger.error("The occupation skill {} is not exist!", iId);
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
-            ids.add(iId);
         }
 
         for (Integer skillId : ids) {
@@ -133,12 +130,7 @@ public class NurseSkillService {
             logger.error("user ids format is wrong!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        List<Long> arrUserIds = new ArrayList<>();
-        String[]   strUserIds = userIds.split(",");
-        for (String strUserId : strUserIds) {
-            long lUserId = Long.parseLong(strUserId);
-            arrUserIds.add(lUserId);
-        }
+        List<Long> arrUserIds = VerifyUtil.parseLongIds(userIds);
         repository.deleteByUserIdIn(arrUserIds);
         return userIds;
     }
@@ -150,12 +142,7 @@ public class NurseSkillService {
             logger.error("skill ids format is wrong!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        List<Integer> arrSkillIds = new ArrayList<>();
-        String[]      strSkillIds = skillIds.split(",");
-        for (String strSkillId : strSkillIds) {
-            int lSkillId = Integer.parseInt(strSkillId);
-            arrSkillIds.add(lSkillId);
-        }
+        List<Integer> arrSkillIds = VerifyUtil.parseIntIds(skillIds);
         repository.deleteBySkillIdIn(arrSkillIds);
         return skillIds;
     }

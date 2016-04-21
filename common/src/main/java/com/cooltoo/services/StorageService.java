@@ -4,13 +4,13 @@ import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.FileStorageRepository;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +45,20 @@ public class StorageService {
         return this.storagePath;
     }
 
+    public boolean isFileExist(String relativeFilePath) {
+        logger.info("judge the file {} is exist", relativeFilePath);
+        if (VerifyUtil.isStringEmpty(relativeFilePath)) {
+            logger.error("the relative file path is invalid");
+            return false;
+        }
+        String dir = getStoragePath();
+        String path= dir+File.separator+relativeFilePath;
+        File file = new File(path);
+        boolean exist = file.exists();
+        logger.info("judge the file {} is exist==>{}", relativeFilePath, exist);
+        return exist;
+    }
+
     public String getNgnixPathPrefix() {
         return "";
     }
@@ -57,7 +71,7 @@ public class StorageService {
         deleteFileIfExist(fileId);
         try {
             String storageDirectory = getStoragePath() + File.separator;
-            String sha1         = sha1(String.valueOf(System.nanoTime()));
+            String sha1         = VerifyUtil.sha1(String.valueOf(System.nanoTime()));
             String folderName   = sha1.substring(0, 2);
             String newFileName  = sha1.substring(2);
             String relativePath = folderName + File.separator + newFileName;
@@ -105,9 +119,38 @@ public class StorageService {
         String pathPrefix = getNgnixPathPrefix();
 
         Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
-        List<FileStorageEntity> fileEntites =  storageRepository.findStorageByIdIn(ids, sort);
+        List<FileStorageEntity> fileEntites =  storageRepository.findByIdIn(ids, sort);
         for (FileStorageEntity entity : fileEntites) {
             ret.put(entity.getId(), pathPrefix + entity.getFilePath());
+        }
+        return ret;
+    }
+
+    public long getFileIdByPath(String filePath) {
+        logger.info("get file storage id by file path={}", filePath);
+        if (VerifyUtil.isStringEmpty(filePath)) {
+            logger.error("file path is invalid");
+            return 0;
+        }
+        FileStorageEntity entity = storageRepository.findByFilePath(filePath);
+        if (null==entity) {
+            logger.error("no record exist");
+            return 0;
+        }
+        logger.info("get file storage id by file path={} value==>{}", filePath, entity);
+        return entity.getId();
+    }
+
+    public Map<String, Long> getFilePaths(List<String> filePaths) {
+        Map<String, Long> ret = new HashMap<>();
+        if (null==filePaths || filePaths.isEmpty()) {
+            return ret;
+        }
+
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        List<FileStorageEntity> fileEntites =  storageRepository.findByFilePathIn(filePaths, sort);
+        for (FileStorageEntity entity : fileEntites) {
+            ret.put(entity.getFilePath(), entity.getId());
         }
         return ret;
     }
@@ -127,7 +170,7 @@ public class StorageService {
         return null;
     }
 
-    private long saveToDB(String fileName, String path) {
+    protected long saveToDB(String fileName, String path) {
         FileStorageEntity entity = new FileStorageEntity();
         entity.setFileRealname(fileName);
         entity.setFilePath(path);
@@ -180,7 +223,7 @@ public class StorageService {
 
     public void deleteFiles(List<Long> ids) {
         Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
-        List<FileStorageEntity> all = storageRepository.findStorageByIdIn(ids, sort);
+        List<FileStorageEntity> all = storageRepository.findByIdIn(ids, sort);
         if (null==all || all.isEmpty()) {
             return;
         }
@@ -201,15 +244,5 @@ public class StorageService {
         } catch (Exception ex) {
             logger.error("failed to delete existing file === " + imageFile, ex);
         }
-    }
-
-    private static String sha1(String input) throws NoSuchAlgorithmException {
-        MessageDigest sha1Digest = MessageDigest.getInstance("SHA1");
-        byte[] result = sha1Digest.digest(input.getBytes());
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < result.length; i++) {
-            sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
-        }
-        return sb.toString();
     }
 }
