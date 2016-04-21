@@ -66,6 +66,7 @@ public class AdminUserAuthenticationFilter implements ContainerRequestFilter {
                 long userId = tokenEntities.get(0).getUserId();
                 logger.info("the user id : "+userId);
                 requestContext.setProperty(ContextKeys.ADMIN_USER_LOGIN_USER_ID, userId);
+                requestContext.setProperty(ContextKeys.ADMIN_USER_TOKEN, token);
             }
         }
     }

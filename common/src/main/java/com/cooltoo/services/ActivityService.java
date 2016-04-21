@@ -289,7 +289,7 @@ public class ActivityService {
                 entity.setPrice(bdPrice);
             }
         }
-
+        entity.setStatus(ActivityStatus.DISABLE);
         entity.setCreateTime(new Date());
         entity = repository.save(entity);
         logger.info("create an activity id={}", entity.getId());
@@ -510,8 +510,19 @@ public class ActivityService {
     }
 
     @Transactional
-    public String createTemporaryFile(String token, String imageName, InputStream image) {
+    public String createTemporaryFile(String token, long activityId, String imageName, InputStream image) {
+        logger.info("create temporary file by token={} activityId={} imageName={} image={}",
+                token, activityId, imageName, image);
         checkToken(token);
+        ActivityEntity entity = repository.findOne(activityId);
+        if (null==entity) {
+            logger.info("the activity do not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (!ActivityStatus.EDITING.equals(entity.getStatus())) {
+            logger.error("the activity is not editing");
+            throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+        }
         String relativePath = tempFileStorageService.cacheTemporaryFile(token, imageName, image);
         return relativePath;
     }

@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 16/3/22.
@@ -101,4 +103,73 @@ public class VerifyUtil {
         }
         return sb.toString();
     }
+
+
+    private static final String JSON_REGEXP_EMPTY = "^\\{\\s*\\}$";
+    private static final String JSON_REGEXP_ONE = "^\\{\\s*\"[^\\s\"]+\"\\s*:\\s*\"[^\\s\"]+\"\\s*\\}$";
+    private static final String JSON_REGEXP_MORE= "^\\{((\\s*\"[^\\s]+\"\\s*:\\s*\"[^\\s]+\"\\s*)\\s*,\\s*)+\\s*\"[^\\s]+\"\\s*:\\s*\"[^\\s]+\"\\s*\\s*\\}$";
+    public static boolean isJsonKeyVal(String json) {
+        if (isStringEmpty(json)) {
+            return false;
+        }
+        json = json.trim();
+        boolean isEmpty = json.matches(JSON_REGEXP_EMPTY);
+        boolean isOne   = json.matches(JSON_REGEXP_ONE);
+        boolean isMore  = json.matches(JSON_REGEXP_MORE);
+        return (isEmpty || isOne || isMore);
+    }
+
+    public static Map<String, String> parseJsonKeyVal(String json) {
+        if (!isJsonKeyVal(json)) {
+            return new HashMap<>();
+        }
+
+        Map<String, String> keyValMap = new HashMap<>();
+        boolean isEmpty = json.matches(JSON_REGEXP_EMPTY);
+        if (isEmpty) {
+            return keyValMap;
+        }
+        boolean isOne   = json.matches(JSON_REGEXP_ONE);
+        if (isOne) {
+            json = json.trim();
+            json = json.substring(1, json.length()-1);
+            String[] keyVal = parseJsonKeyValMap(json);
+            keyValMap.put(keyVal[0], keyVal[1]);
+            return keyValMap;
+        }
+        boolean isMore  = json.matches(JSON_REGEXP_MORE);
+        if (isMore) {
+            json = json.trim();
+            json = json.substring(1, json.length()-1);
+            String[] groups = json.split(",");
+            for (String tmp : groups) {
+                String[] keyVal = parseJsonKeyValMap(tmp);
+                keyValMap.put(keyVal[0], keyVal[1]);
+            }
+            return keyValMap;
+        }
+
+        return keyValMap;
+    }
+
+    private static String[] parseJsonKeyValMap(String keyValMap) {
+        String[] keyVal = keyValMap.trim().split("\"\\s*:\\s*\"");
+        keyVal[0] = keyVal[0].trim();
+        if (keyVal[0].length()!=1) {
+            keyVal[0] = keyVal[0].substring(1, keyVal[0].length());
+        }
+        else {
+            keyVal[0] = "";
+        }
+        keyVal[1] = keyVal[1].trim();
+        if (keyVal[1].length()!=1) {
+            keyVal[1] = keyVal[1].substring(0, keyVal[1].length() - 1);
+        }
+        else {
+            keyVal[1] = "";
+        }
+        return keyVal;
+    }
+
+
 }
