@@ -98,4 +98,22 @@ public class NurseFriendsBean {
     public void setWaitMoreThan1Day(boolean waitMoreThan1Day) {
         this.waitMoreThan1Day = waitMoreThan1Day;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder msg = new StringBuilder();
+        msg.append(getClass()).append("@").append(hashCode()).append("[");
+        msg.append("id=").append(id);
+        msg.append(", userId=").append(userId);
+        msg.append(", friendId=").append(friendId);
+        msg.append(", friendName=").append(friendName);
+        msg.append(", headPhotoUrl=").append(headPhotoUrl);
+        msg.append(", isFriend=").append(isFriend);
+        msg.append(", isAgreed=").append(isAgreed);
+        msg.append(", waitFor=").append(waitFor);
+        msg.append(", waitMoreThan1Day=").append(waitMoreThan1Day);
+        msg.append(", dateTime=").append(dateTime);
+        msg.append("]");
+        return msg.toString();
+    }
 }

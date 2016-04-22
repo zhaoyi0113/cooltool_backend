@@ -10,6 +10,7 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.NurseFriendsRepository;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.services.StorageService;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
@@ -17,10 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -291,6 +289,53 @@ public class NurseFriendsService {
         return retVal;
     }
 
+    public List<NurseFriendsBean> isFriend(long userId, String strOtherUserIds) {
+        logger.info("is user {} is friend with others {}", strOtherUserIds);
+        List<Long> otherUserIds = VerifyUtil.parseLongIds(strOtherUserIds);
+        if (!nurseRepository.exists(userId)) {
+            logger.error("nurse not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (null==otherUserIds || otherUserIds.isEmpty()) {
+            logger.error("other's is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        List<NurseFriendsBean> others = new ArrayList<>();
+        for (Long otherId : otherUserIds) {
+            NurseFriendsBean other = new NurseFriendsBean();
+            other.setUserId(userId);
+            other.setFriendId(otherId);
+            other.setIsFriend(false);
+            other.setWaitMoreThan1Day(false);
+            others.add(other);
+        }
+
+        List<NurseFriendsBean> friendsOfUser = getFriend(userId);
+        Map<Long, NurseFriendsBean> friendId2UserFriend = new HashMap<>();
+        for (NurseFriendsBean tmp : friendsOfUser) {
+            friendId2UserFriend.put(tmp.getFriendId(), tmp);
+        }
+
+        long oneDayAgo = System.currentTimeMillis() - 3600000*24/* one day ago*/;
+        for (NurseFriendsBean other : others) {
+            if (!friendId2UserFriend.containsKey(other.getFriendId())) {
+                continue;
+            }
+            NurseFriendsBean userFriend = friendId2UserFriend.get(other.getFriendId());
+            other.setIsFriend(userFriend.getIsFriend());
+            other.setIsAgreed(userFriend.getIsAgreed());
+            other.setDateTime(userFriend.getDateTime());
+            other.setWaitFor(userFriend.getWaitFor());
+            if (userFriend.getIsAgreed() == AgreeType.WAITING) {
+                long requestTime = (null == userFriend.getDateTime()) ? 0 : userFriend.getDateTime().getTime();
+                other.setWaitMoreThan1Day((requestTime - oneDayAgo) < 0);
+            }
+        }
+
+        return others;
+    }
+
     public List<NurseFriendsBean> getFriendsAgreeStatusNotWaiting(long userId) {
         List<NurseFriendsBean> allFriends = getFriend(userId);
         for (int i=0, count=allFriends.size(); i < count; i ++) {
@@ -336,6 +381,7 @@ public class NurseFriendsService {
                 if (friendMap.getUserId()==userId) {
                     NurseFriendsBean bean = beanConverter.convert(friendMap);
                     userFriendsB.add(bean);
+                    bean.setIsFriend(true);
                 }
                 else {
                     friendsUserE.add(friendMap);

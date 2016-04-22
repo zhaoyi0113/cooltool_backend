@@ -148,4 +148,18 @@ public class NurseFriendsAPI {
         List<NurseFriendsBean> friends = friendsService.searchFriends(userId, name);
         return Response.ok(friends).build();
     }
+
+    @POST
+    @Path("/judge_friend")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response judgeFriend(@Context HttpServletRequest request,
+                                @FormParam("others_ids") String otherIds
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("nurse {} judge friendship with {}", otherIds);
+        List<NurseFriendsBean> judgeResult = friendsService.isFriend(userId, otherIds);
+        logger.info("result is {}", judgeResult);
+        return Response.ok(judgeResult).build();
+    }
 }

@@ -3,6 +3,7 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.services.NurseFriendsService;
+import com.cooltoo.constants.AgreeType;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -34,20 +35,12 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
         long nurseId = 15;
         long friendId= 1;
         List<NurseFriendsBean> friendList = friendsService.getFriend(nurseId);
-        Assert.assertTrue(friendList.isEmpty());
-        friendsService.addFriend(nurseId,1);
-        friendList = friendsService.getFriend(nurseId);
         Assert.assertEquals(1, friendList.size());
-        Assert.assertEquals(friendId, friendList.get(0).getFriendId());
-
-        friendList = friendsService.getFriend(1);
-        Assert.assertEquals(15, friendList.size());
-
-        nurseId = 15;
-        friendsService.addFriend(nurseId,1);
+        friendsService.addFriend(nurseId,friendId);
         friendList = friendsService.getFriend(nurseId);
-        Assert.assertEquals(1, friendList.size());
-        friendList = friendsService.getFriend(1);
+        Assert.assertEquals(2, friendList.size());
+
+        friendList = friendsService.getFriend(friendId);
         Assert.assertEquals(15, friendList.size());
     }
 
@@ -80,7 +73,7 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
 
         friends = friendsService.getFriends(1, 3, 0, 5);
         Assert.assertEquals(1, friends.size());
-        Assert.assertFalse(friends.get(0).getIsFriend());
+        Assert.assertTrue(friends.get(0).getIsFriend());
     }
 
     @Test
@@ -92,8 +85,31 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(2, friends.size());
 
         friends = friendsService.searchFriends(1, "护士");
-       logger.info(friends.toString());
+        logger.info(friends.toString());
         Assert.assertEquals(14, friends.size());
 
+    }
+
+    @Test
+    public void testJudgeFriendship() {
+        List<NurseFriendsBean> friends = null;
+
+        friends = friendsService.isFriend(3, "15,16,17");
+        logger.info(friends.toString());
+        Assert.assertEquals(3, friends.size());
+
+        for (NurseFriendsBean tmp : friends) {
+            if (tmp.getFriendId()==15) {
+                Assert.assertEquals(true, tmp.getIsFriend());
+                Assert.assertEquals(AgreeType.AGREED, tmp.getIsAgreed());
+            }
+            if (tmp.getFriendId()==16) {
+                Assert.assertEquals(true, tmp.getIsFriend());
+                Assert.assertEquals(AgreeType.WAITING, tmp.getIsAgreed());
+            }
+            if (tmp.getFriendId()==17) {
+                Assert.assertEquals(false, tmp.getIsFriend());
+            }
+        }
     }
 }
