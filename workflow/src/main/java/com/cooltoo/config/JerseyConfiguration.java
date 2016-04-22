@@ -63,6 +63,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(TagsServiceAPI.class);
         register(NurseTagsServiceAPI.class);
         register(NurseManageAPI.class);
+        register(CathartProfilePhotoManageAPI.class);
         register(CathartProfilePhotoAPI.class);
         register(ActivityManageAPI.class);
         register(ActivityAPI.class);

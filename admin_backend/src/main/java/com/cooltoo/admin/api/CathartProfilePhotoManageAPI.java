@@ -5,7 +5,6 @@ import com.cooltoo.backend.beans.CathartProfilePhotoBean;
 import com.cooltoo.backend.services.CathartProfilePhotoService;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.util.VerifyUtil;
-import org.apache.http.protocol.HTTP;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -24,9 +23,9 @@ import java.util.List;
  * Created by hp on 2016/4/19.
  */
 @Path("/admin/speak/cathart_profile")
-public class CathartProfilePhotoAPI {
+public class CathartProfilePhotoManageAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(CathartProfilePhotoAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(CathartProfilePhotoManageAPI.class.getName());
 
     @Autowired private CathartProfilePhotoService cathartPhotoService;
 
