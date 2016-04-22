@@ -30,10 +30,11 @@ public class WorkFileTypeServiceTest extends AbstractCooltooTest {
     @DatabaseSetup("classpath:/com/cooltoo/services/work_file_type_data.xml")
     public void testGetAllWorkFileType() {
         List<WorkFileTypeBean> workfileTypes = workFileTypeService.getAllWorkFileType();
-        Assert.assertEquals(3, workfileTypes.size());
+        Assert.assertEquals(4, workfileTypes.size());
         logger.info(workfileTypes.get(0).toString());
         logger.info(workfileTypes.get(1).toString());
         logger.info(workfileTypes.get(2).toString());
+        logger.info(workfileTypes.get(3).toString());
     }
 
     @Test

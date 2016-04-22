@@ -30,10 +30,11 @@ public class SpeakTypeServiceTest extends AbstractCooltooTest {
     @DatabaseSetup("classpath:/com/cooltoo/services/speak_type_data.xml")
     public void testGetAllSpeakType() {
         List<SpeakTypeBean> speakTypes = speakTypeService.getAllSpeakType();
-        Assert.assertEquals(3, speakTypes.size());
+        Assert.assertEquals(4, speakTypes.size());
         logger.info(speakTypes.get(0).toString());
         logger.info(speakTypes.get(1).toString());
         logger.info(speakTypes.get(2).toString());
+        logger.info(speakTypes.get(3).toString());
     }
 
     @Test

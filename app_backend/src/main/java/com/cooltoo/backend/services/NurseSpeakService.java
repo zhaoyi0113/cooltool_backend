@@ -304,14 +304,21 @@ public class NurseSpeakService {
         }
 
         // get user profile photo url
+
+        SpeakTypeBean officialSpeak = speakTypeService.getSpeakTypeByType(SpeakType.OFFICIAL);
         Map<Long, String> idToPath = storageService.getFilePath(fileIds);
-        for (NurseSpeakBean entity : beans) {
-            long   speakId    = entity.getId();
-            long   tmpUserId  = entity.getUserId();
-            long   userProfId = userId2FileId.get(tmpUserId);
+        for (NurseSpeakBean tmp : beans) {
+            long   speakId    = tmp.getId();
+            long   tmpUserId  = tmp.getUserId();
+            Long   userProfId = userId2FileId.get(tmpUserId);
             String userProUrl = idToPath.get(userProfId);
             speakBean = speakIdToBeanMap.get(speakId);
             speakBean.setUserProfilePhotoUrl(userProUrl);
+
+            if (tmp.getSpeakType()==officialSpeak.getId()) {
+                String officialPhotoUrl = storageService.getOfficialSpeakProfilePhotoPath();
+                speakBean.setUserProfilePhotoUrl(officialPhotoUrl);
+            }
         }
 
         // construct return values
@@ -332,19 +339,24 @@ public class NurseSpeakService {
     //             add
     //===============================================================
 
-    public NurseSpeakBean addSmug(long userId, String content, String fileName, InputStream fileInputStream) {
+    public NurseSpeakBean addSmug(long userId, String content, String fileName, InputStream file) {
         logger.info("add SMUG : userId=" + userId + " content="+content+" fileName="+fileName);
-        return addNurseSpeak(userId, content, SpeakType.SMUG.name(), fileName, fileInputStream);
+        return addNurseSpeak(userId, content, SpeakType.SMUG.name(), fileName, file);
     }
 
-    public NurseSpeakBean addCathart(long userId, String content, String fileName, InputStream fileInputStream) {
+    public NurseSpeakBean addCathart(long userId, String content, String fileName, InputStream file) {
         logger.info("add CATHART : userId=" + userId + " content="+content+" fileName="+fileName);
-        return addNurseSpeak(userId, content, SpeakType.CATHART.name(), fileName, fileInputStream);
+        return addNurseSpeak(userId, content, SpeakType.CATHART.name(), fileName, file);
     }
 
-    public NurseSpeakBean addAskQuestion(long userId, String content, String fileName, InputStream fileInputStream) {
+    public NurseSpeakBean addAskQuestion(long userId, String content, String fileName, InputStream file) {
         logger.info("add ASK_QUESTION : userId=" + userId + " content="+content+" fileName="+fileName);
-        return addNurseSpeak(userId, content, SpeakType.ASK_QUESTION.name(), fileName, fileInputStream);
+        return addNurseSpeak(userId, content, SpeakType.ASK_QUESTION.name(), fileName, file);
+    }
+
+    public NurseSpeakBean addOfficial(long userId, String content, String fileName, InputStream file) {
+        logger.info("add SMUG : userId=" + userId + " content="+content+" fileName="+fileName);
+        return addNurseSpeak(userId, content, SpeakType.OFFICIAL.name(), fileName, file);
     }
 
     @Transactional
@@ -422,6 +434,10 @@ public class NurseSpeakService {
         }
         else if (count>=9 && SpeakType.ASK_QUESTION.equals(speakTypeBean.getType())) {
             logger.warn("the ask_question speak do not need image more than nine");
+            return new ImagesInSpeakBean();
+        }
+        else if (count>=1 && SpeakType.OFFICIAL.equals(speakTypeBean.getType())) {
+            logger.warn("the official speak do not need image more than one");
             return new ImagesInSpeakBean();
         }
 

@@ -67,6 +67,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(CathartProfilePhotoAPI.class);
         register(ActivityManageAPI.class);
         register(ActivityAPI.class);
+        register(OfficialSpeakAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 

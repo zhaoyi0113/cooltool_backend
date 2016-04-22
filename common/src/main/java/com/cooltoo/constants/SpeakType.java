@@ -12,7 +12,9 @@ public enum SpeakType {
     /* 吐槽 */
     CATHART,
     /* 提问 */
-    ASK_QUESTION;
+    ASK_QUESTION,
+    /* 官方发言 */
+    OFFICIAL;
 
     public static SpeakType parseString(String speak) {
         SpeakType retVal = null;
@@ -24,6 +26,9 @@ public enum SpeakType {
         }
         else if (ASK_QUESTION.name().equalsIgnoreCase(speak)) {
             retVal = ASK_QUESTION;
+        }
+        else if (OFFICIAL.name().equalsIgnoreCase(speak)) {
+            retVal = OFFICIAL;
         }
         return retVal;
     }
@@ -38,6 +43,9 @@ public enum SpeakType {
         }
         else if (ASK_QUESTION.ordinal()==(speak)) {
             retVal = ASK_QUESTION;
+        }
+        else if (OFFICIAL.ordinal()==(speak)) {
+            retVal = OFFICIAL;
         }
         return retVal;
     }

@@ -3,4 +3,5 @@
     <speak_type id="1" name="SMUG"         type="0" factor="10" image_id="1" disable_image_id="2" />
     <speak_type id="2" name="CATHART"      type="1" factor="15" image_id="1" disable_image_id="2" />
     <speak_type id="3" name="ASK_QUESTION" type="2" factor="20" image_id="1" disable_image_id="2" />
+    <speak_type id="4" name="OFFICIAL"     type="3" factor="30" image_id="1" disable_image_id="2" />
 </dataset>

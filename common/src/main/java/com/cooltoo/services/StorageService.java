@@ -29,6 +29,12 @@ public class StorageService {
     @Autowired
     private FileStorageRepository storageRepository;
 
+    @Value("${storage.official.path}")
+    private String officialPath;
+
+    @Value("${storage.official.speak.profile.photo.path}")
+    private String officialSpeakProfilePhotoPath;
+
     @Value("${storage.path}")
     private String storagePath;
 
@@ -36,6 +42,13 @@ public class StorageService {
     @Value("${storage.url}")
     private String storageUrl;
 
+    public String getOfficialPath() {
+        return officialPath;
+    }
+
+    public String getOfficialSpeakProfilePhotoPath() {
+        return officialPath+""+officialSpeakProfilePhotoPath;
+    }
 
     public String getStorageUrl() {
         return this.storageUrl;
