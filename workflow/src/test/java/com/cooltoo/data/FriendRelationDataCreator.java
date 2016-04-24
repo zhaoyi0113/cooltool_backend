@@ -4,7 +4,6 @@ import com.cooltoo.Application;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.services.NurseFriendsService;
-import com.cooltoo.backend.services.NurseService;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -71,7 +70,7 @@ public class FriendRelationDataCreator {
                         NurseEntity user = nurseEntities.get(ii);
                         NurseEntity friend = nurseEntities.get(index);
                         logger.info("add friend between " + user.getName() + ", " + friend.getName());
-                        nurseFriendsService.addFriend(user.getId(), friend.getId());
+                        nurseFriendsService.setFriendship(user.getId(), friend.getId());
                     }
                     latch.countDown();
                 }

@@ -47,7 +47,7 @@ public class StorageService {
     }
 
     public String getOfficialSpeakProfilePhotoPath() {
-        return officialPath+""+officialSpeakProfilePhotoPath;
+        return officialSpeakProfilePhotoPath;
     }
 
     public String getStorageUrl() {

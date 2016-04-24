@@ -124,7 +124,7 @@ public class CathartProfilePhotoManageAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} disable cathart profile photo by ids={}", userId, ids);
-        String disabledIds = cathartPhotoService.disableByIds(ids);
+        String disabledIds = cathartPhotoService.setStatusByIds(ids);
         logger.info("disable ids is {}", disabledIds);
         return Response.ok(disabledIds).build();
     }

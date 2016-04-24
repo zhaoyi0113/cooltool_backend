@@ -1,9 +1,6 @@
 package com.cooltoo.backend.api;
 
-import com.cooltoo.backend.beans.ImagesInSpeakBean;
-import com.cooltoo.backend.beans.NurseSpeakBean;
-import com.cooltoo.backend.beans.NurseSpeakCommentBean;
-import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
+import com.cooltoo.backend.beans.*;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.ContextKeys;
@@ -267,5 +264,17 @@ public class NurseSpeakAPI {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakThumbsUpBean thumbsUpBean = speakService.setNurseSpeakThumbsUp(nurseSpeakId, userId);
         return Response.ok(thumbsUpBean).build();
+    }
+
+    @Path("/get_thumbs_up_user/{speak_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response getSpeakThumbsUp(@Context HttpServletRequest request,
+                                     @PathParam("speak_id") long speak_id
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<NurseFriendsBean> thumbsFriends = speakService.getThumbsUpUsers(userId, speak_id);
+        return Response.ok(thumbsFriends).build();
     }
 }

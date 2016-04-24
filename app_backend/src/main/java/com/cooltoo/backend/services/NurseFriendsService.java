@@ -14,6 +14,7 @@ import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,56 +46,41 @@ public class NurseFriendsService {
     //            add friend relation
     //======================================================
     @Transactional
-    public void addFriend(long userId, long friendId){
+    public void setFriendship(long userId, long friendId){
         if(userId == friendId){
             logger.error("user can't be himself friend.");
         }
-        insertFriendToDB(userId, friendId, AgreeType.AGREED);
-        insertFriendToDB(friendId, userId, AgreeType.WAITING);
+        setFriendshipToDB(userId, friendId);
     }
 
-    private void insertFriendToDB(long userId, long friendId, AgreeType agreeType){
+    private void setFriendshipToDB(long userId, long friendId){
         validateUserId(userId, friendId);
         long count = friendsRepository.countByUserIdAndFriendId(userId, friendId);
         if(count <= 0){
+            Date datetime = new Date();
             NurseFriendsEntity entity = new NurseFriendsEntity();
             entity.setUserId(userId);
             entity.setFriendId(friendId);
-            entity.setIsAgreed(agreeType);
-            entity.setDateTime(new Date());
+            entity.setIsAgreed(AgreeType.AGREED);
+            entity.setDateTime(datetime);
+            friendsRepository.save(entity);
+
+            entity = new NurseFriendsEntity();
+            entity.setUserId(friendId);
+            entity.setFriendId(userId);
+            entity.setIsAgreed(AgreeType.WAITING);
+            entity.setDateTime(datetime);
             friendsRepository.save(entity);
         }
         else {
-            List<NurseFriendsEntity> entity = friendsRepository.findByUserIdAndFriendId(userId, friendId);
-            NurseFriendsEntity friend = entity.get(0);
-            friend.setIsAgreed(agreeType);
-            friend.setDateTime(new Date());
-            friendsRepository.save(friend);
+            friendsRepository.deleteFriendship(userId, friendId);
         }
     }
 
     private void validateUserId(long userId, long friendId) {
+        logger.info("validate user {} and {}", userId, friendId);
         if (!nurseRepository.exists(userId) || !nurseRepository.exists(friendId)) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
-        }
-    }
-
-    //======================================================
-    //            delete friend relation
-    //======================================================
-    @Transactional
-    public void removeFriend(long userId, long friendId){
-        List<NurseFriendsEntity> entities = null;
-        validateUserId(userId, friendId);
-
-        entities = friendsRepository.findByUserIdAndFriendId(userId, friendId);
-        if(null!=entities && !entities.isEmpty()){
-            friendsRepository.delete(entities);
-        }
-
-        entities = friendsRepository.findByUserIdAndFriendId(friendId, userId);
-        if(null!=entities && !entities.isEmpty()){
-            friendsRepository.delete(entities);
         }
     }
 
@@ -102,15 +88,15 @@ public class NurseFriendsService {
     //            modify friend relation
     //======================================================
     @Transactional
-    public void modifyFriendAgreed(long userId, long friend, AgreeType agreeType) {
+    public AgreeType modifyFriendAgreed(long userId, long friend, AgreeType agreeType) {
         List<NurseFriendsEntity> entities = null;
         NurseFriendsEntity entity = null;
         if (null == agreeType) {
             logger.info("AgreeType is null");
-            return;
+            return null;
         } else if (AgreeType.WAITING == agreeType) {
             logger.info("Cannot set to WAITING again");
-            return;
+            return null;
         } else if (AgreeType.AGREED == agreeType) {
             entities = friendsRepository.findByUserIdAndFriendId(userId, friend);
         } else {// AgreeType.ACCESS_ZONE_DENY, AgreeType.BLACKLIST;
@@ -122,6 +108,7 @@ public class NurseFriendsService {
         }
 
         entity = entities.get(0);
+        // toggle setting (AgreeType.ACCESS_ZONE_DENY, AgreeType.BLACKLIST;) to AgreeType.AGREED
         boolean isLimit1    = (AgreeType.ACCESS_ZONE_DENY==entity.getIsAgreed()
                              ||AgreeType.BLACKLIST       ==entity.getIsAgreed());
         boolean isLimit2    = (AgreeType.ACCESS_ZONE_DENY==agreeType
@@ -133,289 +120,178 @@ public class NurseFriendsService {
 
         entity = friendsRepository.save(entity);
         NurseFriendsBean bean = beanConverter.convert(entity);
-        return;
+        return agreeType;
     }
 
     //======================================================
     //            get friend relation
     //======================================================
 
-    public List<NurseFriendsBean> getFriendsWaitingUserAgree(long userId) {
-        List<NurseFriendsEntity> friendsE         = friendsRepository.findByUserId(userId);
-        List<NurseFriendsBean>   friendsWaitPassB = new ArrayList<NurseFriendsBean>();
-        List<NurseFriendsBean>   friendsB         = convertToNurseFriendsBeans(friendsE);
-        friendsB = fillOtherProperties(friendsB);
-        for (NurseFriendsBean friend : friendsB) {
-            if (AgreeType.WAITING==friend.getIsAgreed()) {
-                friendsWaitPassB.add(friend);
-            }
-        }
-        return friendsWaitPassB;
+    public long countFriendship(long userId) {
+        long count = friendsRepository.countFriendship(userId);
+        logger.info("get user {} friend count {}", userId, count);
+        return count;
     }
 
-    public List<NurseFriendsBean> getUserWaitingFriendAgreed(long userId) {
-        List<NurseFriendsEntity> friendsE         = friendsRepository.findByFriendId(userId);
-        List<NurseFriendsBean>   friendsNotAgreeB = new ArrayList<NurseFriendsBean>();
-        List<NurseFriendsBean>   friendsB         = convertToNurseFriendsBeans(friendsE);
-        friendsB = fillOtherProperties(friendsB);
-        for (NurseFriendsBean friend : friendsB) {
-            if (AgreeType.WAITING==friend.getIsAgreed()) {
-                friendsNotAgreeB.add(friend);
-            }
-        }
+    public List<NurseFriendsBean> getFriendshipAgreed(long userId) {
+        logger.info("user {} get friendship agreed", userId);
+        List<NurseFriendsEntity> friendsE = getFriendship(userId);
+        List<NurseFriendsBean>   friendsAgreedB = entities2beans(friendsE);
+        fillOtherProperties(friendsAgreedB);
+        logger.info("count {}", friendsAgreedB.size());
+        return friendsAgreedB;
+    }
+
+    public List<NurseFriendsBean> getFriendshipWaitingAgreed(long userId) {
+        logger.info("user {} get friendship waiting agreed", userId);
+        List<NurseFriendsEntity> friendsE         = getFriendshipWaitingAgree(userId);
+        List<NurseFriendsBean>   friendsNotAgreeB = entities2beans(friendsE);
+        fillOtherProperties(friendsNotAgreeB);
+        logger.info("count {}", friendsNotAgreeB.size());
         return friendsNotAgreeB;
     }
 
-    public List<NurseFriendsBean> searchFriends(long userId, String name){
-        List<NurseFriendsBean>   filteredFriends = new ArrayList<NurseFriendsBean>();
-
-        List<NurseFriendsEntity> friendsE         = friendsRepository.findByUserId(userId);
-        logger.info("search nurse friends is : " +friendsE);
-        List<NurseFriendsBean>   friendsB         = convertToNurseFriendsBeans(friendsE);
-        friendsB = fillOtherProperties(friendsB);
-        for (NurseFriendsBean friendB : friendsB) {
-            if (friendB.getFriendName()!=null && friendB.getFriendName().contains(name)) {
-                filteredFriends.add(friendB);
-            }
+    public List<NurseFriendsBean> getFriendship(long currentUserId, long userSearchedId, int pageIndex, int number) {
+        logger.info("user {} get others {} 's friendship at page={}, {}/page", currentUserId, userSearchedId, pageIndex, number);
+        if (currentUserId == userSearchedId) {
+            return getFriendship(currentUserId, pageIndex, number);
         }
 
-        return filteredFriends;
-    }
-
-    public List<NurseFriendsBean> getFriends(long userId, long searchId, int pageIdx, int number){
-        logger.info("get friends for the user " + searchId);
-        boolean                  searchSelf         = userId==searchId;
-        PageRequest              pageSort           = new PageRequest(pageIdx, number, Sort.Direction.DESC, "dateTime");
-        List<Long>               friendIds          = new ArrayList<Long>();
-        List<Long>               friendNotExistIds  = new ArrayList<Long>();
-        List<NurseFriendsBean>   searchFriendsB     = new ArrayList<NurseFriendsBean>();
-        List<NurseFriendsBean>   userFriendsB       = new ArrayList<NurseFriendsBean>();
-
-        // search self friends
-        if (!searchSelf) {
-            userFriendsB = getFriend(userId);
-        }
-
-        // search searchId's friends
-        searchFriendsB = getFriendsAgreeStatusNotWaiting(searchId);
-        searchFriendsB = fillOtherProperties(searchFriendsB);
-
-        // set isFriend
-        long oneDayAgo = System.currentTimeMillis() - 3600000*24/* one day ago*/;
-        for(int i=0, count=searchFriendsB.size(); i < count; i++) {
-            NurseFriendsBean searchFriendB = searchFriendsB.get(i);
-            // judge is self friends
-            if(searchSelf){
-                searchFriendB.setIsFriend(true);
-                // remove waiting when search self
-                if (AgreeType.WAIT_FOR_MY_AGREE.equals(searchFriendB.getWaitFor())
-                 || AgreeType.WAIT_FOR_FRIEND_AGREE.equals(searchFriendB.getWaitFor())) {
-                    searchFriendsB.remove(i);
-                    i --;
-                    count --;
-                    continue;
-                }
-            }
-            else {
-                NurseFriendsBean userFriendB = null;
-                for (NurseFriendsBean tmp : userFriendsB) {
-                    if (tmp.getFriendId()==searchFriendB.getFriendId()) {
-                        userFriendB = tmp;
-                        break;
-                    }
-                }
-                if (null!=userFriendB) {
-                    if (AgreeType.WAITING.equals(userFriendB.getIsAgreed())) {
-                        /**
-                         "id": 10032,
-                         "userId": 4,
-                         "friendId": 3,
-                         "headPhotoUrl": "b5/d09630d8e8fb6147a1fa4f2971eda390f1454a",
-                         "friendName": "user003",
-                         -reset--"isFriend": false,
-                         -reset--"dateTime": 1460906623000,
-                         -reset--"isAgreed": "WAITING",
-                         -reset--"waitFor": "WaitingForFriendAgree",
-                         -reset--"waitMoreThan1Day": false
-                         */
-                        searchFriendB.setIsFriend(false);
-                        searchFriendB.setDateTime(userFriendB.getDateTime());
-                        long requestTime = (null==searchFriendB.getDateTime()) ? 0 : searchFriendB.getDateTime().getTime();
-                        searchFriendB.setIsAgreed(AgreeType.WAITING);
-                        searchFriendB.setWaitFor(userFriendB.getWaitFor());
-                        searchFriendB.setWaitMoreThan1Day((requestTime-oneDayAgo) < 0);
-                    }
-                    else {
-                        searchFriendB.setIsFriend(true);
-                    }
-                }
-            }
-            friendIds.add(searchFriendB.getFriendId());
-        }
-
-        List<NurseEntity> friendExist = nurseRepository.findByIdIn(friendIds);
-        boolean exist = false;
-        for (int i=0, count=searchFriendsB.size(); i < count; i ++) {
-            exist = false;
-            NurseFriendsBean friend = searchFriendsB.get(i);
-            for (NurseEntity nurseExist : friendExist) {
-                if (nurseExist.getId()==friend.getFriendId()) {
-                    exist = true;
-                    break;
-                }
-            }
-            if (!exist) {
-                searchFriendsB.remove(friend);
-                count --;
-                i     --;
-                friendNotExistIds.add(friend.getFriendId());
-            }
-        }
-        if (!friendNotExistIds.isEmpty()) {
-            friendsRepository.deleteByFriendIdIn(friendNotExistIds);
-            friendsRepository.deleteByUserIdIn(friendNotExistIds);
-        }
-
-        List<NurseFriendsBean> retVal = new ArrayList<>();
-        int offset = pageIdx*number;
-        for (int i=offset, count=searchFriendsB.size(); i<offset+number; i++) {
-            if (i >= count) {
-                break;
-            }
-            NurseFriendsBean bean = searchFriendsB.get(i);
-            retVal.add(bean);
-        }
-
-        return retVal;
-    }
-
-    public List<NurseFriendsBean> isFriend(long userId, String strOtherUserIds) {
-        logger.info("is user {} is friend with others {}", strOtherUserIds);
-        List<Long> otherUserIds = VerifyUtil.parseLongIds(strOtherUserIds);
-        if (!nurseRepository.exists(userId)) {
-            logger.error("nurse not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
-        }
-        if (null==otherUserIds || otherUserIds.isEmpty()) {
-            logger.error("other's is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-
-        List<NurseFriendsBean> others = new ArrayList<>();
-        for (Long otherId : otherUserIds) {
-            NurseFriendsBean other = new NurseFriendsBean();
-            other.setUserId(userId);
-            other.setFriendId(otherId);
-            other.setIsFriend(false);
-            other.setWaitMoreThan1Day(false);
-            others.add(other);
-        }
-
-        List<NurseFriendsBean> friendsOfUser = getFriend(userId);
-        Map<Long, NurseFriendsBean> friendId2UserFriend = new HashMap<>();
-        for (NurseFriendsBean tmp : friendsOfUser) {
-            friendId2UserFriend.put(tmp.getFriendId(), tmp);
-        }
-
-        long oneDayAgo = System.currentTimeMillis() - 3600000*24/* one day ago*/;
-        for (NurseFriendsBean other : others) {
-            if (!friendId2UserFriend.containsKey(other.getFriendId())) {
-                continue;
-            }
-            NurseFriendsBean userFriend = friendId2UserFriend.get(other.getFriendId());
-            other.setIsFriend(userFriend.getIsFriend());
-            other.setIsAgreed(userFriend.getIsAgreed());
-            other.setDateTime(userFriend.getDateTime());
-            other.setWaitFor(userFriend.getWaitFor());
-            if (userFriend.getIsAgreed() == AgreeType.WAITING) {
-                long requestTime = (null == userFriend.getDateTime()) ? 0 : userFriend.getDateTime().getTime();
-                other.setWaitMoreThan1Day((requestTime - oneDayAgo) < 0);
-            }
-        }
-
-        return others;
-    }
-
-    public List<NurseFriendsBean> getFriendsAgreeStatusNotWaiting(long userId) {
-        List<NurseFriendsBean> allFriends = getFriend(userId);
-        for (int i=0, count=allFriends.size(); i < count; i ++) {
-            NurseFriendsBean friendB = allFriends.get(i);
-            boolean isWait = false;
-            if (AgreeType.WAIT_FOR_FRIEND_AGREE.equals(friendB.getWaitFor())) {
-                isWait = true;
-            }
-            else if (AgreeType.WAIT_FOR_MY_AGREE.equals(friendB.getWaitFor())) {
-                isWait = true;
-            }
-            if (isWait) {
-                allFriends.remove(i);
-                i --;
-                count --;
-            }
-        }
-        return allFriends;
-    }
-
-    public List<NurseFriendsBean> getFriend(long userId) {
-        if (!nurseRepository.exists(userId)) {
-            List<Long> userIds = new ArrayList<Long>();
-            userIds.add(userId);
-            friendsRepository.deleteByFriendIdIn(userIds);
-            friendsRepository.deleteByUserIdIn(userIds);
+        PageRequest page = new PageRequest(pageIndex, number, Sort.Direction.DESC, "dateTime");
+        List<Long> userSearchedFriendshipIds = getFriendshipIds(userSearchedId, page);
+        if (VerifyUtil.isListEmpty(userSearchedFriendshipIds)) {
             return new ArrayList<>();
         }
 
-        List<NurseFriendsBean> userFriendsB   = new ArrayList<>();
+        List<NurseFriendsBean> currentUsersFriendship2SearchedFriends = getFriendshipWithOthers(currentUserId, userSearchedFriendshipIds);
+        fillOtherProperties(currentUsersFriendship2SearchedFriends);
+        logger.info("count {}", currentUsersFriendship2SearchedFriends.size());
+        return currentUsersFriendship2SearchedFriends;
+    }
 
-        // get userId 's friend relationship
-        Sort                     sort         = new Sort(new Sort.Order(Sort.Direction.DESC, "dateTime"));
-        List<NurseFriendsEntity> friendsMapE  = friendsRepository.findByUserIdOrFriendId(userId, userId, sort);
-        if (null!=friendsMapE && !friendsMapE.isEmpty()) {
-            List<NurseFriendsEntity> agreeTypeNull= new ArrayList<>();
-            List<NurseFriendsEntity> friendsUserE = new ArrayList<>();
-            for (NurseFriendsEntity friendMap : friendsMapE) {
-                if (null==friendMap.getIsAgreed()) {
-                    agreeTypeNull.add(friendMap);
-                    continue;
-                }
-                if (friendMap.getUserId()==userId) {
-                    NurseFriendsBean bean = beanConverter.convert(friendMap);
-                    userFriendsB.add(bean);
-                    bean.setIsFriend(true);
+    public List<NurseFriendsBean> getFriendship(long userId, String strOtherIds) {
+        logger.info("get user {} 's friendship with others={}", userId, strOtherIds);
+        List<Long> otherIds = VerifyUtil.parseLongIds(strOtherIds);
+        List<NurseFriendsBean> currentUsersFriendship2SearchedFriends = getFriendshipWithOthers(userId, otherIds);
+        fillOtherProperties(currentUsersFriendship2SearchedFriends);
+        return currentUsersFriendship2SearchedFriends;
+    }
+
+    public List<NurseFriendsBean> getFriendship(long userId, List<Long> otherIds) {
+        logger.info("get user {} 's friendship with others={}", userId, otherIds);
+        List<NurseFriendsBean> currentUsersFriendship2SearchedFriends = getFriendshipWithOthers(userId, otherIds);
+        fillOtherProperties(currentUsersFriendship2SearchedFriends);
+        return currentUsersFriendship2SearchedFriends;
+
+    }
+
+    private List<NurseFriendsBean> getFriendship(long userId, int pageIndex, int number) {
+        PageRequest page = new PageRequest(pageIndex, number, Sort.Direction.DESC, "dateTime");
+        List<NurseFriendsEntity> friends  = getFriendshipByPage(userId, page);
+        List<NurseFriendsBean>   friendsB = entities2beans(friends);
+        fillOtherProperties(friendsB);
+        return friendsB;
+    }
+
+    private List<NurseFriendsBean> getFriendshipWithOthers(long userId, List<Long> othersIds) {
+        logger.info("get friendship of user {} and others {}", userId, othersIds);
+        List<NurseFriendsEntity> userAgreedAndWaiting  = findFriendshipAgreedAndWaiting(userId, othersIds);
+        if (VerifyUtil.isListEmpty(userAgreedAndWaiting)) {
+            userAgreedAndWaiting = new ArrayList<>();
+        }
+        List<Long> userWaitingAgreedIds = findFriendshipUserWaitingAgreedIds(userId, othersIds);
+        if (VerifyUtil.isListEmpty(userWaitingAgreedIds)) {
+            userWaitingAgreedIds = new ArrayList<>();
+        }
+
+        long notFriend = 0;
+        long bothAgreed = 0;
+        long userWaiting = 0;
+        long friendWaiting = 0;
+        List<Long>             userAgreedAndWaitingIds   = new ArrayList<>();
+        List<NurseFriendsBean> userAgreedAndWaitingBeans = entities2beans(userAgreedAndWaiting);
+        // one day ago
+        long oneDayAgo = System.currentTimeMillis() - 3600000*24;
+        for (NurseFriendsBean friendsBean : userAgreedAndWaitingBeans) {
+            boolean isWaiting = false;
+            if (userWaitingAgreedIds.contains(friendsBean.getFriendId())) {
+                friendsBean.setIsAgreed(AgreeType.WAITING);
+                friendsBean.setWaitFor(AgreeType.WAIT_FOR_FRIEND_AGREE);
+                isWaiting = true;
+                userWaiting ++;
+            }
+            else {
+                if (friendsBean.getIsAgreed()==AgreeType.WAITING) {
+                    friendsBean.setWaitFor(AgreeType.WAIT_FOR_MY_AGREE);
+                    isWaiting = true;
+                    friendWaiting ++;
                 }
                 else {
-                    friendsUserE.add(friendMap);
+                    friendsBean.setIsFriend(true);
+                    bothAgreed ++;
                 }
             }
-            friendsRepository.delete(agreeTypeNull);
 
-            // remove friend agree status is null
-            for (NurseFriendsEntity friendUser : friendsUserE) {
-                for (int i=0; i<userFriendsB.size(); i++) {
-                    NurseFriendsBean userFriend = userFriendsB.get(i);
-                    if (userFriend.getFriendId()==friendUser.getUserId()) {
-                        if (AgreeType.WAITING.equals(userFriend.getIsAgreed())) {
-                            userFriend.setWaitFor(AgreeType.WAIT_FOR_MY_AGREE);
-                        }
-                        else if (AgreeType.WAITING.equals(friendUser.getIsAgreed())){
-                            userFriend.setWaitFor(AgreeType.WAIT_FOR_FRIEND_AGREE);
-                            userFriend.setIsAgreed(AgreeType.WAITING);
-                        }
-                        break;
-                    }
-                }
+            if (isWaiting) {
+                long requestTime = friendsBean.getDateTime().getTime();
+                friendsBean.setWaitMoreThan1Day((requestTime-oneDayAgo) < 0);
             }
-            return userFriendsB;
+            userAgreedAndWaitingIds.add(friendsBean.getFriendId());
         }
-        return new ArrayList<>();
+
+        for (Long userSearchedFriendId : othersIds) {
+            if (userAgreedAndWaitingIds.contains(userSearchedFriendId)) {
+                continue;
+            }
+            NurseFriendsBean notFriendBean = new NurseFriendsBean();
+            notFriendBean.setUserId(userId);
+            notFriendBean.setFriendId(userSearchedFriendId);
+            userAgreedAndWaitingBeans.add(notFriendBean);
+            notFriend ++;
+        }
+
+        logger.info("bothAgreed={}个 friendWaiting={}个 userWaiting={}个 notFriend={}个",
+                bothAgreed, friendWaiting, userWaiting, notFriend);
+        return userAgreedAndWaitingBeans;
     }
 
-    public int getFriendsCount(long userId){
-        return getFriendsAgreeStatusNotWaiting(userId).size();
+    public List<NurseFriendsBean> searchFriendshipByName(long userId, String name){
+        logger.info("get user {} friend name like {}", userId, name);
+        List<NurseFriendsEntity> friendsE = getFriendshipByNameLike(userId, "%"+name+"%");
+        List<NurseFriendsBean>   friendsB = entities2beans(friendsE);
+        fillOtherProperties(friendsB);
+        return friendsB;
     }
 
+    private List<NurseFriendsEntity> getFriendshipByPage(long userId, PageRequest page) {
+        return friendsRepository.findFriendshipByPage(userId, page);
+    }
 
-    private List<NurseFriendsBean> convertToNurseFriendsBeans(List<NurseFriendsEntity> entities) {
+    private List<NurseFriendsEntity> getFriendship(long userId) {
+        return friendsRepository.findFriendshipAgreed(userId);
+    }
+
+    private List<Long> getFriendshipIds(long userId, Pageable page) {
+        return friendsRepository.findFriendshipAgreedIds(userId, page);
+    }
+
+    private List<NurseFriendsEntity> findFriendshipAgreedAndWaiting(long userId, List<Long> othersIds) {
+        return friendsRepository.findAgreedAndWaitingIds(userId, othersIds);
+    }
+
+    private List<Long> findFriendshipUserWaitingAgreedIds(long userId, List<Long> othersIds) {
+        return friendsRepository.findUserWaitingAgreeIds(userId, othersIds);
+    }
+
+    private List<NurseFriendsEntity> getFriendshipWaitingAgree(long userId) {
+        return friendsRepository.findFriendshipWaitAgree(userId);
+    }
+
+    private List<NurseFriendsEntity> getFriendshipByNameLike(long userId, String nameLike) {
+        return friendsRepository.findFriendsByName(userId, nameLike);
+    }
+
+    private List<NurseFriendsBean> entities2beans(List<NurseFriendsEntity> entities) {
         if(null==entities || entities.isEmpty()) {
             return new ArrayList<>();
         }

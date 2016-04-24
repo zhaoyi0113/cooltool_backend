@@ -1,5 +1,6 @@
 package com.cooltoo.backend.services;
 
+import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
 import com.cooltoo.backend.converter.NurseSpeakThumbsUpBeanConverter;
 import com.cooltoo.backend.entities.NurseEntity;
@@ -7,6 +8,7 @@ import com.cooltoo.backend.entities.NurseSpeakThumbsUpEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseSpeakThumbsUpRepository;
 import com.cooltoo.services.StorageService;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ public class NurseSpeakThumbsUpService {
     @Autowired
     private NurseRepository              nurseRepository;
     @Autowired
+    private NurseFriendsService          friendsService;
+    @Autowired
     @Qualifier("StorageService")
     private StorageService               storageService;
     @Autowired
@@ -50,6 +54,16 @@ public class NurseSpeakThumbsUpService {
 
         fillOtherProperties(thumbsUpBeans);
         return thumbsUpBeans;
+    }
+
+    public List<NurseFriendsBean> getThumbsUpUsers(long currentUserId, long speakId) {
+        List<Long> thumbsUpUsers = thumbsUpRepository.findThumbsupUserId(speakId);
+        if (VerifyUtil.isListEmpty(thumbsUpUsers)) {
+            return new ArrayList<>();
+        }
+        thumbsUpUsers.remove(new Long(currentUserId));
+
+        return friendsService.getFriendship(currentUserId, thumbsUpUsers);
     }
 
     public List<NurseSpeakThumbsUpBean> getSpeakThumbsUpByNurseSpeakIds(List<Long> nurseSpeakIds) {

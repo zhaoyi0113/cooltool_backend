@@ -585,6 +585,10 @@ public class NurseSpeakService {
         return thumbsUpBean;
     }
 
+    public List<NurseFriendsBean> getThumbsUpUsers(long currentUserId, long nurseSpeakId) {
+        return thumbsUpService.getThumbsUpUsers(currentUserId, nurseSpeakId);
+    }
+
     public NurseSpeakThumbsUpBean getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(long nurseSpeakId, long thumbsUpUserId) {
         return thumbsUpService.findNurseSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
     }

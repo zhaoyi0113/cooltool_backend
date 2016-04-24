@@ -33,7 +33,7 @@ public class NurseFriendsAPI {
     public Response addFriend(@Context HttpServletRequest request,
                               @PathParam("friend_id") long friendId) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        friendsService.addFriend(userId, friendId);
+        friendsService.setFriendship(userId, friendId);
         return Response.ok().build();
     }
 
@@ -69,18 +69,8 @@ public class NurseFriendsAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRequestNotPassList(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseFriendsBean> waitingToPass = friendsService.getFriendsWaitingUserAgree(userId);
+        List<NurseFriendsBean> waitingToPass = friendsService.getFriendshipWaitingAgreed(userId);
         logger.info("friend's need your promise to become your friends === " + waitingToPass);
-        return Response.ok(waitingToPass).build();
-    }
-
-    @GET
-    @Path("/waiting_friend_agree")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getFriendsWaitMyAgree(@Context HttpServletRequest request) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseFriendsBean> waitingToPass = friendsService.getUserWaitingFriendAgreed(userId);
-        logger.info("user need friends promise to become his friend === " + waitingToPass);
         return Response.ok(waitingToPass).build();
     }
 
@@ -92,7 +82,7 @@ public class NurseFriendsAPI {
                                   @PathParam("number") int number) {
         logger.info("search friend list at page=" + pageIdx + ", number=" + number);
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseFriendsBean> friendList = friendsService.getFriends(userId, userId, pageIdx, number);
+        List<NurseFriendsBean> friendList = friendsService.getFriendship(userId, userId, pageIdx, number);
         logger.info("get friend list count " + friendList.size());
         return Response.ok(friendList).build();
     }
@@ -106,36 +96,16 @@ public class NurseFriendsAPI {
                                       @PathParam("number") int number) {
         logger.info("search friend list at page=" + pageIdx + ", number=" + number + ", search id=" + searchId);
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseFriendsBean> friendList = friendsService.getFriends(userId, searchId, pageIdx, number);
+        List<NurseFriendsBean> friendList = friendsService.getFriendship(userId, searchId, pageIdx, number);
         logger.info("get friend list count " + friendList.size());
         return Response.ok(friendList).build();
-    }
-
-    @GET
-    @Path("/list/all")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllFriends(@Context HttpServletRequest request){
-        logger.info("get all friend list ");
-        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseFriendsBean> friendList = friendsService.getFriendsAgreeStatusNotWaiting(userId);
-        logger.info("get friend list count "+friendList.size());
-        return Response.ok(friendList).build();
-    }
-
-    @DELETE
-    @Path("/{friend_id}")
-    public Response removeFriend(@Context HttpServletRequest request,
-                                 @PathParam("friend_id") long friendId) {
-        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        friendsService.removeFriend(userId, friendId);
-        return Response.ok().build();
     }
 
     @GET
     @Path("/count")
     public Response getFriendCount(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        int count = friendsService.getFriendsCount(userId);
+        long count = friendsService.countFriendship(userId);
         return Response.ok(count).build();
     }
 
@@ -145,7 +115,7 @@ public class NurseFriendsAPI {
     public Response searchFriend(@Context HttpServletRequest request,
                                  @PathParam("name") String name) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseFriendsBean> friends = friendsService.searchFriends(userId, name);
+        List<NurseFriendsBean> friends = friendsService.searchFriendshipByName(userId, name);
         return Response.ok(friends).build();
     }
 
@@ -158,7 +128,7 @@ public class NurseFriendsAPI {
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("nurse {} judge friendship with {}", otherIds);
-        List<NurseFriendsBean> judgeResult = friendsService.isFriend(userId, otherIds);
+        List<NurseFriendsBean> judgeResult = friendsService.getFriendship(userId, otherIds);
         logger.info("result is {}", judgeResult);
         return Response.ok(judgeResult).build();
     }

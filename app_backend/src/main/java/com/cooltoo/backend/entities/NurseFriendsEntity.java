@@ -76,7 +76,8 @@ public class NurseFriendsEntity {
         msg.append("id=").append(id).append(" ,");
         msg.append("userId=").append(userId).append(" ,");
         msg.append("friendId=").append(friendId).append(" ,");
-        msg.append("dateTime=").append(dateTime);
+        msg.append("dateTime=").append(dateTime).append(", ");
+        msg.append("isAgree=").append(isAgreed);
         msg.append(" ]");
         return msg.toString();
     }

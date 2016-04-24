@@ -231,7 +231,7 @@ public class CathartProfilePhotoService {
     }
 
     @Transactional
-    public String disableByIds(String strIds) {
+    public String setStatusByIds(String strIds) {
         logger.info("disable cathart profile photo by ids={}", strIds);
         if (!VerifyUtil.isIds(strIds)) {
             logger.warn("the ids in invalid");
@@ -239,12 +239,12 @@ public class CathartProfilePhotoService {
         }
 
         List<Long> recordIds = VerifyUtil.parseLongIds(strIds);
-        recordIds = disableByIds(recordIds);
+        recordIds = setStatusByIds(recordIds);
         return VerifyUtil.numList2String(recordIds);
     }
 
     @Transactional
-    public List<Long> disableByIds(List<Long> lIds) {
+    public List<Long> setStatusByIds(List<Long> lIds) {
         logger.info("disable cathart profile photo by ids={}", lIds);
         List<CathartProfilePhotoEntity> entities = repository.findAll(lIds);
         if (null==entities||entities.isEmpty()) {
@@ -254,7 +254,7 @@ public class CathartProfilePhotoService {
 
         lIds.clear();
         for (CathartProfilePhotoEntity tmp : entities) {
-            tmp.setEnable(CommonStatus.DISABLED);
+            tmp.setEnable(CommonStatus.DISABLED.equals(tmp.getEnable()) ? CommonStatus.ENABLED : CommonStatus.DISABLED);
             lIds.add(tmp.getId());
         }
         repository.save(entities);

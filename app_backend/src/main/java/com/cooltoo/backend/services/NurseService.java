@@ -117,7 +117,7 @@ public class NurseService {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
         NurseBean nurse = beanConverter.convert(entity);
-        int friendsCount = friendsService.getFriendsCount(userId);
+        long friendsCount = friendsService.countFriendship(userId);
         nurse.setProperty(NurseBean.FRIENDS_COUNT, friendsCount);
         List<HospitalEntity> nurseHospitals = hospitalRepository.getNurseHospitals(userId);
         if(!nurseHospitals.isEmpty()){

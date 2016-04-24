@@ -139,7 +139,7 @@ public class CathartProfilePhotoServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(4, enableCount);
         Assert.assertEquals(2, disableCount);
 
-        cathartPhotoService.disableByIds("1,2");
+        cathartPhotoService.setStatusByIds("1,2");
         enableCount  = cathartPhotoService.countByStatus("enabled");
         disableCount = cathartPhotoService.countByStatus("disabled");
         Assert.assertEquals(2, enableCount);
@@ -147,7 +147,7 @@ public class CathartProfilePhotoServiceTest extends AbstractCooltooTest {
 
         List<Long> disableIds = new ArrayList<>();
         disableIds.add(3L); disableIds.add(4L);
-        cathartPhotoService.disableByIds(disableIds);
+        cathartPhotoService.setStatusByIds(disableIds);
         enableCount  = cathartPhotoService.countByStatus("enabled");
         disableCount = cathartPhotoService.countByStatus("disabled");
         Assert.assertEquals(0, enableCount);

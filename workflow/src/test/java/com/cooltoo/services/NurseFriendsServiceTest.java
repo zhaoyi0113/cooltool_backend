@@ -1,14 +1,17 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.NurseFriendsBean;
+import com.cooltoo.backend.entities.NurseFriendsEntity;
+import com.cooltoo.backend.repository.NurseFriendsRepository;
 import com.cooltoo.backend.services.NurseFriendsService;
-import com.cooltoo.constants.AgreeType;
+import com.cooltoo.util.VerifyUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -29,87 +32,115 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private NurseFriendsService friendsService;
+    @Autowired
+    private NurseFriendsRepository friendsRepository;
+
+    //=======================================================================
+    //           test repository
+//    List<NurseFriendsEntity> findByUserIdAndFriendId(long userId, long friendId);
+//    long countByUserIdAndFriendId(long userId, long friendId);
+//    long countFriendship(long userId);
+//    List<NurseFriendsEntity> findFriendshipByPage(long userId, Pageable pageable);
+//    List<NurseFriendsEntity> findFriendshipAgreed(long userId);
+//    List<NurseFriendsEntity> findFriendshipWaitAgree(long userId);
+//    List<Long> findFriendshipAgreedIds(long userId, Pageable pageable);
+//    List<NurseFriendsEntity> findAgreedAndWaitingIds(long userId, List<Long> others);
+//    List<Long> findUserWaitingAgreeIds(long userId, List<Long> others);
+//    List<NurseFriendsEntity> findFriendsByName(@Param("userId") long userId, @Param("name") String nameLike);
+//    void deleteFriendship(long userId, long friendId);
+    //=======================================================================
 
     @Test
-    public void testAddFriend(){
-        long nurseId = 15;
-        long friendId= 1;
-        List<NurseFriendsBean> friendList = friendsService.getFriend(nurseId);
-        Assert.assertEquals(1, friendList.size());
-        friendsService.addFriend(nurseId,friendId);
-        friendList = friendsService.getFriend(nurseId);
-        Assert.assertEquals(2, friendList.size());
-
-        friendList = friendsService.getFriend(friendId);
-        Assert.assertEquals(15, friendList.size());
+    public void testFindFriendship () {
+        List<NurseFriendsEntity> friendships = friendsRepository.findFriendshipAgreed(1L);
+        Assert.assertEquals(11, friendships.size());
     }
 
     @Test
-    public void testDeleteFriend(){
-        List<NurseFriendsBean> friendList = friendsService.getFriend(1);
-        Assert.assertEquals(14, friendList.size());
-        friendsService.removeFriend(1, 2);
-        friendList = friendsService.getFriend(1);
-        Assert.assertEquals(13, friendList.size());
-        friendsService.removeFriend(1, 3);
-        friendList = friendsService.getFriend(1);
-        Assert.assertEquals(12, friendList.size());
+    public void testFindByUserIdAndFriendId() {
+        List<NurseFriendsEntity> friendships = friendsRepository.findByUserIdAndFriendId(1L, 2L);
+        Assert.assertEquals(1, friendships.size());
     }
 
     @Test
-    public void testGetFriends(){
-        List<NurseFriendsBean> friends = friendsService.getFriends(1, 1, 0, 3);
+    public void testCountByUserIdAndFriendId() {
+        long count = friendsRepository.countByUserIdAndFriendId(1L, 2L);
+        Assert.assertEquals(1, count);
+    }
+
+    @Test
+    public void testCountFriendship() {
+        long count = friendsRepository.countFriendship(1L);
+        Assert.assertEquals(11, count);
+    }
+
+    @Test
+    public void testFindFriendshipByPage() {
+        PageRequest pageRequest = new PageRequest(0, 8, Sort.Direction.DESC, "dateTime");
+        List<NurseFriendsEntity> page = friendsRepository.findFriendshipByPage(1L, pageRequest);
+        Assert.assertEquals(8, page.size());
+
+        pageRequest = new PageRequest(1, 8, Sort.Direction.DESC, "dateTime");
+        page = friendsRepository.findFriendshipByPage(1L, pageRequest);
+        Assert.assertEquals(3, page.size());
+    }
+
+    @Test
+    public void testFindFriendshipAgreed() {
+        List<NurseFriendsEntity> friendships = friendsRepository.findFriendshipAgreed(1L);
+        Assert.assertEquals(11, friendships.size());
+    }
+
+    @Test
+    public void testFindFriendWaitAgree() {
+        List<NurseFriendsEntity> friendships = friendsRepository.findFriendshipWaitAgree(1L);
+        Assert.assertEquals(1, friendships.size());
+        Assert.assertEquals(13, friendships.get(0).getFriendId());
+    }
+
+    @Test
+    public void testFindFriendshipAgreedIds() {
+        PageRequest pageRequest = new PageRequest(0, 8, Sort.Direction.DESC, "dateTime");
+        List<Long> page = friendsRepository.findFriendshipAgreedIds(1L, pageRequest);
+        Assert.assertEquals(8, page.size());
+
+        pageRequest = new PageRequest(1, 8, Sort.Direction.DESC, "dateTime");
+        page = friendsRepository.findFriendshipAgreedIds(1L, pageRequest);
+        Assert.assertEquals(3, page.size());
+    }
+
+    @Test
+    public void testFindAgreedAndWaitingIds() {
+        List<Long> ids = VerifyUtil.parseLongIds("2,3,4,13,14");
+        List<NurseFriendsEntity> page = friendsRepository.findAgreedAndWaitingIds(1L, ids);
+        Assert.assertEquals(5, page.size());
+    }
+
+    @Test
+    public void testFindUserWaitingAgreeIds() {
+        List<Long> ids = VerifyUtil.parseLongIds("2,3,4,13,14");
+        List<Long> page = friendsRepository.findUserWaitingAgreeIds(1L, ids);
+        Assert.assertEquals(1, page.size());
+        Assert.assertEquals(14L, page.get(0).longValue());
+    }
+
+    @Test
+    public void testDeleteFriendship() {
+        long count = friendsRepository.countByUserIdAndFriendId(1L, 2L);
+        Assert.assertEquals(1, count);
+
+        friendsRepository.deleteFriendship(1L, 2L);
+
+        count = friendsRepository.countByUserIdAndFriendId(1L, 2L);
+        Assert.assertEquals(0, count);
+    }
+
+    @Test
+    public void testFindByName() {
+        List<NurseFriendsEntity> friends = friendsRepository.findFriendsByName(1L, "%name1%");
         Assert.assertEquals(3, friends.size());
-        Assert.assertEquals(1, friends.get(0).getFriendId());
 
-        friends = friendsService.getFriends(1, 1, 1, 5);
-        Assert.assertEquals(5, friends.size());
-        Assert.assertEquals(6, friends.get(0).getFriendId());
-
-
-        friends = friendsService.getFriends(1, 2, 0, 5);
-        Assert.assertEquals(1, friends.size());
-        Assert.assertTrue(friends.get(0).getIsFriend());
-
-        friends = friendsService.getFriends(1, 3, 0, 5);
-        Assert.assertEquals(1, friends.size());
-        Assert.assertTrue(friends.get(0).getIsFriend());
-    }
-
-    @Test
-    public void testSearchFriends(){
-        List<NurseFriendsBean> friends = null;
-
-        friends = friendsService.searchFriends(1, "4");
-        logger.info(friends.toString());
-        Assert.assertEquals(2, friends.size());
-
-        friends = friendsService.searchFriends(1, "护士");
-        logger.info(friends.toString());
-        Assert.assertEquals(14, friends.size());
-
-    }
-
-    @Test
-    public void testJudgeFriendship() {
-        List<NurseFriendsBean> friends = null;
-
-        friends = friendsService.isFriend(3, "15,16,17");
-        logger.info(friends.toString());
-        Assert.assertEquals(3, friends.size());
-
-        for (NurseFriendsBean tmp : friends) {
-            if (tmp.getFriendId()==15) {
-                Assert.assertEquals(true, tmp.getIsFriend());
-                Assert.assertEquals(AgreeType.AGREED, tmp.getIsAgreed());
-            }
-            if (tmp.getFriendId()==16) {
-                Assert.assertEquals(true, tmp.getIsFriend());
-                Assert.assertEquals(AgreeType.WAITING, tmp.getIsAgreed());
-            }
-            if (tmp.getFriendId()==17) {
-                Assert.assertEquals(false, tmp.getIsFriend());
-            }
-        }
+        friends = friendsRepository.findFriendsByName(1L, "%name1% or 1=1");
+        System.out.println(friends);
     }
 }
