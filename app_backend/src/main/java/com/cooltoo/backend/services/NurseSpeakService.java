@@ -374,9 +374,17 @@ public class NurseSpeakService {
 
         NurseSpeakEntity entity = new NurseSpeakEntity();
         // check speak content
-        if (!SpeakType.SMUG.equals(speakType) && (VerifyUtil.isStringEmpty(content))) {
-            logger.error("speak content is empty");
-            throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
+        if (!SpeakType.SMUG.equals(speakType)) {
+            if (VerifyUtil.isStringEmpty(content)) {
+                logger.error("speak content is empty");
+                throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
+            }
+        }
+        else {
+            if (VerifyUtil.isStringEmpty(content) && null==image) {
+                logger.error("smug's content and image is empty ");
+                throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
+            }
         }
 
         entity.setUserId(userId);
@@ -386,10 +394,13 @@ public class NurseSpeakService {
         entity = speakRepository.save(entity);
 
 
-        if (null==imageName||"".equals(imageName) || null==image) {
+        if (null==image) {
             logger.info("there is no image file need to insert!");
         }
         else {
+            if (VerifyUtil.isStringEmpty(imageName)) {
+                imageName = speakType.name();
+            }
             addImage(userId, entity.getId(), imageName, image);
         }
 
