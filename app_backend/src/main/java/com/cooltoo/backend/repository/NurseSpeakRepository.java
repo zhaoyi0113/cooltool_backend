@@ -20,6 +20,10 @@ public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Lo
     Page<NurseSpeakEntity> findBySpeakType(int speakTypeId, Pageable request);
     long         countByUserId(long userId);
     long         countByUserIdAndSpeakType(long userId, int speakTypeId);
+
     @Query(value = "SELECT speak.userId, count(speak.id) FROM NurseSpeakEntity speak WHERE speak.userId in (?1) GROUP BY speak.userId")
     List<Object[]> countByUserIdIn(List<Long> userIds);
+
+    @Query("FROM NurseSpeakEntity speak WHERE speak.userId=?1 AND speak.speakType IN (?2)")
+    Page<NurseSpeakEntity> findSpecialTypeSpeak(long userId, List<Integer> speakTypeIds);
 }

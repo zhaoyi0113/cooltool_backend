@@ -40,6 +40,17 @@ public class NurseHospitalAPI {
         return Response.ok(all).build();
     }
 
+    @Path("/{province_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response getByProvinceId(@Context HttpServletRequest request,
+                                    @PathParam("province_id") int provinceId
+    ) {
+        List<HospitalBean> provinceHospitals = hospitalService.getHospitalByProvince(provinceId, 1);
+        return Response.ok(provinceHospitals).build();
+    }
+
     @Path("/relation")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

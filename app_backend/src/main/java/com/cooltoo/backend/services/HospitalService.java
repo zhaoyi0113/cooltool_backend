@@ -57,7 +57,7 @@ public class HospitalService {
             HospitalBean bean = beanConverter.convert(entity);
             all.add(bean);
         }
-        addRegion(all);
+        fillOtherProperties(all);
         return all;
     }
 
@@ -77,7 +77,7 @@ public class HospitalService {
             HospitalBean bean = beanConverter.convert(entity);
             hospital.add(bean);
         }
-        addRegion(hospital);
+        fillOtherProperties(hospital);
         return hospital;
     }
 
@@ -91,8 +91,15 @@ public class HospitalService {
             HospitalBean bean = beanConverter.convert(result);
             hospitals.add(bean);
         }
-        addRegion(hospitals);
+        fillOtherProperties(hospitals);
         return hospitals;
+    }
+
+    public List<HospitalBean> getHospitalByProvince(int provinceId, int enable) {
+        List<HospitalEntity> resultSet = repository.findByProvinceAndEnable(provinceId, enable);
+        List<HospitalBean>   hospitalsInProvince = entities2Beans(resultSet);
+        fillOtherProperties(hospitalsInProvince);
+        return hospitalsInProvince;
     }
 
     public List<HospitalBean> searchHospital(boolean isCount, boolean andOrOr, String name,
@@ -187,7 +194,7 @@ public class HospitalService {
         HospitalBean bean = beanConverter.convert(entity);
         List<HospitalBean> one = new ArrayList<HospitalBean>();
         one.add(bean);
-        addRegion(one);
+        fillOtherProperties(one);
         return one.get(0);
     }
 
@@ -374,7 +381,7 @@ public class HospitalService {
         }
         List<HospitalBean> hospitals = new ArrayList<HospitalBean>();
         hospitals.add(hospital);
-        hospitals = addRegion(hospitals);
+        hospitals = fillOtherProperties(hospitals);
         RegionBean province = hospital.getProvinceBean();
         RegionBean city     = hospital.getCityBean();
         RegionBean district = hospital.getDistrictBean();
@@ -397,7 +404,20 @@ public class HospitalService {
         return false;
     }
 
-    private List<HospitalBean> addRegion(List<HospitalBean> hospitals) {
+    private List<HospitalBean> entities2Beans(Iterable<HospitalEntity> entities) {
+        if (null==entities) {
+            return new ArrayList<>();
+        }
+        List<HospitalBean> beans = new ArrayList<HospitalBean>();
+        for (HospitalEntity entity : entities) {
+            HospitalBean bean = beanConverter.convert(entity);
+            beans.add(bean);
+        }
+
+        return beans;
+    }
+
+    private List<HospitalBean> fillOtherProperties(List<HospitalBean> hospitals) {
         if (null==hospitals || hospitals.isEmpty()) {
             return hospitals;
         }

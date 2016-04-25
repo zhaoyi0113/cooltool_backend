@@ -8,13 +8,27 @@ package com.cooltoo.constants;
  */
 public enum SpeakType {
     /* 臭美 */
-    SMUG,
+    SMUG("臭美"),
     /* 吐槽 */
-    CATHART,
+    CATHART("吐槽"),
     /* 提问 */
-    ASK_QUESTION,
+    ASK_QUESTION("提问"),
     /* 官方发言 */
-    OFFICIAL;
+    OFFICIAL("官方发言");
+
+    private String value;
+
+    SpeakType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 
     public static SpeakType parseString(String speak) {
         SpeakType retVal = null;
