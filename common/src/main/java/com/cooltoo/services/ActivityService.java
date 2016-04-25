@@ -251,10 +251,10 @@ public class ActivityService {
 
     @Transactional
     public ActivityBean createActivity(String title, String subtitle, String description,
-                                       String datetime, String place, String price
+                                       String datetime, String place, String price, String enrollUrl
     ) {
-        logger.info("create an activity by title={}, subtitle={} descr={}, time={}, place={}, price={}",
-                    title, subtitle, description, datetime, place, price);
+        logger.info("create an activity by title={}, subtitle={} descr={}, time={}, place={}, price={}, enrollUrl={}",
+                    title, subtitle, description, datetime, place, price, enrollUrl);
         if (VerifyUtil.isStringEmpty(title)) {
             logger.error("the title is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -289,6 +289,9 @@ public class ActivityService {
                 entity.setPrice(bdPrice);
             }
         }
+        if (!VerifyUtil.isStringEmpty(enrollUrl)) {
+            entity.setEnrollUrl(enrollUrl);
+        }
         entity.setStatus(ActivityStatus.DISABLE);
         entity.setCreateTime(new Date());
         entity = repository.save(entity);
@@ -304,10 +307,11 @@ public class ActivityService {
     public ActivityBean updateActivityBasicInfo(long activityId,
                                                 String title, String subtitle, String description,
                                                 String datetime, String place, String price,
-                                                String frontCoverName, InputStream frontCover
+                                                String frontCoverName, InputStream frontCover,
+                                                String enrollUrl
     ) {
-        logger.info("update activity {} by title={}, subtitle={} descr={}, time={}, place={}, price={} image={}",
-                    activityId, title, subtitle, description, datetime, place, price, frontCover!=null);
+        logger.info("update activity {} by title={}, subtitle={} descr={}, time={}, place={}, price={}, image={}, enrollUrl={}",
+                    activityId, title, subtitle, description, datetime, place, price, frontCover!=null, enrollUrl);
 
         ActivityEntity entity = repository.findOne(activityId);
         if (null==entity) {
@@ -361,6 +365,10 @@ public class ActivityService {
             long imageId = storageService.saveFile(entity.getFrontCover(), frontCoverName, frontCover);
             imageUrl = storageService.getFilePath(imageId);
             entity.setFrontCover(imageId);
+            changed = true;
+        }
+        if (!VerifyUtil.isStringEmpty(enrollUrl)) {
+            entity.setEnrollUrl(enrollUrl);
             changed = true;
         }
 

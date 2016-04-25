@@ -122,7 +122,8 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         String place    = "fdafaf";
         String price    = "323.324";
         BigDecimal bdPrice = new BigDecimal("323.32");
-        ActivityBean bean = service.createActivity(title, subtitle, descript, time, place, price);
+        String enrollUrl = "http://afdsafds.com/fdsafd9ejkfdsjakfdjisoafkjfi";
+        ActivityBean bean = service.createActivity(title, subtitle, descript, time, place, price, enrollUrl);
         Assert.assertNotNull(bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(title, bean.getTitle());
@@ -131,6 +132,7 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(new Date(NumberUtil.getTime(time, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS)), bean.getTime());
         Assert.assertEquals(place, bean.getPlace());
         Assert.assertEquals(bdPrice, bean.getPrice());
+        Assert.assertEquals(enrollUrl, bean.getEnrollUrl());
     }
 
     @Test
@@ -144,8 +146,9 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         String price    = "323.324";
         BigDecimal bdPrice = new BigDecimal("323.32");
         ByteArrayInputStream image = new ByteArrayInputStream(title.getBytes());
+        String enrollUrl = "http://afdsafds.com/fdsafd9ejkfdsjakfdjisoafkjfi";
 
-        ActivityBean bean1 = service.updateActivityBasicInfo(id, title, subtitle, descript, time, place, price, null, image);
+        ActivityBean bean1 = service.updateActivityBasicInfo(id, title, subtitle, descript, time, place, price, null, image, enrollUrl);
         Assert.assertNotNull(bean1);
         Assert.assertEquals(id, bean1.getId());
         Assert.assertEquals(title, bean1.getTitle());
@@ -155,6 +158,7 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(place, bean1.getPlace());
         Assert.assertEquals(bdPrice, bean1.getPrice());
         Assert.assertTrue(bean1.getFrontCover()>0);
+        Assert.assertEquals(enrollUrl, bean1.getEnrollUrl());
         logger.info("Test case ====== image path --> {}", bean1.getFrontCoverUrl());
     }
 

@@ -24,6 +24,7 @@ public class ActivityBeanConverter implements Converter<ActivityEntity, Activity
         bean.setCreateTime(source.getCreateTime());
         bean.setStatus(source.getStatus());
         bean.setFrontCover(source.getFrontCover());
+        bean.setEnrollUrl(source.getEnrollUrl());
         return bean;
     }
 }

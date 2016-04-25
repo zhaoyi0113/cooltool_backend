@@ -100,12 +100,13 @@ public class ActivityManageAPI {
                                    @FormParam("description") String description,
                                    @FormParam("time") String time,
                                    @FormParam("place") String place,
-                                   @FormParam("price") double price
+                                   @FormParam("price") double price,
+                                   @FormParam("enroll_url") String enrollUrl
 
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} create activity", userId);
-        ActivityBean activity = activityService.createActivity(title, subtitle, description, time, place, ""+price);
+        ActivityBean activity = activityService.createActivity(title, subtitle, description, time, place, ""+price, enrollUrl);
         logger.info("activity is {}", activity);
         return Response.ok(activity).build();
     }
@@ -121,12 +122,13 @@ public class ActivityManageAPI {
                                             @FormParam("description") String description,
                                             @FormParam("time") String time,
                                             @FormParam("place") String place,
-                                            @FormParam("price") double price
+                                            @FormParam("price") double price,
+                                            @FormParam("enroll_url") String enrollUrl
 
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} update activity basic information", userId);
-        ActivityBean activity = activityService.updateActivityBasicInfo(activityId, title, subtitle, description, time, place, ""+price, null, null);
+        ActivityBean activity = activityService.updateActivityBasicInfo(activityId, title, subtitle, description, time, place, ""+price, null, null, enrollUrl);
         logger.info("activity is {}", activity);
         return Response.ok(activity).build();
     }
@@ -145,7 +147,7 @@ public class ActivityManageAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} update activity front cover", userId);
-        ActivityBean frontCover = activityService.updateActivityBasicInfo(activityId, null, null, null, null, null, null, imageName, image);
+        ActivityBean frontCover = activityService.updateActivityBasicInfo(activityId, null, null, null, null, null, null, imageName, image, null);
         logger.info("activity is {}", frontCover);
         return Response.ok(frontCover).build();
     }

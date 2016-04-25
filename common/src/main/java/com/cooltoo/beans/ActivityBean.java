@@ -21,6 +21,7 @@ public class ActivityBean {
     private ActivityStatus status;
     private long frontCover;
     private String frontCoverUrl;
+    private String enrollUrl;
 
     public long getId() {
         return id;
@@ -118,6 +119,14 @@ public class ActivityBean {
         this.frontCoverUrl = frontCoverUrl;
     }
 
+    public String getEnrollUrl() {
+        return enrollUrl;
+    }
+
+    public void setEnrollUrl(String enrollUrl) {
+        this.enrollUrl = enrollUrl;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -133,6 +142,7 @@ public class ActivityBean {
         msg.append(", frontCover=").append(frontCover);
         msg.append(", description=").append(description);
         msg.append(", content=").append(content);
+        msg.append(", enrollUrl=").append(enrollUrl);
         msg.append("]");
         return msg.toString();
     }

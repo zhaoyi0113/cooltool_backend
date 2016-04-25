@@ -1,0 +1,1 @@
+ALTER TABLE `platform_activities` ADD COLUMN `enroll_url` VARCHAR(1000) NULL DEFAULT '';

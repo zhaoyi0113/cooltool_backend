@@ -23,6 +23,7 @@ public class ActivityEntity {
     private String content;
     private Date createTime;
     private ActivityStatus status;
+    private String enrollUrl;
 
     @Id
     @GeneratedValue
@@ -126,6 +127,15 @@ public class ActivityEntity {
         this.frontCover = frontCover;
     }
 
+    @Column(name = "enroll_url")
+    public String getEnrollUrl() {
+        return enrollUrl;
+    }
+
+    public void setEnrollUrl(String enrollUrl) {
+        this.enrollUrl = enrollUrl;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -141,6 +151,7 @@ public class ActivityEntity {
         msg.append(", frontCover=").append(frontCover);
         msg.append(", description=").append(description);
         msg.append(", content=").append(content);
+        msg.append(", enroll_url").append(enrollUrl);
         msg.append("]");
         return msg.toString();
     }
