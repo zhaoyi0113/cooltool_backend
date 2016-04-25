@@ -25,5 +25,5 @@ public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Lo
     List<Object[]> countByUserIdIn(List<Long> userIds);
 
     @Query("FROM NurseSpeakEntity speak WHERE speak.userId=?1 AND speak.speakType IN (?2)")
-    Page<NurseSpeakEntity> findSpecialTypeSpeak(long userId, List<Integer> speakTypeIds);
+    Page<NurseSpeakEntity> findSpecialTypeSpeak(long userId, List<Integer> speakTypeIds, Pageable page);
 }
