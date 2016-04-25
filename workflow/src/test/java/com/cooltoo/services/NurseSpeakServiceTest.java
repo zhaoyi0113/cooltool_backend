@@ -6,6 +6,7 @@ import com.cooltoo.backend.services.ImagesInSpeakService;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.util.VerifyUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -46,32 +47,46 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     private ImagesInSpeakService imagesService;
 
     @Test
-    public void testGetNurseSpeakOnPage(){
-        List<NurseSpeakBean> nurseSpeak = speakService.getNurseSpeak(1L, 0, 3);
+    public void testGetSpeakOnPage(){
+        long userId = 1L;
+        int pageIdx = 0;
+        int number  = 3;
+        String type = SpeakType.allValues();
+
+        List<NurseSpeakBean> nurseSpeak = speakService.getSpeak(true, userId, type, pageIdx, number);
         Assert.assertEquals(3, nurseSpeak.size());
         Assert.assertEquals(1, nurseSpeak.get(0).getId());
 
-        nurseSpeak = speakService.getNurseSpeak(1, 1, 3);
+        pageIdx = 1;
+        nurseSpeak = speakService.getSpeak(true, userId, type, pageIdx, number);
         Assert.assertEquals(3, nurseSpeak.size());
         Assert.assertEquals(4, nurseSpeak.get(0).getId());
 
-        nurseSpeak = speakService.getNurseSpeak(1, 2, 3);
+        pageIdx = 2;
+        nurseSpeak = speakService.getSpeak(true, userId, type, pageIdx, number);
         Assert.assertEquals(3, nurseSpeak.size());
         Assert.assertEquals(7, nurseSpeak.get(0).getId());
 
-        nurseSpeak = speakService.getNurseSpeak(1, 3, 3);
+        pageIdx = 3;
+        nurseSpeak = speakService.getSpeak(true, userId, type, pageIdx, number);
         Assert.assertEquals(2, nurseSpeak.size());
         Assert.assertEquals(10, nurseSpeak.get(0).getId());
 
     }
 
     @Test
-    public void testGetSpeakByType() {
-        List<NurseSpeakBean> nurseSpeak = speakService.getSpeakByType(-1, "smug", 0, 10);
+    public void testGetSpeakDiffType() {
+        long userId = -1L;
+        int pageIdx = 0;
+        int number  = 10;
+        String type = "smug";
+
+        List<NurseSpeakBean> nurseSpeak = speakService.getSpeak(false, userId, type, pageIdx, number);
         Assert.assertNotNull(nurseSpeak);
         Assert.assertEquals(10, nurseSpeak.size());
 
-        nurseSpeak = speakService.getSpeakByType(-1, "smug", 0, 20);
+        number = 20;
+        nurseSpeak = speakService.getSpeak(false, userId, type, pageIdx, number);
         Assert.assertNotNull(nurseSpeak);
         Assert.assertEquals(11, nurseSpeak.size());
     }
@@ -83,11 +98,11 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         int index = 0;
         int number = 4;
 
-        List<NurseSpeakBean> speaks = speakService.getSpeakByUserIdAndType(userId, speakType, index, number);
+        List<NurseSpeakBean> speaks = speakService.getSpeak(true, userId, speakType, index, number);
         Assert.assertEquals(4, speaks.size());
 
         number = 10;
-        speaks = speakService.getSpeakByUserIdAndType(userId, speakType, index, number);
+        speaks = speakService.getSpeak(true, userId, speakType, index, number);
         Assert.assertEquals(10, speaks.size());
 
         for (NurseSpeakBean speak : speaks) {
@@ -95,7 +110,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         }
 
         speakType = SpeakType.CATHART.name();
-        speaks = speakService.getSpeakByUserIdAndType(userId, speakType, index, number);
+        speaks = speakService.getSpeak(true, userId, speakType, index, number);
         Assert.assertEquals(0, speaks.size());
     }
 
@@ -174,17 +189,16 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     public void testDeleteByIds() {
         String speakIds = "1,2,3,4,5,6";
         long   makerId  = 1;
+        String type     = SpeakType.allValues();
+
         List<NurseSpeakBean> speaks = speakService.deleteByIds(makerId, speakIds);
         Assert.assertEquals(6, speaks.size());
 
-        List<Long> lSpeakIds = new ArrayList<>();
-        lSpeakIds.add(1L); lSpeakIds.add(2L);
-        lSpeakIds.add(3L); lSpeakIds.add(4L);
-        lSpeakIds.add(5L); lSpeakIds.add(6L);
+        List<Long> lSpeakIds = VerifyUtil.parseLongIds(speakIds);
         Map<Long, List<ImagesInSpeakBean>> images = imagesService.getImagesInSpeak(lSpeakIds);
         Assert.assertEquals(0, images.size());
 
-        speaks = speakService.getNurseSpeak(makerId, 0, 11);
+        speaks = speakService.getSpeak(true, makerId, type, 0, 11);
         Assert.assertEquals(5, speaks.size());
     }
 
@@ -244,15 +258,17 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     @Test
     public void testCountByUserId() {
         long userId = 1L;
-        long count = speakService.countByUserId(userId);
+        String type = SpeakType.allValues();
+
+        long count = speakService.countSpeak(true, userId, type);
         Assert.assertEquals(11, count);
 
         userId = 2L;
-        count = speakService.countByUserId(userId);
+        count = speakService.countSpeak(true, userId, type);
         Assert.assertEquals(2, count);
 
         userId = 3L;
-        count = speakService.countByUserId(userId);
+        count = speakService.countSpeak(true, userId, type);
         Assert.assertEquals(2, count);
     }
 
@@ -277,13 +293,25 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     @Test
     public void testCountBySpeakType() {
         long userId = 1L;
-        String speakType = SpeakType.SMUG.name();
-        long count = speakService.countBySpeakType(userId, speakType);
+        String type = SpeakType.SMUG.name();
+
+        long count = speakService.countSpeak(true, userId, type);
         Assert.assertEquals(11, count);
 
-        speakType = SpeakType.ASK_QUESTION.name();
-        count = speakService.countBySpeakType(userId, speakType);
+        type = SpeakType.ASK_QUESTION.name();
+        count = speakService.countSpeak(true, userId, type);
         Assert.assertEquals(0, count);
     }
 
+    @Test
+    public void testCountOfficial() {
+        long userId = -1L;
+        String type = "official";
+
+        long count = speakService.countSpeak(true, userId, type);
+        Assert.assertEquals(5, count);
+
+        List<NurseSpeakBean> speaks = speakService.getSpeak(true, userId, type, 1, 3);
+        Assert.assertEquals(2, speaks.size());
+    }
 }

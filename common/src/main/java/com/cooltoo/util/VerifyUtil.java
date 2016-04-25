@@ -1,5 +1,6 @@
 package com.cooltoo.util;
 
+import com.cooltoo.constants.SpeakType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -178,5 +179,21 @@ public class VerifyUtil {
         return keyVal;
     }
 
+
+    public static List<SpeakType> parseSpeakTypes(String speakTypes) {
+        if (isStringEmpty(speakTypes)) {
+            return new ArrayList<>();
+        }
+        speakTypes = speakTypes.toLowerCase();
+        String[] strArray = speakTypes.split(",");
+
+        List<SpeakType> types = new ArrayList<>();
+        for (String tmp : strArray) {
+            SpeakType type = SpeakType.parseString(tmp);
+            types.add(type);
+        }
+
+        return types;
+    }
 
 }

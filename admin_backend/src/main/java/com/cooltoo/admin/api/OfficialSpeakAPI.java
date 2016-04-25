@@ -39,7 +39,7 @@ public class OfficialSpeakAPI {
     public Response countOfficialSpeak(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("admin {} get official speak count", userId);
-        long count = speakService.countBySpeakType(-1, SpeakType.OFFICIAL.name());
+        long count = speakService.countSpeak(true, -1, SpeakType.OFFICIAL.name());
         logger.info("count is {}", count);
         return Response.ok(count).build();
     }
@@ -54,7 +54,7 @@ public class OfficialSpeakAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("admin {} get official speak at page {} {}/page", userId, index, number);
-        List<NurseSpeakBean> speaks = speakService.getSpeakByType(-1, SpeakType.OFFICIAL.name(), index, number);
+        List<NurseSpeakBean> speaks = speakService.getSpeak(true, -1, SpeakType.OFFICIAL.name(), index, number);
         logger.info("speak count is {}", speaks.size());
         return Response.ok(speaks).build();
     }

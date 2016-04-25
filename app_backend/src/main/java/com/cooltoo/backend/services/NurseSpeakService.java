@@ -45,13 +45,6 @@ public class NurseSpeakService {
     //             get
     //===============================================================
 
-    public long countByUserId(long userId){
-        logger.info("get nurse {} speak count", userId);
-        long count = speakRepository.countByUserId(userId);
-        logger.info("get nurse {} speak count {}", userId, count);
-        return count;
-    }
-
     public Map<Long, Long> countByUserIds(String strUserIds){
         logger.info("get nurse {} speak count", strUserIds);
 
@@ -78,139 +71,76 @@ public class NurseSpeakService {
         return id2num;
     }
 
-    public long countBySpeakType(long userId, String speakType) {
-        logger.info("get nurse speak ("+speakType+") count");
-        SpeakType speaktype = SpeakType.parseString(speakType);
-        if (null==speaktype) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+    public long countSpeak(boolean useUserId, long userId, String strSpeakTypes) {
+        logger.info("useUserId={} (user {}) get speak count by speak type {}", useUserId, userId, strSpeakTypes);
+        List<SpeakType> speakTypes = VerifyUtil.parseSpeakTypes(strSpeakTypes);
+        if (VerifyUtil.isListEmpty(speakTypes)) {
+            logger.warn("speak type parsed is empty");
+            return 0;
         }
-        SpeakTypeBean speakTypeBean = speakTypeService.getSpeakTypeByType(speaktype);
-        if (null==speakTypeBean) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        List<Integer> speakTypeIds = speakTypeService.getSpeakTypeIdByTypes(speakTypes);
+        if (VerifyUtil.isListEmpty(speakTypeIds)) {
+            logger.warn("speak type parsed ids is empty");
+            return 0;
         }
-
-        long count = speakRepository.countByUserIdAndSpeakType(userId, speakTypeBean.getId());
+        long count = 0;
+        if (useUserId) {
+            count = speakRepository.countSpecialTypeSpeak(userId, speakTypeIds);
+        }
+        else {
+            count = speakRepository.countSpecialTypeSpeak(speakTypeIds);
+        }
+        logger.info("speak count is={}", count);
         return count;
     }
 
-    public List<NurseSpeakBean> getNurseSpeak(long userId, int index, int number) {
-        logger.info("get nurse speak at "+index+" number="+number);
-
-        // get speaks
-        PageRequest request = new PageRequest(index, number, Sort.Direction.DESC, "time");
-        Page<NurseSpeakEntity> speaks = speakRepository.findByUserId(userId, request);
-
-        // move to cache
-        List<NurseSpeakEntity> speakEntities = new ArrayList<NurseSpeakEntity>();
-        for (NurseSpeakEntity entity : speaks) {
-            speakEntities.add(entity);
+    public List<NurseSpeakBean> getSpeak(boolean useUserId, long userId, String strSpeakTypes, int pageIndex, int number) {
+        logger.info("useUserId={} (user {}) get speak by speak type {} at page {}, {}/page",
+                useUserId, userId, strSpeakTypes, pageIndex, number);
+        List<SpeakType> speakTypes = VerifyUtil.parseSpeakTypes(strSpeakTypes);
+        if (VerifyUtil.isListEmpty(speakTypes)) {
+            logger.warn("speak type parsed is empty");
+            return new ArrayList<>();
+        }
+        List<Integer> speakTypeIds = speakTypeService.getSpeakTypeIdByTypes(speakTypes);
+        if (VerifyUtil.isListEmpty(speakTypeIds)) {
+            logger.warn("speak type parsed ids is empty");
+            return new ArrayList<>();
         }
 
-        // parse entities to bean
-        List<NurseSpeakBean> beans = entitiesToBeans(speakEntities);
-        fillOtherProperties(userId, beans);
-        return beans;
-    }
-
-    public List<NurseSpeakBean> getSpeakByType(long userId, String speakType, int index, int number) {
-        logger.info("get user={} all speak ({}) at {} number={}", userId, speakType, index, number);
-        SpeakTypeBean speakTypeBean = null;
-        SpeakType speaktype = SpeakType.parseString(speakType);
-        if (null!=speaktype) {
-            speakTypeBean = speakTypeService.getSpeakTypeByType(speaktype);
-        }
-
-        // get speaks
-        PageRequest pagable = new PageRequest(index, number, Sort.Direction.DESC, "time");
-        Page<NurseSpeakEntity> speaks = null;
-        if (null!=speakTypeBean) {
-            logger.info("get speak type's speaks. type is {}", speakTypeBean);
-            speaks = speakRepository.findBySpeakType(speakTypeBean.getId(), pagable);
+        PageRequest request = new PageRequest(pageIndex, number, Sort.Direction.DESC, "time");
+        Page<NurseSpeakEntity> resultSet;
+        if (useUserId) {
+            resultSet = speakRepository.findSpecialTypeSpeak(userId, speakTypeIds, request);
         }
         else {
-            logger.info("get all speak type's speaks");
-            speaks = speakRepository.findAll(pagable);
-        }
-
-        // move to cache
-        List<NurseSpeakEntity> speakEntities = new ArrayList<NurseSpeakEntity>();
-        for (NurseSpeakEntity entity : speaks) {
-            speakEntities.add(entity);
+            resultSet = speakRepository.findSpecialTypeSpeak(speakTypeIds, request);
         }
 
         // parse entities to bean
-        List<NurseSpeakBean> beans = entitiesToBeans(speakEntities);
+        List<NurseSpeakBean> beans = entitiesToBeans(resultSet);
         fillOtherProperties(userId, beans);
-        return beans;
-    }
-
-    public List<NurseSpeakBean> getSpeakByUserIdAndType(long userId, String speakType, int index, int number) {
-        logger.info("get nurse speak ("+speakType+") at "+index+" number="+number);
-        SpeakType speaktype = SpeakType.parseString(speakType);
-        if (null==speaktype) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        SpeakTypeBean speakTypeBean = speakTypeService.getSpeakTypeByType(speaktype);
-        if (null==speakTypeBean) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-
-        // get speaks
-        PageRequest pagable = new PageRequest(index, number, Sort.Direction.DESC, "time");
-        Page<NurseSpeakEntity> speaks = speakRepository.findByUserIdAndSpeakType(userId, speakTypeBean.getId(), pagable);
-
-        // move to cache
-        List<NurseSpeakEntity> speakEntities = new ArrayList<NurseSpeakEntity>();
-        for (NurseSpeakEntity entity : speaks) {
-            speakEntities.add(entity);
-        }
-
-        // parse entities to bean
-        List<NurseSpeakBean> beans = entitiesToBeans(speakEntities);
-        fillOtherProperties(userId, beans);
+        logger.warn("speak count={}", beans.size());
         return beans;
     }
 
     public NurseSpeakBean getNurseSpeak(long userId, long speakId) {
         logger.info("user {} get speak by id={}", userId, speakId);
-        List<NurseSpeakBean> nurseSpeaks = getNurseSpeak(userId, ""+speakId);
-        if (nurseSpeaks.isEmpty()) {
+        NurseSpeakEntity resultSet = speakRepository.findOne(speakId);
+        if (null==resultSet) {
             logger.info("there is no record");
             return null;
         }
-        if (nurseSpeaks.size()!=1) {
-            logger.info("there is more than one record size={}", nurseSpeaks.size());
-            return null;
-        }
+        List<NurseSpeakEntity> entities = new ArrayList<>();
+        entities.add(resultSet);
+
+        List<NurseSpeakBean> nurseSpeaks = entitiesToBeans(entities);
+        fillOtherProperties(userId, nurseSpeaks);
         return nurseSpeaks.get(0);
     }
 
-    public List<NurseSpeakBean> getNurseSpeak(long userId, String strSpeakIds) {
-        logger.info("user {} get speaks by ids={}", userId, strSpeakIds);
-        if (!VerifyUtil.isIds(strSpeakIds)) {
-            logger.warn("speak ids is invalid");
-            return new ArrayList<>();
-        }
-
-        List<Long> speakIds = VerifyUtil.parseLongIds(strSpeakIds);
-        return getNurseSpeak(userId, speakIds);
-    }
-
-    public List<NurseSpeakBean> getNurseSpeak(long userId, List<Long> speakIds) {
-        if (null==speakIds||speakIds.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<NurseSpeakEntity> resultSet = speakRepository.findAll(speakIds);
-        if (null==resultSet||resultSet.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<NurseSpeakBean> speaks = entitiesToBeans(resultSet);
-        fillOtherProperties(userId, speaks);
-        return speaks;
-    }
-
-    private List<NurseSpeakBean> entitiesToBeans(List<NurseSpeakEntity> entities) {
-        if (null==entities || entities.isEmpty()) {
+    private List<NurseSpeakBean> entitiesToBeans(Iterable<NurseSpeakEntity> entities) {
+        if (null==entities) {
             return new ArrayList<>();
         }
 

@@ -12,6 +12,7 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.SpeakType;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -132,7 +133,8 @@ public class NurseService {
         catch (Exception ex) {
         }
         // add speak count
-        long speakCount = speakService.countByUserId(userId);
+        String speakType = SpeakType.allValues();
+        long speakCount = speakService.countSpeak(true, userId, speakType);
         nurse.setProperty(NurseBean.SPEAK_COUNT, speakCount);
         // add skill nominated count
         List<SocialAbilitiesBean> norminated = this.abilitiesService.getUserAllTypeAbilities(userId);

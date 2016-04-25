@@ -149,7 +149,7 @@ public class NurseSocialAbilitiesService {
 
         // add nurse speak abilities(smug/cathart/ask_question)
         for (SpeakTypeBean speakType : speakTypes) {
-            long countOfSpeakType = nurseSpeakService.countBySpeakType(userId, speakType.getType().name());
+            long countOfSpeakType = nurseSpeakService.countSpeak(true, userId, speakType.getType().name());
             if (countOfSpeakType>0) {
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         userId,
@@ -232,7 +232,7 @@ public class NurseSocialAbilitiesService {
         }
         else if (SocialAbilityType.COMMUNITY==socialAbilityType) {
             SpeakTypeBean speakType        = speakTypeService.getSpeakType(abilityId);
-            long          countOfSpeakType = nurseSpeakService.countBySpeakType(userId, speakType.getType().name());
+            long          countOfSpeakType = nurseSpeakService.countSpeak(true, userId, speakType.getType().name());
             // speak social ability
             if (countOfSpeakType>0) {
                 SocialAbilitiesBean abilityBean = newAbilityBean(

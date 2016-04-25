@@ -63,4 +63,13 @@ public enum SpeakType {
         }
         return retVal;
     }
+
+    public static String allValues() {
+        StringBuilder values = new StringBuilder();
+        values.append(SMUG.name()).append(",");
+        values.append(CATHART.name()).append(",");
+        values.append(ASK_QUESTION.name()).append(",");
+        values.append(OFFICIAL.name());
+        return values.toString();
+    }
 }

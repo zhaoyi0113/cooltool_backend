@@ -97,6 +97,20 @@ public class SpeakTypeService {
         return null;
     }
 
+    public List<Integer> getSpeakTypeIdByTypes(List<SpeakType> speakTypes) {
+        logger.info("get speak type ids by speak types {}", speakTypes);
+        if (VerifyUtil.isListEmpty(speakTypes)) {
+            return new ArrayList<>();
+        }
+
+        List<Integer> speakTypeIds = speakTypeRepository.findByTypeIn(speakTypes);
+        logger.info("get speak type ids={}", speakTypeIds);
+        if (null == speakTypeIds) {
+            return new ArrayList<>();
+        }
+        return speakTypeIds;
+    }
+
     //=============================================================
     //             update
     //=============================================================
