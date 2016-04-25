@@ -374,7 +374,7 @@ public class NurseSpeakService {
 
         NurseSpeakEntity entity = new NurseSpeakEntity();
         // check speak content
-        if (null==content || "".equals(content)) {
+        if (!SpeakType.SMUG.equals(speakType) && (VerifyUtil.isStringEmpty(content))) {
             logger.error("speak content is empty");
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
         }
