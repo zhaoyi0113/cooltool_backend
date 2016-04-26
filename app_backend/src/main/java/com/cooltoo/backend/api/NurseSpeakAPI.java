@@ -110,15 +110,12 @@ public class NurseSpeakAPI {
 
     @Path("/ask_question")
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response addAskQuestion(@Context HttpServletRequest request,
-                                   @FormDataParam("content") String content,
-                                   @FormDataParam("file_name") String fileName,
-                                   @FormDataParam("file") InputStream file) {
+                                   @FormDataParam("content") String content) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseSpeakBean nurseSpeak = speakService.addAskQuestion(userId, content, fileName, file);
+        NurseSpeakBean nurseSpeak = speakService.addAskQuestion(userId, content, null, null);
         return Response.ok(nurseSpeak).build();
     }
 
