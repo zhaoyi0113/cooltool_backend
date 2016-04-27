@@ -121,6 +121,13 @@ public class NurseService {
             throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
         }
         NurseBean nurse = beanConverter.convert(entity);
+        List<Long> imageIds = new ArrayList<>();
+        imageIds.add(nurse.getProfilePhotoId());
+        imageIds.add(nurse.getBackgroundImageId());
+        Map<Long, String> imgId2Path = userStorage.getFilePath(imageIds);
+        nurse.setProfilePhotoUrl(imgId2Path.get(nurse.getProfilePhotoId()));
+        nurse.setBackgroundImageUrl(imgId2Path.get(nurse.getBackgroundImageId()));
+
         long friendsCount = friendsService.countFriendship(userId);
         nurse.setProperty(NurseBean.FRIENDS_COUNT, friendsCount);
         List<HospitalEntity> nurseHospitals = hospitalRepository.getNurseHospitals(userId);

@@ -221,7 +221,6 @@ public class ActivityManageAPI {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addImage2Temporary(@Context HttpServletRequest request,
                                        @FormDataParam("activity_id") long activityId,
                                        @FormDataParam("file_name") String imageName,
@@ -244,7 +243,7 @@ public class ActivityManageAPI {
     @Path("/edit/content/submit")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
+    //@AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateActivityContent(@Context HttpServletRequest request,
                                             @FormParam("activity_id") long activityId,
                                             @FormParam("content") String content
