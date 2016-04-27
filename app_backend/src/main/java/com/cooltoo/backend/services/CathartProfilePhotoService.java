@@ -7,7 +7,7 @@ import com.cooltoo.backend.repository.CathartProfilePhotoRepository;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +31,8 @@ public class CathartProfilePhotoService {
     @Autowired private CathartProfilePhotoRepository repository;
     @Autowired private CathartProfilePhotoBeanConverter beanConverter;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("OfficialFileStorageService")
+    private OfficialFileStorageService officialStorage;
 
     //=======================================================
     //                 get
@@ -114,7 +114,7 @@ public class CathartProfilePhotoService {
 
         CathartProfilePhotoBean photo    = beanConverter.convert(reseltSet);
         long                    imageId  = photo.getImageId();
-        String                  imageUrl = storageService.getFilePath(imageId);
+        String                  imageUrl = officialStorage.getFilePath(imageId);
         photo.setImageUrl(imageUrl);
         return photo;
     }
@@ -141,7 +141,7 @@ public class CathartProfilePhotoService {
             imageIds.add(tmp.getImageId());
         }
 
-        Map<Long, String> imageId2Url = storageService.getFilePath(imageIds);
+        Map<Long, String> imageId2Url = officialStorage.getFilePath(imageIds);
         for (CathartProfilePhotoBean tmp : profilePhotos) {
             long imageId = tmp.getImageId();
             String imageUrl = imageId2Url.get(imageId);
@@ -174,8 +174,8 @@ public class CathartProfilePhotoService {
         entity.setName(name);
         entity.setEnable(enable);
         entity.setTimeCreated(new Date());
-        long   imageId  = storageService.saveFile(-1, imageName, image);
-        String imageUrl = storageService.getFilePath(imageId);
+        long   imageId  = officialStorage.addFile(-1, imageName, image);
+        String imageUrl = officialStorage.getFilePath(imageId);
         entity.setImageId(imageId);
         repository.save(entity);
 
@@ -215,8 +215,8 @@ public class CathartProfilePhotoService {
             if (VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "cathart_" + System.nanoTime();
             }
-            imageId  = storageService.saveFile(entity.getImageId(), imageName, image);
-            imageUrl = storageService.getFilePath(imageId);
+            imageId  = officialStorage.addFile(entity.getImageId(), imageName, image);
+            imageUrl = officialStorage.getFilePath(imageId);
             entity.setImageId(imageId);
             changed = true;
         }
@@ -295,7 +295,7 @@ public class CathartProfilePhotoService {
             lIds.add(tmp.getId());
         }
 
-        storageService.deleteFiles(imageIds);
+        officialStorage.deleteFiles(imageIds);
         repository.delete(entities);
 
         return lIds;

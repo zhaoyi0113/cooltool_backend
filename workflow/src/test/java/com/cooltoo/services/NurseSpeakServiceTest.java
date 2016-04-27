@@ -6,6 +6,7 @@ import com.cooltoo.backend.services.ImagesInSpeakService;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
@@ -45,6 +46,8 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     private NurseSpeakService speakService;
     @Autowired
     private ImagesInSpeakService imagesService;
+    @Autowired
+    private UserFileStorageService userStorage;
 
     @Test
     public void testGetSpeakOnPage(){
@@ -136,6 +139,9 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(2, bean.getUserId());
         Assert.assertEquals(content, bean.getContent());
         Assert.assertNotNull(bean.getTime());
+        Assert.assertTrue(userStorage.fileExist(bean.getImages().get(0).getImageId()));
+        userStorage.deleteFile(bean.getImages().get(0).getImageId());
+        Assert.assertFalse(userStorage.fileExist(bean.getImages().get(0).getImageUrl()));
         logger.info(bean.toString());
 
         bean = speakService.addCathart(2, content, fileName, inputStream);
@@ -143,6 +149,9 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(2, bean.getUserId());
         Assert.assertEquals(content, bean.getContent());
         Assert.assertNotNull(bean.getTime());
+        Assert.assertTrue(userStorage.fileExist(bean.getImages().get(0).getImageId()));
+        userStorage.deleteFile(bean.getImages().get(0).getImageId());
+        Assert.assertFalse(userStorage.fileExist(bean.getImages().get(0).getImageUrl()));
         logger.info(bean.toString());
 
         bean = speakService.addAskQuestion(2, content, fileName, inputStream);
@@ -150,6 +159,9 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(2, bean.getUserId());
         Assert.assertEquals(content, bean.getContent());
         Assert.assertNotNull(bean.getTime());
+        Assert.assertTrue(userStorage.fileExist(bean.getImages().get(0).getImageId()));
+        userStorage.deleteFile(bean.getImages().get(0).getImageId());
+        Assert.assertFalse(userStorage.fileExist(bean.getImages().get(0).getImageUrl()));
         logger.info(bean.toString());
     }
 
@@ -157,10 +169,12 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     public void testAddImage() {
         long speakId = 15;
         long userId  = 3;
+        List<ImagesInSpeakBean> imagesInSpeaks = new ArrayList<>();
         NurseSpeakBean speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(2, speak.getImages().size());
         for (int i=15; i > 0; i--) {
-            speakService.addImage(userId, speakId, "test", new ByteArrayInputStream("test".getBytes()));
+            ImagesInSpeakBean image = speakService.addImage(userId, speakId, "test", new ByteArrayInputStream("test".getBytes()));
+            imagesInSpeaks.add(image);
         }
         speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(9, speak.getImages().size());
@@ -169,7 +183,8 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(1, speak.getImages().size());
         for (int i=15; i > 0; i--) {
-            speakService.addImage(userId, speakId, "test", new ByteArrayInputStream("test".getBytes()));
+            ImagesInSpeakBean image = speakService.addImage(userId, speakId, "test", new ByteArrayInputStream("test".getBytes()));
+            imagesInSpeaks.add(image);
         }
         speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(1, speak.getImages().size());
@@ -179,10 +194,19 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(1, speak.getImages().size());
         for (int i=15; i > 0; i--) {
-            speakService.addImage(userId, speakId, "test", new ByteArrayInputStream("test".getBytes()));
+            ImagesInSpeakBean image = speakService.addImage(userId, speakId, "test", new ByteArrayInputStream("test".getBytes()));
+            imagesInSpeaks.add(image);
         }
         speak = speakService.getNurseSpeak(userId, speakId);
         Assert.assertEquals(1, speak.getImages().size());
+
+        for (ImagesInSpeakBean image : imagesInSpeaks) {
+            if (image.getImageId()>0) {
+                Assert.assertTrue(userStorage.fileExist(image.getImageId()));
+                userStorage.deleteFile(image.getImageId());
+                Assert.assertFalse(userStorage.fileExist(image.getImageUrl()));
+            }
+        }
     }
 
     @Test

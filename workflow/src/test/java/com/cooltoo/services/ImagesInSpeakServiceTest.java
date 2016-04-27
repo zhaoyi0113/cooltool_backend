@@ -3,6 +3,7 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.ImagesInSpeakBean;
 import com.cooltoo.backend.services.ImagesInSpeakService;
+import com.cooltoo.services.file.UserFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -28,6 +29,8 @@ public class ImagesInSpeakServiceTest extends AbstractCooltooTest{
 
     @Autowired
     private ImagesInSpeakService service;
+    @Autowired
+    private UserFileStorageService userStorage;
 
     @Test
     public void testCountBySpeakId() {
@@ -107,6 +110,8 @@ public class ImagesInSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertNotNull(bean.getImageUrl());
         Assert.assertTrue(bean.getImageId()>0);
         Assert.assertEquals(speakId, bean.getSpeakId());
-
+        Assert.assertTrue(userStorage.fileExist(bean.getImageId()));
+        userStorage.deleteFile(bean.getImageId());
+        Assert.assertFalse(userStorage.fileExist(bean.getImageUrl()));
     }
 }

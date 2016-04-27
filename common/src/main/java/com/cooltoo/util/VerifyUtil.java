@@ -21,9 +21,27 @@ public class VerifyUtil {
     public static final String OCCUPATION_SKILL_ID = "[[0-9]+,]*[0-9]+";
     private static final Logger logger = LoggerFactory.getLogger(VerifyUtil.class);
 
+    public static boolean isMapEmpty(Map map) {
+        if (map instanceof Map) {
+            return map.isEmpty();
+        }
+        return true;
+    }
+
     public static boolean isListEmpty(List list) {
         if (list instanceof List) {
-            return list.isEmpty();
+            if (list.isEmpty()) {
+                return true;
+            }
+            else {
+                int count = 0;
+                for (Object obj : list) {
+                    if (null==obj) {
+                        count++;
+                    }
+                }
+                return count==list.size();
+            }
         }
         return true;
     }

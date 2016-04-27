@@ -6,6 +6,7 @@ import com.cooltoo.backend.beans.WorkFileTypeBean;
 import com.cooltoo.backend.services.NurseQualificationService;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
+import com.cooltoo.services.file.SecretFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -38,6 +39,8 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private NurseQualificationService qualService;
+    @Autowired
+    private SecretFileStorageService secretStorage;
 
     @Test
     public void testNurseQualificationOK() {
@@ -81,26 +84,28 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         String name = "Identi";
         String content = "dsafdasfdasfdasflksajfdkla;jfdksaljfdksla";
         ByteArrayInputStream byteInput = new ByteArrayInputStream(content.getBytes());
-        Date time = new Date();
-
-        WorkFileTypeBean workFileType = qualService.getWorkFileTypeBean(WorkFileType.EMPLOYEES_CARD.name());
 
         NurseQualificationBean bean = null;
-        qualService.addWorkFile(4, name, WorkFileType.EMPLOYEES_CARD.name(), "aaa.png", byteInput);
+        String filePath = qualService.addWorkFile(4, name, WorkFileType.EMPLOYEES_CARD.name(), "aaa.png", byteInput);
         bean = qualService.getAllNurseQualifications(4).get(0);
         logger.info("add work file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
         Assert.assertEquals(name, bean.getName());
+        Assert.assertTrue(secretStorage.fileExist(filePath));
+        secretStorage.deleteFile(filePath);
+        Assert.assertFalse(secretStorage.fileExist(filePath));
 
-        workFileType = qualService.getWorkFileTypeBean(WorkFileType.IDENTIFICATION.name());
         name = "Identi2";
-        qualService.addWorkFile(4, name, workFileType.getName(), "aaa.png", byteInput);
+        filePath = qualService.addWorkFile(4, name, WorkFileType.IDENTIFICATION.name(), "aaa.png", byteInput);
         bean = qualService.getAllNurseQualifications(4).get(0);
         logger.info("add identification file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
         Assert.assertNotEquals(name, bean.getName());
+        Assert.assertTrue(secretStorage.fileExist(filePath));
+        secretStorage.deleteFile(filePath);
+        Assert.assertFalse(secretStorage.fileExist(filePath));
     }
 
 

@@ -10,7 +10,7 @@ import com.cooltoo.entities.BadgeEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.BadgeRepository;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +40,8 @@ public class BadgeService {
     @Autowired private SkillRepository skillRepository;
     @Autowired private SpeakTypeRepository speakTypeRepository;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("OfficialFileStorageService")
+    private OfficialFileStorageService officialStorage;
 
     public long countByAbilityType(String strAbilityType) {
         logger.info("get abilityType={} count", strAbilityType);
@@ -136,7 +136,7 @@ public class BadgeService {
             imageIds.add(tmp.getImageId());
         }
 
-        Map<Long, String> imageId2Url = storageService.getFilePath(imageIds);
+        Map<Long, String> imageId2Url = officialStorage.getFilePath(imageIds);
         for (BadgeBean tmp : beans) {
             String imageUrl = imageId2Url.get(tmp.getImageId());
             tmp.setImageUrl(imageUrl);
@@ -163,7 +163,7 @@ public class BadgeService {
                 imageIds.add(tmp.getImageId());
                 badgeIds.add(tmp.getId());
             }
-            storageService.deleteFiles(imageIds);
+            officialStorage.deleteFiles(imageIds);
             repository.delete(resultSet);
         }
         logger.info("delete badge by ids={}, delete count={}", ids, badgeIds.size());
@@ -187,7 +187,7 @@ public class BadgeService {
             badgeIds.add(tmp.getId());
         }
 
-        storageService.deleteFiles(imageIds);
+        officialStorage.deleteFiles(imageIds);
         repository.delete(resultSet);
 
         logger.info("delete badge by abilityId={} abilityType={}, ids={}", abilityId, strAbilityType, badgeIds);
@@ -230,8 +230,8 @@ public class BadgeService {
             if (!VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "grade_"+System.nanoTime();
             }
-            imageId  = storageService.saveFile(imageId, imageName, image);
-            imageUrl = storageService.getFilePath(imageId);
+            imageId  = officialStorage.addFile(imageId, imageName, image);
+            imageUrl = officialStorage.getFilePath(imageId);
         }
 
         BadgeEntity entity = new BadgeEntity();
@@ -303,8 +303,8 @@ public class BadgeService {
             if (!VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "grade_"+System.nanoTime();
             }
-            imageId  = storageService.saveFile(imageId, imageName, image);
-            imageUrl = storageService.getFilePath(imageId);
+            imageId  = officialStorage.addFile(imageId, imageName, image);
+            imageUrl = officialStorage.getFilePath(imageId);
             entity.setImageId(imageId);
             changed = true;
         }

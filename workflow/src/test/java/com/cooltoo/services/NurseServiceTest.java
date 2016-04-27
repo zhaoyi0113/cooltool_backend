@@ -7,9 +7,9 @@ import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.repository.FileStorageRepository;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.services.NurseService;
+import com.cooltoo.services.file.UserFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -42,12 +42,8 @@ public class NurseServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private NurseService service;
-
     @Autowired
-    private FileStorageRepository fileStorageRepository;
-
-    @Autowired
-    private NurseRepository nurseRepository;
+    private UserFileStorageService userStorage;
 
     @Test
     public void testNew() {
@@ -97,34 +93,38 @@ public class NurseServiceTest extends AbstractCooltooTest {
     @Test
     public void testAddPhoto(){
         String filePath = "build/"+System.currentTimeMillis();
+        File file = new File(filePath);
         try {
-            File file = new File(filePath);
             file.createNewFile();
             InputStream input = new FileInputStream(filePath);
-            service.updateHeadPhoto(1, file.getName(), input);
-            NurseEntity nurse = nurseRepository.findOne(1l);
-            FileStorageEntity fileStorage = fileStorageRepository.findOne(nurse.getProfilePhotoId());
-            Assert.assertNotNull(fileStorage);
-            Assert.assertEquals(file.getName(), fileStorage.getFileRealname());
+            String profilePhoto = service.updateHeadPhoto(1, file.getName(), input);
+
+            Assert.assertTrue(userStorage.fileExist(profilePhoto));
+            userStorage.deleteFile(profilePhoto);
+            Assert.assertFalse(userStorage.fileExist(profilePhoto));
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            file.delete();
         }
     }
 
     @Test
     public void testAddBackgroundImage(){
         String filePath = "build/"+System.currentTimeMillis();
+        File file = new File(filePath);
         try {
-            File file = new File(filePath);
             file.createNewFile();
             InputStream input = new FileInputStream(filePath);
-            service.updateBackgroundImage(1, file.getName(), input);
-            NurseEntity nurse = nurseRepository.findOne(1l);
-            FileStorageEntity fileStorage = fileStorageRepository.findOne(nurse.getBackgroundImageId());
-            Assert.assertNotNull(fileStorage);
-            Assert.assertEquals(file.getName(), fileStorage.getFileRealname());
+            String backgroundImage = service.updateBackgroundImage(1, file.getName(), input);
+
+            Assert.assertTrue(userStorage.fileExist(backgroundImage));
+            userStorage.deleteFile(backgroundImage);
+            Assert.assertFalse(userStorage.fileExist(backgroundImage));
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            file.delete();
         }
     }
 

@@ -37,7 +37,9 @@ public class NurseBean {
     private String shortNote;
     private UserAuthority authority;
     private String password;
+    private long profilePhotoId;
     private String profilePhotoUrl;
+    private long backgroundImageId;
     private String backgroundImageUrl;
     private String hospital;
     private Map<String, Object> properties = new HashMap<String, Object>();
@@ -91,12 +93,28 @@ public class NurseBean {
         this.password = password;
     }
 
+    public long getProfilePhotoId() {
+        return profilePhotoId;
+    }
+
+    public void setProfilePhotoId(long profilePhotoId) {
+        this.profilePhotoId = profilePhotoId;
+    }
+
     public String getProfilePhotoUrl() {
         return profilePhotoUrl;
     }
 
     public void setProfilePhotoUrl(String profilePhotoUrl) {
         this.profilePhotoUrl = profilePhotoUrl;
+    }
+
+    public long getBackgroundImageId() {
+        return backgroundImageId;
+    }
+
+    public void setBackgroundImageId(long backgroundImageId) {
+        this.backgroundImageId = backgroundImageId;
     }
 
     public String getBackgroundImageUrl() {

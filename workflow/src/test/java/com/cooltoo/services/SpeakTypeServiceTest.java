@@ -3,6 +3,7 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.SpeakTypeBean;
 import com.cooltoo.backend.services.SpeakTypeService;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,6 +26,8 @@ public class SpeakTypeServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private SpeakTypeService speakTypeService;
+    @Autowired
+    private OfficialFileStorageService officialStorage;
 
     @Test
     @DatabaseSetup("classpath:/com/cooltoo/services/speak_type_data.xml")
@@ -59,5 +62,13 @@ public class SpeakTypeServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(newType.getFactor(), factor);
         Assert.assertNotEquals(newType.getImageId(), speakType.getImageId());
         Assert.assertNotEquals(newType.getDisableImageId(), speakType.getDisableImageId());
+
+        Assert.assertTrue(officialStorage.fileExist(newType.getImageUrl()));
+        Assert.assertTrue(officialStorage.fileExist(newType.getDisableImageUrl()));
+        officialStorage.deleteFile(newType.getImageId());
+        officialStorage.deleteFile(newType.getDisableImageId());
+        Assert.assertFalse(officialStorage.fileExist(newType.getImageUrl()));
+        Assert.assertFalse(officialStorage.fileExist(newType.getDisableImageUrl()));
+
     }
 }

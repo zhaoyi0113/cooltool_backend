@@ -38,7 +38,6 @@ public class JerseyConfiguration extends ResourceConfig {
         register(HospitalAPI.class);
         register(HospitalDepartmentAPI.class);
         register(NurseLoginAuthenticationFilter.class);
-        register(StorageAPI.class);
         register(NurseLoginAPI.class);
         register(OccupationSkillAPI.class);
         register(NurseFriendsAPI.class);

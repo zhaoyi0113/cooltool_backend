@@ -16,7 +16,7 @@ import com.cooltoo.constants.SpeakType;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -49,8 +49,8 @@ public class NurseService {
     @Autowired
     private NurseEntityConverter entityConverter;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("UserFileStorageService")
+    private UserFileStorageService userStorage;
     @Autowired
     private NurseFriendsService friendsService;
     @Autowired
@@ -101,6 +101,9 @@ public class NurseService {
     //==================================================================
     //         get
     //==================================================================
+    public boolean existNurse(long nurseId) {
+        return repository.exists(nurseId);
+    }
 
     public NurseBean getNurse(String mobile) {
         List<NurseEntity> nurses = repository.findByMobile(mobile);
@@ -130,8 +133,7 @@ public class NurseService {
                 nurse.setProperty(NurseBean.HOSPITAL_DEPARTMENT, relation);
             }
         }
-        catch (Exception ex) {
-        }
+        catch (Exception ex) {}
         // add speak count
         String speakType = SpeakType.allValues();
         long speakCount = speakService.countSpeak(true, userId, speakType);
@@ -145,6 +147,18 @@ public class NurseService {
             nurse.setProperty(NurseBean.QUALIFICATION, qualifications.get(0));
         }
         return nurse;
+    }
+
+    public List<NurseBean> getNurse(List<Long> nurseIds) {
+        logger.info("get nurse by ids={}", nurseIds);
+
+        List<NurseBean> nurses = new ArrayList<>();
+        if (!VerifyUtil.isListEmpty(nurseIds)) {
+            List<NurseEntity> resultSet = repository.findByIdIn(nurseIds);
+            nurses = entities2Beans(resultSet);
+            fillOtherProperties(nurses);
+        }
+        return nurses;
     }
 
     //==============================================================
@@ -181,15 +195,21 @@ public class NurseService {
         }
 
         // parse to bean
-        List<NurseBean> beanList = new ArrayList<NurseBean>();
-        for (NurseEntity entity : resultSet) {
-            NurseBean bean = beanConverter.convert(entity);
-            beanList.add(bean);
-        }
-
-        // fill other information
+        List<NurseBean> beanList = entities2Beans(resultSet);
         fillOtherProperties(beanList);
         return beanList;
+    }
+
+    private List<NurseBean> entities2Beans(Iterable<NurseEntity> entities) {
+        if (null==entities) {
+            return new ArrayList<>();
+        }
+        List<NurseBean> beans = new ArrayList<>();
+        for (NurseEntity tmp : entities) {
+            NurseBean bean = beanConverter.convert(tmp);
+            beans.add(bean);
+        }
+        return beans;
     }
 
     private void fillOtherProperties(List<NurseBean> nurses) {
@@ -197,9 +217,35 @@ public class NurseService {
             return;
         }
 
-        List<Long> userIds = new ArrayList<>();
+        List<Long> userIds  = new ArrayList<>();
+        List<Long> imageIds = new ArrayList<>();
         for (NurseBean bean :nurses) {
             userIds.add(bean.getId());
+
+            long imageId = bean.getProfilePhotoId();
+            if (!imageIds.contains(imageId)) {
+                imageIds.add(imageId);
+            }
+
+            imageId = bean.getBackgroundImageId();
+            if (!imageIds.contains(imageId)) {
+                imageIds.add(imageId);
+            }
+        }
+
+        Map<Long, String> imageId2Path = userStorage.getFilePath(imageIds);
+        for (NurseBean bean : nurses) {
+            long   imageId = bean.getProfilePhotoId();
+            String imgPath = imageId2Path.get(imageId);
+            if (!VerifyUtil.isStringEmpty(imgPath)) {
+                bean.setProfilePhotoUrl(imgPath);
+            }
+
+            imageId = bean.getBackgroundImageId();
+            imgPath = imageId2Path.get(imageId);
+            if (!VerifyUtil.isStringEmpty(imgPath)) {
+                bean.setBackgroundImageUrl(imgPath);
+            }
         }
 
         try {
@@ -270,7 +316,7 @@ public class NurseService {
         NurseEntity nurse = repository.findOne(userId);
         long fileId = 0;
         try {
-            fileId = storageService.saveFile(nurse.getProfilePhotoId(), fileName, inputStream);
+            fileId = userStorage.addFile(nurse.getProfilePhotoId(), fileName, inputStream);
             nurse.setProfilePhotoId(fileId);
         }
         catch (BadRequestException ex) {
@@ -280,7 +326,7 @@ public class NurseService {
             }
         }
         repository.save(nurse);
-        return storageService.getFilePath(fileId);
+        return userStorage.getFilePath(fileId);
     }
 
     @Transactional
@@ -288,7 +334,7 @@ public class NurseService {
         NurseEntity nurse = repository.findOne(userId);
         long fileId = 0;
         try {
-            fileId = storageService.saveFile(nurse.getBackgroundImageId(), fileName, inputStream);
+            fileId = userStorage.addFile(nurse.getBackgroundImageId(), fileName, inputStream);
             nurse.setBackgroundImageId(fileId);
         }
         catch (BadRequestException ex) {
@@ -298,7 +344,7 @@ public class NurseService {
             }
         }
         repository.save(nurse);
-        return storageService.getFilePath(fileId);
+        return userStorage.getFilePath(fileId);
     }
 
     @Transactional

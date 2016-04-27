@@ -1,12 +1,14 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
+import com.cooltoo.services.file.TemporaryFileStorageService;
 import com.cooltoo.util.HtmlParser;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,6 +100,17 @@ public class HtmlParserTest extends AbstractCooltooTest {
         for (String tag : imgTags) {
             String src = imgTag2SrcValue.get(tag);
             Assert.assertTrue(src.startsWith(baseUrl));
+        }
+    }
+
+    @Test
+    public void testGet () {
+        HtmlParser htmlParser = HtmlParser.newInstance();
+        List<String> srcUrls = htmlParser.getSrcUrls(TestData);
+        Assert.assertEquals(14, srcUrls.size());
+        for (String src : srcUrls) {
+            Assert.assertTrue(src.startsWith("http://img4.imgtn.bdimg.com/it/u="));
+            Assert.assertTrue(src.endsWith(".jpg"));
         }
     }
 }

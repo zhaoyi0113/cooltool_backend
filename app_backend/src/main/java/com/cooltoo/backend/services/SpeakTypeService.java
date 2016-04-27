@@ -7,7 +7,7 @@ import com.cooltoo.backend.repository.SpeakTypeRepository;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +33,8 @@ public class SpeakTypeService {
     private SpeakTypeRepository speakTypeRepository;
 
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("OfficialFileStorageService")
+    private OfficialFileStorageService officialStorage;
 
     @Autowired
     private SpeakTypeBeanConverter beanConverter;
@@ -52,8 +52,8 @@ public class SpeakTypeService {
             return new SpeakTypeBean();
         }
         SpeakTypeBean bean = beanConverter.convert(speakType);
-        bean.setImageUrl(storageService.getFilePath(bean.getImageId()));
-        bean.setDisableImageUrl(storageService.getFilePath(bean.getDisableImageId()));
+        bean.setImageUrl(officialStorage.getFilePath(bean.getImageId()));
+        bean.setDisableImageUrl(officialStorage.getFilePath(bean.getDisableImageId()));
         return bean;
     }
 
@@ -74,7 +74,7 @@ public class SpeakTypeService {
             beans.add(bean);
         }
 
-        Map<Long, String> idToPath = storageService.getFilePath(imageIds);
+        Map<Long, String> idToPath = officialStorage.getFilePath(imageIds);
 
         for (SpeakTypeBean tmp : beans) {
             if (tmp.getImageId()>0) {
@@ -131,20 +131,32 @@ public class SpeakTypeService {
             speakType.setFactor(factor);
             changed = true;
         }
+        String imageUrl=null;
         if (null!=image) {
-            long fileId = storageService.saveFile(speakType.getImageId(), speakType.getName(), image);
-            speakType.setImageId(fileId);
-            changed = true;
+            long fileId = officialStorage.addFile(speakType.getImageId(), speakType.getName(), image);
+            if (fileId>0) {
+                imageUrl = officialStorage.getFilePath(fileId);
+                speakType.setImageId(fileId);
+                changed = true;
+            }
         }
+        String disableImageUrl=null;
         if (null!=disableImage) {
-            long fileId = storageService.saveFile(speakType.getDisableImageId(), speakType.getName(), disableImage);
-            speakType.setDisableImageId(fileId);
-            changed=true;
+            long fileId = officialStorage.addFile(speakType.getDisableImageId(), speakType.getName(), disableImage);
+            if (fileId>0) {
+                disableImageUrl = officialStorage.getFilePath(fileId);
+                speakType.setDisableImageId(fileId);
+                changed = true;
+            }
         }
 
         if (changed) {
             speakType = speakTypeRepository.save(speakType);
         }
-        return beanConverter.convert(speakType);
+
+        SpeakTypeBean bean = beanConverter.convert(speakType);
+        bean.setImageUrl(imageUrl);
+        bean.setDisableImageUrl(disableImageUrl);
+        return bean;
     }
 }

@@ -6,7 +6,7 @@ import com.cooltoo.backend.repository.HospitalDepartmentRepository;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,8 +36,8 @@ public class HospitalDepartmentService {
     @Autowired
     private NurseHospitalRelationService nurseRelationService;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("OfficialFileStorageService")
+    private OfficialFileStorageService officialStorage;
     @Autowired
     private HospitalDepartmentBeanConverter beanConverter;
 
@@ -176,7 +176,7 @@ public class HospitalDepartmentService {
             imageIds.add(department.getImageId());
             imageIds.add(department.getDisableImageId());
         }
-        Map<Long,String> idToPathMap = storageService.getFilePath(imageIds);
+        Map<Long,String> idToPathMap = officialStorage.getFilePath(imageIds);
 
         String path = null;
         for (HospitalDepartmentBean department : departments) {
@@ -269,33 +269,6 @@ public class HospitalDepartmentService {
                 entity.setName(bean.getName());
             }
         }
-
-        if(null!=image) {
-            try {
-                long fileId = storageService.saveFile(entity.getImageId(),entity.getName(), image);
-                entity.setImageId(fileId);
-            }
-            catch(Exception ex) {
-                //do nothing
-            }
-        }
-        if (null!=disableImage) {
-            try {
-                long fileId = storageService.saveFile(entity.getDisableImageId(), entity.getName()+"_disable", disableImage);
-                entity.setDisableImageId(fileId);
-            }
-            catch (Exception ex) {
-                // do nothing
-            }
-        }
-        int enable = bean.getEnable();
-        enable = enable<0 ? enable : (enable>1 ? 1 : enable);
-        if (enable>=0) {
-            entity.setEnable(enable);
-        }
-        if (!VerifyUtil.isStringEmpty(bean.getDescription())) {
-            entity.setDescription(bean.getDescription());
-        }
         if (bean.getParentId()>0 && bean.getParentId()!=bean.getId()) {
             HospitalDepartmentEntity parent = repository.findOne(bean.getParentId());
             if (null!=parent) {
@@ -306,10 +279,37 @@ public class HospitalDepartmentService {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
+
+        String imageUrl = null;
+        if(null!=image) {
+            long fileId = officialStorage.addFile(entity.getImageId(),entity.getName(), image);
+            if (fileId>0) {
+                entity.setImageId(fileId);
+                imageUrl = officialStorage.getFilePath(fileId);
+            }
+        }
+        String disableImageUrl = null;
+        if (null!=disableImage) {
+            long fileId = officialStorage.addFile(entity.getDisableImageId(), entity.getName()+"_disable", disableImage);
+            if (fileId>0) {
+                entity.setDisableImageId(fileId);
+                disableImageUrl = officialStorage.getFilePath(fileId);
+            }
+        }
+        int enable = bean.getEnable();
+        enable = enable<0 ? enable : (enable>1 ? 1 : enable);
+        if (enable>=0) {
+            entity.setEnable(enable);
+        }
+        if (!VerifyUtil.isStringEmpty(bean.getDescription())) {
+            entity.setDescription(bean.getDescription());
+        }
         logger.info("update department is == " + entity);
         entity = repository.save(entity);
         bean = beanConverter.convert(entity);
         bean.setParentValid(null!=repository.findOne(bean.getParentId()));
+        bean.setImageUrl(imageUrl);
+        bean.setDisableImageUrl(disableImageUrl);
         return addImageUrl(bean);
     }
 
@@ -356,7 +356,7 @@ public class HospitalDepartmentService {
         }
         if(null!=image) {
             try {
-                long fileId = storageService.saveFile(entity.getImageId(),entity.getName(), image);
+                long fileId = officialStorage.addFile(entity.getImageId(),entity.getName(), image);
                 entity.setImageId(fileId);
             }
             catch(Exception ex) {
@@ -365,7 +365,7 @@ public class HospitalDepartmentService {
         }
         if (null!=disableImage) {
             try {
-                long fileId = storageService.saveFile(entity.getImageId(), entity.getName()+"_disable", disableImage);
+                long fileId = officialStorage.addFile(entity.getImageId(), entity.getName()+"_disable", disableImage);
                 entity.setDisableImageId(fileId);
             }
             catch (Exception ex) {

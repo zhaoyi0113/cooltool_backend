@@ -3,6 +3,8 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.ActivityBean;
 import com.cooltoo.constants.ActivityStatus;
+import com.cooltoo.services.file.OfficialFileStorageService;
+import com.cooltoo.services.file.TemporaryFileStorageService;
 import com.cooltoo.util.FileUtil;
 import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.NumberUtil;
@@ -13,14 +15,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.Exchanger;
 
 /**
  * Created by hp on 2016/4/20.
@@ -36,10 +36,9 @@ public class ActivityServiceTest extends AbstractCooltooTest {
     @Autowired
     private ActivityService service;
     @Autowired
-    private TemporaryFileStorageService tempStorageService;
+    private TemporaryFileStorageService tempStorage;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    private OfficialFileStorageService officailStorage;
 
 
     private String statusAll = "ALL";
@@ -160,6 +159,11 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(bean1.getFrontCover()>0);
         Assert.assertEquals(enrollUrl, bean1.getEnrollUrl());
         logger.info("Test case ====== image path --> {}", bean1.getFrontCoverUrl());
+        Assert.assertTrue(officailStorage.fileExist(bean1.getFrontCoverUrl()));
+
+        service.deleteByIds(""+bean1.getId());
+        Assert.assertFalse(officailStorage.fileExist(bean1.getFrontCoverUrl()));
+
     }
 
     @Test
@@ -195,12 +199,29 @@ public class ActivityServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testDeleteByIds() {
+        String storagePath1 = officailStorage.getStoragePath();
+        String storagePath2 = tempStorage.getStoragePath();
         long id1 = 1;
         long id2 = 2;
-        String ids = id1+","+id2;
+        long id3 = 6;
+        String ids = id1+","+id2+","+id3;
+
+        // make storage file
+        makeFileForActivity(storagePath1, "11", new String[]{"111111", "222222", "333333"});
+        makeFileForActivity(storagePath1, "22", new String[]{"444444", "555555"});
+        makeFileForActivity(storagePath2, "66", new String[]{"121212", "131313"});
+        String[] fileRelativePath = new String[]{"11/111111", "11/222222", "11/333333", "22/444444", "22/555555", "66/121212", "66/131313"};
+        for (String filePath : fileRelativePath) {
+            if (!filePath.startsWith("66")) {
+                Assert.assertTrue(officailStorage.fileExist(filePath));
+            }
+            else {
+                Assert.assertTrue(tempStorage.fileExist(filePath));
+            }
+        }
 
         List<ActivityBean> beans = service.getActivityByIds(ids);
-        Assert.assertEquals(2, beans.size());
+        Assert.assertEquals(3, beans.size());
 
         service.deleteByIds(ids);
 
@@ -209,6 +230,18 @@ public class ActivityServiceTest extends AbstractCooltooTest {
 
         beans = service.getActivityByIds(id2+"");
         Assert.assertTrue(beans.isEmpty());
+
+        beans = service.getActivityByIds(id3+"");
+        Assert.assertTrue(beans.isEmpty());
+
+        for (String filePath : fileRelativePath) {
+            if (!filePath.startsWith("66")) {
+                Assert.assertFalse(officailStorage.fileExist(filePath));
+            }
+            else {
+                Assert.assertFalse(tempStorage.fileExist(filePath));
+            }
+        }
     }
 
 
@@ -219,19 +252,37 @@ public class ActivityServiceTest extends AbstractCooltooTest {
     //======================================================
     @Test
     public void testGetActivityById() {
-        String nginxBaseHttpUrl = "http://aaa.fdas.com/ddd";
-        ActivityBean page0 = service.getActivityById(1L, nginxBaseHttpUrl);
+        String nginxBaseHttpUrl = "http://aaa.fdas.com/ddd/";
+        ActivityBean page0;
+        String              content;
+        HtmlParser          htmlParser;
+        Map<String, String> imgTag2SrcUrl;
+        Set<String>         imgTags;
+        // enabled
+        page0 = service.getActivityById(1L, nginxBaseHttpUrl);
         Assert.assertNotNull(page0);
         Assert.assertEquals(1, page0.getId());
-
-        String              content       = page0.getContent();
-        HtmlParser          htmlParser    = HtmlParser.newInstance();
-        Map<String, String> imgTag2SrcUrl = htmlParser.getImgTag2SrcUrlMap(content);
-
-        Set<String>         imgTags       = imgTag2SrcUrl.keySet();
+        content       = page0.getContent();
+        htmlParser    = HtmlParser.newInstance();
+        imgTag2SrcUrl = htmlParser.getImgTag2SrcUrlMap(content);
+        imgTags       = imgTag2SrcUrl.keySet();
         for (String tag : imgTags) {
             String  srcUrl   = imgTag2SrcUrl.get(tag);
-            boolean nginxUrl = srcUrl.startsWith(nginxBaseHttpUrl);
+            boolean nginxUrl = srcUrl.startsWith(nginxBaseHttpUrl+officailStorage.getNginxRelativePath());
+            Assert.assertTrue(nginxUrl);
+        }
+
+        // editing
+        page0 = service.getActivityById(6L, nginxBaseHttpUrl);
+        Assert.assertNotNull(page0);
+        Assert.assertEquals(6, page0.getId());
+        content       = page0.getContent();
+        htmlParser    = HtmlParser.newInstance();
+        imgTag2SrcUrl = htmlParser.getImgTag2SrcUrlMap(content);
+        imgTags       = imgTag2SrcUrl.keySet();
+        for (String tag : imgTags) {
+            String  srcUrl   = imgTag2SrcUrl.get(tag);
+            boolean nginxUrl = srcUrl.startsWith(nginxBaseHttpUrl+tempStorage.getNginxRelativePath());
             Assert.assertTrue(nginxUrl);
         }
     }
@@ -239,19 +290,38 @@ public class ActivityServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetActivityByName() {
         String title            = "title 2";
-        String nginxBaseHttpUrl = "http://aaa.fdas.com/ddd";
-        ActivityBean page0 = service.getActivityByTitle(title, nginxBaseHttpUrl);
+        String nginxBaseHttpUrl = "http://aaa.fdas.com/ddd/";
+        ActivityBean page0;
+        String              content;
+        HtmlParser          htmlParser;
+        Map<String, String> imgTag2SrcUrl;
+        Set<String>         imgTags;
+        // enabled
+        page0 = service.getActivityByTitle(title, nginxBaseHttpUrl);
         Assert.assertNotNull(page0);
         Assert.assertEquals(title, page0.getTitle());
-
-        String              content       = page0.getContent();
-        HtmlParser          htmlParser    = HtmlParser.newInstance();
-        Map<String, String> imgTag2SrcUrl = htmlParser.getImgTag2SrcUrlMap(content);
-
-        Set<String>         imgTags       = imgTag2SrcUrl.keySet();
+        content       = page0.getContent();
+        htmlParser    = HtmlParser.newInstance();
+        imgTag2SrcUrl = htmlParser.getImgTag2SrcUrlMap(content);
+        imgTags       = imgTag2SrcUrl.keySet();
         for (String tag : imgTags) {
             String  srcUrl   = imgTag2SrcUrl.get(tag);
-            boolean nginxUrl = srcUrl.startsWith(nginxBaseHttpUrl);
+            boolean nginxUrl = srcUrl.startsWith(nginxBaseHttpUrl+officailStorage.getNginxRelativePath());
+            Assert.assertTrue(nginxUrl);
+        }
+
+        // editing
+        title = "title 6";
+        page0 = service.getActivityByTitle(title, nginxBaseHttpUrl);
+        Assert.assertNotNull(page0);
+        Assert.assertEquals(title, page0.getTitle());
+        content       = page0.getContent();
+        htmlParser    = HtmlParser.newInstance();
+        imgTag2SrcUrl = htmlParser.getImgTag2SrcUrlMap(content);
+        imgTags       = imgTag2SrcUrl.keySet();
+        for (String tag : imgTags) {
+            String  srcUrl   = imgTag2SrcUrl.get(tag);
+            boolean nginxUrl = srcUrl.startsWith(nginxBaseHttpUrl+tempStorage.getNginxRelativePath());
             Assert.assertTrue(nginxUrl);
         }
     }
@@ -265,55 +335,71 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         String               cachePath = null;
 
         cachePath = service.createTemporaryFile(token, activityId, imageName, image);
-        boolean exist = tempStorageService.existTmpFile(cachePath);
+        boolean exist = tempStorage.fileExist(cachePath);
         Assert.assertTrue(exist);
 
-        tempStorageService.cleanTokenCachedFile(token);
+        tempStorage.deleteFile(cachePath);
+        exist = tempStorage.fileExist(cachePath);
+        Assert.assertFalse(exist);
     }
 
     @Test
     public void testMoveActivity2Temporary() {
-        String               storagePath = storageService.getStoragePath();
-        String               token       = "1234567890";
+        String               storagePath = officailStorage.getStoragePath();
         long                 activityId  = 1;
         ActivityBean         activity    = null;
 
         // make storage file
         makeFileForActivity(storagePath, "11", new String[]{"111111", "222222", "333333"});
+        String[] fileRelativePath = new String[]{"11/111111", "11/222222", "11/333333"};
+        for (String filePath : fileRelativePath) {
+            Assert.assertTrue(officailStorage.fileExist(filePath));
+        }
 
-        activity = service.moveActivity2Temporary(token, activityId);
+        // move to temporary path
+        service.moveActivity2Temporary(activityId);
+        for (String filePath : fileRelativePath) {
+            Assert.assertFalse(officailStorage.fileExist(filePath));
+            Assert.assertTrue(tempStorage.fileExist(filePath));
+        }
+
+        activity = service.getActivityById(activityId, "");
         Assert.assertNotNull(activity);
         Assert.assertEquals(ActivityStatus.EDITING, activity.getStatus());
 
-        tempStorageService.cleanTokenCachedFile(token);
+
+        tempStorage.deleteFileByPaths(Arrays.asList(fileRelativePath));
+        for (String filePath : fileRelativePath) {
+            Assert.assertFalse(tempStorage.fileExist(filePath));
+        }
     }
 
     @Test
-    public void test() {
-        String               storagePath  = storageService.getStoragePath();
-        String               relativeFile = null;
-        String               token        = "1234567890";
+    public void testUpdateActivityContent() {
+        String               storagePath  = tempStorage.getStoragePath();
+        String               relativeFile = "11/BBBCCC";
         long                 activityId   = 6;
-        ActivityBean         activity     = null;
+        ActivityBean         activity;
 
-        relativeFile = tempStorageService.cacheTemporaryFile(token, token, new ByteArrayInputStream(token.getBytes()));
-        String content = "<html><head><title>test 04</title></head><body><img src='"+relativeFile+"'></body></html>";
+        // make storage file
+        makeFileForActivity(storagePath, "11", new String[]{ "BBBCCC" });
+        String content = "<html><head><title>test 04</title></head><body><img src='11/BBBCCC'></body></html>";
+        Assert.assertTrue(tempStorage.fileExist(relativeFile));
 
-        activity = service.updateActivityContent(token, activityId, content);
+        activity = service.updateActivityContent(activityId, content);
         Assert.assertEquals(activityId, activity.getId());
         Assert.assertEquals(ActivityStatus.DISABLE, activity.getStatus());
         activity = service.getActivityById(activityId, "");
         Assert.assertEquals(content, activity.getContent());
 
-        List<String> delFile = new ArrayList<>();
-        delFile.add(relativeFile);
-        tempStorageService.deleteStorageFile(delFile);
+        Assert.assertFalse(tempStorage.fileExist(relativeFile));
+        Assert.assertTrue(officailStorage.fileExist(relativeFile));
+        officailStorage.deleteFile(relativeFile);
+        Assert.assertFalse(officailStorage.fileExist(relativeFile));
     }
 
     private void makeFileForActivity(String basePath, String activity_dir, String[] fileName) {
-        String storagePath    = storageService.getStoragePath();
-
-        activity_dir   = storagePath + File.separator + activity_dir;
+        activity_dir   = basePath + File.separator + activity_dir;
         File[] files   = new File[fileName.length];
         for (int i=0; i<files.length; i++) {
             files[i] = new File(activity_dir + File.separator + fileName[i]);

@@ -5,6 +5,7 @@ import com.cooltoo.backend.services.BadgeService;
 import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.constants.BadgeGrade;
 import com.cooltoo.constants.SocialAbilityType;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -28,6 +29,8 @@ public class BadgeServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private BadgeService badgeService;
+    @Autowired
+    private OfficialFileStorageService officialStorage;
 
     @Test
     public void testCountByAbilityType(){
@@ -101,6 +104,10 @@ public class BadgeServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(SocialAbilityType.SKILL, badge.getAbilityType());
         Assert.assertTrue(badge.getImageId() > 0);
         Assert.assertNotNull(badge.getImageUrl());
+        Assert.assertTrue(officialStorage.fileExist(badge.getImageId()));
+        officialStorage.deleteFile(badge.getImageId());
+        Assert.assertFalse(officialStorage.fileExist(badge.getImageUrl()));
+
     }
 
     @Test
@@ -116,5 +123,8 @@ public class BadgeServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(SocialAbilityType.SKILL, badge.getAbilityType());
         Assert.assertNotEquals(1, badge.getImageId());
         Assert.assertNotNull(badge.getImageUrl());
+        Assert.assertTrue(officialStorage.fileExist(badge.getImageId()));
+        officialStorage.deleteFile(badge.getImageId());
+        Assert.assertFalse(officialStorage.fileExist(badge.getImageUrl()));
     }
 }

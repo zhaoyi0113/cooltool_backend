@@ -7,7 +7,7 @@ import com.cooltoo.backend.repository.WorkFileTypeRepository;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,8 +32,8 @@ public class WorkFileTypeService {
     private WorkFileTypeBeanConverter beanConverter;
 
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("OfficialFileStorageService")
+    private OfficialFileStorageService officialStorage;
 
 
     public List<WorkFileTypeBean> getAllWorkFileType() {
@@ -53,7 +53,7 @@ public class WorkFileTypeService {
             beans.add(bean);
         }
 
-        Map<Long, String> idToPath = storageService.getFilePath(imageIds);
+        Map<Long, String> idToPath = officialStorage.getFilePath(imageIds);
 
         for (WorkFileTypeBean tmp : beans) {
             if (tmp.getImageId()>0) {
@@ -102,20 +102,28 @@ public class WorkFileTypeService {
             workfileType.setFactor(factor);
             changed = true;
         }
+        String imagePath = null;
         if (null!=image) {
-            long fileId = storageService.saveFile(workfileType.getImageId(), workfileType.getName(), image);
+            long fileId = officialStorage.addFile(workfileType.getImageId(), workfileType.getName(), image);
             workfileType.setImageId(fileId);
+            imagePath = officialStorage.getFilePath(fileId);
             changed = true;
         }
+        String disableImagePath = null;
         if (null!=disableImage) {
-            long fileId = storageService.saveFile(workfileType.getDisableImageId(), workfileType.getName(), disableImage);
+            long fileId = officialStorage.addFile(workfileType.getDisableImageId(), workfileType.getName(), disableImage);
             workfileType.setDisableImageId(fileId);
+            disableImagePath = officialStorage.getFilePath(fileId);
             changed=true;
         }
 
         if (changed) {
             workfileType = workFileTypeRepository.save(workfileType);
         }
-        return beanConverter.convert(workfileType);
+
+        WorkFileTypeBean bean = beanConverter.convert(workfileType);
+        bean.setImageUrl(imagePath);
+        bean.setDisableImageUrl(disableImagePath);
+        return bean;
     }
 }

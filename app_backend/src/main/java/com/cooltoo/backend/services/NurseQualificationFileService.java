@@ -7,7 +7,7 @@ import com.cooltoo.backend.entities.NurseQualificationFileEntity;
 import com.cooltoo.backend.repository.NurseQualificationFileRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.SecretFileStorageService;
+import com.cooltoo.services.file.SecretFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class NurseQualificationFileService {
     private NurseQualificationFileRepository repository;
     @Autowired
     @Qualifier("SecretFileStorageService")
-    private SecretFileStorageService storageService;
+    private SecretFileStorageService secretStorage;
     @Autowired
     private WorkFileTypeService workfileTypeService;
     @Autowired
@@ -92,7 +92,7 @@ public class NurseQualificationFileService {
             imageIds.add(file.getWorkfileId());
         }
 
-        Map<Long, String> imageId2Url = storageService.getFilePath(imageIds);
+        Map<Long, String> imageId2Url = secretStorage.getFilePath(imageIds);
         for (NurseQualificationFileBean file : qualFiles) {
             String url = imageId2Url.get(file.getWorkfileId());
             if (!VerifyUtil.isStringEmpty(url)) {
@@ -109,17 +109,6 @@ public class NurseQualificationFileService {
     //       delete qualification file
     //=============================================================
 
-    public NurseQualificationFileBean deleteQualificationFileById(long qualificationFileId) {
-        NurseQualificationFileEntity file =  repository.findOne(qualificationFileId);
-        if (null==file) {
-            logger.info("the record not exist by qualification file id {}", qualificationFileId);
-            return null;
-        }
-        repository.delete(file);
-        logger.info("delete the qualification file {}", file);
-        return beanConverter.convert(file);
-    }
-
     public List<NurseQualificationFileBean> deleteFileByQualificationId(long qualificationId) {
         List<NurseQualificationFileBean> files = getAllFileByQualificationId(qualificationId);
         if (null==files||files.isEmpty()) {
@@ -131,7 +120,7 @@ public class NurseQualificationFileService {
             imageIds.add(file.getWorkfileId());
         }
         repository.deleteByQualificationId(qualificationId);
-        storageService.deleteFiles(imageIds);
+        secretStorage.deleteFiles(imageIds);
         logger.info("delete the qualification files ==== {}", files);
         return files;
     }
@@ -164,11 +153,11 @@ public class NurseQualificationFileService {
             if (VerifyUtil.isStringEmpty(fileName)) {
                 fileName = "tmp_"+workFileType.getName()+System.nanoTime();
             }
-            fileId = storageService.saveFile(0, fileName, file);
+            fileId = secretStorage.addFile(0, fileName, file);
             if (fileId <= 0) {
                 throw new BadRequestException(ErrorCode.WORK_FILE_UPLOAD_FAILED);
             }
-            filePath = storageService.getFilePath(fileId);
+            filePath = secretStorage.getFilePath(fileId);
         }
         NurseQualificationFileEntity entity = new NurseQualificationFileEntity();
         entity.setQualificationId(qualificationId);
@@ -197,10 +186,10 @@ public class NurseQualificationFileService {
             if (VerifyUtil.isStringEmpty(fileName)) {
                 fileName = "upload_qualification_file_"+workFileType.getName()+System.nanoTime();
             }
-            long fileId = storageService.saveFile(entity.getWorkfileId(), fileName, file);
+            long fileId = secretStorage.addFile(entity.getWorkfileId(), fileName, file);
             if (fileId > 0) {
                 entity.setWorkfileId(fileId);
-                filePath = storageService.getFilePath(fileId);
+                filePath = secretStorage.getFilePath(fileId);
                 changed = true;
             }
             else {

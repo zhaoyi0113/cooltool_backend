@@ -4,10 +4,9 @@ import com.cooltoo.backend.beans.ImagesInSpeakBean;
 import com.cooltoo.backend.converter.ImagesInSpeakBeanConverter;
 import com.cooltoo.backend.entities.ImagesInSpeakEntity;
 import com.cooltoo.backend.repository.ImagesInSpeakRepository;
-import com.cooltoo.backend.repository.NurseSpeakRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +35,10 @@ public class ImagesInSpeakService {
     @Autowired
     private ImagesInSpeakRepository repository;
     @Autowired
-    private NurseSpeakRepository speakRepository;
-    @Autowired
     private ImagesInSpeakBeanConverter beanConverter;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("UserFileStorageService")
+    private UserFileStorageService userStorage;
 
     //================================================================
     //            get
@@ -118,7 +115,7 @@ public class ImagesInSpeakService {
             imageIds.add(tmp.getImageId());
         }
 
-        Map<Long, String> imageId2Path = storageService.getFilePath(imageIds);
+        Map<Long, String> imageId2Path = userStorage.getFilePath(imageIds);
         for (ImagesInSpeakBean tmp : imagesInSpeak) {
             if (tmp.getImageId()<=0) {
                 continue;
@@ -140,7 +137,7 @@ public class ImagesInSpeakService {
             return new ImagesInSpeakBean();
         }
 
-        storageService.deleteFile(image.getImageId());
+        userStorage.deleteFile(image.getImageId());
         repository.delete(image);
 
         return beanConverter.convert(image);
@@ -161,7 +158,7 @@ public class ImagesInSpeakService {
         for (ImagesInSpeakEntity tmp : images) {
             imageIds.add(tmp.getImageId());
         }
-        storageService.deleteFiles(imageIds);
+        userStorage.deleteFiles(imageIds);
         repository.delete(images);
 
         List<ImagesInSpeakBean>            beans = entitiesToBeans(images);
@@ -185,8 +182,8 @@ public class ImagesInSpeakService {
         if (VerifyUtil.isStringEmpty(imageName)) {
             imageName = "img_speak_" + System.nanoTime();
         }
-        long   imageId   = storageService.saveFile(-1, imageName, image);
-        String imagePath = storageService.getFilePath(imageId);
+        long   imageId   = userStorage.addFile(-1, imageName, image);
+        String imagePath = userStorage.getFilePath(imageId);
 
         ImagesInSpeakEntity entity = new ImagesInSpeakEntity();
         entity.setSpeakId(speakId);

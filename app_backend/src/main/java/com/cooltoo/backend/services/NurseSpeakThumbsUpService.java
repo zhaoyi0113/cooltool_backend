@@ -7,7 +7,7 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakThumbsUpEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseSpeakThumbsUpRepository;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +34,8 @@ public class NurseSpeakThumbsUpService {
     @Autowired
     private NurseFriendsService          friendsService;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService               storageService;
+    @Qualifier("UserFileStorageService")
+    private UserFileStorageService       userStorage;
     @Autowired
     private NurseSpeakThumbsUpBeanConverter beanConverter;
 
@@ -119,7 +119,7 @@ public class NurseSpeakThumbsUpService {
             ids.add(tmp.getProfilePhotoId());
         }
 
-        Map<Long, String>      id2Path  = storageService.getFilePath(ids);
+        Map<Long, String>      id2Path  = userStorage.getFilePath(ids);
 
         NurseEntity maker        = null;
         String      makerName    = null;

@@ -209,10 +209,8 @@ public class ActivityManageAPI {
 
     ) {
         long   userId    = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        String userToken = (String)request.getAttribute(ContextKeys.ADMIN_USER_TOKEN);
-
-        logger.info("user {} with token {} cache activity to temporary path", userId, userToken);
-        ActivityBean bean = activityService.moveActivity2Temporary(userToken, activityId);
+        logger.info("user {} with token {} cache activity to temporary path", userId);
+        ActivityBean bean = activityService.moveActivity2Temporary(activityId);
         logger.info("activity is {}", bean);
         return Response.ok(bean).build();
     }
@@ -253,10 +251,9 @@ public class ActivityManageAPI {
 
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        String userToken = (String)request.getAttribute(ContextKeys.ADMIN_USER_TOKEN);
 
         logger.info("user {} submit activity content", userId);
-        ActivityBean activity = activityService.updateActivityContent(userToken, activityId, content);
+        ActivityBean activity = activityService.updateActivityContent(activityId, content);
 
         logger.info("activity is {}", activity);
         return Response.ok(activity).build();

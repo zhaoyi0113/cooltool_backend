@@ -8,7 +8,7 @@ import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.SkillRepository;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,8 +38,8 @@ public class SkillService {
     @Autowired private SkillBeanConverter beanConverter;
     @Autowired private BadgeService badgeService;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("OfficialFileStorageService")
+    private OfficialFileStorageService officialStorage;
 
     //=========================================================
     //           get skills
@@ -153,8 +153,7 @@ public class SkillService {
             return;
         }
 
-        String                    imageUrl = null;
-        List<Long>                imageIds = new ArrayList<Long>();
+        List<Long> imageIds = new ArrayList<Long>();
 
         for (SkillBean bean : skills) {
             if (bean.getImageId()>0) {
@@ -165,7 +164,7 @@ public class SkillService {
             }
         }
 
-        Map<Long, String> idToPath = storageService.getFilePath(imageIds);
+        Map<Long, String> idToPath = officialStorage.getFilePath(imageIds);
         for (SkillBean tmp : skills) {
             if (tmp.getImageId()>0) {
                 tmp.setImageUrl(idToPath.get(tmp.getImageId()));
@@ -193,11 +192,11 @@ public class SkillService {
 
             SkillEntity entity = new SkillEntity();
             if (null!=image) {
-                long fileId = storageService.saveFile(0, name, image);
+                long fileId = officialStorage.addFile(0, name, image);
                 entity.setImageId(fileId);
             }
             if (null!=disableImage) {
-                long disableFileId = storageService.saveFile(0, name + "_disable", disableImage);
+                long disableFileId = officialStorage.addFile(0, name + "_disable", disableImage);
                 entity.setDisableImageId(disableFileId);
             }
             entity.setName(name);
@@ -222,7 +221,7 @@ public class SkillService {
         List<Long> imageIds = new ArrayList();
         imageIds.add(bean.getImageId());
         imageIds.add(bean.getDisableImageId());
-        storageService.deleteFiles(imageIds);
+        officialStorage.deleteFiles(imageIds);
         skillRepository.delete(id);
         badgeService.deleteByAbilityIdAndType(id, SocialAbilityType.SKILL.name());
     }
@@ -236,14 +235,14 @@ public class SkillService {
     public SkillBean editOccupationSkill(int id, String name, int factor, String status, InputStream imageStream, InputStream disableImageStream) {
         logger.info("edit occupation skill with image skillId={}, enableImage={} disableImage={}", id, (null!=imageStream), (null!=disableImageStream));
         boolean               changed        = false;
-        SkillEntity entity         = editOccupationSkillWithoutImage(id, name, factor, status);
+        SkillEntity           entity         = editOccupationSkillWithoutImage(id, name, factor, status);
         String                imgPath        = null;
         String                disableImgPath = null;
         if (imageStream != null) {
             try {
-                long fileId = storageService.saveFile(entity.getImageId(), entity.getName(), imageStream);
+                long fileId = officialStorage.addFile(entity.getImageId(), entity.getName(), imageStream);
                 entity.setImageId(fileId);
-                imgPath     = storageService.getFilePath(fileId);
+                imgPath     = officialStorage.getFilePath(fileId);
                 changed     = true;
             }
             catch (BadRequestException ex) {
@@ -252,9 +251,9 @@ public class SkillService {
         }
         if (null!=disableImageStream) {
             try {
-                long disableFileId = storageService.saveFile(entity.getDisableImageId(), entity.getName()+"_disable", disableImageStream);
+                long disableFileId = officialStorage.addFile(entity.getDisableImageId(), entity.getName()+"_disable", disableImageStream);
                 entity.setDisableImageId(disableFileId);
-                disableImgPath     = storageService.getFilePath(disableFileId);
+                disableImgPath     = officialStorage.getFilePath(disableFileId);
                 changed            = true;
             }
             catch (BadRequestException ex) {

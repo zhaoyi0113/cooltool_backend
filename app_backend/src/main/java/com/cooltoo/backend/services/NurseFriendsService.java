@@ -1,5 +1,6 @@
 package com.cooltoo.backend.services;
 
+import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.converter.NurseFriendBeanConverter;
 import com.cooltoo.backend.entities.NurseEntity;
@@ -8,8 +9,7 @@ import com.cooltoo.constants.AgreeType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.NurseFriendsRepository;
-import com.cooltoo.backend.repository.NurseRepository;
-import com.cooltoo.services.StorageService;
+import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,10 +35,7 @@ public class NurseFriendsService {
     @Autowired
     private NurseFriendsRepository friendsRepository;
     @Autowired
-    private NurseRepository nurseRepository;
-    @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    private NurseService nurseService;
     @Autowired
     private NurseFriendBeanConverter beanConverter;
 
@@ -79,7 +76,7 @@ public class NurseFriendsService {
 
     private void validateUserId(long userId, long friendId) {
         logger.info("validate user {} and {}", userId, friendId);
-        if (!nurseRepository.exists(userId) || !nurseRepository.exists(friendId)) {
+        if (!nurseService.existNurse(userId) || !nurseService.existNurse(friendId)) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
     }
@@ -310,34 +307,20 @@ public class NurseFriendsService {
             return new ArrayList<>();
         }
 
-        List<Long>             friendIds = new ArrayList<Long>();
-        List<NurseEntity>      nurses    = null;
-        List<Long>             imageIds  = new ArrayList<Long>();
-        Map<Long, String>      img2URLs  = null;
+        List<Long>        friendIds = new ArrayList<Long>();
+        List<NurseBean>   nurses    = null;
 
         for(NurseFriendsBean bean : beans){
             friendIds.add(bean.getFriendId());
         }
-
-        nurses = nurseRepository.findByIdIn(friendIds);
-        for (NurseEntity nurse : nurses) {
-            imageIds.add(nurse.getProfilePhotoId());
-        }
-        img2URLs = storageService.getFilePath(imageIds);
+        nurses = nurseService.getNurse(friendIds);
 
         // set friend name and profile photo image url
-        String friendName     = null;
-        String profilePhoto   = null;
-        Long   profilePhotoId = -1L;
         for (NurseFriendsBean nurseFriend : beans) {
-            for (NurseEntity nurse : nurses) {
+            for (NurseBean nurse : nurses) {
                 if (nurseFriend.getFriendId()==nurse.getId()) {
-                    friendName     = nurse.getName();
-                    profilePhotoId = nurse.getProfilePhotoId();
-                    profilePhoto   = img2URLs.get(profilePhotoId);
-
-                    nurseFriend.setFriendName(friendName);
-                    nurseFriend.setHeadPhotoUrl(profilePhoto);
+                    nurseFriend.setFriendName(nurse.getName());
+                    nurseFriend.setHeadPhotoUrl(nurse.getProfilePhotoUrl());
                     break;
                 }
             }

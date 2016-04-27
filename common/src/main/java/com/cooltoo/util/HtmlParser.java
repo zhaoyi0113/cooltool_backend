@@ -19,6 +19,18 @@ public class HtmlParser {
         return new HtmlParser();
     }
 
+    public List<String> getSrcUrls(String content) {
+        List<String> imageTags = getAllImageTag(content);
+        Map<String, String> imgTag2SrcUrl = getImageSrcAttribute(imageTags);
+        Set<String>  imgTags = imgTag2SrcUrl.keySet();
+        List<String> srcUrls = new ArrayList<>();
+        for (String key : imgTags) {
+            String srcUrl = imgTag2SrcUrl.get(key);
+            srcUrls.add(srcUrl);
+        }
+        return srcUrls;
+    }
+
     public Map<String,String> getImgTag2SrcUrlMap(String content) {
         List<String> imageTags = getAllImageTag(content);
         return getImageSrcAttribute(imageTags);

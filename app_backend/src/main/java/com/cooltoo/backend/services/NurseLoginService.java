@@ -1,6 +1,5 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.converter.NurseBeanConverter;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.TokenAccessRepository;
 import com.cooltoo.constants.CommonStatus;
@@ -31,9 +30,6 @@ public class NurseLoginService {
 
     @Autowired
     private NurseRepository nurseRepository;
-
-    @Autowired
-    private NurseBeanConverter beanConverter;
 
     @Autowired
     private AccessTokenGenerator tokenGenerator;

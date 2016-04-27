@@ -26,7 +26,6 @@ public class NurseSkillServiceTest extends AbstractCooltooTest {
     NurseSkillService nurseSkillService;
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testGetAllNurseSkill() {
         List<NurseSkillBean> skills = nurseSkillService.getAllSkills(1);
         Assert.assertEquals(3, skills.size());
@@ -36,7 +35,6 @@ public class NurseSkillServiceTest extends AbstractCooltooTest {
 
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testGetNurseSkill() {
         NurseSkillBean skill = nurseSkillService.getSkill(1, 2);
         Assert.assertNotNull(skill);
@@ -48,7 +46,6 @@ public class NurseSkillServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testAddNurseSkill() {
         NurseSkillBean skill = null;
         skill = nurseSkillService.getSkill(2, 3);
@@ -66,7 +63,6 @@ public class NurseSkillServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testAddNurseSkills() {
         List<NurseSkillBean> skills = null;
 
@@ -84,7 +80,6 @@ public class NurseSkillServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
     public void testDeleteNurseSkill() {
         NurseSkillBean skill = null;
         skill = nurseSkillService.getSkill(1, 3);

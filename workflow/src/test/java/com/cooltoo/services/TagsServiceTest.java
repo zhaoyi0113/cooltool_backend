@@ -3,6 +3,8 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.TagsBean;
 import com.cooltoo.beans.TagsCategoryBean;
+import com.cooltoo.services.file.OfficialFileStorageService;
+import com.cooltoo.util.FileUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
@@ -31,6 +34,8 @@ public class TagsServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private TagsService tagService;
+    @Autowired
+    private OfficialFileStorageService officialStorage;
 
 
     //==========================================
@@ -133,6 +138,7 @@ public class TagsServiceTest extends AbstractCooltooTest {
         catch (Exception e) { excp = e; }
         Assert.assertNotNull(excp);
 
+
         tagId = 3;
         excp  = null;
         bean  = null;
@@ -142,6 +148,9 @@ public class TagsServiceTest extends AbstractCooltooTest {
         Assert.assertNotNull(bean);
         Assert.assertNotEquals(categoryId, bean.getCategoryId());
         Assert.assertEquals(name, bean.getName());
+        Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
+        officialStorage.deleteFile(bean.getImageUrl());
+        Assert.assertFalse(officialStorage.fileExist(bean.getImageId()));
 
         categoryId = 9;
         excp       = null;
@@ -152,6 +161,9 @@ public class TagsServiceTest extends AbstractCooltooTest {
         Assert.assertNotNull(bean);
         Assert.assertEquals(categoryId, bean.getCategoryId());
         Assert.assertEquals(name, bean.getName());
+        Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
+        officialStorage.deleteFile(bean.getImageUrl());
+        Assert.assertFalse(officialStorage.fileExist(bean.getImageId()));
     }
 
     @Test
@@ -164,7 +176,7 @@ public class TagsServiceTest extends AbstractCooltooTest {
         Throwable         excp = null;
         TagsCategoryBean  bean = null;
         try {
-            bean = tagService.updateCategory(categoryId, name, imageName, image); }
+            tagService.updateCategory(categoryId, name, imageName, image); }
         catch (Exception e) { excp = e; }
         Assert.assertNotNull(excp);
 
@@ -176,6 +188,9 @@ public class TagsServiceTest extends AbstractCooltooTest {
         Assert.assertNull(excp);
         Assert.assertNotNull(bean);
         Assert.assertEquals(name, bean.getName());
+        Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
+        officialStorage.deleteFile(bean.getImageUrl());
+        Assert.assertFalse(officialStorage.fileExist(bean.getImageId()));
     }
 
     //=================================================================
@@ -185,15 +200,23 @@ public class TagsServiceTest extends AbstractCooltooTest {
     @Test
     public void testDeleteTag() {
         long tagId  = 1;
+        String storagePath = officialStorage.getStoragePath();
+        String imagePath   = "aa/c7c653fdc989b9fa7463717fcd29c0ea157710";
+        try {
+            FileUtil.writeFile(new ByteArrayInputStream(imagePath.getBytes()), new File(storagePath + imagePath));
+        } catch (Exception ex) {}
 
         TagsBean bean = tagService.getTag(tagId);
         Assert.assertNotNull(bean);
+        Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
 
         long tagId2 = tagService.deleteTag(tagId);
         Assert.assertEquals(tagId2, tagId);
 
         bean = tagService.getTag(tagId);
         Assert.assertNull(bean);
+
+        Assert.assertFalse(officialStorage.fileExist(imagePath));
     }
 
     @Test
@@ -262,6 +285,9 @@ public class TagsServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(name, bean.getName());
         Assert.assertNotEquals(categoryId, bean.getCategoryId());
+        Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
+        officialStorage.deleteFile(bean.getImageUrl());
+        Assert.assertFalse(officialStorage.fileExist(bean.getImageId()));
 
         categoryId = 3;
         name = "aaaaaaaa";
@@ -270,6 +296,9 @@ public class TagsServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(categoryId, bean.getCategoryId());
+        Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
+        officialStorage.deleteFile(bean.getImageUrl());
+        Assert.assertFalse(officialStorage.fileExist(bean.getImageId()));
     }
 
     @Test
@@ -290,5 +319,8 @@ public class TagsServiceTest extends AbstractCooltooTest {
         bean = tagService.addTagCategory(name, imageName, image);
         Assert.assertNotNull(bean);
         Assert.assertTrue(bean.getId()>0);
+        Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
+        officialStorage.deleteFile(bean.getImageUrl());
+        Assert.assertFalse(officialStorage.fileExist(bean.getImageId()));
     }
 }

@@ -10,6 +10,7 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.TagsCategoryRepository;
 import com.cooltoo.repository.TagsRepository;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,8 @@ public class TagsService {
     @Autowired
     private TagsCategoryBeanConverter categoryConverter;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("OfficialFileStorageService")
+    private OfficialFileStorageService officialStorage;
 
     //=================================================================
     //         getter
@@ -68,7 +69,7 @@ public class TagsService {
         }
         TagsBean tagB = tagsConverter.convert(tag);
         if (tagB.getImageId()>0) {
-            String imageUrl = storageService.getFilePath(tagB.getImageId());
+            String imageUrl = officialStorage.getFilePath(tagB.getImageId());
             tagB.setImageUrl(imageUrl);
         }
 
@@ -90,7 +91,7 @@ public class TagsService {
                 for (TagsEntity tagE : tagsE) {
                     imgIds.add(tagE.getImageId());
                 }
-                imgId2Path = storageService.getFilePath(imgIds);
+                imgId2Path = officialStorage.getFilePath(imgIds);
                 for (TagsEntity tagE : tagsE) {
                     bean = tagsConverter.convert(tagE);
                     path = imgId2Path.get(bean.getImageId());
@@ -117,7 +118,7 @@ public class TagsService {
                 imageIds.add(tagB.getImageId());
             }
 
-            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+            Map<Long, String> imgId2Path = officialStorage.getFilePath(imageIds);
             for (TagsBean tagB : tagsB) {
                 long   imgId   = tagB.getImageId();
                 String imgPath = imgId2Path.get(imgId);
@@ -143,7 +144,7 @@ public class TagsService {
                 imageIds.add(tagB.getImageId());
             }
 
-            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+            Map<Long, String> imgId2Path = officialStorage.getFilePath(imageIds);
             for (TagsBean tagB : tagsB) {
                 long   imgId   = tagB.getImageId();
                 String imgPath = imgId2Path.get(imgId);
@@ -170,7 +171,7 @@ public class TagsService {
                 imageIds.add(tagB.getImageId());
             }
 
-            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+            Map<Long, String> imgId2Path = officialStorage.getFilePath(imageIds);
             for (TagsBean tagB : tagsB) {
                 long   imgId   = tagB.getImageId();
                 String imgPath = imgId2Path.get(imgId);
@@ -197,7 +198,7 @@ public class TagsService {
             for (TagsCategoryEntity category : allCategory) {
                 imageIds.add(category.getImageId());
             }
-            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+            Map<Long, String> imgId2Path = officialStorage.getFilePath(imageIds);
 
             // converter entity to bean
             List<TagsCategoryBean> allCategoryB = new ArrayList<>();
@@ -223,7 +224,7 @@ public class TagsService {
 
         TagsCategoryBean   categoryB = categoryConverter.convert(categoryE);
         long   imageId = categoryB.getImageId();
-        String imgPath = storageService.getFilePath(imageId);
+        String imgPath = officialStorage.getFilePath(imageId);
         categoryB.setImageUrl(imgPath);
 
         List<TagsBean> tagsB = getTagsByCategoryId(categoryId);
@@ -239,7 +240,7 @@ public class TagsService {
 
         TagsCategoryBean   categoryB = categoryConverter.convert(categoryE);
         long   imageId = categoryB.getImageId();
-        String imgPath = storageService.getFilePath(imageId);
+        String imgPath = officialStorage.getFilePath(imageId);
         categoryB.setImageUrl(imgPath);
 
         return categoryB;
@@ -256,7 +257,7 @@ public class TagsService {
                 imageIds.add(tagE.getImageId());
             }
 
-            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+            Map<Long, String> imgId2Path = officialStorage.getFilePath(imageIds);
 
             TagsBean        tagB     = null;
             List<TagsBean>  allTagsB = new ArrayList<>();
@@ -290,7 +291,7 @@ public class TagsService {
             for (TagsCategoryEntity category : allCategory) {
                 imageIds.add(category.getImageId());
             }
-            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+            Map<Long, String> imgId2Path = officialStorage.getFilePath(imageIds);
 
             // converter entity to bean
             List<TagsCategoryBean> allCategoryB = new ArrayList<>();
@@ -332,7 +333,7 @@ public class TagsService {
             for (TagsCategoryEntity category : allCategory) {
                 imageIds.add(category.getImageId());
             }
-            Map<Long, String> imgId2Path = storageService.getFilePath(imageIds);
+            Map<Long, String> imgId2Path = officialStorage.getFilePath(imageIds);
 
             // converter entity to bean
             List<TagsCategoryBean> allCategoryB = new ArrayList<>();
@@ -418,9 +419,9 @@ public class TagsService {
             if (VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "tag_tmp_" + System.nanoTime();
             }
-            long imgId = storageService.saveFile(tagE.getImageId(), imageName, image);
+            long imgId = officialStorage.addFile(tagE.getImageId(), imageName, image);
             if (imgId>0) {
-                imgPath = storageService.getFilePath(imgId);
+                imgPath = officialStorage.getFilePath(imgId);
                 tagE.setImageId(imgId);
                 changed = true;
             }
@@ -458,9 +459,9 @@ public class TagsService {
             if (VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "tag_tmp_" + System.nanoTime();
             }
-            long imgId = storageService.saveFile(categoryE.getImageId(), imageName, image);
+            long imgId = officialStorage.addFile(categoryE.getImageId(), imageName, image);
             if (imgId>0) {
-                imgPath = storageService.getFilePath(imgId);
+                imgPath = officialStorage.getFilePath(imgId);
                 categoryE.setImageId(imgId);
                 changed = true;
             }
@@ -486,7 +487,7 @@ public class TagsService {
             long       imageId = tagsE.getImageId();
             List<Long> imgIds  = new ArrayList<>();
             imgIds.add(imageId);
-            storageService.deleteFiles(imgIds);
+            officialStorage.deleteFiles(imgIds);
             tagsRep.delete(tagId);
 
             return tagId;
@@ -508,7 +509,7 @@ public class TagsService {
                 }
             }
             if (!imgIds.isEmpty()) {
-                storageService.deleteFiles(imgIds);
+                officialStorage.deleteFiles(imgIds);
             }
             tagsRep.delete(tagsE);
 
@@ -531,7 +532,7 @@ public class TagsService {
                 }
             }
 
-            storageService.deleteFiles(imgIds);
+            officialStorage.deleteFiles(imgIds);
             tagsRep.deleteByCategoryId(categoryId);
             categoryRep.delete(categoryId);
 
@@ -556,7 +557,7 @@ public class TagsService {
                 }
             }
             if (!imgIds.isEmpty()) {
-                storageService.deleteFiles(imgIds);
+                officialStorage.deleteFiles(imgIds);
             }
             // set category id = 0
             if (null!=tagsE) {
@@ -594,7 +595,7 @@ public class TagsService {
                 }
             }
             if (!imgIds.isEmpty()) {
-                storageService.deleteFiles(imgIds);
+                officialStorage.deleteFiles(imgIds);
             }
             tagsRep.deleteByCategoryIdIn(lCategoryIds);
             categoryRep.delete(categoriesE);
@@ -634,10 +635,10 @@ public class TagsService {
             if (VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "tag_tmp_" + System.nanoTime();
             }
-            long fileId = storageService.saveFile(-1, imageName, image);
+            long fileId = officialStorage.addFile(-1, imageName, image);
             if (fileId>0) {
                 entity.setImageId(fileId);
-                imagePath = storageService.getFilePath(fileId);
+                imagePath = officialStorage.getFilePath(fileId);
             }
         }
         else {
@@ -675,10 +676,10 @@ public class TagsService {
             if (VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "category_tmp_" + System.nanoTime();
             }
-            long fileId = storageService.saveFile(-1, imageName, image);
+            long fileId = officialStorage.addFile(-1, imageName, image);
             if (fileId>0) {
                 entity.setImageId(fileId);
-                imagePath = storageService.getFilePath(fileId);
+                imagePath = officialStorage.getFilePath(fileId);
             }
         }
 

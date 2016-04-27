@@ -13,10 +13,8 @@ import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.StorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -51,9 +49,6 @@ public class NurseQualificationService {
     private NurseHospitalRelationService hospitalRelationService;
     @Autowired
     private NurseQualificationFileService qualificationFileService;
-    @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
 
     //=======================================================
     //         add qualification file
@@ -106,19 +101,9 @@ public class NurseQualificationService {
         }
         NurseQualificationBean bean = beanConverter.convert(entity);
 
-        // delete images and file_storage record
-        List<NurseQualificationFileBean> filesB = null;
-        filesB = qualificationFileService.getAllFileByQualificationId(bean.getId());
-        if (null!=filesB && !filesB.isEmpty()) {
-            List<Long> imageIds = new ArrayList<Long>();
-            for (NurseQualificationFileBean fileB : filesB) {
-                imageIds.add(fileB.getWorkfileId());
-            }
-            storageService.deleteFiles(imageIds);
-        }
-
-        // delete qualification file record
+        // delete qualification file record, and delete images and file_storage record
         qualificationFileService.deleteFileByQualificationId(bean.getId());
+
         // delete qualification record
         repository.delete(entity);
         return bean;

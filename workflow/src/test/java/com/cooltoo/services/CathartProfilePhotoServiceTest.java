@@ -4,6 +4,7 @@ import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.CathartProfilePhotoBean;
 import com.cooltoo.backend.services.CathartProfilePhotoService;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -33,6 +34,8 @@ public class CathartProfilePhotoServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private CathartProfilePhotoService cathartPhotoService;
+    @Autowired
+    private OfficialFileStorageService officialStorage;
 
     @Test
     public void testCountByStatus() {
@@ -90,6 +93,9 @@ public class CathartProfilePhotoServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(CommonStatus.ENABLED, newOne.getEnable());
         Assert.assertTrue(newOne.getImageId()>0);
         Assert.assertNotNull(newOne.getImageUrl());
+        Assert.assertTrue(officialStorage.fileExist(newOne.getImageId()));
+        officialStorage.deleteFile(newOne.getImageId());
+        Assert.assertFalse(officialStorage.fileExist(newOne.getImageUrl()));
     }
 
     @Test
@@ -130,6 +136,9 @@ public class CathartProfilePhotoServiceTest extends AbstractCooltooTest {
         Assert.assertNotNull(newOne.getImageUrl());
         Assert.assertNotEquals(newOne.getImageUrl(), modify.getImageUrl());
         Assert.assertNotEquals(newOne.getTimeCreated(), modify.getTimeCreated());
+        Assert.assertTrue(officialStorage.fileExist(newOne.getImageId()));
+        officialStorage.deleteFile(newOne.getImageId());
+        Assert.assertFalse(officialStorage.fileExist(newOne.getImageUrl()));
     }
 
     @Test

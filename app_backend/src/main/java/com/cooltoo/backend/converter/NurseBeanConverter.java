@@ -2,9 +2,6 @@ package com.cooltoo.backend.converter;
 
 import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.entities.NurseEntity;
-import com.cooltoo.services.StorageService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +10,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
-
-    @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
 
     @Override
     public NurseBean convert(NurseEntity entity) {
@@ -32,9 +25,8 @@ public class NurseBeanConverter implements Converter<NurseEntity, NurseBean> {
         bean.setIdentification(entity.getIdentification());
         bean.setShortNote(entity.getShortNote());
         bean.setAuthority(entity.getAuthority());
-
-        bean.setBackgroundImageUrl(storageService.getFilePath(entity.getBackgroundImageId()));
-        bean.setProfilePhotoUrl(storageService.getFilePath(entity.getProfilePhotoId()));
+        bean.setProfilePhotoId(entity.getProfilePhotoId());
+        bean.setBackgroundImageId(entity.getBackgroundImageId());
         return bean;
     }
 }

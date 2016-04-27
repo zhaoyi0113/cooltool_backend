@@ -8,6 +8,7 @@ import com.cooltoo.backend.entities.SkillEntity;
 import com.cooltoo.repository.FileStorageRepository;
 import com.cooltoo.backend.repository.SkillRepository;
 import com.cooltoo.backend.services.SkillService;
+import com.cooltoo.services.file.OfficialFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -34,7 +35,7 @@ public class SkillServiceTest extends AbstractCooltooTest {
     private SkillRepository repository;
 
     @Autowired
-    private FileStorageRepository storageRepository;
+    private OfficialFileStorageService storageRepository;
 
     @Test
     public void testAddNewOccupation() {
@@ -42,43 +43,53 @@ public class SkillServiceTest extends AbstractCooltooTest {
         File file = new File("build/" + System.currentTimeMillis());
         try {
             file.createNewFile();
-            skillService.addNewOccupationSkill(skillName, 1, new FileInputStream(file), new FileInputStream(file));
-            List<SkillEntity> skillList = repository.findByName(skillName);
-            Assert.assertTrue(skillList.size() > 0);
-            Assert.assertEquals(skillName, skillList.get(0).getName());
-            FileStorageEntity storageEntity = storageRepository.findOne(skillList.get(0).getImageId());
-            Assert.assertNotNull(storageEntity);
-            Assert.assertEquals(skillName, storageEntity.getFileRealname());
+            SkillBean bean  = skillService.addNewOccupationSkill(skillName, 1, new FileInputStream(file), new FileInputStream(file));
+            Assert.assertTrue(bean.getId() > 0);
+            Assert.assertEquals(skillName, bean.getName());
+
+            Assert.assertTrue(storageRepository.fileExist(bean.getImageId()));
+            Assert.assertTrue(storageRepository.fileExist(bean.getDisableImageId()));
+            storageRepository.deleteFile(bean.getImageId());
+            storageRepository.deleteFile(bean.getDisableImageId());
+            Assert.assertFalse(storageRepository.fileExist(bean.getImageUrl()));
+            Assert.assertFalse(storageRepository.fileExist(bean.getDisableImageUrl()));
         } catch (IOException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
         }
+        file.delete();
     }
 
     @Test
     public void testEditOccupation() {
         SkillBean skill = skillService.getOneSkillById(1000);
         Assert.assertNotNull(skill);
-        String      name          = String.valueOf(System.currentTimeMillis());
-        File        file          = new File("build/" + System.currentTimeMillis());
-        InputStream inputStream   = null;
-        InputStream disableStream = null;
+        String      name    = String.valueOf(System.currentTimeMillis());
+        File        file    = new File("build/" + System.currentTimeMillis());
+        InputStream image   = null;
+        InputStream disable = null;
         try {
             file.createNewFile();
-            inputStream   = new FileInputStream(file);
-            disableStream = new FileInputStream(file);
-            skillService.editOccupationSkill(skill.getId(), name, 1, OccupationSkillStatus.ENABLE.name(), inputStream, disableStream);
-            SkillBean editedSkill = skillService.getOneSkillById(skill.getId());
-            Assert.assertNotNull(editedSkill);
-            Assert.assertEquals(name, editedSkill.getName());
-            FileStorageEntity fileStorage = storageRepository.findOne(editedSkill.getImageId());
-            Assert.assertEquals(name, fileStorage.getFileRealname());
+            image   = new FileInputStream(file);
+            disable = new FileInputStream(file);
+            skillService.editOccupationSkill(skill.getId(), name, 1, OccupationSkillStatus.ENABLE.name(), image, disable);
+            SkillBean bean = skillService.getOneSkillById(skill.getId());
+            Assert.assertNotNull(bean);
+            Assert.assertEquals(name, bean.getName());
+
+            Assert.assertTrue(storageRepository.fileExist(bean.getImageId()));
+            Assert.assertTrue(storageRepository.fileExist(bean.getDisableImageId()));
+            storageRepository.deleteFile(bean.getImageId());
+            storageRepository.deleteFile(bean.getDisableImageId());
+            Assert.assertFalse(storageRepository.fileExist(bean.getImageUrl()));
+            Assert.assertFalse(storageRepository.fileExist(bean.getDisableImageUrl()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
         }
+        file.delete();
     }
 
     @Test

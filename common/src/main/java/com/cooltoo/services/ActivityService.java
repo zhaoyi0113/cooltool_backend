@@ -7,6 +7,8 @@ import com.cooltoo.entities.ActivityEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.ActivityRepository;
+import com.cooltoo.services.file.OfficialFileStorageService;
+import com.cooltoo.services.file.TemporaryFileStorageService;
 import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -35,10 +37,12 @@ public class ActivityService {
 
     @Autowired private ActivityRepository repository;
     @Autowired private ActivityBeanConverter beanConverter;
-    @Autowired private TemporaryFileStorageService tempFileStorageService;
     @Autowired
-    @Qualifier("StorageService")
-    private StorageService storageService;
+    @Qualifier("TemporaryFileStorageService")
+    private TemporaryFileStorageService tempStorage;
+    @Autowired
+    @Qualifier("OfficialFileStorageService")
+    private OfficialFileStorageService officialStorage;
 
     //===========================================================
     //                    get
@@ -168,7 +172,7 @@ public class ActivityService {
             imageIds.add(tmp.getFrontCover());
         }
 
-        Map<Long, String> imgId2Url = storageService.getFilePath(imageIds);
+        Map<Long, String> imgId2Url = officialStorage.getFilePath(imageIds);
         for (ActivityBean tmp : activities) {
             if (tmp.getFrontCover()<=0) {
                 continue;
@@ -187,15 +191,16 @@ public class ActivityService {
         logger.info("get activity by id {}", activityId);
         ActivityEntity entity = repository.findOne(activityId);
         if (null==entity) {
-            logger.info("activity not exist.");
+            logger.warn("activity not exist.");
             return null;
         }
 
         ActivityBean bean = beanConverter.convert(entity);
         if (bean.getFrontCover()>0) {
-            String imgUrl = storageService.getFilePath(bean.getFrontCover());
+            String imgUrl = officialStorage.getFilePath(bean.getFrontCover());
             bean.setFrontCoverUrl(imgUrl);
         }
+
         addBaseUrl2ImgTagSrcAttr(bean, httpNginxBaseUrl);
         return bean;
     }
@@ -214,9 +219,10 @@ public class ActivityService {
 
         ActivityBean bean = beanConverter.convert(entity.get(0));
         if (bean.getFrontCover()>0) {
-            String imgUrl = storageService.getFilePath(bean.getFrontCover());
+            String imgUrl = officialStorage.getFilePath(bean.getFrontCover());
             bean.setFrontCoverUrl(imgUrl);
         }
+
         addBaseUrl2ImgTagSrcAttr(bean, httpNginxBaseUrl);
         return bean;
     }
@@ -237,6 +243,16 @@ public class ActivityService {
         if (!nginxBaseUrl.endsWith("/")) {
             nginxBaseUrl = nginxBaseUrl+"/";
         }
+
+        String tempNginxRelativePath;
+        if (ActivityStatus.EDITING.equals(activity.getStatus())) {
+            tempNginxRelativePath = tempStorage.getNginxRelativePath();
+        }
+        else {
+            tempNginxRelativePath = officialStorage.getNginxRelativePath();
+        }
+
+        nginxBaseUrl += tempNginxRelativePath;
 
         String              content    = activity.getContent();
         HtmlParser          htmlParser = HtmlParser.newInstance();
@@ -362,8 +378,8 @@ public class ActivityService {
             if (VerifyUtil.isStringEmpty(frontCoverName)) {
                 frontCoverName = "frontCover"+System.currentTimeMillis();
             }
-            long imageId = storageService.saveFile(entity.getFrontCover(), frontCoverName, frontCover);
-            imageUrl = storageService.getFilePath(imageId);
+            long imageId = officialStorage.addFile(entity.getFrontCover(), frontCoverName, frontCover);
+            imageUrl = officialStorage.getFilePath(imageId);
             entity.setFrontCover(imageId);
             changed = true;
         }
@@ -409,8 +425,9 @@ public class ActivityService {
         entity.setStatus(status);
         entity = repository.save(entity);
 
-        entity.setContent(null);
-        return entity2BeanAndFillOtherProperties(entity);
+        ActivityBean bean = entity2BeanAndFillOtherProperties(entity);
+        bean.setContent(null);
+        return bean;
     }
 
 
@@ -419,14 +436,12 @@ public class ActivityService {
     //===========================================================
 
     @Transactional
-    public ActivityBean updateActivityContent(String token, long activityId, String content) {
+    public ActivityBean updateActivityContent(long activityId, String content) {
         logger.info("update activity {} token={} content={}", activityId, content);
-        checkToken(token);
 
         ActivityEntity entity = repository.findOne(activityId);
         if (null==entity) {
             logger.error("the activity is not exist (and clean token cache)");
-            cleanTokenCache(token);
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
@@ -438,31 +453,25 @@ public class ActivityService {
         if (VerifyUtil.isStringEmpty(content)) {
             content = "";  // avoid NullException
         }
+        else {
+            // move temporary
+            moveTemporaryFileToOfficial(content);
 
-        // get a html_parser instance
-        HtmlParser          htmlParser = HtmlParser.newInstance();
-        Map<String, String> imgTag2SrcValue;
-        Map<String, String> srcUrl2RelativeFilePathInStorage;
-
-        // get all image tag and its src attribute value
-        imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(content);
-
-        // get all src attribute value
-        List<String> srcAttVals = new ArrayList<>();
-        Set<String>  imgTags    = imgTag2SrcValue.keySet();
-        for (String tag : imgTags) {
-            String srcUrl = imgTag2SrcValue.get(tag);
-            srcAttVals.add(srcUrl);
+            //
+            // replace the content src url
+            //
+            // get a html_parser instance
+            HtmlParser          htmlParser = HtmlParser.newInstance();
+            // get all image tag and its src attribute value
+            Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(content);
+            // get all src attribute value
+            List<String>        srcAttValues    = htmlParser.getSrcUrls(content);
+            Map<String, String> srcUrl2RelativeFilePathInStorage;
+            // move all src attribute urls to storage, and get relative_file_path_in_storage
+            srcUrl2RelativeFilePathInStorage = officialStorage.getRelativePathInStorage(srcAttValues);
+            // replace all image src attribute to relative_file_path_in_storage
+            content = htmlParser.replaceImgTagSrcUrl(content, imgTag2SrcValue, srcUrl2RelativeFilePathInStorage);
         }
-
-        // move all src attribute urls to storage, and get relative_file_path_in_storage
-        srcUrl2RelativeFilePathInStorage = tempFileStorageService.moveToStorage(token, srcAttVals);
-
-        // clean the all cache file by this token
-        cleanTokenCache(token);
-
-        // replace all image src attribute to relative_file_path_in_storage
-        content = htmlParser.replaceImgTagSrcUrl(content, imgTag2SrcValue, srcUrl2RelativeFilePathInStorage);
 
         entity.setContent(content);
         entity.setStatus(ActivityStatus.DISABLE);
@@ -470,9 +479,8 @@ public class ActivityService {
         return entity2BeanAndFillOtherProperties(entity);
     }
 
-    public ActivityBean moveActivity2Temporary(String token, long activityId) {
-        logger.info("move activity {} image file to temporary directory by token={}", activityId, token);
-        checkToken(token);
+    public ActivityBean moveActivity2Temporary(long activityId) {
+        logger.info("move activity {} image file to temporary directory", activityId);
 
         ActivityEntity entity = repository.findOne(activityId);
         if (null==entity) {
@@ -487,41 +495,74 @@ public class ActivityService {
         // has content need to move to temporary
         boolean needMove = !VerifyUtil.isStringEmpty(entity.getContent());
         if (needMove) {
-            Map<String, String> imgTag2SrcValue;
-            String              content    = entity.getContent();
-            HtmlParser          htmlParser = HtmlParser.newInstance();
-
-            // get image tags and src attribute url
-            imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(content);
-
-            // if src attribute url is not empty
-            if (!imgTag2SrcValue.isEmpty()) {
-                List<String> srcUrls = new ArrayList<>();
-                Set<String>  imgTags = imgTag2SrcValue.keySet();
-                for (String tag : imgTags) {
-                    String srcUrl = imgTag2SrcValue.get(tag);
-                    srcUrls.add(srcUrl);
-                }
-                tempFileStorageService.moveToTemporary(token, srcUrls);
-            }
-            else {
-                logger.info("nothing move temporary directory");
-            }
+            moveOfficialFileToTemporary(entity.getContent());
         }
 
         // update to editing
         entity.setStatus(ActivityStatus.EDITING);
         entity = repository.save(entity);
 
-        entity.setContent(null);
-        return entity2BeanAndFillOtherProperties(entity);
+        ActivityBean bean = entity2BeanAndFillOtherProperties(entity);
+        bean.setContent(null);
+        return bean;
+    }
+
+    private void moveOfficialFileToTemporary(String htmlContent) {
+        logger.info("move html img tag src 's images to temporary storage");
+        if (VerifyUtil.isStringEmpty(htmlContent)) {
+            logger.info("html content is empty. nothing move to temporary directory");
+        }
+
+        HtmlParser htmlParser = HtmlParser.newInstance();
+        // get image tags src attribute url
+        List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
+
+        if (!VerifyUtil.isListEmpty(srcUrls)) {
+            List<String> srcFilesInStorage = new ArrayList<>();
+            for (String srcUrl : srcUrls) {
+                String relativePath = officialStorage.getRelativePathInStorage(srcUrl);
+                if (VerifyUtil.isStringEmpty(relativePath)) {
+                    continue;
+                }
+                srcFilesInStorage.add(officialStorage.getStoragePath() + relativePath);
+            }
+            tempStorage.moveFileToHere(srcFilesInStorage);
+        }
+        else {
+            logger.info("img tag is empty. nothing move to temporary directory");
+        }
+    }
+
+    private void moveTemporaryFileToOfficial(String htmlContent) {
+        logger.info("move html img tag src 's images to official storage");
+        if (VerifyUtil.isStringEmpty(htmlContent)) {
+            logger.info("html content is empty. nothing move to official directory");
+        }
+
+        HtmlParser htmlParser = HtmlParser.newInstance();
+        // get image tags src attribute url
+        List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
+
+        if (!VerifyUtil.isListEmpty(srcUrls)) {
+            List<String> srcFilesInStorage = new ArrayList<>();
+            for (String srcUrl : srcUrls) {
+                String relativePath = tempStorage.getRelativePathInStorage(srcUrl);
+                if (VerifyUtil.isStringEmpty(relativePath)) {
+                    continue;
+                }
+                srcFilesInStorage.add(tempStorage.getStoragePath() + relativePath);
+            }
+            officialStorage.moveFileToHere(srcFilesInStorage);
+        }
+        else {
+            logger.info("img tag is empty. nothing move to official directory");
+        }
     }
 
     @Transactional
     public String createTemporaryFile(String token, long activityId, String imageName, InputStream image) {
         logger.info("create temporary file by token={} activityId={} imageName={} image={}",
                 token, activityId, imageName, image);
-        checkToken(token);
         ActivityEntity entity = repository.findOne(activityId);
         if (null==entity) {
             logger.info("the activity do not exist");
@@ -531,22 +572,11 @@ public class ActivityService {
             logger.error("the activity is not editing");
             throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
         }
-        String relativePath = tempFileStorageService.cacheTemporaryFile(token, imageName, image);
+        String relativePath = tempStorage.addFile(imageName, image);
         return relativePath;
     }
 
-    private void cleanTokenCache(String token) {
-        checkToken(token);
-        tempFileStorageService.cleanTokenCachedFile(token);
-    }
 
-    private void checkToken(String token) {
-        logger.info("check token={}", token);
-        if (VerifyUtil.isStringEmpty(token)) {
-            logger.error("token is invalid");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-    }
 
     //=============================================================
     //          delete   for administrator use
@@ -582,32 +612,32 @@ public class ActivityService {
             if (tmp.getFrontCover()<=0) {
                 continue;
             }
-            frontCoverIds.add(tmp.getId());
+            frontCoverIds.add(tmp.getFrontCover());
         }
-        storageService.deleteFiles(frontCoverIds);
+        officialStorage.deleteFiles(frontCoverIds);
 
         //
         // clean the activity content image
         //
         HtmlParser          htmlParser = HtmlParser.newInstance();
         Map<String, String> imgTag2SrcValue;
-        List<String>        srcAttVals = new ArrayList<>();
+        List<String>        srcAttVals;
         for (ActivityEntity tmp : resultSet) {
             if (VerifyUtil.isStringEmpty(tmp.getContent())) {
                 continue;
             }
-            srcAttVals.clear();
 
             // get all image src attribute url
-            imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(tmp.getContent());
-            Set<String>  imgTags    = imgTag2SrcValue.keySet();
-            for (String tag : imgTags) {
-                String srcUrl = imgTag2SrcValue.get(tag);
-                srcAttVals.add(srcUrl);
-            }
+            srcAttVals = htmlParser.getSrcUrls(tmp.getContent());
 
             // remove all image src attribute url from storage
-            srcAttVals = tempFileStorageService.deleteStorageFile(srcAttVals);
+            for (String srcUrl : srcAttVals) {
+                if (ActivityStatus.EDITING.equals(tmp.getStatus())) {
+                    tempStorage.deleteFile(srcUrl);
+                } else {
+                    officialStorage.deleteFile(srcUrl);
+                }
+            }
         }
 
         //
