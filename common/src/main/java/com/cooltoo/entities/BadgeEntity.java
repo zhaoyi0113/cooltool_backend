@@ -1,6 +1,5 @@
 package com.cooltoo.entities;
 
-import com.cooltoo.constants.BadgeGrade;
 import com.cooltoo.constants.SocialAbilityType;
 
 import javax.persistence.*;
@@ -14,7 +13,7 @@ public class BadgeEntity {
 
     private int    id;
     private String name;
-    private BadgeGrade grade;
+    private int grade;
     private long   point;
     private long   imageId;
     private int    abilityId;
@@ -41,12 +40,11 @@ public class BadgeEntity {
     }
 
     @Column(name = "grade")
-    @Enumerated
-    public BadgeGrade getGrade() {
+    public int getGrade() {
         return grade;
     }
 
-    public void setGrade(BadgeGrade grade) {
+    public void setGrade(int grade) {
         this.grade = grade;
     }
 

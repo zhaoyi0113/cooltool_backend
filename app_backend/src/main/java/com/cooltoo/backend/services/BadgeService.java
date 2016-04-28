@@ -3,7 +3,6 @@ package com.cooltoo.backend.services;
 import com.cooltoo.backend.repository.SkillRepository;
 import com.cooltoo.backend.repository.SpeakTypeRepository;
 import com.cooltoo.beans.BadgeBean;
-import com.cooltoo.constants.BadgeGrade;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.converter.BadgeBeanConverter;
 import com.cooltoo.entities.BadgeEntity;
@@ -199,13 +198,12 @@ public class BadgeService {
     //=========================================================
 
     @Transactional
-    public BadgeBean addBadge(String name, int point, String strGrade, int abilityId, String strAbilityType, String imageName, InputStream image) {
+    public BadgeBean addBadge(String name, int point, int grade, int abilityId, String strAbilityType, String imageName, InputStream image) {
         logger.info("add badge name={} point={} grade={} abilityId={} abilityType={} imageName={} image={}",
-                name, point, strGrade, abilityId, strAbilityType, imageName, (null!=image));
+                name, point, grade, abilityId, strAbilityType, imageName, (null!=image));
 
         // check grade
-        BadgeGrade grade = BadgeGrade.parseString(strGrade);
-        if (null==grade) {
+        if (grade<=0) {
             logger.error("grade is invalid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -254,9 +252,9 @@ public class BadgeService {
     //=========================================================
 
     @Transactional
-    public BadgeBean updateBadge(int id, String name, int point, String strGrade, int abilityId, String strAbilityType, String imageName, InputStream image) {
+    public BadgeBean updateBadge(int id, String name, int point, int grade, int abilityId, String strAbilityType, String imageName, InputStream image) {
         logger.info("update badge id={} name={} point={} grade={} abilityId={} abilityType={} imageName={} image={}",
-                id, name, point, strGrade, abilityId, strAbilityType, imageName, (null!=image));
+                id, name, point, grade, abilityId, strAbilityType, imageName, (null!=image));
         if (!repository.exists(id)) {
             throw new BadRequestException(ErrorCode.BADGE_NOT_EXIST);
         }
@@ -264,7 +262,6 @@ public class BadgeService {
         boolean     changed = false;
         BadgeEntity entity  = repository.findOne(id);
 
-        BadgeGrade        grade       = BadgeGrade.parseString(strGrade);
         SocialAbilityType abilityType = SocialAbilityType.parseString(strAbilityType);
 
         // check record is already exist
@@ -285,7 +282,7 @@ public class BadgeService {
         }
 
         // check grade
-        if (null!=grade) {
+        if (grade>0 && grade!=entity.getGrade()) {
             entity.setGrade(grade);
             changed = true;
         }

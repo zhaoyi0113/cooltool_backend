@@ -3,7 +3,6 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.services.BadgeService;
 import com.cooltoo.beans.BadgeBean;
-import com.cooltoo.constants.BadgeGrade;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.services.file.OfficialFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -94,12 +93,12 @@ public class BadgeServiceTest extends AbstractCooltooTest {
     @Test
     public void testAddBadge(){
         ByteArrayInputStream image = new ByteArrayInputStream("fdsafdsafds".getBytes());
-        BadgeBean badge = badgeService.addBadge("name222", 12, "LEVEL1", 1000, "SKILL", "aaaaa", image);
+        BadgeBean badge = badgeService.addBadge("name222", 12, 1, 1000, "SKILL", "aaaaa", image);
         Assert.assertNotNull(badge);
         Assert.assertTrue(badge.getId()>0);
         Assert.assertEquals("name222", badge.getName());
         Assert.assertEquals(12, badge.getPoint());
-        Assert.assertEquals(BadgeGrade.LEVEL1, badge.getGrade());
+        Assert.assertEquals(1, badge.getGrade());
         Assert.assertEquals(1000, badge.getAbilityId());
         Assert.assertEquals(SocialAbilityType.SKILL, badge.getAbilityType());
         Assert.assertTrue(badge.getImageId() > 0);
@@ -113,12 +112,12 @@ public class BadgeServiceTest extends AbstractCooltooTest {
     @Test
     public void testUpdateBadget(){
         ByteArrayInputStream image = new ByteArrayInputStream("fdsafdsafds".getBytes());
-        BadgeBean badge = badgeService.updateBadge(1, "name222", 123, "LEVEL2", 1000, "SKILL", "aaaaa", image);
+        BadgeBean badge = badgeService.updateBadge(1, "name222", 123, 2, 1000, "SKILL", "aaaaa", image);
         Assert.assertNotNull(badge);
         Assert.assertEquals(1, badge.getId());
         Assert.assertEquals("name222", badge.getName());
         Assert.assertEquals(123, badge.getPoint());
-        Assert.assertEquals(BadgeGrade.LEVEL2, badge.getGrade());
+        Assert.assertEquals(2, badge.getGrade());
         Assert.assertEquals(1000, badge.getAbilityId());
         Assert.assertEquals(SocialAbilityType.SKILL, badge.getAbilityType());
         Assert.assertNotEquals(1, badge.getImageId());

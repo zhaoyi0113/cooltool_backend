@@ -1,6 +1,5 @@
 package com.cooltoo.repository;
 
-import com.cooltoo.constants.BadgeGrade;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.entities.BadgeEntity;
 import org.springframework.data.domain.Page;
@@ -17,6 +16,6 @@ public interface BadgeRepository extends JpaRepository<BadgeEntity, Integer> {
     Page<BadgeEntity> findByAbilityType(SocialAbilityType abilityType, Pageable page);
     List<BadgeEntity> findByAbilityIdAndAbilityType(Integer abilityId, SocialAbilityType abilityType);
     List<BadgeEntity> findByAbilityIdAndAbilityType(Integer abilityId, SocialAbilityType abilityType, Sort sort);
-    List<BadgeEntity> findByAbilityIdAndAbilityTypeAndGrade(Integer abilityId, SocialAbilityType abilityType, BadgeGrade grade);
+    List<BadgeEntity> findByAbilityIdAndAbilityTypeAndGrade(Integer abilityId, SocialAbilityType abilityType, int grade);
     long countByAbilityType(SocialAbilityType abilityType);
 }

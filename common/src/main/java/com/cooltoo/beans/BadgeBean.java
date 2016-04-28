@@ -1,6 +1,5 @@
 package com.cooltoo.beans;
 
-import com.cooltoo.constants.BadgeGrade;
 import com.cooltoo.constants.SocialAbilityType;
 
 import javax.ws.rs.FormParam;
@@ -11,7 +10,7 @@ import javax.ws.rs.FormParam;
 public class BadgeBean {
     private int id;
     private String name;
-    private BadgeGrade grade;
+    private int grade;
     private long point;
     private long imageId;
     private String imageUrl;
@@ -34,11 +33,11 @@ public class BadgeBean {
         this.name = name;
     }
 
-    public BadgeGrade getGrade() {
+    public int getGrade() {
         return grade;
     }
 
-    public void setGrade(BadgeGrade grade) {
+    public void setGrade(int grade) {
         this.grade = grade;
     }
 
