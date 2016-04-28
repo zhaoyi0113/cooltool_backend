@@ -3,16 +3,13 @@ package com.cooltoo.backend.services;
 import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.converter.NurseFriendBeanConverter;
-import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseFriendsEntity;
 import com.cooltoo.constants.AgreeType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.NurseFriendsRepository;
-import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -43,14 +40,14 @@ public class NurseFriendsService {
     //            add friend relation
     //======================================================
     @Transactional
-    public void setFriendship(long userId, long friendId){
+    public boolean setFriendship(long userId, long friendId){
         if(userId == friendId){
             logger.error("user can't be himself friend.");
         }
-        setFriendshipToDB(userId, friendId);
+        return setFriendshipToDB(userId, friendId);
     }
 
-    private void setFriendshipToDB(long userId, long friendId){
+    private boolean setFriendshipToDB(long userId, long friendId){
         validateUserId(userId, friendId);
         long count = friendsRepository.countByUserIdAndFriendId(userId, friendId);
         if(count <= 0){
@@ -68,9 +65,11 @@ public class NurseFriendsService {
             entity.setIsAgreed(AgreeType.WAITING);
             entity.setDateTime(datetime);
             friendsRepository.save(entity);
+            return true;
         }
         else {
             friendsRepository.deleteFriendship(userId, friendId);
+            return false;
         }
     }
 
