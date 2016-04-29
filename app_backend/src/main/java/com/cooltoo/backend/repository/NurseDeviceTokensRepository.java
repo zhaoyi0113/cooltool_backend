@@ -12,6 +12,7 @@ import java.util.List;
 public interface NurseDeviceTokensRepository extends JpaRepository<NurseDeviceTokensEntity, Long>{
 
     List<NurseDeviceTokensEntity> findByUserIdAndStatus(long userId, CommonStatus status);
+    List<NurseDeviceTokensEntity> findByUserId(long userId);
     List<NurseDeviceTokensEntity> findByUserIdAndDeviceTokenAndStatus(long userId, String token, CommonStatus status);
     List<NurseDeviceTokensEntity> findByDeviceToken(String token);
 }

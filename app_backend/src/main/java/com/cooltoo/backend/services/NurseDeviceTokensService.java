@@ -72,6 +72,9 @@ public class NurseDeviceTokensService {
                 } else if (entity.getUserId() != userId) {
                     entity.setStatus(CommonStatus.DISABLED);
                     deviceTokensRepository.save(entity);
+                } else if (entity.getUserId() == userId && !entity.getStatus().equals(CommonStatus.ENABLED)){
+                    entity.setStatus(CommonStatus.ENABLED);
+                    deviceTokensRepository.save(entity);
                 }
             }
             List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);

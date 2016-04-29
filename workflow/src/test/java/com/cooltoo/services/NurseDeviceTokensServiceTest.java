@@ -55,13 +55,13 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    public void testRegisterNonExistedUser(){
+    public void testRegisterNonExistedUser() {
         String token = String.valueOf(System.currentTimeMillis());
         long userId = System.currentTimeMillis();
         Exception exception = null;
         try {
             deviceTokensService.registerUserDeviceToken(userId, token);
-        }catch(BadRequestException ex){
+        } catch (BadRequestException ex) {
             exception = ex;
         }
         Assert.assertNotNull(exception);
@@ -69,19 +69,19 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
-    public void testRegisterExistedUserToken(){
+    public void testRegisterExistedUserToken() {
         long id = deviceTokensService.registerUserDeviceToken(1, "aaa");
         Assert.assertEquals(1000, id);
     }
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
-    public void testRegisterTokenForDifferentUser(){
+    public void testRegisterTokenForDifferentUser() {
         long id = deviceTokensService.registerUserDeviceToken(2, "aaa");
         Assert.assertNotEquals(1000, id);
         List<NurseDeviceTokensBean> tokens = deviceTokensService.getNurseDeviceTokens(1);
-        for(NurseDeviceTokensBean bean : tokens){
-            if(bean.getDeviceToken().equals("aaa")){
+        for (NurseDeviceTokensBean bean : tokens) {
+            if (bean.getDeviceToken().equals("aaa")) {
                 Assert.fail();
             }
         }
@@ -89,15 +89,30 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
-    public void testInactiveUserDeviceToken(){
+    public void testInactiveUserDeviceToken() {
         deviceTokensService.inactiveUserDeviceToken(1, "aaa");
         List<NurseDeviceTokensBean> beans = deviceTokensService.getNurseDeviceTokens(1);
-        for(NurseDeviceTokensBean bean : beans){
+        for (NurseDeviceTokensBean bean : beans) {
             Assert.assertEquals(CommonStatus.DISABLED, bean.getStatus());
         }
         deviceTokensService.registerUserDeviceToken(1, "aaa");
         beans = deviceTokensService.getNurseDeviceTokens(1);
-        Assert.assertTrue(beans.size()>0);
+        Assert.assertTrue(beans.size() > 0);
         Assert.assertEquals(CommonStatus.ENABLED, beans.get(0).getStatus());
+    }
+
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
+    public void testActiveLoggedOutUserToken() {
+
+        List<NurseDeviceTokensEntity> tokens = repository.findByUserId(2);
+        Assert.assertEquals(1, tokens.size());
+        Assert.assertEquals(CommonStatus.DISABLED, tokens.get(0).getStatus());
+
+        deviceTokensService.registerUserDeviceToken(2, "bbb");
+        tokens = repository.findByUserId(2);
+        Assert.assertEquals(1, tokens.size());
+        Assert.assertEquals(CommonStatus.ENABLED, tokens.get(0).getStatus());
     }
 }

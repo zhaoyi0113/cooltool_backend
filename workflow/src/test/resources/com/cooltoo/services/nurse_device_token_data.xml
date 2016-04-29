@@ -4,4 +4,5 @@
     <nurse id="2"  name="护士name1"  age="11" gender="1" mobile="1231432143"  integral="0" password="aa" profile_photo_id="1" background_image_id="1" real_name="aaa1"  identification="123111" short_note=" " authority="1"/>
 
     <nurse_device_tokens id="1000" user_id="1" device_token="aaa" status="1"/>
+    <nurse_device_tokens id="1001" user_id="2" device_token="bbb" status="0"/>
 </dataset>
