@@ -35,6 +35,12 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
         Assert.assertNotNull(entity);
         Assert.assertEquals(token, entity.getDeviceToken());
         Assert.assertEquals(-1, entity.getUserId());
+
+        deviceTokensService.registerUserDeviceToken(1, token);
+        entity = repository.findOne(id);
+        Assert.assertNotNull(entity);
+        Assert.assertEquals(token, entity.getDeviceToken());
+        Assert.assertEquals(1, entity.getUserId());
     }
 
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
@@ -89,5 +95,9 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
         for(NurseDeviceTokensBean bean : beans){
             Assert.assertEquals(CommonStatus.DISABLED, bean.getStatus());
         }
+        deviceTokensService.registerUserDeviceToken(1, "aaa");
+        beans = deviceTokensService.getNurseDeviceTokens(1);
+        Assert.assertTrue(beans.size()>0);
+        Assert.assertEquals(CommonStatus.ENABLED, beans.get(0).getStatus());
     }
 }

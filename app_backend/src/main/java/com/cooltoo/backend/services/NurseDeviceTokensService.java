@@ -41,18 +41,18 @@ public class NurseDeviceTokensService {
     }
 
     @Transactional
-    public void inactiveUserDeviceToken(long userId, String token){
+    public void inactiveUserDeviceToken(long userId, String token) {
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);
-        for(NurseDeviceTokensEntity entity : tokens){
+        for (NurseDeviceTokensEntity entity : tokens) {
             entity.setStatus(CommonStatus.DISABLED);
             deviceTokensRepository.save(entity);
         }
     }
 
-    public List<NurseDeviceTokensBean> getNurseDeviceTokens(long userId){
+    public List<NurseDeviceTokensBean> getNurseDeviceTokens(long userId) {
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndStatus(userId, CommonStatus.ENABLED);
         List<NurseDeviceTokensBean> beans = new ArrayList<>();
-        for(NurseDeviceTokensEntity entity : tokens){
+        for (NurseDeviceTokensEntity entity : tokens) {
             NurseDeviceTokensBean bean = beanConverter.convert(entity);
             beans.add(bean);
         }
@@ -65,9 +65,13 @@ public class NurseDeviceTokensService {
 
             //make sure one device token only belones to one user
             List<NurseDeviceTokensEntity> deviceTokens = deviceTokensRepository.findByDeviceToken(token);
-            for(NurseDeviceTokensEntity entity : deviceTokens){
-                if(entity.getUserId() != userId){
+            for (NurseDeviceTokensEntity entity : deviceTokens) {
+                if (entity.getUserId() == ANONYMOUS_USER_ID) {
+                    entity.setUserId(userId);
+                    deviceTokensRepository.save(entity);
+                } else if (entity.getUserId() != userId) {
                     entity.setStatus(CommonStatus.DISABLED);
+                    deviceTokensRepository.save(entity);
                 }
             }
             List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);
