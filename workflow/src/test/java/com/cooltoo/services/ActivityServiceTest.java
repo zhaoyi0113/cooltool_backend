@@ -328,13 +328,12 @@ public class ActivityServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testCreateTemporaryFile() {
-        String               token     = "1234567890";
         long                 activityId= 6;
         String               imageName = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png";
         ByteArrayInputStream image     = new ByteArrayInputStream(imageName.getBytes());
         String               cachePath = null;
 
-        cachePath = service.createTemporaryFile(token, activityId, imageName, image);
+        cachePath = service.createTemporaryFile(activityId, imageName, image);
         boolean exist = tempStorage.fileExist(cachePath);
         Assert.assertTrue(exist);
 

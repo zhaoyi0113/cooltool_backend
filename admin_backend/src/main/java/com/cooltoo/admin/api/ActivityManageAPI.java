@@ -228,11 +228,8 @@ public class ActivityManageAPI {
                                        @FormDataParam("file") FormDataContentDisposition disp
 
     ) {
-        long   userId    = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        String userToken = (String)request.getAttribute(ContextKeys.ADMIN_USER_TOKEN);
-
-        logger.info("user {} with token {} cache image to temporary path", userId, userToken);
-        String relativePath = activityService.createTemporaryFile(userToken, activityId, imageName, image);
+        logger.info("user cache image to temporary path");
+        String relativePath = activityService.createTemporaryFile(activityId, imageName, image);
         logger.info("relative path is {}", relativePath);
         return Response.ok(relativePath).build();
     }
@@ -243,15 +240,12 @@ public class ActivityManageAPI {
     @Path("/edit/content/submit")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    //@AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateActivityContent(@Context HttpServletRequest request,
-                                            @FormParam("activity_id") long activityId,
-                                            @FormParam("content") String content
+                                          @FormParam("activity_id") long activityId,
+                                          @FormParam("content") String content
 
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-
-        logger.info("user {} submit activity content", userId);
+        logger.info("user submit activity content");
         ActivityBean activity = activityService.updateActivityContent(activityId, content);
 
         logger.info("activity is {}", activity);

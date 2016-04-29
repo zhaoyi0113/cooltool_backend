@@ -560,9 +560,9 @@ public class ActivityService {
     }
 
     @Transactional
-    public String createTemporaryFile(String token, long activityId, String imageName, InputStream image) {
+    public String createTemporaryFile(long activityId, String imageName, InputStream image) {
         logger.info("create temporary file by token={} activityId={} imageName={} image={}",
-                token, activityId, imageName, image);
+                activityId, imageName, image);
         ActivityEntity entity = repository.findOne(activityId);
         if (null==entity) {
             logger.info("the activity do not exist");
