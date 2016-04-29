@@ -115,4 +115,9 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(1, tokens.size());
         Assert.assertEquals(CommonStatus.ENABLED, tokens.get(0).getStatus());
     }
+
+    @Test
+    public void testInactiveNoneExistedToken(){
+        deviceTokensService.inactiveUserDeviceToken(3, "aaa");
+    }
 }
