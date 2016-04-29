@@ -5,8 +5,6 @@ import com.cooltoo.backend.converter.NurseDeviceTokensBeanConverter;
 import com.cooltoo.backend.entities.NurseDeviceTokensEntity;
 import com.cooltoo.backend.repository.NurseDeviceTokensRepository;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +40,15 @@ public class NurseDeviceTokensService {
         return saveDeviceToken(userId, token);
     }
 
+    @Transactional
+    public void inactiveUserDeviceToken(long userId, String token){
+        List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);
+        for(NurseDeviceTokensEntity entity : tokens){
+            entity.setStatus(CommonStatus.DISABLED);
+            deviceTokensRepository.save(entity);
+        }
+    }
+
     public List<NurseDeviceTokensBean> getNurseDeviceTokens(long userId){
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndStatus(userId, CommonStatus.ENABLED);
         List<NurseDeviceTokensBean> beans = new ArrayList<>();
@@ -53,9 +60,6 @@ public class NurseDeviceTokensService {
     }
 
     private long saveDeviceToken(long userId, String token) {
-        if (!nurseService.existNurse(userId) && userId != ANONYMOUS_USER_ID) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
-        }
 
         if (userId != ANONYMOUS_USER_ID) {
 

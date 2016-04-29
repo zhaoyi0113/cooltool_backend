@@ -5,6 +5,7 @@ import com.cooltoo.backend.beans.NurseDeviceTokensBean;
 import com.cooltoo.backend.entities.NurseDeviceTokensEntity;
 import com.cooltoo.backend.repository.NurseDeviceTokensRepository;
 import com.cooltoo.backend.services.NurseDeviceTokensService;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
@@ -77,6 +78,16 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
             if(bean.getDeviceToken().equals("aaa")){
                 Assert.fail();
             }
+        }
+    }
+
+    @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
+    public void testInactiveUserDeviceToken(){
+        deviceTokensService.inactiveUserDeviceToken(1, "aaa");
+        List<NurseDeviceTokensBean> beans = deviceTokensService.getNurseDeviceTokens(1);
+        for(NurseDeviceTokensBean bean : beans){
+            Assert.assertEquals(CommonStatus.DISABLED, bean.getStatus());
         }
     }
 }
