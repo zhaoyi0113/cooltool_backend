@@ -32,7 +32,6 @@ public class ActivityAPI {
     @Path("/{index}/{number}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     public Response getActivityByStatus(@Context HttpServletRequest request,
                                         @PathParam("index")  @DefaultValue("0") int index,
                                         @PathParam("number") @DefaultValue("10") int number
@@ -50,7 +49,6 @@ public class ActivityAPI {
     @Path("/get_detail")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     public Response getActivityDetailById(@Context HttpServletRequest request,
                                           @QueryParam("param") String idAndNginxUrl
     ) {
