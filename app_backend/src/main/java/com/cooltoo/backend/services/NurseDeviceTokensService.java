@@ -64,7 +64,7 @@ public class NurseDeviceTokensService {
     }
 
     public List<NurseDeviceTokensBean> getAllActiveDeviceTokens(){
-        List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByState(CommonStatus.ENABLED);
+        List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByStatus(CommonStatus.ENABLED);
         return getNurseDeviceTokensBeans(tokens);
     }
 
