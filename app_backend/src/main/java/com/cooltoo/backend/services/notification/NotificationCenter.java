@@ -1,6 +1,7 @@
-package com.cooltoo.backend.services;
+package com.cooltoo.backend.services.notification;
 
 import com.cooltoo.backend.beans.NurseDeviceTokensBean;
+import com.cooltoo.backend.services.NurseDeviceTokensService;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
 import com.notnoop.apns.PayloadBuilder;
@@ -20,17 +21,33 @@ public class NotificationCenter {
 
     private static final String P12_PASSWORD = "!Yqt0529*";
 
+
+
     @Autowired
     private NurseDeviceTokensService deviceTokensService;
 
-    public void publishToAllDevices(String bodyText, Map<String, String> customFields, String action){
-        ApnsService apnsService = createAPNSService(bodyText);
-        PayloadBuilder badge = APNS.newPayload().alertBody(bodyText).sound("default");
-        for(Map.Entry<String, String> entry : customFields.entrySet()){
-            badge = badge.customField(entry.getKey(), entry.getValue());
-        }
-        String payload = createPayload(bodyText, customFields, action);
+    public void publishToAllDevices(String bodyText, Map<String, String> customFields, String actionCode){
         List<NurseDeviceTokensBean> deviceTokens = deviceTokensService.getAllActiveDeviceTokens();
+        if(deviceTokens.isEmpty()){
+            return;
+        }
+        ApnsService apnsService = createAPNSService(bodyText);
+        String payload = createPayload(bodyText, customFields, actionCode);
+        publishToDevice(apnsService, payload, deviceTokens);
+    }
+
+
+    public void publishToUser(long userId, String bodyText, Map<String, String> customFields, String actionCode){
+        List<NurseDeviceTokensBean> tokens = deviceTokensService.getNurseDeviceTokens(userId);
+        if (tokens.isEmpty()){
+            return;
+        }
+        ApnsService apnsService = createAPNSService(bodyText);
+        String payload = createPayload(bodyText, customFields, actionCode);
+        publishToDevice(apnsService, payload, tokens);
+    }
+
+    private void publishToDevice(ApnsService apnsService, String payload, List<NurseDeviceTokensBean> deviceTokens) {
         for(NurseDeviceTokensBean token : deviceTokens){
             apnsService.push(token.getDeviceToken(), payload);
         }
@@ -47,8 +64,10 @@ public class NotificationCenter {
                 getResourceAsStream(P12_CER_FILE), P12_PASSWORD).
                 withSandboxDestination().build();
         PayloadBuilder badge = APNS.newPayload().alertBody(bodyText).sound("default");
-        for (Map.Entry<String, String> entry : customFields.entrySet()) {
-            badge = badge.customField(entry.getKey(), entry.getValue());
+        if(customFields != null) {
+            for (Map.Entry<String, String> entry : customFields.entrySet()) {
+                badge = badge.customField(entry.getKey(), entry.getValue());
+            }
         }
         return badge.actionKey(action).build();
     }
