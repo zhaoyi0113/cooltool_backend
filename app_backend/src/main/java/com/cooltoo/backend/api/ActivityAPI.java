@@ -37,8 +37,7 @@ public class ActivityAPI {
                                         @PathParam("number") @DefaultValue("10") int number
     ) {
         String status = ActivityStatus.ENABLE.name();
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        logger.info("user {} get activities by status={} at page={}, {}/page", userId, status, index, number);
+        logger.info(" get activities by status={} at page={}, {}/page", status, index, number);
         List<ActivityBean> activities = activityService.getActivityByStatus(status, index, number);
         logger.info("count = {}", activities.size());
         return Response.ok(activities).build();
