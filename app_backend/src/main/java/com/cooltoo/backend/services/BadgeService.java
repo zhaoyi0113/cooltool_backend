@@ -265,10 +265,12 @@ public class BadgeService {
         SocialAbilityType abilityType = SocialAbilityType.parseString(strAbilityType);
 
         // check record is already exist
-        List<BadgeEntity> resultSet   = repository.findByAbilityIdAndAbilityTypeAndGrade(abilityId, abilityType, grade);
-        if (null!=resultSet && !resultSet.isEmpty()) {
-            logger.error("record is exist == {}", resultSet);
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        if (entity.getGrade()!=grade || entity.getAbilityId() != abilityId || !entity.getAbilityType().equals(abilityType)) {
+            List<BadgeEntity> resultSet = repository.findByAbilityIdAndAbilityTypeAndGrade(abilityId, abilityType, grade);
+            if (null != resultSet && !resultSet.isEmpty()) {
+                logger.error("record is exist == {}", resultSet);
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
         }
 
         if (!VerifyUtil.isStringEmpty(name)) {
