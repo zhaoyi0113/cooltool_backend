@@ -15,4 +15,5 @@ public interface NurseDeviceTokensRepository extends JpaRepository<NurseDeviceTo
     List<NurseDeviceTokensEntity> findByUserId(long userId);
     List<NurseDeviceTokensEntity> findByUserIdAndDeviceTokenAndStatus(long userId, String token, CommonStatus status);
     List<NurseDeviceTokensEntity> findByDeviceToken(String token);
+    List<NurseDeviceTokensEntity> findByState(CommonStatus status);
 }

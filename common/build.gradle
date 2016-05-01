@@ -48,4 +48,6 @@ dependencies {
     compile("org.togglz:togglz-console:"+togglzVersion)
     compile("org.togglz:togglz-spring-security:"+togglzVersion)
     compile("com.github.heneke.thymeleaf:thymeleaf-extras-togglz:1.0.1.RELEASE")
+
+    compile("com.notnoop.apns:apns:1.0.0.Beta6")
 }

@@ -51,7 +51,7 @@ dependencies {
     // end::actuator[]
     compile("org.flywaydb:flyway-core")
 
-    compile("com.notnoop.apns:apns:1.0.0.Beta6")
+
 
 //
     testCompile("junit:junit")

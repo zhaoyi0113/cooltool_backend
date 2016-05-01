@@ -51,12 +51,21 @@ public class NurseDeviceTokensService {
 
     public List<NurseDeviceTokensBean> getNurseDeviceTokens(long userId) {
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndStatus(userId, CommonStatus.ENABLED);
+        return getNurseDeviceTokensBeans(tokens);
+    }
+
+    private List<NurseDeviceTokensBean> getNurseDeviceTokensBeans(List<NurseDeviceTokensEntity> tokens) {
         List<NurseDeviceTokensBean> beans = new ArrayList<>();
         for (NurseDeviceTokensEntity entity : tokens) {
             NurseDeviceTokensBean bean = beanConverter.convert(entity);
             beans.add(bean);
         }
         return beans;
+    }
+
+    public List<NurseDeviceTokensBean> getAllActiveDeviceTokens(){
+        List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByState(CommonStatus.ENABLED);
+        return getNurseDeviceTokensBeans(tokens);
     }
 
     private long saveDeviceToken(long userId, String token) {
