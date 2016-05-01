@@ -51,13 +51,12 @@ public class ActivityAPI {
     public Response getActivityDetailById(@Context HttpServletRequest request,
                                           @QueryParam("param") String idAndNginxUrl
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        logger.info("user {} get detail activity by idAndNginxUrl={}", userId, idAndNginxUrl);
+        logger.info("get detail activity by idAndNginxUrl={}", idAndNginxUrl);
 
         // parse Json
         Map<String, String> idAndUrl = VerifyUtil.parseJsonKeyVal(idAndNginxUrl);
         if (idAndUrl.isEmpty()) {
-            logger.info("json parse is empty", userId, idAndNginxUrl);
+            logger.info("json parse is empty", idAndNginxUrl);
             return Response.ok().build();
         }
         String strActivityId    = idAndUrl.get("activity_id");
