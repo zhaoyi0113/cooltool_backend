@@ -3,6 +3,7 @@ package com.cooltoo.backend.aop;
 import com.cooltoo.backend.services.notification.NotificationCenter;
 import com.cooltoo.backend.services.notification.NotificationCode;
 import com.cooltoo.beans.ActivityBean;
+import com.cooltoo.constants.ActivityStatus;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -25,10 +26,22 @@ public class ActivityAOPService {
     @AfterReturning(pointcut = "execution(* com.cooltoo.services.ActivityService.createActivity(..))",
             returning = "retVal")
     public void afterCreateActivity(JoinPoint joinPoint, ActivityBean retVal){
-        if (retVal != null) {
+        publishActivityNotification(retVal);
+    }
+
+    @AfterReturning(pointcut = "execution(* com.cooltoo.services.ActivityService.updateActivityStatus(..))",
+            returning = "retVal")
+    public void afterUpdateActivity(JoinPoint joinPoint, ActivityBean retVal){
+        publishActivityNotification(retVal);
+    }
+
+    private void publishActivityNotification(ActivityBean retVal) {
+        if (retVal != null && ActivityStatus.ENABLE.equals(retVal.getStatus())) {
             String bodyText = "官方发布新活动 "+retVal.getTitle();
             notificationCenter.publishToAllDevices(bodyText, new HashMap<String, String>(), NotificationCode.PUBLISH_ACTIVITY);
         }
     }
+
+
 
 }
