@@ -4,6 +4,7 @@ import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.beans.ActivityBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.services.ActivityService;
+import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -223,6 +224,7 @@ public class ActivityManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addImage2Temporary(@Context HttpServletRequest request,
                                        @FormDataParam("activity_id") long activityId,
+                                       @FormDataParam("nginx_url") String nginxUrl,
                                        @FormDataParam("file_name") String imageName,
                                        @FormDataParam("file") InputStream image,
                                        @FormDataParam("file") FormDataContentDisposition disp
@@ -231,7 +233,18 @@ public class ActivityManageAPI {
         logger.info("user cache image to temporary path");
         String relativePath = activityService.createTemporaryFile(activityId, imageName, image);
         logger.info("relative path is {}", relativePath);
-        return Response.ok(relativePath).build();
+        int errorNo = 0;
+        if (VerifyUtil.isStringEmpty(relativePath)) {
+            errorNo = -1;
+        }
+        relativePath = HtmlParser.constructUrl(nginxUrl, relativePath);
+        StringBuilder retVal = new StringBuilder();
+        retVal.append("{")
+                .append("\"error\":").append(errorNo).append(",")
+                .append("\"url\":\"").append(relativePath).append("\"")
+                .append("}");
+        logger.info("relative path is {}", relativePath);
+        return Response.ok(retVal.toString()).build();
     }
 
 

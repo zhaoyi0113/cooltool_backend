@@ -474,7 +474,7 @@ public class ActivityService {
         }
 
         entity.setContent(content);
-        entity.setStatus(ActivityStatus.DISABLE);
+        entity.setStatus(ActivityStatus.ENABLE);
         entity = repository.save(entity);
         return entity2BeanAndFillOtherProperties(entity);
     }

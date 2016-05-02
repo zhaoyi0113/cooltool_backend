@@ -19,6 +19,24 @@ public class HtmlParser {
         return new HtmlParser();
     }
 
+    public static String constructUrl(String urlHeader, String relativePath) {
+        if (VerifyUtil.isStringEmpty(urlHeader)) {
+            return relativePath;
+        }
+        if (VerifyUtil.isStringEmpty(relativePath)) {
+            return urlHeader;
+        }
+        urlHeader = urlHeader.replace('\\', '/');
+        if (!urlHeader.endsWith("/")) {
+            urlHeader = urlHeader + "/";
+        }
+        relativePath = relativePath.replace('\\', '/');
+        if (relativePath.startsWith("/")) {
+            relativePath = relativePath.substring(1);
+        }
+        return urlHeader+relativePath;
+    }
+
     public List<String> getSrcUrls(String content) {
         List<String> imageTags = getAllImageTag(content);
         Map<String, String> imgTag2SrcUrl = getImageSrcAttribute(imageTags);
