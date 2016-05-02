@@ -45,7 +45,7 @@ public class NurseFriendAOPService {
                 }
                 String bodyText = nurse.getName() + " 请求加你为好友";
                 Map<String, String> fields = new Hashtable<>();
-                notificationCenter.publishToUser(friendId, bodyText, fields, String.valueOf(NotificationCode.REQUEST_ADD_FRIEND));
+                notificationCenter.publishToUser(friendId, bodyText, fields, String.valueOf(NotificationCode.REQUEST_ADD_FRIEND_CODE));
             } catch (NumberFormatException e) {
                 logger.error(e.getMessage());
             }
