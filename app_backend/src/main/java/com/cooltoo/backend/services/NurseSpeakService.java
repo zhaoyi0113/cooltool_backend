@@ -195,7 +195,7 @@ public class NurseSpeakService {
                 tmp.setUserProfilePhotoUrl(nurse.getProfilePhotoUrl());
             }
             if (tmp.getSpeakType()==officialSpeak.getId()) {
-                String officialPhotoUrl = officialStorage.getOfficialSpeakProfilePhotoPath();
+                String officialPhotoUrl = officialStorage.getOfficalSpeakProfilePhotoNginxRelativePath();
                 tmp.setUserProfilePhotoUrl(officialPhotoUrl);
             }
         }

@@ -37,6 +37,12 @@ public class OfficialFileStorageService extends AbstractFileStorageService {
         return path.toString();
     }
 
+    public String getOfficalSpeakProfilePhotoNginxRelativePath() {
+        String retVal = getNginxRelativePath() + officialSpeakProfilePhotoPath;
+        logger.info("get official speak profile photo nginx relative path={}", retVal);
+        return retVal;
+    }
+
     @Override
     public String getName() {
         return "official";
