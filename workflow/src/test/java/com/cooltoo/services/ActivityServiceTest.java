@@ -387,7 +387,7 @@ public class ActivityServiceTest extends AbstractCooltooTest {
 
         activity = service.updateActivityContent(activityId, content);
         Assert.assertEquals(activityId, activity.getId());
-        Assert.assertEquals(ActivityStatus.DISABLE, activity.getStatus());
+        Assert.assertEquals(ActivityStatus.ENABLE, activity.getStatus());
         activity = service.getActivityById(activityId, "");
         Assert.assertEquals(content, activity.getContent());
 
