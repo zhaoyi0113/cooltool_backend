@@ -275,11 +275,12 @@ public class ActivityService {
             logger.error("the title is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        List<ActivityEntity> exist = repository.findByTitle(title);
-        if (null!=exist && !exist.isEmpty()) {
-            logger.error("the title is exist already");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+        // stop check the title is exist or not
+        //List<ActivityEntity> exist = repository.findByTitle(title);
+        //if (null!=exist && !exist.isEmpty()) {
+        //    logger.error("the title is exist already");
+        //    throw new BadRequestException(ErrorCode.DATA_ERROR);
+        //}
 
         ActivityEntity entity = new ActivityEntity();
         entity.setTitle(title);
