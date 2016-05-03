@@ -44,8 +44,9 @@ public class NurseDeviceTokensService {
     public void inactiveUserDeviceToken(long userId, String token) {
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);
         for (NurseDeviceTokensEntity entity : tokens) {
-            entity.setStatus(CommonStatus.DISABLED);
+            entity.setUserId(-1);
             deviceTokensRepository.save(entity);
+
         }
     }
 
@@ -63,7 +64,7 @@ public class NurseDeviceTokensService {
         return beans;
     }
 
-    public List<NurseDeviceTokensBean> getAllActiveDeviceTokens(){
+    public List<NurseDeviceTokensBean> getAllActiveDeviceTokens() {
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByStatus(CommonStatus.ENABLED);
         return getNurseDeviceTokensBeans(tokens);
     }
@@ -81,7 +82,7 @@ public class NurseDeviceTokensService {
                 } else if (entity.getUserId() != userId) {
                     entity.setStatus(CommonStatus.DISABLED);
                     deviceTokensRepository.save(entity);
-                } else if (entity.getUserId() == userId && !entity.getStatus().equals(CommonStatus.ENABLED)){
+                } else if (entity.getUserId() == userId && !entity.getStatus().equals(CommonStatus.ENABLED)) {
                     entity.setStatus(CommonStatus.ENABLED);
                     deviceTokensRepository.save(entity);
                 }
@@ -108,4 +109,6 @@ public class NurseDeviceTokensService {
         NurseDeviceTokensEntity saved = deviceTokensRepository.save(entity);
         return saved.getId();
     }
+
+
 }

@@ -93,7 +93,7 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
         deviceTokensService.inactiveUserDeviceToken(1, "aaa");
         List<NurseDeviceTokensBean> beans = deviceTokensService.getNurseDeviceTokens(1);
         for (NurseDeviceTokensBean bean : beans) {
-            Assert.assertEquals(CommonStatus.DISABLED, bean.getStatus());
+            Assert.assertEquals(-1, bean.getUserId());
         }
         deviceTokensService.registerUserDeviceToken(1, "aaa");
         beans = deviceTokensService.getNurseDeviceTokens(1);
