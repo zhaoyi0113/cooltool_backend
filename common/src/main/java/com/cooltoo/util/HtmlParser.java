@@ -147,8 +147,8 @@ public class HtmlParser {
             srcAttribute = srcAttribute.replace('\'', '\"');
             logger.info("get image tag src ==> {}", srcAttribute);
             int indexOfFirst = srcAttribute.indexOf('\"');
-            int indexOfLast  = srcAttribute.lastIndexOf('\"');
-            srcAttribute = srcAttribute.substring(indexOfFirst+1, indexOfLast);
+            int indexOfSecond = srcAttribute.indexOf('\"', indexOfFirst+1);
+            srcAttribute = srcAttribute.substring(indexOfFirst+1, indexOfSecond);
             logger.info("get image tag src value ==> {}", srcAttribute);
             imageTag2SrcAttrValue.put(tmp, srcAttribute);
         }

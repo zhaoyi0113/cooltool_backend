@@ -30,7 +30,7 @@ public class NurseFriendAOPService {
     @Autowired
     private NurseService nurseService;
 
-    @AfterReturning(pointcut = "execution(* com.cooltoo.backend.services.NurseFriendsService.setFriendship(..))",
+    @AfterReturning(pointcut = "execution(* com.cooltoo.backend.services.NurseFriendsService.addFriendship(..))",
             returning = "retVal")
     public void afterSetFriendship(JoinPoint joinPoint, boolean retVal) {
         logger.info("set friend " + retVal);

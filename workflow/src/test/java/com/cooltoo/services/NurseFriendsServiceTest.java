@@ -1,9 +1,11 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
+import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.entities.NurseFriendsEntity;
 import com.cooltoo.backend.repository.NurseFriendsRepository;
 import com.cooltoo.backend.services.NurseFriendsService;
+import com.cooltoo.constants.AgreeType;
 import com.cooltoo.util.VerifyUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
@@ -34,6 +36,95 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
     private NurseFriendsService friendsService;
     @Autowired
     private NurseFriendsRepository friendsRepository;
+
+    @Test
+    public void testGetAgreedAndGetWaitingAndAddFriendAndModifyFriendAgreed(){
+        long nurseId = 1;
+        long friendId = 15;
+        List<NurseFriendsBean> friendAgreed  = friendsService.getFriendshipAgreed(nurseId);
+        List<NurseFriendsBean> friendWaiting = friendsService.getFriendshipWaitingAgreed(nurseId);
+        Assert.assertEquals(11, friendAgreed.size());
+        Assert.assertEquals(1, friendWaiting.size());
+
+        friendsService.addFriendship(friendId, nurseId);
+
+        friendAgreed  = friendsService.getFriendshipAgreed(nurseId);
+        friendWaiting = friendsService.getFriendshipWaitingAgreed(nurseId);
+        Assert.assertEquals(11, friendAgreed.size());
+        Assert.assertEquals(2, friendWaiting.size());
+
+        friendAgreed  = friendsService.getFriendshipAgreed(friendId);
+        friendWaiting = friendsService.getFriendshipWaitingAgreed(friendId);
+        Assert.assertEquals(1, friendAgreed.size());
+        Assert.assertEquals(0, friendWaiting.size());
+
+        friendsService.modifyFriendAgreed(nurseId, friendId, AgreeType.AGREED);
+
+        friendAgreed  = friendsService.getFriendshipAgreed(nurseId);
+        friendWaiting = friendsService.getFriendshipWaitingAgreed(nurseId);
+        Assert.assertEquals(12, friendAgreed.size());
+        Assert.assertEquals(1, friendWaiting.size());
+
+        friendAgreed  = friendsService.getFriendshipAgreed(friendId);
+        friendWaiting = friendsService.getFriendshipWaitingAgreed(friendId);
+        Assert.assertEquals(2, friendAgreed.size());
+        Assert.assertEquals(0, friendWaiting.size());
+    }
+
+    @Test
+    public void testGetFriendshipByUserIdAndUserSearchedId(){
+        long userId = 3L;
+        long userSearchedId = 1L;
+        List<NurseFriendsBean> friendship = friendsService.getFriendship(userId, userSearchedId, 0, 15);
+        Assert.assertEquals(11, friendship.size());
+
+        friendship = friendsService.getFriendship(userId, userSearchedId, 2, 5);
+        Assert.assertEquals(1, friendship.size());
+        Assert.assertEquals(12, friendship.get(0).getFriendId());
+    }
+
+    @Test
+    public void testGetFriendshipByOthersIds(){
+        long userId = 1L;
+        String otherIds = "3,13,14,15";
+        List<NurseFriendsBean> friends = friendsService.getFriendship(userId, otherIds);
+        Assert.assertEquals(4, friends.size());
+        Assert.assertEquals(3, friends.get(0).getFriendId());
+        Assert.assertEquals(13, friends.get(1).getFriendId());
+        Assert.assertEquals(14, friends.get(2).getFriendId());
+        Assert.assertEquals(15, friends.get(3).getFriendId());
+
+        Assert.assertEquals(true, friends.get(0).getIsFriend());
+        Assert.assertEquals(AgreeType.AGREED, friends.get(0).getIsAgreed());
+
+        Assert.assertEquals(false, friends.get(1).getIsFriend());
+        Assert.assertEquals(AgreeType.WAITING, friends.get(1).getIsAgreed());
+        Assert.assertEquals(AgreeType.WAIT_FOR_MY_AGREE, friends.get(1).getWaitFor());
+        Assert.assertEquals(true, friends.get(1).isWaitMoreThan1Day());
+
+        Assert.assertEquals(false, friends.get(2).getIsFriend());
+        Assert.assertEquals(AgreeType.WAITING, friends.get(2).getIsAgreed());
+        Assert.assertEquals(AgreeType.WAIT_FOR_FRIEND_AGREE, friends.get(2).getWaitFor());
+        Assert.assertEquals(true, friends.get(2).isWaitMoreThan1Day());
+
+        Assert.assertEquals(false, friends.get(3).getIsFriend());
+    }
+
+    @Test
+    public void testSearchFriends(){
+        List<NurseFriendsBean> friends = null;
+
+        friends = friendsService.getFriendship(1, 1, 3, 3);
+        Assert.assertEquals(2, friends.size());
+        Assert.assertEquals(11,friends.get(0).getFriendId());
+        Assert.assertEquals(12,friends.get(1).getFriendId());
+
+        Assert.assertEquals(true, friends.get(0).getIsFriend());
+        Assert.assertEquals(AgreeType.AGREED, friends.get(0).getIsAgreed());
+
+        Assert.assertEquals(true, friends.get(1).getIsFriend());
+        Assert.assertEquals(AgreeType.AGREED, friends.get(1).getIsAgreed());
+    }
 
     //=======================================================================
     //           test repository

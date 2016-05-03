@@ -33,7 +33,7 @@ public class NurseFriendsAPI {
     public Response addFriend(@Context HttpServletRequest request,
                               @PathParam("friend_id") long friendId) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        friendsService.setFriendship(userId, friendId);
+        friendsService.addFriendship(userId, friendId);
         return Response.ok().build();
     }
 

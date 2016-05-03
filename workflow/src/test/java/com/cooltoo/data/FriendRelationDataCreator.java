@@ -70,7 +70,7 @@ public class FriendRelationDataCreator {
                         NurseEntity user = nurseEntities.get(ii);
                         NurseEntity friend = nurseEntities.get(index);
                         logger.info("add friend between " + user.getName() + ", " + friend.getName());
-                        nurseFriendsService.setFriendship(user.getId(), friend.getId());
+                        nurseFriendsService.addFriendship(user.getId(), friend.getId());
                     }
                     latch.countDown();
                 }

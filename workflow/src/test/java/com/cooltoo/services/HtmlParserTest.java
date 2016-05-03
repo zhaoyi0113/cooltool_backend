@@ -24,21 +24,21 @@ public class HtmlParserTest extends AbstractCooltooTest {
             "\t<title>afdasf fdsaf</title>\n" +
             "</head>\n" +
             "<body>\n" +
-            "<img  onerror='pullerror(this,105);' src='http://img4.imgtn.bdimg.com/it/u=227213885,3152702771.jpg'>\n" +
-            "<img  onerror='pullerror(this,106);' src='http://img4.imgtn.bdimg.com/it/u=4253490263,2515058925.jpg'>\n" +
+            "<img  onerror='pullerror(this,105);' src='http://img4.imgtn.bdimg.com/it/u=227213885,3152702771.jpg'/>\n" +
+            "<img  onerror='pullerror(this,106);' src='http://img4.imgtn.bdimg.com/it/u=4253490263,2515058925.jpg' >\n" +
             "<img  onerror='pullerror(this,107);' src='http://img4.imgtn.bdimg.com/it/u=3208940989,3404201031.jpg'>\n" +
-            "<img  onerror='pullerror(this,108);' src='http://img4.imgtn.bdimg.com/it/u=3449727357,3515710346.jpg'>\n" +
-            "<img  onerror='pullerror(this,109);' src='http://img4.imgtn.bdimg.com/it/u=715576259,3597168931.jpg'>\n" +
-            "<img  onerror='pullerror(this,110);' src='http://img4.imgtn.bdimg.com/it/u=1758354233,1981598847.jpg'>\n" +
-            "<img  onerror='pullerror(this,111);' src='http://img4.imgtn.bdimg.com/it/u=3149713355,2311806040.jpg'>\n" +
-            "<img  onerror='pullerror(this,112);' src='http://img4.imgtn.bdimg.com/it/u=3926569211,2704912628.jpg'>\n" +
-            "<img  onerror='pullerror(this,113);' src='http://img4.imgtn.bdimg.com/it/u=1267645111,31998121.jpg'>\n" +
-            " img  onerror='pullerror(this,114);' src='http://img4.imgtn.bdimg.com/it/u=hahahahhahah.jpg'>\n" +
-            "<img  onerror='pullerror(this,115);' src='http://img4.imgtn.bdimg.com/it/u=4080960913,1004736531.jpg'>\n" +
-            "<img  onerror='pullerror(this,116);' src='http://img4.imgtn.bdimg.com/it/u=1333091349,757559938.jpg'>\n" +
-            "<img  onerror='pullerror(this,117);' src='http://img4.imgtn.bdimg.com/it/u=3565939884,2448047316.jpg'>\n" +
-            "<img  onerror='pullerror(this,118);' src='http://img4.imgtn.bdimg.com/it/u=1988509788,1291468676.jpg'>\n" +
-            "<img  onerror='pullerror(this,119);' src='http://img4.imgtn.bdimg.com/it/u=2640109620,1193218977.jpg'>\n" +
+            "<img  onerror='pullerror(this,108);' src='http://img4.imgtn.bdimg.com/it/u=3449727357,3515710346.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,109);' src='http://img4.imgtn.bdimg.com/it/u=715576259,3597168931.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,110);' src='http://img4.imgtn.bdimg.com/it/u=1758354233,1981598847.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,111);' src='http://img4.imgtn.bdimg.com/it/u=3149713355,2311806040.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,112);' src='http://img4.imgtn.bdimg.com/it/u=3926569211,2704912628.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,113);' src='http://img4.imgtn.bdimg.com/it/u=1267645111,31998121.jpg' alt='aaa'>\n" +
+            " img  onerror='pullerror(this,114);' src='http://img4.imgtn.bdimg.com/it/u=hahahahhahah.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,115);' src='http://img4.imgtn.bdimg.com/it/u=4080960913,1004736531.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,116);' src='http://img4.imgtn.bdimg.com/it/u=1333091349,757559938.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,117);' src='http://img4.imgtn.bdimg.com/it/u=3565939884,2448047316.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,118);' src='http://img4.imgtn.bdimg.com/it/u=1988509788,1291468676.jpg' alt='aaa'>\n" +
+            "<img  onerror='pullerror(this,119);' src='http://img4.imgtn.bdimg.com/it/u=2640109620,1193218977.jpg' alt='aaa'>\n" +
             "</body\n" +
             "</html>";
 

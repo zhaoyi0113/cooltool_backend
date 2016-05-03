@@ -20,6 +20,10 @@ public interface NurseFriendsRepository extends JpaRepository<NurseFriendsEntity
 
     List<NurseFriendsEntity> findByUserIdAndFriendId(long userId, long friendId);
 
+    @Query("FROM NurseFriendsEntity a WHERE " +
+            " ((a.userId=?1 AND a.friendId=?2) OR (a.userId=?2  AND a.friendId=?1))")
+    List<NurseFriendsEntity> findFriendshipByUserIdAndFriendId(long userId, long friendId);
+
     long countByUserIdAndFriendId(long userId, long friendId);
 
     @Query("SELECT count(a) FROM NurseFriendsEntity a WHERE a.isAgreed<>0 AND a.userId=?1 AND a.friendId IN (\n" +

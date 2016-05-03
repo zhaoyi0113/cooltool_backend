@@ -40,17 +40,23 @@ public class NurseFriendsService {
     //            add friend relation
     //======================================================
     @Transactional
-    public boolean setFriendship(long userId, long friendId){
+    public boolean addFriendship(long userId, long friendId){
         if(userId == friendId){
             logger.error("user can't be himself friend.");
         }
-        return setFriendshipToDB(userId, friendId);
+        return addFriendshipToDB(userId, friendId);
     }
 
-    private boolean setFriendshipToDB(long userId, long friendId){
+    private boolean addFriendshipToDB(long userId, long friendId){
         validateUserId(userId, friendId);
-        long count = friendsRepository.countByUserIdAndFriendId(userId, friendId);
-        if(count <= 0){
+
+        List<NurseFriendsEntity> friendships = friendsRepository.findFriendshipByUserIdAndFriendId(userId, friendId);
+        // the friendship data is invalid or none
+        if(VerifyUtil.isListEmpty(friendships) || friendships.size()!=2){
+            if (friendships.size()!=2) {
+                logger.info("user {} and other {} has invalid friendship", userId, friendId);
+                friendsRepository.delete(friendships);
+            }
             Date datetime = new Date();
             NurseFriendsEntity entity = new NurseFriendsEntity();
             entity.setUserId(userId);
@@ -65,11 +71,33 @@ public class NurseFriendsService {
             entity.setIsAgreed(AgreeType.WAITING);
             entity.setDateTime(datetime);
             friendsRepository.save(entity);
+            logger.info("user {} add friendship to other {}", userId, friendId);
             return true;
         }
+        // check the invalid data;
         else {
-            friendsRepository.deleteFriendship(userId, friendId);
-            return false;
+            NurseFriendsEntity userEnd = friendships.get(0);
+            NurseFriendsEntity friendEnd = friendships.get(1);
+            if (userEnd.getFriendId()==userId) {
+                userEnd = friendships.get(1);
+                friendEnd = friendships.get(0);
+            }
+            if (userEnd.getIsAgreed()!=AgreeType.WAITING
+                    && friendEnd.getIsAgreed()!=AgreeType.WAITING) {
+                logger.info("user {} and other {} is friend already", userId, friendId);
+                return true;
+            }
+
+            logger.info("user {} update friendship time to other {}", userId, friendId);
+            Date datetime = new Date();
+            userEnd.setIsAgreed(AgreeType.AGREED);
+            userEnd.setDateTime(datetime);
+            friendsRepository.save(userEnd);
+
+            friendEnd.setIsAgreed(AgreeType.WAITING);
+            friendEnd.setDateTime(datetime);
+            friendsRepository.save(friendEnd);
+            return true;
         }
     }
 
@@ -185,12 +213,19 @@ public class NurseFriendsService {
         PageRequest page = new PageRequest(pageIndex, number, Sort.Direction.DESC, "dateTime");
         List<NurseFriendsEntity> friends  = getFriendshipByPage(userId, page);
         List<NurseFriendsBean>   friendsB = entities2beans(friends);
+        for (NurseFriendsBean friend : friendsB) {
+            friend.setIsFriend(true);
+        }
         fillOtherProperties(friendsB);
         return friendsB;
     }
 
     private List<NurseFriendsBean> getFriendshipWithOthers(long userId, List<Long> othersIds) {
         logger.info("get friendship of user {} and others {}", userId, othersIds);
+        if (VerifyUtil.isListEmpty(othersIds)) {
+            logger.info("others ids is empty");
+            return new ArrayList<>();
+        }
         List<NurseFriendsEntity> userAgreedAndWaiting  = findFriendshipAgreedAndWaiting(userId, othersIds);
         if (VerifyUtil.isListEmpty(userAgreedAndWaiting)) {
             userAgreedAndWaiting = new ArrayList<>();
