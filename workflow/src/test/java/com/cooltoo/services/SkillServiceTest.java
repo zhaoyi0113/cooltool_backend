@@ -43,9 +43,10 @@ public class SkillServiceTest extends AbstractCooltooTest {
         File file = new File("build/" + System.currentTimeMillis());
         try {
             file.createNewFile();
-            SkillBean bean  = skillService.addNewOccupationSkill(skillName, 1, new FileInputStream(file), new FileInputStream(file));
+            SkillBean bean  = skillService.addNewOccupationSkill(skillName, 1, "enable", new FileInputStream(file), new FileInputStream(file));
             Assert.assertTrue(bean.getId() > 0);
             Assert.assertEquals(skillName, bean.getName());
+            Assert.assertEquals(OccupationSkillStatus.ENABLE, bean.getStatus());
 
             Assert.assertTrue(storageRepository.fileExist(bean.getImageId()));
             Assert.assertTrue(storageRepository.fileExist(bean.getDisableImageId()));

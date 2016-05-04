@@ -73,9 +73,11 @@ public class OccupationSkillManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addOccupationSkill(@FormParam("name") String name,
-                                       @FormParam("factor") int factor) {
+                                       @FormParam("factor") @DefaultValue("1") int factor,
+                                       @FormParam("status") @DefaultValue("disable") String status
+    ) {
         logger.info("add new occupation skill parameters is ==== name={}, factor={}, image={}, disableImage={}.", name, factor, null, null);
-        SkillBean skill = skillService.addNewOccupationSkill(name, factor, null, null);
+        SkillBean skill = skillService.addNewOccupationSkill(name, factor, status, null, null);
         logger.info("add new occupation skill is " + skill.toString());
         return Response.ok(skill).build();
     }

@@ -181,7 +181,7 @@ public class SkillService {
     //=========================================================
 
     @Transactional
-    public SkillBean addNewOccupationSkill(String name, int factor, InputStream image, InputStream disableImage) {
+    public SkillBean addNewOccupationSkill(String name, int factor, String strStatus, InputStream image, InputStream disableImage) {
         if (!isSkillNameExist(name)) {
             if (VerifyUtil.isStringEmpty(name)) {
                 throw new BadRequestException(ErrorCode.SKILL_NAME_IS_NULL);
@@ -199,6 +199,11 @@ public class SkillService {
                 long disableFileId = officialStorage.addFile(0, name + "_disable", disableImage);
                 entity.setDisableImageId(disableFileId);
             }
+            OccupationSkillStatus status = OccupationSkillStatus.parseStatus(strStatus);
+            if (null==status) {
+                status = OccupationSkillStatus.DISABLE;
+            }
+            entity.setStatus(status);
             entity.setName(name);
             entity.setFactor(factor);
             entity = skillRepository.save(entity);
