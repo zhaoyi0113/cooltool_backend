@@ -201,6 +201,17 @@ public class NurseFriendsService {
         return currentUsersFriendship2SearchedFriends;
     }
 
+    public List<NurseFriendsBean> getFriendshipByFuzzyName(long userId, String fuzzyName) {
+        logger.info("get user {} 's friendship with fuzzy name={}", fuzzyName);
+        List<Long> otherIds = nurseService.getNurseIdsByName(fuzzyName);
+        if (otherIds.contains(userId)) {
+            otherIds.remove(userId);
+        }
+        List<NurseFriendsBean> currentUsersFriendship2SearchedFriends = getFriendshipWithOthers(userId, otherIds);
+        fillOtherProperties(currentUsersFriendship2SearchedFriends);
+        return currentUsersFriendship2SearchedFriends;
+    }
+
     public List<NurseFriendsBean> getFriendship(long userId, List<Long> otherIds) {
         logger.info("get user {} 's friendship with others={}", userId, otherIds);
         List<NurseFriendsBean> currentUsersFriendship2SearchedFriends = getFriendshipWithOthers(userId, otherIds);

@@ -119,6 +119,16 @@ public class NurseFriendsAPI {
         return Response.ok(friends).build();
     }
 
+    @GET
+    @Path("/search_name_like/{name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchNurse(@Context HttpServletRequest request,
+                                 @PathParam("name") String name) {
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<NurseFriendsBean> friends = friendsService.getFriendshipByFuzzyName(userId, name);
+        return Response.ok(friends).build();
+    }
+
     @POST
     @Path("/judge_friend")
     @Produces(MediaType.APPLICATION_JSON)

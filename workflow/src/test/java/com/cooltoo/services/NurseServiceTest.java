@@ -199,4 +199,21 @@ public class NurseServiceTest extends AbstractCooltooTest {
         count = service.getAllByAuthority(UserAuthority.DENY_ALL.name(), 0, 30);
         Assert.assertEquals(8, count.size());
     }
+
+    @Test
+    public void testGetNurseIdsByName() {
+        String name = "护5";
+        List<Long> ids = service.getNurseIdsByName(name);
+        Assert.assertEquals(2, ids.size());
+        Assert.assertTrue(ids.contains(5L));
+        Assert.assertTrue(ids.contains(15L));
+
+        name = "1";
+        ids = service.getNurseIdsByName(name);
+        Assert.assertEquals(9, ids.size());
+
+        name = "11";
+        ids = service.getNurseIdsByName(name);
+        Assert.assertEquals(1, ids.size());
+    }
 }

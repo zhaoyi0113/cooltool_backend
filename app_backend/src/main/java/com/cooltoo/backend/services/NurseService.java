@@ -168,6 +168,29 @@ public class NurseService {
         return nurses;
     }
 
+    public List<Long> getNurseIdsByName(String fuzzyQueryName) {
+        logger.info("execute the fuzzily querying by name={}", fuzzyQueryName);
+        if (VerifyUtil.isStringEmpty(fuzzyQueryName)) {
+            logger.info("the name for fuzzily querying is empty");
+            return new ArrayList<>();
+        }
+        StringBuilder fuzzyName = new StringBuilder();
+        for (int i=0, length=fuzzyQueryName.length(); i < length; i ++) {
+            fuzzyName.append(fuzzyQueryName.charAt(i));
+            if (i+1!=length) {
+                fuzzyName.append('%');
+            }
+        }
+        fuzzyQueryName = fuzzyName.toString();
+        List<Long> nurseIds = repository.findIdsByFuzzyName(fuzzyQueryName);
+        if (VerifyUtil.isListEmpty(nurseIds)) {
+            logger.info("find result set is empty");
+            return new ArrayList<>();
+        }
+        logger.info("find result set size is {}", nurseIds.size());
+        return nurseIds;
+    }
+
     //==============================================================
     //             get used by administrator
     //==============================================================
