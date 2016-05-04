@@ -1,6 +1,7 @@
 package com.cooltoo;
 
 import com.cooltoo.backend.features.AppFeatures;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,10 @@ public class Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Application.class.getName());
 
+    @Value("${togglz_property}")
+    private String togglzFilePath;
+
+
     @Bean
     public FeatureProvider featureProvider() {
         return new EnumBasedFeatureProvider(AppFeatures.class);
@@ -39,20 +45,11 @@ public class Application {
 
     @Bean
     public StateRepository stateRepository() throws IOException {
-//        URL url= getClass().getResource("/application.properties");
-//        File file = null;
-//        try {
-//            logger.info("get property uri "+url.toURI());
-//            file = new File(url.toURI());
-//            return new FileBasedStateRepository(file);
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        } catch(IllegalArgumentException e){
-//            e.printStackTrace();
-//        }
-        final InMemoryStateRepository stateRepository = new InMemoryStateRepository();
-        stateRepository.setFeatureState(new FeatureState(AppFeatures.SMS_CODE, false));
-        return stateRepository;
+        File file = null;
+        logger.info("get property uri " + togglzFilePath);
+        file = new File(togglzFilePath);
+        logger.info(file.getAbsolutePath());
+        return new FileBasedStateRepository(file);
     }
 
     public static void main(String[] args) {
