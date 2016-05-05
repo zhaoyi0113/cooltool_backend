@@ -18,7 +18,7 @@ public interface NurseRepository extends CrudRepository<NurseEntity, Long> {
     List<NurseEntity> findByNameContaining(String name);
 
     @Query("SELECT n.id FROM NurseEntity n WHERE n.name like %?1% ")
-    List<Long>        findIdsByFuzzyName(String fuzzyName);
+    List<Long>        findIdsByFuzzyName(String fuzzyName, Pageable page);
 
     List<NurseEntity> findByName(String name);
     List<NurseEntity> findByIdIn(List<Long> ids);

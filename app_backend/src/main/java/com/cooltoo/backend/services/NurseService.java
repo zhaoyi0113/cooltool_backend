@@ -168,7 +168,7 @@ public class NurseService {
         return nurses;
     }
 
-    public List<Long> getNurseIdsByName(String fuzzyQueryName) {
+    public List<Long> getNurseIdsByName(String fuzzyQueryName, int pageIndex, int sizePerPage) {
         logger.info("execute the fuzzily querying by name={}", fuzzyQueryName);
         if (VerifyUtil.isStringEmpty(fuzzyQueryName)) {
             logger.info("the name for fuzzily querying is empty");
@@ -182,7 +182,8 @@ public class NurseService {
             }
         }
         fuzzyQueryName = fuzzyName.toString();
-        List<Long> nurseIds = repository.findIdsByFuzzyName(fuzzyQueryName);
+        PageRequest pageReq = new PageRequest(pageIndex, sizePerPage);
+        List<Long> nurseIds = repository.findIdsByFuzzyName(fuzzyQueryName, pageReq);
         if (VerifyUtil.isListEmpty(nurseIds)) {
             logger.info("find result set is empty");
             return new ArrayList<>();

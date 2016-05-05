@@ -130,7 +130,7 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
     public void testGetFriendshipByFuzzyName() {
         String fuzzyName = "护5";
         long   userId    = 1L;
-        List<NurseFriendsBean> friendships = friendsService.getFriendshipByFuzzyName(userId, fuzzyName);
+        List<NurseFriendsBean> friendships = friendsService.getFriendshipByFuzzyName(userId, fuzzyName, 0, 5);
         Assert.assertEquals(2, friendships.size());
         Assert.assertEquals(5, friendships.get(0).getFriendId());
         Assert.assertTrue(friendships.get(0).getIsFriend());

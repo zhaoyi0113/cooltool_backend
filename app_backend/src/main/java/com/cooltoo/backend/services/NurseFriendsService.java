@@ -201,9 +201,9 @@ public class NurseFriendsService {
         return currentUsersFriendship2SearchedFriends;
     }
 
-    public List<NurseFriendsBean> getFriendshipByFuzzyName(long userId, String fuzzyName) {
+    public List<NurseFriendsBean> getFriendshipByFuzzyName(long userId, String fuzzyName, int pageIndex, int sizePerPage) {
         logger.info("get user {} 's friendship with fuzzy name={}", fuzzyName);
-        List<Long> otherIds = nurseService.getNurseIdsByName(fuzzyName);
+        List<Long> otherIds = nurseService.getNurseIdsByName(fuzzyName, pageIndex, sizePerPage);
         if (otherIds.contains(userId)) {
             otherIds.remove(userId);
         }

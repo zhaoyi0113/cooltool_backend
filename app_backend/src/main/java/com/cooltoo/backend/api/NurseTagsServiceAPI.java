@@ -30,11 +30,12 @@ public class NurseTagsServiceAPI {
     //    get
     //=======================================================================
 
-    @POST
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response getTag(@Context HttpServletRequest request,
-                           @FormParam("tag_ids") String             tagIds) {
+                           @QueryParam("tag_ids") String tagIds
+    ) {
         logger.info("get tag by ids={}", tagIds);
         List<TagsBean> tags = tagsService.getTagByIds(tagIds);
         return Response.ok(tags).build();
@@ -55,18 +56,20 @@ public class NurseTagsServiceAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getTagByCategoryId(@Context                  HttpServletRequest request,
-                                       @PathParam("category_id") long               categoryId) {
+    public Response getTagByCategoryId(@Context HttpServletRequest request,
+                                       @PathParam("category_id") long categoryId
+    ) {
         List<TagsBean> tags = tagsService.getTagsByCategoryId(categoryId);
         return Response.ok(tags).build();
     }
 
     @Path("/category")
-    @POST
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getCategory(@Context                   HttpServletRequest request,
-                                @FormParam("category_ids") String             categoryIds) {
+    public Response getCategory(@Context HttpServletRequest request,
+                                @QueryParam("category_ids") String categoryIds
+    ) {
         logger.info("get category by ids={}", categoryIds);
         if ("ALL".equalsIgnoreCase(categoryIds)) {
             List<TagsCategoryBean> categories = tagsService.getAllCategory();
@@ -79,11 +82,12 @@ public class NurseTagsServiceAPI {
     }
 
     @Path("/category_with_tags")
-    @POST
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getCategoryWithTags(@Context                   HttpServletRequest request,
-                                        @FormParam("category_ids") String             categoryIds) {
+    public Response getCategoryWithTags(@Context HttpServletRequest request,
+                                        @QueryParam("category_ids") String categoryIds
+    ) {
         logger.info("get category_with_tag by ids={}", categoryIds);
         if ("ALL".equalsIgnoreCase(categoryIds)) {
             List<TagsCategoryBean> categories = tagsService.getAllCategoryWithTags();

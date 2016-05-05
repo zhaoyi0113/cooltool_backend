@@ -120,12 +120,15 @@ public class NurseFriendsAPI {
     }
 
     @GET
-    @Path("/search_name_like/{name}")
+    @Path("/search_name_like/{name}/{index}/{number}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response searchNurse(@Context HttpServletRequest request,
-                                 @PathParam("name") String name) {
+                                @PathParam("name") String name,
+                                @PathParam("index") @DefaultValue("0") int pageIndex,
+                                @PathParam("number") @DefaultValue("20") int sizePerPage
+    ) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseFriendsBean> friends = friendsService.getFriendshipByFuzzyName(userId, name);
+        List<NurseFriendsBean> friends = friendsService.getFriendshipByFuzzyName(userId, name, pageIndex, sizePerPage);
         return Response.ok(friends).build();
     }
 
