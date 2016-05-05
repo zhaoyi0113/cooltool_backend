@@ -132,12 +132,12 @@ public class NurseFriendsAPI {
         return Response.ok(friends).build();
     }
 
-    @POST
+    @GET
     @Path("/judge_friend")
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response judgeFriend(@Context HttpServletRequest request,
-                                @FormParam("others_ids") String otherIds
+                                @QueryParam("others_ids") String otherIds
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("nurse {} judge friendship with {}", otherIds);
