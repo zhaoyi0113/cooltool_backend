@@ -32,7 +32,6 @@ public class NurseTagsServiceAPI {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     public Response getTag(@Context HttpServletRequest request,
                            @QueryParam("tag_ids") String tagIds
     ) {
@@ -44,7 +43,6 @@ public class NurseTagsServiceAPI {
     @Path("/tag_without_category")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     public Response getTagWithoutCategoryId(@Context HttpServletRequest request) {
         logger.info("get tag with no category belong");
         List<TagsBean> tags = tagsService.getTagsWithoutCategoryId();
@@ -55,7 +53,6 @@ public class NurseTagsServiceAPI {
     @Path("/tag_by_category/{category_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     public Response getTagByCategoryId(@Context HttpServletRequest request,
                                        @PathParam("category_id") long categoryId
     ) {
@@ -66,7 +63,6 @@ public class NurseTagsServiceAPI {
     @Path("/category")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     public Response getCategory(@Context HttpServletRequest request,
                                 @QueryParam("category_ids") String categoryIds
     ) {
@@ -85,7 +81,7 @@ public class NurseTagsServiceAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategoryWithTags(@Context HttpServletRequest request,
-                                        @QueryParam("category_ids") String categoryIds
+                                        @DefaultValue("ALL") @QueryParam("category_ids") String categoryIds
     ) {
         logger.info("get category_with_tag by ids={}", categoryIds);
         if ("ALL".equalsIgnoreCase(categoryIds)) {
