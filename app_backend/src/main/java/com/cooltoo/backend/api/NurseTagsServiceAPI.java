@@ -84,7 +84,6 @@ public class NurseTagsServiceAPI {
     @Path("/category_with_tags")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     public Response getCategoryWithTags(@Context HttpServletRequest request,
                                         @QueryParam("category_ids") String categoryIds
     ) {
