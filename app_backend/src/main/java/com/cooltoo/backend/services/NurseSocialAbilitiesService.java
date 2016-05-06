@@ -145,6 +145,10 @@ public class NurseSocialAbilitiesService {
                         skill.getDisableImageId(), skill.getDisableImageUrl());
                 BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.SKILL.name());
                 abilityBean.setBadge(badge);
+                if (null!=badge) {
+                    abilityBean.setSkillName(badge.getName());
+                    abilityBean.setImageUrl(badge.getImageUrl());
+                }
                 nurseSkillAbilities.add(abilityBean);
             }
         }
@@ -161,6 +165,10 @@ public class NurseSocialAbilitiesService {
                         speakType.getDisableImageId(), speakType.getDisableImageUrl());
                 BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMUNITY.name());
                 abilityBean.setBadge(badge);
+                if (null!=badge) {
+                    abilityBean.setSkillName(badge.getName());
+                    abilityBean.setImageUrl(badge.getImageUrl());
+                }
                 nurseSkillAbilities.add(abilityBean);
             }
         }
@@ -175,6 +183,10 @@ public class NurseSocialAbilitiesService {
                     0, "");
             BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.THUMBS_UP_ME.name());
             abilityBean.setBadge(badge);
+            if (null!=badge) {
+                abilityBean.setSkillName(badge.getName());
+                abilityBean.setImageUrl(badge.getImageUrl());
+            }
             nurseSkillAbilities.add(abilityBean);
         }
         // add thumbs up others count
@@ -188,6 +200,10 @@ public class NurseSocialAbilitiesService {
                     0, "");
             BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.THUMBS_UP_OTHERS.name());
             abilityBean.setBadge(badge);
+            if (null!=badge) {
+                abilityBean.setSkillName(badge.getName());
+                abilityBean.setImageUrl(badge.getImageUrl());
+            }
             nurseSkillAbilities.add(abilityBean);
         }
         // add comment made by user
@@ -201,6 +217,10 @@ public class NurseSocialAbilitiesService {
                     0, "");
             BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMENT_MADE.name());
             abilityBean.setBadge(badge);
+            if (null!=badge) {
+                abilityBean.setSkillName(badge.getName());
+                abilityBean.setImageUrl(badge.getImageUrl());
+            }
             nurseSkillAbilities.add(abilityBean);
         }
 
