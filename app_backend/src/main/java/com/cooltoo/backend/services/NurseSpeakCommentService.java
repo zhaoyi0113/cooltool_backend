@@ -41,6 +41,12 @@ public class NurseSpeakCommentService {
     //==================================================================
     //              GET
     //==================================================================
+    public long countCommentUserMake(long nurseId) {
+        long count = commentRepository.countCommentUserMake(nurseId);
+        logger.info("count comment made by user={}, size={}", count);
+        return count;
+    }
+
     public List<NurseSpeakCommentBean> getCommentByIds(String ids) {
         if (!VerifyUtil.isIds(ids)) {
             return new ArrayList<>();

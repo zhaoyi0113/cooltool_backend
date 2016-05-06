@@ -25,7 +25,9 @@ public class NurseSocialAbilitiesService {
     @Autowired private SkillService                  skillService;
     @Autowired private NurseSkillService             nurseSkillService;
     @Autowired private NurseAbilityNominationService nominationService;
-    @Autowired private NurseSpeakService             nurseSpeakService;
+    @Autowired private NurseSpeakService             speakService;
+    @Autowired private NurseSpeakThumbsUpService     thumbsUpService;
+    @Autowired private NurseSpeakCommentService      commentService;
     @Autowired private SpeakTypeService              speakTypeService;
     @Autowired private NurseHospitalRelationService  nurseHospitalService;
     @Autowired private BadgeService                  badgeService;
@@ -149,7 +151,7 @@ public class NurseSocialAbilitiesService {
 
         // add nurse speak abilities(smug/cathart/ask_question)
         for (SpeakTypeBean speakType : speakTypes) {
-            long countOfSpeakType = nurseSpeakService.countSpeak(true, userId, speakType.getType().name());
+            long countOfSpeakType = speakService.countSpeak(true, userId, speakType.getType().name());
             if (countOfSpeakType>0) {
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         userId,
@@ -161,6 +163,45 @@ public class NurseSocialAbilitiesService {
                 abilityBean.setBadge(badge);
                 nurseSkillAbilities.add(abilityBean);
             }
+        }
+        // add thumbs up user count
+        long countThumbsUpUser   = thumbsUpService.countOthersThumbsUpUser(userId);
+        if (countThumbsUpUser>0) {
+            SocialAbilitiesBean abilityBean = newAbilityBean(
+                    userId,
+                    0, "", SocialAbilityType.THUMBS_UP_ME,
+                    1, countThumbsUpUser,
+                    0, "",
+                    0, "");
+            BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.THUMBS_UP_ME.name());
+            abilityBean.setBadge(badge);
+            nurseSkillAbilities.add(abilityBean);
+        }
+        // add thumbs up others count
+        long countThumbsUpOthers = thumbsUpService.countUserThumbsUpOthers(userId);
+        if (countThumbsUpOthers>0) {
+            SocialAbilitiesBean abilityBean = newAbilityBean(
+                    userId,
+                    0, "", SocialAbilityType.THUMBS_UP_OTHERS,
+                    1, countThumbsUpOthers,
+                    0, "",
+                    0, "");
+            BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.THUMBS_UP_OTHERS.name());
+            abilityBean.setBadge(badge);
+            nurseSkillAbilities.add(abilityBean);
+        }
+        // add comment made by user
+        long countCommentMade = commentService.countCommentUserMake(userId);
+        if (countCommentMade>0) {
+            SocialAbilitiesBean abilityBean = newAbilityBean(
+                    userId,
+                    0, "", SocialAbilityType.COMMENT_MADE,
+                    1, countCommentMade,
+                    0, "",
+                    0, "");
+            BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMENT_MADE.name());
+            abilityBean.setBadge(badge);
+            nurseSkillAbilities.add(abilityBean);
         }
 
         // sort skill social abilities by Point
@@ -232,7 +273,7 @@ public class NurseSocialAbilitiesService {
         }
         else if (SocialAbilityType.COMMUNITY==socialAbilityType) {
             SpeakTypeBean speakType        = speakTypeService.getSpeakType(abilityId);
-            long          countOfSpeakType = nurseSpeakService.countSpeak(true, userId, speakType.getType().name());
+            long          countOfSpeakType = speakService.countSpeak(true, userId, speakType.getType().name());
             // speak social ability
             if (countOfSpeakType>0) {
                 SocialAbilitiesBean abilityBean = newAbilityBean(

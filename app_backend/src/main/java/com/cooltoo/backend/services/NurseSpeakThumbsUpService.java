@@ -43,6 +43,18 @@ public class NurseSpeakThumbsUpService {
     //          get
     //============================================================
 
+    public long countUserThumbsUpOthers(long nurseId) {
+        long count = thumbsUpRepository.countUserThumbsUpOthers(nurseId);
+        logger.info("count user thumbs up others speak={}", count);
+        return count;
+    }
+
+    public long countOthersThumbsUpUser(long nurseId) {
+        long count = thumbsUpRepository.countOthersThumbsUpUser(nurseId);
+        logger.info("count others thumbs up user speak={}", count);
+        return count;
+    }
+
     public List<NurseSpeakThumbsUpBean> getSpeakThumbsUpByNurseSpeakId(long nurseSpeakId) {
         List<NurseSpeakThumbsUpEntity> thumbsUpEntities = thumbsUpRepository.findUpByNurseSpeakId(nurseSpeakId);
 

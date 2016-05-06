@@ -176,26 +176,29 @@ public class NurseSocialAbilityAPI {
         return Response.ok(ret).build();
     }
 
-    @Path("/nominate_department_ability")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
-    public Response thumbsUpDepartment(@Context HttpServletRequest request,
-                                       @FormParam("friend_id") long friendId) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        logger.info("user {} nominate friend {} 's department.", userId, friendId);
-
-        NurseHospitalRelationBean relation = hospitalRelationService.getRelationByNurseId(friendId);
-        logger.info("friend's hospital_department relationship is {}" , relation);
-        if (null==relation || relation.getDepartmentId()<=0) {
-            return null;
-        }
-        SocialAbilitiesBean ability =  abilitiesService.nominateSocialAbility(userId, friendId, relation.getDepartmentId(), SocialAbilityType.OCCUPATION.name());
-        logger.info("user {} thumbs up friend {} 's department. value {}", userId, friendId, ability);
-
-        Map<String, String> ret = new Hashtable<String, String>();
-        ret.put("skill_id", relation.getDepartmentId()+"");
-        ret.put("count", ability.getNominatedCount()+"");
-        return Response.ok(ret).build();
-    }
+//
+// 第一版本暂不实现该功能。
+//
+//    @Path("/nominate_department_ability")
+//    @POST
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @LoginAuthentication(requireNurseLogin = true)
+//    public Response thumbsUpDepartment(@Context HttpServletRequest request,
+//                                       @FormParam("friend_id") long friendId) {
+//        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+//        logger.info("user {} nominate friend {} 's department.", userId, friendId);
+//
+//        NurseHospitalRelationBean relation = hospitalRelationService.getRelationByNurseId(friendId);
+//        logger.info("friend's hospital_department relationship is {}" , relation);
+//        if (null==relation || relation.getDepartmentId()<=0) {
+//            return null;
+//        }
+//        SocialAbilitiesBean ability =  abilitiesService.nominateSocialAbility(userId, friendId, relation.getDepartmentId(), SocialAbilityType.OCCUPATION.name());
+//        logger.info("user {} thumbs up friend {} 's department. value {}", userId, friendId, ability);
+//
+//        Map<String, String> ret = new Hashtable<String, String>();
+//        ret.put("skill_id", relation.getDepartmentId()+"");
+//        ret.put("count", ability.getNominatedCount()+"");
+//        return Response.ok(ret).build();
+//    }
 }

@@ -65,11 +65,29 @@ public class NurseSpeakAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getSpeakAllType(@Context HttpServletRequest request,
-                                    @PathParam("index") int index,
-                                    @PathParam("number") int number
+    public Response getSpeak(@Context HttpServletRequest request,
+                             @PathParam("index") int index,
+                             @PathParam("number") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        String type = "smug,ask_question";
+        logger.info("user {} get speak by type={} at page={} {}/page", userId, type, index, number);
+
+        List<NurseSpeakBean> speak = speakService.getSpeak(true, userId, type, index, number);
+        logger.info("speak count={}", speak.size());
+
+        return Response.ok(speak).build();
+    }
+
+    @Path("/query/{user_id}{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response getSpeak(@Context HttpServletRequest request,
+                             @PathParam("user_id") @DefaultValue("0") long userId,
+                             @PathParam("index") @DefaultValue("0") int index,
+                             @PathParam("number") @DefaultValue("10") int number
+    ) {
         String type = "smug,ask_question";
         logger.info("user {} get speak by type={} at page={} {}/page", userId, type, index, number);
 
