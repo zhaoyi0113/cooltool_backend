@@ -47,6 +47,16 @@ public class NurseSpeakService {
     //             get
     //===============================================================
 
+    public long countSortSpeakBySpeakType(List<Long> speakIds, int speakTypeId) {
+        if (VerifyUtil.isListEmpty(speakIds)) {
+            return 0;
+        }
+        logger.info("sort speak(count={}) by speak type={}", speakIds.size(), speakTypeId);
+        long countSortedSpeakIds = speakRepository.countSortSpeakByType(speakIds, speakTypeId);
+        logger.info("sort speak count={}", countSortedSpeakIds);
+        return countSortedSpeakIds;
+    }
+
     public Map<Long, Long> countByUserIds(String strUserIds){
         logger.info("get nurse {} speak count", strUserIds);
 

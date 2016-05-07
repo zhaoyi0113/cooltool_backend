@@ -32,6 +32,18 @@ public class NurseSpeakCommentServiceTest extends AbstractCooltooTest {
     NurseSpeakCommentService commentService;
 
     @Test
+    public void testFindSpeakWithCommentUserMake() {
+        List<Long> speakIds = commentService.findSpeakWithCommentUserMake(1);
+        Assert.assertEquals(4, speakIds.size());
+        speakIds = commentService.findSpeakWithCommentUserMake(2);
+        Assert.assertEquals(1, speakIds.size());
+        Assert.assertEquals(Long.valueOf(3L), speakIds.get(0));
+        speakIds = commentService.findSpeakWithCommentUserMake(3);
+        Assert.assertEquals(1, speakIds.size());
+        Assert.assertEquals(Long.valueOf(4L), speakIds.get(0));
+    }
+
+    @Test
     public void testAddNurseSpeakComment() {
         String comment = "Test ping lun";
         Date time = new Date();

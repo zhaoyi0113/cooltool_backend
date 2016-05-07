@@ -3,6 +3,7 @@ package com.cooltoo.admin.api;
 import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.services.BadgeService;
+import com.cooltoo.beans.SpecificSocialAbility;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +30,28 @@ public class BadgeAPI {
 
     @Autowired
     private BadgeService badgeService;
+
+    @Path("/ability_type")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getAllAbilityType() {
+        Map<String, String> abilityTypes = badgeService.getAllAbilityType();
+        logger.info("get social abilities types={}", abilityTypes);
+        return Response.ok(abilityTypes).build();
+    }
+
+    @Path("/abilities_by_type/{abilityType}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getAbilitiesByAbilityType(@Context HttpServletRequest request,
+                                              @PathParam("abilityType") @DefaultValue("") String abilityType
+    ) {
+        List<SpecificSocialAbility> abilities = badgeService.getItemsOfType(abilityType);
+        logger.info("get social abilities by type={}, values={}", abilityType, abilities);
+        return Response.ok(abilities).build();
+    }
 
     @Path("/count/{ability_type}")
     @GET

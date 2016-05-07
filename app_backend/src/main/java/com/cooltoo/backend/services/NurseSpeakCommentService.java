@@ -41,10 +41,14 @@ public class NurseSpeakCommentService {
     //==================================================================
     //              GET
     //==================================================================
-    public long countCommentUserMake(long nurseId) {
-        long count = commentRepository.countCommentUserMake(nurseId);
-        logger.info("count comment made by user={}, size={}", count);
-        return count;
+    public List<Long> findSpeakWithCommentUserMake(long nurseId) {
+        List<Long> speaks = commentRepository.findSpeakWithCommentUserMake(nurseId);
+        if (VerifyUtil.isListEmpty(speaks)) {
+            logger.info("speak with comment user={} made is empty", nurseId);
+            return new ArrayList<>();
+        }
+        logger.info("speak with comment user={} made, size={}", nurseId, speaks.size());
+        return speaks;
     }
 
     public List<NurseSpeakCommentBean> getCommentByIds(String ids) {

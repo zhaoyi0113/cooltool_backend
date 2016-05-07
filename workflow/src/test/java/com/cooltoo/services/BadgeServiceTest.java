@@ -3,6 +3,7 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.services.BadgeService;
 import com.cooltoo.beans.BadgeBean;
+import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.services.file.OfficialFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yzzhao on 2/24/16.
@@ -22,6 +24,7 @@ import java.util.List;
 @DatabaseSetups({
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/badge_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/speak_type_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_department_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml")
 })
 public class BadgeServiceTest extends AbstractCooltooTest {
@@ -30,6 +33,78 @@ public class BadgeServiceTest extends AbstractCooltooTest {
     private BadgeService badgeService;
     @Autowired
     private OfficialFileStorageService officialStorage;
+
+    @Test
+    public void testGetAllAbilityType() {
+        Map<String, String> allAbility = badgeService.getAllAbilityType();
+        Assert.assertEquals(5, allAbility.size());
+        Assert.assertEquals("发言", allAbility.get("COMMUNITY"));
+        Assert.assertEquals("技能", allAbility.get("SKILL"));
+        Assert.assertEquals("职业", allAbility.get("OCCUPATION"));
+        Assert.assertEquals("点赞", allAbility.get("THUMBS_UP"));
+        Assert.assertEquals("评论", allAbility.get("COMMENT"));
+    }
+
+    @Test
+    public void testGetItemsOfType() {
+        List<SpecificSocialAbility> items = badgeService.getItemsOfType("COMMUNITY");
+        Assert.assertEquals(4, items.size());
+        for (SpecificSocialAbility ability : items) {
+            Assert.assertTrue(ability.getAbilityId() == 1
+                    || ability.getAbilityId() == 2
+                    || ability.getAbilityId() == 3
+                    || ability.getAbilityId() == 4);
+            Assert.assertTrue("SMUG".equals(ability.getAbilityName())
+                    || "CATHART".equals(ability.getAbilityName())
+                    || "ASK_QUESTION".equals(ability.getAbilityName())
+                    || "OFFICIAL".equals(ability.getAbilityName()));
+            Assert.assertEquals("COMMUNITY", ability.getAbilityType().name());
+        }
+
+        items = badgeService.getItemsOfType("SKILL");
+        Assert.assertEquals(1, items.size());
+        Assert.assertEquals(1000, items.get(0).getAbilityId());
+        Assert.assertEquals("occ1", items.get(0).getAbilityName());
+        Assert.assertEquals("SKILL", items.get(0).getAbilityType().name());
+        items = badgeService.getItemsOfType("OCCUPATION");
+        Assert.assertEquals(0, items.size());
+        items = badgeService.getItemsOfType("THUMBS_UP");
+        Assert.assertEquals(2, items.size());
+        for (SpecificSocialAbility ability : items) {
+            Assert.assertTrue(ability.getAbilityId() == 1 || ability.getAbilityId() == 2);
+            Assert.assertTrue("被赞".equals(ability.getAbilityName()) || "点赞".equals(ability.getAbilityName()));
+            Assert.assertEquals("THUMBS_UP", ability.getAbilityType().name());
+        }
+        items = badgeService.getItemsOfType("COMMENT");
+        Assert.assertEquals(2, items.size());
+        for (SpecificSocialAbility ability : items) {
+            Assert.assertTrue(ability.getAbilityId() == 1 || ability.getAbilityId() == 2);
+            Assert.assertTrue("评论".equals(ability.getAbilityName()) || "答题".equals(ability.getAbilityName()));
+            Assert.assertEquals("COMMENT", ability.getAbilityType().name());
+        }
+    }
+
+    @Test
+    public void testGetBadgeByPointAndAbilityIdAndType(){
+        BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(90, 1, "COMMUNITY");
+        Assert.assertNull(badge);
+        badge = badgeService.getBadgeByPointAndAbilityIdAndType(100, 1, "COMMUNITY");
+        Assert.assertEquals(1, badge.getId());
+        Assert.assertEquals("铜 1", badge.getName());
+        Assert.assertEquals(0, badge.getGrade());
+        badge = badgeService.getBadgeByPointAndAbilityIdAndType(150, 1, "COMMUNITY");
+        Assert.assertEquals(1, badge.getId());
+        Assert.assertEquals("铜 1", badge.getName());
+        Assert.assertEquals(0, badge.getGrade());
+        badge = badgeService.getBadgeByPointAndAbilityIdAndType(200, 1, "COMMUNITY");
+        Assert.assertEquals(2, badge.getId());
+        Assert.assertEquals("银 1", badge.getName());
+        Assert.assertEquals(1, badge.getGrade());
+        badge = badgeService.getBadgeByPointAndAbilityIdAndType(250, 1, "COMMUNITY");
+        Assert.assertEquals(2, badge.getId());
+        Assert.assertEquals("银 1", badge.getName());
+        Assert.assertEquals(1, badge.getGrade());
+    }
 
     @Test
     public void testCountByAbilityType(){

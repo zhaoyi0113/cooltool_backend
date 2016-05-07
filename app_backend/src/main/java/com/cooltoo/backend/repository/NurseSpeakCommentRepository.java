@@ -12,8 +12,8 @@ import java.util.List;
  * Created by Test111 on 2016/3/18.
  */
 public interface NurseSpeakCommentRepository extends JpaRepository<NurseSpeakCommentEntity, Long> {
-    @Query("SELECT count(comment.id) FROM NurseSpeakCommentEntity comment WHERE comment.commentMakerId=?1")
-    long countCommentUserMake(long userId);
+    @Query("SELECT DISTINCT comment.nurseSpeakId FROM NurseSpeakCommentEntity comment WHERE comment.commentMakerId=?1")
+    List<Long> findSpeakWithCommentUserMake(long userId);
     List<NurseSpeakCommentEntity> findByIdIn(List<Long> commentIds);
     List<NurseSpeakCommentEntity> findByNurseSpeakId(Long nurseSpeakId, Sort sort);
     List<NurseSpeakCommentEntity> findByNurseSpeakIdIn(List<Long> nurseSpeakIds);

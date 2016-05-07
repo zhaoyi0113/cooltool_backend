@@ -5,6 +5,7 @@ import com.cooltoo.backend.beans.SpeakTypeBean;
 import com.cooltoo.backend.services.SpeakTypeService;
 import com.cooltoo.services.file.OfficialFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ import org.slf4j.LoggerFactory;
  * Created by zhaolisong on 16/3/29.
  */
 @Transactional
+@DatabaseSetups({
+        @DatabaseSetup("classpath:/com/cooltoo/services/speak_type_data.xml")
+})
 public class SpeakTypeServiceTest extends AbstractCooltooTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SpeakTypeServiceTest.class.getName());
@@ -30,7 +34,6 @@ public class SpeakTypeServiceTest extends AbstractCooltooTest {
     private OfficialFileStorageService officialStorage;
 
     @Test
-    @DatabaseSetup("classpath:/com/cooltoo/services/speak_type_data.xml")
     public void testGetAllSpeakType() {
         List<SpeakTypeBean> speakTypes = speakTypeService.getAllSpeakType();
         Assert.assertEquals(4, speakTypes.size());
@@ -41,7 +44,6 @@ public class SpeakTypeServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:/com/cooltoo/services/speak_type_data.xml")
     public void testUpdateSpeakType() {
         List<SpeakTypeBean> speakTypes = speakTypeService.getAllSpeakType();
         SpeakTypeBean       speakType  = speakTypes.get(0);

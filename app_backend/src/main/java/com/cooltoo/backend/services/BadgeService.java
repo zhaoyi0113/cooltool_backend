@@ -1,8 +1,8 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.repository.SkillRepository;
-import com.cooltoo.backend.repository.SpeakTypeRepository;
+import com.cooltoo.backend.converter.social_ability.*;
 import com.cooltoo.beans.BadgeBean;
+import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.converter.BadgeBeanConverter;
 import com.cooltoo.entities.BadgeEntity;
@@ -36,11 +36,54 @@ public class BadgeService {
 
     @Autowired private BadgeRepository repository;
     @Autowired private BadgeBeanConverter beanConverter;
-    @Autowired private SkillRepository skillRepository;
-    @Autowired private SpeakTypeRepository speakTypeRepository;
     @Autowired
     @Qualifier("OfficialFileStorageService")
     private OfficialFileStorageService officialStorage;
+    @Autowired private SpeakAbilityTypeConverter speakTypeConverter;
+    @Autowired private SkillAbilityTypeConverter skillConverter;
+    @Autowired private OccupationAbilityTypeConverter occupationConverter;
+    @Autowired private ThumbsUpAbilityTypeConverter thumbsUpConverter;
+    @Autowired private CommentAbilityTypeConverter commentConverter;
+
+    //=====================================================
+    //                   get
+    //=====================================================
+    public Map<String, String> getAllAbilityType() {
+        return SocialAbilityType.getAllValues();
+    }
+
+    public List<SpecificSocialAbility> getItemsOfType(String strAbilityType) {
+        logger.info("get abilityType={} 's specific abilities", strAbilityType);
+        SocialAbilityType abilityType = SocialAbilityType.parseString(strAbilityType);
+        if (null==abilityType) {
+            logger.error("invalid type.");
+            return new ArrayList<>();
+        }
+        List<SpecificSocialAbility> retVal;
+        if (SocialAbilityType.COMMUNITY==abilityType) {
+            retVal = speakTypeConverter.getItems();
+        }
+        else if (SocialAbilityType.SKILL==abilityType) {
+            retVal = skillConverter.getItems();
+        }
+        else if (SocialAbilityType.OCCUPATION==abilityType) {
+            //retVal = occupationConverter.getItems();
+            retVal = new ArrayList<>();
+            // department do not need to have grade
+            logger.warn("social ability type {OCCUPATION} is not valid for Badge-Grade");
+        }
+        else if (SocialAbilityType.THUMBS_UP==abilityType) {
+            retVal = thumbsUpConverter.getItems();
+        }
+        else if (SocialAbilityType.COMMENT==abilityType) {
+            retVal = commentConverter.getItems();
+        }
+        else {
+            retVal = new ArrayList<>();
+        }
+        logger.info("specific abilities are {}", retVal);
+        return retVal;
+    }
 
     public long countByAbilityType(String strAbilityType) {
         logger.info("get abilityType={} count", strAbilityType);
@@ -87,27 +130,23 @@ public class BadgeService {
 
     public BadgeBean getBadgeByPointAndAbilityIdAndType(int point, int abilityId, String strAbilityType) {
         logger.info("get abilityType={} abilityId={} point near {} 's badge", strAbilityType, abilityId, point);
-        if (point<=0) {
+        if (point<0) {
+            logger.error("point is less than 0!");
             return null;
         }
-        BadgeBean       retVal = null;
-        List<BadgeBean> badges = getBadgeByAbilityIdAndType(abilityId, strAbilityType);
-        int             count  = badges.size();
-        for (int i = 0; i < count; i ++) {
-            BadgeBean tmp = badges.get(i);
-            if (tmp.getPoint()>point) {
-                if (i==0) {
-                    retVal = null;
-                }
-                else {
-                    retVal = badges.get(i-1);
-                }
-                break;
-            }
-            if (i+1==count && null==retVal) {
-                retVal = tmp;
-            }
+        SocialAbilityType abilityType = SocialAbilityType.parseString(strAbilityType);
+        if (null==abilityType) {
+            logger.error("abilityType is invalid!");
+            return null;
         }
+        List<BadgeEntity> badges = repository.findOneByPoint((long)point, abilityId, abilityType);
+        logger.info("the badge is {}", badges);
+        if (VerifyUtil.isListEmpty(badges)) {
+            return null;
+        }
+        BadgeBean retVal = beanConverter.convert(badges.get(0));
+        retVal.setImageUrl(officialStorage.getFilePath(retVal.getImageId()));
+        logger.info("the badge with image is {}", retVal);
         return retVal;
     }
 
@@ -269,7 +308,7 @@ public class BadgeService {
             List<BadgeEntity> resultSet = repository.findByAbilityIdAndAbilityTypeAndGrade(abilityId, abilityType, grade);
             if (null != resultSet && !resultSet.isEmpty()) {
                 logger.error("record is exist == {}", resultSet);
-                throw new BadRequestException(ErrorCode.DATA_ERROR);
+                throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
             }
         }
 
@@ -319,20 +358,35 @@ public class BadgeService {
 
     private boolean isAbilityIdAndTypeValid(int abilityId, SocialAbilityType abilityType) {
         if (SocialAbilityType.SKILL.equals(abilityType)) {
-            if (skillRepository.exists(abilityId)) {
+            if (skillConverter.existItem(abilityId)) {
                 return true;
             }
             logger.warn("skill id is not exist");
         }
         else if (SocialAbilityType.COMMUNITY.equals(abilityType)) {
-            if (speakTypeRepository.exists(abilityId)) {
+            if (speakTypeConverter.existItem(abilityId)) {
                 return true;
             }
             logger.warn("speak type id is not exist");
         }
         else if (SocialAbilityType.OCCUPATION.equals(abilityType)) {
+            //if (occupationConverter.existItem(abilityId)) {
+            //    return true;
+            //}
             // department do not need to have grade
             logger.warn("social ability type {OCCUPATION} is not valid for Badge-Grade");
+        }
+        else if (SocialAbilityType.THUMBS_UP.equals(abilityType)) {
+            if (thumbsUpConverter.existItem(abilityId))  {
+                return true;
+            }
+            logger.warn("thumbs up type id is not exist");
+        }
+        else if (SocialAbilityType.COMMENT.equals(abilityType)) {
+            if (commentConverter.existItem(abilityId))  {
+                return true;
+            }
+            logger.warn("comment type id is not exist");
         }
         else {
             logger.warn("social ability type is invalid");

@@ -35,4 +35,8 @@ public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Lo
 
     @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak WHERE speak.speakType IN (?1)")
     long countSpecialTypeSpeak(List<Integer> speakTypeIds);
+
+    @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak WHERE speak.id IN (?1) AND speak.speakType=?2")
+    long countSortSpeakByType(List<Long> speakIds, Integer speakTypeId);
+
 }

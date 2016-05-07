@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -17,5 +18,7 @@ public interface BadgeRepository extends JpaRepository<BadgeEntity, Integer> {
     List<BadgeEntity> findByAbilityIdAndAbilityType(Integer abilityId, SocialAbilityType abilityType);
     List<BadgeEntity> findByAbilityIdAndAbilityType(Integer abilityId, SocialAbilityType abilityType, Sort sort);
     List<BadgeEntity> findByAbilityIdAndAbilityTypeAndGrade(Integer abilityId, SocialAbilityType abilityType, int grade);
+    @Query("FROM BadgeEntity be WHERE be.point<=?1 AND be.abilityId=?2 AND be.abilityType=?3 ORDER BY be.point DESC")
+    List<BadgeEntity> findOneByPoint(Long point, Integer abilityId, SocialAbilityType abilityType);
     long countByAbilityType(SocialAbilityType abilityType);
 }

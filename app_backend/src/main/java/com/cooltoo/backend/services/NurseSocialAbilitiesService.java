@@ -6,6 +6,9 @@ import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.constants.SocialAbilityType;
+import com.cooltoo.beans.SpecificSocialAbility;
+import com.cooltoo.constants.SpeakType;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +34,6 @@ public class NurseSocialAbilitiesService {
     @Autowired private SpeakTypeService              speakTypeService;
     @Autowired private NurseHospitalRelationService  nurseHospitalService;
     @Autowired private BadgeService                  badgeService;
-
-    //==========================================================================
-    //           get all type
-    //==========================================================================
-    public List<String> getAllSkillTypes() {
-        return SocialAbilityType.getAllValues();
-    }
 
     //=================================================================
     //          get
@@ -172,56 +168,62 @@ public class NurseSocialAbilitiesService {
                 nurseSkillAbilities.add(abilityBean);
             }
         }
-        // add thumbs up user count
-        long countThumbsUpUser   = thumbsUpService.countOthersThumbsUpUser(userId);
-        if (countThumbsUpUser>0) {
-            SocialAbilitiesBean abilityBean = newAbilityBean(
-                    userId,
-                    0, "", SocialAbilityType.THUMBS_UP_ME,
-                    1, countThumbsUpUser,
-                    0, "",
-                    0, "");
-            BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.THUMBS_UP_ME.name());
-            abilityBean.setBadge(badge);
-            if (null!=badge) {
-                abilityBean.setSkillName(badge.getName());
-                abilityBean.setImageUrl(badge.getImageUrl());
+        // add thumbs up
+        List<SpecificSocialAbility> specialAbilities = badgeService.getItemsOfType(SocialAbilityType.THUMBS_UP.name());
+        for (SpecificSocialAbility specificAbility : specialAbilities) {
+            long countThumbsUp = 0;
+            if (specificAbility.getAbilityId()==1) {// others_thumbs_up_me
+                countThumbsUp = thumbsUpService.countOthersThumbsUpUser(userId);
             }
-            nurseSkillAbilities.add(abilityBean);
-        }
-        // add thumbs up others count
-        long countThumbsUpOthers = thumbsUpService.countUserThumbsUpOthers(userId);
-        if (countThumbsUpOthers>0) {
-            SocialAbilitiesBean abilityBean = newAbilityBean(
-                    userId,
-                    0, "", SocialAbilityType.THUMBS_UP_OTHERS,
-                    1, countThumbsUpOthers,
-                    0, "",
-                    0, "");
-            BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.THUMBS_UP_OTHERS.name());
-            abilityBean.setBadge(badge);
-            if (null!=badge) {
-                abilityBean.setSkillName(badge.getName());
-                abilityBean.setImageUrl(badge.getImageUrl());
+            else if (specificAbility.getAbilityId()==2) {// me_thumbs_up_others
+                countThumbsUp = thumbsUpService.countUserThumbsUpOthers(userId);
             }
-            nurseSkillAbilities.add(abilityBean);
+            if (countThumbsUp > 0) {
+                SocialAbilitiesBean abilityBean = newAbilityBean(
+                        userId,
+                        specificAbility.getAbilityId(), specificAbility.getAbilityName(), SocialAbilityType.THUMBS_UP,
+                        1, countThumbsUp,
+                        0, "",  /* there is no image for thumbs_up*/
+                        0, ""   /* there is no disable image for thumbs_up*/);
+                BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.THUMBS_UP.name());
+                abilityBean.setBadge(badge);
+                if (null != badge) {
+                    abilityBean.setSkillName(badge.getName());
+                    abilityBean.setImageUrl(badge.getImageUrl());
+                }
+                nurseSkillAbilities.add(abilityBean);
+            }
         }
         // add comment made by user
-        long countCommentMade = commentService.countCommentUserMake(userId);
-        if (countCommentMade>0) {
-            SocialAbilitiesBean abilityBean = newAbilityBean(
-                    userId,
-                    0, "", SocialAbilityType.COMMENT_MADE,
-                    1, countCommentMade,
-                    0, "",
-                    0, "");
-            BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMENT_MADE.name());
-            abilityBean.setBadge(badge);
-            if (null!=badge) {
-                abilityBean.setSkillName(badge.getName());
-                abilityBean.setImageUrl(badge.getImageUrl());
+        List<Long> speakWithCommentUserMade= commentService.findSpeakWithCommentUserMake(userId);
+        if (!VerifyUtil.isListEmpty(speakWithCommentUserMade)) {
+            SpeakTypeBean askQuestion = speakTypeService.getSpeakTypeByType(SpeakType.ASK_QUESTION);
+            long countAnswerMade  = speakService.countSortSpeakBySpeakType(speakWithCommentUserMade, askQuestion.getId());
+            long countCommentMade = speakWithCommentUserMade.size() - countAnswerMade;
+            specialAbilities = badgeService.getItemsOfType(SocialAbilityType.COMMENT.name());
+            for (SpecificSocialAbility specificAbility : specialAbilities) {
+                long count = 0;
+                if (specificAbility.getAbilityId() == 1) {// comment_made_by_me
+                    count = countCommentMade;
+                } else if (specificAbility.getAbilityId() == 2) {// answer_made_by_me
+                    count = countAnswerMade;
+                }
+                if (count > 0) {
+                    SocialAbilitiesBean abilityBean = newAbilityBean(
+                            userId,
+                            specificAbility.getAbilityId(), specificAbility.getAbilityName(), SocialAbilityType.COMMENT,
+                            1, count,
+                            0, "", /* there is no image for comment */
+                            0, ""  /* there is no disable image for comment */);
+                    BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMENT.name());
+                    abilityBean.setBadge(badge);
+                    if (null != badge) {
+                        abilityBean.setSkillName(badge.getName());
+                        abilityBean.setImageUrl(badge.getImageUrl());
+                    }
+                    nurseSkillAbilities.add(abilityBean);
+                }
             }
-            nurseSkillAbilities.add(abilityBean);
         }
 
         // sort skill social abilities by Point
@@ -305,6 +307,72 @@ public class NurseSocialAbilitiesService {
                 BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMUNITY.name());
                 abilityBean.setBadge(badge);
                 return abilityBean;
+            }
+        }
+        else if (SocialAbilityType.THUMBS_UP==socialAbilityType) {
+            List<SpecificSocialAbility> specialAbilities = badgeService.getItemsOfType(SocialAbilityType.THUMBS_UP.name());
+            for (SpecificSocialAbility specificAbility : specialAbilities) {
+                if (abilityId!=specificAbility.getAbilityId()) {
+                    continue;
+                }
+
+                long countThumbsUp = 0;
+                if (1==abilityId) {// others_thumbs_up_me
+                    countThumbsUp = thumbsUpService.countOthersThumbsUpUser(userId);
+                }
+                else if (2==abilityId) {// me_thumbs_up_others
+                    countThumbsUp = thumbsUpService.countUserThumbsUpOthers(userId);
+                }
+                if (countThumbsUp > 0) {
+                    SocialAbilitiesBean abilityBean = newAbilityBean(
+                            userId,
+                            specificAbility.getAbilityId(), specificAbility.getAbilityName(), SocialAbilityType.THUMBS_UP,
+                            1, countThumbsUp,
+                            0, "",  /* there is no image for thumbs_up*/
+                            0, ""   /* there is no disable image for thumbs_up*/);
+                    BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.THUMBS_UP.name());
+                    abilityBean.setBadge(badge);
+                    if (null != badge) {
+                        abilityBean.setSkillName(badge.getName());
+                        abilityBean.setImageUrl(badge.getImageUrl());
+                    }
+                    return abilityBean;
+                }
+            }
+        }
+        else if (SocialAbilityType.COMMENT==socialAbilityType) {
+            List<Long> speakWithCommentUserMade= commentService.findSpeakWithCommentUserMake(userId);
+            if (!VerifyUtil.isListEmpty(speakWithCommentUserMade)) {
+                SpeakTypeBean askQuestion = speakTypeService.getSpeakTypeByType(SpeakType.ASK_QUESTION);
+                long countAnswerMade  = speakService.countSortSpeakBySpeakType(speakWithCommentUserMade, askQuestion.getId());
+                long countCommentMade = speakWithCommentUserMade.size() - countAnswerMade;
+                List<SpecificSocialAbility> specialAbilities = badgeService.getItemsOfType(SocialAbilityType.COMMENT.name());
+                for (SpecificSocialAbility specificAbility : specialAbilities) {
+                    if (specificAbility.getAbilityId()!=abilityId) {
+                        continue;
+                    }
+                    long count = 0;
+                    if (specificAbility.getAbilityId() == 1) {// comment_made_by_me
+                        count = countCommentMade;
+                    } else if (specificAbility.getAbilityId() == 2) {// answer_made_by_me
+                        count = countAnswerMade;
+                    }
+                    if (count > 0) {
+                        SocialAbilitiesBean abilityBean = newAbilityBean(
+                                userId,
+                                specificAbility.getAbilityId(), specificAbility.getAbilityName(), SocialAbilityType.COMMENT,
+                                1, count,
+                                0, "", /* there is no image for comment */
+                                0, ""  /* there is no disable image for comment */);
+                        BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMENT.name());
+                        abilityBean.setBadge(badge);
+                        if (null != badge) {
+                            abilityBean.setSkillName(badge.getName());
+                            abilityBean.setImageUrl(badge.getImageUrl());
+                        }
+                        return abilityBean;
+                    }
+                }
             }
         }
 
