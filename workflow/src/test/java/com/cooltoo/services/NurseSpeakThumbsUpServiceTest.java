@@ -4,6 +4,7 @@ import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
 import com.cooltoo.backend.services.NurseSpeakThumbsUpService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,15 @@ import java.util.List;
  * Created by hp on 2016/3/18.
  */
 @Transactional
+@DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_thumbs_up_data.xml")
+})
 public class NurseSpeakThumbsUpServiceTest extends AbstractCooltooTest {
 
     @Autowired
     NurseSpeakThumbsUpService thumbsUpService;
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_thumbs_up_data.xml")
     public void testAddNurseSpeakThumbsUp() {
         long nurseSpeakId = 14;
         long thumbsUpUserId = 7;
@@ -37,7 +40,6 @@ public class NurseSpeakThumbsUpServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_thumbs_up_data.xml")
     public void testGetNurseSpeakThumbsUpByNurseSpeakId() {
         long nurseSpeakId = 2;
         List<NurseSpeakThumbsUpBean> thumbsUpBeans = thumbsUpService.getSpeakThumbsUpByNurseSpeakId(nurseSpeakId);
@@ -48,7 +50,6 @@ public class NurseSpeakThumbsUpServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_thumbs_up_data.xml")
     public void testGetNurseSpeakThumbsUpByNurseSpeakIds() {
         List<Long> nurseSpeakIds = new ArrayList<Long>();
         nurseSpeakIds.add(1L);

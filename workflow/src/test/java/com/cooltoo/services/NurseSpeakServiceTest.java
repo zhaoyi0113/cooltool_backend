@@ -274,15 +274,16 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         thumbsUp = speakService.getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(5,3);
         Assert.assertNull(thumbsUp);
 
-        throwable = null;
-        try {
-            speakService.setNurseSpeakThumbsUp(5, 1);
-        }
-        catch (Exception ex) {
-            throwable = ex;
-        }
-        Assert.assertNotNull(throwable);
-        Assert.assertTrue(throwable instanceof BadRequestException);
+// user can thumbs up self speaks
+//        throwable = null;
+//        try {
+//            speakService.setNurseSpeakThumbsUp(5, 1);
+//        }
+//        catch (Exception ex) {
+//            throwable = ex;
+//        }
+//        Assert.assertNotNull(throwable);
+//        Assert.assertTrue(throwable instanceof BadRequestException);
 
         Date time = new Date();
         NurseSpeakThumbsUpBean thumbsUpBean = speakService.setNurseSpeakThumbsUp(7, 3);
