@@ -79,7 +79,7 @@ public class NurseSpeakAPI {
         return Response.ok(speak).build();
     }
 
-    @Path("/query/{user_id}{index}/{number}")
+    @Path("/query/{user_id}/{index}/{number}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
