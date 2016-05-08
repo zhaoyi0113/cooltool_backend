@@ -1,0 +1,1 @@
+ALTER TABLE `nurse_speak` ADD COLUMN `anonymous_name` VARCHAR(60) NULL DEFAULT '';

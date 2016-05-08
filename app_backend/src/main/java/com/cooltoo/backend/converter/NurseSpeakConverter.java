@@ -4,6 +4,7 @@ import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,9 @@ public class NurseSpeakConverter implements Converter<NurseSpeakEntity, NurseSpe
         bean.setTime(source.getTime());
         bean.setId(source.getId());
         bean.setSpeakType(source.getSpeakType());
+        if (!VerifyUtil.isStringEmpty(source.getAnonymousName())) {
+            bean.setUserName(source.getAnonymousName());
+        }
         return bean;
     }
 }

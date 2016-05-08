@@ -91,7 +91,8 @@ public class NurseSpeakDataCreator {
                             nurseSpeakBean = nurseSpeakService.addAskQuestion(entity.getId(), MockDataCreator.getRandomString(100), fileName, inputStream);
                         }
                         else if (speakType.equals(SpeakType.CATHART)) {
-                            nurseSpeakBean = nurseSpeakService.addCathart(entity.getId(), MockDataCreator.getRandomString(100), fileName, inputStream);
+                            String[] anonymName = {"笑哭", "怒", "困", "囧", "惊讶","汗", "官方", "大笑", "大哭", "闭嘴"};
+                            nurseSpeakBean = nurseSpeakService.addCathart(entity.getId(), MockDataCreator.getRandomString(100), anonymName[((int)entity.getId())%anonymName.length], fileName, inputStream);
                         }
                         else if (speakType.equals(SpeakType.SMUG)) {
                             nurseSpeakBean = nurseSpeakService.addSmug(entity.getId(), MockDataCreator.getRandomString(100), fileName, inputStream);

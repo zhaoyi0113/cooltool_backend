@@ -118,11 +118,12 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response addCathartSpeak(@Context HttpServletRequest request,
+                                    @FormDataParam("anonymous_name") String anonymousName,
                                     @FormDataParam("content") String content,
                                     @FormDataParam("file_name") String fileName,
                                     @FormDataParam("file") InputStream file) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseSpeakBean nurseSpeak = speakService.addCathart(userId, content, fileName, file);
+        NurseSpeakBean nurseSpeak = speakService.addCathart(userId, content, anonymousName, fileName, file);
         return Response.ok(nurseSpeak).build();
     }
 

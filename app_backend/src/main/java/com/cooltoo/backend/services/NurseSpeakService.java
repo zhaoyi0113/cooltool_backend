@@ -199,9 +199,14 @@ public class NurseSpeakService {
         }
         // set user name and profileUrl
         for (NurseSpeakBean tmp : beans) {
+            if (!VerifyUtil.isStringEmpty(tmp.getUserName())) {
+                continue;
+            }
             NurseBean nurse = userId2Name.get(tmp.getUserId());
             if (null!=nurse) {
-                tmp.setUserName(nurse.getName());
+                if (VerifyUtil.isStringEmpty(tmp.getUserName())) {// not cathart speak
+                    tmp.setUserName(nurse.getName());
+                }
                 tmp.setUserProfilePhotoUrl(nurse.getProfilePhotoUrl());
             }
             if (tmp.getSpeakType()==officialSpeak.getId()) {
@@ -285,26 +290,26 @@ public class NurseSpeakService {
 
     public NurseSpeakBean addSmug(long userId, String content, String fileName, InputStream file) {
         logger.info("add SMUG : userId=" + userId + " content="+content+" fileName="+fileName);
-        return addNurseSpeak(userId, content, SpeakType.SMUG.name(), fileName, file);
+        return addNurseSpeak(userId, content, SpeakType.SMUG.name(), "", fileName, file);
     }
 
-    public NurseSpeakBean addCathart(long userId, String content, String fileName, InputStream file) {
+    public NurseSpeakBean addCathart(long userId, String content, String anonymousName, String fileName, InputStream file) {
         logger.info("add CATHART : userId=" + userId + " content="+content+" fileName="+fileName);
-        return addNurseSpeak(userId, content, SpeakType.CATHART.name(), fileName, file);
+        return addNurseSpeak(userId, content, SpeakType.CATHART.name(), anonymousName, fileName, file);
     }
 
     public NurseSpeakBean addAskQuestion(long userId, String content, String fileName, InputStream file) {
         logger.info("add ASK_QUESTION : userId=" + userId + " content="+content+" fileName="+fileName);
-        return addNurseSpeak(userId, content, SpeakType.ASK_QUESTION.name(), fileName, file);
+        return addNurseSpeak(userId, content, SpeakType.ASK_QUESTION.name(), "", fileName, file);
     }
 
     public NurseSpeakBean addOfficial(long userId, String content, String fileName, InputStream file) {
         logger.info("add SMUG : userId=" + userId + " content="+content+" fileName="+fileName);
-        return addNurseSpeak(userId, content, SpeakType.OFFICIAL.name(), fileName, file);
+        return addNurseSpeak(userId, content, SpeakType.OFFICIAL.name(), "", fileName, file);
     }
 
     @Transactional
-    private NurseSpeakBean addNurseSpeak(long userId, String content, String strSpeakType, String imageName, InputStream image) {
+    private NurseSpeakBean addNurseSpeak(long userId, String content, String strSpeakType, String anonymousName, String imageName, InputStream image) {
         logger.info("add nurse speak with userId={} speakType={} content={} imageName={} image={}", userId, strSpeakType, content, imageName, (null!=image));
 
         // check speak type
@@ -329,7 +334,10 @@ public class NurseSpeakService {
                 throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
             }
         }
-
+        if (null==anonymousName) {
+            anonymousName = "";
+        }
+        entity.setAnonymousName(anonymousName);
         entity.setUserId(userId);
         entity.setContent(content);
         entity.setSpeakType(speakTypeBean.getId());

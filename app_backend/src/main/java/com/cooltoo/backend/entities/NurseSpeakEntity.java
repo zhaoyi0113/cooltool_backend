@@ -16,7 +16,7 @@ public class NurseSpeakEntity {
     private Date time;
     /** the id of speak_type */
     private int speakType;
-
+    private String anonymousName;
 
     @Id
     @GeneratedValue
@@ -59,14 +59,24 @@ public class NurseSpeakEntity {
 
     public void setSpeakType(int speakType) { this.speakType = speakType; }
 
+    @Column(name = "anonymous_name")
+    public String getAnonymousName() {
+        return anonymousName;
+    }
+
+    public void setAnonymousName(String anonymousName) {
+        this.anonymousName = anonymousName;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
-        msg.append("id=").append(id).append(" , ");
-        msg.append("userId=").append(userId).append(" , ");
-        msg.append("time=").append(time).append(" , ");
-        msg.append("content=").append(content).append(" , ");
-        msg.append("speakType=").append(speakType);
+        msg.append("id=").append(id);
+        msg.append(", userId=").append(userId);
+        msg.append(", time=").append(time);
+        msg.append(", content=").append(content);
+        msg.append(", speakType=").append(speakType);
+        msg.append(", anonymousName=").append(anonymousName);
         msg.append("]");
         return msg.toString();
     }

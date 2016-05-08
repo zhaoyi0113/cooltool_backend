@@ -157,10 +157,11 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertFalse(userStorage.fileExist(bean.getImages().get(0).getImageUrl()));
         logger.info(bean.toString());
 
-        bean = speakService.addCathart(2, content, fileName, inputStream);
+        bean = speakService.addCathart(2, content, "大笑", fileName, inputStream);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(2, bean.getUserId());
         Assert.assertEquals(content, bean.getContent());
+        Assert.assertEquals("大笑", bean.getUserName());
         Assert.assertNotNull(bean.getTime());
         Assert.assertTrue(userStorage.fileExist(bean.getImages().get(0).getImageId()));
         userStorage.deleteFile(bean.getImages().get(0).getImageId());
