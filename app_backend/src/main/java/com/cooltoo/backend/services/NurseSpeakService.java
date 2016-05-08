@@ -530,9 +530,9 @@ public class NurseSpeakService {
         }
 
         // you could not add thumbs_up for yourself
-        if (thumbsUpUserId==speakEntity.getUserId()) {
-            throw new BadRequestException(ErrorCode.SPEAK_THUMBS_UP_CAN_NOT_FOR_SELF);
-        }
+        //if (thumbsUpUserId==speakEntity.getUserId()) {
+        //    throw new BadRequestException(ErrorCode.SPEAK_THUMBS_UP_CAN_NOT_FOR_SELF);
+        //}
 
         NurseSpeakThumbsUpBean thumbsUpBean = thumbsUpService.setSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
         //TODO need to transfer this thumbs_up to the relative person
