@@ -101,7 +101,7 @@ public class BadgeService {
 
     public List<BadgeBean> getBadgeByAbilityType(String strAbilityType, int pageIndex, int number) {
         logger.info("get abilityType={} badge at page={} size/page={}", strAbilityType, pageIndex, number);
-        PageRequest       page      = new PageRequest(pageIndex, number, Sort.Direction.ASC, "abilityId", "grade");
+        PageRequest       page      = new PageRequest(pageIndex, number, Sort.Direction.ASC, "abilityType", "abilityId", "grade");
         Page<BadgeEntity> resultSet = null;
         if ("ALL".equalsIgnoreCase(strAbilityType)) {
             resultSet = repository.findAll(page);
