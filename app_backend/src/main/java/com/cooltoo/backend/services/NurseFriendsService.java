@@ -288,6 +288,9 @@ public class NurseFriendsService {
             NurseFriendsBean notFriendBean = new NurseFriendsBean();
             notFriendBean.setUserId(userId);
             notFriendBean.setFriendId(userSearchedFriendId);
+            notFriendBean.setIsFriend(false);
+            notFriendBean.setIsAgreed(AgreeType.WAITING);
+            notFriendBean.setWaitMoreThan1Day(true);
             userAgreedAndWaitingBeans.add(notFriendBean);
             notFriend ++;
         }
