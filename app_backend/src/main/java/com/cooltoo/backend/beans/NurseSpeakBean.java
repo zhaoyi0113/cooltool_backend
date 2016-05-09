@@ -13,6 +13,7 @@ public class NurseSpeakBean {
     private long userId;
     private String content;
     private String userName;
+    private String anonymousName;
     private String userProfilePhotoUrl;
     private Date time;
     private List<ImagesInSpeakBean> images;
@@ -119,12 +120,21 @@ public class NurseSpeakBean {
         this.thumbsUpsCount = thumbsUpsCount;
     }
 
+    public String getAnonymousName() {
+        return anonymousName;
+    }
+
+    public void setAnonymousName(String anonymousName) {
+        this.anonymousName = anonymousName;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
         msg.append("id=").append(id).append(" , ");
         msg.append("userId=").append(userId).append(" , ");
         msg.append("username=").append(userName).append(" , ");
+        msg.append("anonymousName=").append(anonymousName).append(" , ");
         msg.append("time=").append(time).append(" , ");
         msg.append("content=").append(content).append(" , ");
         msg.append("thumbsUpsCount=").append(thumbsUpsCount).append(" , ");

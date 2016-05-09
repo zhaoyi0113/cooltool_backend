@@ -76,7 +76,7 @@ public class NurseSpeakService {
         Map<Long, Long> id2num = new HashMap<>();
         for(int i=0; i<count.size(); i++) {
             Object[] tmp = count.get(i);
-            logger.info("index {} array is {}--{}", i, tmp[0], tmp[1]);
+            logger.info("index array is {}--{}", i, tmp[0], tmp[1]);
             id2num.put((Long)tmp[0], (Long)tmp[1]);
         }
         logger.info("get nurse {} speak count {}", userIds, count);
@@ -183,6 +183,7 @@ public class NurseSpeakService {
         List<Long> userIds = new ArrayList<Long>();
         List<Long> fileIds = new ArrayList<Long>();
 
+        SpeakTypeBean        cathartSpeak  = speakTypeService.getSpeakTypeByType(SpeakType.CATHART);
         SpeakTypeBean        officialSpeak = speakTypeService.getSpeakTypeByType(SpeakType.OFFICIAL);
         Map<Long, NurseBean> userId2Name   = new HashMap<>();
         Map<Long, Long>      userId2FileId = new HashMap<Long, Long>();
@@ -199,19 +200,17 @@ public class NurseSpeakService {
         }
         // set user name and profileUrl
         for (NurseSpeakBean tmp : beans) {
-            if (!VerifyUtil.isStringEmpty(tmp.getUserName())) {
-                continue;
-            }
             NurseBean nurse = userId2Name.get(tmp.getUserId());
             if (null!=nurse) {
-                if (VerifyUtil.isStringEmpty(tmp.getUserName())) {// not cathart speak
-                    tmp.setUserName(nurse.getName());
-                }
+                tmp.setUserName(nurse.getName());
                 tmp.setUserProfilePhotoUrl(nurse.getProfilePhotoUrl());
             }
             if (tmp.getSpeakType()==officialSpeak.getId()) {
                 String officialPhotoUrl = officialStorage.getOfficalSpeakProfilePhotoNginxRelativePath();
                 tmp.setUserProfilePhotoUrl(officialPhotoUrl);
+            }
+            if (tmp.getSpeakType()==cathartSpeak.getId()) {
+                tmp.setUserName(tmp.getAnonymousName());
             }
         }
 
