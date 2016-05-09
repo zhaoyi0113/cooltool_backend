@@ -5,9 +5,11 @@ import com.cooltoo.backend.converter.NurseSpeakConverter;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
+import com.cooltoo.beans.OfficialConfigBean;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.services.OfficialConfigService;
 import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
@@ -39,7 +41,7 @@ public class NurseSpeakService {
     @Autowired private NurseSpeakThumbsUpService thumbsUpService;
     @Autowired private SpeakTypeService speakTypeService;
     @Autowired private ImagesInSpeakService speakImageService;
-    @Autowired
+    @Autowired private OfficialConfigService officialConfigService;
     @Qualifier("OfficialFileStorageService")
     private OfficialFileStorageService officialStorage;
 
@@ -199,15 +201,17 @@ public class NurseSpeakService {
             userId2Name.put(tmp.getId(), tmp);
         }
         // set user name and profileUrl
+        OfficialConfigBean officialConfig = officialConfigService.getConfig(OfficialConfigService.OFFICIAL_SPEAK_PROFILE);
         for (NurseSpeakBean tmp : beans) {
             NurseBean nurse = userId2Name.get(tmp.getUserId());
             if (null!=nurse) {
                 tmp.setUserName(nurse.getName());
                 tmp.setUserProfilePhotoUrl(nurse.getProfilePhotoUrl());
             }
-            if (tmp.getSpeakType()==officialSpeak.getId()) {
-                String officialPhotoUrl = officialStorage.getOfficalSpeakProfilePhotoNginxRelativePath();
+            if (null!=officialConfig && tmp.getSpeakType()==officialSpeak.getId()) {
+                String officialPhotoUrl = officialConfig.getImageUrl();
                 tmp.setUserProfilePhotoUrl(officialPhotoUrl);
+                tmp.setUserName(officialConfig.getValue());
             }
             if (tmp.getSpeakType()==cathartSpeak.getId()) {
                 tmp.setUserName(tmp.getAnonymousName());

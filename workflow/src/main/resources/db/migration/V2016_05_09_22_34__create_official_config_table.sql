@@ -1,0 +1,10 @@
+CREATE TABLE `official_config` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL DEFAULT '',
+  `value` VARCHAR(500) NOT NULL DEFAULT '',
+  `status` INT NOT NULL DEFAULT 0,
+  `image_id` BIGINT(64) NOT NULL DEFAULT 0,
+  `time_created` DATETIME NOT NULL DEFAULT now(),
+  PRIMARY KEY (`id`)
+)
+  DEFAULT CHARACTER SET = utf8;
