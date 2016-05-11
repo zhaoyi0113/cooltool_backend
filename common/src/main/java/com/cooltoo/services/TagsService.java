@@ -106,7 +106,7 @@ public class TagsService {
     }
 
     public List<TagsBean> getTagsByCategoryId(long categoryId) {
-        Sort             sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
+        Sort             sort = new Sort(new Sort.Order(Sort.Direction.DESC, "timeCreated"));
         List<TagsEntity> tagsE = tagsRep.findByCategoryId(categoryId, sort);
 
         if (null!=tagsE && !tagsE.isEmpty()) {
@@ -132,7 +132,7 @@ public class TagsService {
     }
 
     public List<TagsBean> getTagsWithoutCategoryId() {
-        Sort             sort  = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
+        Sort             sort = new Sort(new Sort.Order(Sort.Direction.DESC, "timeCreated"));
         List<TagsEntity> tagsE = tagsRep.findByCategoryIdLessThanEqual(0, sort);
 
         if (null!=tagsE && !tagsE.isEmpty()) {
@@ -158,7 +158,7 @@ public class TagsService {
     }
 
     public List<TagsBean> getTagsByPage(int pageIndex, int sizeOfPage) {
-        Sort             sort  = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
+        Sort             sort = new Sort(new Sort.Order(Sort.Direction.DESC, "timeCreated"));
         PageRequest      page  = new PageRequest(pageIndex, sizeOfPage, sort);
         Page<TagsEntity> tagsE = tagsRep.findAll(page);
 
@@ -186,7 +186,7 @@ public class TagsService {
 
     public List<TagsCategoryBean> getCategoryByPage(int pageIndex, int sizeOfPage) {
         // get all category
-        Sort                     sortCategory = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        Sort                     sortCategory = new Sort(new Sort.Order(Sort.Direction.DESC, "timeCreated"));
         PageRequest              pageCategory = new PageRequest(pageIndex, sizeOfPage, sortCategory);
         Page<TagsCategoryEntity> allCategory  = categoryRep.findAll(pageCategory);
 
@@ -247,8 +247,8 @@ public class TagsService {
     }
 
     public List<TagsBean> getAllTag() {
-        Sort             sortTags = new Sort(new Sort.Order(Sort.Direction.ASC, "categoryId")
-                                           , new Sort.Order(Sort.Direction.ASC, "name"));
+        Sort             sortTags = new Sort(new Sort.Order(Sort.Direction.DESC, "categoryId")
+                                           , new Sort.Order(Sort.Direction.DESC, "name"));
         List<TagsEntity> allTags  = tagsRep.findAll(sortTags);
 
         if (null!=allTags && !allTags.isEmpty()) {
@@ -280,7 +280,7 @@ public class TagsService {
         List<TagsBean>           allTags      = getAllTag();
 
         // get all category
-        Sort                     sortCategory = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        Sort                     sortCategory = new Sort(new Sort.Order(Sort.Direction.DESC, "timeCreated"));
         List<TagsCategoryEntity> allCategory  = categoryRep.findAll(sortCategory);
 
         // has category
@@ -322,7 +322,7 @@ public class TagsService {
 
     public List<TagsCategoryBean> getAllCategory() {
         // get all category
-        Sort                     sortCategory = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        Sort                     sortCategory = new Sort(new Sort.Order(Sort.Direction.DESC, "timeCreated"));
         List<TagsCategoryEntity> allCategory  = categoryRep.findAll(sortCategory);
 
         // has category

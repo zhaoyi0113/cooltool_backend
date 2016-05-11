@@ -32,8 +32,8 @@ public class NurseAPI {
     public Response newNurse(
             @FormParam("name") String name,
             @FormParam("age") int age,
-            @FormParam("gender") int gender,
-            @DefaultValue("") @FormParam("mobile") String mobile,
+            @DefaultValue("-1") @FormParam("gender") int gender,
+            @DefaultValue("")   @FormParam("mobile") String mobile,
             @FormParam("password") String password,
             @FormParam("sms_code") String smsCode
     ) {

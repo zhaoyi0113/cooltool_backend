@@ -164,8 +164,8 @@ public class NurseSocialAbilitiesService {
                 if (null!=badge) {
                     abilityBean.setSkillName(badge.getName());
                     abilityBean.setImageUrl(badge.getImageUrl());
+                    nurseSkillAbilities.add(abilityBean);
                 }
-                nurseSkillAbilities.add(abilityBean);
             }
         }
         // add thumbs up
@@ -190,8 +190,8 @@ public class NurseSocialAbilitiesService {
                 if (null != badge) {
                     abilityBean.setSkillName(badge.getName());
                     abilityBean.setImageUrl(badge.getImageUrl());
+                    nurseSkillAbilities.add(abilityBean);
                 }
-                nurseSkillAbilities.add(abilityBean);
             }
         }
         // add comment made by user
