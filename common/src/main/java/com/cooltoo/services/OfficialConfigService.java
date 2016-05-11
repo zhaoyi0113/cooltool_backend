@@ -168,6 +168,7 @@ public class OfficialConfigService {
         }
         List<Integer> ids = VerifyUtil.parseIntIds(strIds);
         repository.deleteByIdIn(ids);
+        configKey2Bean.clear();
     }
 
     //=============================================
@@ -210,6 +211,9 @@ public class OfficialConfigService {
         entity = repository.save(entity);
         OfficialConfigBean bean = beanConverter.convert(entity);
         bean.setImageUrl(imageUrl);
+        if (configKey2Bean.containsKey(name)) {
+            configKey2Bean.put(name, bean);
+        }
         return bean;
     }
 
