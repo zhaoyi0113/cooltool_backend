@@ -167,7 +167,18 @@ public class OfficialConfigService {
             return;
         }
         List<Integer> ids = VerifyUtil.parseIntIds(strIds);
-        repository.deleteByIdIn(ids);
+        List<OfficialConfigEntity> entities = repository.findAll(ids);
+        List<Long> imageIds = new ArrayList<>();
+        for (OfficialConfigEntity entity : entities) {
+            if (imageIds.contains(entity.getImageId())) {
+                continue;
+            }
+            imageIds.add(entity.getImageId());
+        }
+        if (!imageIds.isEmpty()) {
+            officialStorage.deleteFiles(imageIds);
+        }
+        repository.delete(entities);
         configKey2Bean.clear();
     }
 
