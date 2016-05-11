@@ -51,54 +51,27 @@ public class NurseFriendsService {
         validateUserId(userId, friendId);
 
         List<NurseFriendsEntity> friendships = friendsRepository.findFriendshipByUserIdAndFriendId(userId, friendId);
+        if (!VerifyUtil.isListEmpty(friendships)) {
+            logger.info("user {} and other {} has friendship already", userId, friendId);
+            friendsRepository.delete(friendships);
+        }
         // the friendship data is invalid or none
-        if(VerifyUtil.isListEmpty(friendships) || friendships.size()!=2){
-            if (friendships.size()!=2) {
-                logger.info("user {} and other {} has invalid friendship", userId, friendId);
-                friendsRepository.delete(friendships);
-            }
-            Date datetime = new Date();
-            NurseFriendsEntity entity = new NurseFriendsEntity();
-            entity.setUserId(userId);
-            entity.setFriendId(friendId);
-            entity.setIsAgreed(AgreeType.AGREED);
-            entity.setDateTime(datetime);
-            friendsRepository.save(entity);
+        Date datetime = new Date();
+        NurseFriendsEntity entity = new NurseFriendsEntity();
+        entity.setUserId(userId);
+        entity.setFriendId(friendId);
+        entity.setIsAgreed(AgreeType.AGREED);
+        entity.setDateTime(datetime);
+        friendsRepository.save(entity);
 
-            entity = new NurseFriendsEntity();
-            entity.setUserId(friendId);
-            entity.setFriendId(userId);
-            entity.setIsAgreed(AgreeType.WAITING);
-            entity.setDateTime(datetime);
-            friendsRepository.save(entity);
-            logger.info("user {} add friendship to other {}", userId, friendId);
-            return true;
-        }
-        // check the invalid data;
-        else {
-            NurseFriendsEntity userEnd = friendships.get(0);
-            NurseFriendsEntity friendEnd = friendships.get(1);
-            if (userEnd.getFriendId()==userId) {
-                userEnd = friendships.get(1);
-                friendEnd = friendships.get(0);
-            }
-            if (userEnd.getIsAgreed()!=AgreeType.WAITING
-                    && friendEnd.getIsAgreed()!=AgreeType.WAITING) {
-                logger.info("user {} and other {} is friend already", userId, friendId);
-                return true;
-            }
-
-            logger.info("user {} update friendship time to other {}", userId, friendId);
-            Date datetime = new Date();
-            userEnd.setIsAgreed(AgreeType.AGREED);
-            userEnd.setDateTime(datetime);
-            friendsRepository.save(userEnd);
-
-            friendEnd.setIsAgreed(AgreeType.WAITING);
-            friendEnd.setDateTime(datetime);
-            friendsRepository.save(friendEnd);
-            return true;
-        }
+        entity = new NurseFriendsEntity();
+        entity.setUserId(friendId);
+        entity.setFriendId(userId);
+        entity.setIsAgreed(AgreeType.WAITING);
+        entity.setDateTime(datetime);
+        friendsRepository.save(entity);
+        logger.info("user {} add friendship to other {}", userId, friendId);
+        return true;
     }
 
     private void validateUserId(long userId, long friendId) {
