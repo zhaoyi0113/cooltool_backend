@@ -30,6 +30,7 @@ public class NurseFriendsAPI {
 
     @POST
     @Path("/add/{friend_id}")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response addFriend(@Context HttpServletRequest request,
                               @PathParam("friend_id") long friendId) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
@@ -39,6 +40,7 @@ public class NurseFriendsAPI {
 
     @POST
     @Path("/agree")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response agreeFriendRequest(@Context HttpServletRequest request,
                                        @FormParam("friend_id") long friendId) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
@@ -48,6 +50,7 @@ public class NurseFriendsAPI {
 
     @POST
     @Path("/blacklist")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response blackListFriend(@Context HttpServletRequest request,
                                     @FormParam("friend_id") long friendId) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
@@ -57,6 +60,7 @@ public class NurseFriendsAPI {
 
     @POST
     @Path("/access_zone_deny")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response accessZoneDenyFriend(@Context HttpServletRequest request,
                                          @FormParam("friend_id") long friendId) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
@@ -67,6 +71,7 @@ public class NurseFriendsAPI {
     @GET
     @Path("/waiting_my_agree")
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getRequestNotPassList(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseFriendsBean> waitingToPass = friendsService.getFriendshipWaitingAgreed(userId);
@@ -77,6 +82,7 @@ public class NurseFriendsAPI {
     @GET
     @Path("/list/{page_index}/{number}")
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getFriendList(@Context HttpServletRequest request,
                                   @PathParam("page_index") int pageIdx,
                                   @PathParam("number") int number) {
@@ -90,6 +96,7 @@ public class NurseFriendsAPI {
     @GET
     @Path("/list_by_id/{search_id}/{page_index}/{number}")
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getFriendListByID(@Context HttpServletRequest request,
                                       @PathParam("search_id") long searchId,
                                       @PathParam("page_index") int pageIdx,
@@ -103,6 +110,7 @@ public class NurseFriendsAPI {
 
     @GET
     @Path("/count")
+    @LoginAuthentication(requireNurseLogin = true)
     public Response getFriendCount(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         long count = friendsService.countFriendship(userId);
@@ -112,6 +120,7 @@ public class NurseFriendsAPI {
     @GET
     @Path("/search/{name}")
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response searchFriend(@Context HttpServletRequest request,
                                  @PathParam("name") String name) {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
@@ -122,6 +131,7 @@ public class NurseFriendsAPI {
     @GET
     @Path("/search_name_like/{name}/{index}/{number}")
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
     public Response searchNurse(@Context HttpServletRequest request,
                                 @PathParam("name") String name,
                                 @PathParam("index") @DefaultValue("0") int pageIndex,

@@ -41,7 +41,7 @@ public class NurseDeviceTokensAPI {
     @POST
     @Path("/inactive/{token}")
     @LoginAuthentication(requireNurseLogin = true)
-    public Response inactievUserDeviceToken(@Context HttpServletRequest request,
+    public Response inactiveUserDeviceToken(@Context HttpServletRequest request,
                                             @PathParam("token") String token){
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         deviceTokensService.inactiveUserDeviceToken(userId, token);
