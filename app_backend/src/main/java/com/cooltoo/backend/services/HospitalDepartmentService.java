@@ -8,8 +8,10 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.VerifyUtil;
+import org.hibernate.engine.spi.ExecutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +47,8 @@ public class HospitalDepartmentService {
     //        get department
     //=======================================================
     public List<HospitalDepartmentBean> getAll() {
-        Iterable<HospitalDepartmentEntity> departments  = repository.findAll();
+        Sort sort = new Sort(Sort.Direction.ASC, "id");
+        Iterable<HospitalDepartmentEntity> departments  = repository.findAll(sort);
         List<HospitalDepartmentBean>       departmentsB = new ArrayList<HospitalDepartmentBean>();
         HospitalDepartmentBean             bean         = null;
         List<Integer>                      topLevelIds  = new ArrayList<Integer>();
@@ -231,7 +234,8 @@ public class HospitalDepartmentService {
         if (null==departmentIds || departmentIds.isEmpty()) {
             return new ArrayList<>();
         }
-        List<HospitalDepartmentEntity> departments = repository.findByIdIn(departmentIds);
+        Sort sort = new Sort(Sort.Direction.ASC, "id");
+        List<HospitalDepartmentEntity> departments = repository.findByIdIn(departmentIds, sort);
         if (null==departments || departments.isEmpty()) {
             logger.info("delete nothing");
             return new ArrayList<>();
