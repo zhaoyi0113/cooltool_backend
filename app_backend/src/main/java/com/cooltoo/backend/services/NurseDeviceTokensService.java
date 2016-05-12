@@ -99,6 +99,10 @@ public class NurseDeviceTokensService {
     }
 
     private long registerNewDeviceToken(long userId, String token) {
+        List<NurseDeviceTokensEntity> existed = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);
+        if (existed != null && !existed.isEmpty()){
+            return existed.get(0).getUserId();
+        }
         NurseDeviceTokensEntity entity = new NurseDeviceTokensEntity();
 
         entity.setUserId(userId);
