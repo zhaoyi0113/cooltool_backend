@@ -29,7 +29,7 @@ public class ImagesInSpeakService {
 
     private static final Sort sort = new Sort(
                                             new Sort.Order(Sort.Direction.ASC, "speakId"),
-                                            new Sort.Order(Sort.Direction.ASC, "timeCreated")
+                                            new Sort.Order(Sort.Direction.ASC, "imageId")
                                      );
 
     @Autowired
