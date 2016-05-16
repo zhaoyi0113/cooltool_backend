@@ -4,6 +4,7 @@ import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.*;
 import com.cooltoo.backend.services.ImagesInSpeakService;
 import com.cooltoo.backend.services.NurseSpeakService;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.services.file.UserFileStorageService;
@@ -48,6 +49,33 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     private ImagesInSpeakService imagesService;
     @Autowired
     private UserFileStorageService userStorage;
+
+    @Test
+    public void testCountSpeakByContentLikeAndTime() {
+        long count = speakService.countByContentAndTime("hello", "2016-01-01 00:0:00", "2016-01-09 00:00:00");
+        Assert.assertEquals(4, count);
+        List<NurseSpeakBean> speaks = speakService.getSpeakByContentLikeAndTime(0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        Assert.assertEquals(4, speaks.size());
+        Assert.assertEquals(12L, speaks.get(0).getId());
+        Assert.assertEquals(13L, speaks.get(1).getId());
+        Assert.assertEquals(14L, speaks.get(2).getId());
+        Assert.assertEquals(15L, speaks.get(3).getId());
+    }
+
+    @Test
+    public void testUpdateSpeak() {
+        String strSpeakIds = "1,2,3,4,5,6,7,8,9";
+        List<Long> speakIds = VerifyUtil.parseLongIds(strSpeakIds);
+        long success = speakService.updateSpeakStatus(strSpeakIds, CommonStatus.DISABLED.name());
+        Assert.assertTrue(success==9);
+        List<NurseSpeakBean> speakBeans = speakService.getSpeakByContentLikeAndTime(0L, null, null, null, 0, 30);
+        for (NurseSpeakBean speak : speakBeans) {
+            if (speakIds.contains(speak.getId()))
+                Assert.assertEquals(CommonStatus.DISABLED, speak.getStatus());
+            else
+                Assert.assertEquals(CommonStatus.ENABLED, speak.getStatus());
+        }
+    }
 
     @Test
     public void testCountSortSpeakBySpeakType() {

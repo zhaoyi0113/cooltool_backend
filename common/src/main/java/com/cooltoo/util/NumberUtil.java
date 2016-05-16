@@ -36,7 +36,7 @@ public class NumberUtil {
         try {
             java.util.Date time = sdf.parse(datetime);
             return time.getTime();
-        } catch (ParseException e) {
+        } catch (Exception e) {
             return -1;
         }
     }

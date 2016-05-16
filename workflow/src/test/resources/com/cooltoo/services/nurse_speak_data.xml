@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <nurse_speak id="1"  user_id="1" content="hello 1 (^-^)!"  time="2016-01-01" speak_type="1" />
-    <nurse_speak id="2"  user_id="1" content="hello 2 (^-^)!"  time="2016-01-01" speak_type="1" />
-    <nurse_speak id="3"  user_id="1" content="hello 3 (@_@)!"  time="2016-01-01" speak_type="1"  />
-    <nurse_speak id="4"  user_id="1" content="hello 4 (*-*)!"  time="2016-01-01" speak_type="1" />
-    <nurse_speak id="5"  user_id="1" content="hello 5 (^-^)!"  time="2016-01-01" speak_type="1"  />
-    <nurse_speak id="6"  user_id="1" content="hello 6 (%-%)!"  time="2016-01-01" speak_type="1"  />
-    <nurse_speak id="7"  user_id="1" content="hello 7 (^-^)!"  time="2016-01-01" speak_type="1"  />
-    <nurse_speak id="8"  user_id="1" content="hello 8 (^-^)!"  time="2016-01-01" speak_type="1" />
-    <nurse_speak id="9"  user_id="1" content="hello 9 (@_@)!"  time="2016-01-01" speak_type="1" />
-    <nurse_speak id="10" user_id="1" content="hello 10 (^-^)!" time="2016-01-01" speak_type="1"  />
-    <nurse_speak id="11" user_id="1" content="hello 11 (*-*)!" time="2016-01-01" speak_type="1" />
+    <nurse_speak id="1"  user_id="1" content="hello 1 (^-^)!"  time="2016-01-20" speak_type="1" status="1" />
+    <nurse_speak id="2"  user_id="1" content="hello 2 (^-^)!"  time="2016-01-19" speak_type="1" status="1" />
+    <nurse_speak id="3"  user_id="1" content="hello 3 (@_@)!"  time="2016-01-18" speak_type="1" status="1" />
+    <nurse_speak id="4"  user_id="1" content="hello 4 (*-*)!"  time="2016-01-17" speak_type="1" status="1" />
+    <nurse_speak id="5"  user_id="1" content="hello 5 (^-^)!"  time="2016-01-16" speak_type="1" status="1" />
+    <nurse_speak id="6"  user_id="1" content="hello 6 (%-%)!"  time="2016-01-15" speak_type="1" status="1" />
+    <nurse_speak id="7"  user_id="1" content="hello 7 (^-^)!"  time="2016-01-14" speak_type="1" status="1" />
+    <nurse_speak id="8"  user_id="1" content="hello 8 (^-^)!"  time="2016-01-13" speak_type="1" status="1" />
+    <nurse_speak id="9"  user_id="1" content="hello 9 (@_@)!"  time="2016-01-12" speak_type="1" status="1" />
+    <nurse_speak id="10" user_id="1" content="hello 10 (^-^)!" time="2016-01-11" speak_type="1" status="1" />
+    <nurse_speak id="11" user_id="1" content="hello 11 (*-*)!" time="2016-01-10" speak_type="1" status="1" />
 
-    <nurse_speak id="12" user_id="2" content="hello 12 (^-^)!" time="2016-01-01" speak_type="2" />
-    <nurse_speak id="13" user_id="2" content="hello 13 (@_@)!" time="2016-01-01" speak_type="3" />
-    <nurse_speak id="14" user_id="3" content="hello 14 (^-^)!" time="2016-01-01" speak_type="2"  />
-    <nurse_speak id="15" user_id="3" content="hello 15 (*-*)!" time="2016-01-01" speak_type="3" />
-    <nurse_speak id="16" user_id="-1" content="admin 16 (*-*)!" time="2016-01-01" speak_type="4" />
-    <nurse_speak id="17" user_id="-1" content="admin 17 (*-*)!" time="2016-01-01" speak_type="4" />
-    <nurse_speak id="18" user_id="-1" content="admin 18 (*-*)!" time="2016-01-01" speak_type="4" />
-    <nurse_speak id="19" user_id="-1" content="admin 19 (*-*)!" time="2016-01-01" speak_type="4" />
-    <nurse_speak id="20" user_id="-1" content="admin 20 (*-*)!" time="2016-01-01" speak_type="4" />
+    <nurse_speak id="12" user_id="2" content="hello 12 (^-^)!" time="2016-01-09" speak_type="2" status="1" />
+    <nurse_speak id="13" user_id="2" content="hello 13 (@_@)!" time="2016-01-08" speak_type="3" status="1" />
+    <nurse_speak id="14" user_id="3" content="hello 14 (^-^)!" time="2016-01-07" speak_type="2" status="1" />
+    <nurse_speak id="15" user_id="3" content="hello 15 (*-*)!" time="2016-01-06" speak_type="3" status="1" />
+    <nurse_speak id="16" user_id="-1" content="admin 16 (*-*)!" time="2016-01-05" speak_type="4" status="1" />
+    <nurse_speak id="17" user_id="-1" content="admin 17 (*-*)!" time="2016-01-04" speak_type="4" status="1" />
+    <nurse_speak id="18" user_id="-1" content="admin 18 (*-*)!" time="2016-01-03" speak_type="4" status="1" />
+    <nurse_speak id="19" user_id="-1" content="admin 19 (*-*)!" time="2016-01-02" speak_type="4" status="1" />
+    <nurse_speak id="20" user_id="-1" content="admin 20 (*-*)!" time="2016-01-01" speak_type="4" status="1" />
 </dataset>

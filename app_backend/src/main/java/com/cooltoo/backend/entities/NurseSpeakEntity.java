@@ -2,6 +2,8 @@ package com.cooltoo.backend.entities;
 
 import javax.persistence.*;
 import java.util.Date;
+
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SpeakType;
 
 /**
@@ -17,6 +19,7 @@ public class NurseSpeakEntity {
     /** the id of speak_type */
     private int speakType;
     private String anonymousName;
+    private CommonStatus status;
 
     @Id
     @GeneratedValue
@@ -68,6 +71,15 @@ public class NurseSpeakEntity {
         this.anonymousName = anonymousName;
     }
 
+    @Column(name = "status")
+    public CommonStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CommonStatus status) {
+        this.status = status;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
@@ -77,6 +89,7 @@ public class NurseSpeakEntity {
         msg.append(", content=").append(content);
         msg.append(", speakType=").append(speakType);
         msg.append(", anonymousName=").append(anonymousName);
+        msg.append(", status=").append(status);
         msg.append("]");
         return msg.toString();
     }

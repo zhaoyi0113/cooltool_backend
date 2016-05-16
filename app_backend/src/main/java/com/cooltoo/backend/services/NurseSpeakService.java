@@ -6,12 +6,14 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
 import com.cooltoo.beans.OfficialConfigBean;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.OfficialConfigService;
 import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.services.file.UserFileStorageService;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,53 @@ public class NurseSpeakService {
     //===============================================================
     //             get
     //===============================================================
+    public long countByContentAndTime(String content, String strStartTime, String strEndTime) {
+        logger.info("count speak by content={} startTime={} endTime={}", content, strStartTime, strEndTime);
+        if (VerifyUtil.isStringEmpty(content)) {
+            content = "%";
+        }
+        else {
+            content = content.trim();
+            StringBuilder fuzzyContent = new StringBuilder();
+            for (int i=0, count=content.length(); i < count; i ++) {
+                fuzzyContent.append(content.charAt(i)).append("%");
+            }
+            content = fuzzyContent.toString();
+        }
+        long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date start     = startTime<0 ? new Date(0) : new Date(startTime);
+        Date end       = endTime  <0 ? new Date()  : new Date(endTime);
+        long count = speakRepository.countByContentAndTime(content, start, end);
+        logger.info("count={}", count);
+        return count;
+    }
+
+    public List<NurseSpeakBean> getSpeakByContentLikeAndTime(long userId, String contentLike, String strStartTime, String strEndTime, int pageIndex, int sizePerPage) {
+        logger.info("get speak by content={} startTime={} endTime={}", contentLike, strStartTime, strEndTime);
+        if (VerifyUtil.isStringEmpty(contentLike)) {
+            contentLike = "%";
+        }
+        else {
+            contentLike = contentLike.trim();
+            StringBuilder fuzzyContent = new StringBuilder();
+            for (int i=0, count=contentLike.length(); i < count; i ++) {
+                fuzzyContent.append(contentLike.charAt(i)).append("%");
+            }
+            contentLike = fuzzyContent.toString();
+        }
+        long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date start     = startTime<0 ? new Date(0) : new Date(startTime);
+        Date end       = endTime  <0 ? new Date()  : new Date(endTime);
+
+        PageRequest page = new PageRequest(pageIndex, sizePerPage, Sort.Direction.DESC, "time");
+        Page<NurseSpeakEntity> speaks = speakRepository.findByContentAndTime(contentLike, start, end, page);
+        List<NurseSpeakBean> speakBeans = entitiesToBeans(speaks);
+        fillOtherProperties(userId, speakBeans);
+        logger.info("speak count is ={}", speakBeans.size());
+        return speakBeans;
+    }
 
     public long countSortSpeakBySpeakType(List<Long> speakIds, int speakTypeId) {
         if (VerifyUtil.isListEmpty(speakIds)) {
@@ -344,6 +393,7 @@ public class NurseSpeakService {
         entity.setUserId(userId);
         entity.setContent(content);
         entity.setSpeakType(speakTypeBean.getId());
+        entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = speakRepository.save(entity);
 
@@ -412,6 +462,42 @@ public class NurseSpeakService {
     }
 
     //===============================================================
+    //             update
+    //===============================================================
+    public long updateSpeakStatus(String strSpeakIds, String strStatus) {
+        logger.info("update speak={} with status={}", strSpeakIds, strStatus);
+        if (!VerifyUtil.isIds(strSpeakIds)) {
+            logger.error("invalid speak ids");
+            return 0;
+        }
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null==status) {
+            logger.error("status not valid");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        List<Long> speakIds = VerifyUtil.parseLongIds(strSpeakIds);
+        return updateSpeakStatus(speakIds, status);
+    }
+
+    public long updateSpeakStatus(List<Long> speakIds, CommonStatus status) {
+        logger.info("update speak={} with status={}", speakIds, status);
+        List<NurseSpeakEntity> entities = speakRepository.findAll(speakIds);
+        if (VerifyUtil.isListEmpty(entities)) {
+            logger.error("speak ids is empty");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (null==status) {
+            logger.error("status not valid");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        for (NurseSpeakEntity entity : entities) {
+            entity.setStatus(status);
+            speakRepository.save(entity);
+        }
+        return entities.size();
+    }
+
+    //===============================================================
     //             delete
     //===============================================================
 
@@ -434,7 +520,7 @@ public class NurseSpeakService {
             return new ArrayList<>();
         }
 
-        List<NurseSpeakEntity> speaks = speakRepository.findByIdIn(speakIds);
+        List<NurseSpeakEntity> speaks = speakRepository.findAll(speakIds);
         if (null==speaks || speaks.isEmpty()) {
             logger.info("delete nothing");
         }
@@ -503,7 +589,7 @@ public class NurseSpeakService {
         }
 
         // is speak not exist
-        List<NurseSpeakEntity> speaks = speakRepository.findByIdIn(speakIds);
+        List<NurseSpeakEntity> speaks = speakRepository.findAll(speakIds);
         if (null==speaks || speakIds.isEmpty()) {
             logger.warn("delete as speak not exist");
             comments = speakCommentService.deleteByIds(strCommentIds);

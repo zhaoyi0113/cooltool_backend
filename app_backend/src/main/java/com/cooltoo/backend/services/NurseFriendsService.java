@@ -45,10 +45,7 @@ public class NurseFriendsService {
             logger.error("user can't be himself friend.");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        return addFriendshipToDB(userId, friendId);
-    }
 
-    private boolean addFriendshipToDB(long userId, long friendId){
         validateUserId(userId, friendId);
 
         List<NurseFriendsEntity> friendships = friendsRepository.findFriendshipByUserIdAndFriendId(userId, friendId);
@@ -267,6 +264,13 @@ public class NurseFriendsService {
             userAgreedAndWaitingBeans.add(notFriendBean);
             notFriend ++;
         }
+
+        Collections.sort(userAgreedAndWaitingBeans, new Comparator<NurseFriendsBean>() {
+            @Override
+            public int compare(NurseFriendsBean o1, NurseFriendsBean o2) {
+                return (int)(o1.getFriendId() - o2.getFriendId());
+            }
+        });
 
         logger.info("bothAgreed={}个 friendWaiting={}个 userWaiting={}个 notFriend={}个",
                 bothAgreed, friendWaiting, userWaiting, notFriend);
