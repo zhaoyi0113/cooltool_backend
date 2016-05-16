@@ -50,8 +50,8 @@ public class NurseSpeakService {
     //===============================================================
     //             get
     //===============================================================
-    public long countByContentAndTime(String content, String strStartTime, String strEndTime) {
-        logger.info("count speak by content={} startTime={} endTime={}", content, strStartTime, strEndTime);
+    public long countByContentAndTime(long userId, String content, String strStartTime, String strEndTime) {
+        logger.info("count user={} speak by content={} startTime={} endTime={}", userId>0?userId:"ALL", content, strStartTime, strEndTime);
         if (VerifyUtil.isStringEmpty(content)) {
             content = "%";
         }
@@ -67,13 +67,19 @@ public class NurseSpeakService {
         long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         Date start     = startTime<0 ? new Date(0) : new Date(startTime);
         Date end       = endTime  <0 ? new Date()  : new Date(endTime);
-        long count = speakRepository.countByContentAndTime(content, start, end);
+        long count = 0;
+        if (userId<=0) {
+            count = speakRepository.countByContentAndTime(content, start, end);
+        }
+        else {
+            count = speakRepository.countByUserIdContentAndTime(userId, content, start, end);
+        }
         logger.info("count={}", count);
         return count;
     }
 
     public List<NurseSpeakBean> getSpeakByContentLikeAndTime(long userId, String contentLike, String strStartTime, String strEndTime, int pageIndex, int sizePerPage) {
-        logger.info("get speak by content={} startTime={} endTime={}", contentLike, strStartTime, strEndTime);
+        logger.info("get user={} speak by content={} startTime={} endTime={}", userId>0?userId:"ALL", contentLike, strStartTime, strEndTime);
         if (VerifyUtil.isStringEmpty(contentLike)) {
             contentLike = "%";
         }
@@ -91,7 +97,13 @@ public class NurseSpeakService {
         Date end       = endTime  <0 ? new Date()  : new Date(endTime);
 
         PageRequest page = new PageRequest(pageIndex, sizePerPage, Sort.Direction.DESC, "time");
-        Page<NurseSpeakEntity> speaks = speakRepository.findByContentAndTime(contentLike, start, end, page);
+        Page<NurseSpeakEntity> speaks = null;
+        if (userId<=0) {
+            speaks = speakRepository.findByContentAndTime(contentLike, start, end, page);
+        }
+        else {
+            speaks = speakRepository.findByUserIdContentAndTime(userId, contentLike, start, end, page);
+        }
         List<NurseSpeakBean> speakBeans = entitiesToBeans(speaks);
         fillOtherProperties(userId, speakBeans);
         logger.info("speak count is ={}", speakBeans.size());

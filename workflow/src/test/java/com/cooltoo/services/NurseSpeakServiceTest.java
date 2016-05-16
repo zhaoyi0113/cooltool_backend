@@ -51,8 +51,18 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
     private UserFileStorageService userStorage;
 
     @Test
-    public void testCountSpeakByContentLikeAndTime() {
-        long count = speakService.countByContentAndTime("hello", "2016-01-01 00:0:00", "2016-01-09 00:00:00");
+    public void testCountAndGetSpeakByUserIdContentLikeAndTime() {
+        long count = speakService.countByContentAndTime(1, "@_@", "2016-01-01 00:00:00", "2016-01-20 00:00:00");
+        Assert.assertEquals(2, count);
+        List<NurseSpeakBean> speaks = speakService.getSpeakByContentLikeAndTime(1, "@_@", "2016-01-01 00:00:00", "2016-01-19 00:00:00", 0, 5);
+        Assert.assertEquals(2, speaks.size());
+        Assert.assertEquals(3L, speaks.get(0).getId());
+        Assert.assertEquals(9L, speaks.get(1).getId());
+    }
+
+    @Test
+    public void testCountAndGetSpeakByContentLikeAndTime() {
+        long count = speakService.countByContentAndTime(0, "hello", "2016-01-01 00:0:00", "2016-01-09 00:00:00");
         Assert.assertEquals(4, count);
         List<NurseSpeakBean> speaks = speakService.getSpeakByContentLikeAndTime(0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
         Assert.assertEquals(4, speaks.size());

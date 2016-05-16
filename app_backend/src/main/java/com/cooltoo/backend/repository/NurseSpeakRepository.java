@@ -26,6 +26,14 @@ public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Lo
     @Query("FROM NurseSpeakEntity speak WHERE speak.content LIKE %?1 AND time>=?2 AND time<=?3")
     Page<NurseSpeakEntity> findByContentAndTime(String contentLike, Date startTime, Date endTime, Pageable page);
 
+    @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak " +
+            " WHERE speak.userId=?1 AND speak.content LIKE %?2 AND time>=?3 AND time<=?4")
+    long countByUserIdContentAndTime(long userId, String contentLike, Date startTime, Date endTime);
+
+    @Query("FROM NurseSpeakEntity speak " +
+            " WHERE speak.userId=?1 AND speak.content LIKE %?2 AND time>=?3 AND time<=?4")
+    Page<NurseSpeakEntity> findByUserIdContentAndTime(long userId, String contentLike, Date startTime, Date endTime, Pageable page);
+
     //=====================================
     //    User use
     //=====================================
@@ -46,10 +54,4 @@ public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Lo
 
     @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak WHERE speak.id IN (?1) AND speak.speakType=?2")
     long countSortSpeakByType(List<Long> speakIds, Integer speakTypeId);
-
-    //=====================================
-    //    Update
-    //=====================================
-    @Query("UPDATE NurseSpeakEntity speak SET speak.status=?1 WHERE speak.id IN (?2)")
-    long updateStatus(CommonStatus status, List<Long> speakIds);
 }
