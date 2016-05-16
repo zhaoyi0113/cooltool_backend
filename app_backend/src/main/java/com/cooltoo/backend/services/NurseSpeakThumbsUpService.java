@@ -73,7 +73,6 @@ public class NurseSpeakThumbsUpService {
         if (VerifyUtil.isListEmpty(thumbsUpUsers)) {
             return new ArrayList<>();
         }
-        thumbsUpUsers.remove(new Long(currentUserId));
 
         return friendsService.getFriendship(currentUserId, thumbsUpUsers);
     }
