@@ -1,0 +1,1 @@
+ALTER TABLE `nurse_speak` ADD COLUMN `status` INT NULL DEFAULT 1;

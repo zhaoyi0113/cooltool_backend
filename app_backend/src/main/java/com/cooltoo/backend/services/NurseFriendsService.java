@@ -43,6 +43,7 @@ public class NurseFriendsService {
     public boolean addFriendship(long userId, long friendId){
         if(userId == friendId){
             logger.error("user can't be himself friend.");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         return addFriendshipToDB(userId, friendId);
     }
