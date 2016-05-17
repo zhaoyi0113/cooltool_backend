@@ -76,11 +76,11 @@ public class NurseHospitalAPI {
         return Response.ok(relationId).build();
     }
 
-    @Path("/search/{name}")
+    @Path("/search")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response searchHospital(@DefaultValue("") @PathParam("name") String  name) {
+    public Response searchHospital(@DefaultValue("") @QueryParam("name") String  name) {
         List<HospitalBean> hospitals = hospitalService.searchHospital(true, true, name, -1, -1, -1, "", 0, 0);
         logger.info("get hospital size is {}", hospitals.size());
         if (null == hospitals) {
