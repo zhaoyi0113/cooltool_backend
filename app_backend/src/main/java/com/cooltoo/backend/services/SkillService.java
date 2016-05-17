@@ -181,13 +181,21 @@ public class SkillService {
     //=========================================================
 
     @Transactional
-    public SkillBean addNewOccupationSkill(String name, int factor, String strStatus, InputStream image, InputStream disableImage) {
+    public SkillBean addNewOccupationSkill(String name, String description, int factor, String strStatus, InputStream image, InputStream disableImage) {
+        logger.info("add skill by name={} descr={} factor={} status={} image={} disImage={}", name, description, factor, strStatus, image!=null, disableImage!=null);
         if (!isSkillNameExist(name)) {
             if (VerifyUtil.isStringEmpty(name)) {
                 throw new BadRequestException(ErrorCode.SKILL_NAME_IS_NULL);
             }
             if (factor<=0) {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+
+            if (VerifyUtil.isStringEmpty(description)) {
+                description = "";
+            }
+            else {
+                description = description.trim();
             }
 
             SkillEntity entity = new SkillEntity();
@@ -203,6 +211,7 @@ public class SkillService {
             if (null==status) {
                 status = OccupationSkillStatus.DISABLE;
             }
+            entity.setDescription(description);
             entity.setStatus(status);
             entity.setName(name);
             entity.setFactor(factor);
@@ -237,8 +246,9 @@ public class SkillService {
     //=========================================================
 
     @Transactional
-    public SkillBean editOccupationSkill(int id, String name, int factor, String status, InputStream imageStream, InputStream disableImageStream) {
-        logger.info("edit occupation skill with image skillId={}, enableImage={} disableImage={}", id, (null!=imageStream), (null!=disableImageStream));
+    public SkillBean editOccupationSkill(int id, String name, String description, int factor, String status, InputStream imageStream, InputStream disableImageStream) {
+        logger.info("edit occupation skill with image skillId={} name={} descr={} factor={} status={} enableImage={} disableImage={}"
+                , id, name, description, factor, status, (null!=imageStream), (null!=disableImageStream));
         boolean               changed        = false;
         SkillEntity           entity         = editOccupationSkillWithoutImage(id, name, factor, status);
         String                imgPath        = null;
@@ -264,6 +274,10 @@ public class SkillService {
             catch (BadRequestException ex) {
                 // do nothing
             }
+        }
+        if (!VerifyUtil.isStringEmpty(description) && !description.trim().equals(entity.getDescription())) {
+            entity.setDescription(description.trim());
+            changed = true;
         }
         if (changed) {
             entity = skillRepository.save(entity);

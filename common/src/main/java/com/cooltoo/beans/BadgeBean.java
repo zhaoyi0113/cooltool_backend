@@ -16,6 +16,7 @@ public class BadgeBean {
     private String imageUrl;
     private int    abilityId;
     private SocialAbilityType abilityType;
+    private String description;
 
     public int getId() {
         return id;
@@ -79,6 +80,14 @@ public class BadgeBean {
 
     public void setAbilityType(SocialAbilityType abilityType) {
         this.abilityType = abilityType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

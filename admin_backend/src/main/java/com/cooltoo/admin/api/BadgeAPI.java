@@ -81,11 +81,12 @@ public class BadgeAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addBadge(@Context HttpServletRequest request,
                              @FormParam("name")                            String name,
+                             @FormParam("description")  @DefaultValue("")  String description,
                              @FormParam("grade")        @DefaultValue("1") int    grade,
                              @FormParam("point")        @DefaultValue("0") int    point,
                              @FormParam("ability_id")   @DefaultValue("0") int    abilityId,
                              @FormParam("ability_type") @DefaultValue("")  String abilityType) {
-        BadgeBean badge = badgeService.addBadge(name, point, grade, abilityId, abilityType, null, null);
+        BadgeBean badge = badgeService.addBadge(name, description, point, grade, abilityId, abilityType, null, null);
         return Response.ok(badge).build();
     }
 
@@ -96,12 +97,13 @@ public class BadgeAPI {
     public Response editBadgeWithoutImage(@Context HttpServletRequest request,
                                           @FormParam("id")           @DefaultValue("0") int    badgeId,
                                           @FormParam("name")         @DefaultValue("")  String name,
+                                          @FormParam("description")  @DefaultValue("")  String description,
                                           @FormParam("grade")        @DefaultValue("1") int    grade,
                                           @FormParam("point")        @DefaultValue("0") int    point,
                                           @FormParam("ability_id")   @DefaultValue("0") int    abilityId,
                                           @FormParam("ability_type") @DefaultValue("")  String abilityType
     ) {
-        BadgeBean badge = badgeService.updateBadge(badgeId, name, point, grade, abilityId, abilityType, null, null);
+        BadgeBean badge = badgeService.updateBadge(badgeId, name, description, point, grade, abilityId, abilityType, null, null);
         return Response.ok(badge).build();
     }
 
@@ -117,7 +119,7 @@ public class BadgeAPI {
                                    @FormDataParam("file") InputStream image,
                                    @FormDataParam("file") FormDataContentDisposition imageDisp
     ) {
-        BadgeBean badge = badgeService.updateBadge(badgeId, null, -1, -1, -1, null, imageName, image);
+        BadgeBean badge = badgeService.updateBadge(badgeId, null, null, -1, -1, -1, null, imageName, image);
         return Response.ok(badge).build();
     }
 

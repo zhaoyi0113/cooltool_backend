@@ -43,9 +43,10 @@ public class SkillServiceTest extends AbstractCooltooTest {
         File file = new File("build/" + System.currentTimeMillis());
         try {
             file.createNewFile();
-            SkillBean bean  = skillService.addNewOccupationSkill(skillName, 1, "enable", new FileInputStream(file), new FileInputStream(file));
+            SkillBean bean  = skillService.addNewOccupationSkill(skillName, "SkillServiceTest", 1, "enable", new FileInputStream(file), new FileInputStream(file));
             Assert.assertTrue(bean.getId() > 0);
             Assert.assertEquals(skillName, bean.getName());
+            Assert.assertEquals("SkillServiceTest", bean.getDescription());
             Assert.assertEquals(OccupationSkillStatus.ENABLE, bean.getStatus());
 
             Assert.assertTrue(storageRepository.fileExist(bean.getImageId()));
@@ -73,10 +74,11 @@ public class SkillServiceTest extends AbstractCooltooTest {
             file.createNewFile();
             image   = new FileInputStream(file);
             disable = new FileInputStream(file);
-            skillService.editOccupationSkill(skill.getId(), name, 1, OccupationSkillStatus.ENABLE.name(), image, disable);
+            skillService.editOccupationSkill(skill.getId(), name, "SkillServiceTest", 1, OccupationSkillStatus.ENABLE.name(), image, disable);
             SkillBean bean = skillService.getOneSkillById(skill.getId());
             Assert.assertNotNull(bean);
             Assert.assertEquals(name, bean.getName());
+            Assert.assertEquals("SkillServiceTest", bean.getDescription());
 
             Assert.assertTrue(storageRepository.fileExist(bean.getImageId()));
             Assert.assertTrue(storageRepository.fileExist(bean.getDisableImageId()));

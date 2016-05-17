@@ -20,6 +20,7 @@ public class SkillBeanConverter implements Converter<SkillEntity, SkillBean> {
         bean.setDisableImageId(source.getDisableImageId());
         bean.setFactor(source.getFactor());
         bean.setStatus(source.getStatus());
+        bean.setDescription(source.getDescription());
         return bean;
     }
 }

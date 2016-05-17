@@ -10,6 +10,7 @@ public class SocialAbilitiesBean {
     private long userId;
     private int skillId;
     private String skillName;
+    private String skillDescription;
     private SocialAbilityType skillType;
     private long factor;
     private long nominatedCount;
@@ -42,6 +43,14 @@ public class SocialAbilitiesBean {
 
     public void setSkillName(String skillName) {
         this.skillName = skillName;
+    }
+
+    public String getSkillDescription() {
+        return skillDescription;
+    }
+
+    public void setSkillDescription(String skillDescription) {
+        this.skillDescription = skillDescription;
     }
 
     public SocialAbilityType getSkillType() {
@@ -123,6 +132,7 @@ public class SocialAbilitiesBean {
         msg.append("skillId=").append(skillId).append(", ");
         msg.append("skillName=").append(skillName).append(", ");
         msg.append("skillType=").append(skillType).append(", ");
+        msg.append("skillDescription=").append(skillDescription).append(", ");
         msg.append("factor=").append(factor).append(", ");
         msg.append("nominatedCount=").append(nominatedCount).append(", ");
         msg.append("point=").append(point).append(", ");

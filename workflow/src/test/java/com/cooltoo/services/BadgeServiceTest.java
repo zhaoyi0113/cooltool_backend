@@ -168,10 +168,11 @@ public class BadgeServiceTest extends AbstractCooltooTest {
     @Test
     public void testAddBadge(){
         ByteArrayInputStream image = new ByteArrayInputStream("fdsafdsafds".getBytes());
-        BadgeBean badge = badgeService.addBadge("name222", 12, 1, 1000, "SKILL", "aaaaa", image);
+        BadgeBean badge = badgeService.addBadge("name222", "description 222", 12, 1, 1000, "SKILL", "aaaaa", image);
         Assert.assertNotNull(badge);
         Assert.assertTrue(badge.getId()>0);
         Assert.assertEquals("name222", badge.getName());
+        Assert.assertEquals("description 222", badge.getDescription());
         Assert.assertEquals(12, badge.getPoint());
         Assert.assertEquals(1, badge.getGrade());
         Assert.assertEquals(1000, badge.getAbilityId());
@@ -187,10 +188,11 @@ public class BadgeServiceTest extends AbstractCooltooTest {
     @Test
     public void testUpdateBadget(){
         ByteArrayInputStream image = new ByteArrayInputStream("fdsafdsafds".getBytes());
-        BadgeBean badge = badgeService.updateBadge(1, "name222", 123, 2, 1000, "SKILL", "aaaaa", image);
+        BadgeBean badge = badgeService.updateBadge(1, "name222", "description 222", 123, 2, 1000, "SKILL", "aaaaa", image);
         Assert.assertNotNull(badge);
         Assert.assertEquals(1, badge.getId());
         Assert.assertEquals("name222", badge.getName());
+        Assert.assertEquals("description 222", badge.getDescription());
         Assert.assertEquals(123, badge.getPoint());
         Assert.assertEquals(2, badge.getGrade());
         Assert.assertEquals(1000, badge.getAbilityId());

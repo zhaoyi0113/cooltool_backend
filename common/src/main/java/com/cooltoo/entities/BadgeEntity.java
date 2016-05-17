@@ -18,6 +18,7 @@ public class BadgeEntity {
     private long   imageId;
     private int    abilityId;
     private SocialAbilityType abilityType;
+    private String description;
 
     @Id
     @GeneratedValue
@@ -85,6 +86,15 @@ public class BadgeEntity {
         this.abilityType = abilityType;
     }
 
+    @Column(name = "description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -94,6 +104,7 @@ public class BadgeEntity {
         msg.append("point=").append(point).append(" ,");
         msg.append("abilityId=").append(abilityId).append(" ,");
         msg.append("abilityType=").append(abilityType).append(" ,");
+        msg.append("description=").append(description).append(" ,");
         msg.append("imageId=").append(imageId).append("]");
         return msg.toString();
     }

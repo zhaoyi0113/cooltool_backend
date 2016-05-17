@@ -73,11 +73,12 @@ public class OccupationSkillManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addOccupationSkill(@FormParam("name") String name,
+                                       @FormParam("description") @DefaultValue("") String description,
                                        @FormParam("factor") @DefaultValue("1") int factor,
                                        @FormParam("status") @DefaultValue("disable") String status
     ) {
         logger.info("add new occupation skill parameters is ==== name={}, factor={}, image={}, disableImage={}.", name, factor, null, null);
-        SkillBean skill = skillService.addNewOccupationSkill(name, factor, status, null, null);
+        SkillBean skill = skillService.addNewOccupationSkill(name, description, factor, status, null, null);
         logger.info("add new occupation skill is " + skill.toString());
         return Response.ok(skill).build();
     }
@@ -95,10 +96,11 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkill2(@FormParam("id") int id,
                                          @FormParam("name") String name,
-                                         @FormParam("factor") int factor,
-                                         @FormParam("status") String status
+                                         @FormParam("description") @DefaultValue("") String description,
+                                         @FormParam("factor") @DefaultValue("1") int factor,
+                                         @FormParam("status") @DefaultValue("disable") String status
     ) {
-        SkillBean bean = skillService.editOccupationSkill(id, name, factor, status, null, null);
+        SkillBean bean = skillService.editOccupationSkill(id, name, description, factor, status, null, null);
         return Response.ok(bean).build();
     }
 
@@ -123,7 +125,7 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillEnableImage(@FormDataParam("id") int id,
                                                    @FormDataParam("file") InputStream image) {
-        SkillBean bean = skillService.editOccupationSkill(id, null, -1, null, image, null);
+        SkillBean bean = skillService.editOccupationSkill(id, null, null, -1, null, image, null);
         return Response.ok(bean).build();
     }
 
@@ -134,7 +136,7 @@ public class OccupationSkillManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response editOccupationSkillDisableImage(@FormDataParam("id") int id,
                                                     @FormDataParam("file") InputStream image) {
-        SkillBean bean = skillService.editOccupationSkill(id, null, -1, null, null, image);
+        SkillBean bean = skillService.editOccupationSkill(id, null, null, -1, null, null, image);
         return Response.ok(bean).build();
     }
 }

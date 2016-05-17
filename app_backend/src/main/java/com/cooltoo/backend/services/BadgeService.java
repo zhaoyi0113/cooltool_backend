@@ -237,9 +237,17 @@ public class BadgeService {
     //=========================================================
 
     @Transactional
-    public BadgeBean addBadge(String name, int point, int grade, int abilityId, String strAbilityType, String imageName, InputStream image) {
+    public BadgeBean addBadge(String name, String description, int point, int grade, int abilityId, String strAbilityType, String imageName, InputStream image) {
         logger.info("add badge name={} point={} grade={} abilityId={} abilityType={} imageName={} image={}",
                 name, point, grade, abilityId, strAbilityType, imageName, (null!=image));
+
+        // check description
+        if (VerifyUtil.isStringEmpty(description)) {
+            description = "";
+        }
+        else {
+            description = description.trim();
+        }
 
         // check grade
         if (grade<=0) {
@@ -273,6 +281,7 @@ public class BadgeService {
 
         BadgeEntity entity = new BadgeEntity();
         entity.setName(name);
+        entity.setDescription(description);
         entity.setGrade(grade);
         entity.setPoint(point);
         entity.setAbilityId(abilityId);
@@ -291,7 +300,7 @@ public class BadgeService {
     //=========================================================
 
     @Transactional
-    public BadgeBean updateBadge(int id, String name, int point, int grade, int abilityId, String strAbilityType, String imageName, InputStream image) {
+    public BadgeBean updateBadge(int id, String name, String description, int point, int grade, int abilityId, String strAbilityType, String imageName, InputStream image) {
         logger.info("update badge id={} name={} point={} grade={} abilityId={} abilityType={} imageName={} image={}",
                 id, name, point, grade, abilityId, strAbilityType, imageName, (null!=image));
         if (!repository.exists(id)) {
@@ -332,6 +341,12 @@ public class BadgeService {
         if (isAbilityIdAndTypeValid(abilityId, abilityType)) {
             entity.setAbilityType(abilityType);
             entity.setAbilityId(abilityId);
+            changed = true;
+        }
+
+        // check description
+        if (!VerifyUtil.isStringEmpty(description) && !description.trim().equals(entity.getDescription())) {
+            entity.setDescription(description.trim());
             changed = true;
         }
 

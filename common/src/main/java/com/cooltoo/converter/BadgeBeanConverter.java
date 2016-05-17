@@ -20,6 +20,7 @@ public class BadgeBeanConverter implements Converter<BadgeEntity, BadgeBean> {
         bean.setImageId(source.getImageId());
         bean.setAbilityId(source.getAbilityId());
         bean.setAbilityType(source.getAbilityType());
+        bean.setDescription(source.getDescription());
         return bean;
     }
 }

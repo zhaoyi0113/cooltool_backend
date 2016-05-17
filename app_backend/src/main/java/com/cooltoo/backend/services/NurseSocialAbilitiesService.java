@@ -40,7 +40,7 @@ public class NurseSocialAbilitiesService {
     //==================================================================
     private SocialAbilitiesBean newAbilityBean(
             long userId,
-            int skillId, String skillName, SocialAbilityType skillType,
+            int skillId, String skillName, String skillDescription, SocialAbilityType skillType,
             long factor, long nominateCount,
             long imageId, String imagePath,
             long disableImageId, String disableImagePath
@@ -49,6 +49,7 @@ public class NurseSocialAbilitiesService {
         bean.setUserId(userId);
         bean.setSkillId(skillId);
         bean.setSkillName(skillName);
+        bean.setSkillDescription(skillDescription);
         bean.setSkillType(skillType);
         bean.setFactor(factor);
         bean.setNominatedCount(nominateCount);
@@ -84,7 +85,7 @@ public class NurseSocialAbilitiesService {
                     }
                     SocialAbilitiesBean abilityBean = newAbilityBean(
                             userId,
-                            nomination.getAbilityId(), department.getName(), SocialAbilityType.OCCUPATION,
+                            nomination.getAbilityId(), department.getName(), department.getDescription(), SocialAbilityType.OCCUPATION,
                             1, nomination.getAbilityNominateCount(),
                             department.getImageId(), department.getImageUrl(),
                             department.getDisableImageId(), department.getDisableImageUrl());
@@ -94,7 +95,7 @@ public class NurseSocialAbilitiesService {
                 if (!hasDepartmentNominate) {
                     SocialAbilitiesBean abilityBean = newAbilityBean(
                             userId,
-                            nurseHospDepart.getDepartmentId(), department.getName(), SocialAbilityType.OCCUPATION,
+                            nurseHospDepart.getDepartmentId(), department.getName(), department.getDescription(), SocialAbilityType.OCCUPATION,
                             1, 0,
                             department.getImageId(), department.getImageUrl(),
                             department.getDisableImageId(), department.getDisableImageUrl());
@@ -125,7 +126,7 @@ public class NurseSocialAbilitiesService {
                 }
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         nurseSkill.getUserId(),
-                        nomination.getAbilityId(), skill.getName(), SocialAbilityType.SKILL,
+                        nomination.getAbilityId(), skill.getName(), skill.getDescription(), SocialAbilityType.SKILL,
                         skill.getFactor(), nomination.getAbilityNominateCount(),
                         skill.getImageId(), skill.getImageUrl(),
                         skill.getDisableImageId(), skill.getDisableImageUrl());
@@ -135,7 +136,7 @@ public class NurseSocialAbilitiesService {
             if (!hasNominate) {
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         nurseSkill.getUserId(),
-                        nurseSkill.getSkillId(), skill.getName(), SocialAbilityType.SKILL,
+                        nurseSkill.getSkillId(), skill.getName(), skill.getDescription(), SocialAbilityType.SKILL,
                         skill.getFactor(), 0,
                         skill.getImageId(), skill.getImageUrl(),
                         skill.getDisableImageId(), skill.getDisableImageUrl());
@@ -155,7 +156,7 @@ public class NurseSocialAbilitiesService {
             if (countOfSpeakType>0) {
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         userId,
-                        speakType.getId(), speakType.getName(), SocialAbilityType.COMMUNITY,
+                        speakType.getId(), speakType.getName(), "", SocialAbilityType.COMMUNITY,
                         speakType.getFactor(), countOfSpeakType,
                         speakType.getImageId(), speakType.getImageUrl(),
                         speakType.getDisableImageId(), speakType.getDisableImageUrl());
@@ -164,6 +165,7 @@ public class NurseSocialAbilitiesService {
                 if (null!=badge) {
                     abilityBean.setSkillName(badge.getName());
                     abilityBean.setImageUrl(badge.getImageUrl());
+                    abilityBean.setSkillDescription(badge.getDescription());
                     nurseSkillAbilities.add(abilityBean);
                 }
             }
@@ -181,7 +183,7 @@ public class NurseSocialAbilitiesService {
             if (countThumbsUp > 0) {
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         userId,
-                        specificAbility.getAbilityId(), specificAbility.getAbilityName(), SocialAbilityType.THUMBS_UP,
+                        specificAbility.getAbilityId(), specificAbility.getAbilityName(), "", SocialAbilityType.THUMBS_UP,
                         1, countThumbsUp,
                         0, "",  /* there is no image for thumbs_up*/
                         0, ""   /* there is no disable image for thumbs_up*/);
@@ -190,6 +192,7 @@ public class NurseSocialAbilitiesService {
                 if (null != badge) {
                     abilityBean.setSkillName(badge.getName());
                     abilityBean.setImageUrl(badge.getImageUrl());
+                    abilityBean.setSkillDescription(badge.getDescription());
                     nurseSkillAbilities.add(abilityBean);
                 }
             }
@@ -211,7 +214,7 @@ public class NurseSocialAbilitiesService {
                 if (count > 0) {
                     SocialAbilitiesBean abilityBean = newAbilityBean(
                             userId,
-                            specificAbility.getAbilityId(), specificAbility.getAbilityName(), SocialAbilityType.COMMENT,
+                            specificAbility.getAbilityId(), specificAbility.getAbilityName(), "", SocialAbilityType.COMMENT,
                             1, count,
                             0, "", /* there is no image for comment */
                             0, ""  /* there is no disable image for comment */);
@@ -220,6 +223,7 @@ public class NurseSocialAbilitiesService {
                     if (null != badge) {
                         abilityBean.setSkillName(badge.getName());
                         abilityBean.setImageUrl(badge.getImageUrl());
+                        abilityBean.setSkillDescription(badge.getDescription());
                         nurseSkillAbilities.add(abilityBean);
                     }
                 }
@@ -267,7 +271,7 @@ public class NurseSocialAbilitiesService {
                     long nominateCount = null==abilityNominate ? 0 : abilityNominate.getAbilityNominateCount();
                     SocialAbilitiesBean ability = newAbilityBean(
                             userId,
-                            departId, department.getName(), SocialAbilityType.OCCUPATION,
+                            departId, department.getName(), department.getDescription(), SocialAbilityType.OCCUPATION,
                             1, nominateCount,
                             department.getImageId(), department.getImageUrl(),
                             department.getDisableImageId(), department.getDisableImageUrl());
@@ -285,12 +289,17 @@ public class NurseSocialAbilitiesService {
             long      nominateCount = null==abilityNominate ? 0 : abilityNominate.getAbilityNominateCount();
             SocialAbilitiesBean abilityBean = newAbilityBean(
                     userId,
-                    abilityId, skill.getName(), SocialAbilityType.OCCUPATION,
+                    abilityId, skill.getName(), skill.getDescription(), SocialAbilityType.OCCUPATION,
                     skill.getFactor(), nominateCount,
                     skill.getImageId(), skill.getImageUrl(),
                     skill.getDisableImageId(), skill.getDisableImageUrl());
             BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.SKILL.name());
             abilityBean.setBadge(badge);
+            if (null != badge) {
+                abilityBean.setSkillName(badge.getName());
+                abilityBean.setImageUrl(badge.getImageUrl());
+                abilityBean.setSkillDescription(badge.getDescription());
+            }
             return abilityBean;
         }
         else if (SocialAbilityType.COMMUNITY==socialAbilityType) {
@@ -300,12 +309,17 @@ public class NurseSocialAbilitiesService {
             if (countOfSpeakType>0) {
                 SocialAbilitiesBean abilityBean = newAbilityBean(
                         userId,
-                        speakType.getId(), speakType.getName(), SocialAbilityType.COMMUNITY,
+                        speakType.getId(), speakType.getName(), "", SocialAbilityType.COMMUNITY,
                         speakType.getFactor(), countOfSpeakType,
                         speakType.getImageId(), speakType.getImageUrl(),
                         speakType.getDisableImageId(), speakType.getDisableImageUrl());
                 BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), SocialAbilityType.COMMUNITY.name());
                 abilityBean.setBadge(badge);
+                if (null != badge) {
+                    abilityBean.setSkillName(badge.getName());
+                    abilityBean.setImageUrl(badge.getImageUrl());
+                    abilityBean.setSkillDescription(badge.getDescription());
+                }
                 return abilityBean;
             }
         }
@@ -326,7 +340,7 @@ public class NurseSocialAbilitiesService {
                 if (countThumbsUp > 0) {
                     SocialAbilitiesBean abilityBean = newAbilityBean(
                             userId,
-                            specificAbility.getAbilityId(), specificAbility.getAbilityName(), SocialAbilityType.THUMBS_UP,
+                            specificAbility.getAbilityId(), specificAbility.getAbilityName(), "", SocialAbilityType.THUMBS_UP,
                             1, countThumbsUp,
                             0, "",  /* there is no image for thumbs_up*/
                             0, ""   /* there is no disable image for thumbs_up*/);
@@ -335,6 +349,7 @@ public class NurseSocialAbilitiesService {
                     if (null != badge) {
                         abilityBean.setSkillName(badge.getName());
                         abilityBean.setImageUrl(badge.getImageUrl());
+                        abilityBean.setSkillDescription(badge.getDescription());
                     }
                     return abilityBean;
                 }
@@ -360,7 +375,7 @@ public class NurseSocialAbilitiesService {
                     if (count > 0) {
                         SocialAbilitiesBean abilityBean = newAbilityBean(
                                 userId,
-                                specificAbility.getAbilityId(), specificAbility.getAbilityName(), SocialAbilityType.COMMENT,
+                                specificAbility.getAbilityId(), specificAbility.getAbilityName(), "", SocialAbilityType.COMMENT,
                                 1, count,
                                 0, "", /* there is no image for comment */
                                 0, ""  /* there is no disable image for comment */);
@@ -369,6 +384,7 @@ public class NurseSocialAbilitiesService {
                         if (null != badge) {
                             abilityBean.setSkillName(badge.getName());
                             abilityBean.setImageUrl(badge.getImageUrl());
+                            abilityBean.setSkillDescription(badge.getDescription());
                         }
                         return abilityBean;
                     }

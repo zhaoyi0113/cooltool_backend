@@ -16,6 +16,7 @@ public class SkillEntity {
     private String name;
     private int factor;
     private OccupationSkillStatus status;
+    private String description;
 
 
     @Id
@@ -74,6 +75,15 @@ public class SkillEntity {
         this.status = status;
     }
 
+    @Column(name = "description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -81,6 +91,7 @@ public class SkillEntity {
         msg.append("imageId=").append(imageId).append(", ");
         msg.append("disableImageId=").append(disableImageId).append(", ");
         msg.append("name=").append(name).append(", ");
+        msg.append("description=").append(description).append(", ");
         msg.append("factor=").append(factor);
         return msg.toString();
     }

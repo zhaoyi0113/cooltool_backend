@@ -14,6 +14,7 @@ public class SkillBean {
     private String disableImageUrl;
     private int factor;
     private OccupationSkillStatus status;
+    private String description;
 
     public int getId() {
         return id;
@@ -79,6 +80,14 @@ public class SkillBean {
         this.status = status;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -87,6 +96,7 @@ public class SkillBean {
         msg.append("disableImageId=").append(disableImageId).append(", ");
         msg.append("name=").append(name).append(", ");
         msg.append("status=").append(status).append(", ");
+        msg.append("description=").append(description).append(", ");
         msg.append("factor=").append(factor);
         return msg.toString();
     }
