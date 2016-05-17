@@ -15,6 +15,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,5 +74,18 @@ public class NurseHospitalAPI {
         long relationId = hospitalRelationService.newOne(nurseId, hospitalId, departmentId);
         logger.info("user " + nurseId + " select hospital " + hospitalId + " select department " + departmentId);
         return Response.ok(relationId).build();
+    }
+
+    @Path("/search/{name}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response searchHospital(@DefaultValue("") @PathParam("name") String  name) {
+        List<HospitalBean> hospitals = hospitalService.searchHospital(true, true, name, -1, -1, -1, "", 0, 0);
+        logger.info("get hospital size is {}", hospitals.size());
+        if (null == hospitals) {
+            Response.ok(new ArrayList<>()).build();
+        }
+        return Response.ok(hospitals).build();
     }
 }
