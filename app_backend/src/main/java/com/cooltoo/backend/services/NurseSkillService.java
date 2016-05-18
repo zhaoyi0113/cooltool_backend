@@ -74,7 +74,7 @@ public class NurseSkillService {
     @Transactional
     public void addSkill(long userId, int skillId) {
         // is Nurse exist
-        nurseService.getNurse(userId);
+        nurseService.getNurseWithoutOtherInfo(userId);
         // is Occupation skill exist
         skillService.getOneSkillById(skillId);
         // is Skill exist already, delete it
@@ -94,7 +94,7 @@ public class NurseSkillService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         // is Nurse exist
-        nurseService.getNurse(userId);
+        nurseService.getNurseWithoutOtherInfo(userId);
 
         // judge the skills exist
         Map<Integer, SkillBean> allSkills = skillService.getAllSkillId2BeanMap();

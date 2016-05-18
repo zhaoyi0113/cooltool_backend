@@ -7,6 +7,9 @@ import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,7 +182,7 @@ public class NurseHospitalRelationService {
             relation = relations.get(0);
         }
 
-        nurseService.getNurse(bean.getNurseId());
+        nurseService.getNurseWithoutOtherInfo(bean.getNurseId());
         if (bean.getHospitalId()>0) {
             hospitalService.getOneById(bean.getHospitalId());
         }
@@ -216,6 +219,23 @@ public class NurseHospitalRelationService {
         bean.setHospitalId(hospitalId);
         bean.setDepartmentId(departmentId);
         return newOne(bean);
+    }
+
+    @Transactional
+    public Long newOne(long nurseId, String hospitalName) {
+        logger.info("set nurse={}--HospitalName={} relationship", nurseId, hospitalName);
+        if (VerifyUtil.isStringEmpty(hospitalName)) {
+            logger.error("hospital name is invalid");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        hospitalName = hospitalName.trim();
+        List<HospitalBean> hospitals = hospitalService.getHospital(hospitalName);
+        if (!VerifyUtil.isListEmpty(hospitals)) {
+            logger.error("hospital is exist");
+            throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
+        }
+        Integer hospitalId = hospitalService.newOne(hospitalName, -1, -1, -1, "", 0);
+        return newOne(nurseId, hospitalId, -1);
     }
 
     //========================================================

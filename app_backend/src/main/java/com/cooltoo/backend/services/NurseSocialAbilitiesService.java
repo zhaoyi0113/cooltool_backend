@@ -251,7 +251,7 @@ public class NurseSocialAbilitiesService {
     public SocialAbilitiesBean getUserSpecialAbility(long userId, int abilityId, String type){
         logger.info("get user {} 's special social abilities id={} type={}", userId, abilityId, type);
         // is nurse exist
-        NurseBean         nurse             = nurseService.getNurse(userId);
+        NurseBean nurse = nurseService.getNurseWithoutOtherInfo(userId);
         // is type exist
         SocialAbilityType socialAbilityType = SocialAbilityType.parseString(type);
         if (null==socialAbilityType) {

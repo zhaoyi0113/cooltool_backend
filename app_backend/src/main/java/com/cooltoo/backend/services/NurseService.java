@@ -116,6 +116,21 @@ public class NurseService {
         throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
 
+    public NurseBean getNurseWithoutOtherInfo(long userId) {
+        NurseEntity entity = repository.findOne(userId);
+        if (null == entity) {
+            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+        }
+        NurseBean nurse = beanConverter.convert(entity);
+        List<Long> imageIds = new ArrayList<>();
+        imageIds.add(nurse.getProfilePhotoId());
+        imageIds.add(nurse.getBackgroundImageId());
+        Map<Long, String> imgId2Path = userStorage.getFilePath(imageIds);
+        nurse.setProfilePhotoUrl(imgId2Path.get(nurse.getProfilePhotoId()));
+        nurse.setBackgroundImageUrl(imgId2Path.get(nurse.getBackgroundImageId()));
+        return nurse;
+    }
+
     public NurseBean getNurse(long userId) {
         NurseEntity entity = repository.findOne(userId);
         if (null == entity) {
@@ -423,7 +438,7 @@ public class NurseService {
 
         NurseBean nurse = null;
         if (repository.exists(userId)) {
-            nurse = getNurse(userId);
+            nurse = getNurseWithoutOtherInfo(userId);
         }
         if (null==nurse) {
             nurse = getNurse(mobile);

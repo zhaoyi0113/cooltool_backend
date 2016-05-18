@@ -52,6 +52,19 @@ public class NurseHospitalAPI {
         return Response.ok(provinceHospitals).build();
     }
 
+    @Path("/search")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response searchHospital(@DefaultValue("") @QueryParam("name") String  name) {
+        List<HospitalBean> hospitals = hospitalService.searchHospital(true, true, name, -1, -1, -1, "", 0, 0);
+        logger.info("get hospital size is {}", hospitals.size());
+        if (null == hospitals) {
+            Response.ok(new ArrayList<>()).build();
+        }
+        return Response.ok(hospitals).build();
+    }
+
     @Path("/relation")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -76,16 +89,16 @@ public class NurseHospitalAPI {
         return Response.ok(relationId).build();
     }
 
-    @Path("/search")
-    @GET
+    @Path("/set_hospital_with_name")
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response searchHospital(@DefaultValue("") @QueryParam("name") String  name) {
-        List<HospitalBean> hospitals = hospitalService.searchHospital(true, true, name, -1, -1, -1, "", 0, 0);
-        logger.info("get hospital size is {}", hospitals.size());
-        if (null == hospitals) {
-            Response.ok(new ArrayList<>()).build();
-        }
-        return Response.ok(hospitals).build();
+    public Response setNurseAndHospitalRelation(@Context HttpServletRequest request,
+                                                @FormParam("hospital_name") @DefaultValue("") String hospitalName
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        long relationId = hospitalRelationService.newOne(nurseId, hospitalName);
+        logger.info("user {} set hospital_name={}", nurseId, hospitalName);
+        return Response.ok(relationId).build();
     }
 }

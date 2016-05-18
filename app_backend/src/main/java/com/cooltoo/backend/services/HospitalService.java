@@ -50,6 +50,13 @@ public class HospitalService {
     //=======================================================
     //        get
     //=======================================================
+    public List<HospitalBean> getHospital(String hospitalName) {
+        List<HospitalEntity> hospitals = repository.findByName(hospitalName);
+        List<HospitalBean> hospitalBeans = entities2Beans(hospitals);
+        fillOtherProperties(hospitalBeans);
+        return hospitalBeans;
+    }
+
     public List<HospitalBean> getAll() {
         Iterable<HospitalEntity> iterable = repository.findAll();
         List<HospitalBean> all = new ArrayList<HospitalBean>();

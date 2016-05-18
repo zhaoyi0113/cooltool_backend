@@ -40,7 +40,7 @@ public class NurseFriendAOPService {
             try {
                 long userId = Long.parseLong(args[0].toString());
                 long friendId = Long.parseLong(args[1].toString());
-                NurseBean nurse = nurseService.getNurse(userId);
+                NurseBean nurse = nurseService.getNurseWithoutOtherInfo(userId);
                 if (nurse == null) {
                     return;
                 }
@@ -61,7 +61,7 @@ public class NurseFriendAOPService {
             try{
                 long userId = Long.parseLong(args[0].toString());
                 long friendId = Long.parseLong(args[1].toString());
-                NurseBean nurse = nurseService.getNurse(userId);
+                NurseBean nurse = nurseService.getNurseWithoutOtherInfo(userId);
                 String bodyText = nurse.getName() + " 已成为你的好友";
                 Map<String, String> fields = new Hashtable<>();
                 notificationCenter.publishToUser(friendId, bodyText, fields, String.valueOf(NotificationCode.APPROVE_ADD_FRIEND_CODE));
