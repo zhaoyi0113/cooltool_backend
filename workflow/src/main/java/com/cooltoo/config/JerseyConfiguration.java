@@ -70,6 +70,7 @@ public class JerseyConfiguration extends ResourceConfig {
         register(NurseDeviceTokensAPI.class);
         register(OfficialConfigAPI.class);
         register(UserSpeakManageAPI.class);
+        register(NurseMessageAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 

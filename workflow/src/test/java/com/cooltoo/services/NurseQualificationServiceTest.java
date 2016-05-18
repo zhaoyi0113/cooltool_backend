@@ -92,6 +92,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
         Assert.assertEquals(name, bean.getName());
+        Assert.assertEquals(1, bean.getWorkfiles().size());
         Assert.assertTrue(secretStorage.fileExist(filePath));
         secretStorage.deleteFile(filePath);
         Assert.assertFalse(secretStorage.fileExist(filePath));
@@ -103,6 +104,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
         Assert.assertNotEquals(name, bean.getName());
+        Assert.assertEquals(2, bean.getWorkfiles().size());
         Assert.assertTrue(secretStorage.fileExist(filePath));
         secretStorage.deleteFile(filePath);
         Assert.assertFalse(secretStorage.fileExist(filePath));

@@ -2,6 +2,8 @@ package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.beans.NurseSpeakCommentBean;
 import com.cooltoo.backend.entities.NurseSpeakCommentEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +20,7 @@ public interface NurseSpeakCommentRepository extends JpaRepository<NurseSpeakCom
     List<NurseSpeakCommentEntity> findByNurseSpeakId(Long nurseSpeakId, Sort sort);
     List<NurseSpeakCommentEntity> findByNurseSpeakIdIn(List<Long> nurseSpeakIds);
     List<NurseSpeakCommentEntity> findByNurseSpeakIdIn(List<Long> nurseSpeakIds, Sort sort);
+    @Query("FROM NurseSpeakCommentEntity comment " +
+            " WHERE (comment.commentReceiverId=?1 OR comment.commentReceiverId=0) AND comment.nurseSpeakId IN (?2)")
+    Page<NurseSpeakCommentEntity> findByReceiverIdAndSpeakIdIn(long receiverId, Iterable<Long> nurseSpeakIds, Pageable page);
 }

@@ -1,34 +1,118 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.constants.MessageType;
+import com.cooltoo.constants.SocialAbilityType;
+
 /**
  * Created by lg380357 on 2016/3/7.
  */
 public class MessageBean {
 
     private long id;
-    private long nurseId;
-    private long millisecond;
     private String content;
+    private MessageType type;
+    private long time;
+    private long userId;
+    private String userName;
+    private String profileImageUrl;
+    private long abilityId;
+    private SocialAbilityType abilityType;
+    private String abilityName;
 
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
+    public long getId() {
+        return id;
+    }
 
-    public long getNurseId() { return nurseId; }
-    public void setNurseId(long nurseId) { this.nurseId = nurseId; }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    public long getMillisecond() { return millisecond; }
-    public void setMillisecond(long millisecond) { this.millisecond = millisecond; }
+    public String getContent() {
+        return content;
+    }
 
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public long getAbilityId() {
+        return abilityId;
+    }
+
+    public void setAbilityId(long abilityId) {
+        this.abilityId = abilityId;
+    }
+
+    public SocialAbilityType getAbilityType() {
+        return abilityType;
+    }
+
+    public void setAbilityType(SocialAbilityType abilityType) {
+        this.abilityType = abilityType;
+    }
+
+    public String getAbilityName() {
+        return abilityName;
+    }
+
+    public void setAbilityName(String abilityName) {
+        this.abilityName = abilityName;
+    }
+
+    public MessageType getType() {
+        return type;
+    }
+
+    public void setType(MessageType type) {
+        this.type = type;
+    }
 
     public String toString() {
+
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" ,");
-        msg.append("nurse_id=").append(nurseId).append(" ,");
-        msg.append("msg_date=").append(millisecond).append(" ,");
-        msg.append("msg_content=").append(content);
+        msg.append("id=").append(id);
+        msg.append(", content=").append(content);
+        msg.append(", type=").append(type);
+        msg.append(", time=").append(time);
+        msg.append(", userId=").append(userId);
+        msg.append(", userName=").append(userName);
+        msg.append(", profileImageUrl=").append(profileImageUrl);
+        msg.append(", abilityId=").append(abilityId);
+        msg.append(", abilityName=").append(abilityName);
+        msg.append(", abilityType=").append(abilityType);
         msg.append(" ]");
         return msg.toString();
     }

@@ -1,6 +1,8 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.NurseSpeakThumbsUpEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -21,6 +23,7 @@ public interface NurseSpeakThumbsUpRepository extends CrudRepository<NurseSpeakT
     List<NurseSpeakThumbsUpEntity> findUpByNurseSpeakId(long nurseSpeakId);
     List<NurseSpeakThumbsUpEntity> findByNurseSpeakIdIn(List<Long> nurseSpeakIds);
     List<NurseSpeakThumbsUpEntity> findByNurseSpeakIdIn(List<Long> nurseSpeakIds, Sort sort);
+    Page<NurseSpeakThumbsUpEntity> findByNurseSpeakIdIn(Iterable<Long> nurseSpeakIds, Pageable page);
     List<NurseSpeakThumbsUpEntity> findByNurseSpeakIdAndThumbsUpUserId(long nurseSpeakId, long thumbsUpUserId);
     long countByNurseSpeakId(long nurseSpeakId);
 }
