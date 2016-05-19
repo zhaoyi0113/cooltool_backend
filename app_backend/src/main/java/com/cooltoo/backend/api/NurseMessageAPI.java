@@ -31,11 +31,11 @@ public class NurseMessageAPI {
     @LoginAuthentication(requireNurseLogin = true)
     public Response getMessages(@Context HttpServletRequest request,
                                 @PathParam("page") @DefaultValue("0") int page,
-                                @PathParam("size") @DefaultValue("10") int size
+                                @PathParam("number") @DefaultValue("10") int number
     ) {
         long userId = (long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        logger.info("user={} get message at page={} size={}", userId, page, size);
-        List<MessageBean> allMessage = messageService.getMessages(userId, page, size);
+        logger.info("user={} get message at page={} size={}", userId, page, number);
+        List<MessageBean> allMessage = messageService.getMessages(userId, page, number);
         return Response.ok(allMessage).build();
     }
 }

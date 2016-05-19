@@ -47,6 +47,7 @@ public class MessageService {
         logger.info("get user={} message at page={} size={}", userId, page, size);
         int fetchPage = 0;
         int fetchSize = page*size + size;
+        logger.info("fetch page={} size={}", fetchPage, fetchSize);
 
         Map<Long, NurseSpeakEntity>    id2Entity  = getSpeaks(userId);
         PageRequest condition = new PageRequest(fetchPage, fetchSize, Sort.Direction.DESC, "time", "thumbsUpUserId");
@@ -61,7 +62,22 @@ public class MessageService {
         int fetchFromIdx = page*size;
         int fetchToIdx = fetchSize;
         int count = allMsg.size();
+        // sort by datetime
+        if (count>0) {
+            allMsg.sort(new Comparator<MessageBean>(){
+                @Override
+                public int compare(MessageBean o1, MessageBean o2) {
+                    int delta = o1.getTime().compareTo(o2.getTime());
+                    return -delta;
+                }
+            });
+        }
+        logger.info("fetch count={} startIdx={} toIdx={}", count, fetchFromIdx, fetchToIdx);
+        if (count>1) {
+            logger.info("all time from <{}> to <{}>", allMsg.get(0).getTime(), allMsg.get(count-1).getTime());
+        }
         if (count <= fetchFromIdx) {
+            logger.info("count size={}", 0);
             return new ArrayList<>();
         }
         List<MessageBean> retMsg = new ArrayList<>();
@@ -71,6 +87,9 @@ public class MessageService {
             }
         }
         fillOtherProperties(retMsg);
+        if (retMsg.size()>1) {
+            logger.info("ret time from <{}> to <{}>", retMsg.get(0).getTime(), retMsg.get(retMsg.size() - 1).getTime());
+        }
         logger.info("count size={}", retMsg.size());
         return retMsg;
     }
@@ -145,13 +164,6 @@ public class MessageService {
         if (VerifyUtil.isListEmpty(all)) {
             return;
         }
-        all.sort(new Comparator<MessageBean>(){
-            @Override
-            public int compare(MessageBean o1, MessageBean o2) {
-                int delta = o1.getTime().compareTo(o2.getTime());
-                return -delta;
-            }
-        });
 
         // 设置 user 名称头像
         List<Long> userIds  = new ArrayList<>();
@@ -176,6 +188,9 @@ public class MessageService {
         Map<Long, String> imageId2Path = storageService.getFilePath(imageIds);
         for (MessageBean msg : all) {
             NurseEntity nurse    = userId2Entity.get(msg.getUserId());
+            if (null==nurse) {
+                continue;
+            }
             String      imageUrl = imageId2Path.get(nurse.getProfilePhotoId());
             msg.setUserName(nurse.getName());
             msg.setProfileImageUrl(imageUrl);
