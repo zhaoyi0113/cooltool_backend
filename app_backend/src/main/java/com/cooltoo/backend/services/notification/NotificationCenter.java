@@ -5,6 +5,8 @@ import com.cooltoo.backend.services.NurseDeviceTokensService;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
 import com.notnoop.apns.PayloadBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +23,7 @@ public class NotificationCenter {
 
     private static final String P12_PASSWORD = "!Yqt0529*";
 
-
+    private static final Logger logger = LoggerFactory.getLogger(NotificationCenter.class);
 
     @Autowired
     private NurseDeviceTokensService deviceTokensService;
@@ -49,6 +51,7 @@ public class NotificationCenter {
 
     private void publishToDevice(ApnsService apnsService, String payload, List<NurseDeviceTokensBean> deviceTokens) {
         for(NurseDeviceTokensBean token : deviceTokens){
+            logger.info("push to device "+payload+","+token.getDeviceToken());
             apnsService.push(token.getDeviceToken(), payload);
         }
     }
