@@ -40,8 +40,8 @@ public class ActivityAOPService {
 
     private void publishActivityNotification(ActivityBean retVal) {
         if (retVal != null && ActivityStatus.ENABLE.equals(retVal.getStatus())) {
-            logger.info("publish official activity notification");
             String bodyText = "官方发布新活动 " + retVal.getTitle();
+            logger.info("publish official activity notification =={}", bodyText);
             notificationCenter.publishToAllDevices(bodyText, new HashMap<String, String>(), NotificationCode.PUBLISH_ACTIVITY);
         }
     }
