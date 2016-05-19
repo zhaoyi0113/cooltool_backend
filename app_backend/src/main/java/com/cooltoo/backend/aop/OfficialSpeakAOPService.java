@@ -6,6 +6,8 @@ import com.cooltoo.backend.services.notification.NotificationCode;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,7 @@ import java.util.Map;
 @Component
 public class OfficialSpeakAOPService {
 
+    private static final Logger logger = LoggerFactory.getLogger(OfficialSpeakAOPService.class);
 
     @Autowired
     private NotificationCenter notificationCenter;
@@ -29,6 +32,7 @@ public class OfficialSpeakAOPService {
         if(retVal == null){
             return;
         }
+        logger.info("publish a official speak "+retVal.getId());
         Map<String, String> fields =new Hashtable<>();
         fields.put(NotificationCode.SPEAK_ID_FIELD, String.valueOf(retVal.getId()));
         String bodyText = "收到一条官方发言";
