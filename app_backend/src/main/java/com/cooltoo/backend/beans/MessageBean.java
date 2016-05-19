@@ -3,6 +3,8 @@ package com.cooltoo.backend.beans;
 import com.cooltoo.constants.MessageType;
 import com.cooltoo.constants.SocialAbilityType;
 
+import java.util.Date;
+
 /**
  * Created by lg380357 on 2016/3/7.
  */
@@ -11,7 +13,7 @@ public class MessageBean {
     private long id;
     private String content;
     private MessageType type;
-    private long time;
+    private Date time;
     private long userId;
     private String userName;
     private String profileImageUrl;
@@ -35,11 +37,11 @@ public class MessageBean {
         this.content = content;
     }
 
-    public long getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(long time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 

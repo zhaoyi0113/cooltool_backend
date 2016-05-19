@@ -37,7 +37,7 @@ public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Lo
     //=====================================
     //    User use
     //=====================================
-    Page<NurseSpeakEntity> findByUserId(long userId, Pageable page);
+    List<NurseSpeakEntity> findByUserId(long userId);
 
     @Query("SELECT speak.userId, count(speak.id) FROM NurseSpeakEntity speak WHERE speak.userId in (?1) GROUP BY speak.userId")
     List<Object[]> countByUserIdIn(List<Long> userIds);

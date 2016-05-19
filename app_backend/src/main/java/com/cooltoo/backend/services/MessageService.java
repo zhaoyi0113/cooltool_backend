@@ -47,11 +47,11 @@ public class MessageService {
         logger.info("get user={} message at page={} size={}", userId, page, size);
         int fetchPage = 0;
         int fetchSize = page*size + size;
-        PageRequest condition = new PageRequest(fetchPage, fetchSize, Sort.Direction.DESC, "time");
-        Page<NurseSpeakEntity> idAndContentResult = speakRepo.findByUserId(userId, condition);
 
-        Map<Long, NurseSpeakEntity>    id2Entity  = getSpeaks(userId, condition);
+        Map<Long, NurseSpeakEntity>    id2Entity  = getSpeaks(userId);
+        PageRequest condition = new PageRequest(fetchPage, fetchSize, Sort.Direction.DESC, "time", "thumbsUpUserId");
         Page<NurseSpeakThumbsUpEntity> thumbsUps  = thumbsUpRepo.findByNurseSpeakIdIn(id2Entity.keySet(), condition);
+        condition = new PageRequest(fetchPage, fetchSize, Sort.Direction.DESC, "time", "commentMakerId");
         Page<NurseSpeakCommentEntity>  comments   = commentsRepo.findByReceiverIdAndSpeakIdIn(userId, id2Entity.keySet(), condition);
 
         List<MessageBean> allMsg = new ArrayList<>();
@@ -75,8 +75,8 @@ public class MessageService {
         return retMsg;
     }
 
-    private Map<Long, NurseSpeakEntity> getSpeaks(long userId, Pageable condition) {
-        Page<NurseSpeakEntity> speaks = speakRepo.findByUserId(userId, condition);
+    private Map<Long, NurseSpeakEntity> getSpeaks(long userId) {
+        List<NurseSpeakEntity> speaks = speakRepo.findByUserId(userId);
         if (null==speaks) {
             return new HashMap<>();
         }
@@ -102,7 +102,7 @@ public class MessageService {
             bean.setId(thumbsUp.getNurseSpeakId());
             bean.setContent(speak.getContent());
             bean.setType(MessageType.ThumbsUp);
-            bean.setTime(thumbsUp.getTime().getTime());
+            bean.setTime(thumbsUp.getTime());
             bean.setUserId(thumbsUp.getThumbsUpUserId());
             //bean.setUserName();
             //bean.setProfileImageUrl();
@@ -129,7 +129,7 @@ public class MessageService {
             bean.setId(comment.getNurseSpeakId());
             bean.setContent(speak.getContent());
             bean.setType(MessageType.Comment);
-            bean.setTime(comment.getTime().getTime());
+            bean.setTime(comment.getTime());
             bean.setUserId(comment.getCommentMakerId());
             //bean.setUserName();
             //bean.setProfileImageUrl();
@@ -148,9 +148,8 @@ public class MessageService {
         all.sort(new Comparator<MessageBean>(){
             @Override
             public int compare(MessageBean o1, MessageBean o2) {
-                long delta = o1.getTime()-o2.getTime();
-                int ret = delta>0 ? 1 : (delta<0) ? -1 : 0;
-                return ret;
+                int delta = o1.getTime().compareTo(o2.getTime());
+                return -delta;
             }
         });
 
