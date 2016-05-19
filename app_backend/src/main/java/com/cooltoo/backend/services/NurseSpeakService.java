@@ -199,7 +199,7 @@ public class NurseSpeakService {
         return beans;
     }
 
-    public NurseSpeakBean getNurseSpeak(long userId, long speakId) {
+    public List<NurseSpeakBean> getNurseSpeak(long userId, long speakId) {
         logger.info("user {} get speak by id={}", userId, speakId);
         NurseSpeakEntity resultSet = speakRepository.findOne(speakId);
         if (null==resultSet) {
@@ -211,7 +211,7 @@ public class NurseSpeakService {
 
         List<NurseSpeakBean> nurseSpeaks = entitiesToBeans(entities);
         fillOtherProperties(userId, nurseSpeaks);
-        return nurseSpeaks.get(0);
+        return nurseSpeaks;
     }
 
     private List<NurseSpeakBean> entitiesToBeans(Iterable<NurseSpeakEntity> entities) {

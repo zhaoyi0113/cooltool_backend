@@ -55,10 +55,8 @@ public class NurseSpeakAPI {
     public Response getSpeakById(@Context HttpServletRequest request,
                                  @PathParam("id") long id) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseSpeakBean nurseSpeak = speakService.getNurseSpeak(userId, id);
-        List<NurseSpeakBean> beans = new ArrayList<>();
-        beans.add(nurseSpeak);
-        return Response.ok(beans).build();
+        List<NurseSpeakBean> nurseSpeak = speakService.getNurseSpeak(userId, id);
+        return Response.ok(nurseSpeak).build();
     }
 
     @Path("/query/{index}/{number}")
