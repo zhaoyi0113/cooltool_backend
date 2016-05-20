@@ -31,6 +31,7 @@ public class NotificationCenter {
     public void publishToAllDevices(String bodyText, Map<String, String> customFields, String actionCode){
         List<NurseDeviceTokensBean> deviceTokens = deviceTokensService.getAllActiveDeviceTokens();
         if(deviceTokens.isEmpty()){
+            logger.warn("there is no device registered.");
             return;
         }
         ApnsService apnsService = createAPNSService(bodyText);
@@ -42,6 +43,7 @@ public class NotificationCenter {
     public void publishToUser(long userId, String bodyText, Map<String, String> customFields, String actionCode){
         List<NurseDeviceTokensBean> tokens = deviceTokensService.getNurseDeviceTokens(userId);
         if (tokens.isEmpty()){
+            logger.warn("the user "+userId+" doesn't have any registered device.");
             return;
         }
         ApnsService apnsService = createAPNSService(bodyText);
