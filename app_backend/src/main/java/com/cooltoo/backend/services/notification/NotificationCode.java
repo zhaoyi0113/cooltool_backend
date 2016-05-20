@@ -15,6 +15,8 @@ final  public class NotificationCode {
 
     public static final String PUBLISH_ACTIVITY = String.valueOf(BASE_CODE + 4);
 
+    public static final String PUBLISH_SMUG_SPEAK_CODE = String.valueOf(BASE_CODE+5);
+
     public static final String SPEAK_ID_FIELD = "speak_id";
 
 

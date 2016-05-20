@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 @DatabaseSetups({
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_comment_service_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
 })
 public class NurseSpeakCommentServiceTest extends AbstractCooltooTest {
 

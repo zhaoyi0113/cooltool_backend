@@ -20,7 +20,8 @@ import java.util.List;
  */
 @Transactional
 @DatabaseSetups({
-        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_thumbs_up_data.xml")
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_speak_thumbs_up_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
 })
 public class NurseSpeakThumbsUpServiceTest extends AbstractCooltooTest {
 
