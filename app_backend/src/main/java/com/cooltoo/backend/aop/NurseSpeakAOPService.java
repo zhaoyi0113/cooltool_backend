@@ -31,6 +31,18 @@ public class NurseSpeakAOPService {
         sendPublishNotification(retVal,NotificationCode.PUBLISH_SMUG_SPEAK_CODE);
     }
 
+    @AfterReturning(pointcut = "execution(* com.cooltoo.backend.services.NurseSpeakService.addCathart(..))",
+            returning = "retVal")
+    public void addCathart(JoinPoint joinPoint, NurseSpeakBean retVal){
+        sendPublishNotification(retVal,NotificationCode.PUBLISH_COMPLAIN_SPEAK_CODE);
+    }
+
+    @AfterReturning(pointcut = "execution(* com.cooltoo.backend.services.NurseSpeakService.addAskQuestion(..))",
+            returning = "retVal")
+    public void addAskQuestion(JoinPoint joinPoint, NurseSpeakBean retVal){
+        sendPublishNotification(retVal,NotificationCode.PUBLISH_QUESTION_SPEAK_CODE);
+    }
+
     public void sendPublishNotification(NurseSpeakBean retVal, String code) {
         if(retVal == null){
             return;
