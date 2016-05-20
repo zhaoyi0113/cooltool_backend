@@ -3,6 +3,8 @@ package com.cooltoo.backend.beans;
 import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.constants.SocialAbilityType;
 
+import java.util.Date;
+
 /**
  * Created by zhaolisong on 16/3/25.
  */
@@ -12,6 +14,7 @@ public class SocialAbilitiesBean {
     private String skillName;
     private String skillDescription;
     private SocialAbilityType skillType;
+    private Date fetchTime = new Date();
     private long factor;
     private long nominatedCount;
     private int point;
@@ -123,6 +126,14 @@ public class SocialAbilitiesBean {
 
     public void setBadge(BadgeBean badge) {
         this.badge = badge;
+    }
+
+    public Date getFetchTime() {
+        return fetchTime;
+    }
+
+    public void setFetchTime(Date fetchTime) {
+        this.fetchTime = fetchTime;
     }
 
     public String toString() {

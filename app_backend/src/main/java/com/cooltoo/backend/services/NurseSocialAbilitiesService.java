@@ -74,6 +74,7 @@ public class NurseSocialAbilitiesService {
         // department social ability
         if (null!=nurseHospDepart) {
             HospitalDepartmentBean department = nurseHospDepart.getDepartment();
+            HospitalDepartmentBean parentDepart = nurseHospDepart.getParentDepart();
             if (null!=nurseHospDepart.getDepartment()) {
                 boolean hasDepartmentNominate = false;
                 for (NurseAbilityNominationBean nomination : abilityNominate) {
@@ -89,6 +90,12 @@ public class NurseSocialAbilitiesService {
                             1, nomination.getAbilityNominateCount(),
                             department.getImageId(), department.getImageUrl(),
                             department.getDisableImageId(), department.getDisableImageUrl());
+                    if (VerifyUtil.isStringEmpty(department.getImageUrl())) {
+                        if (null!=parentDepart && !VerifyUtil.isStringEmpty(parentDepart.getImageUrl())) {
+                            abilityBean.setImageUrl(parentDepart.getImageUrl());
+                            abilityBean.setImageId(parentDepart.getImageId());
+                        }
+                    }
                     socialAbilities.add(abilityBean);
                     hasDepartmentNominate = true;
                 }
@@ -266,6 +273,7 @@ public class NurseSocialAbilitiesService {
             // department social ability
             if (null!=nurseHospDepart) {
                 HospitalDepartmentBean department = nurseHospDepart.getDepartment();
+                HospitalDepartmentBean parentDepart = nurseHospDepart.getParentDepart();
                 if (null!=department) {
                     int  departId      = nurseHospDepart.getDepartmentId();
                     long nominateCount = null==abilityNominate ? 0 : abilityNominate.getAbilityNominateCount();
@@ -275,6 +283,12 @@ public class NurseSocialAbilitiesService {
                             1, nominateCount,
                             department.getImageId(), department.getImageUrl(),
                             department.getDisableImageId(), department.getDisableImageUrl());
+                    if (VerifyUtil.isStringEmpty(department.getImageUrl())) {
+                        if (null!=parentDepart && !VerifyUtil.isStringEmpty(parentDepart.getImageUrl())) {
+                            ability.setImageUrl(parentDepart.getImageUrl());
+                            ability.setImageId(parentDepart.getImageId());
+                        }
+                    }
                     return ability;
                 }
             }
