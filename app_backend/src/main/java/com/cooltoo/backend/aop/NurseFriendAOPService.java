@@ -4,6 +4,7 @@ import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.backend.services.notification.NotificationCenter;
 import com.cooltoo.backend.services.notification.NotificationCode;
+import com.cooltoo.backend.services.notification.NotificationType;
 import com.cooltoo.constants.AgreeType;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -46,7 +47,7 @@ public class NurseFriendAOPService {
                 }
                 String bodyText = nurse.getName() + " 请求加你为好友";
                 Map<String, String> fields = new Hashtable<>();
-                notificationCenter.publishToUser(friendId, bodyText, fields, String.valueOf(NotificationCode.REQUEST_ADD_FRIEND_CODE));
+                notificationCenter.publishToUser(friendId, bodyText, fields, String.valueOf(NotificationCode.REQUEST_ADD_FRIEND_CODE), NotificationType.ALERT);
             } catch (NumberFormatException e) {
                 logger.error(e.getMessage());
             }
@@ -64,7 +65,7 @@ public class NurseFriendAOPService {
                 NurseBean nurse = nurseService.getNurseWithoutOtherInfo(userId);
                 String bodyText = nurse.getName() + " 已成为你的好友";
                 Map<String, String> fields = new Hashtable<>();
-                notificationCenter.publishToUser(friendId, bodyText, fields, String.valueOf(NotificationCode.APPROVE_ADD_FRIEND_CODE));
+                notificationCenter.publishToUser(friendId, bodyText, fields, String.valueOf(NotificationCode.APPROVE_ADD_FRIEND_CODE), NotificationType.ALERT);
             }catch(NumberFormatException e){
                 logger.error(e.getMessage());
             }

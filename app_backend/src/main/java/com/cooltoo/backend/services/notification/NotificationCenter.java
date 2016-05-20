@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -35,35 +34,52 @@ public class NotificationCenter {
     @Autowired
     private NurseDeviceTokensService deviceTokensService;
 
-    public void publishToAllDevices(String bodyText, Map<String, String> customFields, String actionCode){
+    public void publishToAllDevices(String bodyText, Map<String, String> customFields, String actionCode, NotificationType type) {
         List<NurseDeviceTokensBean> deviceTokens = deviceTokensService.getAllActiveDeviceTokens();
-        if(deviceTokens.isEmpty()){
+        if (deviceTokens.isEmpty()) {
             logger.warn("there is no device registered.");
             return;
         }
         ApnsService apnsService = createAPNSService(bodyText);
-        String payload = createPayload(bodyText, customFields, actionCode);
-        publishToDevice(apnsService, payload, deviceTokens);
+        String payload = createPayload(bodyText, customFields, actionCode, type);
+        if (payload != null) {
+            publishToDevice(apnsService, payload, deviceTokens);
+        }
+    }
+
+    private String createPayload(String bodyText, Map<String, String> customFields, String actionCode, NotificationType type) {
+        String payload = null;
+        switch (type){
+            case ALERT:
+                payload = createAlertPayload(bodyText, customFields, actionCode);
+                break;
+            case SILENT:
+                payload = createSilentPayload(bodyText, customFields, actionCode);
+                break;
+        }
+        return payload;
     }
 
 
-    public void publishToUser(long userId, String bodyText, Map<String, String> customFields, String actionCode){
+    public void publishToUser(long userId, String bodyText, Map<String, String> customFields, String actionCode, NotificationType type) {
         List<NurseDeviceTokensBean> tokens = deviceTokensService.getNurseDeviceTokens(userId);
-        if (tokens.isEmpty()){
-            logger.warn("the user "+userId+" doesn't have any registered device.");
+        if (tokens.isEmpty()) {
+            logger.warn("the user " + userId + " doesn't have any registered device.");
             return;
         }
         ApnsService apnsService = createAPNSService(bodyText);
-        String payload = createPayload(bodyText, customFields, actionCode);
-        publishToDevice(apnsService, payload, tokens);
+        String payload = createPayload(bodyText, customFields, actionCode, type);
+        if(payload != null) {
+            publishToDevice(apnsService, payload, tokens);
+        }
     }
 
     private void publishToDevice(final ApnsService apnsService, final String payload, List<NurseDeviceTokensBean> deviceTokens) {
-        for(final NurseDeviceTokensBean token : deviceTokens){
+        for (final NurseDeviceTokensBean token : deviceTokens) {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    logger.debug("push to device "+payload+","+token.getDeviceToken());
+                    logger.debug("push to device " + payload + "," + token.getDeviceToken());
                     apnsService.push(token.getDeviceToken(), payload);
                 }
             });
@@ -71,22 +87,31 @@ public class NotificationCenter {
         }
     }
 
-    private ApnsService createAPNSService(String bodyText){
+    private ApnsService createAPNSService(String bodyText) {
         return APNS.newService().withCert(getClass().
-                getResourceAsStream(P12_CER_FILE),P12_PASSWORD).
+                getResourceAsStream(P12_CER_FILE), P12_PASSWORD).
                 withSandboxDestination().build();
     }
 
-    private String createPayload(String bodyText, Map<String, String> customFields, String action) {
+    private String createAlertPayload(String bodyText, Map<String, String> customFields, String action) {
         PayloadBuilder payloadBuilder = APNS.newPayload().alertBody(bodyText).sound("default").customField(NOTIFICATION_TYPE, action);
-//        PayloadBuilder payloadBuilder = APNS.newPayload().instantDeliveryOrSilentNotification().customField(NOTIFICATION_TYPE, action);
-        if(customFields != null){
+        payloadBuilder = updatePayloadBuilder(customFields, payloadBuilder);
+        return payloadBuilder.build();
+    }
+
+    private String createSilentPayload(String bodyText, Map<String, String> customFields, String action) {
+        PayloadBuilder payloadBuilder = APNS.newPayload().instantDeliveryOrSilentNotification().customField(NOTIFICATION_TYPE, action);
+        payloadBuilder = updatePayloadBuilder(customFields, payloadBuilder);
+        return payloadBuilder.build();
+    }
+
+    private PayloadBuilder updatePayloadBuilder(Map<String, String> customFields, PayloadBuilder payloadBuilder) {
+        if (customFields != null) {
             for (Map.Entry<String, String> entry : customFields.entrySet()) {
                 payloadBuilder = payloadBuilder.customField(entry.getKey(), entry.getValue());
             }
         }
-
-        return payloadBuilder.build();
+        return payloadBuilder;
     }
 
 }

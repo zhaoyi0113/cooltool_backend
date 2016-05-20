@@ -2,6 +2,7 @@ package com.cooltoo.backend.aop;
 
 import com.cooltoo.backend.services.notification.NotificationCenter;
 import com.cooltoo.backend.services.notification.NotificationCode;
+import com.cooltoo.backend.services.notification.NotificationType;
 import com.cooltoo.beans.ActivityBean;
 import com.cooltoo.constants.ActivityStatus;
 import org.aspectj.lang.JoinPoint;
@@ -42,7 +43,7 @@ public class ActivityAOPService {
         if (retVal != null && ActivityStatus.ENABLE.equals(retVal.getStatus())) {
             String bodyText = "官方发布新活动 " + retVal.getTitle();
             logger.info("publish official activity notification =={}", bodyText);
-            notificationCenter.publishToAllDevices(bodyText, new HashMap<String, String>(), NotificationCode.PUBLISH_ACTIVITY);
+            notificationCenter.publishToAllDevices(bodyText, new HashMap<String, String>(), NotificationCode.PUBLISH_ACTIVITY, NotificationType.ALERT);
         }
     }
 

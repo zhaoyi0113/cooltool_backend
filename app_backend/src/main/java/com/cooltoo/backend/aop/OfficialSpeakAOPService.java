@@ -3,6 +3,7 @@ package com.cooltoo.backend.aop;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.services.notification.NotificationCenter;
 import com.cooltoo.backend.services.notification.NotificationCode;
+import com.cooltoo.backend.services.notification.NotificationType;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -36,6 +37,6 @@ public class OfficialSpeakAOPService {
         Map<String, String> fields =new Hashtable<>();
         fields.put(NotificationCode.SPEAK_ID_FIELD, String.valueOf(retVal.getId()));
         String bodyText = "收到一条官方发言";
-        notificationCenter.publishToAllDevices(bodyText, fields, NotificationCode.OFFICIAL_SPEAK_CODE);
+        notificationCenter.publishToAllDevices(bodyText, fields, NotificationCode.OFFICIAL_SPEAK_CODE, NotificationType.ALERT);
     }
 }
