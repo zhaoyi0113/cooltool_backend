@@ -1,0 +1,1 @@
+ALTER TABLE `hospital` ADD COLUMN `alias_name` VARCHAR(500) NULL DEFAULT '';

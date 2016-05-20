@@ -6,6 +6,7 @@ package com.cooltoo.beans;
 public class HospitalBean {
     private int id;
     private String name;
+    private String aliasName;
     private int province;
     private RegionBean provinceB;
     private int city;
@@ -93,6 +94,14 @@ public class HospitalBean {
 
     public void setDistrictBean(RegionBean districtB) {
         this.districtB = districtB;
+    }
+
+    public String getAliasName() {
+        return aliasName;
+    }
+
+    public void setAliasName(String aliasName) {
+        this.aliasName = aliasName;
     }
 
     public String toString() {

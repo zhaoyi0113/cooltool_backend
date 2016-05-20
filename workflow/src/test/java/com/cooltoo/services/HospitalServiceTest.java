@@ -41,7 +41,7 @@ public class HospitalServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testNew2() {
-        int id = service.newOne("name111", 2, 33, 382, null, -1);
+        int id = service.newOne("name111", "aliasName111", 2, 33, 382, null, -1);
         Assert.assertTrue(id > 0);
     }
 
@@ -65,16 +65,19 @@ public class HospitalServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testDeleteByUpdate() {
-        HospitalBean bean = service.update(22, "name123", 2, 3, -1, null, -1);
+        HospitalBean bean = service.update(22, "name123", "aliasName111", 2, 3, -1, null, -1);
         Assert.assertEquals(22, bean.getId());
         Assert.assertEquals("name123", bean.getName());
+        Assert.assertEquals("aliasName111", bean.getAliasName());
         Assert.assertEquals(2, bean.getProvince());
         Assert.assertEquals(3, bean.getCity());
 
         bean.setName("name789");
+        bean.setAliasName("aliasName789");
         bean.setCity(4);
         bean =  service.update(bean);
         Assert.assertEquals(22, bean.getId());
+        Assert.assertEquals("aliasName789", bean.getAliasName());
         Assert.assertEquals("name789", bean.getName());
         Assert.assertEquals(4, bean.getCity());
     }

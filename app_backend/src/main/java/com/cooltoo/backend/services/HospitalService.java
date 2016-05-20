@@ -129,6 +129,7 @@ public class HospitalService {
         }
         for (HospitalBean hospital : allHospitals) {
             condition1 = (!matchName)    || (matchName    && hospital.getName().contains(name));
+            condition1 = (condition1     || (!matchName) || (matchName    && hospital.getAliasName().contains(name)));
             condition2 = (!matchAddress) || (matchAddress && hospital.getAddress().contains(address));
             if (matchRegion) {
                 if (!matchProvince) { province = hospital.getProvince(); }
@@ -283,10 +284,15 @@ public class HospitalService {
             }
             entity.setName(value);
         }
+        value = bean.getAliasName();
+        if (!VerifyUtil.isStringEmpty(value) && !value.equals(entity.getAliasName())) {
+            entity.setAliasName(value);
+        }
         entity.setProvince(bean.getProvince());
         entity.setCity(bean.getCity());
         entity.setDistrict(bean.getDistrict());
         entity.setAddress(bean.getAddress());
+
 
         int enable = bean.getEnable();
         enable = enable<0 ? enable : (enable>1 ? 1 : enable);
@@ -300,7 +306,7 @@ public class HospitalService {
     }
 
     @Transactional
-    public HospitalBean update(int id, String name, int province, int city, int district, String address, int enable) {
+    public HospitalBean update(int id, String name, String aliasName, int province, int city, int district, String address, int enable) {
         HospitalBean bean = new HospitalBean();
         bean.setId(id);
         bean.setName(name);
@@ -309,6 +315,7 @@ public class HospitalService {
         bean.setDistrict(district);
         bean.setAddress(address);
         bean.setEnable(enable);
+        bean.setAliasName(aliasName);
         if (!checkRegion(bean)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -323,12 +330,13 @@ public class HospitalService {
     public Integer newOne(HospitalBean bean) {
         String value = bean.getName();
         if (VerifyUtil.isStringEmpty(value)) {
+            logger.error("hospital name is empty!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         List<HospitalEntity> hospitals = repository.findByName(value);
         if (!hospitals.isEmpty()) {
             logger.error("hospital name has been used!");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
         }
         HospitalEntity entity = entityConverter.convert(bean);
         logger.info("Add hospital == " + bean);
@@ -337,7 +345,7 @@ public class HospitalService {
     }
 
     @Transactional
-    public Integer newOne(String name, int province, int city, int district, String address, int enable) {
+    public Integer newOne(String name, String aliasName, int province, int city, int district, String address, int enable) {
         HospitalBean bean = new HospitalBean();
         bean.setName(name);
         bean.setProvince(province);
@@ -345,6 +353,7 @@ public class HospitalService {
         bean.setDistrict(district);
         bean.setAddress(address);
         bean.setEnable(enable);
+        bean.setAliasName(aliasName);
         if (!checkRegion(bean)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

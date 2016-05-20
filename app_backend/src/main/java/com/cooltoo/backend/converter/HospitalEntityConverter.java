@@ -20,6 +20,7 @@ public class HospitalEntityConverter implements Converter<HospitalBean, Hospital
         entity.setDistrict(source.getDistrict());
         entity.setAddress(source.getAddress());
         entity.setEnable(source.getEnable());
+        entity.setAliasName(source.getAliasName());
         return entity;
     }
 }

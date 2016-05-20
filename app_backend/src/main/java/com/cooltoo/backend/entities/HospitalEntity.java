@@ -10,6 +10,7 @@ import javax.persistence.*;
 public class HospitalEntity {
     private int id;
     private String name;
+    private String aliasName;
     private int province;
     private int city;
     private int district;
@@ -81,11 +82,21 @@ public class HospitalEntity {
         this.enable = enable;
     }
 
+    @Column(name = "alias_name")
+    public String getAliasName() {
+        return aliasName;
+    }
+
+    public void setAliasName(String aliasName) {
+        this.aliasName = aliasName;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(" , ");
         msg.append("name=").append(name).append(" , ");
+        msg.append("aliasName=").append(aliasName).append(" , ");
         msg.append("province=").append(province).append(" , ");
         msg.append("city=").append(city).append(" , ");
         msg.append("district=").append(district).append(", ");
