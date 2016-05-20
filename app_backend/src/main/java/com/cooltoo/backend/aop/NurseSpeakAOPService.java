@@ -28,12 +28,18 @@ public class NurseSpeakAOPService {
     @AfterReturning(pointcut = "execution(* com.cooltoo.backend.services.NurseSpeakService.addSmug(..))",
             returning = "retVal")
     public void addSmug(JoinPoint joinPoint, NurseSpeakBean retVal){
+        sendPublishNotification(retVal,NotificationCode.PUBLISH_SMUG_SPEAK_CODE);
+    }
+
+    public void sendPublishNotification(NurseSpeakBean retVal, String code) {
         if(retVal == null){
             return;
         }
         Map<String, String> fields =new Hashtable<>();
         fields.put(NotificationCode.SPEAK_ID_FIELD, String.valueOf(retVal.getId()));
-        String bodyText = "发布一条臭美";
-        notificationCenter.publishToAllDevices(bodyText, fields, NotificationCode.PUBLISH_SMUG_SPEAK_CODE, NotificationType.SILENT);
+        String bodyText = "";
+        notificationCenter.publishToAllDevices(bodyText, fields, code, NotificationType.SILENT);
     }
+
+
 }
