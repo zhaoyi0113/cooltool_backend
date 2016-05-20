@@ -25,6 +25,19 @@ public class NurseMessageAPI {
     @Autowired
     private MessageService messageService;
 
+    @Path("/count/{status}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response countMessage(@Context HttpServletRequest request,
+                                 @PathParam("status") @DefaultValue("all") String status
+    ) {
+        long userId = (long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("user={} get message by status={}", userId, status);
+        int count = messageService.countMessageByStatus(status);
+        return Response.ok(count).build();
+    }
+
     @Path("/{page}/{number}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

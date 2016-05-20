@@ -11,15 +11,18 @@ import java.util.Date;
 public class MessageBean {
 
     private long id;
+    private long reasonId;
     private String content;
-    private MessageType type;
-    private Date time;
     private long userId;
+    private String userType;
     private String userName;
     private String profileImageUrl;
     private long abilityId;
     private SocialAbilityType abilityType;
     private String abilityName;
+    private MessageType type;
+    private Date time;
+    private String status;
 
     public long getId() {
         return id;
@@ -101,15 +104,42 @@ public class MessageBean {
         this.type = type;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public long getReasonId() {
+        return reasonId;
+    }
+
+    public void setReasonId(long reasonId) {
+        this.reasonId = reasonId;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
     public String toString() {
 
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", reasonId=").append(reasonId);
         msg.append(", content=").append(content);
         msg.append(", type=").append(type);
         msg.append(", time=").append(time);
+        msg.append(", status=").append(status);
         msg.append(", userId=").append(userId);
+        msg.append(", userType").append(userType);
         msg.append(", userName=").append(userName);
         msg.append(", profileImageUrl=").append(profileImageUrl);
         msg.append(", abilityId=").append(abilityId);

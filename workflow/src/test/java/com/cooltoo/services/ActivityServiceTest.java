@@ -27,7 +27,8 @@ import java.util.*;
  */
 @Transactional
 @DatabaseSetups({
-        @DatabaseSetup(value = "classpath:/com/cooltoo/services/platform_activities_data.xml")
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/platform_activities_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
 })
 public class ActivityServiceTest extends AbstractCooltooTest {
 

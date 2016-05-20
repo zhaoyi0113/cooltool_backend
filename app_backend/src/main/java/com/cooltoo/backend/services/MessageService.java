@@ -43,6 +43,11 @@ public class MessageService {
     @Autowired
     private UserFileStorageService storageService;
 
+    public int countMessageByStatus(String strStatuses) {
+        //
+        return 0;
+    }
+
     public List<MessageBean> getMessages(long userId, int page, int size) {
         logger.info("get user={} message at page={} size={}", userId, page, size);
         int fetchPage = 0;
