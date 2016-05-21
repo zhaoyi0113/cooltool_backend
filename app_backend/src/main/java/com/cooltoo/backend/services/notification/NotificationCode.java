@@ -21,6 +21,8 @@ final  public class NotificationCode {
 
     public static final String PUBLISH_QUESTION_SPEAK_CODE = String.valueOf(BASE_CODE+7);
 
+    public static final String PUBLISH_MESSAGE_CODE = String.valueOf(BASE_CODE+8);
+
     public static final String SPEAK_ID_FIELD = "speak_id";
 
 }
