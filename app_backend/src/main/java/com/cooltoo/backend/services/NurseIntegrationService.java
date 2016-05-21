@@ -8,6 +8,7 @@ import com.cooltoo.backend.repository.NurseIntegrationRepository;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.constants.SpeakType;
+import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ public class NurseIntegrationService {
                 NurseIntegrationEntity entity = new NurseIntegrationEntity();
                 entity.setStatus(CommonStatus.ENABLED);
                 entity.setUserId(userId);
+                entity.setUserType(UserType.NURSE);
                 entity.setAbilityType(SocialAbilityType.COMMUNITY);
                 entity.setTimeCreated(Calendar.getInstance().getTime());
                 entity.setReasonId(nurseSpeakBean.getId());
