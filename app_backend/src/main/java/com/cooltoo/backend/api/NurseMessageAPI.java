@@ -51,4 +51,15 @@ public class NurseMessageAPI {
         List<MessageBean> allMessage = messageService.getMessages(userId, page, number);
         return Response.ok(allMessage).build();
     }
+
+    @Path("/read/{id}")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response readMessage(@Context HttpServletRequest request,
+                                @PathParam("id") long id){
+        long userId = (long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        //TODO: mark the message as read
+        return Response.ok().build();
+    }
 }
