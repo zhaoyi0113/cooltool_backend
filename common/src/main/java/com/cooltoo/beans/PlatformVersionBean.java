@@ -25,6 +25,10 @@ public class PlatformVersionBean {
 
     private int required;
 
+    private String message;
+
+    private String releaseNote;
+
     public int getId() {
         return id;
     }
@@ -80,6 +84,22 @@ public class PlatformVersionBean {
 
     public void setRequired(int required) {
         this.required = required;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getReleaseNote() {
+        return releaseNote;
+    }
+
+    public void setReleaseNote(String releaseNote) {
+        this.releaseNote = releaseNote;
     }
 }
 

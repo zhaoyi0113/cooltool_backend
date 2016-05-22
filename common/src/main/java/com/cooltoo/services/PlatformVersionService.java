@@ -33,22 +33,22 @@ public class PlatformVersionService {
     private PlatformVersionBeanConverter beanConverter;
 
     @Transactional
-    public PlatformVersionBean addPlatformVersion(String platformType, String version, String link, int required) {
+    public PlatformVersionBean addPlatformVersion(String platformType, String version, String link, int required, String message, String releaseNote) {
         if (whetherExistPlatformVersion(platformType, version)) {
             throw new BadRequestException(ErrorCode.PLATFORM_VERSION_EXISTED);
         }
         disableAllPlatformVersions(platformType);
         PlatformVersionEntity entity = new PlatformVersionEntity();
-        return savePlatformVersionEntity(platformType, version, link, CommonStatus.ENABLED, entity, required);
+        return savePlatformVersionEntity(platformType, version, link, CommonStatus.ENABLED, entity, required, message, releaseNote);
     }
 
     @Transactional
-    public PlatformVersionBean editPlatformVersion(int id, String platformType, String version, String link, int required) {
+    public PlatformVersionBean editPlatformVersion(int id, String platformType, String version, String link, int required, String message, String releaseNote) {
         PlatformVersionEntity entity = versionRepository.findOne(id);
         if (entity == null) {
             throw new BadRequestException(ErrorCode.PLATFORM_VERSION_NOT_FOUND);
         }
-        return savePlatformVersionEntity(platformType, version, link, entity.getStatus(), entity, required);
+        return savePlatformVersionEntity(platformType, version, link, entity.getStatus(), entity, required, message, releaseNote);
     }
 
     public List<PlatformVersionBean> getAllPlatformVersions() {
@@ -101,7 +101,8 @@ public class PlatformVersionService {
         }
     }
 
-    private PlatformVersionBean savePlatformVersionEntity(String platformType, String version, String link, CommonStatus status, PlatformVersionEntity entity, int required) {
+    private PlatformVersionBean savePlatformVersionEntity(String platformType, String version, String link,
+                                                          CommonStatus status, PlatformVersionEntity entity, int required, String message, String releaseNote) {
         try {
             PlatformType pType = PlatformType.valueOf(platformType);
             entity.setStatus(status);
@@ -110,6 +111,8 @@ public class PlatformVersionService {
             entity.setVersion(version);
             entity.setLink(link);
             entity.setRequired(required);
+            entity.setMessage(message);
+            entity.setReleaseNote(releaseNote);
             PlatformVersionEntity saved = versionRepository.save(entity);
             return beanConverter.convert(saved);
         } catch (IllegalArgumentException e) {

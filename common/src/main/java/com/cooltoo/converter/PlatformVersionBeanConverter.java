@@ -20,6 +20,8 @@ public class PlatformVersionBeanConverter implements Converter<PlatformVersionEn
         bean.setPlatformType(source.getPlatformType());
         bean.setLink(source.getLink());
         bean.setRequired(source.getRequired());
+        bean.setMessage(source.getMessage());
+        bean.setReleaseNote(source.getReleaseNote());
         return bean;
     }
 }

@@ -27,6 +27,10 @@ public class PlatformVersionEntity {
 
     private int required;
 
+    private String message;
+
+    private String releaseNote;
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -92,5 +96,23 @@ public class PlatformVersionEntity {
 
     public void setRequired(int required) {
         this.required = required;
+    }
+
+    @Column(name = "message")
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    @Column(name = "release_note")
+    public String getReleaseNote() {
+        return releaseNote;
+    }
+
+    public void setReleaseNote(String releaseNote) {
+        this.releaseNote = releaseNote;
     }
 }

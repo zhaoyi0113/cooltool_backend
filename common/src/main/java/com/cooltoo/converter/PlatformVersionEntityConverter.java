@@ -20,6 +20,8 @@ public class PlatformVersionEntityConverter implements Converter<PlatformVersion
         entity.setPlatformType(source.getPlatformType());
         entity.setLink(source.getLink());
         entity.setRequired(source.getRequired());
+        entity.setMessage(source.getMessage());
+        entity.setReleaseNote(source.getReleaseNote());
         return entity;
     }
 }

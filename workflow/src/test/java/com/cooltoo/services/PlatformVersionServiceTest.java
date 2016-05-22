@@ -26,12 +26,12 @@ public class PlatformVersionServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testAddPlatformVersion(){
-        PlatformVersionBean bean = versionService.addPlatformVersion("IOS", "4.0", "",1 );
+        PlatformVersionBean bean = versionService.addPlatformVersion("IOS", "4.0", "",1 ,"aaa","bbb");
         Assert.assertNotNull(bean);
         Assert.assertEquals(CommonStatus.ENABLED, bean.getStatus());
         BadRequestException ex = null;
         try{
-            versionService.addPlatformVersion("IOS", "4.0", "" ,0);
+            versionService.addPlatformVersion("IOS", "4.0", "" ,0 ,"aaa","bbb");
         }catch(BadRequestException e){
             ex = e;
         }
