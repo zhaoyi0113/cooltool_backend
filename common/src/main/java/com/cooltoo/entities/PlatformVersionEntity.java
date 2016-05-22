@@ -25,6 +25,8 @@ public class PlatformVersionEntity {
 
     private String link;
 
+    private int required;
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -81,5 +83,14 @@ public class PlatformVersionEntity {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    @Column(name = "required")
+    public int getRequired() {
+        return required;
+    }
+
+    public void setRequired(int required) {
+        this.required = required;
     }
 }

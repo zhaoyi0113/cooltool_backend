@@ -37,16 +37,16 @@ public class PlatformVersionAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response addNewVersion(@FormParam("type") String type, @FormParam("version") String version, @FormParam("link") String link){
-        return Response.ok(platformVersionService.addPlatformVersion(type, version, link)).build();
+    public Response addNewVersion(@FormParam("type") String type, @FormParam("version") String version, @FormParam("link") String link, @FormParam("required") int required){
+        return Response.ok(platformVersionService.addPlatformVersion(type, version, link, required)).build();
     }
 
     @POST
     @Path("/edit")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response editPlatformVersion(@FormDataParam("id") int id, @FormParam("type") String type, @FormParam("version") String version,@FormParam("link") String link){
-        return Response.ok(platformVersionService.editPlatformVersion(id, type, version,link)).build();
+    public Response editPlatformVersion(@FormDataParam("id") int id, @FormParam("type") String type, @FormParam("version") String version,@FormParam("link") String link, @FormParam("required") int required){
+        return Response.ok(platformVersionService.editPlatformVersion(id, type, version,link, required)).build();
     }
 
 }

@@ -33,22 +33,22 @@ public class PlatformVersionService {
     private PlatformVersionBeanConverter beanConverter;
 
     @Transactional
-    public PlatformVersionBean addPlatformVersion(String platformType, String version, String link) {
+    public PlatformVersionBean addPlatformVersion(String platformType, String version, String link, int required) {
         if (whetherExistPlatformVersion(platformType, version)) {
             throw new BadRequestException(ErrorCode.PLATFORM_VERSION_EXISTED);
         }
         disableAllPlatformVersions(platformType);
         PlatformVersionEntity entity = new PlatformVersionEntity();
-        return savePlatformVersionEntity(platformType, version, link, CommonStatus.ENABLED, entity);
+        return savePlatformVersionEntity(platformType, version, link, CommonStatus.ENABLED, entity, required);
     }
 
     @Transactional
-    public PlatformVersionBean editPlatformVersion(int id, String platformType, String version, String link) {
+    public PlatformVersionBean editPlatformVersion(int id, String platformType, String version, String link, int required) {
         PlatformVersionEntity entity = versionRepository.findOne(id);
         if (entity == null) {
             throw new BadRequestException(ErrorCode.PLATFORM_VERSION_NOT_FOUND);
         }
-        return savePlatformVersionEntity(platformType, version, link, entity.getStatus(), entity);
+        return savePlatformVersionEntity(platformType, version, link, entity.getStatus(), entity, required);
     }
 
     public List<PlatformVersionBean> getAllPlatformVersions() {
@@ -79,7 +79,7 @@ public class PlatformVersionService {
         }
         try {
             CommonStatus cStatus = CommonStatus.valueOf(status);
-            if(CommonStatus.ENABLED.equals(cStatus)){
+            if (CommonStatus.ENABLED.equals(cStatus)) {
                 disableAllPlatformVersions(entity.getPlatformType().name());
             }
             entity.setStatus(cStatus);
@@ -101,7 +101,7 @@ public class PlatformVersionService {
         }
     }
 
-    private PlatformVersionBean savePlatformVersionEntity(String platformType, String version, String link, CommonStatus status, PlatformVersionEntity entity) {
+    private PlatformVersionBean savePlatformVersionEntity(String platformType, String version, String link, CommonStatus status, PlatformVersionEntity entity, int required) {
         try {
             PlatformType pType = PlatformType.valueOf(platformType);
             entity.setStatus(status);
@@ -109,6 +109,7 @@ public class PlatformVersionService {
             entity.setTimeCreated(Calendar.getInstance().getTime());
             entity.setVersion(version);
             entity.setLink(link);
+            entity.setRequired(required);
             PlatformVersionEntity saved = versionRepository.save(entity);
             return beanConverter.convert(saved);
         } catch (IllegalArgumentException e) {
@@ -137,10 +138,20 @@ public class PlatformVersionService {
         return beanConverter.convert(platforms.get(0));
     }
 
+    public PlatformVersionBean getPlatformLatestVersion(String type){
+        try {
+            PlatformType ptype = PlatformType.valueOf(type);
+            return  getPlatformLatestVersion(ptype);
+        }catch(IllegalArgumentException e){
+            logger.error(e.getMessage());
+            throw new BadRequestException(ErrorCode.PLATFORM_VERSION_NOT_FOUND);
+        }
+    }
+
     private void disableAllPlatformVersions(String platformType) {
         List<PlatformVersionEntity> platformVersions = versionRepository.findByPlatformType(PlatformType.valueOf(platformType));
         for (PlatformVersionEntity entity : platformVersions) {
-            if(CommonStatus.ENABLED.equals(entity.getStatus())) {
+            if (CommonStatus.ENABLED.equals(entity.getStatus())) {
                 entity.setStatus(CommonStatus.DISABLED);
                 versionRepository.save(entity);
             }

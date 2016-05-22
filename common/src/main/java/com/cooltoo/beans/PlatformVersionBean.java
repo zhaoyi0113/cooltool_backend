@@ -23,6 +23,8 @@ public class PlatformVersionBean {
 
     private String link;
 
+    private int required;
+
     public int getId() {
         return id;
     }
@@ -69,6 +71,15 @@ public class PlatformVersionBean {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+
+    public int getRequired() {
+        return required;
+    }
+
+    public void setRequired(int required) {
+        this.required = required;
     }
 }
 
