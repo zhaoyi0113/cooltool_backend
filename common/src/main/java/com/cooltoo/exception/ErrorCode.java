@@ -60,7 +60,9 @@ public enum ErrorCode {
     NOMINATION_CAN_NOT_FOR_SELF(249, Response.Status.BAD_REQUEST, "不可以给自己提名", "Can not nominate for self"),
     NURSE_DONT_HAVE_SKILL(250, Response.Status.BAD_REQUEST, "护士没有此技能", "Nurse do not have this skill"),
     WORK_FILE_UPLOAD_FAILED(251, Response.Status.BAD_REQUEST, "工作证上传失败", "Upload work file Nurse do not have this skill"),
-    RECORD_ALREADY_EXIST(252, Response.Status.BAD_REQUEST, "记录已存在", "Record already exist");
+    RECORD_ALREADY_EXIST(252, Response.Status.BAD_REQUEST, "记录已存在", "Record already exist"),
+    PLATFORM_VERSION_NOT_FOUND(253, Response.Status.BAD_REQUEST, "版本信息不存在", "Platform version not found"),
+    PLATFORM_VERSION_EXISTED(254, Response.Status.BAD_REQUEST, "版本已存在", "Platform version already exists.");
 
     private final int code;
 
