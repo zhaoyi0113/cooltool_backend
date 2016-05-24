@@ -11,9 +11,9 @@ import java.util.List;
  */
 public interface NurseSkillRepository extends JpaRepository<NurseSkillEntity, Integer>{
 
+    List<NurseSkillEntity> findByUserId(long userId);
     List<NurseSkillEntity> findByUserId(long userId, Sort sort);
     NurseSkillEntity findByUserIdAndSkillId(long userId, int skillId);
-    void deleteByUserIdIn(List<Long> userIds);
-    void deleteBySkillIdIn(List<Integer> skillIds);
+    void deleteByUserIdAndSkillIdIn(long userId, List<Integer> skillIds);
 
 }

@@ -117,7 +117,7 @@ public class SkillService {
 
     public Map<Integer, SkillBean> getAllSkillId2BeanMap() {
         Map<Integer, SkillBean> id2Skills = new HashMap<Integer, SkillBean>();
-        List<SkillBean>         allSkills = getAllSkill();
+        List<SkillBean>         allSkills = getSkillByStatus(OccupationSkillStatus.ENABLE.name());
         if (null!=allSkills && !allSkills.isEmpty()) {
             for (SkillBean skill : allSkills) {
                 id2Skills.put(skill.getId(), skill);

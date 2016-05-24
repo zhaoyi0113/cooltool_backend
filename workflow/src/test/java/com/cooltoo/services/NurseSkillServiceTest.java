@@ -3,6 +3,7 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseSkillBean;
 import com.cooltoo.backend.services.NurseSkillService;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -36,12 +37,12 @@ public class NurseSkillServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testGetNurseSkill() {
-        NurseSkillBean skill = nurseSkillService.getSkill(1, 2);
+        NurseSkillBean skill = nurseSkillService.getSkill(1, 4);
         Assert.assertNotNull(skill);
         Assert.assertEquals(20, skill.getPoint());
         skill = nurseSkillService.getSkill(3, 2);
         Assert.assertNull(skill);
-        skill = nurseSkillService.getSkill(1, 4);
+        skill = nurseSkillService.getSkill(1, 6);
         Assert.assertNull(skill);
     }
 
@@ -63,29 +64,35 @@ public class NurseSkillServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    public void testAddNurseSkills() {
+    public void testSetNurseSkills() {
         List<NurseSkillBean> skills = null;
 
         long userId = 3;
 
-        nurseSkillService.addSkills(userId, "1,2,3");
+        nurseSkillService.setSkills(userId, "1,2,3");
         skills = nurseSkillService.getAllSkills(userId);
         Assert.assertNotNull(skills);
         Assert.assertEquals(3, skills.size());
+        Assert.assertEquals(1, skills.get(0).getSkillId());
+        Assert.assertEquals(2, skills.get(1).getSkillId());
+        Assert.assertEquals(3, skills.get(2).getSkillId());
 
-        nurseSkillService.addSkills(userId, "1,2,3");
+        nurseSkillService.setSkills(userId, "3,4,5");
         skills = nurseSkillService.getAllSkills(userId);
         Assert.assertNotNull(skills);
-        Assert.assertEquals(0, skills.size());
+        Assert.assertEquals(3, skills.size());
+        Assert.assertEquals(3, skills.get(0).getSkillId());
+        Assert.assertEquals(4, skills.get(1).getSkillId());
+        Assert.assertEquals(5, skills.get(2).getSkillId());
     }
 
     @Test
     public void testDeleteNurseSkill() {
         NurseSkillBean skill = null;
-        skill = nurseSkillService.getSkill(1, 3);
+        skill = nurseSkillService.getSkill(1, 4);
         Assert.assertNotNull(skill);
-        nurseSkillService.removeSkillBySkillIds(skill.getId()+"");
-        skill = nurseSkillService.getSkill(1, 3);
+        nurseSkillService.removeSkillByUserIdAndSkillIds(1, skill.getSkillId()+"");
+        skill = nurseSkillService.getSkill(1, 4);
         Assert.assertNull(skill);
     }
 }

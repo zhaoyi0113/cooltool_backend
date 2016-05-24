@@ -7,10 +7,13 @@
     <occupation_skill id="1" name="skill1" image_id="1" disable_image_id="1" /><!-- SKILL -->
     <occupation_skill id="2" name="skill2" image_id="1" disable_image_id="1" /><!-- OCCUPATION -->
     <occupation_skill id="3" name="skill3" image_id="1" disable_image_id="1" /><!-- COMMUNITY -->
+    <occupation_skill id="4" name="skill4" image_id="1" disable_image_id="1" /><!-- skill 4 -->
+    <occupation_skill id="5" name="skill5" image_id="1" disable_image_id="1" /><!-- skill 5-->
+    <occupation_skill id="6" name="skill6" image_id="1" disable_image_id="1" /><!-- skill 6-->
 
     <nurse_occupation_skill id="1" user_id="1" skill_id="1" point="30" />
-    <nurse_occupation_skill id="2" user_id="1" skill_id="2" point="20" />
-    <nurse_occupation_skill id="3" user_id="1" skill_id="3" point="512" />
+    <nurse_occupation_skill id="2" user_id="1" skill_id="4" point="20" />
+    <nurse_occupation_skill id="3" user_id="1" skill_id="5" point="512" />
     <nurse_occupation_skill id="4" user_id="2" skill_id="1" point="15" />
     <nurse_occupation_skill id="5" user_id="2" skill_id="2" point="10" />
 

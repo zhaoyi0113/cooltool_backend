@@ -175,7 +175,7 @@ public class NurseSocialAbilityAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} add skills {} with batch adding.", userId, skillIds);
-        nurseSkillService.addSkills(userId, skillIds);
+        nurseSkillService.setSkills(userId, skillIds);
         return Response.ok(skillIds).build();
     }
 

@@ -26,7 +26,7 @@ import java.util.Map;
 public class NurseSkillService {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseSkillService.class.getName());
-    private static final Sort   sort   = new Sort(new Sort.Order(Sort.Direction.DESC, "point"));
+    private static final Sort   sort   = new Sort(new Sort.Order(Sort.Direction.ASC, "skillId"));
 
     @Autowired private NurseSkillRepository    repository;
     @Autowired private NurseService            nurseService;
@@ -89,7 +89,7 @@ public class NurseSkillService {
     }
 
     @Transactional
-    public void addSkills(long userId, String skillIds) {
+    public void setSkills(long userId, String skillIds) {
         if (!VerifyUtil.isIds(skillIds)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -98,8 +98,7 @@ public class NurseSkillService {
 
         // judge the skills exist
         Map<Integer, SkillBean> allSkills = skillService.getAllSkillId2BeanMap();
-        List<Integer> ids    = VerifyUtil.parseIntIds(skillIds);
-        String[]      idsStr = skillIds.split(",");
+        List<Integer> ids = VerifyUtil.parseIntIds(skillIds);
         for (Integer iId : ids) {
             if (!allSkills.containsKey(iId)) {
                 logger.error("The occupation skill {} is not exist!", iId);
@@ -107,15 +106,29 @@ public class NurseSkillService {
             }
         }
 
-        for (Integer skillId : ids) {
-            // Skill is exist already, delete it;
-            NurseSkillEntity skillExist = repository.findByUserIdAndSkillId(userId, skillId);
-            if (null != skillExist) {
-                repository.delete(skillExist);
-            } else {
-                NurseSkillEntity newSkill = newNurseSkillEntity(userId, skillId, 0);
-                repository.save(newSkill);
+        List<NurseSkillEntity> skillExist = repository.findByUserId(userId);
+        // user has skill already
+        if (!VerifyUtil.isListEmpty(skillExist)) {
+            List<NurseSkillEntity> skillNeedRemove = new ArrayList<>();
+            for (NurseSkillEntity skill : skillExist) {
+                // new skills not contains skill, need remove
+                if (!ids.contains(skill.getSkillId())) {
+                    skillNeedRemove.add(skill);
+                }
+                // contains skill, need not add
+                else {
+                    ids.remove(new Integer(skill.getSkillId()));
+                }
             }
+            // remove the skill not set
+            if (!VerifyUtil.isListEmpty(skillNeedRemove)) {
+                repository.delete(skillNeedRemove);
+            }
+        }
+
+        for (Integer skillId : ids) {
+            NurseSkillEntity newSkill = newNurseSkillEntity(userId, skillId, 0);
+            repository.save(newSkill);
         }
     }
 
@@ -124,26 +137,14 @@ public class NurseSkillService {
     //===============================================================
 
     @Transactional
-    public String removeSkillByUserIds(String userIds) {
-        logger.info("remove nurse skill by user ids = {}", userIds);
-        if (!VerifyUtil.isIds(userIds)) {
-            logger.error("user ids format is wrong!");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        List<Long> arrUserIds = VerifyUtil.parseLongIds(userIds);
-        repository.deleteByUserIdIn(arrUserIds);
-        return userIds;
-    }
-
-    @Transactional
-    public String removeSkillBySkillIds(String skillIds) {
-        logger.info("remove nurse skill by skill ids = {}", skillIds);
+    public String removeSkillByUserIdAndSkillIds(long userId, String skillIds) {
+        logger.info("remove nurse {}'s skill by skill ids = {}", userId, skillIds);
         if (!VerifyUtil.isIds(skillIds)) {
             logger.error("skill ids format is wrong!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         List<Integer> arrSkillIds = VerifyUtil.parseIntIds(skillIds);
-        repository.deleteBySkillIdIn(arrSkillIds);
+        repository.deleteByUserIdAndSkillIdIn(userId, arrSkillIds);
         return skillIds;
     }
 }
