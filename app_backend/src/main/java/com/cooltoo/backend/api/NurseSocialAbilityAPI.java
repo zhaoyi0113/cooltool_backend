@@ -49,7 +49,7 @@ public class NurseSocialAbilityAPI {
         return Response.ok(abilities).build();
     }
 
-    @Path("/skill_ability")
+    @Path("/user_skill_ability")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
