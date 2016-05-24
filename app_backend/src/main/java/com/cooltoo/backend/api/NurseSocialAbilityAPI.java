@@ -44,6 +44,18 @@ public class NurseSocialAbilityAPI {
         return Response.ok(abilities).build();
     }
 
+    @Path("/skill_ability")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response getSkillAbility(@Context HttpServletRequest request) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("get user {} 's just skill ability", userId);
+        List<SocialAbilitiesBean> abilities = abilitiesService.getUserSkillAbility(userId);
+        logger.info("user {} 's just skill ability count ={}", abilities.size());
+        return Response.ok(abilities).build();
+    }
+
     @GET
     @Path("/{skill_id}")
     @Produces(MediaType.APPLICATION_JSON)

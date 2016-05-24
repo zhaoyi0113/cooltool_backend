@@ -155,6 +155,15 @@ public class NurseSocialAbilitiesService {
         return abilityBean;
     }
 
+    public List<SocialAbilitiesBean> getUserSkillAbility(long userId) {
+        List<NurseIntegrationBean> allIntegration = integrationService.getIntegrationSorted(userId, UserType.NURSE, CommonStatus.ENABLED);
+
+        // skill social abilities
+        List<SocialAbilitiesBean> nurseSkillAbilities;
+        nurseSkillAbilities = getUserSkillAbility(allIntegration, UserType.NURSE, userId);
+        return nurseSkillAbilities;
+    }
+
     private List<SocialAbilitiesBean> getUserSkillAbility(List<NurseIntegrationBean> integrations, UserType userType, long userId) {
         Map<Integer, SkillBean>   skillId2Bean   = skillService.getAllSkillId2BeanMap();
         List<NurseSkillBean>      nurseSkills    = nurseSkillService.getAllSkills(userId);
