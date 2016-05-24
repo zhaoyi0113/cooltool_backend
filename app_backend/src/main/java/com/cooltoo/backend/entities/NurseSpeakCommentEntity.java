@@ -1,5 +1,6 @@
 package com.cooltoo.backend.entities;
 
+import com.cooltoo.constants.CommonStatus;
 import org.hibernate.annotations.Generated;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ public class NurseSpeakCommentEntity {
     private long commentReceiverId;
     private String comment;
     private Date time;
+    private CommonStatus status;
 
     @Id
     @GeneratedValue
@@ -75,6 +77,16 @@ public class NurseSpeakCommentEntity {
         this.time = time;
     }
 
+    @Column(name = "status")
+    @Enumerated
+    public CommonStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CommonStatus status) {
+        this.status = status;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
@@ -83,7 +95,8 @@ public class NurseSpeakCommentEntity {
         msg.append("commentMakerId=").append(commentMakerId).append(" , ");
         msg.append("commentReceiverId=").append(commentReceiverId).append(" , ");
         msg.append("comment=").append(comment).append(" , ");
-        msg.append("time=").append(time);
+        msg.append("time=").append(time).append(", ");
+        msg.append("status=").append(status);
         msg.append("]");
         return msg.toString();
     }

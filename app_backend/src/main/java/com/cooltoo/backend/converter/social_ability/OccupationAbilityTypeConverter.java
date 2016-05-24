@@ -28,6 +28,7 @@ public class OccupationAbilityTypeConverter implements SocialAbilityTypeConverte
             ability = new SpecificSocialAbility();
             ability.setAbilityId(department.getId());
             ability.setAbilityName(department.getName());
+            ability.setFactor(1);
             ability.setAbilityType(SocialAbilityType.OCCUPATION);
             items.add(ability);
         }
@@ -43,4 +44,16 @@ public class OccupationAbilityTypeConverter implements SocialAbilityTypeConverte
         return departmentRepository.exists(itemId);
     }
 
+    public SpecificSocialAbility getItem(int itemId) {
+        HospitalDepartmentEntity entity = departmentRepository.findOne(itemId);
+        SpecificSocialAbility ability = null;
+        if (null!=entity) {
+            ability = new SpecificSocialAbility();
+            ability.setAbilityId(entity.getId());
+            ability.setAbilityName(entity.getName());
+            ability.setFactor(1);
+            ability.setAbilityType(SocialAbilityType.OCCUPATION);
+        }
+        return ability;
+    }
 }

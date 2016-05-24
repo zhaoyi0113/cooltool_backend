@@ -4,8 +4,11 @@ import com.cooltoo.backend.beans.NurseSpeakCommentBean;
 import com.cooltoo.backend.converter.NurseSpeakCommentBeanConverter;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakCommentEntity;
+import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseSpeakCommentRepository;
+import com.cooltoo.backend.repository.NurseSpeakRepository;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.file.UserFileStorageService;
@@ -33,6 +36,8 @@ public class NurseSpeakCommentService {
     @Autowired
     private NurseRepository nurseRepository;
     @Autowired
+    private NurseSpeakRepository speakRepository;
+    @Autowired
     @Qualifier("UserFileStorageService")
     private UserFileStorageService userStorage;
     @Autowired
@@ -42,7 +47,7 @@ public class NurseSpeakCommentService {
     //              GET
     //==================================================================
     public List<Long> findSpeakWithCommentUserMake(long nurseId) {
-        List<Long> speaks = commentRepository.findSpeakWithCommentUserMake(nurseId);
+        List<Long> speaks = commentRepository.findSpeakWithCommentUserMake(nurseId, CommonStatus.ENABLED);
         if (VerifyUtil.isListEmpty(speaks)) {
             logger.info("speak with comment user={} made is empty", nurseId);
             return new ArrayList<>();
@@ -64,7 +69,7 @@ public class NurseSpeakCommentService {
             return new ArrayList<>();
         }
 
-        List<NurseSpeakCommentEntity> resultSet = commentRepository.findByIdIn(commentIds);
+        List<NurseSpeakCommentEntity> resultSet = commentRepository.findByStatusAndIdIn(CommonStatus.ENABLED, commentIds);
 
         List<NurseSpeakCommentBean>   comments  = new ArrayList<>();
         for (NurseSpeakCommentEntity tmp : resultSet) {
@@ -80,7 +85,7 @@ public class NurseSpeakCommentService {
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_NOT_EXIST);
         }
         Sort sort = new Sort(Sort.Direction.ASC, "time");
-        List<NurseSpeakCommentEntity> comments = commentRepository.findByNurseSpeakId(nurseSpeakId, sort);
+        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusAndNurseSpeakId(CommonStatus.ENABLED, nurseSpeakId, sort);
         List<NurseSpeakCommentBean> retValue = new ArrayList<NurseSpeakCommentBean>();
 
         int count = null==comments ? 0 : comments.size();
@@ -108,7 +113,7 @@ public class NurseSpeakCommentService {
         Sort.Order speakIdOrder = new Sort.Order(Sort.Direction.DESC, "nurseSpeakId");
         Sort.Order timeOrder = new Sort.Order(Sort.Direction.ASC, "time");
         Sort sort = new Sort(speakIdOrder, timeOrder);
-        List<NurseSpeakCommentEntity> comments = commentRepository.findByNurseSpeakIdIn(nurseSpeakIds, sort);
+        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusAndNurseSpeakIdIn(CommonStatus.ENABLED, nurseSpeakIds, sort);
         List<NurseSpeakCommentBean> retValue = new ArrayList<NurseSpeakCommentBean>();
 
         int count = null==comments ? 0 : comments.size();
@@ -129,23 +134,31 @@ public class NurseSpeakCommentService {
             return;
         }
 
-        List<Long> ids = new ArrayList<>();
+        List<Long> speakIds = new ArrayList<>();
+        List<Long> userIds = new ArrayList<>();
         for (NurseSpeakCommentBean tmp : comments) {
-            ids.add(tmp.getCommentMakerId());
-            ids.add(tmp.getCommentReceiverId());
+            userIds.add(tmp.getCommentMakerId());
+            userIds.add(tmp.getCommentReceiverId());
+            speakIds.add(tmp.getNurseSpeakId());
         }
 
-        List<NurseEntity>      nurses   = nurseRepository.findByIdIn(ids);
+        Map<Long, NurseSpeakEntity> id2Speak = new HashMap<>();
+        List<NurseSpeakEntity> speaks = speakRepository.findAll(speakIds);
+        for (NurseSpeakEntity tmp : speaks) {
+            id2Speak.put(tmp.getId(), tmp);
+        }
+
+        List<NurseEntity>      nurses   = nurseRepository.findByIdIn(userIds);
         Map<Long, NurseEntity> id2Nurse = new HashMap<>();
-        ids.clear();
+        List<Long> imageIds = new ArrayList<>();
         for (NurseEntity tmp : nurses) {
             id2Nurse.put(tmp.getId(), tmp);
-            ids.add(tmp.getProfilePhotoId());
+            imageIds.add(tmp.getProfilePhotoId());
         }
 
-        Map<Long, String>      id2Path  = userStorage.getFilePath(ids);
+        Map<Long, String>      id2Path  = userStorage.getFilePath(imageIds);
 
-
+        NurseSpeakEntity speak   = null;
         NurseEntity maker        = null;
         NurseEntity receiver     = null;
         String      makerName    = null;
@@ -155,6 +168,7 @@ public class NurseSpeakCommentService {
         for (NurseSpeakCommentBean tmp : comments) {
             maker        = id2Nurse.get(tmp.getCommentMakerId());
             receiver     = id2Nurse.get(tmp.getCommentReceiverId());
+            speak        = id2Speak.get(tmp.getNurseSpeakId());
             makerName    = (null==maker)    ? null : maker.getName();
             receiverName = (null==receiver) ? null : receiver.getName();
             makerHead    = (null==maker)    ? null : id2Path.get(maker.getProfilePhotoId());
@@ -163,6 +177,8 @@ public class NurseSpeakCommentService {
             tmp.setMakerHeadImageUrl(makerHead);
             tmp.setReceiverName(receiverName);
             tmp.setReceiverHeadImageUrl(receiverHead);
+            tmp.setSpeakMakerId(speak.getUserId());
+            tmp.setNurseSpeakTypeId(speak.getSpeakType());
         }
     }
 
@@ -177,12 +193,17 @@ public class NurseSpeakCommentService {
             return new ArrayList<>();
         }
 
-        List<NurseSpeakCommentEntity> comments = commentRepository.findByNurseSpeakIdIn(speakIds);
+        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusAndNurseSpeakIdIn(CommonStatus.ENABLED, speakIds);
         if (null==comments || comments.isEmpty()) {
             logger.info("delete nothing");
         }
+        else {
+            for (NurseSpeakCommentEntity comment : comments) {
+                comment.setStatus(CommonStatus.DELETED);
+            }
+            commentRepository.save(comments);
+        }
 
-        commentRepository.delete(comments);
 
         List<NurseSpeakCommentBean> retValue = new ArrayList<>();
         for (NurseSpeakCommentEntity tmp : comments) {
@@ -211,13 +232,16 @@ public class NurseSpeakCommentService {
             return new ArrayList<>();
         }
 
-        List<NurseSpeakCommentEntity> comments = commentRepository.findByIdIn(commentIds);
+        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusAndIdIn(CommonStatus.ENABLED, commentIds);
         if (null==comments || comments.isEmpty()) {
             logger.info("delete nothing");
         }
-
-        commentRepository.delete(comments);
-
+        else {
+            for (NurseSpeakCommentEntity comment : comments) {
+                comment.setStatus(CommonStatus.DELETED);
+            }
+            commentRepository.save(comments);
+        }
 
         List<NurseSpeakCommentBean> retValue = new ArrayList<>();
         for (NurseSpeakCommentEntity tmp : comments) {
@@ -250,7 +274,13 @@ public class NurseSpeakCommentService {
         entity.setCommentReceiverId(commentReceiverId);
         entity.setComment(comment);
         entity.setTime(new Date());
+        entity.setStatus(CommonStatus.ENABLED);
         entity = commentRepository.save(entity);
-        return beanConverter.convert(entity);
+
+        NurseSpeakCommentBean commentBean = beanConverter.convert(entity);
+        NurseSpeakEntity speak = speakRepository.getOne(nurseSpeakId);
+        commentBean.setSpeakMakerId(speak.getUserId());
+        commentBean.setNurseSpeakTypeId(speak.getSpeakType());
+        return commentBean;
     }
 }

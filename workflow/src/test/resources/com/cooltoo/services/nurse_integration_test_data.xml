@@ -1,18 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
-
 <dataset>
-    <nurse id="1"  name="护士name1"  age="11" gender="1" mobile="1231432143"  integral="0" password="aa" profile_photo_id="1" background_image_id="1" real_name="aaa1"  identification="123111" short_note=" " authority="1"/>
-    <nurse id="2"  name="护士name2"  age="22" gender="2" mobile="14321134"    integral="0" password="aa" profile_photo_id="1" background_image_id="1" real_name="aaa2"  identification="123222" short_note=" " authority="1" />
-
-
-    <speak_type id="1" name="SMUG"         type="0" factor="10" image_id="1" disable_image_id="2" />
-    <speak_type id="2" name="CATHART"      type="1" factor="15" image_id="1" disable_image_id="2" />
-    <speak_type id="3" name="ASK_QUESTION" type="2" factor="20" image_id="1" disable_image_id="2" />
-    <speak_type id="4" name="OFFICIAL"     type="3" factor="30" image_id="1" disable_image_id="2" />
-
     <nurse_device_tokens id="1000" user_id="1" device_token="aaa" status="1"/>
 
-    <nurse_integration id="1" user_id="1" />
 
+
+    <nurse_integration id="1" user_id="1" user_type="0"  reason_id="1" ability_type="0" ability_id="1" point="40" status="1" time_created="2016-05-01 00:00:00" /> />
+    <nurse_integration id="2" user_id="1" user_type="0"  reason_id="2" ability_type="0" ability_id="1" point="40" status="1" time_created="2016-05-01 01:00:00" />
+    <nurse_integration id="3" user_id="1" user_type="0"  reason_id="3" ability_type="0" ability_id="1" point="40" status="1" time_created="2016-05-01 02:00:00" />
+    <nurse_integration id="4" user_id="1" user_type="0"  reason_id="4" ability_type="0" ability_id="1" point="40" status="1" time_created="2016-05-01 03:00:00" />
+    <nurse_integration id="5" user_id="1" user_type="0"  reason_id="5" ability_type="0" ability_id="1" point="40" status="1" time_created="2016-05-01 04:00:00" />
+    <nurse_integration id="6" user_id="1" user_type="0"  reason_id="6" ability_type="0" ability_id="1" point="40" status="1" time_created="2016-05-01 05:00:00" />
+    <nurse_integration id="7" user_id="1" user_type="0"  reason_id="7" ability_type="0" ability_id="1" point="40" status="1" time_created="2016-05-01 06:00:00" />
+    <nurse_integration id="8" user_id="1" user_type="0"  reason_id="8" ability_type="0" ability_id="1" point="10" status="1" time_created="2016-05-01 07:00:00" />
+    <nurse_integration id="9" user_id="1" user_type="0"  reason_id="9" ability_type="0" ability_id="1" point="10" status="1" time_created="2016-05-01 08:00:00" />
+    <nurse_integration id="10" user_id="1" user_type="0" reason_id="10" ability_type="0" ability_id="1" point="10" status="1" time_created="2016-05-01 09:00:00" />
+    <nurse_integration id="11" user_id="1" user_type="0" reason_id="11" ability_type="0" ability_id="1" point="10" status="1" time_created="2016-05-01 10:00:00" />
+
+    <nurse_integration id="12" user_id="1" user_type="0" reason_id="0" ability_type="1" ability_id="1000" point="30" status="1" time_created="2016-05-01 11:00:00" />
+
+    <nurse_integration id="13" user_id="1" user_type="0" reason_id="1" ability_type="3" ability_id="1" point="5" status="1" time_created="2016-05-01 12:00:00" />
+    <nurse_integration id="14" user_id="1" user_type="0" reason_id="2" ability_type="3" ability_id="1" point="5" status="1" time_created="2016-05-01 13:00:00" />
+    <nurse_integration id="15" user_id="1" user_type="0" reason_id="3" ability_type="3" ability_id="1" point="5" status="1" time_created="2016-05-01 14:00:00" />
+    <nurse_integration id="16" user_id="1" user_type="0" reason_id="4" ability_type="3" ability_id="1" point="5" status="1" time_created="2016-05-01 15:00:00" />
+    <nurse_integration id="17" user_id="1" user_type="0" reason_id="5" ability_type="3" ability_id="1" point="5" status="1" time_created="2016-05-01 16:00:00" />
+    <nurse_integration id="18" user_id="1" user_type="0" reason_id="6" ability_type="3" ability_id="1" point="10" status="1" time_created="2016-05-01 17:00:00" />
+    <nurse_integration id="19" user_id="1" user_type="0" reason_id="7" ability_type="3" ability_id="1" point="10" status="1" time_created="2016-05-01 18:00:00" />
+    <nurse_integration id="20" user_id="2" user_type="0" reason_id="1" ability_type="3" ability_id="2" point="10" status="1" time_created="2016-05-01 19:00:00" />
+    <nurse_integration id="21" user_id="3" user_type="0" reason_id="2" ability_type="3" ability_id="2" point="10" status="1" time_created="2016-05-01 20:00:00" />
+    <nurse_integration id="22" user_id="4" user_type="0" reason_id="3" ability_type="3" ability_id="2" point="10" status="1" time_created="2016-05-01 21:00:00" />
+    <nurse_integration id="23" user_id="2" user_type="0" reason_id="4" ability_type="3" ability_id="2" point="10" status="1" time_created="2016-05-01 23:00:00" />
+    <nurse_integration id="24" user_id="3" user_type="0" reason_id="5" ability_type="3" ability_id="2" point="10" status="1" time_created="2016-05-02 00:00:00" />
+    <nurse_integration id="25" user_id="7" user_type="0" reason_id="6" ability_type="3" ability_id="2" point="10" status="1" time_created="2016-05-02 01:00:00" />
+    <nurse_integration id="26" user_id="5" user_type="0" reason_id="7" ability_type="3" ability_id="2" point="10" status="1" time_created="2016-05-02 02:00:00" />
+
+    <nurse_integration id="33" user_id="2" user_type="0" reason_id="5" ability_type="4" ability_id="1" point="3" status="1" time_created="2016-05-02 22:00:00" />
+    <nurse_integration id="34" user_id="3" user_type="0" reason_id="8" ability_type="4" ability_id="1" point="4" status="1" time_created="2016-05-02 23:00:00" />
 </dataset>

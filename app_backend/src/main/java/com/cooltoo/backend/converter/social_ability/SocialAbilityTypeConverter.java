@@ -12,4 +12,5 @@ public interface SocialAbilityTypeConverter {
     List<SpecificSocialAbility> getItems();
     long itemSize();
     boolean existItem(int itemId);
+    SpecificSocialAbility getItem(int itemId);
 }

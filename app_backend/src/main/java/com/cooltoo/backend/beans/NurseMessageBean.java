@@ -1,28 +1,32 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.MessageType;
 import com.cooltoo.constants.SocialAbilityType;
+import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.UserType;
 
 import java.util.Date;
 
 /**
  * Created by lg380357 on 2016/3/7.
  */
-public class MessageBean {
+public class NurseMessageBean {
 
     private long id;
     private long reasonId;
     private String content;
     private long userId;
-    private String userType;
+    private UserType userType;
     private String userName;
     private String profileImageUrl;
     private long abilityId;
     private SocialAbilityType abilityType;
     private String abilityName;
     private MessageType type;
+    private SpecificSocialAbility abilityApproved;
     private Date time;
-    private String status;
+    private SuggestionStatus status;
 
     public long getId() {
         return id;
@@ -104,11 +108,11 @@ public class MessageBean {
         this.type = type;
     }
 
-    public String getStatus() {
+    public SuggestionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(SuggestionStatus status) {
         this.status = status;
     }
 
@@ -120,12 +124,20 @@ public class MessageBean {
         this.reasonId = reasonId;
     }
 
-    public String getUserType() {
+    public UserType getUserType() {
         return userType;
     }
 
-    public void setUserType(String userType) {
+    public void setUserType(UserType userType) {
         this.userType = userType;
+    }
+
+    public SpecificSocialAbility getAbilityApproved() {
+        return abilityApproved;
+    }
+
+    public void setAbilityApproved(SpecificSocialAbility abilityApproved) {
+        this.abilityApproved = abilityApproved;
     }
 
     public String toString() {
@@ -145,6 +157,7 @@ public class MessageBean {
         msg.append(", abilityId=").append(abilityId);
         msg.append(", abilityName=").append(abilityName);
         msg.append(", abilityType=").append(abilityType);
+        msg.append(", abilityApproved=").append(abilityApproved);
         msg.append(" ]");
         return msg.toString();
     }

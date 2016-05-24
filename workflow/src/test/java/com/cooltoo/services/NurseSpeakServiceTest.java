@@ -375,13 +375,13 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         userIds.add(2L);
         userIds.add(3L);
 
-        Map<Long, Long> count1 = speakService.countByUserIds(strUserIds);
+//        Map<Long, Long> count1 = speakService.countByUserIds(strUserIds);
         Map<Long, Long> count2 = speakService.countByUserIds(userIds);
 
-        Assert.assertNotNull(count1);
+//        Assert.assertNotNull(count1);
         Assert.assertNotNull(count2);
-        Assert.assertEquals(2L, (count1.get(userIds.get(0))).longValue());
-        Assert.assertEquals(2L, (count1.get(userIds.get(1))).longValue());
+//        Assert.assertEquals(2L, (count1.get(userIds.get(0))).longValue());
+//        Assert.assertEquals(2L, (count1.get(userIds.get(1))).longValue());
         Assert.assertEquals(2L, (count2.get(userIds.get(0))).longValue());
         Assert.assertEquals(2L, (count2.get(userIds.get(1))).longValue());
     }

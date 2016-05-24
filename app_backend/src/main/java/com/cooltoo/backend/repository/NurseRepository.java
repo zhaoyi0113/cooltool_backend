@@ -4,6 +4,7 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.constants.UserAuthority;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * Created by lg380357 on 2016/3/2.
  */
-public interface NurseRepository extends CrudRepository<NurseEntity, Long> {
+public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     Page<NurseEntity> findAll(Pageable page);
     List<NurseEntity> findByMobile(String mobile);
     List<NurseEntity> findByNameContaining(String name);

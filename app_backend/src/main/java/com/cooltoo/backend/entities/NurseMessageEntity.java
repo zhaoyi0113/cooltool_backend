@@ -1,29 +1,26 @@
 package com.cooltoo.backend.entities;
 
-import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SocialAbilityType;
+import com.cooltoo.constants.SuggestionStatus;
 import com.cooltoo.constants.UserType;
 
 import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Created by yzzhao on 5/21/16.
+ * Created by hp on 2016/5/21.
  */
 @Entity
-@Table(name = "nurse_integration")
-public class NurseIntegrationEntity {
+@Table(name = "nurse_message")
+public class NurseMessageEntity {
     private long id;
     private long userId;
     private UserType userType;
-    //根据abilityType和abilityId决定reasonId,如果abilityType是community,abilityId是SpeakType.SMUG的id,则reasonId就是nurse_speak表中对应的发言ID
     private long reasonId;
-    // 技能表中的ID,如果abilityType是community,该ID就是speak_type表中的id;如果是skill, 就是occupation_skill表中的id
     private int abilityId;
     private SocialAbilityType abilityType;
-    private long point;
     private Date time;
-    private CommonStatus status;
+    private SuggestionStatus status;
 
     @GeneratedValue
     @Id
@@ -83,15 +80,6 @@ public class NurseIntegrationEntity {
         this.abilityType = abilityType;
     }
 
-    @Column(name = "point")
-    public long getPoint() {
-        return point;
-    }
-
-    public void setPoint(long point) {
-        this.point = point;
-    }
-
     @Column(name = "time_created")
     public Date getTime() {
         return time;
@@ -103,11 +91,11 @@ public class NurseIntegrationEntity {
 
     @Column(name = "status")
     @Enumerated
-    public CommonStatus getStatus() {
+    public SuggestionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(CommonStatus status) {
+    public void setStatus(SuggestionStatus status) {
         this.status = status;
     }
 
@@ -120,7 +108,6 @@ public class NurseIntegrationEntity {
         msg.append(", reasonId=").append(reasonId);
         msg.append(", abilityId=").append(abilityId);
         msg.append(", abilityType=").append(abilityType);
-        msg.append(", point=").append(point);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append("]");

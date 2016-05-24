@@ -6,6 +6,9 @@ import java.util.Date;
  * Created by hp on 2016/3/18.
  */
 public class NurseSpeakThumbsUpBean {
+    public static final String THUMBS_UP_ADD    = "add_thumbs_up";
+    public static final String THUMBS_UP_DELETE = "add_thumbs_delete";
+
     private long id;
     private long nurseSpeakId;
     private long thumbsUpUserId;
@@ -13,6 +16,8 @@ public class NurseSpeakThumbsUpBean {
     private String thumbsUpUserHeadImageUrl;
     private long speakThumbsUpCount;
     private Date time;
+    private long userIdBeenThumbsUp = 0;
+    private String thumbsUpAddOrDelete = null;
 
     public long getId() {
         return id;
@@ -68,6 +73,22 @@ public class NurseSpeakThumbsUpBean {
 
     public void setThumbsUpUserHeadImageUrl(String thumbsUpUserHeadImageUrl) {
         this.thumbsUpUserHeadImageUrl = thumbsUpUserHeadImageUrl;
+    }
+
+    public long getUserIdBeenThumbsUp() {
+        return userIdBeenThumbsUp;
+    }
+
+    public void setUserIdBeenThumbsUp(long userIdBeenThumbsUp) {
+        this.userIdBeenThumbsUp = userIdBeenThumbsUp;
+    }
+
+    public String getThumbsUpAddOrDelete() {
+        return thumbsUpAddOrDelete;
+    }
+
+    public void setThumbsUpAddOrDelete(String thumbsUpAddOrDelete) {
+        this.thumbsUpAddOrDelete = thumbsUpAddOrDelete;
     }
 
     public String toString() {

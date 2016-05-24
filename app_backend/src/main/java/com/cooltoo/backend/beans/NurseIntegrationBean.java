@@ -1,33 +1,25 @@
-package com.cooltoo.backend.entities;
+package com.cooltoo.backend.beans;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.constants.UserType;
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Created by yzzhao on 5/21/16.
+ * Created by hp on 2016/5/21.
  */
-@Entity
-@Table(name = "nurse_integration")
-public class NurseIntegrationEntity {
+public class NurseIntegrationBean {
     private long id;
     private long userId;
     private UserType userType;
-    //根据abilityType和abilityId决定reasonId,如果abilityType是community,abilityId是SpeakType.SMUG的id,则reasonId就是nurse_speak表中对应的发言ID
     private long reasonId;
-    // 技能表中的ID,如果abilityType是community,该ID就是speak_type表中的id;如果是skill, 就是occupation_skill表中的id
     private int abilityId;
     private SocialAbilityType abilityType;
     private long point;
     private Date time;
     private CommonStatus status;
 
-    @GeneratedValue
-    @Id
-    @Column(name = "id")
     public long getId() {
         return id;
     }
@@ -36,7 +28,6 @@ public class NurseIntegrationEntity {
         this.id = id;
     }
 
-    @Column(name = "user_id")
     public long getUserId() {
         return userId;
     }
@@ -45,8 +36,6 @@ public class NurseIntegrationEntity {
         this.userId = userId;
     }
 
-    @Column(name = "user_type")
-    @Enumerated
     public UserType getUserType() {
         return userType;
     }
@@ -55,7 +44,6 @@ public class NurseIntegrationEntity {
         this.userType = userType;
     }
 
-    @Column(name = "reason_id")
     public long getReasonId() {
         return reasonId;
     }
@@ -64,7 +52,6 @@ public class NurseIntegrationEntity {
         this.reasonId = reasonId;
     }
 
-    @Column(name = "ability_id")
     public int getAbilityId() {
         return abilityId;
     }
@@ -73,8 +60,6 @@ public class NurseIntegrationEntity {
         this.abilityId = abilityId;
     }
 
-    @Column(name = "ability_type")
-    @Enumerated
     public SocialAbilityType getAbilityType() {
         return abilityType;
     }
@@ -83,7 +68,6 @@ public class NurseIntegrationEntity {
         this.abilityType = abilityType;
     }
 
-    @Column(name = "point")
     public long getPoint() {
         return point;
     }
@@ -92,7 +76,6 @@ public class NurseIntegrationEntity {
         this.point = point;
     }
 
-    @Column(name = "time_created")
     public Date getTime() {
         return time;
     }
@@ -101,8 +84,6 @@ public class NurseIntegrationEntity {
         this.time = time;
     }
 
-    @Column(name = "status")
-    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }

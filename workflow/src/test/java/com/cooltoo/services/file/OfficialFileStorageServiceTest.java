@@ -68,13 +68,13 @@ public class OfficialFileStorageServiceTest extends AbstractCooltooTest {
         String absolutePath1 = "http://jkfdsivjnkcanfejwvnid/fjdisfds/11/fdsafdjklfjdslajfkdsajflk";
         String absolutePath2 = "http://jkfdsivjnk.ca/fjdisfds/11/fdsafdjklfjdslajfkdsajflk";
         String relaPath1 = officialStorage.getRelativePathInStorage(absolutePath1);
-        Assert.assertEquals(relativePath1, relaPath1);
+        Assert.assertEquals(relativePath1, relaPath1.replace('\\', '/'));
 
         String[] array = new String[]{absolutePath1, absolutePath2};
         List<String> absolutePaths = Arrays.asList(array);
         Map<String, String> absolute2relative = officialStorage.getRelativePathInStorage(absolutePaths);
-        Assert.assertEquals(relativePath1, absolute2relative.get(absolutePath1));
-        Assert.assertEquals(relativePath2, absolute2relative.get(absolutePath2));
+        Assert.assertEquals(relativePath1, absolute2relative.get(absolutePath1).replace('\\', '/'));
+        Assert.assertEquals(relativePath2, absolute2relative.get(absolutePath2).replace('\\', '/'));
     }
 
     @Test
@@ -85,13 +85,13 @@ public class OfficialFileStorageServiceTest extends AbstractCooltooTest {
         String absolutePath1 = "http://jkfdsivjnkcanfejwvnid/fjdisfds/11/fdsafdjklfjdslajfkdsajflk";
         String absolutePath2 = "http://jkfdsivjnk.ca/fjdisfds/11/fdsafdjklfjdslajfkdsajflk";
         String relaPath1 = officialStorage.getRelativePathInBase(absolutePath1);
-        Assert.assertEquals(nginxPath+relativePath1, relaPath1);
+        Assert.assertEquals(nginxPath+relativePath1, relaPath1.replace('\\', '/'));
 
         String[] array = new String[]{absolutePath1, absolutePath2};
         List<String> absolutePaths = Arrays.asList(array);
         Map<String, String> absolute2relative = officialStorage.getRelativePathInBase(absolutePaths);
-        Assert.assertEquals(nginxPath+relativePath1, absolute2relative.get(absolutePath1));
-        Assert.assertEquals(nginxPath+relativePath2, absolute2relative.get(absolutePath2));
+        Assert.assertEquals(nginxPath+relativePath1, absolute2relative.get(absolutePath1).replace('\\', '/'));
+        Assert.assertEquals(nginxPath+relativePath2, absolute2relative.get(absolutePath2).replace('\\', '/'));
     }
 
     @Test

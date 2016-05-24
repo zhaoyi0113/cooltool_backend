@@ -27,6 +27,7 @@ public class SkillAbilityTypeConverter implements SocialAbilityTypeConverter {
             ability = new SpecificSocialAbility();
             ability.setAbilityId(skill.getId());
             ability.setAbilityName(skill.getName());
+            ability.setFactor(skill.getFactor());
             ability.setAbilityType(SocialAbilityType.SKILL);
             items.add(ability);
         }
@@ -41,4 +42,16 @@ public class SkillAbilityTypeConverter implements SocialAbilityTypeConverter {
         return skillRepository.exists(itemId);
     }
 
+    public SpecificSocialAbility getItem(int itemId) {
+        SkillEntity skill = skillRepository.findOne(itemId);
+        SpecificSocialAbility ability = null;
+        if (null!=skill) {
+            ability = new SpecificSocialAbility();
+            ability.setAbilityId(skill.getId());
+            ability.setAbilityName(skill.getName());
+            ability.setFactor(skill.getFactor());
+            ability.setAbilityType(SocialAbilityType.SKILL);
+        }
+        return ability;
+    }
 }

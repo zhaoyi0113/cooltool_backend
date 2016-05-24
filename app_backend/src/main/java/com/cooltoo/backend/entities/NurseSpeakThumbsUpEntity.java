@@ -1,5 +1,7 @@
 package com.cooltoo.backend.entities;
 
+import com.cooltoo.constants.CommonStatus;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -13,6 +15,7 @@ public class NurseSpeakThumbsUpEntity {
     private long nurseSpeakId;
     private long thumbsUpUserId;
     private Date time;
+    private CommonStatus status;
 
     @Id
     @GeneratedValue
@@ -52,13 +55,24 @@ public class NurseSpeakThumbsUpEntity {
         this.time = time;
     }
 
+    @Column(name = "status")
+    @Enumerated
+    public CommonStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CommonStatus status) {
+        this.status = status;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(" ,");
         msg.append("nurseSpeakId=").append(nurseSpeakId).append(" ,");
         msg.append("thumbsUpUserId=").append(thumbsUpUserId).append(" ,");
-        msg.append("time=").append(time);
+        msg.append("time=").append(time).append(", ");
+        msg.append("status=").append(status);
         msg.append(" ]");
         return msg.toString();
     }

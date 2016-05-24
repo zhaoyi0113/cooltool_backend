@@ -54,10 +54,10 @@ public class BadgeServiceTest extends AbstractCooltooTest {
                     || ability.getAbilityId() == 2
                     || ability.getAbilityId() == 3
                     || ability.getAbilityId() == 4);
-            Assert.assertTrue("SMUG".equals(ability.getAbilityName())
-                    || "CATHART".equals(ability.getAbilityName())
-                    || "ASK_QUESTION".equals(ability.getAbilityName())
-                    || "OFFICIAL".equals(ability.getAbilityName()));
+            Assert.assertTrue("晒图".equals(ability.getAbilityName())
+                    || "吐槽".equals(ability.getAbilityName())
+                    || "提问".equals(ability.getAbilityName())
+                    || "官方发言".equals(ability.getAbilityName()));
             Assert.assertEquals("COMMUNITY", ability.getAbilityType().name());
         }
 

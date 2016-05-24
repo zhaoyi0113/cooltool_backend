@@ -390,7 +390,7 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(activityId, activity.getId());
         Assert.assertEquals(ActivityStatus.ENABLE, activity.getStatus());
         activity = service.getActivityById(activityId, "");
-        Assert.assertEquals(content, activity.getContent());
+        Assert.assertEquals(content, activity.getContent().replace('\\', '/'));
 
         Assert.assertFalse(tempStorage.fileExist(relativeFile));
         Assert.assertTrue(officailStorage.fileExist(relativeFile));

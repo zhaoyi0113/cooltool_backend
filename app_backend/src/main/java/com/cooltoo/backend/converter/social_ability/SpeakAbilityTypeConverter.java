@@ -19,8 +19,6 @@ import java.util.List;
 @Component
 public class SpeakAbilityTypeConverter implements SocialAbilityTypeConverter {
 
-    private static final Logger logger = LoggerFactory.getLogger(SpeakAbilityTypeConverter.class.getName());
-
     @Autowired
     private SpeakTypeRepository speakTypeRepository;
 
@@ -29,11 +27,7 @@ public class SpeakAbilityTypeConverter implements SocialAbilityTypeConverter {
         SpecificSocialAbility ability;
         List<SpeakTypeEntity> speakTypes = speakTypeRepository.findAll(sorter);
         for (SpeakTypeEntity speakType : speakTypes) {
-            ability = new SpecificSocialAbility();
-            ability.setAbilityId(speakType.getId());
-            ability.setAbilityName(speakType.getName());
-            ability.setAbilityType(SocialAbilityType.COMMUNITY);
-            items.add(ability);
+            items.add(convert(speakType));
         }
         return items;
     }
@@ -46,4 +40,26 @@ public class SpeakAbilityTypeConverter implements SocialAbilityTypeConverter {
         return speakTypeRepository.exists(itemId);
     }
 
+    public SpecificSocialAbility getItem(int itemId) {
+        SpeakTypeEntity speakType = speakTypeRepository.findOne(itemId);
+        return convert(speakType);
+    }
+
+    public SpecificSocialAbility getItem(SpeakType speakType) {
+        SpeakTypeEntity speakTypeE = speakTypeRepository.findOneBySpeakType(speakType);
+        return convert(speakTypeE);
+    }
+
+    private SpecificSocialAbility convert(SpeakTypeEntity entity) {
+        SpecificSocialAbility ability = null;
+        if (null!=entity) {
+            ability = new SpecificSocialAbility();
+            ability.setAbilityId(entity.getId());
+            ability.setAbilityName(entity.getName());
+            ability.setFactor(entity.getFactor());
+            ability.setAbilityType(SocialAbilityType.COMMUNITY);
+            ability.addProperty(SpecificSocialAbility.Speak_Type, entity.getType());
+        }
+        return ability;
+    }
 }

@@ -52,17 +52,7 @@ public class NurseSpeakService {
     //===============================================================
     public long countByContentAndTime(long userId, String content, String strStartTime, String strEndTime) {
         logger.info("count user={} speak by content={} startTime={} endTime={}", userId>0?userId:"ALL", content, strStartTime, strEndTime);
-        if (VerifyUtil.isStringEmpty(content)) {
-            content = "%";
-        }
-        else {
-            content = content.trim();
-            StringBuilder fuzzyContent = new StringBuilder();
-            for (int i=0, count=content.length(); i < count; i ++) {
-                fuzzyContent.append(content.charAt(i)).append("%");
-            }
-            content = fuzzyContent.toString();
-        }
+        content = reconstructContentLike(content);
         long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         Date start     = startTime<0 ? new Date(0) : new Date(startTime);
@@ -80,17 +70,7 @@ public class NurseSpeakService {
 
     public List<NurseSpeakBean> getSpeakByContentLikeAndTime(long userId, String contentLike, String strStartTime, String strEndTime, int pageIndex, int sizePerPage) {
         logger.info("get user={} speak by content={} startTime={} endTime={}", userId>0?userId:"ALL", contentLike, strStartTime, strEndTime);
-        if (VerifyUtil.isStringEmpty(contentLike)) {
-            contentLike = "%";
-        }
-        else {
-            contentLike = contentLike.trim();
-            StringBuilder fuzzyContent = new StringBuilder();
-            for (int i=0, count=contentLike.length(); i < count; i ++) {
-                fuzzyContent.append(contentLike.charAt(i)).append("%");
-            }
-            contentLike = fuzzyContent.toString();
-        }
+        contentLike = reconstructContentLike(contentLike);
         long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         Date start     = startTime<0 ? new Date(0) : new Date(startTime);
@@ -110,32 +90,47 @@ public class NurseSpeakService {
         return speakBeans;
     }
 
+    private String reconstructContentLike(String contentLike) {
+        if (VerifyUtil.isStringEmpty(contentLike)) {
+            contentLike = "%";
+        }
+        else {
+            contentLike = contentLike.trim();
+            StringBuilder fuzzyContent = new StringBuilder();
+            for (int i=0, count=contentLike.length(); i < count; i ++) {
+                fuzzyContent.append(contentLike.charAt(i)).append("%");
+            }
+            contentLike = fuzzyContent.toString();
+        }
+        return contentLike;
+    }
+
     public long countSortSpeakBySpeakType(List<Long> speakIds, int speakTypeId) {
         if (VerifyUtil.isListEmpty(speakIds)) {
             return 0;
         }
         logger.info("sort speak(count={}) by speak type={}", speakIds.size(), speakTypeId);
-        long countSortedSpeakIds = speakRepository.countSortSpeakByType(speakIds, speakTypeId);
+        long countSortedSpeakIds = speakRepository.countSortSpeakByTypeAndStatus(speakIds, speakTypeId, CommonStatus.ENABLED);
         logger.info("sort speak count={}", countSortedSpeakIds);
         return countSortedSpeakIds;
     }
 
-    public Map<Long, Long> countByUserIds(String strUserIds){
-        logger.info("get nurse {} speak count", strUserIds);
-
-        if (VerifyUtil.isIds(strUserIds)) {
-            List<Long> userIds = VerifyUtil.parseLongIds(strUserIds);
-            return countByUserIds(userIds);
-        }
-        return new HashMap<>();
-    }
+//    public Map<Long, Long> countByUserIds(String strUserIds){
+//        logger.info("get nurse {} speak count", strUserIds);
+//
+//        if (VerifyUtil.isIds(strUserIds)) {
+//            List<Long> userIds = VerifyUtil.parseLongIds(strUserIds);
+//            return countByUserIds(userIds);
+//        }
+//        return new HashMap<>();
+//    }
 
     public Map<Long, Long> countByUserIds(List<Long> userIds){
         if (null==userIds || userIds.isEmpty()) {
             return new HashMap<>();
         }
         logger.info("get nurse {} speak count", userIds);
-        List<Object[]>  count  = speakRepository.countByUserIdIn(userIds);
+        List<Object[]>  count  = speakRepository.countByUserIdIn(userIds, CommonStatus.ENABLED);
         Map<Long, Long> id2num = new HashMap<>();
         for(int i=0; i<count.size(); i++) {
             Object[] tmp = count.get(i);
@@ -160,10 +155,10 @@ public class NurseSpeakService {
         }
         long count = 0;
         if (useUserId) {
-            count = speakRepository.countSpecialTypeSpeak(userId, speakTypeIds);
+            count = speakRepository.countSpecialTypeSpeak(userId, speakTypeIds, CommonStatus.ENABLED);
         }
         else {
-            count = speakRepository.countSpecialTypeSpeak(speakTypeIds);
+            count = speakRepository.countSpecialTypeSpeak(speakTypeIds, CommonStatus.ENABLED);
         }
         logger.info("speak count is={}", count);
         return count;
@@ -186,10 +181,10 @@ public class NurseSpeakService {
         PageRequest request = new PageRequest(pageIndex, number, Sort.Direction.DESC, "time");
         Page<NurseSpeakEntity> resultSet;
         if (useUserId) {
-            resultSet = speakRepository.findSpecialTypeSpeak(userId, speakTypeIds, request);
+            resultSet = speakRepository.findSpecialTypeSpeak(userId, speakTypeIds, CommonStatus.ENABLED, request);
         }
         else {
-            resultSet = speakRepository.findSpecialTypeSpeak(speakTypeIds, request);
+            resultSet = speakRepository.findSpecialTypeSpeak(speakTypeIds, CommonStatus.ENABLED, request);
         }
 
         // parse entities to bean
@@ -544,8 +539,11 @@ public class NurseSpeakService {
             logger.warn("can not delete the comment {} not making by yourself {}", speak, speakMakerId);
             return new ArrayList<>();
         }
+        for (NurseSpeakEntity speak : speaks) {
+            speak.setStatus(CommonStatus.DELETED);
+        }
+        speakRepository.save(speaks);
 
-        speakRepository.delete(speaks);
         speakCommentService.deleteBySpeakIds(speakIds);
         thumbsUpService.deleteBySpeakIds(speakIds);
         speakImageService.deleteBySpeakIds(speakIds);
@@ -568,8 +566,6 @@ public class NurseSpeakService {
 
     public NurseSpeakCommentBean addSpeakComment(long speakId, long commentMakerId, long commentReceiverId, String comment) {
         NurseSpeakCommentBean commentBean = speakCommentService.addSpeakComment(speakId, commentMakerId, commentReceiverId, comment);
-        //TODO need to transfer the comment to the relative person
-        //... ...
         return commentBean;
     }
 
@@ -644,8 +640,6 @@ public class NurseSpeakService {
         //}
 
         NurseSpeakThumbsUpBean thumbsUpBean = thumbsUpService.setSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
-        //TODO need to transfer this thumbs_up to the relative person
-
         return thumbsUpBean;
     }
 

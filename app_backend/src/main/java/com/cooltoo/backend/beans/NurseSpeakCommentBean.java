@@ -17,6 +17,8 @@ public class NurseSpeakCommentBean {
     private String comment;
     private boolean isCurrentUserMade;
     private Date time;
+    private long speakMakerId;
+    private int nurseSpeakTypeId;
 
     public long getId() {
         return id;
@@ -104,6 +106,22 @@ public class NurseSpeakCommentBean {
 
     public void setIsCurrentUserMade(boolean isCurrentUserMade) {
         this.isCurrentUserMade = isCurrentUserMade;
+    }
+
+    public long getSpeakMakerId() {
+        return speakMakerId;
+    }
+
+    public void setSpeakMakerId(long speakMakerId) {
+        this.speakMakerId = speakMakerId;
+    }
+
+    public int getNurseSpeakTypeId() {
+        return nurseSpeakTypeId;
+    }
+
+    public void setNurseSpeakTypeId(int nurseSpeakTypeId) {
+        this.nurseSpeakTypeId = nurseSpeakTypeId;
     }
 
     public String toString() {

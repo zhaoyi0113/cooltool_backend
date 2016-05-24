@@ -128,9 +128,9 @@ public class HospitalService {
             return allHospitals;
         }
         for (HospitalBean hospital : allHospitals) {
-            condition1 = (!matchName)    || (matchName    && hospital.getName().contains(name));
-            condition1 = (condition1     || (!matchName) || (matchName    && hospital.getAliasName().contains(name)));
-            condition2 = (!matchAddress) || (matchAddress && hospital.getAddress().contains(address));
+            condition1 = (!matchName)    || (matchName && !VerifyUtil.isStringEmpty(hospital.getName()) && hospital.getName().contains(name));
+            condition1 = (condition1     || (!matchName) || (matchName && !VerifyUtil.isStringEmpty( hospital.getAliasName()) && hospital.getAliasName().contains(name)));
+            condition2 = (!matchAddress) || (matchAddress && !VerifyUtil.isStringEmpty( hospital.getAddress()) && hospital.getAddress().contains(address));
             if (matchRegion) {
                 if (!matchProvince) { province = hospital.getProvince(); }
                 if (!matchCity    ) { city     = hospital.getCity();     }

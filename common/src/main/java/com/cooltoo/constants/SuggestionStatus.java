@@ -9,6 +9,7 @@ import java.util.List;
 public enum SuggestionStatus {
       UNREAD //未读
     , READ   //已读
+    , DELETED //已删除
     ;
 
     public static SuggestionStatus parseString(String type) {
@@ -18,6 +19,9 @@ public enum SuggestionStatus {
         else if (READ.name().equalsIgnoreCase(type)) {
             return READ;
         }
+        else if (DELETED.name().equalsIgnoreCase(type)) {
+            return DELETED;
+        }
         return null;
     }
 
@@ -25,6 +29,7 @@ public enum SuggestionStatus {
         List<String> status = new ArrayList<String>();
         status.add(UNREAD.name());
         status.add(READ.name());
+        status.add(DELETED.name());
         return status;
     }
 }

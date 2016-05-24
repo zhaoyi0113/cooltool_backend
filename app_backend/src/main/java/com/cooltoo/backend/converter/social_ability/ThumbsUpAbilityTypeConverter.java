@@ -13,18 +13,23 @@ import java.util.List;
 @Component
 public class ThumbsUpAbilityTypeConverter implements SocialAbilityTypeConverter {
 
+    public static final int BEEN_THUMBS_UP = 1;
+    public static final int THUMBS_UP_OTHERS = 2;
+
     public List<SpecificSocialAbility> getItems() {
         List<SpecificSocialAbility> items = new ArrayList<>();
         SpecificSocialAbility ability;
 
         ability = new SpecificSocialAbility();
-        ability.setAbilityId(1);
+        ability.setAbilityId(BEEN_THUMBS_UP);
         ability.setAbilityName("被赞");
+        ability.setFactor(1);
         ability.setAbilityType(SocialAbilityType.THUMBS_UP);
         items.add(ability);
         ability = new SpecificSocialAbility();
-        ability.setAbilityId(2);
+        ability.setAbilityId(THUMBS_UP_OTHERS);
         ability.setAbilityName("点赞");
+        ability.setFactor(1);
         ability.setAbilityType(SocialAbilityType.THUMBS_UP);
         items.add(ability);
 
@@ -36,7 +41,26 @@ public class ThumbsUpAbilityTypeConverter implements SocialAbilityTypeConverter 
     }
 
     public boolean existItem(int itemId) {
-        return (1==itemId || 2==itemId);
+        return (BEEN_THUMBS_UP ==itemId || THUMBS_UP_OTHERS ==itemId);
     }
 
+    @Override
+    public SpecificSocialAbility getItem(int itemId) {
+        SpecificSocialAbility ability = null;
+        if (1==itemId) {
+            ability = new SpecificSocialAbility();
+            ability.setAbilityId(BEEN_THUMBS_UP);
+            ability.setAbilityName("被赞");
+            ability.setFactor(1);
+            ability.setAbilityType(SocialAbilityType.THUMBS_UP);
+        }
+        else if (2==itemId) {
+            ability = new SpecificSocialAbility();
+            ability.setAbilityId(THUMBS_UP_OTHERS);
+            ability.setAbilityName("点赞");
+            ability.setFactor(1);
+            ability.setAbilityType(SocialAbilityType.THUMBS_UP);
+        }
+        return ability;
+    }
 }
