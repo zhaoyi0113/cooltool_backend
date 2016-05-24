@@ -197,8 +197,8 @@ public class NurseSocialAbilitiesService {
                 abilityBean.setSkillDescription(badge.getDescription());
                 Date fetchTime = integrationService.firstTimeFetchPoint(integrations, userType, userId, abilityBean.getSkillType(), skill.getId(), badge.getPoint());
                 abilityBean.setFetchTime(fetchTime);
-                nurseSkillAbilities.add(abilityBean);
             }
+            nurseSkillAbilities.add(abilityBean);
         }
         return nurseSkillAbilities;
     }
