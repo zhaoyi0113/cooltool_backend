@@ -1,10 +1,14 @@
 package com.cooltoo.backend.api;
 
+import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.beans.NurseMessageBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
+import com.cooltoo.backend.services.NurseFriendsService;
 import com.cooltoo.backend.services.NurseMessageService;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.SuggestionStatus;
 import com.cooltoo.constants.UserType;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +26,23 @@ public class NurseMessageAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseMessageAPI.class.getName());
 
-    @Autowired
-    private NurseMessageService nurseMessageService;
+    @Autowired private NurseMessageService nurseMessageService;
+    @Autowired private NurseFriendsService nurseFriendsService;
+
+    @Path("/unread")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response countMessage(@Context HttpServletRequest request) {
+        long userId = (long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("user={} get message unread", userId);
+        long messageUnreadCount = nurseMessageService.countMessageByStatus(UserType.NURSE, userId, SuggestionStatus.UNREAD.name());
+        List<NurseFriendsBean> waitForAgree = nurseFriendsService.getFriendshipWaitingAgreed(userId);
+        long messageFriendWaitForAgreeCount = VerifyUtil.isListEmpty(waitForAgree) ? 0 : waitForAgree.size();
+        logger.info("count={} message unread", messageUnreadCount);
+        logger.info("count={} friendship wait for agree", messageFriendWaitForAgreeCount);
+        return Response.ok(messageUnreadCount + messageFriendWaitForAgreeCount).build();
+    }
 
     @Path("/count/{status}")
     @GET

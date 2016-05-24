@@ -1,12 +1,15 @@
 package com.cooltoo.backend.api;
 
+import com.cooltoo.backend.beans.SkillBean;
 import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseHospitalRelationService;
 import com.cooltoo.backend.services.NurseSkillService;
 import com.cooltoo.backend.services.NurseSocialAbilitiesService;
+import com.cooltoo.backend.services.SkillService;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.constants.SocialAbilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +33,8 @@ public class NurseSocialAbilityAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseSocialAbilityAPI.class.getName());
 
-    @Autowired private NurseSkillService skillService;
+    @Autowired private SkillService skillService;
+    @Autowired private NurseSkillService nurseSkillService;
     @Autowired private NurseSocialAbilitiesService  abilitiesService;
     @Autowired private NurseHospitalRelationService hospitalRelationService;
 
@@ -52,8 +57,13 @@ public class NurseSocialAbilityAPI {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("get user {} 's just skill ability", userId);
         List<SocialAbilitiesBean> abilities = abilitiesService.getUserSkillAbility(userId);
+        List<SkillBean>           allSkills = skillService.getSkillByStatus(OccupationSkillStatus.ENABLE.name());
+        Map<String, List> nurseSkillAndAllSkill = new HashMap<>();
+        nurseSkillAndAllSkill.put("user_skill", abilities);
+        nurseSkillAndAllSkill.put("all_skill", allSkills);
         logger.info("user {} 's just skill ability count ={}", abilities.size());
-        return Response.ok(abilities).build();
+        logger.info("all skill count ={}", allSkills.size());
+        return Response.ok(nurseSkillAndAllSkill).build();
     }
 
     @GET
@@ -152,7 +162,7 @@ public class NurseSocialAbilityAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} add skill {}.", userId, skillId);
-        skillService.addSkill(userId, skillId);
+        nurseSkillService.addSkill(userId, skillId);
         return Response.ok(skillId).build();
     }
 
@@ -165,7 +175,7 @@ public class NurseSocialAbilityAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} add skills {} with batch adding.", userId, skillIds);
-        skillService.addSkills(userId, skillIds);
+        nurseSkillService.addSkills(userId, skillIds);
         return Response.ok(skillIds).build();
     }
 
