@@ -175,7 +175,7 @@ public class ActivityManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateActivityStatus(@Context HttpServletRequest request,
                                          @FormParam("activity_id") long activityId,
-                                         @FormParam("grade") int grade
+                                         @FormParam("grade") @DefaultValue("0") int grade
 
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
