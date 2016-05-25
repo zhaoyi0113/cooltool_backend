@@ -24,6 +24,7 @@ public class ActivityEntity {
     private Date createTime;
     private ActivityStatus status;
     private String enrollUrl;
+    private int grade;
 
     @Id
     @GeneratedValue
@@ -136,11 +137,21 @@ public class ActivityEntity {
         this.enrollUrl = enrollUrl;
     }
 
+    @Column(name = "grade")
+    public int getGrade() {
+        return grade;
+    }
+
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", grade=").append(grade);
         msg.append(", title=").append(title);
         msg.append(", subtitle=").append(subtitle);
         msg.append(", time=").append(time);

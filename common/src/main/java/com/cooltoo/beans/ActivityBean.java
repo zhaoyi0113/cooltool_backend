@@ -22,6 +22,7 @@ public class ActivityBean {
     private long frontCover;
     private String frontCoverUrl;
     private String enrollUrl;
+    private int grade;
 
     public long getId() {
         return id;
@@ -127,11 +128,20 @@ public class ActivityBean {
         this.enrollUrl = enrollUrl;
     }
 
+    public int getGrade() {
+        return grade;
+    }
+
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", grade=").append(grade);
         msg.append(", title=").append(title);
         msg.append(", subtitle=").append(subtitle);
         msg.append(", time=").append(time);

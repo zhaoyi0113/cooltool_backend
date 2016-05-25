@@ -163,8 +163,24 @@ public class ActivityManageAPI {
 
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        logger.info("user {} update activity front cover", userId);
-        ActivityBean bean = activityService.updateActivityStatus(activityId, status);
+        logger.info("user {} update activity status", userId);
+        ActivityBean bean = activityService.updateActivityStatus(activityId, status, -1);
+        logger.info("activity is {}", bean);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/edit/grade")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response updateActivityStatus(@Context HttpServletRequest request,
+                                         @FormParam("activity_id") long activityId,
+                                         @FormParam("grade") int grade
+
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+        logger.info("user {} update activity grade", userId);
+        ActivityBean bean = activityService.updateActivityStatus(activityId, null, grade);
         logger.info("activity is {}", bean);
         return Response.ok(bean).build();
     }

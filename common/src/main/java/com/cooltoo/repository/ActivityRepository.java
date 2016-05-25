@@ -18,5 +18,4 @@ public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> 
     List<ActivityEntity> findByStatus(ActivityStatus status, Sort sort);
     Page<ActivityEntity> findByStatus(ActivityStatus status, Pageable page);
     long countByStatus(ActivityStatus status);
-    void deleteByIdIn(List<Long> ids);
 }

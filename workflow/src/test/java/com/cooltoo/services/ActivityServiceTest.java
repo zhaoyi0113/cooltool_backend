@@ -173,29 +173,50 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         Throwable thr = null;
 
         // test editing activity update
-        try { service.updateActivityStatus(activityId, statusDis); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusDis, -1); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
-        try { service.updateActivityStatus(activityId, statusEdt); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusEdt, -1); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
-        try { service.updateActivityStatus(activityId, statusEnb); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusEnb, -1); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
 
         // test set activity to editing status
         activityId = 1;
-        try { service.updateActivityStatus(activityId, statusEdt); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusEdt, -1); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
 
         // test activity is not exist
         activityId = 1000;
-        try { service.updateActivityStatus(activityId, statusEdt); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusEdt, -1); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
 
         // test normal status setting
         activityId = 1;
-        ActivityBean bean = service.updateActivityStatus(activityId, statusDis);
+        ActivityBean bean = service.updateActivityStatus(activityId, statusDis, -1);
         Assert.assertEquals(ActivityStatus.DISABLE, bean.getStatus());
-        bean = service.updateActivityStatus(activityId, statusEnb);
+        bean = service.updateActivityStatus(activityId, statusEnb, -1);
         Assert.assertEquals(ActivityStatus.ENABLE, bean.getStatus());
+    }
+
+    @Test
+    public void testUpdateActivityGrade() {
+        long activityId;
+
+        List<ActivityBean> activities = service.getActivityByStatus(ActivityStatus.ENABLE.name());
+        Assert.assertEquals(5, activities.get(0).getId());
+        Assert.assertEquals(4, activities.get(1).getId());
+
+        activityId = 4;
+        service.updateActivityStatus(activityId, null, 1);
+        activities = service.getActivityByStatus(ActivityStatus.ENABLE.name());
+        Assert.assertEquals(4, activities.get(0).getId());
+        Assert.assertEquals(5, activities.get(1).getId());
+
+        activityId = 3;
+        service.updateActivityStatus(activityId, null, 2);
+        activities = service.getActivityByStatus(ActivityStatus.ENABLE.name());
+        Assert.assertEquals(3, activities.get(0).getId());
+        Assert.assertEquals(4, activities.get(1).getId());
     }
 
     @Test

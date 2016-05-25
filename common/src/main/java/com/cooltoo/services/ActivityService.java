@@ -15,7 +15,6 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,14 +34,15 @@ public class ActivityService {
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityService.class.getName());
 
+    private static final Sort sort = new Sort(
+            new Sort.Order(Sort.Direction.DESC, "grade"),
+            new Sort.Order(Sort.Direction.DESC, "createTime")
+            );
+
     @Autowired private ActivityRepository repository;
     @Autowired private ActivityBeanConverter beanConverter;
-    @Autowired
-    @Qualifier("TemporaryFileStorageService")
-    private TemporaryFileStorageService tempStorage;
-    @Autowired
-    @Qualifier("OfficialFileStorageService")
-    private OfficialFileStorageService officialStorage;
+    @Autowired private TemporaryFileStorageService tempStorage;
+    @Autowired private OfficialFileStorageService officialStorage;
 
     //===========================================================
     //                    get
@@ -83,7 +83,6 @@ public class ActivityService {
         logger.info("get activity by status {}", strStatus);
 
         // get nuser by authority
-        Sort                 sort      = new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"));
         List<ActivityEntity> resultSet = (List<ActivityEntity>) getActivityByStatus(strStatus, sort);
 
         // parse to bean
@@ -97,7 +96,7 @@ public class ActivityService {
         logger.info("get activity by status {} at page {} with number {}", strStatus, pageIndex, number);
 
         // get nuser by authority
-        PageRequest          page          = new PageRequest(pageIndex, number, Sort.Direction.DESC, "createTime");
+        PageRequest          page          = new PageRequest(pageIndex, number, sort);
         Page<ActivityEntity> resultSetPage = (Page<ActivityEntity>) getActivityByStatus(strStatus, page);
         // parse to bean
         List<ActivityBean> beans = entities2Beans(resultSetPage);
@@ -400,7 +399,7 @@ public class ActivityService {
     }
 
     @Transactional
-    public ActivityBean updateActivityStatus(long activityId, String strStatus) {
+    public ActivityBean updateActivityStatus(long activityId, String strStatus, int grade) {
         logger.info("update activity {} status to {}", activityId, strStatus);
 
         ActivityEntity entity = repository.findOne(activityId);
@@ -409,28 +408,33 @@ public class ActivityService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
+        boolean changed = false;
         ActivityStatus status = ActivityStatus.parseString(strStatus);
-        if (null==status) {
-            logger.error("the status is invalid");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        if (null!=status) {
+            if (ActivityStatus.EDITING.equals(entity.getStatus())) {
+                logger.error("the activity is editing");
+                throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+            }
+            if (ActivityStatus.EDITING.equals(status)) {
+                logger.error("can not set activity to editing");
+                throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+            }
+            entity.setStatus(status);
+            changed = true;
         }
-        if (ActivityStatus.EDITING.equals(entity.getStatus())) {
-            logger.error("the activity is editing");
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
-        }
-        if (ActivityStatus.EDITING.equals(status)) {
-            logger.error("can not set activity to editing");
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+        if (grade>=0) {
+            entity.setGrade(grade);
+            changed = true;
         }
 
-        entity.setStatus(status);
-        entity = repository.save(entity);
+        if (changed) {
+            entity = repository.save(entity);
+        }
 
         ActivityBean bean = entity2BeanAndFillOtherProperties(entity);
         bean.setContent(null);
         return bean;
     }
-
 
     //===========================================================
     //         update for the image src attribute

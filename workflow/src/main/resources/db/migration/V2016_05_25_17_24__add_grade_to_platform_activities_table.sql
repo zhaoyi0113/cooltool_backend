@@ -1,0 +1,1 @@
+ALTER TABLE `platform_activities` ADD COLUMN `grade` INT(11) NULL DEFAULT 0;
