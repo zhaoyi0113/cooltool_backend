@@ -74,17 +74,6 @@ public class HospitalAPI {
         return Response.ok(bean).build();
     }
 
-    @Path("/search/count_test")
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response countByConditionsTest(@Context HttpServletRequest request,
-                                          @QueryParam("conditions") String conditions) {
-        logger.info("output information: {}", conditions);
-        return Response.ok().build();
-    }
-
     @Path("/search/count")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -94,8 +83,9 @@ public class HospitalAPI {
                                         @DefaultValue("-1")   @FormParam("province") int     province,
                                         @DefaultValue("-1")   @FormParam("city")     int     city,
                                         @DefaultValue("-1")   @FormParam("district") int     district,
-                                        @DefaultValue("")     @FormParam("address")  String  address) {
-        List<HospitalBean> hospitals = service.searchHospital(true, andOrOr, name, province, city, district, address, -1, -1);
+                                        @DefaultValue("")     @FormParam("address")  String  address,
+                                        @DefaultValue("-1")  @FormParam("status") int status) {
+        List<HospitalBean> hospitals = service.searchHospital(true, andOrOr, name, province, city, district, address, status, -1, -1);
         logger.info("get hospital size is {}", hospitals.size());
         if (null == hospitals) {
             Response.ok(0).build();
@@ -113,9 +103,10 @@ public class HospitalAPI {
                                    @DefaultValue("-1")   @FormParam("city")     int     city,
                                    @DefaultValue("-1")   @FormParam("district") int     district,
                                    @DefaultValue("")     @FormParam("address")  String  address,
+                                   @DefaultValue("-1")  @FormParam("status") int status,
                                    @DefaultValue("0")    @FormParam("index")    int     index,
                                    @DefaultValue("10")   @FormParam("number")   int     number) {
-        List<HospitalBean> hospitals = service.searchHospital(false, andOrOr, name, province, city, district, address, index, number);
+        List<HospitalBean> hospitals = service.searchHospital(false, andOrOr, name, province, city, district, address, status, index, number);
         logger.info("get hospital size is {}", hospitals.size());
         if (null == hospitals) {
             Response.ok().build();

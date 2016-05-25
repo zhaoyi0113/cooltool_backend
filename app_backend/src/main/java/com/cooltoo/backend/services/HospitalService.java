@@ -8,6 +8,7 @@ import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.HospitalDepartmentRelationBean;
 import com.cooltoo.beans.RegionBean;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.RegionService;
@@ -109,8 +110,9 @@ public class HospitalService {
         return hospitalsInProvince;
     }
 
-    public List<HospitalBean> searchHospital(boolean isCount, boolean andOrOr, String name,
+    public List<HospitalBean> searchHospital(boolean isCount, boolean isAnd, String name,
                                              int province, int city, int district, String address,
+                                             int status,
                                              int index, int number) {
         List<HospitalBean> allHospitals     = getAll();
         List<HospitalBean> allHospitalMatch = new ArrayList<HospitalBean>();
@@ -121,9 +123,11 @@ public class HospitalService {
         boolean matchCity     = (city    >0);
         boolean matchDistrict = (district>0);
         boolean matchRegion   = (matchProvince || matchCity || matchDistrict);
+        boolean matchStatus   = (1==status || 0==status);
         boolean condition1    = true;
         boolean condition2    = true;
         boolean condition3    = true;
+        boolean condition4    = true;
         if (null==allHospitals || allHospitals.isEmpty()) {
             return allHospitals;
         }
@@ -131,6 +135,7 @@ public class HospitalService {
             condition1 = (!matchName)    || (matchName && !VerifyUtil.isStringEmpty(hospital.getName()) && hospital.getName().contains(name));
             condition1 = (condition1     || (!matchName) || (matchName && !VerifyUtil.isStringEmpty( hospital.getAliasName()) && hospital.getAliasName().contains(name)));
             condition2 = (!matchAddress) || (matchAddress && !VerifyUtil.isStringEmpty( hospital.getAddress()) && hospital.getAddress().contains(address));
+            condition4 = (!matchStatus)  || (matchStatus && hospital.getEnable()==status);
             if (matchRegion) {
                 if (!matchProvince) { province = hospital.getProvince(); }
                 if (!matchCity    ) { city     = hospital.getCity();     }
@@ -144,8 +149,8 @@ public class HospitalService {
                 condition3 = true;
             }
 
-            if (( andOrOr && (condition1 && condition2 && condition3))
-             || (!andOrOr && (condition1 || condition2 || condition3))) {
+            if (( isAnd && (condition1 && condition2 && condition3 && condition4))
+             || (!isAnd && (condition1 || condition2 || condition3 || condition4))) {
                 allHospitalMatch.add(hospital);
             }
         }

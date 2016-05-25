@@ -24,6 +24,18 @@ public class NurseManageAPI {
 
     @Autowired private NurseService nurseService;
 
+    @Path("/{id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getNurseById(@Context HttpServletRequest request,
+                                 @PathParam("id") @DefaultValue("0") long nurseId) {
+        logger.info("get nurse information by nurse id={}", nurseId);
+        NurseBean nurse = nurseService.getNurse(nurseId);
+        logger.info("nurse is {}", nurse);
+        return Response.ok(nurse).build();
+    }
+
     @Path("/authority_type")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
