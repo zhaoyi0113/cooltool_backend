@@ -138,6 +138,7 @@ public class NurseSocialAbilitiesService {
                 1, point,
                 department.getImageId(), department.getImageUrl(),
                 department.getDisableImageId(), department.getDisableImageUrl());
+        abilityBean.setFetchTime(nurseHospDepart.getTime());
         if (VerifyUtil.isStringEmpty(abilityBean.getImageUrl())) {
             if (null != parentDepart && !VerifyUtil.isStringEmpty(parentDepart.getImageUrl())) {
                 abilityBean.setImageUrl(parentDepart.getImageUrl());
