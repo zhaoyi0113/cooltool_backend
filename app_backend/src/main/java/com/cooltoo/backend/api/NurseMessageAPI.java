@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 16/5/18.
@@ -41,7 +43,9 @@ public class NurseMessageAPI {
         long messageFriendWaitForAgreeCount = VerifyUtil.isListEmpty(waitForAgree) ? 0 : waitForAgree.size();
         logger.info("count={} message unread", messageUnreadCount);
         logger.info("count={} friendship wait for agree", messageFriendWaitForAgreeCount);
-        return Response.ok(messageUnreadCount + messageFriendWaitForAgreeCount).build();
+        Map<String, Long> totalUnreadSize = new HashMap<>();
+        totalUnreadSize.put("size", messageUnreadCount + messageFriendWaitForAgreeCount);
+        return Response.ok(totalUnreadSize).build();
     }
 
     @Path("/count/{status}")
