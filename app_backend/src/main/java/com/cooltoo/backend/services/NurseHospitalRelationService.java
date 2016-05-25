@@ -200,7 +200,7 @@ public class NurseHospitalRelationService {
             departmentService.getOneById(bean.getDepartmentId());
             if (relation.getDepartmentId()!=bean.getDepartmentId()) {
                 relation.setDepartmentId(bean.getDepartmentId());
-                bean.setTime(new Date());
+                relation.setTime(new Date());
             }
         }
 
