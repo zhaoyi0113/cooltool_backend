@@ -230,4 +230,19 @@ public class VerifyUtil {
 
         return types;
     }
+
+    public static String reconstructSQLContentLike(String contentLike) {
+        if (VerifyUtil.isStringEmpty(contentLike)) {
+            contentLike = "%";
+        }
+        else {
+            contentLike = contentLike.trim();
+            StringBuilder fuzzyContent = new StringBuilder("%");
+            for (int i=0, count=contentLike.length(); i < count; i ++) {
+                fuzzyContent.append(contentLike.charAt(i)).append("%");
+            }
+            contentLike = fuzzyContent.toString();
+        }
+        return contentLike;
+    }
 }

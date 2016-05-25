@@ -2,10 +2,12 @@ package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.*;
 import com.cooltoo.backend.converter.NurseSpeakConverter;
+import com.cooltoo.backend.converter.social_ability.SpeakAbilityTypeConverter;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
 import com.cooltoo.beans.OfficialConfigBean;
+import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
@@ -44,22 +46,26 @@ public class NurseSpeakService {
     @Autowired private SpeakTypeService speakTypeService;
     @Autowired private ImagesInSpeakService speakImageService;
     @Autowired private OfficialConfigService officialConfigService;
-    @Qualifier("OfficialFileStorageService")
-    private OfficialFileStorageService officialStorage;
+    @Autowired private SpeakAbilityTypeConverter speakAbilityTypeConverter;
 
     //===============================================================
-    //             get
+    //             get ----  admin using
     //===============================================================
-    public long countByContentAndTime(long userId, String content, String strStartTime, String strEndTime) {
+    public long countByContentAndTime(String speakType, long userId, String content, String strStartTime, String strEndTime) {
         logger.info("count user={} speak by content={} startTime={} endTime={}", userId>0?userId:"ALL", content, strStartTime, strEndTime);
-        content = reconstructContentLike(content);
+        content = VerifyUtil.reconstructSQLContentLike(content);
         long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         Date start     = startTime<0 ? new Date(0) : new Date(startTime);
         Date end       = endTime  <0 ? new Date()  : new Date(endTime);
+
+        SpeakType speaktype = SpeakType.parseString(speakType);
+        SpecificSocialAbility speakTypeAbility = speakAbilityTypeConverter.getItem(speaktype);
+        int speakTypeId = null==speakTypeAbility ? 0 : speakTypeAbility.getAbilityId();
+
         long count = 0;
-        if (userId<=0) {
-            count = speakRepository.countByContentAndTime(content, start, end);
+        if (userId==0 || userId<-1) {
+            count = speakRepository.countBySpeakTypeAndContentAndTime(speakTypeId, content, start, end);
         }
         else {
             count = speakRepository.countByUserIdContentAndTime(userId, content, start, end);
@@ -68,18 +74,22 @@ public class NurseSpeakService {
         return count;
     }
 
-    public List<NurseSpeakBean> getSpeakByContentLikeAndTime(long userId, String contentLike, String strStartTime, String strEndTime, int pageIndex, int sizePerPage) {
-        logger.info("get user={} speak by content={} startTime={} endTime={}", userId>0?userId:"ALL", contentLike, strStartTime, strEndTime);
-        contentLike = reconstructContentLike(contentLike);
+    public List<NurseSpeakBean> getSpeakByContentLikeAndTime(String speakType, long userId, String contentLike, String strStartTime, String strEndTime, int pageIndex, int sizePerPage) {
+        logger.info("get user={} speak by speakType={} content={} startTime={} endTime={}", userId>0?userId:"ALL", contentLike, strStartTime, strEndTime);
+        contentLike = VerifyUtil.reconstructSQLContentLike(contentLike);
         long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         Date start     = startTime<0 ? new Date(0) : new Date(startTime);
         Date end       = endTime  <0 ? new Date()  : new Date(endTime);
 
+        SpeakType speaktype = SpeakType.parseString(speakType);
+        SpecificSocialAbility speakTypeAbility = speakAbilityTypeConverter.getItem(speaktype);
+        int speakTypeId = null==speakTypeAbility ? 0 : speakTypeAbility.getAbilityId();
+
         PageRequest page = new PageRequest(pageIndex, sizePerPage, Sort.Direction.DESC, "time");
         Page<NurseSpeakEntity> speaks = null;
-        if (userId<=0) {
-            speaks = speakRepository.findByContentAndTime(contentLike, start, end, page);
+        if (userId==0 || userId<-1) {
+            speaks = speakRepository.findBySpeakTypeAndContentAndTime(speakTypeId, contentLike, start, end, page);
         }
         else {
             speaks = speakRepository.findByUserIdContentAndTime(userId, contentLike, start, end, page);
@@ -90,21 +100,9 @@ public class NurseSpeakService {
         return speakBeans;
     }
 
-    private String reconstructContentLike(String contentLike) {
-        if (VerifyUtil.isStringEmpty(contentLike)) {
-            contentLike = "%";
-        }
-        else {
-            contentLike = contentLike.trim();
-            StringBuilder fuzzyContent = new StringBuilder();
-            for (int i=0, count=contentLike.length(); i < count; i ++) {
-                fuzzyContent.append(contentLike.charAt(i)).append("%");
-            }
-            contentLike = fuzzyContent.toString();
-        }
-        return contentLike;
-    }
-
+    //===============================================================
+    //             get ----  nurse using
+    //===============================================================
     public long countSortSpeakBySpeakType(List<Long> speakIds, int speakTypeId) {
         if (VerifyUtil.isListEmpty(speakIds)) {
             return 0;

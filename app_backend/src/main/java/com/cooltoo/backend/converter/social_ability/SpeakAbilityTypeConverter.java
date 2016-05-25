@@ -46,6 +46,9 @@ public class SpeakAbilityTypeConverter implements SocialAbilityTypeConverter {
     }
 
     public SpecificSocialAbility getItem(SpeakType speakType) {
+        if (null==speakType) {
+            return null;
+        }
         SpeakTypeEntity speakTypeE = speakTypeRepository.findOneBySpeakType(speakType);
         return convert(speakTypeE);
     }

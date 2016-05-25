@@ -5,6 +5,7 @@ import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +36,41 @@ public class NurseManageAPI {
         NurseBean nurse = nurseService.getNurse(nurseId);
         logger.info("nurse is {}", nurse);
         return Response.ok(nurse).build();
+    }
+
+    @Path("/search_name/count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getNurseById(@Context HttpServletRequest request,
+                                 @QueryParam("name") @DefaultValue("") String nurseName
+    ) {
+        logger.info("get nurse size by nurse name like={} ", nurseName);
+        long count = nurseService.countNurseIdsByName(nurseName);
+        logger.info("nurse size is {}", count);
+        return Response.ok(count).build();
+    }
+
+    @Path("/search_name")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getNurseById(@Context HttpServletRequest request,
+                                 @QueryParam("name") @DefaultValue("") String nurseName,
+                                 @QueryParam("index") @DefaultValue("0") int index,
+                                 @QueryParam("number") @DefaultValue("10") int number
+    ) {
+        logger.info("get nurse information by nurse name like={} ", nurseName);
+        List<Long> nurseIds = nurseService.getNurseIdsByName(nurseName, index, number);
+        List<NurseBean> nurses;
+        if (!VerifyUtil.isListEmpty(nurseIds)) {
+            nurses = nurseService.getNurse(nurseIds);
+        }
+        else {
+            nurses = new ArrayList<>();
+        }
+        logger.info("nurse size is {}", nurses.size());
+        return Response.ok(nurses).build();
     }
 
     @Path("/authority_type")

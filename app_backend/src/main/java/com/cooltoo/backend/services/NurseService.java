@@ -184,20 +184,25 @@ public class NurseService {
         return nurses;
     }
 
+    public long countNurseIdsByName(String fuzzyQueryName) {
+        logger.info("count the fuzzily querying by name={}", fuzzyQueryName);
+        if (VerifyUtil.isStringEmpty(fuzzyQueryName)) {
+            logger.info("the name for fuzzily querying is empty");
+            return 0;
+        }
+        fuzzyQueryName = VerifyUtil.reconstructSQLContentLike(fuzzyQueryName);
+        long count = repository.countByFuzzyName(fuzzyQueryName);
+        logger.info("size is {}", count);
+        return count;
+    }
+
     public List<Long> getNurseIdsByName(String fuzzyQueryName, int pageIndex, int sizePerPage) {
         logger.info("execute the fuzzily querying by name={}", fuzzyQueryName);
         if (VerifyUtil.isStringEmpty(fuzzyQueryName)) {
             logger.info("the name for fuzzily querying is empty");
             return new ArrayList<>();
         }
-        StringBuilder fuzzyName = new StringBuilder();
-        for (int i=0, length=fuzzyQueryName.length(); i < length; i ++) {
-            fuzzyName.append(fuzzyQueryName.charAt(i));
-            if (i+1!=length) {
-                fuzzyName.append('%');
-            }
-        }
-        fuzzyQueryName = fuzzyName.toString();
+        fuzzyQueryName = VerifyUtil.reconstructSQLContentLike(fuzzyQueryName);
         PageRequest pageReq = new PageRequest(pageIndex, sizePerPage);
         List<Long> nurseIds = repository.findIdsByFuzzyName(fuzzyQueryName, pageReq);
         if (VerifyUtil.isListEmpty(nurseIds)) {
@@ -207,6 +212,7 @@ public class NurseService {
         logger.info("find result set size is {}", nurseIds.size());
         return nurseIds;
     }
+
 
     //==============================================================
     //             get used by administrator
