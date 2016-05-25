@@ -18,6 +18,8 @@ public class NurseSkillBeanConverter implements Converter<NurseSkillEntity, Nurs
         bean.setUserId(source.getUserId());
         bean.setSkillId(source.getSkillId());
         bean.setPoint(source.getPoint());
+        bean.setTime(source.getTime());
+        bean.setStatus(source.getStatus());
         return bean;
     }
 }

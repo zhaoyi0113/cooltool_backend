@@ -75,7 +75,7 @@ public class NurseSocialAbilitiesService {
 
         List<NurseIntegrationBean> allIntegration = integrationService.getIntegrationSorted(userId, UserType.NURSE, CommonStatus.ENABLED);
 
-        Map<Integer, SkillBean>   skillId2Bean   = skillService.getAllSkillId2BeanMap();
+        Map<Integer, SkillBean>   skillId2Bean   = skillService.getAllEnableSkillId2BeanMap();
         List<NurseSkillBean>      nurseSkills    = nurseSkillService.getAllSkills(userId);
 
         NurseHospitalRelationBean nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId);
@@ -189,6 +189,7 @@ public class NurseSocialAbilitiesService {
                     skill.getFactor(), point,
                     skill.getImageId(), skill.getImageUrl(),
                     skill.getDisableImageId(), skill.getDisableImageUrl());
+            abilityBean.setFetchTime(nurseSkill.getTime());
             BadgeBean badge = badgeService.getBadgeByPointAndAbilityIdAndType(abilityBean.getPoint(), abilityBean.getSkillId(), abilityBean.getSkillType().name());
             abilityBean.setBadge(badge);
             if (null!=badge) {

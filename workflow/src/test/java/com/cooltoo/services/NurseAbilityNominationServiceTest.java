@@ -6,6 +6,7 @@ import com.cooltoo.backend.repository.NurseAbilityNominationRepository;
 import com.cooltoo.backend.services.NurseAbilityNominationService;
 import com.cooltoo.constants.SocialAbilityType;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +18,18 @@ import java.util.List;
  * Created by yzzhao on 3/13/16.
  */
 @Transactional
+@DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
+})
 public class NurseAbilityNominationServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private NurseAbilityNominationService nominationService;
 
-    @Autowired
-    private NurseAbilityNominationRepository nominationRepository;
-
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testGetAllNominationCount() {
         List<NurseAbilityNominationBean> countMap = nominationService.getSpecialTypeNominated(1, SocialAbilityType.SKILL);
         System.out.println(countMap);
@@ -54,7 +57,6 @@ public class NurseAbilityNominationServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testGetSkillNominationCount() {
         List<NurseAbilityNominationBean> countMap = nominationService.getSpecialTypeNominated(1, SocialAbilityType.SKILL);
         Assert.assertEquals(5, countMap.size());
@@ -64,7 +66,6 @@ public class NurseAbilityNominationServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testAddSkillNominationCount() {
         String skillType = SocialAbilityType.SKILL.name();
         nominationService.nominateNurseSkill(1, 2, 6, skillType);
@@ -76,7 +77,6 @@ public class NurseAbilityNominationServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_skill_normination_service_data.xml")
     public void testGetAllSkillCount(){
         long count = nominationService.getUserAllAbilityNominatedCount(1);
         Assert.assertEquals(10, count);

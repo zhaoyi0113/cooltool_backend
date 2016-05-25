@@ -5,6 +5,7 @@ import com.cooltoo.backend.beans.SkillBean;
 import com.cooltoo.backend.converter.NurseSkillBeanConverter;
 import com.cooltoo.backend.entities.NurseSkillEntity;
 import com.cooltoo.backend.repository.NurseSkillRepository;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.VerifyUtil;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +70,8 @@ public class NurseSkillService {
         newSkill.setUserId(userId);
         newSkill.setSkillId(skillId);
         newSkill.setPoint(point);
+        newSkill.setStatus(CommonStatus.ENABLED);
+        newSkill.setTime(new Date());
         return newSkill;
     }
 
@@ -94,10 +98,13 @@ public class NurseSkillService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         // is Nurse exist
-        nurseService.getNurseWithoutOtherInfo(userId);
+        if (!nurseService.existNurse(userId)) {
+            logger.info("user not exist");
+            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+        }
 
         // judge the skills exist
-        Map<Integer, SkillBean> allSkills = skillService.getAllSkillId2BeanMap();
+        Map<Integer, SkillBean> allSkills = skillService.getAllEnableSkillId2BeanMap();
         List<Integer> ids = VerifyUtil.parseIntIds(skillIds);
         for (Integer iId : ids) {
             if (!allSkills.containsKey(iId)) {

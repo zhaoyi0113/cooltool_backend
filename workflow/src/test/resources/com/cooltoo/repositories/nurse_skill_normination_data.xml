@@ -8,12 +8,12 @@
     <occupation_skill id="5" name="skill5" image_id="1"/>
     <occupation_skill id="6" name="skill6" image_id="1"/>
 
-    <nurse_occupation_skill id="1" user_id="1" skill_id="1"/>
-    <nurse_occupation_skill id="2" user_id="1" skill_id="2"/>
-    <nurse_occupation_skill id="3" user_id="1" skill_id="3"/>
-    <nurse_occupation_skill id="4" user_id="1" skill_id="4"/>
-    <nurse_occupation_skill id="5" user_id="1" skill_id="5"/>
-    <nurse_occupation_skill id="6" user_id="1" skill_id="6"/>
+    <nurse_skill id="1" user_id="1" skill_id="1"/>
+    <nurse_skill id="2" user_id="1" skill_id="2"/>
+    <nurse_skill id="3" user_id="1" skill_id="3"/>
+    <nurse_skill id="4" user_id="1" skill_id="4"/>
+    <nurse_skill id="5" user_id="1" skill_id="5"/>
+    <nurse_skill id="6" user_id="1" skill_id="6"/>
 
     <nurse_skill_nomination id="1" user_id="1" skill_id="1" skill_type="1" nomiated_user_id="10" date_time="2016-03-01"/>
     <nurse_skill_nomination id="2" user_id="1" skill_id="1" skill_type="1" nomiated_user_id="11" date_time="2016-03-01"/>

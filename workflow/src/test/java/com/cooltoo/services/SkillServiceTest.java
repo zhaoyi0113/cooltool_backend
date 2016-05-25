@@ -64,7 +64,7 @@ public class SkillServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testEditOccupation() {
-        SkillBean skill = skillService.getOneSkillById(1000);
+        SkillBean skill = skillService.getOneSkillById(1);
         Assert.assertNotNull(skill);
         String      name    = String.valueOf(System.currentTimeMillis());
         File        file    = new File("build/" + System.currentTimeMillis());
@@ -97,7 +97,7 @@ public class SkillServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testEditOccupationWithoutImage() {
-        SkillBean skill = skillService.getOneSkillById(1000);
+        SkillBean skill = skillService.getOneSkillById(1);
         Assert.assertNotNull(skill);
         String name = String.valueOf(System.currentTimeMillis());
         skillService.editOccupationSkillWithoutImage(skill.getId(), name, 1, OccupationSkillStatus.ENABLE.name());
@@ -109,7 +109,7 @@ public class SkillServiceTest extends AbstractCooltooTest {
     @Test
     public void testDeleteOccupation() {
         int number = skillService.getAllSkill().size();
-        skillService.deleteOccupationSkill(1000);
+        skillService.deleteOccupationSkill(1);
         int newNumber = skillService.getAllSkill().size();
         Assert.assertEquals(number - 1, newNumber);
     }

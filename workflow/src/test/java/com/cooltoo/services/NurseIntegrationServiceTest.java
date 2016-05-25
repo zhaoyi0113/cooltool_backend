@@ -189,7 +189,7 @@ public class NurseIntegrationServiceTest extends AbstractCooltooTest {
         int integration = integrationService.getIntegration(allIntegrations_UserID_1, UserType.NURSE, userId, ability.getAbilityType(), ability.getAbilityId());
         Assert.assertEquals(320, integration);
 
-        ability = skillAbilityTypeConverter.getItem(1000);
+        ability = skillAbilityTypeConverter.getItem(1);
         integration = integrationService.getIntegration(allIntegrations_UserID_1, UserType.NURSE, userId, ability.getAbilityType(), ability.getAbilityId());
         Assert.assertEquals(30, integration);
 

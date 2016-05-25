@@ -18,7 +18,8 @@ import java.util.List;
  */
 @Transactional
 @DatabaseSetups({
-        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_hospital_relation_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/occupation_skill_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_occupation_skill_service_data.xml")
 })
 public class NurseSkillServiceTest extends AbstractCooltooTest {
@@ -39,7 +40,6 @@ public class NurseSkillServiceTest extends AbstractCooltooTest {
     public void testGetNurseSkill() {
         NurseSkillBean skill = nurseSkillService.getSkill(1, 4);
         Assert.assertNotNull(skill);
-        Assert.assertEquals(20, skill.getPoint());
         skill = nurseSkillService.getSkill(3, 2);
         Assert.assertNull(skill);
         skill = nurseSkillService.getSkill(1, 6);

@@ -1,18 +1,23 @@
 package com.cooltoo.backend.entities;
 
+import com.cooltoo.constants.CommonStatus;
+
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by yzzhao on 3/13/16.
  */
 @Entity
-@Table(name = "nurse_occupation_skill")
+@Table(name = "nurse_skill")
 public class NurseSkillEntity {
 
     private int id;
     private long userId;
     private int skillId;
     private int point;
+    private Date time;
+    private CommonStatus status;
 
     @Id
     @GeneratedValue
@@ -52,13 +57,33 @@ public class NurseSkillEntity {
         this.point = point;
     }
 
+    @Column(name = "time_created")
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    @Column(name = "status")
+    public CommonStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CommonStatus status) {
+        this.status = status;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id).append(", ");
-        msg.append("userId=").append(userId).append(", ");
-        msg.append("skillId=").append(skillId).append(", ");
-        msg.append("point=").append(point);
+        msg.append(", userId=").append(userId).append(", ");
+        msg.append(", skillId=").append(skillId).append(", ");
+        msg.append(", point=").append(point);
+        msg.append(", time=").append(time);
+        msg.append(", status=").append(status);
         msg.append("]");
         return msg.toString();
     }

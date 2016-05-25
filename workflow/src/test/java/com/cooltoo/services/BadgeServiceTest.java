@@ -62,9 +62,9 @@ public class BadgeServiceTest extends AbstractCooltooTest {
         }
 
         items = badgeService.getItemsOfType("SKILL");
-        Assert.assertEquals(1, items.size());
-        Assert.assertEquals(1000, items.get(0).getAbilityId());
-        Assert.assertEquals("occ1", items.get(0).getAbilityName());
+        Assert.assertEquals(6, items.size());
+        Assert.assertEquals(1, items.get(0).getAbilityId());
+        Assert.assertEquals("skill1", items.get(0).getAbilityName());
         Assert.assertEquals("SKILL", items.get(0).getAbilityType().name());
         items = badgeService.getItemsOfType("OCCUPATION");
         Assert.assertEquals(0, items.size());
@@ -168,14 +168,14 @@ public class BadgeServiceTest extends AbstractCooltooTest {
     @Test
     public void testAddBadge(){
         ByteArrayInputStream image = new ByteArrayInputStream("fdsafdsafds".getBytes());
-        BadgeBean badge = badgeService.addBadge("name222", "description 222", 12, 1, 1000, "SKILL", "aaaaa", image);
+        BadgeBean badge = badgeService.addBadge("name222", "description 222", 12, 1, 3, "SKILL", "aaaaa", image);
         Assert.assertNotNull(badge);
         Assert.assertTrue(badge.getId()>0);
         Assert.assertEquals("name222", badge.getName());
         Assert.assertEquals("description 222", badge.getDescription());
         Assert.assertEquals(12, badge.getPoint());
         Assert.assertEquals(1, badge.getGrade());
-        Assert.assertEquals(1000, badge.getAbilityId());
+        Assert.assertEquals(3, badge.getAbilityId());
         Assert.assertEquals(SocialAbilityType.SKILL, badge.getAbilityType());
         Assert.assertTrue(badge.getImageId() > 0);
         Assert.assertNotNull(badge.getImageUrl());
@@ -188,14 +188,14 @@ public class BadgeServiceTest extends AbstractCooltooTest {
     @Test
     public void testUpdateBadget(){
         ByteArrayInputStream image = new ByteArrayInputStream("fdsafdsafds".getBytes());
-        BadgeBean badge = badgeService.updateBadge(1, "name222", "description 222", 123, 2, 1000, "SKILL", "aaaaa", image);
+        BadgeBean badge = badgeService.updateBadge(1, "name222", "description 222", 123, 2, 1, "SKILL", "aaaaa", image);
         Assert.assertNotNull(badge);
         Assert.assertEquals(1, badge.getId());
         Assert.assertEquals("name222", badge.getName());
         Assert.assertEquals("description 222", badge.getDescription());
         Assert.assertEquals(123, badge.getPoint());
         Assert.assertEquals(2, badge.getGrade());
-        Assert.assertEquals(1000, badge.getAbilityId());
+        Assert.assertEquals(1, badge.getAbilityId());
         Assert.assertEquals(SocialAbilityType.SKILL, badge.getAbilityType());
         Assert.assertNotEquals(1, badge.getImageId());
         Assert.assertNotNull(badge.getImageUrl());
