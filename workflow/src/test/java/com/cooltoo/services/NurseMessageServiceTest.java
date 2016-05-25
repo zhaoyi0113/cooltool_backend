@@ -88,6 +88,48 @@ public class NurseMessageServiceTest extends AbstractCooltooTest {
         long userId = 1L;
         UserType userType = UserType.NURSE;
         String statuses = "deleted";
+        List<NurseMessageBean> messages = messageSvr.getMessages(userType, userId, statuses);
+        Assert.assertEquals(1, messages.size());
+
+        // thumbs up
+        // <nurse_message id="7" user_type="0" user_id="1" reason_id="7" ability_id="2" ability_type="3" status="2" time_created="2016-03-18 9:11:32" />
+        Assert.assertEquals(7L, messages.get(0).getId());
+        Assert.assertEquals(NumberUtil.getTime("2016-03-18 9:11:32", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS), messages.get(0).getTime().getTime());
+        Assert.assertEquals(SuggestionStatus.DELETED,  messages.get(0).getStatus());
+        Assert.assertEquals(SocialAbilityType.COMMUNITY, messages.get(0).getAbilityType());
+        Assert.assertEquals(1, messages.get(0).getAbilityId());
+        Assert.assertEquals(UserType.NURSE, messages.get(0).getUserType());
+        Assert.assertEquals(5L, messages.get(0).getUserId());
+        Assert.assertEquals(4L, messages.get(0).getReasonId());
+        Assert.assertEquals("hello 4 (*-*)!", messages.get(0).getContent());
+        Assert.assertEquals(MessageType.ThumbsUp, messages.get(0).getType());
+        Assert.assertNotNull(messages.get(0).getAbilityName());
+
+        statuses = "read,unread";
+        messages = messageSvr.getMessages(userType, userId, statuses);
+        Assert.assertEquals(14, messages.size());
+        Assert.assertEquals(9L, messages.get(12).getId());
+        Assert.assertEquals(8L, messages.get(13).getId());
+        // comment
+        // <nurse_message id="9"  user_type="0" user_id="1" reason_id="2" ability_id="1" ability_type="3" status="1" time_created="2016-02-02 00:00:00" />
+        Assert.assertEquals(9L, messages.get(12).getId());
+        Assert.assertEquals(NumberUtil.getTime("2016-02-02 00:00:00", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS), messages.get(12).getTime().getTime());
+        Assert.assertEquals(SuggestionStatus.READ,  messages.get(12).getStatus());
+        Assert.assertEquals(SocialAbilityType.COMMUNITY, messages.get(12).getAbilityType());
+        Assert.assertEquals(1, messages.get(12).getAbilityId());
+        Assert.assertEquals(UserType.NURSE, messages.get(12).getUserType());
+        Assert.assertEquals(1L, messages.get(12).getUserId());
+        Assert.assertEquals(1L, messages.get(12).getReasonId());
+        Assert.assertEquals("chou mei 2", messages.get(12).getContent());
+        Assert.assertEquals(MessageType.Comment, messages.get(12).getType());
+        Assert.assertNull(messages.get(12).getAbilityName());
+    }
+
+    @Test
+    public void testGetMessagePerPage() {
+        long userId = 1L;
+        UserType userType = UserType.NURSE;
+        String statuses = "deleted";
         List<NurseMessageBean> messages = messageSvr.getMessages(userType, userId, statuses, 0, 3);
         Assert.assertEquals(1, messages.size());
 

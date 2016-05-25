@@ -112,6 +112,17 @@ public class NurseMessageService {
         return beans;
     }
 
+    public List<NurseMessageBean> getMessages(UserType userType, long userId, String strStatuses) {
+        logger.info("get userType={} user={} message status={}", userType, userId, strStatuses);
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "time"));
+        List<SuggestionStatus> statuses = VerifyUtil.parseSuggestionStatuses(strStatuses);
+        List<NurseMessageEntity> entities = repository.findByUserTypeAndUserIdAndStatusIn(userType, userId, statuses, sort);
+        List<NurseMessageBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
+        logger.info("count size={}", beans.size());
+        return beans;
+    }
+
     private List<NurseMessageBean> entitiesToBeans(Iterable<NurseMessageEntity> entities) {
         List<NurseMessageBean> beans = new ArrayList<>();
         if(null!=entities) {

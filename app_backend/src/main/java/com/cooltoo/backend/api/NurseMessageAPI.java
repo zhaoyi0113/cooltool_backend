@@ -65,7 +65,7 @@ public class NurseMessageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getMessages(@Context HttpServletRequest request,
+    public Response getVisibleMessagesPerPage(@Context HttpServletRequest request,
                                 @PathParam("page") @DefaultValue("0") int page,
                                 @PathParam("number") @DefaultValue("10") int number
     ) {
@@ -75,6 +75,19 @@ public class NurseMessageAPI {
         List<NurseMessageBean> allMessage = nurseMessageService.getMessages(UserType.NURSE, userId, strStatuses, page, number);
         return Response.ok(allMessage).build();
     }
+
+    @Path("/all")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response getVisibleMessage(@Context HttpServletRequest request) {
+        String strStatuses = "UNREAD,READ";
+        long userId = (long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("userType={} user={} get message status={}",UserType.NURSE, userId);
+        List<NurseMessageBean> allMessage = nurseMessageService.getMessages(UserType.NURSE, userId, strStatuses);
+        return Response.ok(allMessage).build();
+    }
+
 
     @Path("/read/{id}")
     @POST

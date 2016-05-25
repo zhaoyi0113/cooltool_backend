@@ -17,6 +17,7 @@ import java.util.List;
  */
 public interface NurseMessageRepository extends JpaRepository<NurseMessageEntity, Long> {
     long countByUserTypeAndUserIdAndStatusIn(UserType userType, long userId, List<SuggestionStatus> statuses);
+    List<NurseMessageEntity> findByUserTypeAndUserIdAndStatusIn(UserType userType, long userId, List<SuggestionStatus> statuses, Sort sort);
     Page<NurseMessageEntity> findByUserTypeAndUserIdAndStatusIn(UserType userType, long userId, List<SuggestionStatus> statuses, Pageable page);
     NurseMessageEntity findByUserIdAndUserTypeAndAbilityTypeAndAbilityIdAndReasonId(long userId, UserType userType, SocialAbilityType type, int abilityId, long reasonId);
     List<NurseMessageEntity> findByUserIdAndAbilityTypeAndAbilityIdAndStatus(long userId, SocialAbilityType type, int abilityId, CommonStatus status);
