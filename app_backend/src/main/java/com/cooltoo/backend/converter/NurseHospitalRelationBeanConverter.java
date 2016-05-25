@@ -17,6 +17,8 @@ public class NurseHospitalRelationBeanConverter implements Converter<NurseHospit
         bean.setNurseId(source.getNurseId());
         bean.setHospitalId(source.getHospitalId());
         bean.setDepartmentId(source.getDepartmentId());
+        bean.setTime(source.getTime());
+        bean.setStatus(source.getStatus());
         return bean;
     }
 }

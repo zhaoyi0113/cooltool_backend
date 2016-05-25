@@ -17,6 +17,8 @@ public class NurseHospitalRelationEntityConverter implements Converter<NurseHosp
         entity.setNurseId(source.getNurseId());
         entity.setHospitalId(source.getHospitalId());
         entity.setDepartmentId(source.getDepartmentId());
+        entity.setTime(source.getTime());
+        entity.setStatus(source.getStatus());
         return entity;
     }
 }

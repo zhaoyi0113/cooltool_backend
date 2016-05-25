@@ -3,6 +3,7 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseMessageBean;
 import com.cooltoo.backend.services.NurseMessageService;
+import com.cooltoo.constants.MessageType;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.constants.SuggestionStatus;
 import com.cooltoo.constants.UserType;
@@ -32,9 +33,9 @@ import java.util.List;
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/images_in_speak_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_message_data.xml")
 })
-public class NurseNurseMessageServiceTest extends AbstractCooltooTest {
+public class NurseMessageServiceTest extends AbstractCooltooTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseNurseMessageServiceTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseMessageServiceTest.class.getName());
 
     @Autowired
     private NurseMessageService messageSvr;
@@ -95,12 +96,13 @@ public class NurseNurseMessageServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(7L, messages.get(0).getId());
         Assert.assertEquals(NumberUtil.getTime("2016-03-18 9:11:32", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS), messages.get(0).getTime().getTime());
         Assert.assertEquals(SuggestionStatus.DELETED,  messages.get(0).getStatus());
-        Assert.assertEquals(SocialAbilityType.THUMBS_UP, messages.get(0).getAbilityType());
-        Assert.assertEquals(2, messages.get(0).getAbilityId());
+        Assert.assertEquals(SocialAbilityType.COMMUNITY, messages.get(0).getAbilityType());
+        Assert.assertEquals(1, messages.get(0).getAbilityId());
         Assert.assertEquals(UserType.NURSE, messages.get(0).getUserType());
         Assert.assertEquals(5L, messages.get(0).getUserId());
         Assert.assertEquals(4L, messages.get(0).getReasonId());
         Assert.assertEquals("hello 4 (*-*)!", messages.get(0).getContent());
+        Assert.assertEquals(MessageType.ThumbsUp, messages.get(0).getType());
         Assert.assertNotNull(messages.get(0).getAbilityName());
 
         statuses = "read,unread";
@@ -113,12 +115,13 @@ public class NurseNurseMessageServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(9L, messages.get(0).getId());
         Assert.assertEquals(NumberUtil.getTime("2016-02-02 00:00:00", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS), messages.get(0).getTime().getTime());
         Assert.assertEquals(SuggestionStatus.READ,  messages.get(0).getStatus());
-        Assert.assertEquals(SocialAbilityType.COMMENT, messages.get(0).getAbilityType());
+        Assert.assertEquals(SocialAbilityType.COMMUNITY, messages.get(0).getAbilityType());
         Assert.assertEquals(1, messages.get(0).getAbilityId());
         Assert.assertEquals(UserType.NURSE, messages.get(0).getUserType());
         Assert.assertEquals(1L, messages.get(0).getUserId());
         Assert.assertEquals(1L, messages.get(0).getReasonId());
         Assert.assertEquals("chou mei 2", messages.get(0).getContent());
+        Assert.assertEquals(MessageType.Comment, messages.get(0).getType());
         Assert.assertNull(messages.get(0).getAbilityName());
     }
 }

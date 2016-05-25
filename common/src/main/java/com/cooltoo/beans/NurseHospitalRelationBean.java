@@ -1,5 +1,9 @@
 package com.cooltoo.beans;
 
+import com.cooltoo.constants.CommonStatus;
+
+import java.util.Date;
+
 /**
  * Created by lg380357 on 2016/3/5.
  */
@@ -12,6 +16,8 @@ public class NurseHospitalRelationBean {
     private HospitalBean hospital;
     private HospitalDepartmentBean parentDepart;
     private HospitalDepartmentBean department;
+    private Date time;
+    private CommonStatus status;
 
     public long getId() {
         return id;
@@ -69,13 +75,31 @@ public class NurseHospitalRelationBean {
         this.parentDepart = parentDepart;
     }
 
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public CommonStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CommonStatus status) {
+        this.status = status;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" ,");
-        msg.append("nurseId=").append(nurseId).append(" ,");
-        msg.append("hospitalId=").append(hospitalId).append(" ,");
-        msg.append("departmentId=").append(departmentId);
+        msg.append("id=").append(id);
+        msg.append(", nurseId=").append(nurseId);
+        msg.append(", hospitalId=").append(hospitalId);
+        msg.append(", departmentId=").append(departmentId);
+        msg.append(", time=").append(time);
+        msg.append(", status=").append(status);
         msg.append(" ]");
         return msg.toString();
     }

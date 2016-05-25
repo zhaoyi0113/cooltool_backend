@@ -67,6 +67,7 @@ public class NurseSkillEntity {
     }
 
     @Column(name = "status")
+    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }

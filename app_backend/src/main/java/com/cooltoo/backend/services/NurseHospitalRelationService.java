@@ -7,6 +7,7 @@ import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.VerifyUtil;
@@ -16,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lg380357 on 2016/3/5.
@@ -179,36 +177,36 @@ public class NurseHospitalRelationService {
         NurseHospitalRelationEntity relation     = null;
         List<NurseHospitalRelationEntity> relations = repository.findByNurseId(bean.getNurseId());
         if (!relations.isEmpty()) {
+            // exist relationship
             relation = relations.get(0);
         }
-
+        else {
+            // new relationship
+            relation = new NurseHospitalRelationEntity();
+            relation.setTime(new Date());
+        }
+        // nurse exist
         nurseService.getNurseWithoutOtherInfo(bean.getNurseId());
+        relation.setNurseId(bean.getNurseId());
+        // hospital exist
         if (bean.getHospitalId()>0) {
             hospitalService.getOneById(bean.getHospitalId());
+            if (relation.getHospitalId()!=bean.getHospitalId()) {
+                relation.setHospitalId(bean.getHospitalId());
+            }
         }
+        // department exist
         if (bean.getDepartmentId()>0) {
-            department = departmentService.getOneById(bean.getDepartmentId());
-            if (department.getParentValid()) {
-                parentDepart = departmentService.getOneById(bean.getDepartmentId());
+            departmentService.getOneById(bean.getDepartmentId());
+            if (relation.getDepartmentId()!=bean.getDepartmentId()) {
+                relation.setDepartmentId(bean.getDepartmentId());
+                bean.setTime(new Date());
             }
         }
 
-        if (null!=relation) {
-            if (relation.getDepartmentId()>0 && bean.getDepartmentId()<=0) {
-                bean.setDepartmentId(relation.getDepartmentId());
-            }
-            if (relation.getHospitalId()>0 && bean.getHospitalId()<=0) {
-                bean.setHospitalId(relation.getHospitalId());
-            }
-        }
-
-        if (!relations.isEmpty()) {
-            repository.delete(relations);
-        }
-
-        NurseHospitalRelationEntity entity = entityConverter.convert(bean);
-        entity = repository.save(entity);
-        return entity.getId();
+        relation.setStatus(CommonStatus.ENABLED);
+        relation = repository.save(relation);
+        return relation.getId();
     }
 
     @Transactional

@@ -186,7 +186,10 @@ public class NurseMessageService {
                 long userId = comment.getCommentMakerId();
                 long speakId = comment.getNurseSpeakId();
                 NurseBean user = userId2Bean.get(userId);
+                NurseSpeakEntity speak = speakId2Entity.get(speakId);
                 message.setReasonId(speakId); // 替换为 speak 表的 ID
+                message.setAbilityId(speak.getSpeakType());  // 替换为 speak type 的 ID
+                message.setAbilityType(SocialAbilityType.COMMUNITY);  // 替换为 speak 的 social ability type
                 message.setContent(comment.getComment()); // 评论内容
                 message.setUserId(userId);
                 message.setUserName(user.getName());
@@ -200,6 +203,8 @@ public class NurseMessageService {
                 NurseBean user = userId2Bean.get(userId);
                 NurseSpeakEntity speak = speakId2Entity.get(speakId);
                 message.setReasonId(speakId); // 替换为 speak 表的 ID
+                message.setAbilityId(speak.getSpeakType());  // 替换为 speak type 的 ID
+                message.setAbilityType(SocialAbilityType.COMMUNITY);  // 替换为 speak 的 social ability type
                 message.setContent(speak.getContent()); // 发言内容
                 message.setUserId(userId);
                 message.setUserName(user.getName());

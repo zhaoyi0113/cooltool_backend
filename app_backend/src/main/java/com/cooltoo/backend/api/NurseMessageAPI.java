@@ -29,7 +29,7 @@ public class NurseMessageAPI {
     @Autowired private NurseMessageService nurseMessageService;
     @Autowired private NurseFriendsService nurseFriendsService;
 
-    @Path("/unread")
+    @Path("/unread_friend_and_message_count")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
