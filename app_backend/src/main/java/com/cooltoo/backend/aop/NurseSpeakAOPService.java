@@ -166,10 +166,15 @@ public class NurseSpeakAOPService {
         else {
             ability = commentAbilityTypeConverter.getItem(CommentAbilityTypeConverter.COMMENT);
         }
+        long speakMakerId = retVal.getSpeakMakerId();
+        long commentMakerId = retVal.getCommentMakerId();
+        long commentReceiverId = retVal.getCommentReceiverId();
         // 给晒图/吐槽/提问的用户添加消息
-        messageService.addMessage(retVal.getSpeakMakerId(), UserType.NURSE, ability.getAbilityType(), ability.getAbilityId(), retVal.getId());
+        if (speakMakerId!=commentMakerId && speakMakerId>0) {
+            messageService.addMessage(speakMakerId, UserType.NURSE, ability.getAbilityType(), ability.getAbilityId(), retVal.getId());
+        }
         // 给评论者指定的用户添加消息
-        if (retVal.getSpeakMakerId()!=retVal.getCommentReceiverId() && retVal.getCommentReceiverId()>0) {
+        if (speakMakerId!=commentReceiverId && commentMakerId!=commentReceiverId && commentReceiverId>0) {
             messageService.addMessage(retVal.getCommentReceiverId(), UserType.NURSE, ability.getAbilityType(), ability.getAbilityId(), retVal.getId());
         }
     }
@@ -181,7 +186,11 @@ public class NurseSpeakAOPService {
         }
         SpecificSocialAbility ability = thumbsUpAbilityTypeConverter.getItem(ThumbsUpAbilityTypeConverter.BEEN_THUMBS_UP);
         // 给晒图/吐槽/提问的用户添加消息
-        messageService.addMessage(retVal.getUserIdBeenThumbsUp(), UserType.NURSE, ability.getAbilityType(), ability.getAbilityId(), retVal.getId());
+        long userIdBeenThumbsUp = retVal.getUserIdBeenThumbsUp();
+        long thumbsUpUserId = retVal.getThumbsUpUserId();
+        if (thumbsUpUserId!=userIdBeenThumbsUp && userIdBeenThumbsUp>0) {
+            messageService.addMessage(retVal.getUserIdBeenThumbsUp(), UserType.NURSE, ability.getAbilityType(), ability.getAbilityId(), retVal.getId());
+        }
     }
 
     //====================================================================
