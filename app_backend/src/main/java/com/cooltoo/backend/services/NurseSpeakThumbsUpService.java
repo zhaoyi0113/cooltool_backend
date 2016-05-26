@@ -195,7 +195,7 @@ public class NurseSpeakThumbsUpService {
         NurseSpeakThumbsUpBean bean = beanConverter.convert(thumbsUpEntity);
         bean.setUserIdBeenThumbsUp(null!=speak ? speak.getUserId() : 0);
         bean.setThumbsUpAddOrDelete(addOrDelete);
-        long count = thumbsUpRepository.countByNurseSpeakId(nurseSpeakId);
+        long count = thumbsUpRepository.countByStatusAndNurseSpeakId(CommonStatus.ENABLED, nurseSpeakId);
         bean.setSpeakThumbsUpCount(count);
         return bean;
     }

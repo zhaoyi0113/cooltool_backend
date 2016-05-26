@@ -26,7 +26,7 @@ public interface NurseSpeakThumbsUpRepository extends JpaRepository<NurseSpeakTh
     List<NurseSpeakThumbsUpEntity> findByStatusAndNurseSpeakIdIn(CommonStatus status, List<Long> nurseSpeakIds);
     List<NurseSpeakThumbsUpEntity> findByStatusAndNurseSpeakIdIn(CommonStatus status, List<Long> nurseSpeakIds, Sort sort);
     List<NurseSpeakThumbsUpEntity> findByStatusAndNurseSpeakIdAndThumbsUpUserId(CommonStatus status, long nurseSpeakId, long thumbsUpUserId);
-    long countByNurseSpeakId(long nurseSpeakId);
+    long countByStatusAndNurseSpeakId(CommonStatus status, long nurseSpeakId);
 
     @Query("SELECT thumbsUp.id FROM NurseSpeakThumbsUpEntity thumbsUp WHERE thumbsUp.nurseSpeakId=?1 AND thumbsUp.thumbsUpUserId=?2")
     List<Long> findThumbsUpIdBySpeakIdAndMakerId(long nurseSpeakId, long thumbsUpMakerId);
