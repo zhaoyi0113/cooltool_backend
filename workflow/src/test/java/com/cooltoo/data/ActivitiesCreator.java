@@ -40,7 +40,7 @@ public class ActivitiesCreator {
             String place = MockDataCreator.getRandomString(20);
             long price = MockDataCreator.getRandomInt(0, 1000);
             String enrollUrl = "http://" + MockDataCreator.getRandomString(30);
-            activityService.createActivity(title, subTitle, description, Calendar.getInstance().getTime().toString(), place, String.valueOf(price), enrollUrl);
+            activityService.createActivity(title, subTitle, description, Calendar.getInstance().getTime().toString(), place, String.valueOf(price), enrollUrl, 0);
         }
     }
 }

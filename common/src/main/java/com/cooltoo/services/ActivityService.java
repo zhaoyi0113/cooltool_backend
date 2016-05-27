@@ -266,10 +266,10 @@ public class ActivityService {
 
     @Transactional
     public ActivityBean createActivity(String title, String subtitle, String description,
-                                       String datetime, String place, String price, String enrollUrl
+                                       String datetime, String place, String price, String enrollUrl, int grade
     ) {
-        logger.info("create an activity by title={}, subtitle={} descr={}, time={}, place={}, price={}, enrollUrl={}",
-                    title, subtitle, description, datetime, place, price, enrollUrl);
+        logger.info("create an activity by title={}, subtitle={} descr={}, time={}, place={}, price={}, enrollUrl={}, grade={}",
+                    title, subtitle, description, datetime, place, price, enrollUrl, grade);
         if (VerifyUtil.isStringEmpty(title)) {
             logger.error("the title is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -308,6 +308,10 @@ public class ActivityService {
         if (!VerifyUtil.isStringEmpty(enrollUrl)) {
             entity.setEnrollUrl(enrollUrl);
         }
+        if (grade<0) {
+            grade = 0;
+        }
+        entity.setGrade(grade);
         entity.setStatus(ActivityStatus.DISABLE);
         entity.setCreateTime(new Date());
         entity = repository.save(entity);
@@ -324,10 +328,10 @@ public class ActivityService {
                                                 String title, String subtitle, String description,
                                                 String datetime, String place, String price,
                                                 String frontCoverName, InputStream frontCover,
-                                                String enrollUrl
+                                                String enrollUrl, int grade
     ) {
-        logger.info("update activity {} by title={}, subtitle={} descr={}, time={}, place={}, price={}, image={}, enrollUrl={}",
-                    activityId, title, subtitle, description, datetime, place, price, frontCover!=null, enrollUrl);
+        logger.info("update activity {} by title={}, subtitle={} descr={}, time={}, place={}, price={}, image={}, enrollUrl={}, grade={}",
+                    activityId, title, subtitle, description, datetime, place, price, frontCover!=null, enrollUrl, grade);
 
         ActivityEntity entity = repository.findOne(activityId);
         if (null==entity) {
@@ -387,6 +391,10 @@ public class ActivityService {
             entity.setEnrollUrl(enrollUrl);
             changed = true;
         }
+        if (grade>=0) {
+            entity.setGrade(grade);
+            changed = true;
+        }
 
         if (changed) {
             entity.setCreateTime(new Date());
@@ -399,7 +407,7 @@ public class ActivityService {
     }
 
     @Transactional
-    public ActivityBean updateActivityStatus(long activityId, String strStatus, int grade) {
+    public ActivityBean updateActivityStatus(long activityId, String strStatus) {
         logger.info("update activity {} status to {}", activityId, strStatus);
 
         ActivityEntity entity = repository.findOne(activityId);
@@ -420,10 +428,6 @@ public class ActivityService {
                 throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
             }
             entity.setStatus(status);
-            changed = true;
-        }
-        if (grade>=0) {
-            entity.setGrade(grade);
             changed = true;
         }
 

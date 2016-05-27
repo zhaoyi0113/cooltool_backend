@@ -123,7 +123,7 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         String price    = "323.324";
         BigDecimal bdPrice = new BigDecimal("323.32");
         String enrollUrl = "http://afdsafds.com/fdsafd9ejkfdsjakfdjisoafkjfi";
-        ActivityBean bean = service.createActivity(title, subtitle, descript, time, place, price, enrollUrl);
+        ActivityBean bean = service.createActivity(title, subtitle, descript, time, place, price, enrollUrl, -1);
         Assert.assertNotNull(bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(title, bean.getTitle());
@@ -148,7 +148,7 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         ByteArrayInputStream image = new ByteArrayInputStream(title.getBytes());
         String enrollUrl = "http://afdsafds.com/fdsafd9ejkfdsjakfdjisoafkjfi";
 
-        ActivityBean bean1 = service.updateActivityBasicInfo(id, title, subtitle, descript, time, place, price, null, image, enrollUrl);
+        ActivityBean bean1 = service.updateActivityBasicInfo(id, title, subtitle, descript, time, place, price, null, image, enrollUrl, -1);
         Assert.assertNotNull(bean1);
         Assert.assertEquals(id, bean1.getId());
         Assert.assertEquals(title, bean1.getTitle());
@@ -173,28 +173,28 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         Throwable thr = null;
 
         // test editing activity update
-        try { service.updateActivityStatus(activityId, statusDis, -1); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusDis); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
-        try { service.updateActivityStatus(activityId, statusEdt, -1); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusEdt); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
-        try { service.updateActivityStatus(activityId, statusEnb, -1); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusEnb); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
 
         // test set activity to editing status
         activityId = 1;
-        try { service.updateActivityStatus(activityId, statusEdt, -1); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusEdt); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
 
         // test activity is not exist
         activityId = 1000;
-        try { service.updateActivityStatus(activityId, statusEdt, -1); } catch (Exception ex) { thr = ex; }
+        try { service.updateActivityStatus(activityId, statusEdt); } catch (Exception ex) { thr = ex; }
         Assert.assertNotNull(thr); thr = null;
 
         // test normal status setting
         activityId = 1;
-        ActivityBean bean = service.updateActivityStatus(activityId, statusDis, -1);
+        ActivityBean bean = service.updateActivityStatus(activityId, statusDis);
         Assert.assertEquals(ActivityStatus.DISABLE, bean.getStatus());
-        bean = service.updateActivityStatus(activityId, statusEnb, -1);
+        bean = service.updateActivityStatus(activityId, statusEnb);
         Assert.assertEquals(ActivityStatus.ENABLE, bean.getStatus());
     }
 
@@ -207,13 +207,13 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(4, activities.get(1).getId());
 
         activityId = 4;
-        service.updateActivityStatus(activityId, null, 1);
+        service.updateActivityBasicInfo(activityId, null, null, null, null, null, null, null, null, null, 1);
         activities = service.getActivityByStatus(ActivityStatus.ENABLE.name());
         Assert.assertEquals(4, activities.get(0).getId());
         Assert.assertEquals(5, activities.get(1).getId());
 
         activityId = 3;
-        service.updateActivityStatus(activityId, null, 2);
+        service.updateActivityBasicInfo(activityId, null, null, null, null, null, null, null, null, null, 2);
         activities = service.getActivityByStatus(ActivityStatus.ENABLE.name());
         Assert.assertEquals(3, activities.get(0).getId());
         Assert.assertEquals(4, activities.get(1).getId());

@@ -102,12 +102,13 @@ public class ActivityManageAPI {
                                    @FormParam("time") String time,
                                    @FormParam("place") String place,
                                    @FormParam("price") double price,
-                                   @FormParam("enroll_url") String enrollUrl
+                                   @FormParam("enroll_url") String enrollUrl,
+                                   @FormParam("grade") @DefaultValue("0") int grade
 
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} create activity", userId);
-        ActivityBean activity = activityService.createActivity(title, subtitle, description, time, place, ""+price, enrollUrl);
+        ActivityBean activity = activityService.createActivity(title, subtitle, description, time, place, ""+price, enrollUrl, grade);
         logger.info("activity is {}", activity);
         return Response.ok(activity).build();
     }
@@ -124,12 +125,13 @@ public class ActivityManageAPI {
                                             @FormParam("time") String time,
                                             @FormParam("place") String place,
                                             @FormParam("price") double price,
-                                            @FormParam("enroll_url") String enrollUrl
+                                            @FormParam("enroll_url") String enrollUrl,
+                                            @FormParam("grade") @DefaultValue("0") int grade
 
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} update activity basic information", userId);
-        ActivityBean activity = activityService.updateActivityBasicInfo(activityId, title, subtitle, description, time, place, ""+price, null, null, enrollUrl);
+        ActivityBean activity = activityService.updateActivityBasicInfo(activityId, title, subtitle, description, time, place, ""+price, null, null, enrollUrl, grade);
         logger.info("activity is {}", activity);
         return Response.ok(activity).build();
     }
@@ -148,7 +150,7 @@ public class ActivityManageAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} update activity front cover", userId);
-        ActivityBean frontCover = activityService.updateActivityBasicInfo(activityId, null, null, null, null, null, null, imageName, image, null);
+        ActivityBean frontCover = activityService.updateActivityBasicInfo(activityId, null, null, null, null, null, null, imageName, image, null, -1);
         logger.info("activity is {}", frontCover);
         return Response.ok(frontCover).build();
     }
@@ -158,29 +160,13 @@ public class ActivityManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateActivityStatus(@Context HttpServletRequest request,
-                                         @FormParam("activity_id") long activityId,
-                                         @FormParam("status") String status
+                                         @FormParam("activity_id") @DefaultValue("-1") long activityId,
+                                         @FormParam("status") @DefaultValue("") String status
 
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} update activity status", userId);
-        ActivityBean bean = activityService.updateActivityStatus(activityId, status, -1);
-        logger.info("activity is {}", bean);
-        return Response.ok(bean).build();
-    }
-
-    @Path("/edit/grade")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response updateActivityStatus(@Context HttpServletRequest request,
-                                         @FormParam("activity_id") long activityId,
-                                         @FormParam("grade") @DefaultValue("0") int grade
-
-    ) {
-        long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        logger.info("user {} update activity grade", userId);
-        ActivityBean bean = activityService.updateActivityStatus(activityId, null, grade);
+        ActivityBean bean = activityService.updateActivityStatus(activityId, status);
         logger.info("activity is {}", bean);
         return Response.ok(bean).build();
     }
