@@ -43,16 +43,12 @@ public class NurseSpeakAOPService {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseSpeakAOPService.class);
 
-    @Autowired
-    private NotificationCenter notificationCenter;
-    @Autowired
-    private NurseMessageService messageService;
-    @Autowired
-    private NurseIntegrationService integrationService;
-    @Autowired
-    private CommentAbilityTypeConverter commentAbilityTypeConverter;
-    @Autowired
-    private ThumbsUpAbilityTypeConverter thumbsUpAbilityTypeConverter;
+    @Autowired private NotificationCenter notificationCenter;
+    @Autowired private NurseService nurseService;
+    @Autowired private NurseMessageService messageService;
+    @Autowired private NurseIntegrationService integrationService;
+    @Autowired private CommentAbilityTypeConverter commentAbilityTypeConverter;
+    @Autowired private ThumbsUpAbilityTypeConverter thumbsUpAbilityTypeConverter;
 
     @AfterReturning(pointcut = "execution(* com.cooltoo.backend.services.NurseSpeakService.addSmug(..))",
             returning = "retVal")
@@ -227,8 +223,8 @@ public class NurseSpeakAOPService {
             return;
         }
         Map<String, String> fields = new Hashtable<>();
-        String nurseName = retVal.getThumbsUpUserName();
-        String bodyText = VerifyUtil.isStringEmpty(nurseName) ? "你获得一个赞" : (nurseName + " 赞了你");
+        NurseBean nurse = nurseService.getNurse(retVal.getThumbsUpUserId());
+        String bodyText = null==nurse ? "你获得一个赞" : (nurse.getName() + " 赞了你");
         // 发送给被点赞的用户
         notificationCenter.publishToUser(retVal.getUserIdBeenThumbsUp(), bodyText, fields, code, NotificationType.ALERT);
     }
