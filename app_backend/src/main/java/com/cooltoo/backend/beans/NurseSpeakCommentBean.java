@@ -129,6 +129,9 @@ public class NurseSpeakCommentBean {
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
         msg.append("id=").append(id).append(" , ");
         msg.append("nurseSpeakId=").append(nurseSpeakId).append(" , ");
+        msg.append("speakMakerId=").append(speakMakerId).append(" , ");
+        msg.append("nurseSpeakTypeId=").append(nurseSpeakTypeId).append(" , ");
+
 
         msg.append("commentMakerId=").append(commentMakerId).append(" , ");
         msg.append("makerName=").append(makerName).append(" , ");
