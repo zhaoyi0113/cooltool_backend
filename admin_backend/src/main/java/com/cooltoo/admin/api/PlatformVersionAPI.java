@@ -3,7 +3,6 @@ package com.cooltoo.admin.api;
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.constants.PlatformType;
 import com.cooltoo.services.PlatformVersionService;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
@@ -48,7 +47,7 @@ public class PlatformVersionAPI {
     @Path("/edit")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response editPlatformVersion(@FormDataParam("id") int id, @FormParam("type") String type,
+    public Response editPlatformVersion(@FormParam("id") int id, @FormParam("type") String type,
                                         @FormParam("version") String version,@FormParam("link") String link,
                                         @FormParam("required") int required,
                                         @FormParam("message") String message, @FormParam("release_note") String releaseNote){
