@@ -79,7 +79,7 @@ public class NurseSpeakAOPService {
     public void addComment(JoinPoint joinPoint, NurseSpeakCommentBean retVal) {
         updateNurseIntegration(joinPoint, retVal);
         addMessage(retVal);
-        sendPublishNotification(retVal, NotificationCode.PUBLISH_COMMENT_SPEAK_CODE);
+        sendPublishNotification(retVal, NotificationCode.PUBLISH_MESSAGE_COUNT_CODE);
     }
 
     @AfterReturning(pointcut = "execution(* com.cooltoo.backend.services.NurseSpeakService.setNurseSpeakThumbsUp(..))",
@@ -87,7 +87,7 @@ public class NurseSpeakAOPService {
     public void addComment(JoinPoint joinPoint, NurseSpeakThumbsUpBean retVal) {
         updateNurseIntegration(joinPoint, retVal);
         addMessage(retVal);
-        sendPublishNotification(retVal, NotificationCode.PUBLISH_BEEN_THUMBS_UP_SPEAK_CODE);
+        sendPublishNotification(retVal, NotificationCode.PUBLISH_MESSAGE_COUNT_CODE);
     }
 
 

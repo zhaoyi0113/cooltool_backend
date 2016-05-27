@@ -23,9 +23,7 @@ final  public class NotificationCode {
 
     public static final String PUBLISH_MESSAGE_CODE = String.valueOf(BASE_CODE+8);
 
-    public static final String PUBLISH_BEEN_THUMBS_UP_SPEAK_CODE = String.valueOf(BASE_CODE+10);
-
-    public static final String PUBLISH_COMMENT_SPEAK_CODE = String.valueOf(BASE_CODE+11);
+    public static final String PUBLISH_MESSAGE_COUNT_CODE = String.valueOf(BASE_CODE+9);
 
     public static final String SPEAK_ID_FIELD = "speak_id";
 
