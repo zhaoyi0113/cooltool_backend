@@ -173,6 +173,7 @@ public class NurseSpeakThumbsUpService {
     public NurseSpeakThumbsUpBean setSpeakThumbsUp(long nurseSpeakId, long thumbsUpUserId) {
         NurseSpeakThumbsUpEntity thumbsUpEntity = null;
         NurseSpeakEntity speak = speakRepository.getOne(nurseSpeakId);
+        NurseEntity      nurse = nurseRepository.getOne(thumbsUpUserId);
         String addOrDelete = null;
         List<NurseSpeakThumbsUpEntity> thumbsUpEntitys = thumbsUpRepository.findByStatusAndNurseSpeakIdAndThumbsUpUserId(CommonStatus.ENABLED, nurseSpeakId, thumbsUpUserId);
         if (null!=thumbsUpEntitys && !thumbsUpEntitys.isEmpty()) {
@@ -194,6 +195,7 @@ public class NurseSpeakThumbsUpService {
         }
         NurseSpeakThumbsUpBean bean = beanConverter.convert(thumbsUpEntity);
         bean.setUserIdBeenThumbsUp(null!=speak ? speak.getUserId() : 0);
+        bean.setThumbsUpUserName(null==nurse ? "" : nurse.getName());
         bean.setThumbsUpAddOrDelete(addOrDelete);
         long count = thumbsUpRepository.countByStatusAndNurseSpeakId(CommonStatus.ENABLED, nurseSpeakId);
         bean.setSpeakThumbsUpCount(count);

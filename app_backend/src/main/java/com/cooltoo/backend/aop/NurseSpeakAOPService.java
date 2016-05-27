@@ -20,6 +20,7 @@ import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.util.VerifyUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -226,7 +227,8 @@ public class NurseSpeakAOPService {
             return;
         }
         Map<String, String> fields = new Hashtable<>();
-        String bodyText = retVal.getThumbsUpUserName() + " 赞了你";
+        String nurseName = retVal.getThumbsUpUserName();
+        String bodyText = VerifyUtil.isStringEmpty(nurseName) ? "你获得一个赞" : (nurseName + " 赞了你");
         // 发送给被点赞的用户
         notificationCenter.publishToUser(retVal.getUserIdBeenThumbsUp(), bodyText, fields, code, NotificationType.ALERT);
     }
