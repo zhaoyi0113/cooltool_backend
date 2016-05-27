@@ -212,12 +212,12 @@ public class NurseSpeakAOPService {
         }
         Map<String, String> fields = new Hashtable<>();
         fields.put(NotificationCode.SPEAK_ID_FIELD, String.valueOf(retVal.getNurseSpeakId()));
-        String bodyText = "";
+        String bodyText = "你有一条回复";
         // 发送给晒图/吐槽/提问的用户
-        notificationCenter.publishToUser(retVal.getSpeakMakerId(), bodyText, fields, code, NotificationType.SILENT);
+        notificationCenter.publishToUser(retVal.getSpeakMakerId(), bodyText, fields, code, NotificationType.ALERT);
         // 发送给评论者指定的用户
         if (retVal.getSpeakMakerId()!=retVal.getCommentReceiverId() && retVal.getCommentReceiverId()>0) {
-            notificationCenter.publishToUser(retVal.getCommentReceiverId(), bodyText, fields, code, NotificationType.SILENT);
+            notificationCenter.publishToUser(retVal.getCommentReceiverId(), bodyText, fields, code, NotificationType.ALERT);
         }
     }
 
@@ -226,9 +226,8 @@ public class NurseSpeakAOPService {
             return;
         }
         Map<String, String> fields = new Hashtable<>();
-        fields.put(NotificationCode.SPEAK_ID_FIELD, String.valueOf(retVal.getNurseSpeakId()));
-        String bodyText = "";
+        String bodyText = retVal.getThumbsUpUserName() + " 赞了你";
         // 发送给被点赞的用户
-        notificationCenter.publishToUser(retVal.getUserIdBeenThumbsUp(), bodyText, fields, code, NotificationType.SILENT);
+        notificationCenter.publishToUser(retVal.getUserIdBeenThumbsUp(), bodyText, fields, code, NotificationType.ALERT);
     }
 }
