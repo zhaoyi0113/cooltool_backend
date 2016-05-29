@@ -35,14 +35,24 @@ public class OfficialConfigService {
     private OfficialFileStorageService officialStorage;
 
     public static final Map<String, OfficialConfigBean> configKey2Bean = new HashMap<String, OfficialConfigBean>();
+
     public static final String OFFICIAL_SPEAK_PROFILE = "OfficialSpeakProfile";
+    public static final String SUBSTITUTION_OF_FORBIDDEN_SPEAK_CONTENT="SubstitutionOfForbiddenSpeakContent";
+    public static final String SUBSTITUTION_OF_FORBIDDEN_SPEAK_IMAGE="SubstitutionOfForbiddenSpeakImage";
+    public static final String SUBSTITUTION_OF_FORBIDDEN_COMMENT="SubstitutionOfForbiddenComment";
+    public static final String EULA = "EULA";
 
     //===============================================
     //               get
     //===============================================
     public List<String> getKeys() {
         logger.info("get all config keys");
-        String[] keys = {OFFICIAL_SPEAK_PROFILE};
+        String[] keys = {
+                OFFICIAL_SPEAK_PROFILE,
+                SUBSTITUTION_OF_FORBIDDEN_SPEAK_CONTENT,
+                SUBSTITUTION_OF_FORBIDDEN_SPEAK_IMAGE,
+                SUBSTITUTION_OF_FORBIDDEN_COMMENT
+        };
         return Arrays.asList(keys);
     }
 
@@ -173,6 +183,10 @@ public class OfficialConfigService {
             if (imageIds.contains(entity.getImageId())) {
                 continue;
             }
+            if (isReadOnlyKey(entity.getName())) {
+                logger.info("{} is read only record", entity.getName());
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
             imageIds.add(entity.getImageId());
         }
         if (!imageIds.isEmpty()) {
@@ -190,6 +204,10 @@ public class OfficialConfigService {
         OfficialConfigEntity entity = repository.findOne(Integer.valueOf(id));
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (isReadOnlyKey(entity.getName())) {
+            logger.info("{} is read only record", entity.getName());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if (!VerifyUtil.isStringEmpty(name)) {
             name = name.trim();
@@ -268,5 +286,16 @@ public class OfficialConfigService {
         OfficialConfigBean bean = beanConverter.convert(entity);
         bean.setImageUrl(imageUrl);
         return bean;
+    }
+
+    private boolean isReadOnlyKey(String name) {
+        if (VerifyUtil.isStringEmpty(name)) {
+            return false;
+        }
+        if (EULA.equalsIgnoreCase(name)) {
+            return true;
+        }
+
+        return false;
     }
 }

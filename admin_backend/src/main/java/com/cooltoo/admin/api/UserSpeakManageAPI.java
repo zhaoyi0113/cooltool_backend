@@ -99,4 +99,29 @@ public class UserSpeakManageAPI {
         long effectedCount = userSpeakService.updateSpeakStatus(speakIds, status);
         return Response.ok(effectedCount).build();
     }
+
+    //==========================================================
+    //            用户举报接口
+    //==========================================================
+    @Path("/complaint/count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response countComplaint(@Context HttpServletRequest request,
+                                    @QueryParam("status") @DefaultValue("ALL") String status
+    ) {
+        // TODO -- need fixed
+        return Response.ok(0).build();
+    }
+
+    @Path("/complaint")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getComplaintByStatus(@Context HttpServletRequest request,
+                                          @QueryParam("status") @DefaultValue("ALL") String status
+    ) {
+        // TODO -- need fixed
+        return Response.ok().build();
+    }
 }

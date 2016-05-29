@@ -50,31 +50,34 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
             }
         }
         logger.info("access "+requestContext.getUriInfo().getAbsolutePath());
-        if (login.requireNurseLogin()) {
-            MultivaluedMap<String, String> pathParameters = requestContext.getHeaders();
-            List<String> tokens = pathParameters.get(HeaderKeys.ACCESS_TOKEN);
-            if (tokens == null || tokens.isEmpty()) {
+        MultivaluedMap<String, String> pathParameters = requestContext.getHeaders();
+        List<String> tokens = pathParameters.get(HeaderKeys.ACCESS_TOKEN);
+        if ((tokens == null || tokens.isEmpty())) {
+            if(login.requireNurseLogin()) {
                 throw new BadRequestException(ErrorCode.NOT_LOGIN);
             }
-            String token = tokens.get(0);
-            logger.info("get token " + token);
-            if (token != null) {
-                //read user id from token
-                List<TokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByToken(token);
-                if (tokenEntities.isEmpty()) {
-                    throw new BadRequestException(ErrorCode.NOT_LOGIN);
-                }
-                long userId = tokenEntities.get(0).getUserId();
-                logger.info("get user id "+userId);
-                NurseEntity nurseEntity = nurseRepository.findOne(userId);
-                if (null==nurseEntity) {
-                    throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
-                }
-                if (UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
-                    throw new BadRequestException(ErrorCode.NOT_PERMITTED);
-                }
-                requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, userId);
+            else {
+                return;
             }
+        }
+        String token = tokens.get(0);
+        logger.info("get token " + token);
+        if (token != null) {
+            //read user id from token
+            List<TokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByToken(token);
+            if (tokenEntities.isEmpty()) {
+                throw new BadRequestException(ErrorCode.NOT_LOGIN);
+            }
+            long userId = tokenEntities.get(0).getUserId();
+            logger.info("get user id "+userId);
+            NurseEntity nurseEntity = nurseRepository.findOne(userId);
+            if (null==nurseEntity) {
+                throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            }
+            if (UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
+                throw new BadRequestException(ErrorCode.NOT_PERMITTED);
+            }
+            requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, userId);
         }
     }
 }

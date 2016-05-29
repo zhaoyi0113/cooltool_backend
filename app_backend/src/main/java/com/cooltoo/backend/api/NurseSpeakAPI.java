@@ -9,6 +9,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -172,6 +173,19 @@ public class NurseSpeakAPI {
         long userId =  (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         ImagesInSpeakBean imageAdded = speakService.deleteImagesInSpeak(imageInSpeakId);
         return Response.ok(imageAdded).build();
+    }
+
+    @Path("/complaint")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = false)
+    public Response complaintSpeak(@Context HttpServletRequest request,
+                                   @FormParam("speak_id") @DefaultValue("0") long complaintSpeakId,
+                                   @FormParam("reason") @DefaultValue("") String complaintReason
+    ) {
+        Object userId =  request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        // TODO -- need fixed
+        return Response.ok().build();
     }
 
     @Path("/comment")
