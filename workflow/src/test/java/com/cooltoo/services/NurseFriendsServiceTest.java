@@ -10,6 +10,7 @@ import com.cooltoo.util.VerifyUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +30,8 @@ import org.slf4j.LoggerFactory;
 @Transactional
 @DatabaseSetups({
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/file_storage_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_page_data.xml")
 })
 public class NurseFriendsServiceTest extends AbstractCooltooTest {
@@ -69,6 +75,30 @@ public class NurseFriendsServiceTest extends AbstractCooltooTest {
         friendWaiting = friendsService.getFriendshipWaitingAgreed(friendId);
         Assert.assertEquals(2, friendAgreed.size());
         Assert.assertEquals(0, friendWaiting.size());
+    }
+
+    @Test
+    @Ignore
+    public void testAddFriendshipMultithread() {
+        final CountDownLatch countDown = new CountDownLatch(10);
+        for (int i = 0; i < 10; i ++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    countDown.countDown();
+                    friendsService.addFriendship(1, 2);
+                }
+            }).start();
+        }
+        try {
+            countDown.await(10, TimeUnit.SECONDS);
+            logger.info("count down number ===="+ countDown.getCount());
+            List<NurseFriendsEntity> friendships = friendsRepository.findFriendshipByUserIdAndFriendId(1, 2);
+            Assert.assertEquals(2, friendships.size());
+        }
+        catch (Exception ex) {
+            logger.info("error ====> {}", ex);
+        }
     }
 
     @Test
