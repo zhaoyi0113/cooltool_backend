@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
  */
 @Transactional
 @DatabaseSetups({
-        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/file_storage_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_friends_page_data.xml")
 })
