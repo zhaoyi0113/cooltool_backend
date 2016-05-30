@@ -9,6 +9,7 @@ import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.backend.repository.TokenAccessRepository;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +53,7 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
         logger.info("access "+requestContext.getUriInfo().getAbsolutePath());
         MultivaluedMap<String, String> pathParameters = requestContext.getHeaders();
         List<String> tokens = pathParameters.get(HeaderKeys.ACCESS_TOKEN);
-        if ((tokens == null || tokens.isEmpty())) {
+        if (tokens == null || tokens.isEmpty() || VerifyUtil.isStringEmpty(tokens.get(0))) {
             if(login.requireNurseLogin()) {
                 throw new BadRequestException(ErrorCode.NOT_LOGIN);
             }
@@ -66,7 +67,12 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
             //read user id from token
             List<TokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByToken(token);
             if (tokenEntities.isEmpty()) {
-                throw new BadRequestException(ErrorCode.NOT_LOGIN);
+                if (login.requireNurseLogin()) {
+                    throw new BadRequestException(ErrorCode.NOT_LOGIN);
+                }
+                else {
+                    return;
+                }
             }
             long userId = tokenEntities.get(0).getUserId();
             logger.info("get user id "+userId);

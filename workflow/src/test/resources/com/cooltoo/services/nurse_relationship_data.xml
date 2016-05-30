@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <nurse_relationship id="1" user_id="1" relative_user_id="4" relationship="0" status="0" time_created="2016-03-10 16:00:00" />
+    <nurse_relationship id="2" user_id="1" relative_user_id="4" relationship="1" status="1" time_created="2016-03-11 16:00:00" />
+    <nurse_relationship id="3" user_id="1" relative_user_id="5" relationship="1" status="1" time_created="2016-03-12 16:00:00" />
+    <nurse_relationship id="4" user_id="2" relative_user_id="3" relationship="1" status="0" time_created="2016-03-13 16:00:00" />
+    <nurse_relationship id="5" user_id="2" relative_user_id="3" relationship="0" status="1" time_created="2016-03-14 16:00:00" />
+</dataset>
