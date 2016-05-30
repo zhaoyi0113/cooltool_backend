@@ -1,5 +1,6 @@
 package com.cooltoo.backend.services;
 
+import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseRelationshipBean;
 import com.cooltoo.backend.converter.NurseRelationshipBeanConverter;
 import com.cooltoo.backend.entities.NurseRelationshipEntity;
@@ -16,8 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hp on 2016/5/30.
@@ -59,13 +59,69 @@ public class NurseRelationshipService {
         CommonStatus status = CommonStatus.parseString(strStatus);
         PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
         Page<NurseRelationshipEntity> resultSet = repository.findByConditions(userId, relativeUserId, relationType, status, page);
-        return null;
+        List<NurseRelationshipBean> beans = entitiesToBeans(resultSet);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
     }
 
     //================================================================
     //               get -- user use
     //================================================================
-//    public
+    public List<NurseRelationshipBean> getRelation(boolean withInfo, long userId, long relativeUserId, String strRelationType, String strStatus) {
+        logger.info("get relation by userId={} relativeUserId={} relationType={} status={}, withOtherInfo={}",
+                userId, relativeUserId, strRelationType, strStatus, withInfo, withInfo);
+        RelationshipType relationType = RelationshipType.parseString(strRelationType);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<NurseRelationshipEntity> resultSet = repository.findByConditions(userId, relativeUserId, relationType, status, sort);
+        List<NurseRelationshipBean> beans = entitiesToBeans(resultSet);
+        if (withInfo) {
+            fillOtherProperties(beans);
+        }
+        return beans;
+    }
+
+
+    private List<NurseRelationshipBean> entitiesToBeans(Iterable<NurseRelationshipEntity> entities) {
+        List<NurseRelationshipBean> beans = new ArrayList<>();
+        if (null==entities) {
+            return beans;
+        }
+        NurseRelationshipBean bean;
+        for (NurseRelationshipEntity entity : entities) {
+            bean = beanConverter.convert(entity);
+            beans.add(bean);
+        }
+        return beans;
+    }
+
+    private void fillOtherProperties(List<NurseRelationshipBean> beans) {
+        List<Long> userIds = new ArrayList<>();
+        for (NurseRelationshipBean relation : beans) {
+            long userId = relation.getUserId();
+            if (!userIds.contains(userId)) {
+                userIds.add(userId);
+            }
+            userId = relation.getRelativeUserId();
+            if (!userIds.contains(userId)) {
+                userIds.add(userId);
+            }
+        }
+
+        List<NurseBean> nurses = nurseService.getNurseWithoutOtherInfo(userIds);
+        Map<Long, NurseBean> userId2Bean = new HashMap<>();
+        for (NurseBean nurse : nurses) {
+            userId2Bean.put(nurse.getId(), nurse);
+        }
+
+        NurseBean nurse;
+        for (NurseRelationshipBean relation : beans) {
+            nurse = userId2Bean.get(relation.getUserId());
+            relation.setUser(nurse);
+            nurse = userId2Bean.get(relation.getRelativeUserId());
+            relation.setRelativeUser(nurse);
+        }
+    }
 
     //================================================================
     //                       add

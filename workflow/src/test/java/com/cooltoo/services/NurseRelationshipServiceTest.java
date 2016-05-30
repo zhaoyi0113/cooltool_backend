@@ -6,7 +6,6 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.RelationshipType;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
