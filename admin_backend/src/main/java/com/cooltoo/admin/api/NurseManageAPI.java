@@ -2,7 +2,10 @@ package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseRelationshipBean;
+import com.cooltoo.backend.services.NurseRelationshipService;
 import com.cooltoo.backend.services.NurseService;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.util.VerifyUtil;
@@ -25,6 +28,7 @@ public class NurseManageAPI {
     private static final Logger logger = LoggerFactory.getLogger(NurseManageAPI.class);
 
     @Autowired private NurseService nurseService;
+    @Autowired private NurseRelationshipService nurseRelationshipService;
 
     @Path("/{id}")
     @GET
@@ -130,4 +134,75 @@ public class NurseManageAPI {
         return Response.ok(nurses).build();
     }
 
+    //============================================================================================
+    //                    用户关系管理
+    //============================================================================================
+    // 所有条件是 与 的关系
+    @Path("/relation/count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response countNurseRelation(@Context HttpServletRequest request,
+                                  @QueryParam("user_id") @DefaultValue("0") long userId,
+                                  @QueryParam("relative_user_id") @DefaultValue("0") long relativeUserId,
+                                  @QueryParam("relation_type") @DefaultValue("") String relationType,
+                                  @QueryParam("status") @DefaultValue("") String status
+    ) {
+        long adminUserId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+        logger.info("admin user {} count nurse relation by condition userId={} relativeUserId={}, relationType={} status={}",
+                adminUserId, userId, relativeUserId, relationType, status
+        );
+        long count = nurseRelationshipService.countCondition(userId, relativeUserId, relationType, status);
+        return Response.ok(count).build();
+    }
+
+    @Path("/relation")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getNurseRelation(@Context HttpServletRequest request,
+                                     @QueryParam("user_id") @DefaultValue("0") long userId,
+                                     @QueryParam("relative_user_id") @DefaultValue("0") long relativeUserId,
+                                     @QueryParam("relation_type") @DefaultValue("") String relationType,
+                                     @QueryParam("status") @DefaultValue("") String status,
+                                     @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
+    ) {
+        long adminUserId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+        logger.info("admin user {} count nurse relation by condition userId={} relativeUserId={}, relationType={} status={}",
+                adminUserId, userId, relativeUserId, relationType, status
+        );
+        List<NurseRelationshipBean> relation = nurseRelationshipService.getRelation(userId, relativeUserId, relationType, status, pageIndex, sizePerPage);
+        return Response.ok(relation).build();
+    }
+
+    @Path("/relation/edit")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response updateRelationship(@Context HttpServletRequest request,
+                                       @FormParam("user_id") @DefaultValue("0") long userId,
+                                       @FormParam("relative_user_id") @DefaultValue("0") long relativeUserId,
+                                       @FormParam("relation_type") @DefaultValue("") String relationType,
+                                       @FormParam("status") @DefaultValue("0") int status
+    ) {
+        CommonStatus commonStatus = CommonStatus.parseInt(status);
+        String strStatus = null==commonStatus ? "" : commonStatus.name();
+        NurseRelationshipBean relationship = nurseRelationshipService.updateRelationStatus(userId, relativeUserId, relationType, strStatus);
+        return Response.ok(relationship).build();
+    }
+
+    @Path("/relation/edit_by_id")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response updateRelationship(@Context HttpServletRequest request,
+                                       @FormParam("relation_id") @DefaultValue("0") long relationId,
+                                       @FormParam("status") @DefaultValue("0") int status
+    ) {
+        CommonStatus commonStatus = CommonStatus.parseInt(status);
+        String strStatus = null==commonStatus ? "" : commonStatus.name();
+        NurseRelationshipBean relationship = nurseRelationshipService.updateRelationStatus(relationId, strStatus);
+        return Response.ok(relationship).build();
+    }
 }

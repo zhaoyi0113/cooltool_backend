@@ -28,8 +28,10 @@ public class NurseRelationshipService {
     private static final Logger logger = LoggerFactory.getLogger(NurseRelationshipService.class);
 
     private static final Sort sort = new Sort(
+            new Sort.Order(Sort.Direction.ASC, "userId"),
             new Sort.Order(Sort.Direction.ASC, "relationType"),
-            new Sort.Order(Sort.Direction.ASC, "relativeUserId")
+            new Sort.Order(Sort.Direction.ASC, "relativeUserId"),
+            new Sort.Order(Sort.Direction.ASC, "time")
     );
 
     @Autowired private NurseRelationshipRepository repository;
@@ -68,6 +70,18 @@ public class NurseRelationshipService {
     //================================================================
     //               get -- user use
     //================================================================
+    public List<Long> getRelativeUserId(long userId, String strRelationType, String strStatus) {
+        logger.info("user {} get relative user ids by relationType={} status={}", userId, strRelationType, strStatus);
+        RelationshipType relationType = RelationshipType.parseString(strRelationType);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Long> relativeUserIds = repository.findRelativeUserIdByCondition(userId, relationType, status);
+        if (null==relativeUserIds) {
+            relativeUserIds = new ArrayList<>();
+        }
+        logger.info("count is {}", relativeUserIds.size());
+        return relativeUserIds;
+    }
+
     public List<NurseRelationshipBean> getRelation(boolean withInfo, long userId, long relativeUserId, String strRelationType, String strStatus) {
         logger.info("get relation by userId={} relativeUserId={} relationType={} status={}, withOtherInfo={}",
                 userId, relativeUserId, strRelationType, strStatus, withInfo, withInfo);
@@ -78,9 +92,9 @@ public class NurseRelationshipService {
         if (withInfo) {
             fillOtherProperties(beans);
         }
+        logger.info("count is {}", beans.size());
         return beans;
     }
-
 
     private List<NurseRelationshipBean> entitiesToBeans(Iterable<NurseRelationshipEntity> entities) {
         List<NurseRelationshipBean> beans = new ArrayList<>();
@@ -168,7 +182,31 @@ public class NurseRelationshipService {
     //================================================================
     //                       update
     //================================================================
-    public NurseRelationshipBean updateRelation(long userId, long relativeUserId, RelationshipType relationType, CommonStatus status) {
+    public  NurseRelationshipBean updateRelationStatus(long relationId, String strStatus) {
+        logger.info("update status by relationId={} to status={}", relationId, strStatus);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null==status) {
+            logger.warn("status is invalid");
+            return null;
+        }
+        if (!repository.exists(relationId)) {
+            logger.warn("record not exist");
+            return null;
+        }
+        NurseRelationshipEntity relationship = repository.findOne(relationId);
+        boolean changed = false;
+        if (!status.equals(relationship.getStatus())) {
+            relationship.setStatus(status);
+            changed = true;
+        }
+
+        if (changed) {
+            repository.save(relationship);
+        }
+        return beanConverter.convert(relationship);
+    }
+
+    public NurseRelationshipBean updateRelationStatus(long userId, long relativeUserId, RelationshipType relationType, CommonStatus status) {
         logger.info("user {} update relationship {} to user {} to status={}", userId, relationType, relativeUserId, status);
         if (relationType==null) {
             logger.error("relationship type is invalid");
@@ -191,9 +229,9 @@ public class NurseRelationshipService {
         return null;
     }
 
-    public NurseRelationshipBean updateRelation(long userId, long relativeUserId, String strRelation, String strStatus) {
+    public NurseRelationshipBean updateRelationStatus(long userId, long relativeUserId, String strRelation, String strStatus) {
         RelationshipType relationType = RelationshipType.parseString(strRelation);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        return updateRelation(userId, relativeUserId, relationType, status);
+        return updateRelationStatus(userId, relativeUserId, relationType, status);
     }
 }

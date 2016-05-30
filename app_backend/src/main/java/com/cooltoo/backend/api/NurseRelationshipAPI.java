@@ -46,6 +46,24 @@ public class NurseRelationshipAPI {
                                     @FormParam("relative_user_id") @DefaultValue("0") long relativeUserId,
                                     @FormParam("relation_type") @DefaultValue("") String relationType
     ) {
-        return Response.ok().build();
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseRelationshipBean relationship = relationshipService.addRelation(userId, relativeUserId, relationType);
+        return Response.ok(relationship).build();
+    }
+
+    @Path("/edit")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response updateRelationship(@Context HttpServletRequest request,
+                                       @FormParam("relative_user_id") @DefaultValue("0") long relativeUserId,
+                                       @FormParam("relation_type") @DefaultValue("") String relationType,
+                                       @FormParam("status") @DefaultValue("0") int status
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        CommonStatus commonStatus = CommonStatus.parseInt(status);
+        String strStatus = null==commonStatus ? "" : commonStatus.name();
+        NurseRelationshipBean relationship = relationshipService.updateRelationStatus(userId, relativeUserId, relationType, strStatus);
+        return Response.ok(relationship).build();
     }
 }
