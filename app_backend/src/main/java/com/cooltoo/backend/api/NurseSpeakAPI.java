@@ -33,17 +33,26 @@ public class NurseSpeakAPI {
     @Path("/query/all/{type}/{index}/{number}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = false)
     public Response getSpeakByAnonymous(@Context HttpServletRequest request,
                                         @PathParam("type") String type,
                                         @PathParam("index")  @DefaultValue("0")  int index,
                                         @PathParam("number") @DefaultValue("10") int number
     ) {
-        logger.info("anonymous user to get all speak content type={} index={} number={}", type, index, number);
         if ("ALL".equalsIgnoreCase(type)) {
             type = SpeakType.allValues();
             logger.info("speak type assign to {}", type);
         }
-        List<NurseSpeakBean> all = speakService.getSpeak(false, -1, type, index, number);
+
+        boolean useUserId = false;
+        long userId = 0;
+        Object objUserId = request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        if (null!=objUserId) {
+            useUserId = true;
+            userId = (Long) objUserId;
+        }
+        logger.info("anonymous user to get all speak content useUserId={} userId={} type={} index={} number={}", useUserId, userId, type, index, number);
+        List<NurseSpeakBean> all = speakService.getSpeak(useUserId, userId, type, index, number);
         logger.info("all speak count={}", all.size());
         return Response.ok(all).build();
     }
