@@ -42,6 +42,9 @@ public class NurseService {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseService.class.getName());
 
+    private static boolean isInitDenyNurseIds = false;
+    private static final List<Long> denyNurseIds = new ArrayList<>();
+
     @Autowired
     private NurseRepository repository;
     @Autowired
@@ -102,6 +105,21 @@ public class NurseService {
     //==================================================================
     //         get
     //==================================================================
+    public List<Long> getAllDenyNurseIds() {
+        if (!isInitDenyNurseIds) {
+            List<Long> denyIds = repository.findIdsByAuthority(UserAuthority.DENY_ALL);
+            if (!VerifyUtil.isListEmpty(denyIds)) {
+                denyNurseIds.addAll(denyIds);
+            }
+            isInitDenyNurseIds = true;
+        }
+        List<Long> tmp = new ArrayList<>();
+        for (Long denyUseId : denyNurseIds) {
+            tmp.add(denyUseId);
+        }
+        return tmp;
+    }
+
     public boolean existNurse(long nurseId) {
         return repository.exists(nurseId);
     }
@@ -578,6 +596,7 @@ public class NurseService {
         }
         for (NurseEntity nurse : nurses) {
             nurse.setAuthority(authority);
+            modifyDenyNurseIds(nurse);
         }
         Iterable        resultSet = repository.save(nurses);
         List<NurseBean> results   = new ArrayList<NurseBean>();
@@ -587,6 +606,25 @@ public class NurseService {
                 results.add(bean);
             }
         }
+
         return results;
+    }
+
+    private void modifyDenyNurseIds(NurseEntity nurse) {
+        if (null==nurse) {
+            return;
+        }
+        long nurseId = nurse.getId();
+        UserAuthority authority = nurse.getAuthority();
+        if (UserAuthority.DENY_ALL.equals(authority)) {
+            if (!denyNurseIds.contains(nurseId)) {
+                denyNurseIds.add(nurseId);
+            }
+        }
+        else if (UserAuthority.AGREE_ALL.equals(authority)) {
+            if (denyNurseIds.contains(nurseId)) {
+                denyNurseIds.remove(nurseId);
+            }
+        }
     }
 }

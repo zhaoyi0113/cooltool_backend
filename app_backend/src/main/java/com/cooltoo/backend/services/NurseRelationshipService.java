@@ -9,6 +9,7 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.RelationshipType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ public class NurseRelationshipService {
             new Sort.Order(Sort.Direction.ASC, "relativeUserId"),
             new Sort.Order(Sort.Direction.ASC, "time")
     );
+
+    private static final Map<Long, List<Long>> userId2BlockSpeakUserIds = new HashMap<Long, List<Long>>();
 
     @Autowired private NurseRelationshipRepository repository;
     @Autowired private NurseRelationshipBeanConverter beanConverter;
@@ -70,6 +73,25 @@ public class NurseRelationshipService {
     //================================================================
     //               get -- user use
     //================================================================
+    public List<Long> getUserBlockSpeakUserIds(long userId) {
+        List<Long> blockSpeakUserIds = userId2BlockSpeakUserIds.get(userId);
+        if (null==blockSpeakUserIds) {
+            List<Long> blockUserIds = repository.findRelativeUserIdByCondition(userId, RelationshipType.BLOCK_ALL_SPEAK, CommonStatus.ENABLED);
+            if (!VerifyUtil.isListEmpty(blockUserIds)) {
+                blockSpeakUserIds = blockUserIds;
+            }
+            else {
+                blockSpeakUserIds = new ArrayList<>();
+            }
+            userId2BlockSpeakUserIds.put(userId, blockSpeakUserIds);
+        }
+        List<Long> tmp = new ArrayList<>();
+        for (Long blockSpeakUserId : blockSpeakUserIds) {
+            tmp.add(blockSpeakUserId);
+        }
+        return tmp;
+    }
+
     public List<Long> getRelativeUserId(long userId, String strRelationType, String strStatus) {
         logger.info("user {} get relative user ids by relationType={} status={}", userId, strRelationType, strStatus);
         RelationshipType relationType = RelationshipType.parseString(strRelationType);
@@ -176,6 +198,8 @@ public class NurseRelationshipService {
         }
         repository.save(relationship);
 
+        modifyBlockSpeakUserIds(relationship);
+
         return beanConverter.convert(relationship);
     }
 
@@ -199,6 +223,8 @@ public class NurseRelationshipService {
             relationship.setStatus(status);
             changed = true;
         }
+
+        modifyBlockSpeakUserIds(relationship);
 
         if (changed) {
             repository.save(relationship);
@@ -224,6 +250,9 @@ public class NurseRelationshipService {
             if (changed) {
                 repository.save(relationship);
             }
+
+            modifyBlockSpeakUserIds(relationship);
+
             return beanConverter.convert(relationship);
         }
         return null;
@@ -233,5 +262,34 @@ public class NurseRelationshipService {
         RelationshipType relationType = RelationshipType.parseString(strRelation);
         CommonStatus status = CommonStatus.parseString(strStatus);
         return updateRelationStatus(userId, relativeUserId, relationType, status);
+    }
+
+    private void modifyBlockSpeakUserIds(NurseRelationshipEntity relationship) {
+        if (null==relationship) {
+            return;
+        }
+
+        long userId = relationship.getUserId();
+        long relativeUserId = relationship.getRelativeUserId();
+        RelationshipType relationType = relationship.getRelationType();
+        CommonStatus status = relationship.getStatus();
+
+        if (RelationshipType.BLOCK_ALL_SPEAK.equals(relationType)) {
+            List<Long> blockSpeakUserIds = userId2BlockSpeakUserIds.get(userId);
+            if (null==blockSpeakUserIds) {
+                blockSpeakUserIds = new ArrayList<>();
+                userId2BlockSpeakUserIds.put(userId, blockSpeakUserIds);
+            }
+            if (CommonStatus.ENABLED.equals(status)) {
+                if (!blockSpeakUserIds.contains(relativeUserId)) {
+                    blockSpeakUserIds.add(relativeUserId);
+                }
+            }
+            else {
+                if (blockSpeakUserIds.contains(relativeUserId)) {
+                    blockSpeakUserIds.remove(relativeUserId);
+                }
+            }
+        }
     }
 }

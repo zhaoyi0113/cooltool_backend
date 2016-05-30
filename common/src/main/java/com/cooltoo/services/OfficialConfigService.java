@@ -37,8 +37,7 @@ public class OfficialConfigService {
     public static final Map<String, OfficialConfigBean> configKey2Bean = new HashMap<String, OfficialConfigBean>();
 
     public static final String OFFICIAL_SPEAK_PROFILE = "OfficialSpeakProfile";
-    public static final String SUBSTITUTION_OF_FORBIDDEN_SPEAK_CONTENT="SubstitutionOfForbiddenSpeakContent";
-    public static final String SUBSTITUTION_OF_FORBIDDEN_SPEAK_IMAGE="SubstitutionOfForbiddenSpeakImage";
+    public static final String SUBSTITUTION_OF_FORBIDDEN_SPEAK="SubstitutionOfForbiddenSpeak";
     public static final String SUBSTITUTION_OF_FORBIDDEN_COMMENT="SubstitutionOfForbiddenComment";
     public static final String EULA = "EULA";
 
@@ -49,8 +48,7 @@ public class OfficialConfigService {
         logger.info("get all config keys");
         String[] keys = {
                 OFFICIAL_SPEAK_PROFILE,
-                SUBSTITUTION_OF_FORBIDDEN_SPEAK_CONTENT,
-                SUBSTITUTION_OF_FORBIDDEN_SPEAK_IMAGE,
+                SUBSTITUTION_OF_FORBIDDEN_SPEAK,
                 SUBSTITUTION_OF_FORBIDDEN_COMMENT
         };
         return Arrays.asList(keys);

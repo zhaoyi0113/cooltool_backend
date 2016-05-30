@@ -1,5 +1,7 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.constants.CommonStatus;
+
 import java.util.Date;
 
 /**
@@ -17,6 +19,7 @@ public class NurseSpeakCommentBean {
     private String comment;
     private boolean isCurrentUserMade;
     private Date time;
+    private CommonStatus status;
     private long speakMakerId;
     private int nurseSpeakTypeId;
 
@@ -122,6 +125,14 @@ public class NurseSpeakCommentBean {
 
     public void setNurseSpeakTypeId(int nurseSpeakTypeId) {
         this.nurseSpeakTypeId = nurseSpeakTypeId;
+    }
+
+    public CommonStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CommonStatus status) {
+        this.status = status;
     }
 
     public String toString() {

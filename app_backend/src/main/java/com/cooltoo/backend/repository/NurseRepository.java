@@ -18,6 +18,9 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     List<NurseEntity> findByMobile(String mobile);
     List<NurseEntity> findByNameContaining(String name);
 
+    @Query("SELECT n.id FROM NurseEntity n WHERE n.authority=?1")
+    List<Long> findIdsByAuthority(UserAuthority authority);
+
     @Query("SELECT count(n.id) FROM NurseEntity n WHERE n.name like %?1")
     long      countByFuzzyName(String fuzzyName);
     @Query("SELECT n.id FROM NurseEntity n WHERE n.name like %?1")

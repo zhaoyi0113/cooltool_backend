@@ -96,18 +96,18 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         }
     }
 
-    @Test
-    public void testCountSortSpeakBySpeakType() {
-        List<Long> speakIds = VerifyUtil.parseLongIds("2,3,12,13,14,15,16,17");
-        long count = speakService.countSortSpeakBySpeakType(speakIds, 1);
-        Assert.assertEquals(2, count);
-        count = speakService.countSortSpeakBySpeakType(speakIds, 2);
-        Assert.assertEquals(2, count);
-        count = speakService.countSortSpeakBySpeakType(speakIds, 3);
-        Assert.assertEquals(2, count);
-        count = speakService.countSortSpeakBySpeakType(speakIds, 4);
-        Assert.assertEquals(2, count);
-    }
+//    @Test
+//    public void testCountSortSpeakBySpeakType() {
+//        List<Long> speakIds = VerifyUtil.parseLongIds("2,3,12,13,14,15,16,17");
+//        long count = speakService.countSortSpeakBySpeakType(speakIds, 1);
+//        Assert.assertEquals(2, count);
+//        count = speakService.countSortSpeakBySpeakType(speakIds, 2);
+//        Assert.assertEquals(2, count);
+//        count = speakService.countSortSpeakBySpeakType(speakIds, 3);
+//        Assert.assertEquals(2, count);
+//        count = speakService.countSortSpeakBySpeakType(speakIds, 4);
+//        Assert.assertEquals(2, count);
+//    }
 
     @Test
     public void testGetSpeakOnPage(){

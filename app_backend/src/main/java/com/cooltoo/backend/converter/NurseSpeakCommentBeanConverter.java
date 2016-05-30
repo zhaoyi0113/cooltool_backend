@@ -20,6 +20,7 @@ public class NurseSpeakCommentBeanConverter implements Converter <NurseSpeakComm
         bean.setCommentReceiverId(source.getCommentReceiverId());
         bean.setComment(source.getComment());
         bean.setTime(source.getTime());
+        bean.setStatus(source.getStatus());
         return bean;
     }
 }

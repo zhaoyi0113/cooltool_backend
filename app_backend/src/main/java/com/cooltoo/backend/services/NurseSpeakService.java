@@ -3,7 +3,6 @@ package com.cooltoo.backend.services;
 import com.cooltoo.backend.beans.*;
 import com.cooltoo.backend.converter.NurseSpeakConverter;
 import com.cooltoo.backend.converter.social_ability.SpeakAbilityTypeConverter;
-import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
 import com.cooltoo.beans.OfficialConfigBean;
@@ -13,14 +12,11 @@ import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.OfficialConfigService;
-import com.cooltoo.services.file.OfficialFileStorageService;
-import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -39,6 +35,7 @@ public class NurseSpeakService {
     private static final Logger logger = LoggerFactory.getLogger(NurseSpeakService.class.getName());
 
     @Autowired private NurseService nurseService;
+    @Autowired private NurseRelationshipService nurseRelationshipService;
     @Autowired private NurseSpeakRepository speakRepository;
     @Autowired private NurseSpeakConverter speakConverter;
     @Autowired private NurseSpeakCommentService speakCommentService;
@@ -112,16 +109,16 @@ public class NurseSpeakService {
     //===============================================================
     //             get ----  nurse using
     //===============================================================
-    public long countSortSpeakBySpeakType(List<Long> speakIds, int speakTypeId) {
-        if (VerifyUtil.isListEmpty(speakIds)) {
-            return 0;
-        }
-        logger.info("sort speak(count={}) by speak type={}", speakIds.size(), speakTypeId);
-        long countSortedSpeakIds = speakRepository.countSortSpeakByTypeAndStatus(speakIds, speakTypeId, CommonStatus.ENABLED);
-        logger.info("sort speak count={}", countSortedSpeakIds);
-        return countSortedSpeakIds;
-    }
-
+//    public long countSortSpeakBySpeakType(List<Long> speakIds, int speakTypeId) {
+//        if (VerifyUtil.isListEmpty(speakIds)) {
+//            return 0;
+//        }
+//        logger.info("sort speak(count={}) by speak type={}", speakIds.size(), speakTypeId);
+//        long countSortedSpeakIds = speakRepository.countSortSpeakByTypeAndStatus(speakIds, speakTypeId, CommonStatus.ENABLED);
+//        logger.info("sort speak count={}", countSortedSpeakIds);
+//        return countSortedSpeakIds;
+//    }
+//
 //    public Map<Long, Long> countByUserIds(String strUserIds){
 //        logger.info("get nurse {} speak count", strUserIds);
 //
@@ -137,7 +134,7 @@ public class NurseSpeakService {
             return new HashMap<>();
         }
         logger.info("get nurse {} speak count", userIds);
-        List<Object[]>  count  = speakRepository.countByUserIdIn(userIds, CommonStatus.ENABLED);
+        List<Object[]>  count  = speakRepository.countByUserIdInAndStatusNot(userIds, CommonStatus.DELETED);
         Map<Long, Long> id2num = new HashMap<>();
         for(int i=0; i<count.size(); i++) {
             Object[] tmp = count.get(i);
@@ -160,12 +157,14 @@ public class NurseSpeakService {
             logger.warn("speak type parsed ids is empty");
             return 0;
         }
+
+        List<Long> denyUserIds = denyOrBlockSpeakUserIds(userId);
         long count = 0;
         if (useUserId) {
-            count = speakRepository.countSpecialTypeSpeak(userId, speakTypeIds, CommonStatus.ENABLED);
+            count = speakRepository.countSpecialTypeSpeakAndStatusNot(userId, speakTypeIds, CommonStatus.DELETED, denyUserIds);
         }
         else {
-            count = speakRepository.countSpecialTypeSpeak(speakTypeIds, CommonStatus.ENABLED);
+            count = speakRepository.countSpecialTypeSpeakAndStatusNot(speakTypeIds, CommonStatus.DELETED, denyUserIds);
         }
         logger.info("speak count is={}", count);
         return count;
@@ -187,11 +186,13 @@ public class NurseSpeakService {
 
         PageRequest request = new PageRequest(pageIndex, number, Sort.Direction.DESC, "time");
         Page<NurseSpeakEntity> resultSet;
+
+        List<Long> denyUserId = denyOrBlockSpeakUserIds(userId);
         if (useUserId) {
-            resultSet = speakRepository.findSpecialTypeSpeak(userId, speakTypeIds, CommonStatus.ENABLED, request);
+            resultSet = speakRepository.findSpecialTypeSpeakAndStatusNot(userId, speakTypeIds, CommonStatus.DELETED, denyUserId, request);
         }
         else {
-            resultSet = speakRepository.findSpecialTypeSpeak(speakTypeIds, CommonStatus.ENABLED, request);
+            resultSet = speakRepository.findSpecialTypeSpeakAndStatusNot(speakTypeIds, CommonStatus.DELETED, denyUserId, request);
         }
 
         // parse entities to bean
@@ -218,6 +219,20 @@ public class NurseSpeakService {
 
     public boolean existsSpeak(long speakId) {
         return speakRepository.exists(speakId);
+    }
+
+    public List<Long> denyOrBlockSpeakUserIds(long userId) {
+        List<Long> denyUserIds = nurseService.getAllDenyNurseIds();
+        List<Long> blockSpeakUserIds = nurseRelationshipService.getUserBlockSpeakUserIds(userId);
+        if (!VerifyUtil.isListEmpty(blockSpeakUserIds)) {
+            for (Long blockSpeakUserId : blockSpeakUserIds) {
+                denyUserIds.add(blockSpeakUserId);
+            }
+        }
+        if (VerifyUtil.isListEmpty(denyUserIds)) {
+            denyUserIds.add(0L);
+        }
+        return denyUserIds;
     }
 
     private List<NurseSpeakBean> entitiesToBeans(Iterable<NurseSpeakEntity> entities) {
@@ -268,20 +283,35 @@ public class NurseSpeakService {
             userId2Name.put(tmp.getId(), tmp);
         }
         // set user name and profileUrl
-        OfficialConfigBean officialConfig = officialConfigService.getConfig(OfficialConfigService.OFFICIAL_SPEAK_PROFILE);
+        OfficialConfigBean officialSpeakProfile = officialConfigService.getConfig(OfficialConfigService.OFFICIAL_SPEAK_PROFILE);
+        OfficialConfigBean forbiddenSpeak       = officialConfigService.getConfig(OfficialConfigService.SUBSTITUTION_OF_FORBIDDEN_SPEAK);
+        List<ImagesInSpeakBean> forbiddenImages = new ArrayList<>();
+        if (null!=forbiddenSpeak) {
+            ImagesInSpeakBean forbiddenImage = new ImagesInSpeakBean();
+            forbiddenImage.setId(0);
+            forbiddenImage.setImageId(forbiddenSpeak.getImageId());
+            forbiddenImage.setImageUrl(forbiddenSpeak.getImageUrl());
+            forbiddenImage.setSpeakId(0);
+            forbiddenImage.setTimeCreated(forbiddenSpeak.getCreateTime());
+            forbiddenImages.add(forbiddenImage);
+        }
         for (NurseSpeakBean tmp : beans) {
             NurseBean nurse = userId2Name.get(tmp.getUserId());
             if (null!=nurse) {
                 tmp.setUserName(nurse.getName());
                 tmp.setUserProfilePhotoUrl(nurse.getProfilePhotoUrl());
             }
-            if (null!=officialConfig && tmp.getSpeakType()==officialSpeak.getId()) {
-                String officialPhotoUrl = officialConfig.getImageUrl();
+            if (null!=officialSpeakProfile && tmp.getSpeakType()==officialSpeak.getId()) {
+                String officialPhotoUrl = officialSpeakProfile.getImageUrl();
                 tmp.setUserProfilePhotoUrl(officialPhotoUrl);
-                tmp.setUserName(officialConfig.getValue());
+                tmp.setUserName(officialSpeakProfile.getValue());
             }
             if (tmp.getSpeakType()==cathartSpeak.getId()) {
                 tmp.setUserName(tmp.getAnonymousName());
+            }
+            if (null!=forbiddenSpeak && CommonStatus.DISABLED.equals(tmp.getStatus())) {
+                tmp.setContent(forbiddenSpeak.getValue());
+                tmp.setImages(forbiddenImages);
             }
         }
 
@@ -290,6 +320,7 @@ public class NurseSpeakService {
         //
         // get comment of speak
         //
+        OfficialConfigBean forbiddenComment  = officialConfigService.getConfig(OfficialConfigService.SUBSTITUTION_OF_FORBIDDEN_COMMENT);
         List<NurseSpeakCommentBean> comments = speakCommentService.getSpeakCommentsByNurseSpeakIds(speakIds);
         for (NurseSpeakCommentBean tmp : comments) {
             long speakId = tmp.getNurseSpeakId();
@@ -302,6 +333,11 @@ public class NurseSpeakService {
             }
             // is current user made
             tmp.setIsCurrentUserMade((userId>0 && tmp.getCommentMakerId()==userId));
+
+            // comment is forbidden by admin
+            if (null!=forbiddenComment && CommonStatus.DISABLED.equals(tmp.getStatus())) {
+                tmp.setComment(forbiddenComment.getValue());
+            }
 
             mapValue.add(tmp);
         }

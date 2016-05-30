@@ -41,21 +41,42 @@ public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Lo
     //=====================================
     //List<NurseSpeakEntity> findByUserId(long userId);
 
-    @Query("SELECT speak.userId, count(speak.id) FROM NurseSpeakEntity speak WHERE speak.userId in (?1) AND speak.status=?2 GROUP BY speak.userId")
-    List<Object[]> countByUserIdIn(List<Long> userIds, CommonStatus status);
+    @Query("SELECT speak.userId, count(speak.id) FROM NurseSpeakEntity speak" +
+            " WHERE speak.userId in (?1)" +
+            " AND speak.status<>?2" +
+            " GROUP BY speak.userId")
+    List<Object[]> countByUserIdInAndStatusNot(List<Long> userIds, CommonStatus status);
 
-    @Query("FROM NurseSpeakEntity speak WHERE speak.userId=?1 AND speak.speakType IN (?2) AND speak.status=?3")
-    Page<NurseSpeakEntity> findSpecialTypeSpeak(long userId, List<Integer> speakTypeIds, CommonStatus status, Pageable page);
+    @Query("FROM NurseSpeakEntity speak" +
+            " WHERE speak.userId=?1" +
+            " AND speak.speakType IN (?2)" +
+            " AND speak.status<>?3" +
+            " AND speak.userId NOT IN (?4)")
+    Page<NurseSpeakEntity> findSpecialTypeSpeakAndStatusNot(long userId, List<Integer> speakTypeIds, CommonStatus status, List<Long> denyUserIds, Pageable page);
 
-    @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak WHERE speak.status=?3 AND speak.userId=?1 AND speak.speakType IN (?2)")
-    long countSpecialTypeSpeak(long userId, List<Integer> speakTypeIds, CommonStatus status);
+    @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak" +
+            " WHERE speak.userId=?1" +
+            " AND speak.speakType IN (?2)" +
+            " AND speak.status<>?3" +
+            " AND speak.userId NOT IN (?4)")
+    long countSpecialTypeSpeakAndStatusNot(long userId, List<Integer> speakTypeIds, CommonStatus status, List<Long> denyUserIds);
 
-    @Query("FROM NurseSpeakEntity speak WHERE speak.status=?2 AND  speak.speakType IN (?1)")
-    Page<NurseSpeakEntity> findSpecialTypeSpeak(List<Integer> speakTypeIds, CommonStatus status, Pageable page);
+    @Query("FROM NurseSpeakEntity speak" +
+            " WHERE speak.speakType IN (?1)" +
+            " AND speak.status<>?2" +
+            " AND speak.userId NOT IN (?3)")
+    Page<NurseSpeakEntity> findSpecialTypeSpeakAndStatusNot(List<Integer> speakTypeIds, CommonStatus status, List<Long> denyUserIds, Pageable page);
 
-    @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak WHERE speak.status=?2 AND speak.speakType IN (?1)")
-    long countSpecialTypeSpeak(List<Integer> speakTypeIds, CommonStatus status);
+    @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak" +
+            " WHERE speak.speakType IN (?1)" +
+            " AND speak.status<>?2" +
+            " AND speak.userId NOT IN (?3)")
+    long countSpecialTypeSpeakAndStatusNot(List<Integer> speakTypeIds, CommonStatus status, List<Long> denyUserIds);
 
-    @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak WHERE speak.id IN (?1) AND speak.speakType=?2 AND speak.status=?3")
-    long countSortSpeakByTypeAndStatus(List<Long> speakIds, Integer speakTypeId, CommonStatus status);
+    @Query("SELECT count(speak.id) FROM NurseSpeakEntity speak" +
+            " WHERE speak.id IN (?1)" +
+            " AND speak.speakType=?2" +
+            " AND speak.status<>?3" +
+            " AND speak.userId NOT IN (?4)")
+    long countSortSpeakByTypeAndStatus(List<Long> speakIds, Integer speakTypeId, CommonStatus status, List<Long> denyUserIds);
 }
