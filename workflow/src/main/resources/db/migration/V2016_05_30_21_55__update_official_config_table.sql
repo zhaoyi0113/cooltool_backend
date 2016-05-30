@@ -1,0 +1,1 @@
+ALTER TABLE `official_config` CHANGE COLUMN `value` `value` TEXT(30000) NOT NULL;
