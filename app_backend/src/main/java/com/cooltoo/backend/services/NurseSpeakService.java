@@ -100,6 +100,15 @@ public class NurseSpeakService {
         return speakBeans;
     }
 
+    public List<NurseSpeakBean> getSpeakByIds(List<Long> speakIds) {
+        logger.info("get speak by speak ids={}", speakIds);
+        List<NurseSpeakEntity> resultSet = speakRepository.findAll(speakIds);
+        List<NurseSpeakBean> beans = entitiesToBeans(resultSet);
+        fillOtherProperties(0, beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     //===============================================================
     //             get ----  nurse using
     //===============================================================
@@ -205,6 +214,10 @@ public class NurseSpeakService {
         List<NurseSpeakBean> nurseSpeaks = entitiesToBeans(entities);
         fillOtherProperties(userId, nurseSpeaks);
         return nurseSpeaks;
+    }
+
+    public boolean existsSpeak(long speakId) {
+        return speakRepository.exists(speakId);
     }
 
     private List<NurseSpeakBean> entitiesToBeans(Iterable<NurseSpeakEntity> entities) {

@@ -38,7 +38,7 @@ public class OfficialConfigServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetKeys() {
         List<String> configKeys = configService.getKeys();
-        Assert.assertEquals(1, configKeys.size());
+        Assert.assertEquals(4, configKeys.size());
     }
 
     @Test

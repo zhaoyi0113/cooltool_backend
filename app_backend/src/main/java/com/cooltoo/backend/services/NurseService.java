@@ -131,6 +131,29 @@ public class NurseService {
         return nurse;
     }
 
+    public List<NurseBean> getNurseWithoutOtherInfo(List<Long> userIds) {
+        logger.info("get nurse without other info by ids={}", userIds);
+        List<NurseEntity> entities = repository.findByIdIn(userIds);
+        if (VerifyUtil.isListEmpty(entities)) {
+            return new ArrayList<>();
+        }
+        List<NurseBean> beans = entities2Beans(entities);
+        List<Long> imageIds = new ArrayList<>();
+        for (NurseBean nurse : beans) {
+            imageIds.add(nurse.getProfilePhotoId());
+            imageIds.add(nurse.getBackgroundImageId());
+        }
+        Map<Long, String> imgId2Path = userStorage.getFilePath(imageIds);
+        for (NurseBean nurse : beans) {
+            String profile = imgId2Path.get(nurse.getProfilePhotoId());
+            String background = imgId2Path.get(nurse.getBackgroundImageId());
+            nurse.setProfilePhotoUrl(profile);
+            nurse.setBackgroundImageUrl(background);
+        }
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     public NurseBean getNurse(long userId) {
         NurseEntity entity = repository.findOne(userId);
         if (null == entity) {

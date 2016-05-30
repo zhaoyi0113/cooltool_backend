@@ -2,6 +2,7 @@ package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.beans.*;
 import com.cooltoo.backend.filter.LoginAuthentication;
+import com.cooltoo.backend.services.NurseSpeakComplaintService;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.SpeakType;
@@ -28,8 +29,8 @@ public class NurseSpeakAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseSpeakAPI.class);
 
-    @Autowired
-    private NurseSpeakService speakService;
+    @Autowired private NurseSpeakService speakService;
+    @Autowired private NurseSpeakComplaintService complaintService;
 
     @Path("/query/all/{type}/{index}/{number}")
     @GET
@@ -183,9 +184,13 @@ public class NurseSpeakAPI {
                                    @FormParam("speak_id") @DefaultValue("0") long complaintSpeakId,
                                    @FormParam("reason") @DefaultValue("") String complaintReason
     ) {
-        Object userId =  request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        // TODO -- need fixed
-        return Response.ok().build();
+        Object objUserId =  request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        Long userId = -1L;
+        if (null!=objUserId) {
+            userId = (Long) objUserId;
+        }
+        NurseSpeakComplaintBean complaintBean = complaintService.addComplaint(userId, complaintSpeakId, complaintReason);
+        return Response.ok(complaintBean).build();
     }
 
     @Path("/comment")

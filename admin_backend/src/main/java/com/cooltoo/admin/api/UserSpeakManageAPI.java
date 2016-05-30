@@ -2,6 +2,8 @@ package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.NurseSpeakBean;
+import com.cooltoo.backend.beans.NurseSpeakComplaintBean;
+import com.cooltoo.backend.services.NurseSpeakComplaintService;
 import com.cooltoo.backend.services.NurseSpeakService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +24,8 @@ public class UserSpeakManageAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(UserSpeakManageAPI.class.getName());
 
-    @Autowired
-    private NurseSpeakService userSpeakService;
+    @Autowired private NurseSpeakService userSpeakService;
+    @Autowired private NurseSpeakComplaintService complaintService;
 
     // base_url/admin/user_speak/count/?speak_type=ALL&content=点&start_time=2016-05-11 11:11:11&end_time=2016-05-21 11:11:11
     @Path("/count/all")
@@ -103,25 +105,64 @@ public class UserSpeakManageAPI {
     //==========================================================
     //            用户举报接口
     //==========================================================
-    @Path("/complaint/count")
+    @Path("/complaint_by_status/count/{status}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response countComplaint(@Context HttpServletRequest request,
-                                    @QueryParam("status") @DefaultValue("ALL") String status
+                                   @PathParam("status") @DefaultValue("ALL") String status
     ) {
-        // TODO -- need fixed
-        return Response.ok(0).build();
+        long count = complaintService.countByStatus(status);
+        return Response.ok(count).build();
     }
 
-    @Path("/complaint")
+    @Path("/complaint_by_speak_id/count/{speak_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response countComplaint(@Context HttpServletRequest request,
+                                   @PathParam("speak_id") @DefaultValue("0") long speakId
+    ) {
+        long count = complaintService.countBySpeakId(speakId);
+        return Response.ok(count).build();
+    }
+
+    @Path("/complaint_by_status")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getComplaintByStatus(@Context HttpServletRequest request,
-                                          @QueryParam("status") @DefaultValue("ALL") String status
+                                         @QueryParam("status") @DefaultValue("ALL") String status,
+                                         @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                         @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        // TODO -- need fixed
-        return Response.ok().build();
+        List<NurseSpeakComplaintBean> complaints = complaintService.getComplaintByStatus(status, pageIndex, sizePerPage);
+        return Response.ok(complaints).build();
+    }
+
+    @Path("/complaint_by_speak_id")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getComplaintBySpeakId(@Context HttpServletRequest request,
+                                         @QueryParam("speak_id") @DefaultValue("0") long speakId,
+                                         @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                         @QueryParam("number") @DefaultValue("10") int sizePerPage
+    ) {
+        List<NurseSpeakComplaintBean> complaints = complaintService.getComplaintBySpeakId(speakId, pageIndex, sizePerPage);
+        return Response.ok(complaints).build();
+    }
+
+    @Path("/complaint/edit")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editComplaint(@Context HttpServletRequest request,
+                                  @FormParam("complaint_id") @DefaultValue("0") long complaintId,
+                                  @FormParam("status") @DefaultValue("") String status,
+                                  @FormParam("reason") @DefaultValue("") String reason
+    ) {
+        NurseSpeakComplaintBean complaint = complaintService.updateCompliant(complaintId, reason, status);
+        return Response.ok(complaint).build();
     }
 }
