@@ -3,6 +3,7 @@ package com.cooltoo.backend.services;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.TokenAccessRepository;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.TokenAccessEntity;
@@ -44,6 +45,9 @@ public class NurseLoginService {
         NurseEntity nurseEntity = nurses.get(0);
         if(nurseEntity.getPassword()!=null && !nurseEntity.getPassword().equals(password)){
             throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+        }
+        if(UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
+            throw new BadRequestException(ErrorCode.NOT_PERMITTED);
         }
         TokenAccessEntity entity = new TokenAccessEntity();
         entity.setUserId(nurseEntity.getId());
