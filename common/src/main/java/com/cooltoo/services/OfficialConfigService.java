@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.*;
@@ -169,6 +170,7 @@ public class OfficialConfigService {
     //=============================================
     //                 delete
     //=============================================
+    @Transactional
     public void deleteByIds(String strIds) {
         logger.info("delete by ids={}", strIds);
         if (!VerifyUtil.isIds(strIds)) {
@@ -197,6 +199,7 @@ public class OfficialConfigService {
     //=============================================
     //                 update
     //=============================================
+    @Transactional
     public OfficialConfigBean updateConfig(int id, String name, String value, String strStatus, String imageName, InputStream image) {
         logger.info("update config={} by name={} value={} status={} imageName={} image={}", id, name, value, strStatus, imageName, image!=null);
         OfficialConfigEntity entity = repository.findOne(Integer.valueOf(id));
@@ -247,6 +250,7 @@ public class OfficialConfigService {
     //=============================================
     //                 add
     //=============================================
+    @Transactional
     public OfficialConfigBean addConfig(String name, String value, String strStatus, String imageName, InputStream image) {
         logger.info("add config by name={} value={} status={} imageName={} image={}", name, value, strStatus, imageName, image!=null);
         if (VerifyUtil.isStringEmpty(name)) {

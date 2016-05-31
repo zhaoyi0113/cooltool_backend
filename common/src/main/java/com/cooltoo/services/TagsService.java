@@ -609,7 +609,7 @@ public class TagsService {
     //=================================================================
     //         add tag and category
     //=================================================================
-
+    @Transactional
     public TagsBean addTags(String name, long categoryId, String imageName, InputStream image) {
         logger.info("add tag : name={} categoryId={} imageName={} image={}", name, categoryId, imageName, (null!=image));
 
@@ -655,6 +655,7 @@ public class TagsService {
         return bean;
     }
 
+    @Transactional
     public TagsCategoryBean addTagCategory(String name, String imageName, InputStream image) {
         logger.info("add tag category : name={} imageName={} image={}", name, imageName, (null!=image));
 

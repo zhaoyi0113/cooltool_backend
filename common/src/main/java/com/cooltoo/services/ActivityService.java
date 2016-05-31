@@ -488,6 +488,7 @@ public class ActivityService {
         return entity2BeanAndFillOtherProperties(entity);
     }
 
+    @Transactional
     public ActivityBean moveActivity2Temporary(long activityId) {
         logger.info("move activity {} image file to temporary directory", activityId);
 
