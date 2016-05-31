@@ -84,7 +84,7 @@ public class NurseSpeakService {
         int speakTypeId = null==speakTypeAbility ? 0 : speakTypeAbility.getAbilityId();
 
         PageRequest page = new PageRequest(pageIndex, sizePerPage, Sort.Direction.DESC, "time");
-        Page<NurseSpeakEntity> speaks = null;
+        Page<NurseSpeakEntity> speaks;
         if (userId==0 || userId<-1) {
             speaks = speakRepository.findBySpeakTypeAndContentAndTime(speakTypeId, contentLike, start, end, page);
         }
@@ -159,7 +159,7 @@ public class NurseSpeakService {
         }
 
         List<Long> denyUserIds = denyOrBlockSpeakUserIds(userId);
-        long count = 0;
+        long count;
         if (useUserId) {
             count = speakRepository.countSpecialTypeSpeakAndStatusNot(userId, speakTypeIds, CommonStatus.DELETED, denyUserIds);
         }
@@ -253,7 +253,7 @@ public class NurseSpeakService {
         if (null==beans || beans.isEmpty()) {
             return;
         }
-        List<Long>                speakIds         = new ArrayList<Long>();
+        List<Long>                speakIds         = new ArrayList<>();
         Map<Long, NurseSpeakBean> speakIdToBeanMap = new HashMap<>();
         for (NurseSpeakBean tmp : beans) {
             speakIdToBeanMap.put(tmp.getId(), tmp);
@@ -264,13 +264,12 @@ public class NurseSpeakService {
         // get username and profile photo path
         //
         // speak ids/file ids cache
-        List<Long> userIds = new ArrayList<Long>();
-        List<Long> fileIds = new ArrayList<Long>();
+        List<Long> userIds = new ArrayList<>();
+        List<Long> fileIds = new ArrayList<>();
 
         SpeakTypeBean        cathartSpeak  = speakTypeService.getSpeakTypeByType(SpeakType.CATHART);
         SpeakTypeBean        officialSpeak = speakTypeService.getSpeakTypeByType(SpeakType.OFFICIAL);
         Map<Long, NurseBean> userId2Name   = new HashMap<>();
-        Map<Long, Long>      userId2FileId = new HashMap<Long, Long>();
         userIds.add(userId);
         for(NurseSpeakBean tmp : beans){
             if (userIds.contains(tmp.getUserId())) {
@@ -284,17 +283,6 @@ public class NurseSpeakService {
         }
         // set user name and profileUrl
         OfficialConfigBean officialSpeakProfile = officialConfigService.getConfig(OfficialConfigService.OFFICIAL_SPEAK_PROFILE);
-        OfficialConfigBean forbiddenSpeak       = officialConfigService.getConfig(OfficialConfigService.SUBSTITUTION_OF_FORBIDDEN_SPEAK);
-        List<ImagesInSpeakBean> forbiddenImages = new ArrayList<>();
-        if (null!=forbiddenSpeak) {
-            ImagesInSpeakBean forbiddenImage = new ImagesInSpeakBean();
-            forbiddenImage.setId(0);
-            forbiddenImage.setImageId(forbiddenSpeak.getImageId());
-            forbiddenImage.setImageUrl(forbiddenSpeak.getImageUrl());
-            forbiddenImage.setSpeakId(0);
-            forbiddenImage.setTimeCreated(forbiddenSpeak.getCreateTime());
-            forbiddenImages.add(forbiddenImage);
-        }
         for (NurseSpeakBean tmp : beans) {
             NurseBean nurse = userId2Name.get(tmp.getUserId());
             if (null!=nurse) {
@@ -308,10 +296,6 @@ public class NurseSpeakService {
             }
             if (tmp.getSpeakType()==cathartSpeak.getId()) {
                 tmp.setUserName(tmp.getAnonymousName());
-            }
-            if (null!=forbiddenSpeak && CommonStatus.DISABLED.equals(tmp.getStatus())) {
-                tmp.setContent(forbiddenSpeak.getValue());
-                tmp.setImages(forbiddenImages);
             }
         }
 
@@ -362,6 +346,17 @@ public class NurseSpeakService {
         //
         // get image url of speak
         //
+        OfficialConfigBean forbiddenSpeak = officialConfigService.getConfig(OfficialConfigService.SUBSTITUTION_OF_FORBIDDEN_SPEAK);
+        List<ImagesInSpeakBean> forbiddenImages = new ArrayList<>();
+        if (null!=forbiddenSpeak) {
+            ImagesInSpeakBean forbiddenImage = new ImagesInSpeakBean();
+            forbiddenImage.setId(0);
+            forbiddenImage.setImageId(forbiddenSpeak.getImageId());
+            forbiddenImage.setImageUrl(forbiddenSpeak.getImageUrl());
+            forbiddenImage.setSpeakId(0);
+            forbiddenImage.setTimeCreated(forbiddenSpeak.getCreateTime());
+            forbiddenImages.add(forbiddenImage);
+        }
         SpeakTypeBean                      cathartType = speakTypeService.getSpeakTypeByType(SpeakType.CATHART);
         Map<Long, List<ImagesInSpeakBean>> idToImage = speakImageService.getImagesInSpeak(speakIds);
         for (NurseSpeakBean tmp : beans) {
@@ -373,6 +368,10 @@ public class NurseSpeakService {
                 if (!VerifyUtil.isListEmpty(images)) {
                     speakBean.setUserProfilePhotoUrl(images.get(0).getImageUrl());
                 }
+            }
+            if (null!=forbiddenSpeak && CommonStatus.DISABLED.equals(tmp.getStatus())) {
+                tmp.setContent(forbiddenSpeak.getValue());
+                tmp.setImages(forbiddenImages);
             }
         }
 
