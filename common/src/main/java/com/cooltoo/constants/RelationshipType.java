@@ -16,6 +16,9 @@ public enum RelationshipType {
         if (BLOCK_ALL_SPEAK.name().equalsIgnoreCase(relationship)) {
             type = BLOCK_ALL_SPEAK;
         }
+        else if (OTHER.name().equalsIgnoreCase(relationship)) {
+            type = OTHER;
+        }
         return type;
     }
 
@@ -23,6 +26,9 @@ public enum RelationshipType {
         RelationshipType type = null;
         if (BLOCK_ALL_SPEAK.ordinal()==relationship) {
             type = BLOCK_ALL_SPEAK;
+        }
+        else if (OTHER.ordinal()==relationship) {
+            type = OTHER;
         }
         return type;
     }
