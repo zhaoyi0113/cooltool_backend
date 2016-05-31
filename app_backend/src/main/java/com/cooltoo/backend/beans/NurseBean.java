@@ -4,6 +4,7 @@ import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +43,7 @@ public class NurseBean {
     private long backgroundImageId;
     private String backgroundImageUrl;
     private String hospital;
+    private List<NurseRelationshipBean> relationshipToRequester;
     private Map<String, Object> properties = new HashMap<String, Object>();
 
 
@@ -189,20 +191,30 @@ public class NurseBean {
         this.authority = authority;
     }
 
+    public List<NurseRelationshipBean> getRelationshipToRequester() {
+        return relationshipToRequester;
+    }
+
+    public void setRelationshipToRequester(List<NurseRelationshipBean> relationshipToRequester) {
+        this.relationshipToRequester = relationshipToRequester;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" , ");
-        msg.append("name=").append(name).append(" , ");
-        msg.append("gender=").append(gender).append(" , ");
-        msg.append("age=").append(age).append(" , ");
-        msg.append("password=").append(password).append(" , ");
-        msg.append("profilePhotoUrl=").append(profilePhotoUrl).append(" , ");
-        msg.append("backgroundImageUrl=").append(backgroundImageUrl).append(" , ");
-        msg.append("integral=").append(integral).append(" , ");
-        msg.append("realName=").append(realName).append(" , ");
-        msg.append("identification=").append(identification).append(" , ");
-        msg.append("shortNote=").append(shortNote);
+        msg.append("id=").append(id);
+        msg.append(", name=").append(name);
+        msg.append(", gender=").append(gender);
+        msg.append(", age=").append(age);
+        msg.append(", password=").append(password);
+        msg.append(", profilePhotoUrl=").append(profilePhotoUrl);
+        msg.append(", backgroundImageUrl=").append(backgroundImageUrl);
+        msg.append(", integral=").append(integral);
+        msg.append(", realName=").append(realName);
+        msg.append(", identification=").append(identification);
+        msg.append(", shortNote=").append(shortNote);
+        msg.append(", relationshipToRequester=").append(relationshipToRequester);
+        msg.append(", properties=").append(properties);
         msg.append("]");
         return msg.toString();
     }

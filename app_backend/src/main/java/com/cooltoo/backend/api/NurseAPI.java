@@ -1,8 +1,11 @@
 package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseRelationshipBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
+import com.cooltoo.backend.services.NurseRelationshipService;
 import com.cooltoo.backend.services.NurseService;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -12,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.InputStream;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +28,8 @@ public class NurseAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseAPI.class.getName());
 
-    @Autowired
-    NurseService service;
+    @Autowired NurseService service;
+    @Autowired NurseRelationshipService relationService;
 
     @POST
     @Path("/register")
@@ -72,11 +77,15 @@ public class NurseAPI {
     }
 
     @GET
-    @Path("{id}")
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response getNurse(@DefaultValue("-1") @PathParam("id") long id) {
+    public Response getNurse(@Context HttpServletRequest request,
+                             @DefaultValue("-1") @PathParam("id") long id) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean one = service.getNurse(id);
+        List<NurseRelationshipBean> relations = relationService.getRelation(false, id, userId, "", CommonStatus.ENABLED.name());
+        one.setRelationshipToRequester(relations);
         logger.info("get nurse is " + one);
         return Response.ok(one).build();
     }

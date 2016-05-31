@@ -39,6 +39,17 @@ public class NurseRelationshipAPI {
         return Response.ok(relationships).build();
     }
 
+    @Path("/{relative_user_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response getRelationship(@Context HttpServletRequest request,
+                                    @PathParam("relative_user_id") @DefaultValue("0") long relativeUserId) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<NurseRelationshipBean> relationships = relationshipService.getRelation(true, userId, relativeUserId, "", CommonStatus.ENABLED.name());
+        return Response.ok(relationships).build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
@@ -47,7 +58,7 @@ public class NurseRelationshipAPI {
                                     @FormParam("relation_type") @DefaultValue("") String relationType
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseRelationshipBean relationship = relationshipService.addRelation(userId, relativeUserId, relationType);
+        NurseRelationshipBean relationship = relationshipService.setRelation(userId, relativeUserId, relationType);
         return Response.ok(relationship).build();
     }
 

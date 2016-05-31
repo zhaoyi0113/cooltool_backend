@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <sensitive_words id="1" type="1" time_created="2016-05-10 12:30:00" status="1" word="hello" />
+    <sensitive_words id="2" type="1" time_created="2016-05-11 12:30:00" status="1" word="admin" />
+    <sensitive_words id="3" type="1" time_created="2016-05-12 12:30:00" status="1" word="chou" />
+    <sensitive_words id="4" type="1" time_created="2016-05-13 12:30:00" status="1" word="mei" />
+    <sensitive_words id="5" type="0" time_created="2016-05-13 12:30:00" status="1" word="i00" />
+    <sensitive_words id="6" type="1" time_created="2016-05-13 12:30:00" status="0" word="e11" />
+</dataset>

@@ -6,12 +6,15 @@ import com.cooltoo.backend.converter.social_ability.SpeakAbilityTypeConverter;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
 import com.cooltoo.beans.OfficialConfigBean;
+import com.cooltoo.beans.SensitiveWordBean;
 import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.SensitiveWordType;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.OfficialConfigService;
+import com.cooltoo.services.SensitiveWordService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -34,6 +37,7 @@ public class NurseSpeakService {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseSpeakService.class.getName());
 
+    @Autowired private SensitiveWordService sensitiveWordService;
     @Autowired private NurseService nurseService;
     @Autowired private NurseRelationshipService nurseRelationshipService;
     @Autowired private NurseSpeakRepository speakRepository;
@@ -416,6 +420,7 @@ public class NurseSpeakService {
     @Transactional
     private NurseSpeakBean addNurseSpeak(long userId, String content, String strSpeakType, String anonymousName, String imageName, InputStream image) {
         logger.info("add nurse speak with userId={} speakType={} content={} imageName={} image={}", userId, strSpeakType, content, imageName, (null!=image));
+        judgeSensitiveWord(content);
 
         // check speak type
         SpeakType     speakType     = SpeakType.parseString(strSpeakType);
@@ -611,11 +616,13 @@ public class NurseSpeakService {
     //=======================================================
 
     public NurseSpeakCommentBean addSpeakComment(long speakId, long commentMakerId, long commentReceiverId, String comment) {
+        judgeSensitiveWord(comment);
         NurseSpeakCommentBean commentBean = speakCommentService.addSpeakComment(speakId, commentMakerId, commentReceiverId, comment);
         return commentBean;
     }
 
     public NurseSpeakCommentBean updateSpeakComment(long commentId, String comment, String status) {
+        judgeSensitiveWord(comment);
         NurseSpeakCommentBean commentBean = speakCommentService.updateSpeakComment(commentId, comment, status);
         return commentBean;
     }
@@ -700,5 +707,18 @@ public class NurseSpeakService {
 
     public NurseSpeakThumbsUpBean getNurseSpeakThumbsUpByNurseSpeakIdAndThumbsUpUserId(long nurseSpeakId, long thumbsUpUserId) {
         return thumbsUpService.findNurseSpeakThumbsUp(nurseSpeakId, thumbsUpUserId);
+    }
+
+    private void judgeSensitiveWord(String content) {
+        if (!VerifyUtil.isStringEmpty(content)) {
+            content = content.trim();
+            List<SensitiveWordBean> sensitiveWords = sensitiveWordService.getWords(SensitiveWordType.ADD_CONTENT_FORBIDDEN.name(), CommonStatus.ENABLED.name());
+            for (SensitiveWordBean word : sensitiveWords) {
+                if (content.contains(word.getWord())) {
+                    logger.info("contains sensitive word={}", word);
+                    throw new BadRequestException(ErrorCode.CONTAINS_SENSITIVE_WORD);
+                }
+            }
+        }
     }
 }

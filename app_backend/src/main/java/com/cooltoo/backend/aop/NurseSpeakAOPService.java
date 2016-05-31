@@ -24,6 +24,7 @@ import com.cooltoo.util.VerifyUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,8 @@ public class NurseSpeakAOPService {
     @Autowired private NurseIntegrationService integrationService;
     @Autowired private CommentAbilityTypeConverter commentAbilityTypeConverter;
     @Autowired private ThumbsUpAbilityTypeConverter thumbsUpAbilityTypeConverter;
+
+    
 
     @AfterReturning(pointcut = "execution(* com.cooltoo.backend.services.NurseSpeakService.addSmug(..))",
             returning = "retVal")

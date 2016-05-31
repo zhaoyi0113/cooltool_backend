@@ -117,7 +117,7 @@ public class NurseRelationshipServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    public void testAddRelation() {
+    public void testSetRelation() {
         long userId = 1;
         long relativeUserId = 6;
         String relationType = RelationshipType.BLOCK_ALL_SPEAK.name();
@@ -125,7 +125,7 @@ public class NurseRelationshipServiceTest extends AbstractCooltooTest {
         List<NurseRelationshipBean> relationships = relationshipService.getRelation(false, userId, relativeUserId, relationType, "");
         Assert.assertEquals(0, relationships.size());
 
-        NurseRelationshipBean bean = relationshipService.addRelation(userId, relativeUserId, relationType);
+        NurseRelationshipBean bean = relationshipService.setRelation(userId, relativeUserId, relationType);
         Assert.assertNotNull(bean);
         Assert.assertEquals(userId, bean.getUserId());
         Assert.assertEquals(relativeUserId, bean.getRelativeUserId());
@@ -134,6 +134,13 @@ public class NurseRelationshipServiceTest extends AbstractCooltooTest {
 
         relationships = relationshipService.getRelation(false, userId, relativeUserId, relationType, "");
         Assert.assertEquals(1, relationships.size());
+
+        bean = relationshipService.setRelation(userId, relativeUserId, relationType);
+        Assert.assertNotNull(bean);
+        Assert.assertEquals(userId, bean.getUserId());
+        Assert.assertEquals(relativeUserId, bean.getRelativeUserId());
+        Assert.assertEquals(RelationshipType.BLOCK_ALL_SPEAK, bean.getRelationType());
+        Assert.assertEquals(CommonStatus.DISABLED, bean.getStatus());
     }
 
     @Test

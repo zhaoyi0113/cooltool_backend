@@ -164,7 +164,7 @@ public class NurseRelationshipService {
     //                       add
     //================================================================
     @Transactional
-    public NurseRelationshipBean addRelation(long userId, long relativeUserId, String strRelation) {
+    public NurseRelationshipBean setRelation(long userId, long relativeUserId, String strRelation) {
         logger.info("user {} add relationship {} to user {}", userId, strRelation, relativeUserId);
         RelationshipType relationType = RelationshipType.parseString(strRelation);
         if (null==relationType) {
@@ -188,7 +188,15 @@ public class NurseRelationshipService {
         );
         if (null!=relationship) {
             logger.info("the relationship already exist, {}", relationship);
-            relationship.setStatus(CommonStatus.ENABLED);
+            if (CommonStatus.ENABLED.equals(relationship.getStatus())) {
+                relationship.setStatus(CommonStatus.DISABLED);
+            }
+            else if (CommonStatus.DISABLED.equals(relationship.getStatus())) {
+                relationship.setStatus(CommonStatus.ENABLED);
+            }
+            else if (CommonStatus.DELETED.equals(relationship.getStatus())) {
+                relationship.setStatus(CommonStatus.ENABLED);
+            }
         }
         else {
             relationship = new NurseRelationshipEntity();
