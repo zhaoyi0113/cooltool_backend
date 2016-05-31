@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -97,8 +98,8 @@ public class NurseAPI {
     public Response getNurseInformation(@Context HttpServletRequest request){
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean one = service.getNurse(userId);
+        one.setRelationshipToRequester(new ArrayList<>());
         logger.info("get nurse is " + one);
-        
         return Response.ok(one).build();
     }
 
