@@ -9,7 +9,7 @@ ALTER TABLE `nurse_integration`
   CHANGE COLUMN `time_created` `time_created` DATETIME NULL DEFAULT now(),
   CHANGE COLUMN `status` `status` INT(11) NULL DEFAULT 0;
 
-CREATE TABLE `nurse_message` (
+CREATE TABLE IF NOT EXISTS `nurse_message` (
   `id` BIGINT(64) NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT(64) NOT NULL DEFAULT 0,
   `user_type` INT(11) NULL DEFAULT 0,
