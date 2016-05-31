@@ -2,6 +2,7 @@ package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.NurseSpeakBean;
+import com.cooltoo.backend.beans.NurseSpeakCommentBean;
 import com.cooltoo.backend.beans.NurseSpeakComplaintBean;
 import com.cooltoo.backend.services.NurseSpeakComplaintService;
 import com.cooltoo.backend.services.NurseSpeakService;
@@ -100,6 +101,18 @@ public class UserSpeakManageAPI {
     ) {
         long effectedCount = userSpeakService.updateSpeakStatus(speakIds, status);
         return Response.ok(effectedCount).build();
+    }
+
+    @Path("/comment/invisible")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response updateSpeakCommentStatus(@Context HttpServletRequest request,
+                                             @FormParam("comment_id") @DefaultValue("0") long commentId,
+                                             @FormParam("status") @DefaultValue("disabled") String status
+    ) {
+        NurseSpeakCommentBean comment = userSpeakService.updateSpeakComment(commentId, "", status);
+        return Response.ok(comment).build();
     }
 
     //==========================================================

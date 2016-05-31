@@ -1,8 +1,6 @@
 package com.cooltoo.backend.entities;
 
 import com.cooltoo.constants.CommonStatus;
-import org.hibernate.annotations.Generated;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Date;

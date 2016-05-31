@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -162,6 +163,7 @@ public class NurseRelationshipService {
     //================================================================
     //                       add
     //================================================================
+    @Transactional
     public NurseRelationshipBean addRelation(long userId, long relativeUserId, String strRelation) {
         logger.info("user {} add relationship {} to user {}", userId, strRelation, relativeUserId);
         RelationshipType relationType = RelationshipType.parseString(strRelation);
@@ -206,6 +208,7 @@ public class NurseRelationshipService {
     //================================================================
     //                       update
     //================================================================
+    @Transactional
     public  NurseRelationshipBean updateRelationStatus(long relationId, String strStatus) {
         logger.info("update status by relationId={} to status={}", relationId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
@@ -232,6 +235,7 @@ public class NurseRelationshipService {
         return beanConverter.convert(relationship);
     }
 
+    @Transactional
     public NurseRelationshipBean updateRelationStatus(long userId, long relativeUserId, RelationshipType relationType, CommonStatus status) {
         logger.info("user {} update relationship {} to user {} to status={}", userId, relationType, relativeUserId, status);
         if (relationType==null) {
@@ -258,6 +262,7 @@ public class NurseRelationshipService {
         return null;
     }
 
+    @Transactional
     public NurseRelationshipBean updateRelationStatus(long userId, long relativeUserId, String strRelation, String strStatus) {
         RelationshipType relationType = RelationshipType.parseString(strRelation);
         CommonStatus status = CommonStatus.parseString(strStatus);

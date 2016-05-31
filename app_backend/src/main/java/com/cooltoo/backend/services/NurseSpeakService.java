@@ -616,6 +616,11 @@ public class NurseSpeakService {
         return commentBean;
     }
 
+    public NurseSpeakCommentBean updateSpeakComment(long commentId, String comment, String status) {
+        NurseSpeakCommentBean commentBean = speakCommentService.updateSpeakComment(commentId, comment, status);
+        return commentBean;
+    }
+
     public List<NurseSpeakCommentBean> deleteSpeakComment(long userId, String strCommentIds) {
         List<NurseSpeakCommentBean> comments = speakCommentService.getCommentByIds(strCommentIds);
 

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.*;
@@ -108,7 +109,7 @@ public class NurseQualificationFileService {
     //=============================================================
     //       delete qualification file
     //=============================================================
-
+    @Transactional
     public List<NurseQualificationFileBean> deleteFileByQualificationId(long qualificationId) {
         List<NurseQualificationFileBean> files = getAllFileByQualificationId(qualificationId);
         if (null==files||files.isEmpty()) {
@@ -129,6 +130,7 @@ public class NurseQualificationFileService {
     //=============================================================
     //       add qualification file
     //=============================================================
+    @Transactional
     public String addQualificationFile(long qualificationId, WorkFileTypeBean workFileType, String fileName, InputStream file) {
         logger.info("add a qualification file parameters is qualification_id={} type={} fileName={} file={}", qualificationId, workFileType, fileName, file);
         String filePath = null;
@@ -169,6 +171,7 @@ public class NurseQualificationFileService {
         return filePath;
     }
 
+    @Transactional
     public NurseQualificationFileBean updateQualificationFile(long id, WorkFileTypeBean workFileType, String fileName, InputStream file, Date expiryTime) {
         logger.info("update a qualification file parameters is expiryTime={} type={} fileName={} file={}", expiryTime, workFileType, fileName, file);
 

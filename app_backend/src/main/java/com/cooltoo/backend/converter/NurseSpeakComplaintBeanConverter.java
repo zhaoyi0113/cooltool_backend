@@ -13,6 +13,9 @@ public class NurseSpeakComplaintBeanConverter implements Converter<NurseSpeakCom
 
     @Override
     public NurseSpeakComplaintBean convert(NurseSpeakComplaintEntity source) {
+        if (null==source) {
+            return null;
+        }
         NurseSpeakComplaintBean bean = new NurseSpeakComplaintBean();
         bean.setId(source.getId());
         bean.setInformantId(source.getInformantId());

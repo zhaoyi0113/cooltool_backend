@@ -47,7 +47,7 @@ public class NurseSpeakCommentService {
     //              GET
     //==================================================================
     public List<Long> findSpeakWithCommentUserMake(long nurseId) {
-        List<Long> speaks = commentRepository.findSpeakWithCommentUserMake(nurseId, CommonStatus.ENABLED);
+        List<Long> speaks = commentRepository.findSpeakWithCommentUserMakeAndStatusNot(nurseId, CommonStatus.DELETED);
         if (VerifyUtil.isListEmpty(speaks)) {
             logger.info("speak with comment user={} made is empty", nurseId);
             return new ArrayList<>();
@@ -69,7 +69,7 @@ public class NurseSpeakCommentService {
             return new ArrayList<>();
         }
 
-        List<NurseSpeakCommentEntity> resultSet = commentRepository.findByStatusAndIdIn(CommonStatus.ENABLED, commentIds);
+        List<NurseSpeakCommentEntity> resultSet = commentRepository.findByStatusNotAndIdIn(CommonStatus.DELETED, commentIds);
 
         List<NurseSpeakCommentBean>   comments  = new ArrayList<>();
         for (NurseSpeakCommentEntity tmp : resultSet) {
@@ -85,7 +85,7 @@ public class NurseSpeakCommentService {
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_NOT_EXIST);
         }
         Sort sort = new Sort(Sort.Direction.ASC, "time");
-        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusAndNurseSpeakId(CommonStatus.ENABLED, nurseSpeakId, sort);
+        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusNotAndNurseSpeakId(CommonStatus.DELETED, nurseSpeakId, sort);
         List<NurseSpeakCommentBean> retValue = new ArrayList<NurseSpeakCommentBean>();
 
         int count = null==comments ? 0 : comments.size();
@@ -113,7 +113,7 @@ public class NurseSpeakCommentService {
         Sort.Order speakIdOrder = new Sort.Order(Sort.Direction.DESC, "nurseSpeakId");
         Sort.Order timeOrder = new Sort.Order(Sort.Direction.ASC, "time");
         Sort sort = new Sort(speakIdOrder, timeOrder);
-        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusAndNurseSpeakIdIn(CommonStatus.ENABLED, nurseSpeakIds, sort);
+        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusNotAndNurseSpeakIdIn(CommonStatus.DELETED, nurseSpeakIds, sort);
         List<NurseSpeakCommentBean> retValue = new ArrayList<NurseSpeakCommentBean>();
 
         int count = null==comments ? 0 : comments.size();
@@ -193,7 +193,7 @@ public class NurseSpeakCommentService {
             return new ArrayList<>();
         }
 
-        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusAndNurseSpeakIdIn(CommonStatus.ENABLED, speakIds);
+        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusNotAndNurseSpeakIdIn(CommonStatus.DELETED, speakIds);
         if (null==comments || comments.isEmpty()) {
             logger.info("delete nothing");
         }
@@ -232,7 +232,7 @@ public class NurseSpeakCommentService {
             return new ArrayList<>();
         }
 
-        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusAndIdIn(CommonStatus.ENABLED, commentIds);
+        List<NurseSpeakCommentEntity> comments = commentRepository.findByStatusNotAndIdIn(CommonStatus.DELETED, commentIds);
         if (null==comments || comments.isEmpty()) {
             logger.info("delete nothing");
         }
@@ -265,14 +265,14 @@ public class NurseSpeakCommentService {
         if (commentReceiverId < 0) {
             commentReceiverId = 0;
         }
-        if (null==comment || "".equals(comment)) {
+        if (VerifyUtil.isStringEmpty(comment)) {
             throw new BadRequestException(ErrorCode.SPEAK_COMMENT_NOT_EXIST);
         }
         NurseSpeakCommentEntity entity = new NurseSpeakCommentEntity();
         entity.setNurseSpeakId(nurseSpeakId);
         entity.setCommentMakerId(commentMakerId);
         entity.setCommentReceiverId(commentReceiverId);
-        entity.setComment(comment);
+        entity.setComment(comment.trim());
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity = commentRepository.save(entity);
@@ -282,5 +282,36 @@ public class NurseSpeakCommentService {
         commentBean.setSpeakMakerId(speak.getUserId());
         commentBean.setNurseSpeakTypeId(speak.getSpeakType());
         return commentBean;
+    }
+
+    //==================================================================
+    //                update
+    //==================================================================
+    @Transactional
+    public NurseSpeakCommentBean updateSpeakComment(long commentId, String comment, String strStatus) {
+        logger.info("update comment {} with content={} status={}", commentId, comment, strStatus);
+        NurseSpeakCommentEntity commentE = commentRepository.findOne(commentId);
+        if (null==commentE) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        boolean changed = false;
+        if (!VerifyUtil.isStringEmpty(comment)) {
+            comment = comment.trim();
+            if (!comment.equals(commentE.getComment())) {
+                commentE.setComment(comment);
+                changed = true;
+            }
+        }
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null!=status) {
+            if (!status.equals(commentE.getStatus())) {
+                commentE.setStatus(status);
+                changed = true;
+            }
+        }
+        if (changed) {
+            commentRepository.save(commentE);
+        }
+        return beanConverter.convert(commentE);
     }
 }

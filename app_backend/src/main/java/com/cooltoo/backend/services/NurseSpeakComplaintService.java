@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -140,6 +141,7 @@ public class NurseSpeakComplaintService {
     //========================================================================
     //            add
     //========================================================================
+    @Transactional
     public NurseSpeakComplaintBean addComplaint(long informantId, long speakId, String reason) {
         logger.info("add complaint by user={} speakId={} reason={}", informantId, speakId, reason);
         if (!nurseSpeakService.existsSpeak(speakId)) {
@@ -164,11 +166,13 @@ public class NurseSpeakComplaintService {
     //========================================================================
     //            update
     //========================================================================
+    @Transactional
     public NurseSpeakComplaintBean updateCompliant(long complaintId, String reason, String strStatus) {
         logger.info("update complaint by id={} reason={} status={}",
                 complaintId, reason, strStatus);
 
         NurseSpeakComplaintEntity complaint = repository.getOne(complaintId);
+        NurseSpeakComplaintBean complaintB =  beanConverter.convert(complaint);
         if (null==complaint) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }

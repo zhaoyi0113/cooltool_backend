@@ -255,7 +255,7 @@ public class NurseQualificationService {
     //=======================================================
     //   update qualification file
     //=======================================================
-
+    @Transactional
     public NurseQualificationBean updateQualification(long qualificatinId, String name, VetStatus status, String statusDescr) {
         NurseQualificationEntity entity = repository.findOne(qualificatinId);
         if (null==entity) {
@@ -288,6 +288,7 @@ public class NurseQualificationService {
         return bean;
     }
 
+    @Transactional
     public NurseQualificationFileBean updateQualificationFile(int qualificationFileId, String workfileType, String fileName, InputStream file, Date expiryTime) {
         WorkFileTypeBean workfileTypeB = getWorkFileTypeBean(workfileType);
         NurseQualificationFileBean bean = qualificationFileService.updateQualificationFile(qualificationFileId, workfileTypeB, fileName, file, expiryTime);

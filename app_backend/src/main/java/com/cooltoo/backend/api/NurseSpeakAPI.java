@@ -44,15 +44,13 @@ public class NurseSpeakAPI {
             logger.info("speak type assign to {}", type);
         }
 
-        boolean useUserId = false;
         long userId = 0;
         Object objUserId = request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         if (null!=objUserId) {
-            useUserId = true;
             userId = (Long) objUserId;
         }
-        logger.info("anonymous user to get all speak content useUserId={} userId={} type={} index={} number={}", useUserId, userId, type, index, number);
-        List<NurseSpeakBean> all = speakService.getSpeak(useUserId, userId, type, index, number);
+        logger.info("anonymous user to get all speak content useUserId={} userId={} type={} index={} number={}", userId, type, index, number);
+        List<NurseSpeakBean> all = speakService.getSpeak(false, userId, type, index, number);
         logger.info("all speak count={}", all.size());
         return Response.ok(all).build();
     }
