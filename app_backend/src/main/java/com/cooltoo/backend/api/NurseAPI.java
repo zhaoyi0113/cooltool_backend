@@ -84,7 +84,7 @@ public class NurseAPI {
                              @DefaultValue("-1") @PathParam("id") long id) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean one = service.getNurse(id);
-        List<NurseRelationshipBean> relations = relationService.getRelation(false, id, userId, "", CommonStatus.ENABLED.name());
+        List<NurseRelationshipBean> relations = relationService.getRelation(false, userId, id, "", CommonStatus.ENABLED.name());
         one.setRelationshipToRequester(relations);
         logger.info("get nurse is " + one);
         return Response.ok(one).build();
