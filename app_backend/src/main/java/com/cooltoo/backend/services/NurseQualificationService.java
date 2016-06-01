@@ -57,7 +57,7 @@ public class NurseQualificationService {
     @Transactional
     public String addWorkFile(long nurseId, String name, String workfileType, String fileName, InputStream file) {
         if (!nurseRepository.exists(nurseId)) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
 
         WorkFileType                   type           = WorkFileType.parseString(workfileType);

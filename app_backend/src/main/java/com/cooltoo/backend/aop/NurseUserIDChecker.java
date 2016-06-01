@@ -41,11 +41,11 @@ public class NurseUserIDChecker {
             try {
                 long userId = Long.parseLong(String.valueOf(args[0]));
                 if (!nurseService.existNurse(userId) && userId != ANONYMOUS_USER_ID) {
-                    throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+                    throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
                 }
             } catch (NumberFormatException e) {
                 logger.error(e.getMessage());
-                throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+                throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
             }
         }
     }

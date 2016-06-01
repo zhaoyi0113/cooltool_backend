@@ -137,7 +137,7 @@ public class NurseService {
     public NurseBean getNurseWithoutOtherInfo(long userId) {
         NurseEntity entity = repository.findOne(userId);
         if (null == entity) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
         NurseBean nurse = beanConverter.convert(entity);
         List<Long> imageIds = new ArrayList<>();
@@ -175,7 +175,7 @@ public class NurseService {
     public NurseBean getNurse(long userId) {
         NurseEntity entity = repository.findOne(userId);
         if (null == entity) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
         NurseBean nurse = beanConverter.convert(entity);
         List<Long> imageIds = new ArrayList<>();
@@ -368,7 +368,7 @@ public class NurseService {
     public NurseBean deleteNurse(long userId) {
         NurseEntity entity = repository.findOne(userId);
         if (null==entity) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
         repository.delete(userId);
         return beanConverter.convert(entity);
@@ -382,7 +382,7 @@ public class NurseService {
     public NurseBean updateNurse(long userId, String name, int age, int gender) {
         NurseEntity entity = repository.findOne(userId);
         if (null==entity) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
 
         boolean changed = false;
@@ -446,7 +446,7 @@ public class NurseService {
         boolean changed = false;
         NurseEntity nurse = repository.findOne(userId);
         if (null==nurse) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
         logger.info("nurse real name is : " + realName);
         logger.info("nurse identification is : " + identification);
@@ -468,7 +468,7 @@ public class NurseService {
     public NurseBean updateShortNote(long userId, String shortNote) {
         NurseEntity nurse = repository.findOne(userId);
         if (null==nurse) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
         logger.info("nurse short note is : " + shortNote);
         if (VerifyUtil.isStringEmpty(shortNote)) {
@@ -536,7 +536,7 @@ public class NurseService {
         // get nurse
         NurseEntity nurseEntity = repository.findOne(bean.getId());
         if (null==nurseEntity) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
 
         boolean changed = false;

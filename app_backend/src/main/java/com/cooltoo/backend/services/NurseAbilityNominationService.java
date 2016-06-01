@@ -163,7 +163,7 @@ public class NurseAbilityNominationService {
 
     private void validateNurse(long userId) {
         if (!nurseRepository.exists(userId)) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
     }
 

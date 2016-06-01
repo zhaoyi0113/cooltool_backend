@@ -59,7 +59,7 @@ public class NurseIntegrationService {
         try {
             if (!nurseService.existNurse(userId)) {
                 logger.error("can't find nurse {}", userId);
-                throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+                throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
             }
             SpecificSocialAbility speakAbility = getSpeakTypePoint(speakType);
             addIntegration(userId, UserType.NURSE, speakAbility.getAbilityType(), speakAbility.getAbilityId(), nurseSpeakBean.getId(), speakAbility.getFactor());

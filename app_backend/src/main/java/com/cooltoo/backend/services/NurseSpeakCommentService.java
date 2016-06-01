@@ -260,7 +260,7 @@ public class NurseSpeakCommentService {
             throw new BadRequestException(ErrorCode.SPEAK_CONTENT_NOT_EXIST);
         }
         if (commentMakerId <= 0) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
         if (commentReceiverId < 0) {
             commentReceiverId = 0;

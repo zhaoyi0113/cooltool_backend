@@ -54,7 +54,7 @@ public class PatientBadgeService{
     public PatientBadgeBean deleteById(Integer id) {
         PatientBadgeEntity entity = repository.findOne(id);
         if (null==entity) {
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
         repository.delete(id);
         return beanConverter.convert(entity);

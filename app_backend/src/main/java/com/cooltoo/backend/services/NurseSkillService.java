@@ -100,7 +100,7 @@ public class NurseSkillService {
         // is Nurse exist
         if (!nurseService.existNurse(userId)) {
             logger.info("user not exist");
-            throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
 
         // judge the skills exist

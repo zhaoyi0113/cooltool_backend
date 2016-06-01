@@ -33,7 +33,6 @@ public enum ErrorCode {
     NOT_LOGIN(222, Response.Status.BAD_REQUEST, "未登陆", "Not Login"),
     BADGE_NOT_EXIST(223, Response.Status.BAD_REQUEST, "徽章不存在", "Badge not exist"),
     ORDER_NOT_EXIST(224, Response.Status.BAD_REQUEST,  "订单不存在", "Order not exist"),
-    NURSE_NOT_EXIST(225, Response.Status.BAD_REQUEST,  "护士不存在", "Nurse not exist"),
     RECORD_NOT_EXIST(226, Response.Status.BAD_REQUEST,  "记录不存在", "Record not exist"),
     HOSPITAL_NOT_EXIST(227, Response.Status.BAD_REQUEST,  "医院不存在", "Hospital not exist"),
     HOSPITAL_DEPARTMENT_NOT_EXIST(228, Response.Status.BAD_REQUEST,  "科室不存在", "Hospital department not exist"),

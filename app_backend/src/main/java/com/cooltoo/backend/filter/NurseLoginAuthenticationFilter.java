@@ -83,7 +83,7 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
             logger.info("get user id "+userId);
             NurseEntity nurseEntity = nurseRepository.findOne(userId);
             if (null==nurseEntity) {
-                throw new BadRequestException(ErrorCode.NURSE_NOT_EXIST);
+                throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
             }
             if (!isLogout && UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
                 throw new BadRequestException(ErrorCode.NOT_PERMITTED);
