@@ -62,7 +62,8 @@ public enum ErrorCode {
     RECORD_ALREADY_EXIST(252, Response.Status.BAD_REQUEST, "记录已存在", "Record already exist"),
     PLATFORM_VERSION_NOT_FOUND(253, Response.Status.BAD_REQUEST, "版本信息不存在", "Platform version not found"),
     PLATFORM_VERSION_EXISTED(254, Response.Status.BAD_REQUEST, "版本已存在", "Platform version already exists."),
-    CONTAINS_SENSITIVE_WORD(255, Response.Status.BAD_REQUEST, "包含敏感词", "Contains sensitive word");
+    CONTAINS_SENSITIVE_WORD(255, Response.Status.BAD_REQUEST, "包含敏感词", "Contains sensitive word"),
+    USER_AUTHORITY_DENY_ALL(256, Response.Status.BAD_REQUEST, "用户权限被禁", "User authority denied all");
 
     private final int code;
 

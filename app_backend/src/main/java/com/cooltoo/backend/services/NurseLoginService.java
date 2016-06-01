@@ -47,7 +47,7 @@ public class NurseLoginService {
             throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
         }
         if(UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
-            throw new BadRequestException(ErrorCode.NOT_PERMITTED);
+            throw new BadRequestException(ErrorCode.USER_AUTHORITY_DENY_ALL);
         }
         TokenAccessEntity entity = new TokenAccessEntity();
         entity.setUserId(nurseEntity.getId());
