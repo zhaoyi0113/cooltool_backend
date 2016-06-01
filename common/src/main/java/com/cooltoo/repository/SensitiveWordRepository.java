@@ -3,6 +3,8 @@ package com.cooltoo.repository;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SensitiveWordType;
 import com.cooltoo.entities.SensitiveWordEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -19,4 +21,7 @@ public interface SensitiveWordRepository extends JpaRepository<SensitiveWordEnti
     List<SensitiveWordEntity> findByStatus(CommonStatus status, Sort sort);
     List<SensitiveWordEntity> findByType(SensitiveWordType type, Sort sort);
     List<SensitiveWordEntity> findByTypeAndStatus(SensitiveWordType type, CommonStatus status, Sort sort);
+    Page<SensitiveWordEntity> findByStatus(CommonStatus status, Pageable page);
+    Page<SensitiveWordEntity> findByType(SensitiveWordType type, Pageable page);
+    Page<SensitiveWordEntity> findByTypeAndStatus(SensitiveWordType type, CommonStatus status, Pageable page);
 }

@@ -12,6 +12,8 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +71,27 @@ public class SensitiveWordService {
         List<SensitiveWordEntity> resultSet = repository.findAll(sort);
         List<SensitiveWordBean> beans = entitiesToBeans(resultSet);
         logger.info("get all sensitive word, count={}", beans.size());
+        return beans;
+    }
+
+    public List<SensitiveWordBean> getWords(String sensitiveWordType, String strStatus, int pageIndex, int sizePerPage) {
+        logger.info("get sensitive word by type={} status={} at page={} {}/page",
+                sensitiveWordType, strStatus, pageIndex, sizePerPage);
+        Page<SensitiveWordEntity> resultSet = null;
+        PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
+        SensitiveWordType type = SensitiveWordType.parseString(sensitiveWordType);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null!=type && null!=status) {
+            resultSet = repository.findByTypeAndStatus(type, status, page);
+        }
+        else if (null!=type && null==status) {
+            resultSet = repository.findByType(type, page);
+        }
+        else if (null==type && null!=status) {
+            resultSet = repository.findByStatus(status, page);
+        }
+        List<SensitiveWordBean> beans = entitiesToBeans(resultSet);
+        logger.info("count is {}", beans.size());
         return beans;
     }
 
