@@ -52,9 +52,9 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
         }
         logger.info("access "+requestContext.getUriInfo().getAbsolutePath());
         String invokePath = requestContext.getUriInfo().getAbsolutePath().getPath();
-        boolean isLogout = false;
-        if (invokePath.endsWith("logout")) {
-            isLogout = true;
+        boolean isLogoutLogin = false;
+        if (invokePath.endsWith("logout") || invokePath.endsWith("login")) {
+            isLogoutLogin = true;
         }
         MultivaluedMap<String, String> pathParameters = requestContext.getHeaders();
         List<String> tokens = pathParameters.get(HeaderKeys.ACCESS_TOKEN);
@@ -85,7 +85,7 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
             if (null==nurseEntity) {
                 throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
             }
-            if (!isLogout && UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
+            if (!isLogoutLogin && UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
                 throw new BadRequestException(ErrorCode.NOT_PERMITTED);
             }
             requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, userId);
