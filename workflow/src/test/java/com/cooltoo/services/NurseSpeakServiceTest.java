@@ -53,9 +53,9 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
 
     @Test
     public void testCountAndGetSpeakByUserIdContentLikeAndTime() {
-        long count = speakService.countByContentAndTime("", 1, "@_@", "2016-01-01 00:00:00", "2016-01-20 00:00:00");
+        long count = speakService.countByContentAndTime("", "", 1, "@_@", "2016-01-01 00:00:00", "2016-01-20 00:00:00");
         Assert.assertEquals(2, count);
-        List<NurseSpeakBean> speaks = speakService.getSpeakByContentLikeAndTime("", 1, "@_@", "2016-01-01 00:00:00", "2016-01-19 00:00:00", 0, 5);
+        List<NurseSpeakBean> speaks = speakService.getSpeakByContentLikeAndTime("", "", 1, "@_@", "2016-01-01 00:00:00", "2016-01-19 00:00:00", 0, 5);
         Assert.assertEquals(2, speaks.size());
         Assert.assertEquals(3L, speaks.get(0).getId());
         Assert.assertEquals(9L, speaks.get(1).getId());
@@ -63,21 +63,37 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
 
     @Test
     public void testCountAndGetSpeakByContentLikeAndTime() {
-        long count = speakService.countByContentAndTime("", 0, "hello", "2016-01-01 00:0:00", "2016-01-09 00:00:00");
+        long count = speakService.countByContentAndTime("", "", 0, "hello", "2016-01-01 00:0:00", "2016-01-09 00:00:00");
         Assert.assertEquals(4, count);
-        List<NurseSpeakBean> speaks = speakService.getSpeakByContentLikeAndTime("", 0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        List<NurseSpeakBean> speaks = speakService.getSpeakByContentLikeAndTime("", "", 0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
         Assert.assertEquals(4, speaks.size());
         Assert.assertEquals(12L, speaks.get(0).getId());
         Assert.assertEquals(13L, speaks.get(1).getId());
         Assert.assertEquals(14L, speaks.get(2).getId());
         Assert.assertEquals(15L, speaks.get(3).getId());
-        speaks = speakService.getSpeakByContentLikeAndTime("ask_question", 0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+
+        speaks = speakService.getSpeakByContentLikeAndTime("ask_question", "", 0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
         Assert.assertEquals(2, speaks.size());
-        speaks = speakService.getSpeakByContentLikeAndTime("cathart", 0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        speaks = speakService.getSpeakByContentLikeAndTime("ask_question", "enabled", 0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
         Assert.assertEquals(2, speaks.size());
-        speaks = speakService.getSpeakByContentLikeAndTime("official", 0, "admin", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        speaks = speakService.getSpeakByContentLikeAndTime("ask_question", "disabled", 0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        Assert.assertEquals(0, speaks.size());
+
+        speaks = speakService.getSpeakByContentLikeAndTime("cathart","",  0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        Assert.assertEquals(2, speaks.size());
+        speaks = speakService.getSpeakByContentLikeAndTime("cathart","enabled",  0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        Assert.assertEquals(2, speaks.size());
+        speaks = speakService.getSpeakByContentLikeAndTime("cathart","disabled",  0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        Assert.assertEquals(0, speaks.size());
+
+        speaks = speakService.getSpeakByContentLikeAndTime("official", "", 0, "admin", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
         Assert.assertEquals(5, speaks.size());
-        speaks = speakService.getSpeakByContentLikeAndTime("smug", 0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        speaks = speakService.getSpeakByContentLikeAndTime("official", "enabled", 0, "admin", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        Assert.assertEquals(5, speaks.size());
+        speaks = speakService.getSpeakByContentLikeAndTime("official", "disabled", 0, "admin", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
+        Assert.assertEquals(0, speaks.size());
+
+        speaks = speakService.getSpeakByContentLikeAndTime("smug","",  0, "hello", "2016-01-01 00:00:00", "2016-01-09 00:00:00", 0, 5);
         Assert.assertEquals(0, speaks.size());
     }
 
@@ -87,7 +103,7 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         List<Long> speakIds = VerifyUtil.parseLongIds(strSpeakIds);
         long success = speakService.updateSpeakStatus(strSpeakIds, CommonStatus.DISABLED.name());
         Assert.assertTrue(success==9);
-        List<NurseSpeakBean> speakBeans = speakService.getSpeakByContentLikeAndTime("", 0L, null, null, null, 0, 30);
+        List<NurseSpeakBean> speakBeans = speakService.getSpeakByContentLikeAndTime("", "", 0L, null, null, null, 0, 30);
         for (NurseSpeakBean speak : speakBeans) {
             if (speakIds.contains(speak.getId()))
                 Assert.assertEquals(CommonStatus.DISABLED, speak.getStatus());
