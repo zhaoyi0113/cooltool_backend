@@ -259,38 +259,51 @@ public class NurseService {
     //             get used by administrator
     //==============================================================
 
-    public long countByAuthority(String strAuthority) {
-        logger.info("get nurse count by authority={}", strAuthority);
-        if ("ALL".equalsIgnoreCase(strAuthority)) {
-            return repository.count();
-        }
+    public long countByAuthorityAndFuzzyName(String strAuthority, String fuzzyName) {
+        logger.info("get nurse count by authority={} fuzzyName={}", strAuthority, fuzzyName);
         UserAuthority authority = UserAuthority.parseString(strAuthority);
-        if (null==authority) {
-            return 0;
+        if (VerifyUtil.isStringEmpty(fuzzyName)) {
+            fuzzyName = null;
         }
-        return repository.countByAuthority(authority);
+        else {
+            fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
+        }
+        long count;
+        if (null==authority && null==fuzzyName) {
+            count = repository.count();
+        }
+        else {
+            count = repository.countByAuthority(authority, fuzzyName);
+        }
+        logger.info("count is {}", count);
+        return count;
     }
 
-    public List<NurseBean> getAllByAuthority(String strAuthority, int pageIndex, int number) {
-        logger.info("get nurse by authority={} at page {} with number {}", strAuthority, pageIndex, number);
-        PageRequest       page      = new PageRequest(pageIndex, number, Sort.Direction.DESC, "id");
+    public List<NurseBean> getAllByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, int pageIndex, int number) {
+        logger.info("get nurse by authority={} fuzzyName={} at page {} with number {}",
+                strAuthority, fuzzyName, pageIndex, number);
+        PageRequest page = new PageRequest(pageIndex, number, Sort.Direction.DESC, "id");
+        Page<NurseEntity> resultSet = null;
 
         // get nuser by authority
-        Page<NurseEntity> resultSet = null;
-        if ("ALL".equalsIgnoreCase(strAuthority)) {
+        UserAuthority authority = UserAuthority.parseString(strAuthority);
+        if (VerifyUtil.isStringEmpty(fuzzyName)) {
+            fuzzyName = null;
+        }
+        else {
+            fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
+        }
+        if (null==authority && null==fuzzyName) {
             resultSet = repository.findAll(page);
         }
         else {
-            UserAuthority authority = UserAuthority.parseString(strAuthority);
-            if (null == authority) {
-                return new ArrayList<>();
-            }
-            resultSet = repository.findByAuthority(authority, page);
+            resultSet = repository.findByAuthority(authority, fuzzyName, page);
         }
 
         // parse to bean
         List<NurseBean> beanList = entities2Beans(resultSet);
         fillOtherProperties(beanList);
+        logger.info("count is {}", beanList.size());
         return beanList;
     }
 

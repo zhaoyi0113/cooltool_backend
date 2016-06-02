@@ -8,7 +8,6 @@ import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.UserAuthority;
-import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,51 +28,16 @@ public class NurseManageAPI {
     @Autowired private NurseService nurseService;
     @Autowired private NurseRelationshipService nurseRelationshipService;
 
-    @Path("/{id}")
+    @Path("/{nurse_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getNurseById(@Context HttpServletRequest request,
-                                 @PathParam("id") @DefaultValue("0") long nurseId) {
+                                 @PathParam("nurse_id") @DefaultValue("0") long nurseId) {
         logger.info("get nurse information by nurse id={}", nurseId);
         NurseBean nurse = nurseService.getNurse(nurseId);
         logger.info("nurse is {}", nurse);
         return Response.ok(nurse).build();
-    }
-
-    @Path("/search_name/count")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getNurseById(@Context HttpServletRequest request,
-                                 @QueryParam("name") @DefaultValue("") String nurseName
-    ) {
-        logger.info("get nurse size by nurse name like={} ", nurseName);
-        long count = nurseService.countNurseIdsByName(nurseName);
-        logger.info("nurse size is {}", count);
-        return Response.ok(count).build();
-    }
-
-    @Path("/search_name")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getNurseById(@Context HttpServletRequest request,
-                                 @QueryParam("name") @DefaultValue("") String nurseName,
-                                 @QueryParam("index") @DefaultValue("0") int index,
-                                 @QueryParam("number") @DefaultValue("10") int number
-    ) {
-        logger.info("get nurse information by nurse name like={} ", nurseName);
-        List<Long> nurseIds = nurseService.getNurseIdsByName(nurseName, index, number);
-        List<NurseBean> nurses;
-        if (!VerifyUtil.isListEmpty(nurseIds)) {
-            nurses = nurseService.getNurse(nurseIds);
-        }
-        else {
-            nurses = new ArrayList<>();
-        }
-        logger.info("nurse size is {}", nurses.size());
-        return Response.ok(nurses).build();
     }
 
     @Path("/authority_type")
@@ -89,33 +52,35 @@ public class NurseManageAPI {
         return Response.ok(allType).build();
     }
 
-    @Path("/count/{authority}")
+    @Path("/count")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response countNurseByAuthority(@Context HttpServletRequest request,
-                                          @PathParam("authority") String strAuthority
+    public Response countNurseByAuthorityAndName(@Context HttpServletRequest request,
+                                                 @QueryParam("authority") @DefaultValue("") String authority,
+                                                 @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        logger.info("user {} get nurse record count by authority {}", userId, strAuthority);
-        long count = nurseService.countByAuthority(strAuthority);
-        logger.info("user {} get nurse record count by authority {}", userId, strAuthority);
+        logger.info("user {} get nurse record count by authority {} fuzzyName={}", userId, authority, fuzzyName);
+        long count = nurseService.countByAuthorityAndFuzzyName(authority, fuzzyName);
+        logger.info("count={}", count);
         return Response.ok(count).build();
     }
 
-    @Path("/{authority}/{index}/{number}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getNurseByAuthority(@Context HttpServletRequest request,
-                                        @PathParam("authority") String strAuthority,
-                                        @PathParam("index")  @DefaultValue("0")  int index,
-                                        @PathParam("number") @DefaultValue("10") int number
+    public Response getNurseByAuthorityAndName(@Context HttpServletRequest request,
+                                               @QueryParam("authority") @DefaultValue("") String strAuthority,
+                                               @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
+                                               @QueryParam("index")  @DefaultValue("0")  int index,
+                                               @QueryParam("number") @DefaultValue("10") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        logger.info("user {} get nurse record count by authority {} at page {} with {} record/page", userId, strAuthority, index, number);
-        List<NurseBean> nurses = nurseService.getAllByAuthority(strAuthority, index, number);
-        logger.info("user {} get nurse record count by authority {} at page {} with {} record/page, count={}", userId, strAuthority, index, number, nurses.size());
+        logger.info("user {} get nurse record count by authority {} fuzzyName{} at page {} with {} record/page",
+                userId, strAuthority, fuzzyName, index, number);
+        List<NurseBean> nurses = nurseService.getAllByAuthorityAndFuzzyName(strAuthority, fuzzyName, index, number);
+        logger.info("count={}", userId, strAuthority, fuzzyName, index, number, nurses.size());
         return Response.ok(nurses).build();
     }
 

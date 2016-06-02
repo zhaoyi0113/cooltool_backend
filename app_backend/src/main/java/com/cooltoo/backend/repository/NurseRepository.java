@@ -28,6 +28,16 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
 
     List<NurseEntity> findByName(String name);
     List<NurseEntity> findByIdIn(List<Long> ids);
-    Page<NurseEntity> findByAuthority(UserAuthority authority, Pageable page);
-    long              countByAuthority(UserAuthority authority);
+
+    //==================================================================
+    //              for administrator user
+    //==================================================================
+    @Query("FROM NurseEntity n" +
+            " WHERE (n.authority=?1  OR ?1 IS NULL)" +
+            " AND   (n.name LIKE %?2 OR ?2 IS NULL)")
+    Page<NurseEntity> findByAuthority(UserAuthority authority, String fuzzyName, Pageable page);
+    @Query("SELECT count(n.id) FROM NurseEntity n" +
+            " WHERE (n.authority=?1  OR ?1 IS NULL)" +
+            " AND   (n.name LIKE %?2 OR ?2 IS NULL)")
+    long countByAuthority(UserAuthority authority, String fuzzyName);
 }
