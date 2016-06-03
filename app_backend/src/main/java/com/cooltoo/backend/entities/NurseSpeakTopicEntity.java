@@ -1,6 +1,7 @@
 package com.cooltoo.backend.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.UserType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,6 +17,7 @@ public class NurseSpeakTopicEntity {
     private Date time;
     private CommonStatus status;
     private long creatorId;
+    private UserType creatorType;
     private String title;
     private long profileImageId;
     private String label;
@@ -61,6 +63,16 @@ public class NurseSpeakTopicEntity {
 
     public void setCreatorId(long creatorId) {
         this.creatorId = creatorId;
+    }
+
+    @Column(name = "creator_type")
+    @Enumerated
+    public UserType getCreatorType() {
+        return creatorType;
+    }
+
+    public void setCreatorType(UserType creatorType) {
+        this.creatorType = creatorType;
     }
 
     @Column(name = "title")
@@ -133,6 +145,7 @@ public class NurseSpeakTopicEntity {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", creatorId=").append(creatorId);
+        msg.append(", creatorType=").append(creatorType);
         msg.append(", title=").append(title);
         msg.append(", profileImageId=").append(profileImageId);
         msg.append(", label=").append(label);

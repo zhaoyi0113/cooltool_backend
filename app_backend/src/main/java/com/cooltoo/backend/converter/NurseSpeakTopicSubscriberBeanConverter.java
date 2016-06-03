@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * Created by hp on 2016/6/2.
  */
 @Component
-public class NurseSpeakTopicSubscriberConverter implements Converter<NurseSpeakTopicSubscriberEntity, NurseSpeakTopicSubscriberBean> {
+public class NurseSpeakTopicSubscriberBeanConverter implements Converter<NurseSpeakTopicSubscriberEntity, NurseSpeakTopicSubscriberBean> {
     @Override
     public NurseSpeakTopicSubscriberBean convert(NurseSpeakTopicSubscriberEntity source) {
         NurseSpeakTopicSubscriberBean bean = new NurseSpeakTopicSubscriberBean();

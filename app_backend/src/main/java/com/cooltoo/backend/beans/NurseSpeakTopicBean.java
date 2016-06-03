@@ -1,6 +1,7 @@
 package com.cooltoo.backend.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.UserType;
 
 import java.util.Date;
 
@@ -13,8 +14,11 @@ public class NurseSpeakTopicBean {
     private Date time;
     private CommonStatus status;
     private long creatorId;
+    private UserType creatorType;
+    private NurseBean creator;
     private String title;
     private long profileImageId;
+    private String profileImageUrl;
     private String label;
     private String taxonomy;
     private String description;
@@ -55,6 +59,22 @@ public class NurseSpeakTopicBean {
         this.creatorId = creatorId;
     }
 
+    public UserType getCreatorType() {
+        return creatorType;
+    }
+
+    public void setCreatorType(UserType creatorType) {
+        this.creatorType = creatorType;
+    }
+
+    public NurseBean getCreator() {
+        return creator;
+    }
+
+    public void setCreator(NurseBean creator) {
+        this.creator = creator;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -69,6 +89,14 @@ public class NurseSpeakTopicBean {
 
     public void setProfileImageId(long profileImageId) {
         this.profileImageId = profileImageId;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public String getLabel() {
@@ -134,8 +162,11 @@ public class NurseSpeakTopicBean {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", creatorId=").append(creatorId);
+        msg.append(", creatorType=").append(creatorType);
+        msg.append(", creator=").append(creator);
         msg.append(", title=").append(title);
         msg.append(", profileImageId=").append(profileImageId);
+        msg.append(", profileImageUrl=").append(profileImageUrl);
         msg.append(", label=").append(label);
         msg.append(", taxonomy=").append(taxonomy);
         msg.append(", description=").append(description);

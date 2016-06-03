@@ -1,5 +1,6 @@
 package com.cooltoo.util;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.constants.SuggestionStatus;
 import org.slf4j.Logger;
@@ -203,13 +204,15 @@ public class VerifyUtil {
         if (isStringEmpty(speakTypes)) {
             return new ArrayList<>();
         }
-        speakTypes = speakTypes.toLowerCase();
+        speakTypes = speakTypes.toLowerCase().trim();
         String[] strArray = speakTypes.split(",");
 
         List<SpeakType> types = new ArrayList<>();
         for (String tmp : strArray) {
             SpeakType type = SpeakType.parseString(tmp);
-            types.add(type);
+            if (null!=type) {
+                types.add(type);
+            }
         }
 
         return types;
@@ -219,16 +222,36 @@ public class VerifyUtil {
         if (isStringEmpty(statuses)) {
             return new ArrayList<>();
         }
-        statuses = statuses.toLowerCase();
+        statuses = statuses.toLowerCase().trim();
         String[] strArray = statuses.split(",");
 
         List<SuggestionStatus> types = new ArrayList<>();
         for (String tmp : strArray) {
             SuggestionStatus type = SuggestionStatus.parseString(tmp);
-            types.add(type);
+            if (null!=type) {
+                types.add(type);
+            }
         }
 
         return types;
+    }
+
+    public static List<CommonStatus> parseCommonStatus(String statuses) {
+        if (isStringEmpty(statuses)) {
+            return new ArrayList<>();
+        }
+        statuses = statuses.toLowerCase().trim();
+        String[] strArray = statuses.split(",");
+
+        List<CommonStatus> commonStatuses  = new ArrayList<>();
+        for (String tmp : strArray) {
+            CommonStatus status = CommonStatus.parseString(tmp);
+            if (null!=status) {
+                commonStatuses.add(status);
+            }
+        }
+
+        return commonStatuses;
     }
 
     public static String reconstructSQLContentLike(String contentLike) {

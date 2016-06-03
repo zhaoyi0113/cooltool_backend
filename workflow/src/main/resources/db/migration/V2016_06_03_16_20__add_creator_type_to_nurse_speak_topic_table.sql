@@ -1,0 +1,1 @@
+ALTER TABLE `nurse_speak_topic` ADD COLUMN `creator_type` INT(11) NULL DEFAULT 0 AFTER `creator`;
