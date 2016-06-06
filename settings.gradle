@@ -1,2 +1,3 @@
 rootProject.name = 'cooltoo-backend'
-include  'workflow','common','app_backend','admin_backend', 'service_discovery'
+include  'workflow','common','app_backend','admin_backend', 'service_discovery',
+        'go2nurse:common', 'go2nurse:go2nurse_workflow'
