@@ -17,16 +17,7 @@ apply plugin: 'groovy'
 group = 'com.cooltoo.workflow'
 version = '1.0.0-SNAPSHOT'
 
-
-//jar {
-//    baseName = 'workflow'
-//    version =  '0.1.0'
-//}
-
-
 dependencies {
-
-
 
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-jersey")
@@ -59,6 +50,7 @@ dependencies {
     testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
     testCompile("org.dbunit:dbunit:2.5.0")
 
+    compile project(':dbschema')
     compile project(':common')
     compile project(':app_backend')
     compile project(':admin_backend')
