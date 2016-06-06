@@ -1,0 +1,1 @@
+ALTER TABLE `nurse_speak_topic` ADD COLUMN `background_photo` BIGINT(64) NULL DEFAULT 0 AFTER `profile_photo`;

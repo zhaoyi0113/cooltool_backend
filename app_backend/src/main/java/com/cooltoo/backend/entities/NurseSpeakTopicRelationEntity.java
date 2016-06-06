@@ -17,6 +17,7 @@ public class NurseSpeakTopicRelationEntity {
     private CommonStatus status;
     private long topicId;
     private long speakId;
+    private long userId;
 
     @Id
     @GeneratedValue
@@ -66,6 +67,15 @@ public class NurseSpeakTopicRelationEntity {
         this.speakId = speakId;
     }
 
+    @Column(name = "user_id")
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -74,6 +84,7 @@ public class NurseSpeakTopicRelationEntity {
         msg.append(", status=").append(status);
         msg.append(", topicId=").append(topicId);
         msg.append(", speakId=").append(speakId);
+        msg.append(", userId=").append(userId);
         msg.append("]");
         return msg.toString();
     }

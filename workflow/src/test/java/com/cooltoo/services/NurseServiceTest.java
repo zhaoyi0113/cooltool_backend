@@ -2,15 +2,17 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.services.file.UserFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +21,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by lg380357 on 2016/3/2.
@@ -179,16 +179,16 @@ public class NurseServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(17, count);
 
         count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "");
-        Assert.assertEquals(9, count);
+        Assert.assertEquals(12, count);
         count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "");
-        Assert.assertEquals(8, count);
+        Assert.assertEquals(5, count);
 
         count = service.countByAuthorityAndFuzzyName("", "护士1");
         Assert.assertEquals(9, count);
         count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "护士1");
-        Assert.assertEquals(1, count);
+        Assert.assertEquals(4, count);
         count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "护士1");
-        Assert.assertEquals(8, count);
+        Assert.assertEquals(5, count);
     }
 
     @Test
@@ -197,16 +197,16 @@ public class NurseServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(17, count.size());
 
         count = service.getAllByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "", 0, 30);
-        Assert.assertEquals(9, count.size());
+        Assert.assertEquals(12, count.size());
         count = service.getAllByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "", 0, 30);
-        Assert.assertEquals(8, count.size());
+        Assert.assertEquals(5, count.size());
 
         count = service.getAllByAuthorityAndFuzzyName("", "name1", 0, 30);
         Assert.assertEquals(9, count.size());
         count = service.getAllByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "name1", 0, 30);
-        Assert.assertEquals(1, count.size());
+        Assert.assertEquals(4, count.size());
         count = service.getAllByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "name1", 0, 30);
-        Assert.assertEquals(8, count.size());
+        Assert.assertEquals(5, count.size());
     }
 
     @Test

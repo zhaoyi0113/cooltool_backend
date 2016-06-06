@@ -18,6 +18,7 @@ public class NurseSpeakTopicRelationBeanConverter implements Converter<NurseSpea
         bean.setStatus(source.getStatus());
         bean.setTopicId(source.getTopicId());
         bean.setSpeakId(source.getSpeakId());
+        bean.setUserId(source.getUserId());
         return bean;
     }
 }

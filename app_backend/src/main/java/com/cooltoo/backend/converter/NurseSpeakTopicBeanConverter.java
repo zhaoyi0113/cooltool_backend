@@ -21,6 +21,7 @@ public class NurseSpeakTopicBeanConverter implements Converter<NurseSpeakTopicEn
         bean.setCreatorType(source.getCreatorType());
         bean.setTitle(source.getTitle());
         bean.setProfileImageId(source.getProfileImageId());
+        bean.setBackgroundImageId(source.getBackgroundImageId());
         bean.setLabel(source.getLabel());
         bean.setTaxonomy(source.getTaxonomy());
         bean.setDescription(source.getDescription());

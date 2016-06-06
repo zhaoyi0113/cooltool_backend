@@ -1,5 +1,5 @@
 package com.cooltoo.backend.services;
-;
+
 import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakComplaintBean;
@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+;
 
 /**
  * Created by hp on 2016/5/30.
@@ -120,7 +122,7 @@ public class NurseSpeakComplaintService {
         NurseBean nurse = null;
         NurseSpeakBean speak = null;
         List<NurseBean> nurses = nurseService.getNurseWithoutOtherInfo(userIds);
-        List<NurseSpeakBean> speaks = nurseSpeakService.getSpeakByIds(speakIds);
+        List<NurseSpeakBean> speaks = nurseSpeakService.getSpeakByIds(speakIds, false);
         for (NurseSpeakComplaintBean complaint : beans) {
             for (NurseBean tmp_nurse : nurses) {
                 if (complaint.getInformantId() == tmp_nurse.getId()) {

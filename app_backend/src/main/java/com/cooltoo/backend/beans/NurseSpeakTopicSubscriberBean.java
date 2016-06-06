@@ -16,6 +16,8 @@ public class NurseSpeakTopicSubscriberBean {
     private long topicId;
     private long userId;
     private UserType userType;
+    private String userName;
+    private String userHeaderImage;
 
     public long getId() {
         return id;
@@ -63,6 +65,22 @@ public class NurseSpeakTopicSubscriberBean {
 
     public void setUserType(UserType userType) {
         this.userType = userType;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserHeaderImage() {
+        return userHeaderImage;
+    }
+
+    public void setUserHeaderImage(String userHeaderImage) {
+        this.userHeaderImage = userHeaderImage;
     }
 
     public String toString() {

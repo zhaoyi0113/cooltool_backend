@@ -1,0 +1,1 @@
+ALTER TABLE `nurse_speak_topic_relation` ADD COLUMN `user_id` BIGINT(64) NULL DEFAULT 0;

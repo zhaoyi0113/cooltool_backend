@@ -1,11 +1,8 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.NurseSpeakTopicRelationEntity;
-import com.cooltoo.constants.CommonStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -15,42 +12,39 @@ import java.util.List;
  */
 public interface NurseSpeakTopicRelationRepository extends JpaRepository<NurseSpeakTopicRelationEntity, Long> {
 
-    @Query("SELECT count(topicRelation.id)" +
-            " FROM NurseSpeakTopicRelationEntity topicRelation" +
-            " WHERE topicRelation.topicId=?1" +
-            " AND ?2 IS NOT NULL" +
-            " AND topicRelation.status=?2")
-    long countSpeakInTopic(long topicId, CommonStatus statues);
+    @Query("SELECT DISTINCT topicRelation.userId FROM NurseSpeakTopicRelationEntity topicRelation" +
+            " WHERE topicRelation.topicId=?1")
+    List<Long> getUserIdInTopic(long topicId, Sort sort);
 
-    @Query("SELECT topicRelation.speakId" +
+    @Query("SELECT DISTINCT topicRelation.speakId" +
             " FROM NurseSpeakTopicRelationEntity topicRelation" +
-            " WHERE topicRelation.topicId=?1" +
-            " AND ?2 IS NOT NULL" +
-            " AND topicRelation.status=?2")
-    Page<Long> findSpeakIdsInTopic(long topicId, CommonStatus status, Pageable page);
+            " WHERE topicRelation.topicId=?1")
+    List<Long> findSpeakIdsInTopic(long topicId, Sort sort);
 
     @Query("SELECT DISTINCT topicRelation.topicId" +
             " FROM NurseSpeakTopicRelationEntity topicRelation" +
-            " WHERE topicRelation.speakId=?1" +
-            " AND ?2 IS NOT NULL" +
-            " AND topicRelation.status=?2")
-    long findTopicIdsBySpeakId(long speakId, CommonStatus status);
+            " WHERE topicRelation.speakId=?1")
+    List<Long> findTopicIdsBySpeakId(long speakId, Sort sort);
 
-    @Modifying
-    @Query("UPDATE NurseSpeakTopicRelationEntity topicRelation" +
-            " SET topicRelation.status = ?3" +
-            " WHERE topicRelation.speakId = ?1" +
-            " AND ?2 IS NOT NULL" +
-            " AND topicRelation.status IN (?2)" +
-            " AND ?3 IS NOT NULL")
-    long updateStatusBySpeakId(long speakId, List<CommonStatus> originalStatuses, CommonStatus status);
+    @Query("SELECT topicRelation.speakId, topicRelation.topicId" +
+            " FROM NurseSpeakTopicRelationEntity topicRelation" +
+            " WHERE topicRelation.speakId IN (?1)" +
+            " GROUP BY topicRelation.speakId")
+    List<Long[]> findTopicIdsBySpeakIds(List<Long> speakIds, Sort sort);
 
-    @Modifying
-    @Query("UPDATE NurseSpeakTopicRelationEntity topicRelation" +
-            " SET topicRelation.status = ?3" +
-            " WHERE topicRelation.topicId = ?1" +
-            " AND ?2 IS NOT NULL" +
-            " AND topicRelation.status IN (?2)" +
-            " AND ?3 IS NOT NULL")
-    long updateStatusByTopicId(long topicId, List<CommonStatus> originalStatuses, CommonStatus status);
+//    @Modifying
+//    @Query("UPDATE NurseSpeakTopicRelationEntity topicRelation" +
+//            " SET topicRelation.status=?3" +
+//            " WHERE topicRelation.speakId=?1" +
+//            " AND topicRelation.status IN (?2)" +
+//            " AND ?3 IS NOT NULL")
+//    int updateStatusBySpeakId(long speakId, List<CommonStatus> originalStatuses, CommonStatus status);
+
+//    @Modifying
+//    @Query("UPDATE NurseSpeakTopicRelationEntity topicRelation" +
+//            " SET topicRelation.status=?3" +
+//            " WHERE topicRelation.topicId=?1" +
+//            " AND topicRelation.status IN (?2)" +
+//            " AND ?3 IS NOT NULL")
+//    int updateStatusByTopicId(long topicId, List<CommonStatus> originalStatuses, CommonStatus status);
 }

@@ -2,7 +2,6 @@ package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.SpeakType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -48,6 +47,9 @@ public interface NurseSpeakRepository extends JpaRepository<NurseSpeakEntity, Lo
     //    User use
     //=====================================
     //List<NurseSpeakEntity> findByUserId(long userId);
+
+    @Query("SELECT speak.id FROM NurseSpeakEntity speak WHERE speak.id IN (?2) AND speak.status=?1 AND ?1 IS NOT NULL")
+    List<Long> findByStatusAndIdIn(CommonStatus status, List<Long> ids);
 
     @Query("SELECT speak.userId, count(speak.id) FROM NurseSpeakEntity speak" +
             " WHERE speak.userId in (?1)" +

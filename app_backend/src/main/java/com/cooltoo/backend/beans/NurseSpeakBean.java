@@ -1,7 +1,6 @@
 package com.cooltoo.backend.beans;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.SpeakType;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +24,7 @@ public class NurseSpeakBean {
     private int commentsCount;
     private int thumbsUpsCount;
     private CommonStatus status;
+    private List<NurseSpeakTopicBean> topics;
 
     public long getId() {
         return id;
@@ -138,6 +138,10 @@ public class NurseSpeakBean {
         this.status = status;
     }
 
+    public void setTopics(List<NurseSpeakTopicBean> topics) {
+        this.topics = topics;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(this.hashCode()).append("[");
@@ -150,6 +154,7 @@ public class NurseSpeakBean {
         msg.append("content=").append(content).append(" , ");
         msg.append("thumbsUpsCount=").append(thumbsUpsCount).append(" , ");
         msg.append("commentsCount=").append(commentsCount).append(" , ");
+        msg.append("topicsCount={}").append(topics.size()).append(" , ");
         msg.append("speakType=").append(speakType);
         int countC = null==comments  ? 0 : comments.size();
         int countT = null==thumbsUps ? 0 : thumbsUps.size();

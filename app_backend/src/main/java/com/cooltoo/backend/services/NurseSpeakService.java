@@ -11,6 +11,7 @@ import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SensitiveWordType;
 import com.cooltoo.constants.SpeakType;
+import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.OfficialConfigService;
@@ -48,6 +49,7 @@ public class NurseSpeakService {
     @Autowired private ImagesInSpeakService speakImageService;
     @Autowired private OfficialConfigService officialConfigService;
     @Autowired private SpeakAbilityTypeConverter speakAbilityTypeConverter;
+    @Autowired private NurseSpeakTopicService topicService;
 
     //===============================================================
     //             get ----  admin using
@@ -100,16 +102,16 @@ public class NurseSpeakService {
             speaks = speakRepository.findByUserIdContentAndTime(userId, contentLike, start, end, page);
         }
         List<NurseSpeakBean> speakBeans = entitiesToBeans(speaks);
-        fillOtherProperties(userId, speakBeans);
+        fillOtherProperties(userId, speakBeans, true);
         logger.info("speak count is ={}", speakBeans.size());
         return speakBeans;
     }
 
-    public List<NurseSpeakBean> getSpeakByIds(List<Long> speakIds) {
+    public List<NurseSpeakBean> getSpeakByIds(List<Long> speakIds, boolean fillTopics) {
         logger.info("get speak by speak ids={}", speakIds);
         List<NurseSpeakEntity> resultSet = speakRepository.findAll(speakIds);
         List<NurseSpeakBean> beans = entitiesToBeans(resultSet);
-        fillOtherProperties(0, beans);
+        fillOtherProperties(0, beans, fillTopics);
         logger.info("count is {}", beans.size());
         return beans;
     }
@@ -205,7 +207,7 @@ public class NurseSpeakService {
 
         // parse entities to bean
         List<NurseSpeakBean> beans = entitiesToBeans(resultSet);
-        fillOtherProperties(userId, beans);
+        fillOtherProperties(userId, beans, true);
         logger.warn("speak count={}", beans.size());
         return beans;
     }
@@ -221,7 +223,7 @@ public class NurseSpeakService {
         entities.add(resultSet);
 
         List<NurseSpeakBean> nurseSpeaks = entitiesToBeans(entities);
-        fillOtherProperties(userId, nurseSpeaks);
+        fillOtherProperties(userId, nurseSpeaks, true);
         return nurseSpeaks;
     }
 
@@ -257,7 +259,7 @@ public class NurseSpeakService {
         return beans;
     }
 
-    private void fillOtherProperties(long userId, List<NurseSpeakBean> beans) {
+    private void fillOtherProperties(long userId, List<NurseSpeakBean> beans, boolean fillTopic) {
         if (null==beans || beans.isEmpty()) {
             return;
         }
@@ -370,11 +372,10 @@ public class NurseSpeakService {
         for (NurseSpeakBean tmp : beans) {
             long                    speakId = tmp.getId();
             List<ImagesInSpeakBean> images  = idToImage.get(speakId);
-            speakBean = speakIdToBeanMap.get(speakId);
-            speakBean.setImages(images);
-            if (speakBean.getSpeakType()==cathartType.getId()) {
+            tmp.setImages(images);
+            if (tmp.getSpeakType()==cathartType.getId()) {
                 if (!VerifyUtil.isListEmpty(images)) {
-                    speakBean.setUserProfilePhotoUrl(images.get(0).getImageUrl());
+                    tmp.setUserProfilePhotoUrl(images.get(0).getImageUrl());
                 }
             }
             if (null!=forbiddenSpeak && CommonStatus.DISABLED.equals(tmp.getStatus())) {
@@ -382,6 +383,23 @@ public class NurseSpeakService {
                 tmp.setImages(forbiddenImages);
             }
         }
+
+        //
+        //   fill topics
+        //
+        if (fillTopic) {
+            String topicStatus = CommonStatus.ENABLED.name();
+            Map<Long, List<NurseSpeakTopicBean>> speakId2Topics = topicService.getTopicsBySpeakIds(speakIds, topicStatus);
+            for (NurseSpeakBean tmp : beans) {
+                if (!CommonStatus.ENABLED.equals(tmp.getStatus())) {
+                    continue;
+                }
+                long speakId = tmp.getId();
+                List<NurseSpeakTopicBean> topics  = speakId2Topics.get(speakId);
+                tmp.setTopics(topics);
+            }
+        }
+
 
         // construct return values
         List<Object> countTarget = null;
@@ -476,6 +494,8 @@ public class NurseSpeakService {
             images.add(imageInSpeak);
             bean.setImages(images);
         }
+        List<NurseSpeakTopicBean> topics = topicService.addSpeakTopicsBySpeakContent(userId, UserType.NURSE.name(), bean.getId(), bean.getContent());
+        bean.setTopics(topics);
 
         return bean;
     }

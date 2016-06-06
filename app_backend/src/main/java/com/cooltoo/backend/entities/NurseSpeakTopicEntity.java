@@ -20,6 +20,7 @@ public class NurseSpeakTopicEntity {
     private UserType creatorType;
     private String title;
     private long profileImageId;
+    private long backgroundImageId;
     private String label;
     private String taxonomy;
     private String description;
@@ -93,6 +94,15 @@ public class NurseSpeakTopicEntity {
         this.profileImageId = profileImageId;
     }
 
+    @Column(name = "background_photo")
+    public long getBackgroundImageId() {
+        return backgroundImageId;
+    }
+
+    public void setBackgroundImageId(long backgroundImageId) {
+        this.backgroundImageId = backgroundImageId;
+    }
+
     @Column(name = "label")
     public String getLabel() {
         return label;
@@ -148,6 +158,7 @@ public class NurseSpeakTopicEntity {
         msg.append(", creatorType=").append(creatorType);
         msg.append(", title=").append(title);
         msg.append(", profileImageId=").append(profileImageId);
+        msg.append(", backgroundImageId=").append(backgroundImageId);
         msg.append(", label=").append(label);
         msg.append(", taxonomy=").append(taxonomy);
         msg.append(", description=").append(description);

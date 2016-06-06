@@ -268,4 +268,35 @@ public class VerifyUtil {
         }
         return contentLike;
     }
+
+    private static final char SPEAK_TOPIC_MARK = '#';
+    public static List<String> parseSpeakTopic(String speakContent) {
+        List<String> topics = new ArrayList<>();
+        if (!isStringEmpty(speakContent)) {
+            int preMarkIndex = -1;
+            char[] chars = speakContent.toCharArray();
+            for (int i = 0, count = chars.length; i < count; i++) {
+                char currentChar = chars[i];
+                if (SPEAK_TOPIC_MARK==currentChar) {
+                    // topic begin
+                    if (preMarkIndex<0) {
+                        preMarkIndex = i;
+                    }
+                    // topic end
+                    else {
+                        if (preMarkIndex+1==i) {
+                            // empty topic
+                        }
+                        else {
+                            String topic = speakContent.substring(preMarkIndex+1, i);
+                            topic = topic.trim();
+                            topics.add(topic);
+                        }
+                        preMarkIndex = -1;
+                    }
+                }
+            }
+        }
+        return topics;
+    }
 }

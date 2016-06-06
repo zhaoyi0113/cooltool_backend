@@ -19,6 +19,8 @@ public class NurseSpeakTopicBean {
     private String title;
     private long profileImageId;
     private String profileImageUrl;
+    private long backgroundImageId;
+    private String backgroundImageUrl;
     private String label;
     private String taxonomy;
     private String description;
@@ -89,6 +91,22 @@ public class NurseSpeakTopicBean {
 
     public void setProfileImageId(long profileImageId) {
         this.profileImageId = profileImageId;
+    }
+
+    public long getBackgroundImageId() {
+        return backgroundImageId;
+    }
+
+    public void setBackgroundImageId(long backgroundImageId) {
+        this.backgroundImageId = backgroundImageId;
+    }
+
+    public String getBackgroundImageUrl() {
+        return backgroundImageUrl;
+    }
+
+    public void setBackgroundImageUrl(String backgroundImageUrl) {
+        this.backgroundImageUrl = backgroundImageUrl;
     }
 
     public String getProfileImageUrl() {
@@ -167,6 +185,8 @@ public class NurseSpeakTopicBean {
         msg.append(", title=").append(title);
         msg.append(", profileImageId=").append(profileImageId);
         msg.append(", profileImageUrl=").append(profileImageUrl);
+        msg.append(", backgroundImageId=").append(backgroundImageId);
+        msg.append(", backgroundImageUrl=").append(backgroundImageUrl);
         msg.append(", label=").append(label);
         msg.append(", taxonomy=").append(taxonomy);
         msg.append(", description=").append(description);

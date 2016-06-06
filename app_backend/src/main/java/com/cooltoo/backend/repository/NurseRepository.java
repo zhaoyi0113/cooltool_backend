@@ -21,6 +21,10 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     @Query("SELECT n.id FROM NurseEntity n WHERE n.authority=?1")
     List<Long> findIdsByAuthority(UserAuthority authority);
 
+    long countByAuthorityAndIdIn(UserAuthority authority, List<Long> ids);
+    @Query("SELECT n.id FROM NurseEntity n WHERE n.authority=?1 AND n.id IN (?2)")
+    List<Long> findByAuthorityAndIdIn(UserAuthority authority, List<Long> ids);
+
     @Query("SELECT count(n.id) FROM NurseEntity n WHERE n.name like %?1")
     long      countByFuzzyName(String fuzzyName);
     @Query("SELECT n.id FROM NurseEntity n WHERE n.name like %?1")

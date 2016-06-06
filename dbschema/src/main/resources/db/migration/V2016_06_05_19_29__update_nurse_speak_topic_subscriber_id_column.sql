@@ -1,0 +1,1 @@
+ALTER TABLE `nurse_speak_topic_subscriber` CHANGE COLUMN `id` `id` BIGINT(64) NOT NULL AUTO_INCREMENT ;

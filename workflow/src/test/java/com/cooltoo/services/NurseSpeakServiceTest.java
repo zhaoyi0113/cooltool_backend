@@ -1,18 +1,22 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.*;
+import com.cooltoo.backend.beans.ImagesInSpeakBean;
+import com.cooltoo.backend.beans.NurseSpeakBean;
+import com.cooltoo.backend.beans.NurseSpeakCommentBean;
+import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
 import com.cooltoo.backend.services.ImagesInSpeakService;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SpeakType;
-import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,9 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by yzzhao on 3/15/16.
@@ -105,10 +106,9 @@ public class NurseSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertTrue(success==9);
         List<NurseSpeakBean> speakBeans = speakService.getSpeakByContentLikeAndTime("", "", 0L, null, null, null, 0, 30);
         for (NurseSpeakBean speak : speakBeans) {
-            if (speakIds.contains(speak.getId()))
+            if (speakIds.contains(speak.getId())) {
                 Assert.assertEquals(CommonStatus.DISABLED, speak.getStatus());
-            else
-                Assert.assertEquals(CommonStatus.ENABLED, speak.getStatus());
+            }
         }
     }
 
