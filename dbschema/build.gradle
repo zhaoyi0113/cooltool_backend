@@ -48,10 +48,10 @@ ext {
 
 }
 
-//sourceSets {
-//    main {
-//        resources {
-//            srcDirs = ["src/main/resources", environmentPah]
-//        }
-//    }
-//}
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/resources", environmentPah]
+        }
+    }
+}
