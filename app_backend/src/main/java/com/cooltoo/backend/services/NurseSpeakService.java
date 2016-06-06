@@ -396,7 +396,9 @@ public class NurseSpeakService {
                 }
                 long speakId = tmp.getId();
                 List<NurseSpeakTopicBean> topics  = speakId2Topics.get(speakId);
-                tmp.setTopics(topics);
+                if (!VerifyUtil.isListEmpty(topics)) {
+                    tmp.setTopics(topics);
+                }
             }
         }
 

@@ -2,6 +2,7 @@ package com.cooltoo.backend.beans;
 
 import com.cooltoo.constants.CommonStatus;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class NurseSpeakBean {
     private int commentsCount;
     private int thumbsUpsCount;
     private CommonStatus status;
-    private List<NurseSpeakTopicBean> topics;
+    private List<NurseSpeakTopicBean> topics = new ArrayList<>();
 
     public long getId() {
         return id;
