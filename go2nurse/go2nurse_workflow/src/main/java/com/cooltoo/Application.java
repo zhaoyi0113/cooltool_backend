@@ -1,4 +1,4 @@
-package com.cooltoo.go2nurse;
+package com.cooltoo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class Application {
 
     @Bean
     public FeatureProvider featureProvider() {
-        return new EnumBasedFeatureProvider(GoToNurseFeatures.class);
+        return  new EnumBasedFeatureProvider(GoToNurseFeatures.class);
     }
 
     @Bean

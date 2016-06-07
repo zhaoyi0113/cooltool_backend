@@ -1,4 +1,4 @@
-package com.cooltoo.go2nurse.config;
+package com.cooltoo.config;
 
 import com.cooltoo.go2nurse.patient.api.PatientAPI;
 import io.swagger.annotations.Api;

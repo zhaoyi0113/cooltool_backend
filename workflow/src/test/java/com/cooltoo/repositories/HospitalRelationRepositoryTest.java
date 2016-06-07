@@ -1,8 +1,8 @@
 package com.cooltoo.repositories;
 
 import com.cooltoo.AbstractCooltooTest;
+import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.entities.HospitalEntity;
-import com.cooltoo.repository.HospitalRepository;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,10 +15,10 @@ import java.util.List;
  * Created by yzzhao on 3/15/16.
  */
 @Transactional
-public class HospitalRepositoryTest extends AbstractCooltooTest {
+public class HospitalRelationRepositoryTest extends AbstractCooltooTest {
 
     @Autowired
-    private HospitalRepository repository;
+    private NurseHospitalRelationRepository repository;
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/repositories/nurse_hospital_relation_data.xml")

@@ -1,6 +1,6 @@
 package com.cooltoo.backend.beans;
 
-import com.cooltoo.constants.WorkFileType;
+import com.cooltoo.beans.WorkFileTypeBean;
 
 import java.util.Date;
 

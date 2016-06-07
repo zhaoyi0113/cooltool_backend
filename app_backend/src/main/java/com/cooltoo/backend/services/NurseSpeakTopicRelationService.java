@@ -163,7 +163,7 @@ public class NurseSpeakTopicRelationService {
         );
         CommonStatus status = CommonStatus.parseString(strTopicStatus);
 
-        List<Long[]> speakId2TopicId = repository.findTopicIdsBySpeakIds(speakIds, sort);
+        List<Object[]> speakId2TopicId = repository.findTopicIdsBySpeakIds(speakIds, sort);
         if (!VerifyUtil.isListEmpty(speakId2TopicId)) {
             List<Long> topicIds = new ArrayList<>();
             for (Object[] st : speakId2TopicId) {

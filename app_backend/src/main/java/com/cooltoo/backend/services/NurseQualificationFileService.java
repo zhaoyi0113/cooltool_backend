@@ -1,12 +1,13 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseQualificationFileBean;
-import com.cooltoo.backend.beans.WorkFileTypeBean;
+import com.cooltoo.beans.WorkFileTypeBean;
 import com.cooltoo.backend.converter.NurseQualificationFileBeanConverter;
 import com.cooltoo.backend.entities.NurseQualificationFileEntity;
 import com.cooltoo.backend.repository.NurseQualificationFileRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.services.WorkFileTypeService;
 import com.cooltoo.services.file.SecretFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;

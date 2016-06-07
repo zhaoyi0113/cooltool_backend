@@ -30,7 +30,7 @@ public interface NurseSpeakTopicRelationRepository extends JpaRepository<NurseSp
             " FROM NurseSpeakTopicRelationEntity topicRelation" +
             " WHERE topicRelation.speakId IN (?1)" +
             " GROUP BY topicRelation.speakId")
-    List<Long[]> findTopicIdsBySpeakIds(List<Long> speakIds, Sort sort);
+    List<Object[]> findTopicIdsBySpeakIds(List<Long> speakIds, Sort sort);
 
 //    @Modifying
 //    @Query("UPDATE NurseSpeakTopicRelationEntity topicRelation" +

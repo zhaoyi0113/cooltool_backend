@@ -1,4 +1,4 @@
-package com.cooltoo.go2nurse;
+package com.cooltoo;
 
 import org.togglz.core.Feature;
 

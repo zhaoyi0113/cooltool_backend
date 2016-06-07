@@ -1,7 +1,10 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.NurseHospitalRelationEntity;
+import com.cooltoo.entities.HospitalEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -13,6 +16,8 @@ public interface NurseHospitalRelationRepository extends CrudRepository<NurseHos
     List<NurseHospitalRelationEntity> findByNurseIdIn(List<Long> userIds);
     List<NurseHospitalRelationEntity> findByHospitalIdIn(List<Integer> departmentIds);
     List<NurseHospitalRelationEntity> findByDepartmentIdIn(List<Integer> departmentIds);
+    @Query("select hospital from HospitalEntity hospital, NurseHospitalRelationEntity relation where relation.nurseId = :userId and relation.hospitalId = hospital.id")
+    List<HospitalEntity> getNurseHospitals(@Param("userId") long userId);
     void deleteByDepartmentIdIn(List<Integer> departIds);
     void deleteByHospitalIdIn(List<Integer> hospitalIds);
 }

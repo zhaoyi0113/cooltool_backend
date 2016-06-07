@@ -2,7 +2,7 @@ package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.beans.NurseQualificationFileBean;
-import com.cooltoo.backend.beans.WorkFileTypeBean;
+import com.cooltoo.beans.WorkFileTypeBean;
 import com.cooltoo.backend.converter.NurseQualificationBeanConverter;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseQualificationEntity;
@@ -13,6 +13,7 @@ import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.services.WorkFileTypeService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -1,8 +1,8 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
-import com.cooltoo.backend.beans.WorkFileTypeBean;
-import com.cooltoo.backend.services.WorkFileTypeService;
+import com.cooltoo.beans.WorkFileTypeBean;
+import com.cooltoo.services.WorkFileTypeService;
 import com.cooltoo.constants.ContextKeys;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;

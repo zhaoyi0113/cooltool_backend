@@ -6,14 +6,14 @@ import com.cooltoo.services.file.OfficialFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/3/29.
@@ -23,10 +23,8 @@ public class WorkFileTypeServiceTest extends AbstractCooltooTest {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkFileTypeServiceTest.class.getName());
 
-    @Autowired
-    private WorkFileTypeService workFileTypeService;
-    @Autowired
-    private OfficialFileStorageService officialStorage;
+    @Autowired private WorkFileTypeService workFileTypeService;
+    @Autowired private OfficialFileStorageService officialStorage;
 
     @Test
     @DatabaseSetup("classpath:/com/cooltoo/services/work_file_type_data.xml")
@@ -46,15 +44,12 @@ public class WorkFileTypeServiceTest extends AbstractCooltooTest {
         WorkFileTypeBean       workFileType  = workfileTypes.get(0);
 
         String               imageData    = "fdafdafdsafdsafdsafdsafdsafdsa";
-        ByteArrayInputStream imageStream  = new ByteArrayInputStream(imageData.getBytes());
-        InputStream image        = imageStream;
-        InputStream disableImage = imageStream;
         String      name         = "aaaaaa";
         int         factor       = 50;
         int         maxFileCount = 29;
         int         minFileCount = 10;
 
-        WorkFileTypeBean newType = workFileTypeService.updateWorkfileType(workFileType.getId(), name, factor, maxFileCount, minFileCount, image, disableImage);
+        WorkFileTypeBean newType = workFileTypeService.updateWorkfileType(workFileType.getId(), name, factor, maxFileCount, minFileCount, null, null);
 
         Assert.assertEquals(newType.getId(), workFileType.getId());
         Assert.assertNotEquals(newType.getName(), workFileType.getName());
@@ -65,17 +60,5 @@ public class WorkFileTypeServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(newType.getMinFileCount(), minFileCount);
         Assert.assertNotEquals(newType.getMaxFileCount(), workFileType.getMaxFileCount());
         Assert.assertEquals(newType.getMaxFileCount(), maxFileCount);
-        Assert.assertNotEquals(newType.getImageId(), workFileType.getImageId());
-        Assert.assertNotEquals(newType.getDisableImageId(), workFileType.getDisableImageId());
-        Assert.assertTrue(officialStorage.fileExist(newType.getImageUrl()));
-        Assert.assertTrue(officialStorage.fileExist(newType.getDisableImageUrl()));
-
-
-        officialStorage.deleteFile(newType.getImageId());
-        officialStorage.deleteFile(newType.getDisableImageId());
-
-        Assert.assertFalse(officialStorage.fileExist(newType.getImageUrl()));
-        Assert.assertFalse(officialStorage.fileExist(newType.getDisableImageUrl()));
-
     }
 }

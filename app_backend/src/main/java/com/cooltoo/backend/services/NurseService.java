@@ -5,9 +5,9 @@ import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.backend.converter.NurseBeanConverter;
 import com.cooltoo.backend.converter.NurseEntityConverter;
+import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.backend.leancloud.LeanCloudService;
-import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.beans.NurseHospitalRelationBean;
@@ -56,7 +56,7 @@ public class NurseService {
     @Autowired
     private NurseFriendsService friendsService;
     @Autowired
-    private HospitalRepository hospitalRepository;
+    private NurseHospitalRelationRepository hospitalRelationRepository;
     @Autowired
     private NurseSpeakService speakService;
     @Autowired
@@ -186,7 +186,7 @@ public class NurseService {
 
         long friendsCount = friendsService.countFriendship(userId);
         nurse.setProperty(NurseBean.FRIENDS_COUNT, friendsCount);
-        List<HospitalEntity> nurseHospitals = hospitalRepository.getNurseHospitals(userId);
+        List<HospitalEntity> nurseHospitals = hospitalRelationRepository.getNurseHospitals(userId);
         if(!nurseHospitals.isEmpty()){
             nurse.setHospital(nurseHospitals.get(0).getName());
         }

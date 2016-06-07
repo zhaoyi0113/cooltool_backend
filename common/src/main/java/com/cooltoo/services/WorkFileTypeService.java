@@ -1,9 +1,9 @@
-package com.cooltoo.backend.services;
+package com.cooltoo.services;
 
-import com.cooltoo.backend.beans.WorkFileTypeBean;
-import com.cooltoo.backend.converter.WorkFileTypeBeanConverter;
-import com.cooltoo.backend.entities.WorkFileTypeEntity;
-import com.cooltoo.backend.repository.WorkFileTypeRepository;
+import com.cooltoo.beans.WorkFileTypeBean;
+import com.cooltoo.converter.WorkFileTypeBeanConverter;
+import com.cooltoo.entities.WorkFileTypeEntity;
+import com.cooltoo.repository.WorkFileTypeRepository;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;

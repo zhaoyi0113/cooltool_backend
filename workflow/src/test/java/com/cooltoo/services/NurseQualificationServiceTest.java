@@ -2,7 +2,6 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseQualificationBean;
-import com.cooltoo.backend.beans.WorkFileTypeBean;
 import com.cooltoo.backend.services.NurseQualificationService;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
@@ -15,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
