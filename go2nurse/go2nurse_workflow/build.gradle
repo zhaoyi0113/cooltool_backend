@@ -65,7 +65,7 @@ ext {
 sourceSets {
     main {
         resources {
-            srcDirs = ["src/main/resources", environmentPah, "../dbschema/src/main/resources"]
+            srcDirs = ["src/main/resources", environmentPah]
         }
     }
 }
