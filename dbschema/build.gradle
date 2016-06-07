@@ -32,7 +32,7 @@ dependencies {
 ext {
 
     environment = project.hasProperty("env") ? env : 'dev'
-    environmentPah = "../workflow/envs/"+environment
+    environmentPah = "envs/"+environment
     // read database envs
     Properties props = new Properties()
     props.load(new FileInputStream(file(environmentPah + "/application.properties")))
