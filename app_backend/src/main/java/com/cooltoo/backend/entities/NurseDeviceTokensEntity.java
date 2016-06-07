@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Created by yzzhao on 4/28/16.
  */
-@Table(name = "nurse_device_tokens")
+@Table(name = "nursego_nurse_device_tokens")
 @Entity
 public class NurseDeviceTokensEntity {
 

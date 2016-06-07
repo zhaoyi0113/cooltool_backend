@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by hp on 2016/4/4.
  */
 @Entity
-@Table(name = "nurse_qualification_file")
+@Table(name = "nursego_nurse_qualification_file")
 public class NurseQualificationFileEntity {
     private long id;
     private long qualificationId;

@@ -5,7 +5,7 @@ import javax.persistence.*;
 /**
  * Created by yzzhao on 3/10/16.
  */
-@Table(name = "nurse_department_relation")
+@Table(name = "nursego_nurse_department_relation")
 @Entity
 public class NurseDepartmentRelationEntity {
 

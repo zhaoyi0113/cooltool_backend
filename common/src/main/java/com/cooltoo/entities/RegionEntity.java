@@ -9,7 +9,7 @@ import javax.persistence.Table;
  * Created by zhaolisong on 16/3/29.
  */
 @Entity
-@Table(name = "region")
+@Table(name = "cooltoo_region")
 public class RegionEntity {
 
     private int id;

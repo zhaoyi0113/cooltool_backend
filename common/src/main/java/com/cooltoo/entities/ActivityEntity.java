@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by hp on 2016/4/20.
  */
 @Entity
-@Table(name = "platform_activities")
+@Table(name = "nursego_platform_activities")
 public class ActivityEntity {
     private long id;
     private String title;

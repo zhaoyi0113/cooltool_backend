@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <patient_badge id="11" patient_id="4" badge_id="1001"/>
-    <patient_badge id="22" patient_id="9" badge_id="1003"/>
-    <patient_badge id="33" patient_id="3" badge_id="1002"/>
-    <patient_badge id="44" patient_id="5" badge_id="1001"/>
-    <patient_badge id="55" patient_id="8" badge_id="1003"/>
-    <patient_badge id="66" patient_id="6" badge_id="1001"/>
-    <patient_badge id="77" patient_id="7" badge_id="1004"/>
-    <badge id="1001" name="name2" point="101" grade="9" file_id="1"></badge>
-    <badge id="1002" name="name3" point="102" grade="10" file_id="1"></badge>
-    <badge id="1003" name="name4" point="103" grade="11" file_id="1"></badge>
-    <badge id="1004" name="name5" point="104" grade="12" file_id="1"></badge>
-    <patient id="1" name="name1" nickname="nickname1" certificate_id="11" office_id="19" mobile="13312315252" birthdate="1982-09-20" age="11" usercol="xx"/>
-    <patient id="2" name="name2" nickname="nickname2" certificate_id="12" office_id="18" mobile="18312315252" birthdate="1982-09-20" age="22" usercol="xx"/>
-    <patient id="3" name="name3" nickname="nickname3" certificate_id="13" office_id="17" mobile="15312315252" birthdate="1982-09-20" age="33" usercol="xx"/>
-    <patient id="4" name="name4" nickname="nickname4" certificate_id="14" office_id="16" mobile="15512315252" birthdate="1982-09-20" age="44" usercol="xx"/>
-    <patient id="5" name="name5" nickname="nickname5" certificate_id="15" office_id="15" mobile="15812315252" birthdate="1982-09-20" age="55" usercol="xx"/>
-    <patient id="6" name="name6" nickname="nickname6" certificate_id="16" office_id="14" mobile="18612315252" birthdate="1982-09-20" age="66" usercol="xx"/>
-    <patient id="7" name="name7" nickname="nickname7" certificate_id="17" office_id="13" mobile="13612315252" birthdate="1982-09-20" age="77" usercol="xx"/>
-    <patient id="8" name="name8" nickname="nickname8" certificate_id="18" office_id="12" mobile="13812315252" birthdate="1982-09-20" age="88" usercol="xx"/>
-    <patient id="9" name="name9" nickname="nickname9" certificate_id="19" office_id="11" mobile="18512315252" birthdate="1982-09-20" age="99" usercol="xx"/>
+    <go2nurse_patient_badge id="11" patient_id="4" badge_id="1001"/>
+    <go2nurse_patient_badge id="22" patient_id="9" badge_id="1003"/>
+    <go2nurse_patient_badge id="33" patient_id="3" badge_id="1002"/>
+    <go2nurse_patient_badge id="44" patient_id="5" badge_id="1001"/>
+    <go2nurse_patient_badge id="55" patient_id="8" badge_id="1003"/>
+    <go2nurse_patient_badge id="66" patient_id="6" badge_id="1001"/>
+    <go2nurse_patient_badge id="77" patient_id="7" badge_id="1004"/>
+    <nursego_badge id="1001" name="name2" point="101" grade="9" file_id="1" />
+    <nursego_badge id="1002" name="name3" point="102" grade="10" file_id="1" />
+    <nursego_badge id="1003" name="name4" point="103" grade="11" file_id="1" />
+    <nursego_badge id="1004" name="name5" point="104" grade="12" file_id="1" />
+    <go2nurse_patient id="1" name="name1" nickname="nickname1" certificate_id="11" office_id="19" mobile="13312315252" birthdate="1982-09-20" age="11" usercol="xx"/>
+    <go2nurse_patient id="2" name="name2" nickname="nickname2" certificate_id="12" office_id="18" mobile="18312315252" birthdate="1982-09-20" age="22" usercol="xx"/>
+    <go2nurse_patient id="3" name="name3" nickname="nickname3" certificate_id="13" office_id="17" mobile="15312315252" birthdate="1982-09-20" age="33" usercol="xx"/>
+    <go2nurse_patient id="4" name="name4" nickname="nickname4" certificate_id="14" office_id="16" mobile="15512315252" birthdate="1982-09-20" age="44" usercol="xx"/>
+    <go2nurse_patient id="5" name="name5" nickname="nickname5" certificate_id="15" office_id="15" mobile="15812315252" birthdate="1982-09-20" age="55" usercol="xx"/>
+    <go2nurse_patient id="6" name="name6" nickname="nickname6" certificate_id="16" office_id="14" mobile="18612315252" birthdate="1982-09-20" age="66" usercol="xx"/>
+    <go2nurse_patient id="7" name="name7" nickname="nickname7" certificate_id="17" office_id="13" mobile="13612315252" birthdate="1982-09-20" age="77" usercol="xx"/>
+    <go2nurse_patient id="8" name="name8" nickname="nickname8" certificate_id="18" office_id="12" mobile="13812315252" birthdate="1982-09-20" age="88" usercol="xx"/>
+    <go2nurse_patient id="9" name="name9" nickname="nickname9" certificate_id="19" office_id="11" mobile="18512315252" birthdate="1982-09-20" age="99" usercol="xx"/>
 </dataset>

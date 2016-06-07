@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by hp on 2016/3/18.
  */
 @Entity
-@Table(name = "nurse_speak_thumbs_up")
+@Table(name = "nursego_nurse_speak_thumbs_up")
 public class NurseSpeakThumbsUpEntity {
     private long id;
     private long nurseSpeakId;

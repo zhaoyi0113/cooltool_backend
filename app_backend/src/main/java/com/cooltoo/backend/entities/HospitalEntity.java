@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by lg380357 on 2016/3/5.
  */
 @Entity
-@Table(name = "hospital")
+@Table(name = "cooltoo_hospital")
 public class HospitalEntity {
     private int id;
     private String name;

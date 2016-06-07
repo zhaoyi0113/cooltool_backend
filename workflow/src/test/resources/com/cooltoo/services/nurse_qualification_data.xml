@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <nurse_qualification id="1" name="身份证" user_id="1" status="1" status_description=" " />
-    <nurse_qualification id="2" name="身份证" user_id="2" status="0" status_description=" " />
-    <nurse_qualification id="3" name="身份证" user_id="3" status="2" status_description=" " />
+    <nursego_nurse_qualification id="1" name="身份证" user_id="1" status="1" status_description=" " />
+    <nursego_nurse_qualification id="2" name="身份证" user_id="2" status="0" status_description=" " />
+    <nursego_nurse_qualification id="3" name="身份证" user_id="3" status="2" status_description=" " />
 </dataset>

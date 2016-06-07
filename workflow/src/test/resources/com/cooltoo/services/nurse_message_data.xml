@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
     <!-- thumbs up message -->
-    <nurse_message id="1" user_type="0" user_id="1" reason_id="1" ability_id="2" ability_type="3" status="0" time_created="2016-02-11 23:11:32" />
-    <nurse_message id="2" user_type="0" user_id="1" reason_id="2" ability_id="2" ability_type="3" status="0" time_created="2016-02-12 12:11:32" />
-    <nurse_message id="3" user_type="0" user_id="1" reason_id="3" ability_id="2" ability_type="3" status="0" time_created="2016-03-11 23:11:32" />
-    <nurse_message id="4" user_type="0" user_id="1" reason_id="4" ability_id="2" ability_type="3" status="1" time_created="2016-03-01 15:11:32" />
-    <nurse_message id="5" user_type="0" user_id="1" reason_id="5" ability_id="2" ability_type="3" status="1" time_created="2016-03-17 23:11:32" />
-    <nurse_message id="6" user_type="0" user_id="1" reason_id="6" ability_id="2" ability_type="3" status="1" time_created="2016-03-15 8:11:32" />
-    <nurse_message id="7" user_type="0" user_id="1" reason_id="7" ability_id="2" ability_type="3" status="2" time_created="2016-03-18 9:11:32" />
+    <nursego_nurse_message id="1" user_type="0" user_id="1" reason_id="1" ability_id="2" ability_type="3" status="0" time_created="2016-02-11 23:11:32" />
+    <nursego_nurse_message id="2" user_type="0" user_id="1" reason_id="2" ability_id="2" ability_type="3" status="0" time_created="2016-02-12 12:11:32" />
+    <nursego_nurse_message id="3" user_type="0" user_id="1" reason_id="3" ability_id="2" ability_type="3" status="0" time_created="2016-03-11 23:11:32" />
+    <nursego_nurse_message id="4" user_type="0" user_id="1" reason_id="4" ability_id="2" ability_type="3" status="1" time_created="2016-03-01 15:11:32" />
+    <nursego_nurse_message id="5" user_type="0" user_id="1" reason_id="5" ability_id="2" ability_type="3" status="1" time_created="2016-03-17 23:11:32" />
+    <nursego_nurse_message id="6" user_type="0" user_id="1" reason_id="6" ability_id="2" ability_type="3" status="1" time_created="2016-03-15 8:11:32" />
+    <nursego_nurse_message id="7" user_type="0" user_id="1" reason_id="7" ability_id="2" ability_type="3" status="2" time_created="2016-03-18 9:11:32" />
 
     <!-- comment message -->
-    <nurse_message id="8"  user_type="0" user_id="1" reason_id="1" ability_id="1" ability_type="4" status="0" time_created="2016-02-01 00:00:00" />
-    <nurse_message id="9"  user_type="0" user_id="1" reason_id="2" ability_id="1" ability_type="4" status="1" time_created="2016-02-02 00:00:00" />
-    <nurse_message id="10" user_type="0" user_id="1" reason_id="3" ability_id="1" ability_type="4" status="0" time_created="2016-02-03 00:00:00" />
-    <nurse_message id="11" user_type="0" user_id="1" reason_id="4" ability_id="1" ability_type="4" status="1" time_created="2016-02-04 00:00:00" />
-    <nurse_message id="12" user_type="0" user_id="1" reason_id="5" ability_id="1" ability_type="4" status="0" time_created="2016-02-05 00:00:00" />
-    <nurse_message id="13" user_type="0" user_id="2" reason_id="6" ability_id="1" ability_type="4" status="0" time_created="2016-02-06 00:00:00" />
-    <nurse_message id="14" user_type="0" user_id="1" reason_id="7" ability_id="1" ability_type="4" status="0" time_created="2016-02-05 00:00:00" />
-    <nurse_message id="15" user_type="0" user_id="1" reason_id="8" ability_id="1" ability_type="4" status="0" time_created="2016-02-04 00:00:00" />
-    <nurse_message id="16" user_type="0" user_id="3" reason_id="9" ability_id="1" ability_type="4" status="0" time_created="2016-02-03 00:00:00" />
-    <nurse_message id="17" user_type="0" user_id="1" reason_id="10" ability_id="1" ability_type="4" status="0" time_created="2016-02-02 12:00:00" />
+    <nursego_nurse_message id="8"  user_type="0" user_id="1" reason_id="1" ability_id="1" ability_type="4" status="0" time_created="2016-02-01 00:00:00" />
+    <nursego_nurse_message id="9"  user_type="0" user_id="1" reason_id="2" ability_id="1" ability_type="4" status="1" time_created="2016-02-02 00:00:00" />
+    <nursego_nurse_message id="10" user_type="0" user_id="1" reason_id="3" ability_id="1" ability_type="4" status="0" time_created="2016-02-03 00:00:00" />
+    <nursego_nurse_message id="11" user_type="0" user_id="1" reason_id="4" ability_id="1" ability_type="4" status="1" time_created="2016-02-04 00:00:00" />
+    <nursego_nurse_message id="12" user_type="0" user_id="1" reason_id="5" ability_id="1" ability_type="4" status="0" time_created="2016-02-05 00:00:00" />
+    <nursego_nurse_message id="13" user_type="0" user_id="2" reason_id="6" ability_id="1" ability_type="4" status="0" time_created="2016-02-06 00:00:00" />
+    <nursego_nurse_message id="14" user_type="0" user_id="1" reason_id="7" ability_id="1" ability_type="4" status="0" time_created="2016-02-05 00:00:00" />
+    <nursego_nurse_message id="15" user_type="0" user_id="1" reason_id="8" ability_id="1" ability_type="4" status="0" time_created="2016-02-04 00:00:00" />
+    <nursego_nurse_message id="16" user_type="0" user_id="3" reason_id="9" ability_id="1" ability_type="4" status="0" time_created="2016-02-03 00:00:00" />
+    <nursego_nurse_message id="17" user_type="0" user_id="1" reason_id="10" ability_id="1" ability_type="4" status="0" time_created="2016-02-02 12:00:00" />
 </dataset>

@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by zhaolisong on 16/4/6.
  */
 @Entity
-@Table(name = "tags")
+@Table(name = "nursego_tags")
 public class TagsEntity {
     private long id;
     private long categoryId;

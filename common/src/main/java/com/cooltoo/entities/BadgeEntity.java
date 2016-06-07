@@ -8,7 +8,7 @@ import javax.persistence.*;
  * Created by yzzhao on 2/24/16.
  */
 @Entity
-@Table(name = "badge")
+@Table(name = "nursego_badge")
 public class BadgeEntity {
 
     private int    id;

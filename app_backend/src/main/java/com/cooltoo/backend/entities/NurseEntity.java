@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Created by yzzhao on 3/1/16.
  */
 @Entity
-@Table(name = "nurse")
+@Table(name = "cooltoo_nurse")
 public class NurseEntity {
 
     private long id;

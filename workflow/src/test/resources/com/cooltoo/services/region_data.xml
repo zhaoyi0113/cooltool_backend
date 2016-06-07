@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <region id="1" code="100000" name="china"      en_name="CN" short_en_name="CN" parent_id="-1" />
-    <region id="2" code="100000" name="beijing"    en_name="BJ" short_en_name="BJ" parent_id="1" />
-    <region id="3" code="100000" name="fang shan"  en_name="FS" short_en_name="FS" parent_id="2" />
-    <region id="4" code="100000" name="chang ping" en_name="CP" short_en_name="CP" parent_id="2" />
-    <region id="5" code="100000" name="dong cheng" en_name="DC" short_en_name="DC" parent_id="2" />
+    <cooltoo_region id="1" code="100000" name="china"      en_name="CN" short_en_name="CN" parent_id="-1" />
+    <cooltoo_region id="2" code="100000" name="beijing"    en_name="BJ" short_en_name="BJ" parent_id="1" />
+    <cooltoo_region id="3" code="100000" name="fang shan"  en_name="FS" short_en_name="FS" parent_id="2" />
+    <cooltoo_region id="4" code="100000" name="chang ping" en_name="CP" short_en_name="CP" parent_id="2" />
+    <cooltoo_region id="5" code="100000" name="dong cheng" en_name="DC" short_en_name="DC" parent_id="2" />
 </dataset>

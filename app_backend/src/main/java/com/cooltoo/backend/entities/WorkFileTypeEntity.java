@@ -8,7 +8,7 @@ import javax.persistence.*;
  * Created by zhaolisong on 16/3/29.
  */
 @Entity
-@Table(name = "workfile_type")
+@Table(name = "nursego_workfile_type")
 public class WorkFileTypeEntity {
     private int id;
     private String name;

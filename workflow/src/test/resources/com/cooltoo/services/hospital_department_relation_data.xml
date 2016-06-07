@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <hospital_department_relation id="11" hospital_id="11" department_id="11" />
-    <hospital_department_relation id="22" hospital_id="22" department_id="22" />
-    <hospital_department_relation id="33" hospital_id="33" department_id="33" />
-    <hospital_department_relation id="44" hospital_id="44" department_id="44" />
-    <hospital_department_relation id="55" hospital_id="55" department_id="55" />
-    <hospital id="11" name="hospital1" province="2" city="3" />
-    <hospital id="22" name="hospital2" province="2" city="3" />
-    <hospital id="33" name="hospital3" province="2" city="3" />
-    <hospital id="44" name="hospital4" province="2" city="3" />
-    <hospital id="55" name="hospital5" province="2" city="3" />
-    <hospital_department id="11" name="department1" />
-    <hospital_department id="22" name="department2" />
-    <hospital_department id="33" name="department3" />
-    <hospital_department id="44" name="department4" />
-    <hospital_department id="55" name="department5" />
+    <nursego_hospital_department_relation id="11" hospital_id="11" department_id="11" />
+    <nursego_hospital_department_relation id="22" hospital_id="22" department_id="22" />
+    <nursego_hospital_department_relation id="33" hospital_id="33" department_id="33" />
+    <nursego_hospital_department_relation id="44" hospital_id="44" department_id="44" />
+    <nursego_hospital_department_relation id="55" hospital_id="55" department_id="55" />
+    <cooltoo_hospital id="11" name="hospital1" province="2" city="3" />
+    <cooltoo_hospital id="22" name="hospital2" province="2" city="3" />
+    <cooltoo_hospital id="33" name="hospital3" province="2" city="3" />
+    <cooltoo_hospital id="44" name="hospital4" province="2" city="3" />
+    <cooltoo_hospital id="55" name="hospital5" province="2" city="3" />
+    <cooltoo_hospital_department id="11" name="department1" />
+    <cooltoo_hospital_department id="22" name="department2" />
+    <cooltoo_hospital_department id="33" name="department3" />
+    <cooltoo_hospital_department id="44" name="department4" />
+    <cooltoo_hospital_department id="55" name="department5" />
 </dataset>

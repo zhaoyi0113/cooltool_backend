@@ -8,7 +8,7 @@ import javax.persistence.*;
  * Created by yzzhao on 3/10/16.
  */
 @Entity
-@Table(name = "occupation_skill")
+@Table(name = "nursego_skill")
 public class SkillEntity {
     private int id;
     private long imageId;

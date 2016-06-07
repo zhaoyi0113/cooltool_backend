@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by hp on 2016/6/2.
  */
 @Entity
-@Table(name = "nurse_speak_topic")
+@Table(name = "nursego_nurse_speak_topic")
 public class NurseSpeakTopicEntity {
 
     private long id;

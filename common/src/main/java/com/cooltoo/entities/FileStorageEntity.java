@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by yzzhao on 2/26/16.
  */
 @Entity
-@Table(name = "file_storage")
+@Table(name = "nursego_file_storage")
 public class FileStorageEntity {
 
     private long id;

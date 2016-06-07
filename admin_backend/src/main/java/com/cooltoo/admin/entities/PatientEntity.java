@@ -7,7 +7,7 @@ import java.sql.Date;
  * Created by yzzhao on 2/29/16.
  */
 @Entity
-@Table(name = "patient")
+@Table(name = "go2nurse_patient")
 public class PatientEntity {
 
     private long id;

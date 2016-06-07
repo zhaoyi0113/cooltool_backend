@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * Created by lg380357 on 2016/2/29.
  */
 @Entity
-@Table(name = "order_list")
+@Table(name = "nursego_order_list")
 public class OrderEntity {
 
     private long id;

@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by yzzhao on 5/22/16.
  */
 @Entity
-@Table(name = "platform_version")
+@Table(name = "nursego_platform_version")
 public class PlatformVersionEntity {
 
     private int id;

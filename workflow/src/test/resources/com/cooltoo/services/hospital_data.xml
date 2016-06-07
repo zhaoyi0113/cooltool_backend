@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <hospital id="11" name="name1" province="2" city="3" />
-    <hospital id="22" name="name2" province="2" city="3" />
-    <hospital id="33" name="name3" province="2" city="3" />
-    <hospital id="44" name="name4" province="2" city="3" />
-    <hospital id="55" name="name5" province="2" city="3" />
+    <cooltoo_hospital id="11" name="name1" province="2" city="3" />
+    <cooltoo_hospital id="22" name="name2" province="2" city="3" />
+    <cooltoo_hospital id="33" name="name3" province="2" city="3" />
+    <cooltoo_hospital id="44" name="name4" province="2" city="3" />
+    <cooltoo_hospital id="55" name="name5" province="2" city="3" />
 </dataset>

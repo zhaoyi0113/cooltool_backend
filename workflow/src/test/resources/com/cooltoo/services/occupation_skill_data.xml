@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <occupation_skill id="1" name="skill1" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 1" />
-    <occupation_skill id="2" name="skill2" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 2" />
-    <occupation_skill id="3" name="skill3" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 3" />
-    <occupation_skill id="4" name="skill4" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 4" />
-    <occupation_skill id="5" name="skill5" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 5" />
-    <occupation_skill id="6" name="skill6" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 6" />
+    <nursego_skill id="1" name="skill1" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 1" />
+    <nursego_skill id="2" name="skill2" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 2" />
+    <nursego_skill id="3" name="skill3" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 3" />
+    <nursego_skill id="4" name="skill4" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 4" />
+    <nursego_skill id="5" name="skill5" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 5" />
+    <nursego_skill id="6" name="skill6" image_id="1" disable_image_id="1" factor="1" status="1" description="skill description 6" />
 </dataset>

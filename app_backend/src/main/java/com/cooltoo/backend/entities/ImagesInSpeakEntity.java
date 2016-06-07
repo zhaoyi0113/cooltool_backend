@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by zhaolisong on 16/4/14.
  */
 @Entity
-@Table(name = "images_in_speak")
+@Table(name = "nursego_images_in_speak")
 public class ImagesInSpeakEntity {
     private long id;
     private long speakId;

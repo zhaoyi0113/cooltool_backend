@@ -11,7 +11,7 @@ import java.util.Date;
  * Created by yzzhao on 5/21/16.
  */
 @Entity
-@Table(name = "nurse_integration")
+@Table(name = "nursego_nurse_integration")
 public class NurseIntegrationEntity {
     private long id;
     private long userId;

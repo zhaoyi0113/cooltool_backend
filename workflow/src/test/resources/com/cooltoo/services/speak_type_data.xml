@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dataset>
-    <speak_type id="1" name="晒图"      type="0" factor="10" image_id="1" disable_image_id="2" />
-    <speak_type id="2" name="吐槽"      type="1" factor="15" image_id="1" disable_image_id="2" />
-    <speak_type id="3" name="提问"      type="2" factor="20" image_id="1" disable_image_id="2" />
-    <speak_type id="4" name="官方发言"  type="3" factor="30" image_id="1" disable_image_id="2" />
+    <nursego_speak_type id="1" name="晒图"      type="0" factor="10" image_id="1" disable_image_id="2" />
+    <nursego_speak_type id="2" name="吐槽"      type="1" factor="15" image_id="1" disable_image_id="2" />
+    <nursego_speak_type id="3" name="提问"      type="2" factor="20" image_id="1" disable_image_id="2" />
+    <nursego_speak_type id="4" name="官方发言"  type="3" factor="30" image_id="1" disable_image_id="2" />
 </dataset>

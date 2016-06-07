@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dataset>
-    <workfile_type id="1" name="UNKNOW"         type="0" factor="11" max_file_count="40" min_file_count="0" image_id="1" disable_image_id="2" />
-    <workfile_type id="2" name="IDENTIFICATION" type="1" factor="13" max_file_count="2"  min_file_count="2" image_id="3" disable_image_id="4" />
-    <workfile_type id="3" name="EMPLOYEES_CARD" type="2" factor="17" max_file_count="20" min_file_count="1" image_id="5" disable_image_id="6" />
-    <workfile_type id="4" name="QUALIFICATION"  type="3" factor="19" max_file_count="1" min_file_count="0" image_id="7" disable_image_id="8" />
+    <nursego_workfile_type id="1" name="UNKNOW"         type="0" factor="11" max_file_count="40" min_file_count="0" image_id="1" disable_image_id="2" />
+    <nursego_workfile_type id="2" name="IDENTIFICATION" type="1" factor="13" max_file_count="2"  min_file_count="2" image_id="3" disable_image_id="4" />
+    <nursego_workfile_type id="3" name="EMPLOYEES_CARD" type="2" factor="17" max_file_count="20" min_file_count="1" image_id="5" disable_image_id="6" />
+    <nursego_workfile_type id="4" name="QUALIFICATION"  type="3" factor="19" max_file_count="1" min_file_count="0" image_id="7" disable_image_id="8" />
 </dataset>

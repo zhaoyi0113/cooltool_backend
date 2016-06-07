@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by yzzhao on 2/29/16.
  */
 @Entity
-@Table(name = "patient_badge")
+@Table(name = "go2nurse_patient_badge")
 public class PatientBadgeEntity {
 
     private int id;

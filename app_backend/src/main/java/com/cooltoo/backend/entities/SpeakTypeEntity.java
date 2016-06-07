@@ -8,7 +8,7 @@ import javax.persistence.*;
  * Created by zhaolisong on 16/3/28.
  */
 @Entity
-@Table(name = "speak_type")
+@Table(name = "nursego_speak_type")
 public class SpeakTypeEntity {
     private int id;
     private String name;

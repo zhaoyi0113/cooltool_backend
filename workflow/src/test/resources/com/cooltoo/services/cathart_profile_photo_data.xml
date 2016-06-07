@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dataset>
-    <cathart_profile_photo id="1" name="匿名 1" image_id="1" enable="1" create_time="2016-03-23 12:12:12" />
-    <cathart_profile_photo id="2" name="匿名 2" image_id="2" enable="1" create_time="2016-03-23 12:12:12" />
-    <cathart_profile_photo id="3" name="匿名 3" image_id="3" enable="1" create_time="2016-03-23 12:12:12" />
-    <cathart_profile_photo id="4" name="匿名 4" image_id="4" enable="1" create_time="2016-03-23 12:12:12" />
-    <cathart_profile_photo id="5" name="匿名 5" image_id="5" enable="0" create_time="2016-03-23 12:12:12" />
-    <cathart_profile_photo id="6" name="匿名 6" image_id="6" enable="0" create_time="2016-03-23 12:12:12" />
+    <nursego_cathart_profile_photo id="1" name="匿名 1" image_id="1" enable="1" create_time="2016-03-23 12:12:12" />
+    <nursego_cathart_profile_photo id="2" name="匿名 2" image_id="2" enable="1" create_time="2016-03-23 12:12:12" />
+    <nursego_cathart_profile_photo id="3" name="匿名 3" image_id="3" enable="1" create_time="2016-03-23 12:12:12" />
+    <nursego_cathart_profile_photo id="4" name="匿名 4" image_id="4" enable="1" create_time="2016-03-23 12:12:12" />
+    <nursego_cathart_profile_photo id="5" name="匿名 5" image_id="5" enable="0" create_time="2016-03-23 12:12:12" />
+    <nursego_cathart_profile_photo id="6" name="匿名 6" image_id="6" enable="0" create_time="2016-03-23 12:12:12" />
 </dataset>

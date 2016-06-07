@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <nurse_skill id="1" user_id="1" skill_id="1" point="30" />
-    <nurse_skill id="2" user_id="1" skill_id="4" point="20" />
-    <nurse_skill id="3" user_id="1" skill_id="5" point="512" />
-    <nurse_skill id="4" user_id="2" skill_id="1" point="15" />
-    <nurse_skill id="5" user_id="2" skill_id="2" point="10" />
+    <nursego_nurse_skill id="1" user_id="1" skill_id="1" point="30" />
+    <nursego_nurse_skill id="2" user_id="1" skill_id="4" point="20" />
+    <nursego_nurse_skill id="3" user_id="1" skill_id="5" point="512" />
+    <nursego_nurse_skill id="4" user_id="2" skill_id="1" point="15" />
+    <nursego_nurse_skill id="5" user_id="2" skill_id="2" point="10" />
 </dataset>

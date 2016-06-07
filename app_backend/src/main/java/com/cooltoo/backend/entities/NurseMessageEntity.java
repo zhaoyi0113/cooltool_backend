@@ -11,7 +11,7 @@ import java.util.Date;
  * Created by hp on 2016/5/21.
  */
 @Entity
-@Table(name = "nurse_message")
+@Table(name = "nursego_nurse_message")
 public class NurseMessageEntity {
     private long id;
     private long userId;

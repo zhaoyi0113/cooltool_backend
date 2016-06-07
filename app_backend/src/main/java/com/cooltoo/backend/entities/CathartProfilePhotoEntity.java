@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by hp on 2016/4/18.
  */
 @Entity
-@Table(name = "cathart_profile_photo")
+@Table(name = "nursego_cathart_profile_photo")
 public class CathartProfilePhotoEntity {
     private long id;
     private String name;

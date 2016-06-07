@@ -1,0 +1,46 @@
+ALTER TABLE `admin_user`                   RENAME TO  `nursego_admin_user`;
+ALTER TABLE `admin_user_token_access`      RENAME TO  `nursego_admin_user_token_access`;
+ALTER TABLE `badge`                        RENAME TO  `nursego_badge`;
+ALTER TABLE `cathart_profile_photo`        RENAME TO  `nursego_cathart_profile_photo`;
+ALTER TABLE `file_storage`                 RENAME TO  `nursego_file_storage`;
+ALTER TABLE `hospital_department_relation` RENAME TO  `nursego_hospital_department_relation`;
+ALTER TABLE `images_in_speak`              RENAME TO  `nursego_images_in_speak`;
+ALTER TABLE `nurse_department_relation`    RENAME TO  `nursego_nurse_department_relation`;
+ALTER TABLE `nurse_device_tokens`          RENAME TO  `nursego_nurse_device_tokens`;
+ALTER TABLE `nurse_friends`                RENAME TO  `nursego_nurse_friends`;
+ALTER TABLE `nurse_hospital_relation`      RENAME TO  `nursego_nurse_hospital_relation`;
+ALTER TABLE `nurse_integration`            RENAME TO  `nursego_nurse_integration`;
+ALTER TABLE `nurse_message`                RENAME TO  `nursego_nurse_message`;
+ALTER TABLE `nurse_qualification`          RENAME TO  `nursego_nurse_qualification`;
+ALTER TABLE `nurse_qualification_file`     RENAME TO  `nursego_nurse_qualification_file`;
+ALTER TABLE `nurse_relationship`           RENAME TO  `nursego_nurse_relationship`;
+ALTER TABLE `nurse_skill`                  RENAME TO  `nursego_nurse_skill`;
+ALTER TABLE `nurse_skill_nomination`       RENAME TO  `nursego_nurse_ability_nomination`;
+ALTER TABLE `nurse_speak`                  RENAME TO  `nursego_nurse_speak`;
+ALTER TABLE `nurse_speak_comment`          RENAME TO  `nursego_nurse_speak_comment`;
+ALTER TABLE `nurse_speak_complaint`        RENAME TO  `nursego_nurse_speak_complaint`;
+ALTER TABLE `nurse_speak_thumbs_up`        RENAME TO  `nursego_nurse_speak_thumbs_up`;
+ALTER TABLE `nurse_speak_topic`            RENAME TO  `nursego_nurse_speak_topic`;
+ALTER TABLE `nurse_speak_topic_relation`   RENAME TO  `nursego_nurse_speak_topic_relation`;
+ALTER TABLE `nurse_speak_topic_subscriber` RENAME TO  `nursego_nurse_speak_topic_subscriber`;
+ALTER TABLE `occupation_skill`             RENAME TO  `nursego_skill`;
+ALTER TABLE `official_config`              RENAME TO  `nursego_official_config`;
+ALTER TABLE `order_list`                   RENAME TO  `nursego_order_list`;
+ALTER TABLE `platform_activities`          RENAME TO  `nursego_platform_activities`;
+ALTER TABLE `platform_version`             RENAME TO  `nursego_platform_version`;
+ALTER TABLE `sensitive_words`              RENAME TO  `nursego_sensitive_words`;
+ALTER TABLE `speak_type`                   RENAME TO  `nursego_speak_type`;
+ALTER TABLE `tags`                         RENAME TO  `nursego_tags`;
+ALTER TABLE `tags_category`                RENAME TO  `nursego_tags_category`;
+ALTER TABLE `token_access`                 RENAME TO  `nursego_token_access`;
+ALTER TABLE `user_suggestion`              RENAME TO  `nursego_user_suggestion`;
+ALTER TABLE `workfile_type`                RENAME TO  `nursego_workfile_type`;
+
+
+ALTER TABLE `hospital`            RENAME TO  `cooltoo_hospital`;
+ALTER TABLE `hospital_department` RENAME TO  `cooltoo_hospital_department`;
+ALTER TABLE `nurse`               RENAME TO  `cooltoo_nurse`;
+ALTER TABLE `region`              RENAME TO  `cooltoo_region`;
+
+ALTER TABLE `patient`        RENAME TO  `go2nurse_patient`;
+ALTER TABLE `patient_badge`  RENAME TO  `go2nurse_patient_badge`;

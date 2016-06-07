@@ -10,7 +10,7 @@ import com.cooltoo.constants.SpeakType;
  * Created by yzzhao on 3/15/16.
  */
 @Entity
-@Table(name = "nurse_speak")
+@Table(name = "nursego_nurse_speak")
 public class NurseSpeakEntity {
     private long id;
     private long userId;

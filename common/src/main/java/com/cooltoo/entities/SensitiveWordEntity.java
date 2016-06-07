@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by hp on 2016/5/31.
  */
 @Entity
-@Table(name = "sensitive_words")
+@Table(name = "nursego_sensitive_words")
 public class SensitiveWordEntity {
 
     private int id;

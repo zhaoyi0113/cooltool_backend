@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by yzzhao on 3/2/16.
  */
 @Entity
-@Table(name = "token_access")
+@Table(name = "nursego_token_access")
 public class TokenAccessEntity {
     private long id;
 
