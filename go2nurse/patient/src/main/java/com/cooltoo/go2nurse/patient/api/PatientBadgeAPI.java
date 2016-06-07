@@ -1,7 +1,7 @@
-package com.cooltoo.admin.api;
+package com.cooltoo.go2nurse.patient.api;
 
-import com.cooltoo.admin.beans.PatientBadgeBean;
-import com.cooltoo.admin.services.PatientBadgeService;
+import com.cooltoo.go2nurse.patient.beans.PatientBadgeBean;
+import com.cooltoo.go2nurse.patient.services.PatientBadgeService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;

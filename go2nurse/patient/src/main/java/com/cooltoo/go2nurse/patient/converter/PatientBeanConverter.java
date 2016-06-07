@@ -1,7 +1,7 @@
-package com.cooltoo.admin.converter;
+package com.cooltoo.go2nurse.patient.converter;
 
-import com.cooltoo.admin.beans.PatientBean;
-import com.cooltoo.admin.entities.PatientEntity;
+import com.cooltoo.go2nurse.patient.beans.PatientBean;
+import com.cooltoo.go2nurse.patient.entities.PatientEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

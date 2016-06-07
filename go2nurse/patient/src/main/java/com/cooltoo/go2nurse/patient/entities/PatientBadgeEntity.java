@@ -1,4 +1,4 @@
-package com.cooltoo.admin.entities;
+package com.cooltoo.go2nurse.patient.entities;
 
 import javax.persistence.*;
 

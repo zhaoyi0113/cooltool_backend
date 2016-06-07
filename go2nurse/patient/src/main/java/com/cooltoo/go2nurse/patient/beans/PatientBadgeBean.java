@@ -1,4 +1,4 @@
-package com.cooltoo.admin.beans;
+package com.cooltoo.go2nurse.patient.beans;
 
 /**
  * Created by lg380357 on 2016/3/3.

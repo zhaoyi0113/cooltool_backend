@@ -27,6 +27,17 @@ public class NurseSpeakTopicAPI {
 
     @Autowired private NurseSpeakTopicService topicService;
 
+    @Path("/list")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTopic(@Context HttpServletRequest request,
+                             @QueryParam("index") @DefaultValue("0") int pageIndex,
+                             @QueryParam("number") @DefaultValue("10") int sizePerPage
+    ) {
+        List<NurseSpeakTopicBean> topics = topicService.getTopic("", CommonStatus.ENABLED.name(), pageIndex, sizePerPage);
+        return Response.ok(topics).build();
+    }
+
     @Path("/speak")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -70,7 +81,6 @@ public class NurseSpeakTopicAPI {
     @Path("/add_click_number")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
     public Response editTopic(@Context HttpServletRequest request,
                               @FormParam("topic_id") @DefaultValue("0") long topicId
     ) {

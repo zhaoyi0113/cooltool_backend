@@ -1,6 +1,6 @@
-package com.cooltoo.admin.repository;
+package com.cooltoo.go2nurse.patient.repository;
 
-import com.cooltoo.admin.entities.PatientBadgeEntity;
+import com.cooltoo.go2nurse.patient.entities.PatientBadgeEntity;
 import org.springframework.data.repository.CrudRepository;
 
 /**

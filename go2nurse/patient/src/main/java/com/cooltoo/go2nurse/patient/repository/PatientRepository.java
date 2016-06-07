@@ -1,6 +1,6 @@
-package com.cooltoo.admin.repository;
+package com.cooltoo.go2nurse.patient.repository;
 
-import com.cooltoo.admin.entities.PatientEntity;
+import com.cooltoo.go2nurse.patient.entities.PatientEntity;
 import org.springframework.data.repository.CrudRepository;
 
 /**
