@@ -6,7 +6,7 @@ import com.cooltoo.backend.entities.NurseHospitalRelationEntity;
 import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.backend.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;

@@ -1,6 +1,6 @@
-package com.cooltoo.backend.repository;
+package com.cooltoo.repository;
 
-import com.cooltoo.backend.entities.HospitalDepartmentEntity;
+import com.cooltoo.entities.HospitalDepartmentEntity;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 

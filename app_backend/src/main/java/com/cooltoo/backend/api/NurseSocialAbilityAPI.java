@@ -7,7 +7,7 @@ import com.cooltoo.backend.services.NurseHospitalRelationService;
 import com.cooltoo.backend.services.NurseSkillService;
 import com.cooltoo.backend.services.NurseSocialAbilitiesService;
 import com.cooltoo.backend.services.SkillService;
-import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.backend.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.constants.SocialAbilityType;

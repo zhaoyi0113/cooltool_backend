@@ -1,6 +1,6 @@
-package com.cooltoo.backend.repository;
+package com.cooltoo.repository;
 
-import com.cooltoo.backend.entities.HospitalEntity;
+import com.cooltoo.entities.HospitalEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;

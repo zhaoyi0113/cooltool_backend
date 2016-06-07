@@ -1,5 +1,7 @@
-package com.cooltoo.beans;
+package com.cooltoo.backend.beans;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 
 import java.util.Date;

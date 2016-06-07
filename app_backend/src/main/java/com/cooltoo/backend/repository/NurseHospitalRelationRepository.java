@@ -1,7 +1,6 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.NurseHospitalRelationEntity;
-import com.cooltoo.beans.NurseHospitalRelationBean;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

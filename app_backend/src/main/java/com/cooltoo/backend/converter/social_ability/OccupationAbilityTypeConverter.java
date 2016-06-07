@@ -1,7 +1,7 @@
 package com.cooltoo.backend.converter.social_ability;
 
-import com.cooltoo.backend.entities.HospitalDepartmentEntity;
-import com.cooltoo.backend.repository.HospitalDepartmentRepository;
+import com.cooltoo.entities.HospitalDepartmentEntity;
+import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.SocialAbilityType;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,14 +1,13 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.converter.HospitalDepartmentBeanConverter;
-import com.cooltoo.backend.entities.HospitalDepartmentEntity;
-import com.cooltoo.backend.repository.HospitalDepartmentRepository;
+import com.cooltoo.converter.HospitalDepartmentBeanConverter;
+import com.cooltoo.entities.HospitalDepartmentEntity;
+import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.VerifyUtil;
-import org.hibernate.engine.spi.ExecutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;

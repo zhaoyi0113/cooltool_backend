@@ -6,7 +6,7 @@ import com.cooltoo.backend.converter.social_ability.SpeakAbilityTypeConverter;
 import com.cooltoo.backend.converter.social_ability.ThumbsUpAbilityTypeConverter;
 import com.cooltoo.beans.BadgeBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.backend.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.*;
 import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.exception.BadRequestException;

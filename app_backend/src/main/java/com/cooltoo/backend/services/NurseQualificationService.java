@@ -8,7 +8,7 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseQualificationEntity;
 import com.cooltoo.backend.repository.NurseQualificationRepository;
 import com.cooltoo.backend.repository.NurseRepository;
-import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.backend.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
