@@ -1,4 +1,3 @@
 rootProject.name = 'cooltoo-backend'
 include 'dbschema', 'workflow','common','app_backend','admin_backend', 'service_discovery',
-        'go2nurse:common', 'go2nurse:go2nurse_workflow'
-//, 'go2nurse:patient'
+        'go2nurse:common', 'go2nurse:go2nurse_workflow' , 'go2nurse:patient'
