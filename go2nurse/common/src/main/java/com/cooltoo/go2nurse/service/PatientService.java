@@ -1,10 +1,10 @@
-package com.cooltoo.go2nurse.patient.services;
+package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.go2nurse.patient.repository.PatientRepository;
-import com.cooltoo.go2nurse.patient.beans.PatientBean;
-import com.cooltoo.go2nurse.patient.converter.PatientBeanConverter;
-import com.cooltoo.go2nurse.patient.converter.PatientEntityConverter;
-import com.cooltoo.go2nurse.patient.entities.PatientEntity;
+import com.cooltoo.go2nurse.repository.PatientRepository;
+import com.cooltoo.go2nurse.beans.PatientBean;
+import com.cooltoo.go2nurse.converter.PatientBeanConverter;
+import com.cooltoo.go2nurse.converter.PatientEntityConverter;
+import com.cooltoo.go2nurse.entities.PatientEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.NumberUtil;

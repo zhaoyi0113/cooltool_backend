@@ -2,9 +2,13 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.CourseCategoryBean;
+import com.cooltoo.go2nurse.beans.CourseCategoryRelationBean;
+import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.go2nurse.service.CourseCategoryService;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -24,7 +28,9 @@ import java.util.List;
  */
 @Transactional
 @DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_category_relation_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_category_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/file_storage_data.xml")
 })
 public class CourseCategoryServiceTest extends AbstractCooltooTest {
@@ -34,10 +40,104 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
     @Autowired private CourseCategoryService service;
     @Autowired private UserGo2NurseFileStorageService userStorage;
 
+    private static final String All = "ALL";
+    private static final String CategoryDisabled = CommonStatus.DISABLED.name();
+    private static final String CategoryEnabled = CommonStatus.ENABLED.name();
+    private static final String CategoryDeleted = CommonStatus.DELETED.name();
+    private static final String CourseDisable = CourseStatus.DISABLE.name();
+    private static final String CourseEnable = CourseStatus.ENABLE.name();
+    private static final String CourseEditing = CourseStatus.EDITING.name();
 
     //==========================================
-    //  get
+    //   course category relation getter
     //==========================================
+    @Test
+    public void testGetCategoryByCourseId() {
+        long courseId = 1L;
+        List<CourseCategoryBean> categories = service.getCategoryByCourseId(All, courseId);
+        Assert.assertEquals(2, categories.size());
+        Assert.assertEquals(1L, categories.get(0).getId());
+        Assert.assertEquals(2L, categories.get(1).getId());
+
+        courseId = 2L;
+        categories = service.getCategoryByCourseId(All, courseId);
+        Assert.assertEquals(4, categories.size());
+        Assert.assertEquals(1L, categories.get(0).getId());
+        Assert.assertEquals(2L, categories.get(1).getId());
+        Assert.assertEquals(6L, categories.get(2).getId());
+        Assert.assertEquals(8L, categories.get(3).getId());
+        categories = service.getCategoryByCourseId(CategoryEnabled, courseId);
+        Assert.assertEquals(2, categories.size());
+        Assert.assertEquals(1L, categories.get(0).getId());
+        Assert.assertEquals(2L, categories.get(1).getId());
+        categories = service.getCategoryByCourseId(CategoryDisabled, courseId);
+        Assert.assertEquals(1, categories.size());
+        Assert.assertEquals(6L, categories.get(0).getId());
+        categories = service.getCategoryByCourseId(CategoryDeleted, courseId);
+        Assert.assertEquals(1, categories.size());
+        Assert.assertEquals(8L, categories.get(0).getId());
+
+    }
+
+    @Test
+    public void testGetCategoryByCourseIds() {
+        List<Long> courseIds = Arrays.asList(new Long[]{1L, 2L});
+        List<CourseCategoryBean> categories = service.getCategoryByCourseId(All, courseIds);
+        Assert.assertEquals(4, categories.size());
+        Assert.assertEquals(1L, categories.get(0).getId());
+        Assert.assertEquals(2L, categories.get(1).getId());
+        Assert.assertEquals(6L, categories.get(2).getId());
+        Assert.assertEquals(8L, categories.get(3).getId());
+        categories = service.getCategoryByCourseId(CategoryEnabled, courseIds);
+        Assert.assertEquals(2, categories.size());
+        Assert.assertEquals(1L, categories.get(0).getId());
+        Assert.assertEquals(2L, categories.get(1).getId());
+        categories = service.getCategoryByCourseId(CategoryDisabled, courseIds);
+        Assert.assertEquals(1, categories.size());
+        Assert.assertEquals(6L, categories.get(0).getId());
+        categories = service.getCategoryByCourseId(CategoryDeleted, courseIds);
+        Assert.assertEquals(1, categories.size());
+        Assert.assertEquals(8L, categories.get(0).getId());
+    }
+
+    @Test
+    public void testGetCourseByCategoryId() {
+        long categoryId = 1L;
+        List<CourseBean> courses = service.getCourseByCategoryId(All, categoryId);
+        Assert.assertEquals(5, courses.size());
+        Assert.assertEquals(8L, courses.get(0).getId());
+        Assert.assertEquals(7L, courses.get(1).getId());
+        Assert.assertEquals(6L, courses.get(2).getId());
+        Assert.assertEquals(2L, courses.get(3).getId());
+        Assert.assertEquals(1L, courses.get(4).getId());
+        courses = service.getCourseByCategoryId(CourseEnable, categoryId);
+        Assert.assertEquals(2, courses.size());
+        Assert.assertEquals(2L, courses.get(0).getId());
+        Assert.assertEquals(1L, courses.get(1).getId());
+        courses = service.getCourseByCategoryId(CourseDisable, categoryId);
+        Assert.assertEquals(2, courses.size());
+        Assert.assertEquals(8L, courses.get(0).getId());
+        Assert.assertEquals(7L, courses.get(1).getId());
+        courses = service.getCourseByCategoryId(CourseEditing, categoryId);
+        Assert.assertEquals(1, courses.size());
+        Assert.assertEquals(6L, courses.get(0).getId());
+    }
+
+    //==========================================
+    //   category getter
+    //==========================================
+
+    @Test
+    public void testExistsCategory() {
+        long categoryId = 1;
+        boolean exists = service.existsCategory(categoryId);
+        Assert.assertTrue(exists);
+
+        categoryId = 100L;
+        exists = service.existsCategory(categoryId);
+        Assert.assertFalse(exists);
+    }
+
     @Test
     public void testCountByStatus() {
         String status = "ALL";
@@ -86,7 +186,7 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetCategoryByStatusAndIds() {
         List<Long> ids = Arrays.asList(new Long[]{5L, 6L, 7L, 8L, 9L});
-        String status = "all";
+        String status = "";
         List<CourseCategoryBean> beans = service.getCategoryByStatusAndIds(status, ids);
         Assert.assertEquals(0, beans.size());
 
@@ -109,7 +209,23 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
     }
 
     //==========================================
-    //  update
+    //   relation update
+    //==========================================
+    @Test
+    public void testUpdateCourseRelation() {
+        long courseId = 1;
+        long categoryId = 3;
+        List<CourseCategoryBean> beans = service.getCategoryByCourseId(CategoryEnabled, courseId);
+        int oldSize = beans.size();
+        service.updateCourseRelation(courseId, categoryId, CommonStatus.ENABLED.name());
+        beans = service.getCategoryByCourseId(CategoryEnabled, courseId);
+        int newSize = beans.size();
+        Assert.assertEquals(oldSize+1, newSize);
+        Assert.assertEquals(courseId, beans.get(0).getId());
+    }
+
+    //==========================================
+    //   category update
     //==========================================
     @Test
     public void testUpdateCategory() {
@@ -140,6 +256,31 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(userStorage.fileExist(bean.getImageId()));
         userStorage.deleteFile(bean.getImageUrl());
         Assert.assertFalse(userStorage.fileExist(bean.getImageId()));
+    }
+
+    //=================================================================
+    //         relation add
+    //=================================================================
+    @Test
+    public void testAddRelation() {
+        long courseId = 1;
+        long categoryId = 3;
+        CourseCategoryRelationBean relation = service.getRelation(courseId, categoryId);
+        Assert.assertNotNull(relation);
+        Assert.assertEquals(CommonStatus.DISABLED, relation.getStatus());
+        service.addCourseRelation(courseId, categoryId);
+        relation = service.getRelation(courseId, categoryId);
+        Assert.assertNotNull(relation);
+        Assert.assertEquals(CommonStatus.ENABLED, relation.getStatus());
+
+        courseId = 9;
+        relation = service.getRelation(courseId, categoryId);
+        Assert.assertNull(relation);
+        service.addCourseRelation(courseId, categoryId);
+        relation = service.getRelation(courseId, categoryId);
+        Assert.assertNotNull(relation);
+        Assert.assertEquals(CommonStatus.ENABLED, relation.getStatus());
+
     }
 
     //=================================================================

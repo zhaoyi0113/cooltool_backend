@@ -1,7 +1,7 @@
-package com.cooltoo.go2nurse.patient.converter;
+package com.cooltoo.go2nurse.converter;
 
-import com.cooltoo.go2nurse.patient.beans.PatientBadgeBean;
-import com.cooltoo.go2nurse.patient.entities.PatientBadgeEntity;
+import com.cooltoo.go2nurse.beans.PatientBadgeBean;
+import com.cooltoo.go2nurse.entities.PatientBadgeEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

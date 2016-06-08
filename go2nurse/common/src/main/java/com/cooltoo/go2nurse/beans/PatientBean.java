@@ -1,4 +1,4 @@
-package com.cooltoo.go2nurse.patient.beans;
+package com.cooltoo.go2nurse.beans;
 
 import java.util.Date;
 

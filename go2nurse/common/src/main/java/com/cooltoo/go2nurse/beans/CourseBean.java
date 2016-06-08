@@ -1,7 +1,6 @@
 package com.cooltoo.go2nurse.beans;
 
-import com.cooltoo.constants.ActivityStatus;
-import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.constants.CourseStatus;
 
 import java.util.Date;
 
@@ -12,7 +11,7 @@ public class CourseBean {
 
     private long id;
     private Date time;
-    private ActivityStatus status;
+    private CourseStatus status;
     private String name;
     private String introduction;
     private String content;
@@ -28,7 +27,7 @@ public class CourseBean {
         return time;
     }
 
-    public ActivityStatus getStatus() {
+    public CourseStatus getStatus() {
         return status;
     }
 
@@ -64,7 +63,7 @@ public class CourseBean {
         this.time = time;
     }
 
-    public void setStatus(ActivityStatus status) {
+    public void setStatus(CourseStatus status) {
         this.status = status;
     }
 

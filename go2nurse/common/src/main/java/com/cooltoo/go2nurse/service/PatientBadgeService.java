@@ -1,13 +1,13 @@
-package com.cooltoo.go2nurse.patient.services;
+package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.patient.beans.PatientBadgeBean;
-import com.cooltoo.go2nurse.patient.converter.PatientBadgeBeanConverter;
-import com.cooltoo.go2nurse.patient.converter.PatientBadgeEntityConverter;
-import com.cooltoo.go2nurse.patient.entities.PatientBadgeEntity;
-import com.cooltoo.go2nurse.patient.repository.PatientBadgeRepository;
-import com.cooltoo.go2nurse.patient.repository.PatientRepository;
+import com.cooltoo.go2nurse.beans.PatientBadgeBean;
+import com.cooltoo.go2nurse.converter.PatientBadgeBeanConverter;
+import com.cooltoo.go2nurse.converter.PatientBadgeEntityConverter;
+import com.cooltoo.go2nurse.entities.PatientBadgeEntity;
+import com.cooltoo.go2nurse.repository.PatientBadgeRepository;
+import com.cooltoo.go2nurse.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

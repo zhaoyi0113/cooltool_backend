@@ -1,5 +1,8 @@
 package com.cooltoo.config;
 
+import com.cooltoo.go2nurse.admin.api.CourseCategoryManageAPI;
+import com.cooltoo.go2nurse.admin.api.CourseManageAPI;
+import com.cooltoo.go2nurse.patient.api.CourseAPI;
 import com.cooltoo.go2nurse.patient.api.PatientAPI;
 import io.swagger.annotations.Api;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -25,6 +28,9 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
     public Go2NurseJerseyConfiguration() {
         register(MultiPartFeature.class);
         register(PatientAPI.class);
+        register(CourseAPI.class);
+        register(CourseManageAPI.class);
+        register(CourseCategoryManageAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 

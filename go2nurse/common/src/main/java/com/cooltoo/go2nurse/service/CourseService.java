@@ -1,6 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.constants.ActivityStatus;
+import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.CourseBean;
@@ -47,10 +47,16 @@ public class CourseService {
     //                    get
     //===========================================================
 
+    public boolean existCourse(long courseId) {
+        boolean exist = repository.exists(courseId);
+        logger.info("exist course={}, exists={}", courseId, exist);
+        return exist;
+    }
+
     public long countByStatus(String strStatus) {
         logger.info("count all course by status={}", strStatus);
         long count = 0;
-        ActivityStatus status = ActivityStatus.parseString(strStatus);
+        CourseStatus status = CourseStatus.parseString(strStatus);
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 count = repository.count();
@@ -67,7 +73,7 @@ public class CourseService {
 
     public List<CourseBean> getCourseByStatus(String strStatus, int pageIndex, int sizePerPage) {
         logger.info("get all course by status={} at page={} sizePerPage={}", strStatus, pageIndex, sizePerPage);
-        ActivityStatus status = ActivityStatus.parseString(strStatus);
+        CourseStatus status = CourseStatus.parseString(strStatus);
         PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
         Page<CourseEntity> resultSet = null;
         if (null==status) {
@@ -88,8 +94,25 @@ public class CourseService {
 
     public List<CourseBean> getCourseByStatusAndIds(String strStatus, List<Long> courseIds) {
         logger.info("get course by status={} ids={}", strStatus, courseIds);
-        ActivityStatus status = ActivityStatus.parseString(strStatus);
-        List<CourseEntity> resultSet = repository.findByStatusAndIdIn(status, courseIds, sort);
+        CourseStatus status = CourseStatus.parseString(strStatus);
+        List<CourseEntity> resultSet = null;
+        if (null==status) {
+            if ("ALL".equalsIgnoreCase(strStatus)) {
+                resultSet = repository.findByIdIn(courseIds, sort);
+            }
+        }
+        else {
+            resultSet = repository.findByStatusAndIdIn(status, courseIds, sort);
+        }
+        List<CourseBean>   beans = entities2BeansWithoutContent(resultSet);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
+    public List<CourseBean> getCourseByIds(List<Long> courseIds) {
+        logger.info("get course by ids={}", courseIds);
+        List<CourseEntity> resultSet = repository.findAll(courseIds);
         List<CourseBean>   beans = entities2BeansWithoutContent(resultSet);
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
@@ -171,9 +194,9 @@ public class CourseService {
         return bean;
     }
 
-    public CourseBean getCourseByTitle(String title, String httpNginxBaseUrl) {
-        logger.info("get course by title {}", title);
-        List<CourseEntity> entity = repository.findByName(title, sort);
+    public CourseBean getCourseByName(String name, String httpNginxBaseUrl) {
+        logger.info("get course by title {}", name);
+        List<CourseEntity> entity = repository.findByName(name, sort);
         if (null==entity || entity.isEmpty()) {
             logger.info("course not exist.");
             return null;
@@ -195,9 +218,9 @@ public class CourseService {
 
     /** the nginxBaseUrl need user judge tmp_or_storage and send*/
     private void addBaseUrl2ImgTagSrcAttr(CourseBean course, String nginxBaseUrl) {
-        logger.info("convert activity img tags src attribute with nginxUrl={}", nginxBaseUrl);
+        logger.info("convert course img tags src attribute with nginxUrl={}", nginxBaseUrl);
         if (null==course || VerifyUtil.isStringEmpty(course.getContent())) {
-            logger.warn("activity content is empty");
+            logger.warn("course content is empty");
             return;
         }
         if (VerifyUtil.isStringEmpty(nginxBaseUrl)) {
@@ -211,7 +234,7 @@ public class CourseService {
         }
 
         String tempNginxRelativePath;
-        if (ActivityStatus.EDITING.equals(course.getStatus())) {
+        if (CourseStatus.EDITING.equals(course.getStatus())) {
             tempNginxRelativePath = tempStorage.getNginxRelativePath();
         }
         else {
@@ -254,7 +277,7 @@ public class CourseService {
         if (!VerifyUtil.isStringEmpty(link)) {
             entity.setLink(link);
         }
-        entity.setStatus(ActivityStatus.DISABLE);
+        entity.setStatus(CourseStatus.DISABLE);
         entity.setTime(new Date());
         entity = repository.save(entity);
         logger.info("create an course id={}", entity.getId());
@@ -334,13 +357,13 @@ public class CourseService {
         }
 
         boolean changed = false;
-        ActivityStatus status = ActivityStatus.parseString(strStatus);
+        CourseStatus status = CourseStatus.parseString(strStatus);
         if (null!=status) {
-            if (ActivityStatus.EDITING.equals(entity.getStatus())) {
+            if (CourseStatus.EDITING.equals(entity.getStatus())) {
                 logger.error("the course is editing");
                 throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
             }
-            if (ActivityStatus.EDITING.equals(status)) {
+            if (CourseStatus.EDITING.equals(status)) {
                 logger.error("can not set course to editing");
                 throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
             }
@@ -371,7 +394,7 @@ public class CourseService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
-        if (!ActivityStatus.EDITING.equals(entity.getStatus())) {
+        if (!CourseStatus.EDITING.equals(entity.getStatus())) {
             logger.error("the course is not editing");
             throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
         }
@@ -400,7 +423,7 @@ public class CourseService {
         }
 
         entity.setContent(content);
-        entity.setStatus(ActivityStatus.ENABLE);
+        entity.setStatus(CourseStatus.ENABLE);
         entity = repository.save(entity);
         return entities2BeansWithContent(entity);
     }
@@ -414,7 +437,7 @@ public class CourseService {
             logger.info("the course do not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (ActivityStatus.EDITING.equals(entity.getStatus())) {
+        if (CourseStatus.EDITING.equals(entity.getStatus())) {
             logger.error("the course is editing");
             throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
         }
@@ -426,7 +449,7 @@ public class CourseService {
         }
 
         // update to editing
-        entity.setStatus(ActivityStatus.EDITING);
+        entity.setStatus(CourseStatus.EDITING);
         entity = repository.save(entity);
 
         CourseBean bean = entities2BeansWithContent(entity);
@@ -488,14 +511,14 @@ public class CourseService {
 
     @Transactional
     public String createTemporaryFile(long courseId, String imageName, InputStream image) {
-        logger.info("create temporary file by token={} activityId={} imageName={} image={}",
+        logger.info("create temporary file by token={} courseId={} imageName={} image={}",
                 courseId, imageName, image);
         CourseEntity entity = repository.findOne(courseId);
         if (null==entity) {
             logger.info("the course do not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (!ActivityStatus.EDITING.equals(entity.getStatus())) {
+        if (!CourseStatus.EDITING.equals(entity.getStatus())) {
             logger.error("the course is not editing");
             throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
         }
@@ -544,7 +567,7 @@ public class CourseService {
         userStorage.deleteFiles(frontCoverIds);
 
         //
-        // clean the activity content image
+        // clean the course content image
         //
         HtmlParser          htmlParser = HtmlParser.newInstance();
         Map<String, String> imgTag2SrcValue;
@@ -559,7 +582,7 @@ public class CourseService {
 
             // remove all image src attribute url from storage
             for (String srcUrl : srcAttVals) {
-                if (ActivityStatus.EDITING.equals(tmp.getStatus())) {
+                if (CourseStatus.EDITING.equals(tmp.getStatus())) {
                     tempStorage.deleteFile(srcUrl);
                 } else {
                     userStorage.deleteFile(srcUrl);

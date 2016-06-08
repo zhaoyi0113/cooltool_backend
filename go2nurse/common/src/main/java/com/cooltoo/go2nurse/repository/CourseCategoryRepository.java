@@ -16,5 +16,6 @@ public interface CourseCategoryRepository extends JpaRepository<CourseCategoryEn
     long countByStatus(CommonStatus status);
     long countByName(String name);
     Page<CourseCategoryEntity> findByStatus(CommonStatus status, Pageable page);
+    List<CourseCategoryEntity> findByIdIn(List<Long> ids, Sort sort);
     List<CourseCategoryEntity> findByStatusAndIdIn(CommonStatus status, List<Long> ids, Sort sort);
 }

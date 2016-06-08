@@ -23,6 +23,10 @@ public abstract class AbstractGo2NurseFileStorageService {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractGo2NurseFileStorageService.class.getName());
 
+    @Value("${go2nurse.nginx.prefix}")
+    public static String nginxPrefix;
+
+
     @Autowired
     private Go2NurseFileStorageDBService dbService;
 

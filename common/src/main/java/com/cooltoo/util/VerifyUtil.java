@@ -290,7 +290,9 @@ public class VerifyUtil {
                         else {
                             String topic = speakContent.substring(preMarkIndex+1, i);
                             topic = topic.trim();
-                            topics.add(topic);
+                            if (!topics.contains(topic)) {
+                                topics.add(topic);
+                            }
                         }
                         preMarkIndex = -1;
                     }

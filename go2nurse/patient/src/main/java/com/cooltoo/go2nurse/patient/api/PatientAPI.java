@@ -1,9 +1,9 @@
 package com.cooltoo.go2nurse.patient.api;
 
-import com.cooltoo.go2nurse.patient.beans.PatientBean;
-import com.cooltoo.go2nurse.patient.converter.PatientBeanConverter;
-import com.cooltoo.go2nurse.patient.converter.PatientEntityConverter;
-import com.cooltoo.go2nurse.patient.services.PatientService;
+import com.cooltoo.go2nurse.beans.PatientBean;
+import com.cooltoo.go2nurse.converter.PatientBeanConverter;
+import com.cooltoo.go2nurse.converter.PatientEntityConverter;
+import com.cooltoo.go2nurse.service.PatientService;
 import com.cooltoo.util.NumberUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,6 @@
 package com.cooltoo.go2nurse.entities;
 
-import com.cooltoo.constants.ActivityStatus;
-import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.constants.CourseStatus;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,7 +14,7 @@ public class CourseEntity {
 
     private long id;
     private Date time;
-    private ActivityStatus status;
+    private CourseStatus status;
     private String name;
     private String introduction;
     private String content;
@@ -36,7 +35,7 @@ public class CourseEntity {
 
     @Column(name = "status")
     @Enumerated
-    public ActivityStatus getStatus() {
+    public CourseStatus getStatus() {
         return status;
     }
 
@@ -73,7 +72,7 @@ public class CourseEntity {
         this.time = time;
     }
 
-    public void setStatus(ActivityStatus status) {
+    public void setStatus(CourseStatus status) {
         this.status = status;
     }
 
