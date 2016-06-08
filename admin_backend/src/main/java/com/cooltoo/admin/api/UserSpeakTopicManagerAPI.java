@@ -2,6 +2,7 @@ package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakTopicBean;
 import com.cooltoo.backend.services.NurseSpeakTopicService;
@@ -96,7 +97,7 @@ public class UserSpeakTopicManagerAPI {
                                     @QueryParam("index") @DefaultValue("0") int pageIndex,
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<NurseBean> nurses = topicService.getUsersInTopic(topicId, UserAuthority.AGREE_ALL.name(), pageIndex, sizePerPage);
+        List<NurseFriendsBean> nurses = topicService.getUsersInTopic(topicId, 0, UserAuthority.AGREE_ALL.name(), pageIndex, sizePerPage);
         return Response.ok(nurses).build();
     }
 

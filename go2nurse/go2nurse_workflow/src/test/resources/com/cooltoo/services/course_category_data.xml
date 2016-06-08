@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <go2nurse_course_category id="1" name="category_1" introduction="category introduction 1" image_id="1" status="1" time_created="2016-04-08 00:00:00" />
+    <go2nurse_course_category id="2" name="category_2" introduction="category introduction 2" image_id="2" status="1" time_created="2016-04-08 00:00:00" />
+    <go2nurse_course_category id="3" name="category_3" introduction="category introduction 3" image_id="3" status="1" time_created="2016-04-08 00:00:00" />
+    <go2nurse_course_category id="4" name="category_4" introduction="category introduction 4" image_id="4" status="1" time_created="2016-04-08 00:00:00" />
+    <go2nurse_course_category id="5" name="category_5" introduction="category introduction 5" image_id="5" status="1" time_created="2016-04-08 00:00:00" />
+    <go2nurse_course_category id="6" name="category_6" introduction="category introduction 6" image_id="6" status="0" time_created="2016-04-08 00:00:00" />
+    <go2nurse_course_category id="7" name="category_7" introduction="category introduction 7" image_id="7" status="0" time_created="2016-04-08 00:00:00" />
+    <go2nurse_course_category id="8" name="category_8" introduction="category introduction 8" image_id="8" status="2" time_created="2016-04-08 00:00:00" />
+    <go2nurse_course_category id="9" name="category_9" introduction="category introduction 9" image_id="9" status="1" time_created="2016-04-08 00:00:00" />
+</dataset>

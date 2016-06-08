@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakTopicBean;
 import com.cooltoo.backend.services.NurseSpeakTopicService;
@@ -117,19 +118,19 @@ public class NurseSpeakTopicServiceTest extends AbstractCooltooTest {
     public void testGetUsersInTopic() {
         long topicId = 1L;
         String userAuthority = UserAuthority.AGREE_ALL.name();
-        List<NurseBean> nurses = topicService.getUsersInTopic(topicId, userAuthority, 0, 2);
+        List<NurseFriendsBean> nurses = topicService.getUsersInTopic(topicId, 0, userAuthority, 0, 2);
         Assert.assertEquals(2, nurses.size());
 
         topicId = 2L;
-        nurses = topicService.getUsersInTopic(topicId, userAuthority, 0, 2);
+        nurses = topicService.getUsersInTopic(topicId, 0, userAuthority, 0, 2);
         Assert.assertEquals(1, nurses.size());
-        Assert.assertEquals(11L, nurses.get(0).getId());
+        Assert.assertEquals(11L, nurses.get(0).getFriendId());
 
         userAuthority = UserAuthority.DENY_ALL.name();
-        nurses = topicService.getUsersInTopic(topicId, userAuthority, 0, 2);
+        nurses = topicService.getUsersInTopic(topicId, 0, userAuthority, 0, 2);
         Assert.assertEquals(2, nurses.size());
-        Assert.assertEquals(12L, nurses.get(0).getId());
-        Assert.assertEquals(15L, nurses.get(1).getId());
+        Assert.assertEquals(12L, nurses.get(0).getFriendId());
+        Assert.assertEquals(15L, nurses.get(1).getFriendId());
     }
 
     @Test

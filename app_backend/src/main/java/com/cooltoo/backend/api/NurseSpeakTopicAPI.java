@@ -1,6 +1,7 @@
 package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakTopicBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
@@ -64,12 +65,18 @@ public class NurseSpeakTopicAPI {
     @Path("/user")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = false)
     public Response getUsersInTopic(@Context HttpServletRequest request,
                              @QueryParam("topic_id") @DefaultValue("0") long topicId,
                              @QueryParam("index") @DefaultValue("0") int pageIndex,
                              @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<NurseBean> nurses = topicService.getUsersInTopic(topicId, UserAuthority.AGREE_ALL.name(), pageIndex, sizePerPage);
+        long currentUserId = 0;
+        Object userId = request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        if (userId instanceof Long) {
+            currentUserId = ((Long) userId).longValue();
+        }
+        List<NurseFriendsBean> nurses = topicService.getUsersInTopic(topicId, currentUserId, UserAuthority.AGREE_ALL.name(), pageIndex, sizePerPage);
         return Response.ok(nurses).build();
     }
 
@@ -95,7 +102,6 @@ public class NurseSpeakTopicAPI {
     public Response editTopic(@Context HttpServletRequest request,
                               @FormParam("topic_id") @DefaultValue("0") long topicId
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakTopicBean topic = topicService.updateTopic(topicId, 0, "", "", "", "", 0, "", 1);
         return Response.ok(topic).build();
     }

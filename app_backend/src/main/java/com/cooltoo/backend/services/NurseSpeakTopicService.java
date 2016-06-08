@@ -1,6 +1,7 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakTopicBean;
 import com.cooltoo.backend.converter.NurseSpeakTopicBeanConverter;
@@ -42,6 +43,7 @@ public class NurseSpeakTopicService {
     @Autowired private NurseSpeakTopicRelationService topicRelationService;
     @Autowired private NurseSpeakService speakService;
     @Autowired private NurseService nurseService;
+    @Autowired private NurseFriendsService friendsService;
     @Autowired private RegionRepository regionRepository;
     @Autowired private UserFileStorageService storageService;
 
@@ -104,16 +106,17 @@ public class NurseSpeakTopicService {
         return count;
     }
 
-    public List<NurseBean> getUsersInTopic(long topicId, String strUserAuthority, int pageIndex, int sizePerPage) {
+    public List<NurseFriendsBean> getUsersInTopic(long topicId, long currentUserId, String strUserAuthority, int pageIndex, int sizePerPage) {
         logger.info("get user information in topic={} userAuthority={} at page={} sizePerPage={}",
                 topicId, strUserAuthority, pageIndex, sizePerPage);
         List<Long> usersId = topicRelationService.getUserTakePartIn(topicId, strUserAuthority, pageIndex, sizePerPage);
-        List<NurseBean> sortedUserInTopic = new ArrayList<>();
+        List<NurseFriendsBean> sortedUserInTopic = new ArrayList<>();
         if (!VerifyUtil.isListEmpty(usersId)) {
-            List<NurseBean> usersInTopic = nurseService.getNurse(usersId);
+            List<NurseFriendsBean> usersInTopicWithFriendInfo = friendsService.getFriendship(currentUserId, usersId);
             for (Long userId : usersId) {
-                for (NurseBean user : usersInTopic) {
-                    if (user.getId()==userId) {
+                for (NurseFriendsBean user : usersInTopicWithFriendInfo) {
+                    // friendId is the user in topic, the userId is currentUserId
+                    if (user.getFriendId()==userId) {
                         sortedUserInTopic.add(user);
                     }
                 }
