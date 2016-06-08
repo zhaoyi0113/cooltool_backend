@@ -14,6 +14,9 @@ import org.togglz.core.repository.StateRepository;
 import org.togglz.core.repository.file.FileBasedStateRepository;
 import org.togglz.core.repository.mem.InMemoryStateRepository;
 import org.togglz.core.spi.FeatureProvider;
+import org.togglz.core.user.FeatureUser;
+import org.togglz.core.user.SimpleFeatureUser;
+import org.togglz.core.user.UserProvider;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.io.File;
@@ -50,6 +53,16 @@ public class Application {
         file = new File(togglzFilePath);
         logger.info(file.getAbsolutePath());
         return new FileBasedStateRepository(file);
+    }
+
+    @Bean
+    public UserProvider getUserProvider() {
+        return new UserProvider() {
+            @Override
+            public FeatureUser getCurrentUser() {
+                return new SimpleFeatureUser("admin", true);
+            }
+        };
     }
 
     public static void main(String[] args) {
