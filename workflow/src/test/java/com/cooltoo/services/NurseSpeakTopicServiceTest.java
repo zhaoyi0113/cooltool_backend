@@ -34,6 +34,22 @@ public class NurseSpeakTopicServiceTest extends AbstractCooltooTest {
     @Autowired private NurseSpeakTopicService topicService;
 
     @Test
+    public void testGetTopicByTitle() {
+        String title = "";
+        NurseSpeakTopicBean topic = topicService.getTopicByTile(title);
+        Assert.assertNull(topic);
+
+        title = "topic";
+        topic = topicService.getTopicByTile(title);
+        Assert.assertNull(topic);
+
+        title = "topic 002";
+        topic = topicService.getTopicByTile(title);
+        Assert.assertNotNull(topic);
+        Assert.assertEquals(2, topic.getId());
+    }
+
+    @Test
     public void testCountTopic() {
         String title = "";
         String status = CommonStatus.ENABLED.name();

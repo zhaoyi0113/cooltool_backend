@@ -4,6 +4,7 @@ import com.cooltoo.backend.entities.NurseSpeakTopicEntity;
 import com.cooltoo.constants.CommonStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public interface NurseSpeakTopicRepository extends JpaRepository<NurseSpeakTopicEntity, Long> {
     long countByTitle(String title);
-    List<NurseSpeakTopicEntity> findByTitleIn(List<String> titles);
+    List<NurseSpeakTopicEntity> findByTitleIn(List<String> titles, Sort sort);
 
     @Query("SELECT topic.id FROM NurseSpeakTopicEntity topic" +
             " WHERE topic.status=?1" +

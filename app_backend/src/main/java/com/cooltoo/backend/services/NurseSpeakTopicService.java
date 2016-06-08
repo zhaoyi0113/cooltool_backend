@@ -49,6 +49,21 @@ public class NurseSpeakTopicService {
     //=====================================================================
     //          get
     //=====================================================================
+    public NurseSpeakTopicBean getTopicByTile(String title) {
+        logger.info("get topic by title={}", title);
+        List<String> titles = Arrays.asList(new String[]{title});
+        List<NurseSpeakTopicBean> topics = getTopicByTitle(titles);
+        logger.info("topic is {}", topics);
+        int count = topics.size();
+        if (count>0) {
+            if (count>1) {
+                logger.info("there is more than one topics for title");
+            }
+            return topics.get(0);
+        }
+        return null;
+    }
+
     public long countTopic(String titleLike, String strStatus) {
         logger.info("count topic by title={} and status={}", titleLike, strStatus);
         if (VerifyUtil.isStringEmpty(titleLike)) {
@@ -191,7 +206,7 @@ public class NurseSpeakTopicService {
             titlesTrim.add(title.trim());
         }
 
-        List<NurseSpeakTopicEntity> topicEntities = repository.findByTitleIn(titlesTrim);
+        List<NurseSpeakTopicEntity> topicEntities = repository.findByTitleIn(titlesTrim, sort);
         if (!VerifyUtil.isListEmpty(topicEntities)) {
             List<NurseSpeakTopicBean> beans = entitiesToBeans(topicEntities);
             fillOtherProperties(beans);

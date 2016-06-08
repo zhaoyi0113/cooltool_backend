@@ -17,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,6 +37,16 @@ public class NurseSpeakTopicAPI {
     ) {
         List<NurseSpeakTopicBean> topics = topicService.getTopic("", CommonStatus.ENABLED.name(), pageIndex, sizePerPage);
         return Response.ok(topics).build();
+    }
+
+    @Path("/title")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTopic(@Context HttpServletRequest request,
+                             @QueryParam("title") @DefaultValue("") String title
+    ) {
+        NurseSpeakTopicBean topic = topicService.getTopicByTile(title);
+        return Response.ok(topic).build();
     }
 
     @Path("/speak")
