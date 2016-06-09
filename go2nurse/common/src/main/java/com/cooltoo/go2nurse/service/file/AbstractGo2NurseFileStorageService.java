@@ -26,6 +26,8 @@ public abstract class AbstractGo2NurseFileStorageService {
     @Value("${go2nurse.nginx.prefix}")
     public static String nginxPrefix;
 
+    @Value("${go2nurse.nginx.prefix}")
+    public String httpPrefix;
 
     @Autowired
     private Go2NurseFileStorageDBService dbService;
@@ -185,7 +187,7 @@ public abstract class AbstractGo2NurseFileStorageService {
         Set<Long> ids = id2Path.keySet();
         for (Long id : ids) {
             String relativePath = id2Path.get(id);
-            id2Path.put(id, nginxRelativePath + relativePath);
+            id2Path.put(id, this.httpPrefix+ nginxRelativePath + relativePath);
         }
         return id2Path;
     }
