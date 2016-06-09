@@ -2,6 +2,7 @@ package com.cooltoo.config;
 
 import com.cooltoo.go2nurse.admin.api.CourseCategoryManageAPI;
 import com.cooltoo.go2nurse.admin.api.CourseManageAPI;
+import com.cooltoo.go2nurse.filters.CORSResponseFilter;
 import com.cooltoo.go2nurse.patient.api.CourseAPI;
 import com.cooltoo.go2nurse.patient.api.PatientAPI;
 import io.swagger.annotations.Api;
@@ -31,6 +32,7 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
         register(CourseAPI.class);
         register(CourseManageAPI.class);
         register(CourseCategoryManageAPI.class);
+        register(CORSResponseFilter.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 

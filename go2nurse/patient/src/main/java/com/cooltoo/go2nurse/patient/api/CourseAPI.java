@@ -28,14 +28,16 @@ public class CourseAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(CourseAPI.class.getName());
 
-    @Autowired private CourseService courseService;
-    @Autowired private CourseCategoryService categoryService;
+    @Autowired
+    private CourseService courseService;
+    @Autowired
+    private CourseCategoryService categoryService;
 
     @Path("/get_by_category/{category_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCourseByCategoryId(@Context HttpServletRequest request,
-                                        @PathParam("category_id")  @DefaultValue("0") long categoryId
+                                          @PathParam("category_id") @DefaultValue("0") long categoryId
     ) {
         String status = CourseStatus.ENABLE.name();
         logger.info(" get courses by status={} categoryId={}", status, categoryId);
@@ -66,5 +68,16 @@ public class CourseAPI {
 
         CourseBean course = courseService.getCourseById(courseId, AbstractGo2NurseFileStorageService.nginxPrefix);
         return Response.ok(course).build();
+    }
+
+    @Path("/get_available_categories/{page}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAvailableCategories(@Context HttpServletRequest request,
+                                           @PathParam("page") int page, @PathParam("number") int number) {
+        List<CourseCategoryBean> categories = categoryService.getCategoryByStatus(
+                CommonStatus.ENABLED.name(), page, number);
+
+        return Response.ok(categories).build();
     }
 }
