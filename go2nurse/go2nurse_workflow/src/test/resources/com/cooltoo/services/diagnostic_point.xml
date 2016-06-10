@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <go2nurse_diagnostic_point id="1" name="title 1" image_id="1" time_created="2001-01-01 00:00:00" status="1"/>
+    <go2nurse_diagnostic_point id="2" name="title 2" image_id="1" time_created="2001-01-01 00:00:00" status="1"/>
+    <go2nurse_diagnostic_point id="3" name="title 3" image_id="1" time_created="2001-01-01 00:00:00" status="1"/>
+    <go2nurse_diagnostic_point id="4" name="title 4" image_id="1" time_created="2001-01-01 00:00:00" status="1"/>
+    <go2nurse_diagnostic_point id="5" name="title 5" image_id="1" time_created="2001-01-01 00:00:00" status="1"/>
+    <go2nurse_diagnostic_point id="6" name="title 6" image_id="1" time_created="2001-01-01 00:00:00" status="1"/>
+</dataset>

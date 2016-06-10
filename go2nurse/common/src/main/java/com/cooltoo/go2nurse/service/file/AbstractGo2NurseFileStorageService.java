@@ -46,6 +46,10 @@ public abstract class AbstractGo2NurseFileStorageService {
 
     abstract public String getNginxRelativePath();
 
+    public long addNewFile(String fileName, InputStream file){
+        return addFile(-1, fileName, file);
+    }
+
     public long addFile(long oldFileId, String fileName, InputStream file) {
         logger.info("add file oldFileId={} filename={} file={}", oldFileId, fileName, file);
         if (null==file) {
