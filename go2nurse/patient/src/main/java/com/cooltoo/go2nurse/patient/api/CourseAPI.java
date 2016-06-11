@@ -70,6 +70,13 @@ public class CourseAPI {
         return Response.ok(course).build();
     }
 
+    /**
+     * 获得学习页面数据
+     * @param request
+     * @param page
+     * @param number
+     * @return
+     */
     @Path("/get_available_categories/{page}/{number}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
