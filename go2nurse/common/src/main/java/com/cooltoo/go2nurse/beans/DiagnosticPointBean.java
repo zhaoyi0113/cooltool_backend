@@ -20,6 +20,8 @@ public class DiagnosticPointBean {
 
     private String imageUrl;
 
+    private int dorder;
+
     public long getId() {
         return id;
     }
@@ -66,5 +68,13 @@ public class DiagnosticPointBean {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public int getDorder() {
+        return dorder;
+    }
+
+    public void setDorder(int dorder) {
+        this.dorder = dorder;
     }
 }

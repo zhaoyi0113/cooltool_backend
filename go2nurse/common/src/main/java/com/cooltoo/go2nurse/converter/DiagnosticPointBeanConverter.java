@@ -19,6 +19,7 @@ public class DiagnosticPointBeanConverter implements Converter<DiagnosticPointEn
         bean.setImageId(source.getImageId());
         bean.setTimeCreated(source.getTimeCreated());
         bean.setName(source.getName());
+        bean.setDorder(source.getDorder());
         return bean;
     }
 }

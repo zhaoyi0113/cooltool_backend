@@ -40,15 +40,13 @@ public class DiagnosticPointService {
         entity.setName(name);
         long id = userStorage.addNewFile(name, inputStream);
         entity.setImageId(id);
+        entity.setDorder((int)diagnosticPointRepository.count()+1);
         DiagnosticPointEntity saved = diagnosticPointRepository.save(entity);
         return beanConverter.convert(saved);
     }
 
     public DiagnosticPointBean getDiagnosticPoint(long id){
-        DiagnosticPointEntity entity = diagnosticPointRepository.findOne(id);
-        if (entity == null) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+        DiagnosticPointEntity entity = getDiagnosticPointEntity(id);
         DiagnosticPointBean bean = beanConverter.convert(entity);
         saveImageUrl(bean);
         return bean;
@@ -56,10 +54,7 @@ public class DiagnosticPointService {
 
     @Transactional
     public DiagnosticPointBean editDiagnosticPointName(long id, String name) {
-        DiagnosticPointEntity entity = diagnosticPointRepository.findOne(id);
-        if (entity == null) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+        DiagnosticPointEntity entity = getDiagnosticPointEntity(id);
         if (name != null) {
             entity.setName(name);
             DiagnosticPointEntity saved = diagnosticPointRepository.save(entity);
@@ -70,10 +65,7 @@ public class DiagnosticPointService {
 
     @Transactional
     public DiagnosticPointBean editDiagnosticPointStatus(long id, String s){
-        DiagnosticPointEntity entity = diagnosticPointRepository.findOne(id);
-        if (entity == null) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+        DiagnosticPointEntity entity = getDiagnosticPointEntity(id);
         if (s != null) {
             CommonStatus status = CommonStatus.valueOf(s);
             entity.setStatus(status);
@@ -85,16 +77,21 @@ public class DiagnosticPointService {
 
     @Transactional
     public DiagnosticPointBean editDiagnosticImage(long id, InputStream inputStream) {
-        DiagnosticPointEntity entity = diagnosticPointRepository.findOne(id);
-        if (entity == null) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+        DiagnosticPointEntity entity = getDiagnosticPointEntity(id);
         long imageId = userStorage.addNewFile(entity.getName(), inputStream);
         long oldId = entity.getImageId();
         entity.setImageId(imageId);
         DiagnosticPointEntity saved = diagnosticPointRepository.save(entity);
         userStorage.deleteFile(oldId);
         return beanConverter.convert(saved);
+    }
+
+    public DiagnosticPointEntity getDiagnosticPointEntity(long id) {
+        DiagnosticPointEntity entity = diagnosticPointRepository.findOne(id);
+        if (entity == null) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        return entity;
     }
 
     public List<DiagnosticPointBean> getAllDiagnosticPoints(){
@@ -105,6 +102,30 @@ public class DiagnosticPointService {
         }
         saveImageUrls(allBeans);
         return allBeans;
+    }
+
+    @Transactional
+    public void moveDiagnosticPointUp(long id){
+        DiagnosticPointEntity entity = getDiagnosticPointEntity(id);
+
+        List<DiagnosticPointEntity> entities = diagnosticPointRepository.findByDorderLessThanOrderByDorder(entity.getDorder());
+        if(entities.size() > 0){
+            DiagnosticPointEntity last = entities.get(entities.size() - 1);
+            int order = last.getDorder();
+            last.setDorder(entity.getDorder());
+            entity.setDorder(order);
+        }
+    }
+
+    @Transactional
+    public void moveDiagnosticPointDown(long id){
+        DiagnosticPointEntity entity = getDiagnosticPointEntity(id);
+        List<DiagnosticPointEntity> entities = diagnosticPointRepository.findByDorderGreaterThanOrderByDorder(entity.getDorder());
+        if(entities.size()>0){
+            int order = entities.get(0).getDorder();
+            entities.get(0).setDorder(entity.getDorder());
+            entity.setDorder(order);
+        }
     }
 
     private void saveImageUrls(List<DiagnosticPointBean> beans){

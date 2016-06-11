@@ -34,6 +34,7 @@ public class DiagnosticPointServiceTest extends AbstractCooltooTest {
         Assert.assertNotNull(dp);
         dp = service.getDiagnosticPoint(dp.getId());
         Assert.assertEquals("aaa",dp.getName());
+        Assert.assertEquals(7, dp.getDorder());
 
         List<DiagnosticPointBean> allDiagnosticPoints = service.getAllDiagnosticPoints();
         Assert.assertEquals(7, allDiagnosticPoints.size());
@@ -42,5 +43,14 @@ public class DiagnosticPointServiceTest extends AbstractCooltooTest {
         dp = service.getDiagnosticPoint(dp.getId());
         Assert.assertEquals(CommonStatus.DISABLED, dp.getStatus());
 
+    }
+
+    @Test
+    public void testDiagnosticPointMove(){
+        service.moveDiagnosticPointDown(3);
+        DiagnosticPointBean diagnosticPoint3 = service.getDiagnosticPoint(3);
+        DiagnosticPointBean diagnosticPoint4 = service.getDiagnosticPoint(4);
+        Assert.assertEquals(4, diagnosticPoint3.getDorder());
+        Assert.assertEquals(3, diagnosticPoint4.getDorder());
     }
 }

@@ -21,6 +21,8 @@ public class DiagnosticPointEntity {
 
     private Date timeCreated;
 
+    private int dorder;
+
     @Id
     @Column(name = "id")
     @GeneratedValue
@@ -67,4 +69,15 @@ public class DiagnosticPointEntity {
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
     }
+
+    @Column(name = "dorder")
+    public int getDorder() {
+        return dorder;
+    }
+
+    public void setDorder(int dorder) {
+        this.dorder = dorder;
+    }
+
+
 }
