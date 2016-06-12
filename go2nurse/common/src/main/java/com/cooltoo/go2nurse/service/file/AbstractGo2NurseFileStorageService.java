@@ -151,7 +151,7 @@ public abstract class AbstractGo2NurseFileStorageService {
      * @param fileId file id in file_storage table
      * @return
      */
-    public String getFileUrl(long fileId) {
+    public String getFilePath(long fileId) {
         logger.info("get file path by fileId={}", fileId);
         String filePath = dbRecordGet(fileId);
         if (VerifyUtil.isStringEmpty(filePath)) {

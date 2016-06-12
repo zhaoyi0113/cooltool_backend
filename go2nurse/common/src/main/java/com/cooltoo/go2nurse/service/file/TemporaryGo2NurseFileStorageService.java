@@ -192,7 +192,7 @@ public class TemporaryGo2NurseFileStorageService extends AbstractGo2NurseFileSto
     @Deprecated @Override public void deleteFiles(List<Long> fileIds) {
         throw new UnsupportedOperationException();
     }
-    @Deprecated @Override public String getFileUrl(long fileId) {
+    @Deprecated @Override public String getFilePath(long fileId) {
         throw new UnsupportedOperationException();
     }
     @Deprecated @Override public Map<Long, String> getFileUrl(List<Long> fileIds) {

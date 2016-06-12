@@ -41,16 +41,16 @@ public class UserGo2NurseFileStorageServiceTest extends AbstractCooltooTest {
 
         long fileId = userStorage.addFile(1, fileName, file);
         Assert.assertTrue(fileId > 0);
-        String filePath = userStorage.getFileUrl(1);
+        String filePath = userStorage.getFilePath(1);
         Assert.assertTrue(VerifyUtil.isStringEmpty(filePath));
-        filePath = userStorage.getFileUrl(fileId);
+        filePath = userStorage.getFilePath(fileId);
 
         boolean existFile = userStorage.fileExist(fileId);
         Assert.assertEquals(true, existFile);
         existFile = userStorage.fileExist(filePath);
         Assert.assertEquals(true, existFile);
 
-        filePath = userStorage.getFileUrl(fileId);
+        filePath = userStorage.getFilePath(fileId);
         Assert.assertTrue(filePath.startsWith(officialNginxPath));
 
         userStorage.deleteFile(fileId);
@@ -75,7 +75,7 @@ public class UserGo2NurseFileStorageServiceTest extends AbstractCooltooTest {
             file      = new ByteArrayInputStream(fileName.getBytes());
             fileId    = userStorage.addFile(-1, fileName, file);
             existFile = userStorage.fileExist(fileId);
-            filePath  = userStorage.getFileUrl(fileId);
+            filePath  = userStorage.getFilePath(fileId);
             Assert.assertTrue(fileId > 0);
             Assert.assertEquals(true, existFile);
             Assert.assertTrue(filePath.startsWith(officialNginxPath));
