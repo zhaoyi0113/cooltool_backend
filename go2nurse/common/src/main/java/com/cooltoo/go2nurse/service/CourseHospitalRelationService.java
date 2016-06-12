@@ -7,7 +7,6 @@ import com.cooltoo.go2nurse.beans.CourseHospitalRelationBean;
 import com.cooltoo.go2nurse.converter.CourseHospitalRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.CourseHospitalRelationEntity;
 import com.cooltoo.go2nurse.repository.CourseHospitalRelationRepository;
-import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Entity;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,18 +27,35 @@ public class CourseHospitalRelationService {
 
     private static final Logger logger = LoggerFactory.getLogger(CourseHospitalRelationService.class);
 
-    private static final Sort sort = new Sort(
+    public static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "time"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
     @Autowired private CourseHospitalRelationRepository repository;
     @Autowired private CourseHospitalRelationBeanConverter beanConverter;
-    @Autowired private HospitalRepository hospitalRepository;
 
     //============================================================================
     //                 get
     //============================================================================
-
+    public List<Long> getCourseInHospital(int iHospitalId, String strStatus) {
+        logger.info("count course in hospital={} with status={}", iHospitalId, strStatus);
+        Integer hospitalId = Integer.valueOf(iHospitalId);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Long> courseIds = null;
+        if (null==status) {
+            if ("ALL".equalsIgnoreCase(strStatus)) {
+                courseIds = repository.findByHospitalIdAndStatus(hospitalId, status, sort);
+            }
+        }
+        else {
+            courseIds = repository.findByHospitalIdAndStatus(hospitalId, status, sort);
+        }
+        if (null==courseIds) {
+            courseIds = new ArrayList<>();
+        }
+        logger.info("count is {}", courseIds.size());
+        return courseIds;
+    }
 
     //============================================================================
     //                 update

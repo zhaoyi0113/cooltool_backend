@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <cooltoo_hospital_department id="11" name="department name1" description="description 1" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" />
+    <cooltoo_hospital_department id="22" name="department name2" description="description 2" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" />
+    <cooltoo_hospital_department id="33" name="department name3" description="description 3" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" />
+    <cooltoo_hospital_department id="44" name="department name4" description="description 4" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" />
+    <cooltoo_hospital_department id="55" name="department name5" description="description 5" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" />
+</dataset>

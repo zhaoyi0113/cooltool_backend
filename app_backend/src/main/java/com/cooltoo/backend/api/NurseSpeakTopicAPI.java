@@ -33,10 +33,11 @@ public class NurseSpeakTopicAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTopic(@Context HttpServletRequest request,
+                             @QueryParam("title") @DefaultValue("") String titleLike,
                              @QueryParam("index") @DefaultValue("0") int pageIndex,
                              @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<NurseSpeakTopicBean> topics = topicService.getTopic("", CommonStatus.ENABLED.name(), pageIndex, sizePerPage);
+        List<NurseSpeakTopicBean> topics = topicService.getTopic(titleLike, CommonStatus.ENABLED.name(), pageIndex, sizePerPage);
         return Response.ok(topics).build();
     }
 

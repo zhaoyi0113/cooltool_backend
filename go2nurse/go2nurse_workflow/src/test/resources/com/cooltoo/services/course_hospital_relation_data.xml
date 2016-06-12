@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <go2nurse_course_hospital_relation id="10" time_created="2016-04-01 14:44:44" status="1" course_id="1" hospital_id="11" />
+    <go2nurse_course_hospital_relation id="11" time_created="2016-04-02 14:44:44" status="1" course_id="1" hospital_id="11" />
+    <go2nurse_course_hospital_relation id="12" time_created="2016-04-03 14:44:44" status="1" course_id="2" hospital_id="11" />
+    <go2nurse_course_hospital_relation id="13" time_created="2016-04-04 14:44:44" status="1" course_id="3" hospital_id="11" />
+    <go2nurse_course_hospital_relation id="14" time_created="2016-04-05 14:44:44" status="1" course_id="4" hospital_id="11" />
+    <go2nurse_course_hospital_relation id="15" time_created="2016-04-06 14:44:44" status="1" course_id="5" hospital_id="11" />
+    <go2nurse_course_hospital_relation id="16" time_created="2016-04-07 14:44:44" status="1" course_id="2" hospital_id="22" />
+    <go2nurse_course_hospital_relation id="17" time_created="2016-04-08 14:44:44" status="1" course_id="3" hospital_id="22" />
+    <go2nurse_course_hospital_relation id="18" time_created="2016-04-09 14:44:44" status="1" course_id="4" hospital_id="22" />
+    <go2nurse_course_hospital_relation id="19" time_created="2016-04-10 14:44:44" status="0" course_id="5" hospital_id="22" />
+    <go2nurse_course_hospital_relation id="20" time_created="2016-04-11 14:44:44" status="2" course_id="6" hospital_id="22" />
+    <go2nurse_course_hospital_relation id="21" time_created="2016-04-12 14:44:44" status="1" course_id="3" hospital_id="33" />
+    <go2nurse_course_hospital_relation id="22" time_created="2016-04-13 14:44:44" status="1" course_id="4" hospital_id="33" />
+    <go2nurse_course_hospital_relation id="23" time_created="2016-04-14 14:44:44" status="1" course_id="5" hospital_id="33" />
+    <go2nurse_course_hospital_relation id="24" time_created="2016-04-15 14:44:44" status="1" course_id="6" hospital_id="33" />
+    <go2nurse_course_hospital_relation id="25" time_created="2016-04-16 14:44:44" status="1" course_id="7" hospital_id="33" />
+    <go2nurse_course_hospital_relation id="26" time_created="2016-04-17 14:44:44" status="1" course_id="4" hospital_id="44" />
+    <go2nurse_course_hospital_relation id="27" time_created="2016-04-18 14:44:44" status="1" course_id="5" hospital_id="44" />
+    <go2nurse_course_hospital_relation id="28" time_created="2016-04-19 14:44:44" status="1" course_id="5" hospital_id="55" />
+</dataset>
