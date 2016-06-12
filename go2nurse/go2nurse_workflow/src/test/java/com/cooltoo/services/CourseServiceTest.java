@@ -29,6 +29,7 @@ import java.util.Set;
  */
 @Transactional
 @DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/file_storage_data.xml")
 })
@@ -95,6 +96,23 @@ public class CourseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
+    public void testCountCourseByStatusAndIds() {
+        List<Long> ids = Arrays.asList(new Long[]{4L, 5L, 6L, 7L});
+        List<Long> courseIdFound = service.getCourseIdByStatusAndIds(CourseStatus.ENABLE.name(), ids);
+        Assert.assertEquals(2, courseIdFound.size());
+        Assert.assertEquals(5L, courseIdFound.get(0).longValue());
+        Assert.assertEquals(4L, courseIdFound.get(1).longValue());
+
+        courseIdFound = service.getCourseIdByStatusAndIds(CourseStatus.EDITING.name(), ids);
+        Assert.assertEquals(1, courseIdFound.size());
+        Assert.assertEquals(6L, courseIdFound.get(0).longValue());
+
+        courseIdFound = service.getCourseIdByStatusAndIds(CourseStatus.DISABLE.name(), ids);
+        Assert.assertEquals(1, courseIdFound.size());
+        Assert.assertEquals(7L, courseIdFound.get(0).longValue());
+    }
+
+    @Test
     public void testGetCourseByStatusAndIds() {
         List<Long> ids = Arrays.asList(new Long[]{4L, 5L, 6L, 7L});
         List<CourseBean> beans = service.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), ids);
@@ -116,7 +134,8 @@ public class CourseServiceTest extends AbstractCooltooTest {
         String name = "title test";
         String introduction = "描述 0003";
         String link = "http://afdsafds.com/fdsafd9ejkfdsjakfdjisoafkjfi";
-        CourseBean bean = service.createCourse(name, introduction, link);
+        int hospitalId = 11;
+        CourseBean bean = service.createCourse(name, introduction, link, hospitalId);
         Assert.assertNotNull(bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(name, bean.getName());

@@ -84,13 +84,14 @@ public class CourseManageAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response createCourse(@Context HttpServletRequest request,
-                                   @FormParam("name") @DefaultValue("") String name,
-                                   @FormParam("introduction") @DefaultValue("") String introduction,
-                                   @FormParam("link") @DefaultValue("") String link
+                                 @FormParam("name") @DefaultValue("") String name,
+                                 @FormParam("introduction") @DefaultValue("") String introduction,
+                                 @FormParam("link") @DefaultValue("") String link,
+                                 @FormParam("hospital_id") @DefaultValue("-1") int hospitalId
 
     ) {
         logger.info("create course");
-        CourseBean course = courseService.createCourse(name, introduction, link);
+        CourseBean course = courseService.createCourse(name, introduction, link, hospitalId);
         logger.info("course is {}", course);
         return Response.ok(course).build();
     }

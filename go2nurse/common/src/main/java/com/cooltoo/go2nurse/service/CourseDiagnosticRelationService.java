@@ -37,6 +37,26 @@ public class CourseDiagnosticRelationService {
     //============================================================================
     //                 get
     //============================================================================
+    public List<Long> judgeCourseInDiagnostic(long lDiagnosticId, List<Long> coursesId, String strStatus) {
+        logger.info("judge course={} in diagnostic={} with status={}", coursesId, lDiagnosticId, strStatus);
+        Long diagnosticId = Long.valueOf(lDiagnosticId);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Long> validCourseIds = null;
+        if (null==status) {
+            if ("ALL".equalsIgnoreCase(strStatus)) {
+                validCourseIds = repository.findByDiagnosticIdAndStatusAndCoursesId(diagnosticId, status, coursesId, sort);
+            }
+        }
+        else {
+            validCourseIds = repository.findByDiagnosticIdAndStatusAndCoursesId(diagnosticId, status, coursesId, sort);
+        }
+        if (null==validCourseIds) {
+            validCourseIds = new ArrayList<>();
+        }
+        logger.info("count is {}", validCourseIds.size());
+        return validCourseIds;
+    }
+
     public List<Long> getCourseInDiagnostic(long lDiagnosticId, String strStatus) {
         logger.info("count course in diagnostic={} with status={}", lDiagnosticId, strStatus);
         Long diagnosticId = Long.valueOf(lDiagnosticId);

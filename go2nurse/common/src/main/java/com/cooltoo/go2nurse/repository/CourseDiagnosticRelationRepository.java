@@ -17,6 +17,12 @@ public interface CourseDiagnosticRelationRepository extends JpaRepository<Course
 
     @Query("SELECT DISTINCT relation.courseId FROM CourseDiagnosticRelationEntity relation" +
             " WHERE relation.diagnosticId=?1" +
+            " AND (?2 IS NULL OR relation.status=?2)" +
+            " AND relation.courseId IN (?3)")
+    List<Long> findByDiagnosticIdAndStatusAndCoursesId(Long diagnosticId, CommonStatus status, List<Long> coursesId, Sort sort);
+
+    @Query("SELECT DISTINCT relation.courseId FROM CourseDiagnosticRelationEntity relation" +
+            " WHERE relation.diagnosticId=?1" +
             " AND (?2 IS NULL OR relation.status=?2)")
     List<Long> findByDiagnosticIdAndStatus(Long diagnosticId, CommonStatus status, Sort sort);
 

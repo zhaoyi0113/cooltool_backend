@@ -37,8 +37,28 @@ public class CourseDepartmentRelationService {
     //============================================================================
     //                 get
     //============================================================================
+    public List<Long> judgeCourseInDepartment(int iDepartmentId, List<Long> coursesId, String strStatus) {
+        logger.info("judge course={} in department={} with status={}", coursesId, iDepartmentId, strStatus);
+        Integer departmentId = Integer.valueOf(iDepartmentId);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Long> validCourseIds = null;
+        if (null==status) {
+            if ("ALL".equalsIgnoreCase(strStatus)) {
+                validCourseIds = repository.findByDepartmentIdAndStatusAndCoursesId(departmentId, status, coursesId, sort);
+            }
+        }
+        else {
+            validCourseIds = repository.findByDepartmentIdAndStatusAndCoursesId(departmentId, status, coursesId, sort);
+        }
+        if (null==validCourseIds) {
+            validCourseIds = new ArrayList<>();
+        }
+        logger.info("count is {}", validCourseIds.size());
+        return validCourseIds;
+    }
+
     public List<Long> getCourseInDepartment(int iDepartmentId, String strStatus) {
-        logger.info("count course in department={} with status={}", iDepartmentId, strStatus);
+        logger.info("get course in department={} with status={}", iDepartmentId, strStatus);
         Integer departmentId = Integer.valueOf(iDepartmentId);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Long> courseIds = null;
@@ -58,7 +78,7 @@ public class CourseDepartmentRelationService {
     }
 
     public List<Integer> getDepartmentByCourseId(List<Long> courseIds, String strStatus) {
-        logger.info("count department by courseId={} with status={}", courseIds, strStatus);
+        logger.info("get department by courseId={} with status={}", courseIds, strStatus);
         if (VerifyUtil.isListEmpty(courseIds)) {
             return new ArrayList<>();
         }

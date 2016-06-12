@@ -45,6 +45,10 @@ public class DiagnosticPointService {
         return beanConverter.convert(saved);
     }
 
+    public boolean exists(long diagnosticId) {
+        return diagnosticPointRepository.exists(diagnosticId);
+    }
+
     public DiagnosticPointBean getDiagnosticPoint(long id){
         DiagnosticPointEntity entity = getDiagnosticPointEntity(id);
         DiagnosticPointBean bean = beanConverter.convert(entity);

@@ -17,6 +17,12 @@ public interface CourseDepartmentRelationRepository extends JpaRepository<Course
 
     @Query("SELECT DISTINCT relation.courseId FROM CourseDepartmentRelationEntity relation" +
             " WHERE relation.departmentId=?1" +
+            " AND (?2 IS NULL OR relation.status=?2)" +
+            " AND relation.courseId IN (?3)")
+    List<Long> findByDepartmentIdAndStatusAndCoursesId(Integer departmentId, CommonStatus status, List<Long> coursesId, Sort sort);
+
+    @Query("SELECT DISTINCT relation.courseId FROM CourseDepartmentRelationEntity relation" +
+            " WHERE relation.departmentId=?1" +
             " AND (?2 IS NULL OR relation.status=?2)")
     List<Long> findByDepartmentIdAndStatus(Integer departmentId, CommonStatus status, Sort sort);
 

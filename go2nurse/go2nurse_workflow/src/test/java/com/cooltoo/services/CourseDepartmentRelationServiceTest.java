@@ -31,6 +31,33 @@ public class CourseDepartmentRelationServiceTest extends AbstractCooltooTest {
     private CourseDepartmentRelationRepository repository;
 
     @Test
+    public void testJudgeCourseInDepartment() {
+        List<Long> checkingCoursesId = Arrays.asList(new Long[]{2L, 5L, 6L});
+        int departmentId = 22;
+        String status = "ALL";
+        List<Long> validCoursesId = service.judgeCourseInDepartment(departmentId, checkingCoursesId, status);
+        Assert.assertEquals(3, validCoursesId.size());
+        Assert.assertEquals(6, validCoursesId.get(0).longValue());
+        Assert.assertEquals(5, validCoursesId.get(1).longValue());
+        Assert.assertEquals(2, validCoursesId.get(2).longValue());
+
+        status = CommonStatus.ENABLED.name();
+        validCoursesId = service.judgeCourseInDepartment(departmentId, checkingCoursesId, status);
+        Assert.assertEquals(1, validCoursesId.size());
+        Assert.assertEquals(2, validCoursesId.get(0).longValue());
+
+        status = CommonStatus.DISABLED.name();
+        validCoursesId = service.judgeCourseInDepartment(departmentId, checkingCoursesId, status);
+        Assert.assertEquals(1, validCoursesId.size());
+        Assert.assertEquals(5, validCoursesId.get(0).longValue());
+
+        status = CommonStatus.DELETED.name();
+        validCoursesId = service.judgeCourseInDepartment(departmentId, checkingCoursesId, status);
+        Assert.assertEquals(1, validCoursesId.size());
+        Assert.assertEquals(6, validCoursesId.get(0).longValue());
+    }
+
+    @Test
     public void testGetCourseInDepartment() {
         int departmentId = 22;
         String status = "ALL";

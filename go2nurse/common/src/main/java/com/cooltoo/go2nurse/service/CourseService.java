@@ -9,6 +9,7 @@ import com.cooltoo.go2nurse.entities.CourseEntity;
 import com.cooltoo.go2nurse.repository.CourseRepository;
 import com.cooltoo.go2nurse.service.file.TemporaryGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ public class CourseService {
     @Autowired private CourseBeanConverter beanConverter;
     @Autowired private UserGo2NurseFileStorageService userStorage;
     @Autowired private TemporaryGo2NurseFileStorageService tempStorage;
+    @Autowired private CourseRelationManageService relationManageService;
 
     //===========================================================
     //                    get
@@ -90,6 +92,25 @@ public class CourseService {
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
         return beans;
+    }
+
+    public List<Long> getCourseIdByStatusAndIds(String strStatus, List<Long> courseIds) {
+        logger.info("get courseId by status={} ids={}", strStatus, courseIds);
+        CourseStatus status = CourseStatus.parseString(strStatus);
+        List<Long> resultSet = null;
+        if (null==status) {
+            if ("ALL".equalsIgnoreCase(strStatus)) {
+                resultSet = repository.findCourseIdByStatusAndIdIn(status, courseIds, sort);
+            }
+        }
+        else {
+            resultSet = repository.findCourseIdByStatusAndIdIn(status, courseIds, sort);
+        }
+        if (null==resultSet) {
+            resultSet = new ArrayList<>();
+        }
+        logger.info("count is {}", resultSet.size());
+        return resultSet;
     }
 
     public List<CourseBean> getCourseByStatusAndIds(String strStatus, List<Long> courseIds) {
@@ -255,9 +276,9 @@ public class CourseService {
     //===========================================================
 
     @Transactional
-    public CourseBean createCourse(String name, String introduction, String link) {
-        logger.info("create an course by name={}, introduction={} link={}",
-                name, introduction, link);
+    public CourseBean createCourse(String name, String introduction, String link, int hospitalId) {
+        logger.info("create an course by name={} introduction={} link={} and hospitalId={}",
+                name, introduction, link, hospitalId);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("the name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -266,6 +287,10 @@ public class CourseService {
         long count = repository.countByName(name);
         if (count>0) {
             logger.error("the name is exist already");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (!relationManageService.hospitalExist(hospitalId)) {
+            logger.error("the hospital not exist!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         CourseEntity entity = new CourseEntity();
@@ -280,6 +305,13 @@ public class CourseService {
         entity.setStatus(CourseStatus.DISABLE);
         entity.setTime(new Date());
         entity = repository.save(entity);
+        if (entity.getId()>0) {
+            boolean success = relationManageService.addCourseToHospital(entity.getId(), hospitalId);
+            if (!success) {
+                logger.error("add course to hospital failed!");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
         logger.info("create an course id={}", entity.getId());
         return beanConverter.convert(entity);
     }
