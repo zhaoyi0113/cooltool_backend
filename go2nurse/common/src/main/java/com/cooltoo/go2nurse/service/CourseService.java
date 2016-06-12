@@ -161,7 +161,7 @@ public class CourseService {
             imageIds.add(tmp.getFrontCover());
         }
 
-        Map<Long, String> imageId2Url = userStorage.getFilePath(imageIds);
+        Map<Long, String> imageId2Url = userStorage.getFileUrl(imageIds);
         for (CourseBean tmp : courses) {
             if (tmp.getFrontCover()<=0) {
                 continue;
@@ -186,7 +186,7 @@ public class CourseService {
 
         CourseBean bean = beanConverter.convert(entity);
         if (bean.getFrontCover()>0) {
-            String imgUrl = userStorage.getFilePath(bean.getFrontCover());
+            String imgUrl = userStorage.getFileURL(bean.getFrontCover());
             bean.setFrontCoverUrl(imgUrl);
         }
 
@@ -208,7 +208,7 @@ public class CourseService {
 
         CourseBean bean = beanConverter.convert(entity.get(0));
         if (bean.getFrontCover()>0) {
-            String imgUrl = userStorage.getFilePath(bean.getFrontCover());
+            String imgUrl = userStorage.getFileURL(bean.getFrontCover());
             bean.setFrontCoverUrl(imgUrl);
         }
 
@@ -331,7 +331,7 @@ public class CourseService {
                 frontCoverName = "course_front_cover_"+System.currentTimeMillis();
             }
             long imageId = userStorage.addFile(entity.getFrontCover(), frontCoverName, frontCover);
-            imageUrl = userStorage.getFilePath(imageId);
+            imageUrl = userStorage.getFileURL(imageId);
             entity.setFrontCover(imageId);
             changed = true;
         }

@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.service.file;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.service.Go2NurseFileStorageDBService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.FileUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -23,11 +24,8 @@ public abstract class AbstractGo2NurseFileStorageService {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractGo2NurseFileStorageService.class.getName());
 
-    @Value("${go2nurse.nginx.prefix}")
-    public static String nginxPrefix;
-
-    @Value("${go2nurse.nginx.prefix}")
-    public String httpPrefix;
+    @Autowired
+    private Go2NurseUtility utility;
 
     @Autowired
     private Go2NurseFileStorageDBService dbService;
@@ -153,7 +151,7 @@ public abstract class AbstractGo2NurseFileStorageService {
      * @param fileId file id in file_storage table
      * @return
      */
-    public String getFilePath(long fileId) {
+    public String getFileUrl(long fileId) {
         logger.info("get file path by fileId={}", fileId);
         String filePath = dbRecordGet(fileId);
         if (VerifyUtil.isStringEmpty(filePath)) {
@@ -166,11 +164,31 @@ public abstract class AbstractGo2NurseFileStorageService {
     }
 
     /**
+     * get file url with nginx prefix path
+     * @param fileId file id in file_storage table
+     * @return
+     */
+    public String getFileURL(long fileId) {
+        logger.info("get file path by fileId={}", fileId);
+        String filePath = dbRecordGet(fileId);
+        if (VerifyUtil.isStringEmpty(filePath)) {
+            return "";
+        }
+        logger.info("relative file path={}", filePath);
+        filePath = getNginxRelativePath()+filePath;
+        logger.info("nginx relative file path={}", filePath);
+        filePath = utility.getHttpPrefix()+filePath;
+        logger.info("nginx file url={}", filePath);
+        return filePath;
+    }
+
+
+    /**
      * get file relative path with nginx prefix path
      * @param fileIds file ids in file_storage table
      * @return
      */
-    public Map<Long, String> getFilePath(List<Long> fileIds) {
+    public Map<Long, String> getFileUrl(List<Long> fileIds) {
         if (VerifyUtil.isListEmpty(fileIds)) {
             logger.warn("file ids is empty");
             return new HashMap<>();
@@ -191,7 +209,7 @@ public abstract class AbstractGo2NurseFileStorageService {
         Set<Long> ids = id2Path.keySet();
         for (Long id : ids) {
             String relativePath = id2Path.get(id);
-            id2Path.put(id, this.httpPrefix+ nginxRelativePath + relativePath);
+            id2Path.put(id, utility.getHttpPrefix()+ nginxRelativePath + relativePath);
         }
         return id2Path;
     }

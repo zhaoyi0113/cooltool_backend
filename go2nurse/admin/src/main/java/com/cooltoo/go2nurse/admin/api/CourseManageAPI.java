@@ -2,7 +2,7 @@ package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.service.CourseService;
-import com.cooltoo.go2nurse.service.file.AbstractGo2NurseFileStorageService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -26,6 +26,7 @@ public class CourseManageAPI {
     private static final Logger logger = LoggerFactory.getLogger(CourseManageAPI.class.getName());
 
     @Autowired private CourseService courseService;
+    @Autowired private Go2NurseUtility utility;
 
     // status ==> all/enable/disable/editing
     @Path("/status/count/{status}")
@@ -153,8 +154,8 @@ public class CourseManageAPI {
     public Response getDetailById(@Context HttpServletRequest request,
                                   @QueryParam("course_id") @DefaultValue("0") long courseId
     ) {
-        logger.info("get detail course={} nginxPrefix={}", courseId, AbstractGo2NurseFileStorageService.nginxPrefix);
-        CourseBean course = courseService.getCourseById(courseId, AbstractGo2NurseFileStorageService.nginxPrefix);
+        logger.info("get detail course={} nginxPrefix={}", courseId, utility.getHttpPrefix());
+        CourseBean course = courseService.getCourseById(courseId, utility.getHttpPrefix());
         return Response.ok(course).build();
     }
 
@@ -193,7 +194,7 @@ public class CourseManageAPI {
         if (VerifyUtil.isStringEmpty(relativePath)) {
             errorNo = -1;
         }
-        relativePath = HtmlParser.constructUrl(AbstractGo2NurseFileStorageService.nginxPrefix, relativePath);
+        relativePath = HtmlParser.constructUrl(utility.getHttpPrefix(), relativePath);
         StringBuilder retVal = new StringBuilder();
         retVal.append("{")
                 .append("\"error\":").append(errorNo).append(",")

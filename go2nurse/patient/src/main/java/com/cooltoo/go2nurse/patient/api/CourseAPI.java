@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.go2nurse.service.CourseCategoryService;
 import com.cooltoo.go2nurse.service.CourseService;
 import com.cooltoo.go2nurse.service.file.AbstractGo2NurseFileStorageService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ public class CourseAPI {
     private CourseService courseService;
     @Autowired
     private CourseCategoryService categoryService;
+    @Autowired
+    private Go2NurseUtility utility;
 
     @Path("/get_by_category/{category_id}")
     @GET
@@ -64,9 +67,9 @@ public class CourseAPI {
     public Response getCourseDetailById(@Context HttpServletRequest request,
                                         @QueryParam("course_id") @DefaultValue("0") long courseId
     ) {
-        logger.info("get detail course by id={} nginxPrefix={}", courseId, AbstractGo2NurseFileStorageService.nginxPrefix);
+        logger.info("get detail course by id={} nginxPrefix={}", courseId, utility.getHttpPrefix());
 
-        CourseBean course = courseService.getCourseById(courseId, AbstractGo2NurseFileStorageService.nginxPrefix);
+        CourseBean course = courseService.getCourseById(courseId, utility.getHttpPrefix());
         return Response.ok(course).build();
     }
 

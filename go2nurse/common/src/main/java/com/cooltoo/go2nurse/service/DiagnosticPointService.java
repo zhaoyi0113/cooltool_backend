@@ -133,7 +133,7 @@ public class DiagnosticPointService {
     }
 
     private void saveImageUrl(DiagnosticPointBean bean){
-        String filePath = userStorage.getFilePath(bean.getImageId());
-        bean.setImageUrl(filePath);
+        String fileUrl = userStorage.getFileURL(bean.getImageId());
+        bean.setImageUrl(fileUrl);
     }
 }

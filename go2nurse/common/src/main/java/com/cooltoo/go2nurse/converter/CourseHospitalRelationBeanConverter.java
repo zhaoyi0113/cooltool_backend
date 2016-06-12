@@ -3,10 +3,12 @@ package com.cooltoo.go2nurse.converter;
 import com.cooltoo.go2nurse.beans.CourseHospitalRelationBean;
 import com.cooltoo.go2nurse.entities.CourseHospitalRelationEntity;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by hp on 2016/6/12.
  */
+@Component
 public class CourseHospitalRelationBeanConverter implements Converter<CourseHospitalRelationEntity, CourseHospitalRelationBean> {
     @Override
     public CourseHospitalRelationBean convert(CourseHospitalRelationEntity source) {

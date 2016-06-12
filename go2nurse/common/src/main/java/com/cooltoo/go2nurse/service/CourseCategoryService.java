@@ -177,7 +177,7 @@ public class CourseCategoryService {
         for (CourseCategoryBean bean : beans) {
             imageIds.add(bean.getImageId());
         }
-        Map<Long, String> imageId2Path = fileStorageService.getFilePath(imageIds);
+        Map<Long, String> imageId2Path = fileStorageService.getFileUrl(imageIds);
         for (CourseCategoryBean bean : beans) {
             long imageId = bean.getImageId();
             String imagePath = imageId2Path.get(imageId);
@@ -194,7 +194,7 @@ public class CourseCategoryService {
     @Transactional
     public CourseCategoryBean updateCategory(long categoryId, String name, String introduction, String strStatus, String imageName, InputStream image) {
         boolean    changed = false;
-        String     imgPath = "";
+        String     imgUrl = "";
         logger.info("update category {} by name={} introduction={} status={} imageName={} image={}",
                 categoryId, name, introduction, strStatus, imageName, null!=image);
         CourseCategoryEntity entity = repository.findOne(categoryId);
@@ -231,7 +231,7 @@ public class CourseCategoryService {
             }
             long imgId = fileStorageService.addFile(entity.getImageId(), imageName, image);
             if (imgId>0) {
-                imgPath = fileStorageService.getFilePath(imgId);
+                imgUrl = fileStorageService.getFileURL(imgId);
                 entity.setImageId(imgId);
                 changed = true;
             }
@@ -241,7 +241,7 @@ public class CourseCategoryService {
             entity = repository.save(entity);
         }
         CourseCategoryBean bean = beanConverter.convert(entity);
-        bean.setImageUrl(imgPath);
+        bean.setImageUrl(imgUrl);
         logger.info("updated is {}", bean);
         return bean;
     }
@@ -274,7 +274,7 @@ public class CourseCategoryService {
         logger.info("add tag category : name={} introduction={} imageName={} image={}",
                 name, introduction, imageName, (null!=image));
         name = VerifyUtil.isStringEmpty(name) ? "" : name.trim();
-        String imagePath = null;
+        String imageUrl = null;
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("add category : name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -298,7 +298,7 @@ public class CourseCategoryService {
             long fileId = fileStorageService.addFile(-1, imageName, image);
             if (fileId>0) {
                 entity.setImageId(fileId);
-                imagePath = fileStorageService.getFilePath(fileId);
+                imageUrl = fileStorageService.getFileURL(fileId);
             }
         }
 
@@ -307,7 +307,7 @@ public class CourseCategoryService {
         entity = repository.save(entity);
 
         CourseCategoryBean bean = beanConverter.convert(entity);
-        bean.setImageUrl(imagePath);
+        bean.setImageUrl(imageUrl);
 
         return bean;
     }
