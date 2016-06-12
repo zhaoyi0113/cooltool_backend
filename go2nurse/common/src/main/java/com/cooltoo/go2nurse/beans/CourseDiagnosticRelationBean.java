@@ -1,49 +1,38 @@
-package com.cooltoo.go2nurse.entities;
+package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by hp on 2016/6/12.
  */
-@Entity
-@Table(name = "go2nurse_course_hospital_relation")
-public class CourseHospitalRelationEntity {
+public class CourseDiagnosticRelationBean {
 
     private long id;
     private Date time;
     private CommonStatus status;
     private long courseId;
-    private int hospitalId;
+    private long diagnosticId;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
     public long getId() {
         return id;
     }
 
-    @Column(name = "time_created")
     public Date getTime() {
         return time;
     }
 
-    @Column(name = "status")
-    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }
 
-    @Column(name = "course_id")
     public long getCourseId() {
         return courseId;
     }
 
-    @Column(name = "hospital_id")
-    public int getHospitalId() {
-        return hospitalId;
+    public long getDiagnosticId() {
+        return diagnosticId;
     }
 
     public void setId(long id) {
@@ -62,8 +51,8 @@ public class CourseHospitalRelationEntity {
         this.courseId = courseId;
     }
 
-    public void setHospitalId(int hospitalId) {
-        this.hospitalId = hospitalId;
+    public void setDiagnosticId(long diagnosticId) {
+        this.diagnosticId = diagnosticId;
     }
 
     public String toString() {
@@ -73,7 +62,7 @@ public class CourseHospitalRelationEntity {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", courseId=").append(courseId);
-        msg.append(", hospitalId=").append(hospitalId);
+        msg.append(", diagnosticId=").append(diagnosticId);
         msg.append("]");
         return msg.toString();
     }

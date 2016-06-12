@@ -1,16 +1,13 @@
-package com.cooltoo.go2nurse.entities;
+package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by hp on 2016/6/12.
  */
-@Entity
-@Table(name = "go2nurse_course_hospital_relation")
-public class CourseHospitalRelationEntity {
+public class CourseHospitalRelationBean {
 
     private long id;
     private Date time;
@@ -18,30 +15,22 @@ public class CourseHospitalRelationEntity {
     private long courseId;
     private int hospitalId;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
     public long getId() {
         return id;
     }
 
-    @Column(name = "time_created")
     public Date getTime() {
         return time;
     }
 
-    @Column(name = "status")
-    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }
 
-    @Column(name = "course_id")
     public long getCourseId() {
         return courseId;
     }
 
-    @Column(name = "hospital_id")
     public int getHospitalId() {
         return hospitalId;
     }
