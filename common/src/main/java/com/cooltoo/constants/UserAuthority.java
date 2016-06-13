@@ -21,6 +21,16 @@ public enum UserAuthority {
         return null;
     }
 
+    public static UserAuthority parseInt(int authority) {
+        if (DENY_ALL.ordinal()==authority) {
+            return DENY_ALL;
+        }
+        else if (AGREE_ALL.ordinal()==authority) {
+            return AGREE_ALL;
+        }
+        return null;
+    }
+
     public static List<String> getUserAuthority() {
         List<String> enumes = new ArrayList<>();
         enumes.add(DENY_ALL.name());

@@ -7,7 +7,7 @@ import com.cooltoo.backend.converter.NurseBeanConverter;
 import com.cooltoo.backend.converter.NurseEntityConverter;
 import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.entities.HospitalEntity;
-import com.cooltoo.backend.leancloud.LeanCloudService;
+import com.cooltoo.leancloud.LeanCloudService;
 import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.beans.NurseHospitalRelationBean;

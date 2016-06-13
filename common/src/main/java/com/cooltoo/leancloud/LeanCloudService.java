@@ -1,6 +1,6 @@
-package com.cooltoo.backend.leancloud;
+package com.cooltoo.leancloud;
 
-import com.cooltoo.backend.features.AppFeatures;
+import com.cooltoo.features.AppFeatures;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import org.apache.http.HttpResponse;

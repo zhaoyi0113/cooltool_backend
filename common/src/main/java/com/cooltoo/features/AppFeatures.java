@@ -1,4 +1,4 @@
-package com.cooltoo.backend.features;
+package com.cooltoo.features;
 
 import org.springframework.context.annotation.Bean;
 import org.togglz.core.Feature;

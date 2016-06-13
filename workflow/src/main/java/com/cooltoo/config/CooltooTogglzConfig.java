@@ -1,7 +1,6 @@
 package com.cooltoo.config;
 
-import com.cooltoo.backend.features.AppFeatures;
-import org.springframework.stereotype.Component;
+import com.cooltoo.features.AppFeatures;
 import org.togglz.core.Feature;
 import org.togglz.core.manager.TogglzConfig;
 import org.togglz.core.repository.StateRepository;
