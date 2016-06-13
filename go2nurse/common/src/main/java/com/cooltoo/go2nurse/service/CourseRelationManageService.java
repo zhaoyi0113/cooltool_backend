@@ -54,7 +54,7 @@ public class CourseRelationManageService {
     }
 
     public boolean diagnosticExist(long diagnosticId) {
-        return diagnostic.exists(diagnosticId);
+        return diagnostic.exitsDiagnostic(diagnosticId);
     }
 
     public Map<String, List<Long>> getCoursesIdByConditions(int hospitalId, int departmentId, long diagnosticId,
@@ -85,7 +85,7 @@ public class CourseRelationManageService {
         }
 
         List<Long> courseInDiagnostic = null;
-        boolean checkCoursesInDiagnostic = departmentId>0;
+        boolean checkCoursesInDiagnostic = diagnosticId>=0;
         if (checkCoursesInDiagnostic) {
             courseInDiagnostic = diagnosticRelation.judgeCourseInDiagnostic(diagnosticId, courseInDepartment, CommonStatus.ENABLED.name());
             hospitalDepartmentDiagnostic.put(key_diagnostic, courseInDiagnostic);

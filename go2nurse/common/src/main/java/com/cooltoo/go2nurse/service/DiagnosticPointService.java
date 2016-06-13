@@ -3,11 +3,16 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
 import com.cooltoo.go2nurse.beans.DiagnosticPointBean;
+import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.converter.DiagnosticEnumerationBeanConverter;
 import com.cooltoo.go2nurse.converter.DiagnosticPointBeanConverter;
 import com.cooltoo.go2nurse.entities.DiagnosticPointEntity;
 import com.cooltoo.go2nurse.repository.DiagnosticPointRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,14 +28,35 @@ import java.util.List;
 @Service("DiagnosticPointService")
 public class DiagnosticPointService {
 
-    @Autowired
-    private DiagnosticPointRepository diagnosticPointRepository;
+    private static final Logger logger = LoggerFactory.getLogger(DiagnosticPointService.class);
 
-    @Autowired
-    private UserGo2NurseFileStorageService userStorage;
+    @Autowired private DiagnosticPointRepository diagnosticPointRepository;
+    @Autowired private UserGo2NurseFileStorageService userStorage;
+    @Autowired private DiagnosticPointBeanConverter beanConverter;
+    @Autowired private DiagnosticEnumerationBeanConverter enumerationBeanConverter;
 
-    @Autowired
-    private DiagnosticPointBeanConverter beanConverter;
+    //========================================================================
+    //            use enumeration for first time
+    //========================================================================
+    public boolean exitsDiagnostic(long diagnosticId) {
+        boolean exist = DiagnosticEnumeration.exists((int)diagnosticId);
+        logger.info("exist diagnostic={}, exist={}", diagnosticId, exist);
+        return exist;
+    }
+
+    public List<DiagnosticEnumerationBean> getAllDiagnostic() {
+        List<DiagnosticEnumerationBean> beans = new ArrayList<>();
+        List<DiagnosticEnumeration> diagnostics = DiagnosticEnumeration.getAllDiagnostic();
+        for (DiagnosticEnumeration enume : diagnostics) {
+            DiagnosticEnumerationBean bean = enumerationBeanConverter.convert(enume);
+            beans.add(bean);
+        }
+        return beans;
+    }
+
+    //========================================================================
+    //            use table for first time
+    //========================================================================
 
     @Transactional
     public DiagnosticPointBean createDiagnosticPoint(String name, InputStream inputStream) {

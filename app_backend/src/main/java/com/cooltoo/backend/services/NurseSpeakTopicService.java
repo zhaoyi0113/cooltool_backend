@@ -107,8 +107,8 @@ public class NurseSpeakTopicService {
     }
 
     public List<NurseFriendsBean> getUsersInTopic(long topicId, long currentUserId, String strUserAuthority, int pageIndex, int sizePerPage) {
-        logger.info("get user information in topic={} userAuthority={} at page={} sizePerPage={}",
-                topicId, strUserAuthority, pageIndex, sizePerPage);
+        logger.info("get user information in topic={} userAuthority={} currentUserId={} at page={} sizePerPage={}",
+                topicId, strUserAuthority, currentUserId, pageIndex, sizePerPage);
         List<Long> usersId = topicRelationService.getUserTakePartIn(topicId, strUserAuthority, pageIndex, sizePerPage);
         List<NurseFriendsBean> sortedUserInTopic = new ArrayList<>();
         if (!VerifyUtil.isListEmpty(usersId)) {
