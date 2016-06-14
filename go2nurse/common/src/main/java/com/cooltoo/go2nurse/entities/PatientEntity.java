@@ -1,5 +1,8 @@
 package com.cooltoo.go2nurse.entities;
 
+import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.GenderType;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -11,22 +14,13 @@ import java.util.Date;
 public class PatientEntity {
 
     private long id;
-
+    private Date time;
+    private CommonStatus status;
     private String name;
-
-    private int officeId;
-
-    private String nickname;
-
-    private int certificateId;
-
-    private String mobile;
-
-    private int age;
-
+    private GenderType gender;
     private Date birthday;
-
-    private String usercol;
+    private String identityCard;
+    private String mobile;
 
     @Id
     @Column(name = "id")
@@ -46,28 +40,25 @@ public class PatientEntity {
         this.name = name;
     }
 
-    @Column(name = "office_id")
-    public int getOfficeId() {
-        return officeId;
+    @Column(name = "gender")
+    @Enumerated
+    public GenderType getGender() {
+        return gender;
     }
-    public void setOfficeId(int officeId) {
-        this.officeId = officeId;
-    }
-
-    @Column(name = "nickname")
-    public String getNickname() {
-        return nickname;
-    }
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setGender(GenderType gender) {
+        this.gender = gender;
     }
 
-    @Column(name = "certificate_id")
-    public int getCertificateId() {
-        return certificateId;
+    @Column(name = "birthday")
+    public Date getBirthday() { return birthday; }
+    public void setBirthday(Date birthday) { this.birthday = birthday; }
+
+    @Column(name = "identity_card")
+    public String getIdentityCard() {
+        return identityCard;
     }
-    public void setCertificateId(int certificateId) {
-        this.certificateId = certificateId;
+    public void setIdentityCard(String identityCard) {
+        this.identityCard = identityCard;
     }
 
     @Column(name = "mobile")
@@ -78,30 +69,34 @@ public class PatientEntity {
         this.mobile = mobile;
     }
 
-    @Column(name="age")
-    public int getAge() { return age; }
-    public void setAge(int age) { this.age = age; }
+    @Column(name = "time_created")
+    public Date getTime() {
+        return time;
+    }
+    public void setTime(Date time) {
+        this.time = time;
+    }
 
-    @Column(name = "birthdate")
-    public Date getBirthday() { return birthday; }
-    public void setBirthday(Date birthday) { this.birthday = birthday; }
-
-    @Column(name = "usercol")
-    public String getUsercol() { return usercol; }
-    public void setUsercol(String usercol) { this.usercol = usercol; }
+    @Column(name = "status")
+    @Enumerated
+    public CommonStatus getStatus() {
+        return status;
+    }
+    public void setStatus(CommonStatus status) {
+        this.status = status;
+    }
 
     public String toString() {
         StringBuilder msg = new StringBuilder();
-        msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" , ");
-        msg.append("officeId=").append(officeId).append(" , ");
-        msg.append("certificateId=").append(certificateId).append(" , ");
-        msg.append("name=").append(name).append(" , ");
-        msg.append("nickname=").append(nickname).append(" , ");
-        msg.append("birthday=").append(birthday).append(" , ");
-        msg.append("usercol=").append(usercol).append(" , ");
-        msg.append("mobile=").append(mobile).append(" , ");
-        msg.append("age=").append(age);
+        msg.append(getClass()).append("@").append(hashCode()).append("[");
+        msg.append("id=").append(id);
+        msg.append(", time=").append(time);
+        msg.append(", status=").append(status);
+        msg.append(", name=").append(name);
+        msg.append(", gender=").append(gender);
+        msg.append(", birthday=").append(birthday);
+        msg.append(", identityCard=").append(identityCard);
+        msg.append(", mobile=").append(mobile);
         msg.append("]");
         return msg.toString();
     }

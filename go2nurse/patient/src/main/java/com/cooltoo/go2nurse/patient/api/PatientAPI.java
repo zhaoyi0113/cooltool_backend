@@ -1,17 +1,22 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.PatientBean;
-import com.cooltoo.go2nurse.converter.PatientBeanConverter;
-import com.cooltoo.go2nurse.converter.PatientEntityConverter;
+import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.PatientService;
 import com.cooltoo.util.NumberUtil;
-import org.apache.log4j.Logger;
+import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,98 +25,68 @@ import java.util.List;
 @Path("/patient")
 public class PatientAPI {
 
-    private static final Logger logger = Logger.getLogger(PatientAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(PatientAPI.class);
 
-    @Autowired
-    private PatientService service;
+    @Autowired private PatientService service;
 
-    @Autowired
-    private PatientBeanConverter beanConverter;
-
-    @Autowired
-    private PatientEntityConverter entityConverter;
-
+    @Path("/get_by_ids")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAll() {
-        List<PatientBean> all = service.getAll();
-        return Response.ok(all).build();
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getByPatientsId(@Context HttpServletRequest request,
+                                    @QueryParam("patients_id") @DefaultValue("") String strPatientsId
+    ) {
+        List<Long> patientsId = VerifyUtil.parseLongIds(strPatientsId);
+        List<PatientBean> beans;
+        if (!VerifyUtil.isListEmpty(patientsId)) {
+            beans = service.getAllByStatusAndIds(patientsId, CommonStatus.ENABLED);
+        }
+        else {
+            beans = new ArrayList<>();
+        }
+        logger.info("patient count is {}", beans.size());
+        return Response.ok(beans).build();
     }
 
+    @Path("/create")
     @POST
-    @Path("/new")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newOne(
-            @FormParam("name") String name,
-            @DefaultValue("") @FormParam("nickname") String nickname,
-            @DefaultValue("0") @FormParam("certificateId") int certificateId,
-            @DefaultValue("0") @FormParam("officeId") int officeId,
-            @DefaultValue("") @FormParam("mobile") String mobile,
-            @DefaultValue("0") @FormParam("age") int age,
-            @DefaultValue("") @FormParam("birthday") String birthday,
-            @DefaultValue("") @FormParam("usercol") String usercol
+    @LoginAuthentication(requireUserLogin = true)
+    public Response create(@Context HttpServletRequest request,
+                           @FormParam("name") @DefaultValue("") String name,
+                           @FormParam("gender") @DefaultValue("2") int gender,
+                           @FormParam("birthday") @DefaultValue("") String strBirthday,
+                           @FormParam("identityCard") @DefaultValue("") String identityCard,
+                           @FormParam("mobile") @DefaultValue("") String mobile
     ) {
         Date date = null;
-        long time = NumberUtil.getTime(birthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (time > 0) {
             date = new Date(time);
         }
-        if (null == name || "".equals(name.trim()) || age<0) {
-            logger.info("new patient name="+name +" age="+age);
-            return Response.ok().build();
-        }
-        long id = service.create(name, nickname, certificateId, officeId, mobile, age, date, usercol);
+        long id = service.create(name, gender, date, identityCard, mobile);
         return Response.ok(id).build();
     }
 
-    @POST
-    @Path("/get")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getOne(@DefaultValue("-1") @FormParam("id") long id) {
-        PatientBean one = service.getOneById(id);
-        logger.info("get patient is " + one);
-        if (null==one) {
-            return Response.ok().build();
-        }
-        return Response.ok(one).build();
-    }
-
-    @POST
-    @Path("/delete")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteOne(@DefaultValue("-1")@FormParam("id") long id) {
-        PatientBean one = service.delete(id);
-        logger.info("delete patient is " + one);
-        if (null==one) {
-            return Response.ok().build();
-        }
-        return Response.ok(one).build();
-    }
-
-    @POST
     @Path("/update")
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateOne(
-            @DefaultValue("-1") @FormParam("id") long id,
-            @DefaultValue("") @FormParam("name") String name,
-            @DefaultValue("") @FormParam("nickname") String nickname,
-            @DefaultValue("0") @FormParam("certificateId") int certificateId,
-            @DefaultValue("0") @FormParam("officeId") int officeId,
-            @DefaultValue("") @FormParam("mobile") String mobile,
-            @DefaultValue("0") @FormParam("age") int age,
-            @DefaultValue("") @FormParam("birthday") String birthday,
-            @DefaultValue("") @FormParam("usercol") String usercol
+    @LoginAuthentication(requireUserLogin = true)
+    public Response update(@Context HttpServletRequest request,
+                           @FormParam("id") @DefaultValue("-1") long id,
+                           @FormParam("name") @DefaultValue("") String name,
+                           @FormParam("gender") @DefaultValue("2") int gender,
+                           @FormParam("birthday") @DefaultValue("") String strBirthday,
+                           @FormParam("identityCard") @DefaultValue("") String identityCard,
+                           @FormParam("mobile") @DefaultValue("") String mobile,
+                           @FormParam("status") @DefaultValue("ENABLED") String status
     ) {
-        Date date = null;
-        long time = NumberUtil.getTime(birthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date birthday = null;
+        long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (time > 0) {
-            date = new Date(time);
+            birthday = new Date(time);
         }
-        PatientBean one = service.update(id, name, nickname, certificateId, officeId, mobile, age, date, usercol);
-        logger.info("update patient is " + one);
-        if (null==one) {
-            return Response.ok().build();
-        }
-        return Response.ok(id).build();
+        PatientBean one = service.update(id, name, gender, birthday, identityCard, mobile, status);
+        return Response.ok(one).build();
     }
 }

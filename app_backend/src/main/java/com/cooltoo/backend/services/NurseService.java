@@ -81,7 +81,11 @@ public class NurseService {
         NurseBean bean = new NurseBean();
         bean.setName(name);
         bean.setAge(age);
-        bean.setGender(GenderType.parseInt(gender));
+
+        GenderType genderType = GenderType.parseInt(gender);
+        genderType = null==genderType ? GenderType.SECRET : genderType;
+        bean.setGender(genderType);
+
         bean.setMobile(mobile);
         bean.setPassword(password);
         return registerNurse(bean);
@@ -407,7 +411,9 @@ public class NurseService {
             changed = true;
         }
         if(gender >= 0) {
-            entity.setGender(GenderType.parseInt(gender));
+            GenderType genderType = GenderType.parseInt(gender);
+            genderType = null==genderType ? GenderType.SECRET : genderType;
+            entity.setGender(genderType);
         }
 
         if (changed) {

@@ -13,15 +13,14 @@ public class PatientBeanConverter implements Converter<PatientEntity, PatientBea
     @Override
     public PatientBean convert(PatientEntity source) {
         PatientBean bean = new PatientBean();
-        bean.setOfficeId(source.getOfficeId());
-        bean.setNickname(source.getNickname());
-        bean.setName(source.getName());
-        bean.setMobile(source.getMobile());
-        bean.setCertificateId(source.getCertificateId());
         bean.setId(source.getId());
-        bean.setAge(source.getAge());
+        bean.setTime(source.getTime());
+        bean.setStatus(source.getStatus());
+        bean.setName(source.getName());
+        bean.setGender(source.getGender());
         bean.setBirthday(source.getBirthday());
-        bean.setUsercol(source.getUsercol());
+        bean.setIdentityCard(source.getIdentityCard());
+        bean.setMobile(source.getMobile());
         return bean;
     }
 }
