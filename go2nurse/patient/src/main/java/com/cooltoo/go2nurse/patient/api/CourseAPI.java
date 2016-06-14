@@ -4,6 +4,7 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.CourseCategoryBean;
 import com.cooltoo.go2nurse.constants.CourseStatus;
+import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.CourseCategoryService;
 import com.cooltoo.go2nurse.service.CourseService;
 import com.cooltoo.go2nurse.service.file.AbstractGo2NurseFileStorageService;
@@ -39,6 +40,7 @@ public class CourseAPI {
     @Path("/get_by_category/{category_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response getCourseByCategoryId(@Context HttpServletRequest request,
                                           @PathParam("category_id") @DefaultValue("0") long categoryId
     ) {
@@ -52,6 +54,7 @@ public class CourseAPI {
     @Path("/categories/get_by_course_ids")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response getCategoriesByCourseId(@Context HttpServletRequest request,
                                             @QueryParam("course_ids") @DefaultValue("0") String strCourseIds
     ) {
@@ -64,6 +67,7 @@ public class CourseAPI {
     @Path("/get_course_detail")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response getCourseDetailById(@Context HttpServletRequest request,
                                         @QueryParam("course_id") @DefaultValue("0") long courseId
     ) {
@@ -83,6 +87,7 @@ public class CourseAPI {
     @Path("/get_available_categories/{page}/{number}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response getAvailableCategories(@Context HttpServletRequest request,
                                            @PathParam("page") int page, @PathParam("number") int number) {
         List<CourseCategoryBean> categories = categoryService.getCategoryByStatus(

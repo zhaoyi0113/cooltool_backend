@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.constants.CourseStatus;
+import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,6 +27,7 @@ public class CourseRelationAPI {
     @Path("/conditions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response getCourse(@Context HttpServletRequest request,
                               @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
                               @QueryParam("department_id") @DefaultValue("0") int departmentId,
