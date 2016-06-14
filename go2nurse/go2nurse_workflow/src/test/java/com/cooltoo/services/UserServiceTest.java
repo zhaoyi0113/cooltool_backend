@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -129,6 +130,23 @@ public class UserServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(4, count);
         count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "用户1");
         Assert.assertEquals(5, count);
+    }
+
+    @Test
+    public void testGetUserByAuthorityAndIds() {
+        List<Long> userIds = Arrays.asList(new Long[]{9L, 10L, 11L, 12L, 13L});
+        UserAuthority authority = null;
+
+        List<UserBean> users = service.getUser(userIds, authority);
+        Assert.assertEquals(5, users.size());
+
+        authority = UserAuthority.AGREE_ALL;
+        users = service.getUser(userIds, authority);
+        Assert.assertEquals(2, users.size());
+
+        authority = UserAuthority.DENY_ALL;
+        users = service.getUser(userIds, authority);
+        Assert.assertEquals(3, users.size());
     }
 
     @Test

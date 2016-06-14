@@ -84,7 +84,13 @@ public class PatientService {
 
     public List<PatientBean> getAllByStatusAndIds(List<Long> ids, CommonStatus status) {
         List<PatientBean> beans = new ArrayList<>();
-        List<PatientEntity> entities = repository.findByStatusAndIdIn(status, ids, sort);
+        List<PatientEntity> entities;
+        if (null==status) {
+            entities = repository.findByIdIn(ids, sort);
+        }
+        else {
+            entities = repository.findByStatusAndIdIn(status, ids, sort);
+        }
         if (VerifyUtil.isListEmpty(entities)) {
             return beans;
         }

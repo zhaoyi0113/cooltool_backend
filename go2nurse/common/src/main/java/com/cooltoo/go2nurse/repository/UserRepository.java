@@ -4,6 +4,8 @@ import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.go2nurse.entities.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -26,4 +28,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             " WHERE (user.authority=?1  OR ?1 IS NULL)" +
             " AND   (user.name LIKE %?2 OR ?2 IS NULL)")
     long countByAuthorityAndName(UserAuthority authority, String fuzzyName);
+
+    @Query("FROM UserEntity user" +
+            " WHERE (user.authority=?1  OR ?1 IS NULL)" +
+            " AND   (user.id IN (?2))")
+    List<UserEntity> findByAuthorityAndIdIn(UserAuthority authority, List<Long> userIds, Sort sort);
 }

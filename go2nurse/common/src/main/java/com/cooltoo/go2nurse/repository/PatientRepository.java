@@ -32,4 +32,5 @@ public interface PatientRepository extends JpaRepository<PatientEntity, Long> {
     Page<PatientEntity> findByConditions(CommonStatus status, String name, GenderType gender, String identity, String mobile, Pageable page);
 
     List<PatientEntity> findByStatusAndIdIn(CommonStatus status, List<Long> ids, Sort sort);
+    List<PatientEntity> findByIdIn(List<Long> ids, Sort sort);
 }

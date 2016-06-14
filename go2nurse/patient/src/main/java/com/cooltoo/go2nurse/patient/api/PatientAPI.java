@@ -1,9 +1,12 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.PatientBean;
+import com.cooltoo.go2nurse.beans.UserPatientRelationBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.PatientService;
+import com.cooltoo.go2nurse.service.UserPatientRelationService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -28,6 +31,18 @@ public class PatientAPI {
     private static final Logger logger = LoggerFactory.getLogger(PatientAPI.class);
 
     @Autowired private PatientService service;
+    @Autowired private UserPatientRelationService userPatientRelation;
+
+    @Path("/get_patient")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getPatientWithUserId(@Context HttpServletRequest request) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<Long> patientIds = userPatientRelation.getPatientByUser(userId, CommonStatus.ENABLED.name());
+        List<PatientBean> patients = service.getAllByStatusAndIds(patientIds, CommonStatus.ENABLED);
+        return Response.ok(patients).build();
+    }
 
     @Path("/get_by_ids")
     @GET
@@ -59,13 +74,18 @@ public class PatientAPI {
                            @FormParam("identityCard") @DefaultValue("") String identityCard,
                            @FormParam("mobile") @DefaultValue("") String mobile
     ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Date date = null;
         long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (time > 0) {
             date = new Date(time);
         }
-        long id = service.create(name, gender, date, identityCard, mobile);
-        return Response.ok(id).build();
+        long patientId = service.create(name, gender, date, identityCard, mobile);
+        if (patientId>0) {
+            UserPatientRelationBean relation = userPatientRelation.addPatientToUser(patientId, userId);
+            logger.info("user patient relation is {}", relation);
+        }
+        return Response.ok(patientId).build();
     }
 
     @Path("/update")
@@ -89,4 +109,5 @@ public class PatientAPI {
         PatientBean one = service.update(id, name, gender, birthday, identityCard, mobile, status);
         return Response.ok(one).build();
     }
+
 }

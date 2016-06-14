@@ -133,6 +133,16 @@ public class UserService {
         return beanConverter.convert(user);
     }
 
+    public List<UserBean> getUser(List<Long> userIds, UserAuthority authority) {
+        logger.info("get user by authority={} and userIds={}", authority, userIds);
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
+        List<UserEntity> resultSet = repository.findByAuthorityAndIdIn(authority, userIds, sort);
+        List<UserBean> users = entities2Beans(resultSet);
+        fillOtherProperties(users);
+        logger.info("count is {}", users.size());
+        return users;
+    }
+
     public UserBean getUser(long userId) {
         UserBean user = getUserWithoutOtherInfo(userId);
         fillOtherProperties(user);

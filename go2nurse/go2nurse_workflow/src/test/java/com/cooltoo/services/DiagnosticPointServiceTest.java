@@ -4,9 +4,9 @@ import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.DiagnosticPointBean;
 import com.cooltoo.go2nurse.service.DiagnosticPointService;
+import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
-import org.glassfish.jersey.internal.util.collection.ByteBufferInputStream;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,8 @@ import java.util.List;
 })
 public class DiagnosticPointServiceTest extends AbstractCooltooTest {
 
-    @Autowired
-    private DiagnosticPointService service;
+    @Autowired private DiagnosticPointService service;
+    @Autowired private UserGo2NurseFileStorageService userStorage;
 
     @Test
     public void testDiagnosticPointService(){
@@ -35,6 +35,10 @@ public class DiagnosticPointServiceTest extends AbstractCooltooTest {
         dp = service.getDiagnosticPoint(dp.getId());
         Assert.assertEquals("aaa",dp.getName());
         Assert.assertEquals(7, dp.getDorder());
+        String filePath = userStorage.getFilePath(dp.getImageId());
+        Assert.assertTrue(userStorage.fileExist(filePath));
+        userStorage.deleteFile(filePath);
+
 
         List<DiagnosticPointBean> allDiagnosticPoints = service.getAllDiagnosticPoints();
         Assert.assertEquals(7, allDiagnosticPoints.size());
