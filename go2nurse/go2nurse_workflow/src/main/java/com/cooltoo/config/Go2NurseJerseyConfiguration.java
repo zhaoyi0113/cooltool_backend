@@ -2,6 +2,7 @@ package com.cooltoo.config;
 
 import com.cooltoo.go2nurse.admin.api.*;
 import com.cooltoo.go2nurse.filters.CORSResponseFilter;
+import com.cooltoo.go2nurse.filters.UserLoginAuthenticationFilter;
 import com.cooltoo.go2nurse.patient.api.*;
 import io.swagger.annotations.Api;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -25,6 +26,7 @@ import javax.ws.rs.ApplicationPath;
 public class Go2NurseJerseyConfiguration extends ResourceConfig {
 
     public Go2NurseJerseyConfiguration() {
+        register(UserLoginAuthenticationFilter.class);
         register(MultiPartFeature.class);
         register(CourseAPI.class);
         register(CourseManageAPI.class);
