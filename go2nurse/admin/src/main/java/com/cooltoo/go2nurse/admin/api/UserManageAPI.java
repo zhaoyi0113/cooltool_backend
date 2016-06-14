@@ -19,15 +19,15 @@ import java.util.List;
 /**
  * Created by hp on 2016/6/13.
  */
-@Path("/user")
+@Path("/admin/user")
 public class UserManageAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(UserManageAPI.class.getName());
 
     @Autowired private UserService service;
 
-    @POST
     @Path("/update")
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(@Context HttpServletRequest request,
                                 @FormParam("user_id") @DefaultValue("0") long userId,
@@ -47,11 +47,11 @@ public class UserManageAPI {
     @POST
     @Path("/edit_head_photo")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response addHeadPhoto(@Context HttpServletRequest request,
-                                 @FormDataParam("user_id") @DefaultValue("0") long userId,
-                                 @FormDataParam("image_name") @DefaultValue("") String imageName,
-                                 @FormDataParam("file") InputStream image,
-                                 @FormDataParam("file") FormDataContentDisposition disposition
+    public Response updateProfilePhoto(@Context HttpServletRequest request,
+                                       @FormDataParam("user_id") @DefaultValue("0") long userId,
+                                       @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                       @FormDataParam("file") InputStream image,
+                                       @FormDataParam("file") FormDataContentDisposition disposition
     ) {
         UserBean user = service.updateProfilePhoto(userId, imageName, image);
         logger.info("upload successfully");
@@ -61,10 +61,10 @@ public class UserManageAPI {
     @Path("/modify/mobile_or_password")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(@Context HttpServletRequest request,
-                                @FormParam("user_id") @DefaultValue("0") long userId,
-                                @FormParam("new_mobile") @DefaultValue("") String newMobile,
-                                @FormParam("new_password") @DefaultValue("") String newPassword
+    public Response updateMobilePassword(@Context HttpServletRequest request,
+                                         @FormParam("user_id") @DefaultValue("0") long userId,
+                                         @FormParam("new_mobile") @DefaultValue("") String newMobile,
+                                         @FormParam("new_password") @DefaultValue("") String newPassword
     ) {
         UserBean bean = service.updateMobilePassword(userId, newMobile, newPassword);
         logger.info("update user mobile and password is " + bean);
