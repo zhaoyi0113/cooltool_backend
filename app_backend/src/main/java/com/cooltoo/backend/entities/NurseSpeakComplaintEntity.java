@@ -1,6 +1,6 @@
 package com.cooltoo.backend.entities;
 
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,7 +17,7 @@ public class NurseSpeakComplaintEntity {
     private long speakId;
     private String reason;
     private Date time;
-    private SuggestionStatus status;
+    private ReadingStatus status;
 
     @Id
     @GeneratedValue
@@ -68,11 +68,11 @@ public class NurseSpeakComplaintEntity {
 
     @Column(name = "status")
     @Enumerated
-    public SuggestionStatus getStatus() {
+    public ReadingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(SuggestionStatus status) {
+    public void setStatus(ReadingStatus status) {
         this.status = status;
     }
 

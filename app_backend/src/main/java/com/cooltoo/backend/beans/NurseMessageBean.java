@@ -3,7 +3,7 @@ package com.cooltoo.backend.beans;
 import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.MessageType;
 import com.cooltoo.constants.SocialAbilityType;
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.constants.UserType;
 
 import java.util.Date;
@@ -26,7 +26,7 @@ public class NurseMessageBean {
     private MessageType type;
     private SpecificSocialAbility abilityApproved;
     private Date time;
-    private SuggestionStatus status;
+    private ReadingStatus status;
 
     public long getId() {
         return id;
@@ -108,11 +108,11 @@ public class NurseMessageBean {
         this.type = type;
     }
 
-    public SuggestionStatus getStatus() {
+    public ReadingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(SuggestionStatus status) {
+    public void setStatus(ReadingStatus status) {
         this.status = status;
     }
 

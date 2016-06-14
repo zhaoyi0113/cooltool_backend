@@ -3,7 +3,7 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.NurseSpeakComplaintBean;
 import com.cooltoo.backend.services.NurseSpeakComplaintService;
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -41,11 +41,11 @@ public class NurseSpeakComplaintServiceTest extends AbstractCooltooTest {
         long count = complaintService.countByStatus(status);
         Assert.assertEquals(6, count);
 
-        status = SuggestionStatus.UNREAD.name();
+        status = ReadingStatus.UNREAD.name();
         count = complaintService.countByStatus(status);
         Assert.assertEquals(2, count);
 
-        status = SuggestionStatus.READ.name();
+        status = ReadingStatus.READ.name();
         count = complaintService.countByStatus(status);
         Assert.assertEquals(4, count);
 
@@ -73,7 +73,7 @@ public class NurseSpeakComplaintServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(2, complaints.size());
         Assert.assertEquals(2, complaints.get(0).getId());
 
-        status = SuggestionStatus.READ.name();
+        status = ReadingStatus.READ.name();
         complaints = complaintService.getComplaintByStatus(status, 0, 5);
         Assert.assertEquals(4, complaints.size());
         Assert.assertEquals(6, complaints.get(0).getId());
@@ -104,7 +104,7 @@ public class NurseSpeakComplaintServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(0, bean.getInformantId());
         Assert.assertEquals(4, bean.getSpeakId());
         Assert.assertEquals(reason, bean.getReason());
-        Assert.assertEquals(SuggestionStatus.UNREAD, bean.getStatus());
+        Assert.assertEquals(ReadingStatus.UNREAD, bean.getStatus());
 
         speakId = 200;
         Throwable thr = null;
@@ -126,6 +126,6 @@ public class NurseSpeakComplaintServiceTest extends AbstractCooltooTest {
         Assert.assertNotNull(complaint);
         Assert.assertEquals(1, complaint.getId());
         Assert.assertEquals(reason, complaint.getReason());
-        Assert.assertEquals(SuggestionStatus.READ, complaint.getStatus());
+        Assert.assertEquals(ReadingStatus.READ, complaint.getStatus());
     }
 }

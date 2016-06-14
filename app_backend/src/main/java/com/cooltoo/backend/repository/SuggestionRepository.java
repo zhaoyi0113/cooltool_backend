@@ -1,7 +1,7 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.SuggestionEntity;
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
@@ -14,8 +14,8 @@ import java.util.List;
 public interface SuggestionRepository extends CrudRepository<SuggestionEntity, Long> {
 
     Page<SuggestionEntity> findAll(Pageable page);
-    Page<SuggestionEntity> findByStatus(SuggestionStatus status, Pageable page);
+    Page<SuggestionEntity> findByStatus(ReadingStatus status, Pageable page);
     List<SuggestionEntity> findByIdIn(List<Long> ids);
     List<SuggestionEntity> deleteByIdIn(List<Long> ids);
-    long countByStatus(SuggestionStatus status);
+    long countByStatus(ReadingStatus status);
 }

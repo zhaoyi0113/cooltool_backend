@@ -6,13 +6,13 @@ import java.util.List;
 /**
  * Created by zhaolisong on 16/4/11.
  */
-public enum SuggestionStatus {
+public enum ReadingStatus {
       UNREAD //未读
     , READ   //已读
     , DELETED //已删除
     ;
 
-    public static SuggestionStatus parseString(String type) {
+    public static ReadingStatus parseString(String type) {
         if (UNREAD.name().equalsIgnoreCase(type)) {
             return UNREAD;
         }
@@ -20,6 +20,19 @@ public enum SuggestionStatus {
             return READ;
         }
         else if (DELETED.name().equalsIgnoreCase(type)) {
+            return DELETED;
+        }
+        return null;
+    }
+
+    public static ReadingStatus parseInt(int type) {
+        if (UNREAD.ordinal() == type) {
+            return UNREAD;
+        }
+        else if (READ.ordinal() == type) {
+            return READ;
+        }
+        else if (DELETED.ordinal() == type) {
             return DELETED;
         }
         return null;

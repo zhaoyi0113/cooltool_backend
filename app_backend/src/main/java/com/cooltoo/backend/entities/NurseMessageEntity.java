@@ -1,7 +1,7 @@
 package com.cooltoo.backend.entities;
 
 import com.cooltoo.constants.SocialAbilityType;
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.constants.UserType;
 
 import javax.persistence.*;
@@ -20,7 +20,7 @@ public class NurseMessageEntity {
     private int abilityId;
     private SocialAbilityType abilityType;
     private Date time;
-    private SuggestionStatus status;
+    private ReadingStatus status;
 
     @GeneratedValue
     @Id
@@ -91,11 +91,11 @@ public class NurseMessageEntity {
 
     @Column(name = "status")
     @Enumerated
-    public SuggestionStatus getStatus() {
+    public ReadingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(SuggestionStatus status) {
+    public void setStatus(ReadingStatus status) {
         this.status = status;
     }
 

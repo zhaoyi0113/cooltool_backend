@@ -6,7 +6,7 @@ import com.cooltoo.backend.entities.NurseEntity;
 import com.cooltoo.backend.entities.SuggestionEntity;
 import com.cooltoo.backend.repository.NurseRepository;
 import com.cooltoo.backend.repository.SuggestionRepository;
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.VerifyUtil;
@@ -46,7 +46,7 @@ public class SuggestionService {
         if ("ALL".equalsIgnoreCase(status)) {
             return repository.count();
         }
-        SuggestionStatus suggStatus = SuggestionStatus.parseString(status);
+        ReadingStatus suggStatus = ReadingStatus.parseString(status);
         if (null==suggStatus) {
             logger.info("suggestions status is invalid");
             return 0;
@@ -56,7 +56,7 @@ public class SuggestionService {
 
     public List<SuggestionBean> getSuggestions(String status, int pageIndex, int number) {
         logger.info("get suggestions by status {} on page {}, {} records/page", status, pageIndex, number);
-        SuggestionStatus suggStatus = SuggestionStatus.parseString(status);
+        ReadingStatus suggStatus = ReadingStatus.parseString(status);
         if (null==suggStatus) {
             logger.info("suggestions status is invalid");
             return new ArrayList<>();
@@ -133,7 +133,7 @@ public class SuggestionService {
         if (!VerifyUtil.isIds(ids)) {
             logger.warn("the suggestion ids are not valid");
         }
-        SuggestionStatus status = SuggestionStatus.parseString(suggestionType);
+        ReadingStatus status = ReadingStatus.parseString(suggestionType);
         if (null==status) {
             logger.warn("the suggestion type is not valid");
         }
@@ -165,7 +165,7 @@ public class SuggestionService {
         SuggestionEntity entity = new SuggestionEntity();
         entity.setUserId(userId);
         entity.setSuggestion(suggestion);
-        entity.setStatus(SuggestionStatus.UNREAD);
+        entity.setStatus(ReadingStatus.UNREAD);
         entity.setTimeCreated(new Date());
         entity = repository.save(entity);
         return beanConverter.convert(entity);

@@ -1,7 +1,7 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.NurseSpeakComplaintEntity;
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +11,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface NurseSpeakComplaintRepository extends JpaRepository<NurseSpeakComplaintEntity, Long> {
     long countBySpeakId(long speakId);
-    long countByStatus(SuggestionStatus status);
+    long countByStatus(ReadingStatus status);
     Page<NurseSpeakComplaintEntity> findBySpeakId(long speakId, Pageable page);
-    Page<NurseSpeakComplaintEntity> findByStatus(SuggestionStatus status, Pageable page);
+    Page<NurseSpeakComplaintEntity> findByStatus(ReadingStatus status, Pageable page);
     NurseSpeakComplaintEntity findByInformantIdAndSpeakId(long informantId, long speakId);
 }

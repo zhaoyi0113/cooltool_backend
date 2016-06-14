@@ -2,7 +2,7 @@ package com.cooltoo.util;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SpeakType;
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -218,16 +218,16 @@ public class VerifyUtil {
         return types;
     }
 
-    public static List<SuggestionStatus> parseSuggestionStatuses(String statuses) {
+    public static List<ReadingStatus> parseSuggestionStatuses(String statuses) {
         if (isStringEmpty(statuses)) {
             return new ArrayList<>();
         }
         statuses = statuses.toLowerCase().trim();
         String[] strArray = statuses.split(",");
 
-        List<SuggestionStatus> types = new ArrayList<>();
+        List<ReadingStatus> types = new ArrayList<>();
         for (String tmp : strArray) {
-            SuggestionStatus type = SuggestionStatus.parseString(tmp);
+            ReadingStatus type = ReadingStatus.parseString(tmp);
             if (null!=type) {
                 types.add(type);
             }

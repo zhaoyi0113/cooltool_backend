@@ -4,7 +4,7 @@ import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.beans.SuggestionBean;
 import com.cooltoo.backend.services.SuggestionService;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class SuggestionManageAPI {
     public Response getSuggestionStatusType(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get suggestion status type", userId);
-        List<String> status = SuggestionStatus.getAllStatus();
+        List<String> status = ReadingStatus.getAllStatus();
         logger.info("user {} get suggestion all status {}", status);
         return Response.ok(status).build();
     }
@@ -87,7 +87,7 @@ public class SuggestionManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response setSuggestionsRead(@Context HttpServletRequest request,
                                        @FormParam("ids") String suggestIds) {
-        suggestIds = service.updateStatus(suggestIds, SuggestionStatus.READ.name());
+        suggestIds = service.updateStatus(suggestIds, ReadingStatus.READ.name());
         return Response.ok(suggestIds).build();
     }
 

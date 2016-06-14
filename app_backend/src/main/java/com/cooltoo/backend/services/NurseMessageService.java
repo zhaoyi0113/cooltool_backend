@@ -2,7 +2,6 @@ package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseMessageBean;
-import com.cooltoo.backend.beans.SpeakTypeBean;
 import com.cooltoo.backend.converter.NurseBeanConverter;
 import com.cooltoo.backend.converter.NurseMessageBeanConverter;
 import com.cooltoo.backend.converter.social_ability.SpeakAbilityTypeConverter;
@@ -56,7 +55,7 @@ public class NurseMessageService {
 
     public long countMessageByStatus(UserType userType, long userId, String strStatuses) {
         logger.info("count message by userType={} userId={} status={}", userType, userId, strStatuses);
-        List<SuggestionStatus> statuses = VerifyUtil.parseSuggestionStatuses(strStatuses);
+        List<ReadingStatus> statuses = VerifyUtil.parseSuggestionStatuses(strStatuses);
         long count = repository.countByUserTypeAndUserIdAndStatusIn(userType, userId, statuses);
         logger.info("count is {}", count);
         return count;
@@ -75,7 +74,7 @@ public class NurseMessageService {
                 entity.setAbilityId(abilityId);
                 entity.setReasonId(reasonId);
                 entity.setTime(new Date());
-                entity.setStatus(SuggestionStatus.UNREAD);
+                entity.setStatus(ReadingStatus.UNREAD);
                 repository.save(entity);
             }
             else {
@@ -89,7 +88,7 @@ public class NurseMessageService {
     @Transactional
     public void setMessageStatus(long messageId, String strStatus) {
         logger.info("set message={} to status={}", messageId, strStatus);
-        SuggestionStatus status = SuggestionStatus.parseString(strStatus);
+        ReadingStatus status = ReadingStatus.parseString(strStatus);
         NurseMessageEntity entity = repository.findOne(messageId);
         if (null!=entity && null!=status) {
             entity.setStatus(status);
@@ -104,7 +103,7 @@ public class NurseMessageService {
     public List<NurseMessageBean> getMessages(UserType userType, long userId, String strStatuses, int pageIndex, int size) {
         logger.info("get userType={} user={} message status={} at page={} size={}", userType, userId, strStatuses, pageIndex, size);
         PageRequest page = new PageRequest(pageIndex, size, Sort.Direction.DESC, "time");
-        List<SuggestionStatus> statuses = VerifyUtil.parseSuggestionStatuses(strStatuses);
+        List<ReadingStatus> statuses = VerifyUtil.parseSuggestionStatuses(strStatuses);
         Page<NurseMessageEntity> entities = repository.findByUserTypeAndUserIdAndStatusIn(userType, userId, statuses, page);
         List<NurseMessageBean> beans = entitiesToBeans(entities);
         fillOtherProperties(beans);
@@ -115,7 +114,7 @@ public class NurseMessageService {
     public List<NurseMessageBean> getMessages(UserType userType, long userId, String strStatuses) {
         logger.info("get userType={} user={} message status={}", userType, userId, strStatuses);
         Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "time"));
-        List<SuggestionStatus> statuses = VerifyUtil.parseSuggestionStatuses(strStatuses);
+        List<ReadingStatus> statuses = VerifyUtil.parseSuggestionStatuses(strStatuses);
         List<NurseMessageEntity> entities = repository.findByUserTypeAndUserIdAndStatusIn(userType, userId, statuses, sort);
         List<NurseMessageBean> beans = entitiesToBeans(entities);
         fillOtherProperties(beans);

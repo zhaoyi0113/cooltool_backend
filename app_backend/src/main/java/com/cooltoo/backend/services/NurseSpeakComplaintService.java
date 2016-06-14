@@ -6,7 +6,7 @@ import com.cooltoo.backend.beans.NurseSpeakComplaintBean;
 import com.cooltoo.backend.converter.NurseSpeakComplaintBeanConverter;
 import com.cooltoo.backend.entities.NurseSpeakComplaintEntity;
 import com.cooltoo.backend.repository.NurseSpeakComplaintRepository;
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.VerifyUtil;
@@ -63,14 +63,14 @@ public class NurseSpeakComplaintService {
     }
 
     public List<String> getAllStatus() {
-        List<String> status = SuggestionStatus.getAllStatus();
+        List<String> status = ReadingStatus.getAllStatus();
         logger.info("get all complaint status={}", status);
         return status;
     }
 
     public long countByStatus(String strStatus) {
         logger.info("count by status={}", strStatus);
-        SuggestionStatus status  = SuggestionStatus.parseString(strStatus);
+        ReadingStatus status  = ReadingStatus.parseString(strStatus);
         long count = 0;
         if ("ALL".equalsIgnoreCase(strStatus)) {
             count = repository.count();
@@ -84,7 +84,7 @@ public class NurseSpeakComplaintService {
 
     public List<NurseSpeakComplaintBean> getComplaintByStatus(String strStatus, int pageIndex, int sizePerPage) {
         logger.info("get speak complaint by status={} at page={} number={}", strStatus, pageIndex, sizePerPage);
-        SuggestionStatus status = SuggestionStatus.parseString(strStatus);
+        ReadingStatus status = ReadingStatus.parseString(strStatus);
         PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
         Page<NurseSpeakComplaintEntity> resultSet=null;
         if ("ALL".equalsIgnoreCase(strStatus)) {
@@ -158,7 +158,7 @@ public class NurseSpeakComplaintService {
         complaint.setInformantId(informantId);
         complaint.setSpeakId(speakId);
         complaint.setReason(reason);
-        complaint.setStatus(SuggestionStatus.UNREAD);
+        complaint.setStatus(ReadingStatus.UNREAD);
         complaint.setTime(new Date());
         repository.save(complaint);
 
@@ -184,7 +184,7 @@ public class NurseSpeakComplaintService {
             complaint.setReason(reason);
             changed = true;
         }
-        SuggestionStatus status = SuggestionStatus.parseString(strStatus);
+        ReadingStatus status = ReadingStatus.parseString(strStatus);
         if (null!=status && !status.equals(complaint.getStatus())) {
             complaint.setStatus(status);
             changed = true;

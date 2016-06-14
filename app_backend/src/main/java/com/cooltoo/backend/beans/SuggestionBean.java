@@ -1,6 +1,6 @@
 package com.cooltoo.backend.beans;
 
-import com.cooltoo.constants.SuggestionStatus;
+import com.cooltoo.constants.ReadingStatus;
 
 import java.util.Date;
 
@@ -13,7 +13,7 @@ public class SuggestionBean {
     private String userName;
     private String suggestion;
     private Date   timeCreated;
-    private SuggestionStatus status;
+    private ReadingStatus status;
 
     public long getId() {
         return this.id;
@@ -55,11 +55,11 @@ public class SuggestionBean {
         this.timeCreated = timeCreated;
     }
 
-    public SuggestionStatus getStatus() {
+    public ReadingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(SuggestionStatus status) {
+    public void setStatus(ReadingStatus status) {
         this.status = status;
     }
 
