@@ -1,6 +1,7 @@
 package com.cooltoo.config;
 
 import com.cooltoo.go2nurse.admin.api.*;
+import com.cooltoo.go2nurse.filters.BadRequestExceptionMapper;
 import com.cooltoo.go2nurse.filters.CORSResponseFilter;
 import com.cooltoo.go2nurse.filters.UserLoginAuthenticationFilter;
 import com.cooltoo.go2nurse.patient.api.*;
@@ -41,6 +42,7 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
         register(UserManageAPI.class);
         register(PatientAPI.class);
         register(PatientManageAPI.class);
+        register(BadRequestExceptionMapper.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 
