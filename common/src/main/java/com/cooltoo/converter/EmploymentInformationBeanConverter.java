@@ -20,6 +20,7 @@ public class EmploymentInformationBeanConverter implements Converter<EmploymentI
         bean.setFrontCover(source.getFrontCover());
         bean.setUrl(source.getUrl());
         bean.setGrade(source.getGrade());
+        bean.setType(source.getType());
         return bean;
     }
 }

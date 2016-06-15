@@ -40,7 +40,7 @@ public class EmploymentInformationManageAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get employment information count by status={}", userId, status);
-        long count = employmentInfoService.countEmploymentInfoByStatus(status);
+        long count = employmentInfoService.countEmploymentInfoByStatus(status, employmentType);
         logger.info("count = {}", count);
         return Response.ok(count).build();
     }
@@ -58,7 +58,7 @@ public class EmploymentInformationManageAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get employment information by status={} at page={}, {}/page", userId, status, index, number);
-        List<EmploymentInformationBean> activities = employmentInfoService.getEmploymentInfoByStatus(status, index, number);
+        List<EmploymentInformationBean> activities = employmentInfoService.getEmploymentInfoByStatus(status, employmentType, index, number);
         logger.info("count = {}", activities.size());
         return Response.ok(activities).build();
     }
@@ -103,7 +103,7 @@ public class EmploymentInformationManageAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} create employment information", userId);
-        EmploymentInformationBean bean = employmentInfoService.createEmploymentInfo(title, url, grade);
+        EmploymentInformationBean bean = employmentInfoService.createEmploymentInfo(title, url, grade, employmentType);
         logger.info("employment information is {}", bean);
         return Response.ok(bean).build();
     }
@@ -122,7 +122,7 @@ public class EmploymentInformationManageAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} update employment information", userId);
-        EmploymentInformationBean bean = employmentInfoService.updateEmploymentInfo(employmentInfoId, title, url, grade, null, null, null);
+        EmploymentInformationBean bean = employmentInfoService.updateEmploymentInfo(employmentInfoId, title, url, grade, employmentType, null, null, null);
         logger.info("employment information is {}", bean);
         return Response.ok(bean).build();
     }
@@ -141,7 +141,7 @@ public class EmploymentInformationManageAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} update employment information front cover", userId);
-        EmploymentInformationBean frontCover = employmentInfoService.updateEmploymentInfo(employmentInfoId, null, null, -1, null, imageName, image);
+        EmploymentInformationBean frontCover = employmentInfoService.updateEmploymentInfo(employmentInfoId, null, null, -1, null, null, imageName, image);
         logger.info("employment information is {}", frontCover);
         return Response.ok(frontCover).build();
     }
@@ -157,7 +157,7 @@ public class EmploymentInformationManageAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} update employment information status", userId);
-        EmploymentInformationBean bean = employmentInfoService.updateEmploymentInfo(employmentInfoId, null, null, -1, status, null, null);
+        EmploymentInformationBean bean = employmentInfoService.updateEmploymentInfo(employmentInfoId, null, null, -1, null, status, null, null);
         logger.info("employment information is {}", bean);
         return Response.ok(bean).build();
     }

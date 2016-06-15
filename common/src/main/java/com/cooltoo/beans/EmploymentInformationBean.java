@@ -1,6 +1,7 @@
 package com.cooltoo.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.EmploymentType;
 
 import java.util.Date;
 
@@ -16,6 +17,7 @@ public class EmploymentInformationBean {
     private String frontCoverUrl;
     private String url;
     private int grade;
+    private EmploymentType type;
 
     public long getId() {
         return id;
@@ -63,6 +65,14 @@ public class EmploymentInformationBean {
 
     public void setGrade(int grade) {
         this.grade = grade;
+    }
+
+    public EmploymentType getType() {
+        return type;
+    }
+
+    public void setType(EmploymentType type) {
+        this.type = type;
     }
 
     public Date getTime() {

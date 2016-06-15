@@ -33,7 +33,7 @@ public class EmploymentInformationAPI {
     ) {
         String status = CommonStatus.ENABLED.name();
         logger.info(" get employment information by status={} at page={}, {}/page", status, index, number);
-        List<EmploymentInformationBean> employmentInfo = employmentService.getEmploymentInfoByStatus(status, index, number);
+        List<EmploymentInformationBean> employmentInfo = employmentService.getEmploymentInfoByStatus(status, employmentType, index, number);
         logger.info("count = {}", employmentInfo.size());
         return Response.ok(employmentInfo).build();
     }

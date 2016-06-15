@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <nursego_employment_information id="1" title="title 1" time_created="2001-01-01 00:00:00" status="1" grade="0" front_cover="1" url="http://www.cool-too.com/" />
-    <nursego_employment_information id="2" title="title 2" time_created="2002-02-02 00:00:00" status="1" grade="0" front_cover="2" url="http://www.12306.com/"  />
-    <nursego_employment_information id="3" title="title 3" time_created="2003-03-03 00:00:00" status="1" grade="0" front_cover="3" url="http://www.google.com/"  />
-    <nursego_employment_information id="4" title="title 4" time_created="2004-04-04 00:00:00" status="1" grade="1" front_cover="4" url="http://www.sina.com.cn/"  />
-    <nursego_employment_information id="5" title="title 5" time_created="2005-05-05 00:00:00" status="1" grade="2" front_cover="5" url="http://www.baidu.com/" />
-    <nursego_employment_information id="6" title="title 6" time_created="2006-06-06 00:00:00" status="2" grade="0" front_cover="6" url="http://www.stackoverflow.com/" />
-    <nursego_employment_information id="7" title="title 7" time_created="2007-07-07 00:00:00" status="0" grade="0" front_cover="7" url="http://www.jd.com/" />
-    <nursego_employment_information id="8" title="title 8" time_created="2008-08-08 00:00:00" status="0" grade="1" front_cover="8" url="http://www.taobao.com/" />
-    <nursego_employment_information id="9" title="title 9" time_created="2009-09-09 00:00:00" status="0" grade="2" front_cover="9" url="http://www.git-hub.com/" />
+    <nursego_employment_information id="1" title="title 1" type="0" time_created="2001-01-01 00:00:00" status="1" grade="0" front_cover="1" url="http://www.cool-too.com/" />
+    <nursego_employment_information id="2" title="title 2" type="0" time_created="2002-02-02 00:00:00" status="1" grade="0" front_cover="2" url="http://www.12306.com/"  />
+    <nursego_employment_information id="3" title="title 3" type="0" time_created="2003-03-03 00:00:00" status="1" grade="0" front_cover="3" url="http://www.google.com/"  />
+    <nursego_employment_information id="4" title="title 4" type="0" time_created="2004-04-04 00:00:00" status="1" grade="1" front_cover="4" url="http://www.sina.com.cn/"  />
+    <nursego_employment_information id="5" title="title 5" type="0" time_created="2005-05-05 00:00:00" status="1" grade="2" front_cover="5" url="http://www.baidu.com/" />
+    <nursego_employment_information id="6" title="title 6" type="0" time_created="2006-06-06 00:00:00" status="2" grade="0" front_cover="6" url="http://www.stackoverflow.com/" />
+    <nursego_employment_information id="7" title="title 7" type="1" time_created="2007-07-07 00:00:00" status="0" grade="0" front_cover="7" url="http://www.jd.com/" />
+    <nursego_employment_information id="8" title="title 8" type="1" time_created="2008-08-08 00:00:00" status="0" grade="1" front_cover="8" url="http://www.taobao.com/" />
+    <nursego_employment_information id="9" title="title 9" type="1" time_created="2009-09-09 00:00:00" status="0" grade="2" front_cover="9" url="http://www.git-hub.com/" />
 </dataset>

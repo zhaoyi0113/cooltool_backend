@@ -1,6 +1,7 @@
 package com.cooltoo.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.EmploymentType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,6 +19,7 @@ public class EmploymentInformationEntity {
     private long frontCover;
     private String url;
     private int grade;
+    private EmploymentType type;
 
     @Id
     @GeneratedValue
@@ -60,6 +62,15 @@ public class EmploymentInformationEntity {
     @Column(name = "grade")
     public int getGrade() {
         return grade;
+    }
+
+    @Column(name = "type")
+    public EmploymentType getType() {
+        return type;
+    }
+
+    public void setType(EmploymentType type) {
+        this.type = type;
     }
 
     public void setGrade(int grade) {

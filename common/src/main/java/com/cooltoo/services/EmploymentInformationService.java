@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.beans.EmploymentInformationBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.EmploymentType;
 import com.cooltoo.converter.EmploymentInformationBeanConverter;
 import com.cooltoo.entities.EmploymentInformationEntity;
 import com.cooltoo.exception.BadRequestException;
@@ -46,19 +47,13 @@ public class EmploymentInformationService {
     //                    get
     //===========================================================
 
-    public long countEmploymentInfoByStatus(String strStatus) {
-        logger.info("count all employment information by status={}", strStatus);
-        long count = 0;
+    public long countEmploymentInfoByStatus(String strStatus, String strType) {
+        logger.info("count all employment information by status={} and type={}", strStatus, strType);
 
         CommonStatus status = CommonStatus.parseString(strStatus);
-        if (null==status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                count = repository.count();
-            }
-        }
-        else {
-            count = repository.countByStatus(status);
-        }
+        EmploymentType type = EmploymentType.parseString(strType);
+        long count = repository.countByStatusAndType(status, type);
+
         logger.info("count all Employment Information, size={}", count);
         return count;
     }
@@ -78,11 +73,11 @@ public class EmploymentInformationService {
         return employments;
     }
 
-    public List<EmploymentInformationBean> getEmploymentInfoByStatus(String strStatus) {
-        logger.info("get employment information by status {}", strStatus);
+    public List<EmploymentInformationBean> getEmploymentInfoByStatus(String strStatus, String strType) {
+        logger.info("get employment information by status {} type={}", strStatus, strType);
 
         // get nuser by authority
-        List<EmploymentInformationEntity> resultSet = (List<EmploymentInformationEntity>) getEmploymentInfoByStatus(strStatus, sort);
+        List<EmploymentInformationEntity> resultSet = (List<EmploymentInformationEntity>) getEmploymentInfoByStatus(strStatus, strType, sort);
 
         // parse to bean
         List<EmploymentInformationBean> beans = entities2Beans(resultSet);
@@ -91,12 +86,12 @@ public class EmploymentInformationService {
         return beans;
     }
 
-    public List<EmploymentInformationBean> getEmploymentInfoByStatus(String strStatus, int pageIndex, int number) {
-        logger.info("get employment information by status {} at page {} with number {}", strStatus, pageIndex, number);
+    public List<EmploymentInformationBean> getEmploymentInfoByStatus(String strStatus, String strType, int pageIndex, int number) {
+        logger.info("get employment information by status {} type={} at page {} with number {}", strStatus,strType, pageIndex, number);
 
         // get nuser by authority
         PageRequest page = new PageRequest(pageIndex, number, sort);
-        Page<EmploymentInformationEntity> resultSetPage = (Page<EmploymentInformationEntity>) getEmploymentInfoByStatus(strStatus, page);
+        Page<EmploymentInformationEntity> resultSetPage = (Page<EmploymentInformationEntity>) getEmploymentInfoByStatus(strStatus, strType, page);
         // parse to bean
         List<EmploymentInformationBean> beans = entities2Beans(resultSetPage);
         fillOtherProperties(beans);
@@ -104,25 +99,15 @@ public class EmploymentInformationService {
         return beans;
     }
 
-    private Iterable<EmploymentInformationEntity> getEmploymentInfoByStatus(String strStatus, Object sortOrPage) {
+    private Iterable<EmploymentInformationEntity> getEmploymentInfoByStatus(String strStatus, String strType, Object sortOrPage) {
         Iterable<EmploymentInformationEntity> resultSet = null;
         CommonStatus status = CommonStatus.parseString(strStatus);
-        if (null == status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                if (sortOrPage instanceof PageRequest) {
-                    resultSet = repository.findAll((Pageable) sortOrPage);
-                } else if (sortOrPage instanceof Sort) {
-                    resultSet = repository.findAll((Sort) sortOrPage);
-                }
-            }
+        EmploymentType type = EmploymentType.parseString(strType);
+        if (sortOrPage instanceof PageRequest) {
+            resultSet = repository.findByStatusAndType(status, type, (Pageable) sortOrPage);
         }
-        else {
-            if (sortOrPage instanceof PageRequest) {
-                resultSet = repository.findByStatus(status, (Pageable) sortOrPage);
-            }
-            else if (sortOrPage instanceof Sort) {
-                resultSet = repository.findByStatus(status, (Sort) sortOrPage);
-            }
+        else if (sortOrPage instanceof Sort) {
+            resultSet = repository.findByStatusAndType(status, type, (Sort) sortOrPage);
         }
         return resultSet;
     }
@@ -208,8 +193,8 @@ public class EmploymentInformationService {
     //===========================================================
 
     @Transactional
-    public EmploymentInformationBean createEmploymentInfo(String title, String url, int grade) {
-        logger.info("create an employment information by title={}, url={}, grade={}", title, url, grade);
+    public EmploymentInformationBean createEmploymentInfo(String title, String url, int grade, String strType) {
+        logger.info("create an employment information by title={}, url={}, grade={}, type={}", title, url, grade, strType);
         if (VerifyUtil.isStringEmpty(title)) {
             logger.error("the title is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -227,6 +212,11 @@ public class EmploymentInformationService {
             entity.setUrl(url.trim());
         }
 
+        EmploymentType type = EmploymentType.parseString(strType);
+        if (null!=type) {
+            entity.setType(type);
+        }
+
         entity.setStatus(CommonStatus.DISABLED);
         entity.setTime(new Date());
         entity = repository.save(entity);
@@ -240,11 +230,11 @@ public class EmploymentInformationService {
 
     @Transactional
     public EmploymentInformationBean updateEmploymentInfo(long employmentInfoId,
-                                                          String title, String url, int grade, String strStatus,
+                                                          String title, String url, int grade, String strType, String strStatus,
                                                           String frontCoverName, InputStream frontCover
     ) {
-        logger.info("update employment information {} by title={}, imageName={} image={}, url={}, grade={}, status={}",
-                    employmentInfoId, title, frontCoverName, frontCover!=null, url, grade, strStatus);
+        logger.info("update employment information {} by title={}, imageName={} image={}, url={}, grade={}, type={}, status={}",
+                    employmentInfoId, title, frontCoverName, frontCover!=null, url, grade, strType, strStatus);
 
         EmploymentInformationEntity entity = repository.findOne(employmentInfoId);
         if (null==entity) {
@@ -279,6 +269,11 @@ public class EmploymentInformationService {
         }
         if (grade>=0) {
             entity.setGrade(grade);
+            changed = true;
+        }
+        EmploymentType type = EmploymentType.parseString(strType);
+        if (null!=type && !type.equals(entity.getType())) {
+            entity.setType(type);
             changed = true;
         }
         CommonStatus status = CommonStatus.parseString(strStatus);
