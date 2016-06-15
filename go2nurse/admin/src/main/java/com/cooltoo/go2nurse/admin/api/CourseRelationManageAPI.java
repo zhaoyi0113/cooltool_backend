@@ -76,6 +76,17 @@ public class CourseRelationManageAPI {
         return Response.ok(relation).build();
     }
 
+    @Path("/hospital")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addHospitalRelation(@Context HttpServletRequest request,
+                                        @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                        @FormParam("course_id") @DefaultValue("0") long courseId
+    ) {
+        boolean success = relationManage.addCourseToHospital(courseId, hospitalId);
+        return Response.ok(success).build();
+    }
+
     @Path("/department")
     @POST
     @Produces(MediaType.APPLICATION_JSON)

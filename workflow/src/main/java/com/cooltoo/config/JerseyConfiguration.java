@@ -75,6 +75,8 @@ public class JerseyConfiguration extends ResourceConfig {
         register(SensitiveWordManageAPI.class);
         register(UserSpeakTopicManagerAPI.class);
         register(NurseSpeakTopicAPI.class);
+        register(EmploymentInformationAPI.class);
+        register(EmploymentInformationManageAPI.class);
 
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");

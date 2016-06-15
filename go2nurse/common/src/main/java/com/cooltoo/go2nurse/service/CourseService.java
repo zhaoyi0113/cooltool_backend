@@ -289,10 +289,7 @@ public class CourseService {
             logger.error("the name is exist already");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (!relationManageService.hospitalExist(hospitalId)) {
-            logger.error("the hospital not exist!");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+
         CourseEntity entity = new CourseEntity();
         entity.setName(name);
 
@@ -306,10 +303,15 @@ public class CourseService {
         entity.setTime(new Date());
         entity = repository.save(entity);
         if (entity.getId()>0) {
-            boolean success = relationManageService.addCourseToHospital(entity.getId(), hospitalId);
-            if (!success) {
-                logger.error("add course to hospital failed!");
-                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            if (relationManageService.hospitalExist(hospitalId)){
+                boolean success = relationManageService.addCourseToHospital(entity.getId(), hospitalId);
+                if (!success) {
+                    logger.error("add course to hospital failed!");
+                    throw new BadRequestException(ErrorCode.DATA_ERROR);
+                }
+            }
+            else {
+                logger.error("the hospital not exist!");
             }
         }
         logger.info("create an course id={}", entity.getId());
