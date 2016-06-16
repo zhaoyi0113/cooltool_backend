@@ -14,10 +14,20 @@ import java.util.List;
  * Created by hp on 2016/6/8.
  */
 public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
-    long countByStatus(CourseStatus status);
+    @Query("SELECT count(course.id) FROM CourseEntity course" +
+            " WHERE (?1 IS NULL OR course.name LIKE %?1)" +
+            " AND (?2 IS NULL OR course.status=?2)")
+    long countByNameLikeAndStatus(String nameLike, CourseStatus status);
+    @Query("FROM CourseEntity course" +
+            " WHERE (?1 IS NULL OR course.name LIKE %?1)" +
+            " AND (?2 IS NULL OR course.status=?2)")
+    List<CourseEntity> findByNameLikeAndStatus(String nameLike, CourseStatus status, Sort sort);
+    @Query("FROM CourseEntity course" +
+            " WHERE (?1 IS NULL OR course.name LIKE %?1)" +
+            " AND (?2 IS NULL OR course.status=?2)")
+    Page<CourseEntity> findByNameLikeAndStatus(String nameLike, CourseStatus status, Pageable page);
     long countByName(String name);
     List<CourseEntity> findByName(String name, Sort sort);
-    Page<CourseEntity> findByStatus(CourseStatus status, Pageable page);
     List<CourseEntity> findByIdIn(List<Long> ids, Sort sort);
     List<CourseEntity> findByStatusAndIdIn(CourseStatus status, List<Long> ids, Sort sort);
     @Query("SELECT course.id FROM CourseEntity course" +

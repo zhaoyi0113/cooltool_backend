@@ -1,5 +1,7 @@
 package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 
 import java.util.Date;
@@ -14,7 +16,9 @@ public class UserHospitalizedRelationBean {
     private CommonStatus status;
     private long userId;
     private int hospitalId;
+    private HospitalBean hospital;
     private int departmentId;
+    private HospitalDepartmentBean department;
 
     public long getId() {
         return id;
@@ -64,6 +68,22 @@ public class UserHospitalizedRelationBean {
         this.departmentId = departmentId;
     }
 
+    public HospitalBean getHospital() {
+        return hospital;
+    }
+
+    public void setHospital(HospitalBean hospital) {
+        this.hospital = hospital;
+    }
+
+    public HospitalDepartmentBean getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(HospitalDepartmentBean department) {
+        this.department = department;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -73,6 +93,8 @@ public class UserHospitalizedRelationBean {
         msg.append(", departmentId=").append(departmentId);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
+        msg.append(", hospital=").append(hospital);
+        msg.append(", department=").append(department);
         msg.append("]");
         return msg.toString();
     }

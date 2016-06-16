@@ -32,6 +32,7 @@ public class CourseRelationManageService {
     public static final String key_all_courses_in_hospital = "all_courses_in_hospital";
     public static final String key_diagnostic = "diagnostic";
     public static final String key_department = "department";
+    public static final String key_others = "others";
 
     @Autowired private HospitalRepository hospital;
     @Autowired private HospitalDepartmentRepository department;
@@ -57,11 +58,13 @@ public class CourseRelationManageService {
         return diagnostic.exitsDiagnostic(diagnosticId);
     }
 
-    public Map<String, List<Long>> getCoursesIdByConditions(int hospitalId, int departmentId, long diagnosticId,
+    public Map<String, List<Long>> getCoursesIdByConditions(List<Long> courseIds,
+                                                            int hospitalId, int departmentId, long diagnosticId,
                                                             String strHospitalRelationStatus, String strCourseStatus
     ) {
         logger.info("get courses id in hospital={} department={} diagnostic={} with hospitalRelationStatus={} and courseStatus={}",
                 hospitalId, departmentId, diagnosticId, strHospitalRelationStatus, strCourseStatus);
+        logger.info("course id must in {}", courseIds);
 
         Map<String, List<Long>> hospitalDepartmentDiagnostic = new HashMap<>();
         boolean hospitalExists = hospitalExist(hospitalId);
@@ -71,6 +74,20 @@ public class CourseRelationManageService {
         }
 
         List<Long> courseInHospital = hospitalRelation.getCourseInHospital(hospitalId, strHospitalRelationStatus);
+        if (!VerifyUtil.isListEmpty(courseIds)) {
+            List<Long> coursesIdNotInHospital = new ArrayList<>();
+            List<Long> validCoursesInHospital = new ArrayList<>();
+            for (Long courseIdInHospital : courseInHospital) {
+                if (courseIds.contains(courseIdInHospital)) {
+                    validCoursesInHospital.add(courseIdInHospital);
+                }
+                else {
+                    coursesIdNotInHospital.add(courseIdInHospital);
+                }
+            }
+            courseInHospital = validCoursesInHospital;
+            hospitalDepartmentDiagnostic.put(key_others, coursesIdNotInHospital);
+        }
         List<Long> courseInStatus = course.getCourseIdByStatusAndIds(strCourseStatus, courseInHospital);
         hospitalDepartmentDiagnostic.put(key_all_courses_in_hospital, courseInStatus);
 
@@ -96,14 +113,20 @@ public class CourseRelationManageService {
         return hospitalDepartmentDiagnostic;
     }
 
-    public Map<String, List<CourseBean>> getCoursesByConditions(int hospitalId, int departmentId, long diagnosticId,
-                                                                  String strRelationStatus, String strCourseStatus) {
-        Map<String, List<Long>> courseIdsInHospitalDepartmentDiagnostic = getCoursesIdByConditions(hospitalId, departmentId, diagnosticId, strRelationStatus, strCourseStatus);
+    public Map<String, List<CourseBean>> getCoursesByConditions(List<Long> courseIds,
+                                                                int hospitalId, int departmentId, long diagnosticId,
+                                                                String strRelationStatus, String strCourseStatus) {
+        Map<String, List<Long>> courseIdsInHospitalDepartmentDiagnostic = getCoursesIdByConditions(courseIds, hospitalId, departmentId, diagnosticId, strRelationStatus, strCourseStatus);
         List<Long> coursesIdInHospital = courseIdsInHospitalDepartmentDiagnostic.get(key_all_courses_in_hospital);
         List<Long> coursesIdInDepartment = courseIdsInHospitalDepartmentDiagnostic.get(key_department);
         List<Long> coursesIdInDiagnostic = courseIdsInHospitalDepartmentDiagnostic.get(key_diagnostic);
+        List<Long> coursesIdInOther = courseIdsInHospitalDepartmentDiagnostic.get(key_others);
 
         Map<String, List<CourseBean>> coursesInHospitalDepartmentDiagnostic = new HashMap<>();
+        if (!VerifyUtil.isListEmpty(coursesIdInOther)) {
+            List<CourseBean> courses = course.getCourseByIds(coursesIdInOther);
+            coursesInHospitalDepartmentDiagnostic.put(key_others, courses);
+        }
         if (!VerifyUtil.isListEmpty(coursesIdInHospital)) {
             List<CourseBean> courses = course.getCourseByIds(coursesIdInHospital);
             coursesInHospitalDepartmentDiagnostic.put(key_all_courses_in_hospital, courses);

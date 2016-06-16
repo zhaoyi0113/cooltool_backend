@@ -37,6 +37,17 @@ public class CourseAPI {
     @Autowired
     private Go2NurseUtility utility;
 
+    @Path("/get_by_name")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getCourseByName(@Context HttpServletRequest request,
+                                    @QueryParam("name_like") @DefaultValue("") String nameLike
+    ) {
+        List<CourseBean> courses = courseService.getCourseByNameAndStatus(nameLike, CourseStatus.ENABLE.name());
+        return Response.ok(courses).build();
+    }
+
     @Path("/get_by_category/{category_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -49,18 +60,6 @@ public class CourseAPI {
         List<CourseBean> courses = categoryService.getCourseByCategoryId(status, categoryId);
         logger.info("count = {}", courses.size());
         return Response.ok(courses).build();
-    }
-
-    @Path("/categories/get_by_course_ids")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
-    public Response getCategoriesByCourseId(@Context HttpServletRequest request,
-                                            @QueryParam("course_ids") @DefaultValue("0") String strCourseIds
-    ) {
-        List<Long> courseIds = VerifyUtil.parseLongIds(strCourseIds);
-        List<CourseCategoryBean> categories = categoryService.getCategoryByCourseId(CommonStatus.ENABLED.name(), courseIds);
-        return Response.ok(categories).build();
     }
 
     // 获取课程详情
@@ -93,6 +92,18 @@ public class CourseAPI {
         List<CourseCategoryBean> categories = categoryService.getCategoryByStatus(
                 CommonStatus.ENABLED.name(), page, number);
 
+        return Response.ok(categories).build();
+    }
+
+    @Path("/categories/get_by_course_ids")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getCategoriesByCourseId(@Context HttpServletRequest request,
+                                            @QueryParam("course_ids") @DefaultValue("0") String strCourseIds
+    ) {
+        List<Long> courseIds = VerifyUtil.parseLongIds(strCourseIds);
+        List<CourseCategoryBean> categories = categoryService.getCategoryByCourseId(CommonStatus.ENABLED.name(), courseIds);
         return Response.ok(categories).build();
     }
 }

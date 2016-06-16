@@ -35,7 +35,7 @@ public class CourseRelationManageAPI {
                               // course_hospital_relation_status: ALL/DISABLE/ENABLE/EDITING
                               @QueryParam("course_status") @DefaultValue("ALL") String courseStatus
     ) {
-        Map<String, List<CourseBean>> courses = relationManage.getCoursesByConditions(hospitalId, departmentId, diagnosticId,
+        Map<String, List<CourseBean>> courses = relationManage.getCoursesByConditions(null, hospitalId, departmentId, diagnosticId,
                 courseHospitalRelationStatus, courseStatus);
         return Response.ok(courses).build();
     }

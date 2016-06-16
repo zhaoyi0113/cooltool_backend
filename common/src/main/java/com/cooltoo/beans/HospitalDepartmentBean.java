@@ -110,12 +110,14 @@ public class HospitalDepartmentBean {
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" , ");
-        msg.append("name=").append(name).append(" , ");
-        msg.append("description=").append(description).append(" , ");
-        msg.append("enable=").append(enable).append(" , ");
-        msg.append("imageId=").append(imageId).append(" , ");
-        msg.append("disableImageId=").append(disableImageId).append(" , ");
+        msg.append("id=").append(id);
+        msg.append(", name=").append(name);
+        msg.append(", description=").append(description);
+        msg.append(", enable=").append(enable);
+        msg.append(", imageId=").append(imageId);
+        msg.append(", imageUrl=").append(imageUrl);
+        msg.append(", disableImageId=").append(disableImageId);
+        msg.append(", disableImageUrl=").append(disableImageUrl);
         msg.append("parentId=").append(parentId).append("]");
         return msg.toString();
     }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * Created by hp on 2016/6/14.
  */
 @Component
-public class UserDiagnosticPointRelationConverter implements Converter<UserDiagnosticPointRelationEntity, UserDiagnosticPointRelationBean> {
+public class UserDiagnosticPointRelationBeanConverter implements Converter<UserDiagnosticPointRelationEntity, UserDiagnosticPointRelationBean> {
     @Override
     public UserDiagnosticPointRelationBean convert(UserDiagnosticPointRelationEntity source) {
         UserDiagnosticPointRelationBean bean = new UserDiagnosticPointRelationBean();

@@ -34,7 +34,7 @@ public class SuggestionManageAPI {
     public Response getSuggestionStatusType(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get suggestion status type", userId);
-        List<String> status = ReadingStatus.getAllStatus();
+        List<String> status = ReadingStatus.getAllStatusString();
         logger.info("user {} get suggestion all status {}", status);
         return Response.ok(status).build();
     }

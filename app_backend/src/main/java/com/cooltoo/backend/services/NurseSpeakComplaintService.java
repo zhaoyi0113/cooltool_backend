@@ -63,7 +63,7 @@ public class NurseSpeakComplaintService {
     }
 
     public List<String> getAllStatus() {
-        List<String> status = ReadingStatus.getAllStatus();
+        List<String> status = ReadingStatus.getAllStatusString();
         logger.info("get all complaint status={}", status);
         return status;
     }

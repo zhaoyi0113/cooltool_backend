@@ -1,5 +1,7 @@
 package com.cooltoo.constants;
 
+import com.cooltoo.util.VerifyUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,11 +40,37 @@ public enum ReadingStatus {
         return null;
     }
 
-    public static List<String> getAllStatus() {
+    public static List<String> getAllStatusString() {
         List<String> status = new ArrayList<String>();
         status.add(UNREAD.name());
         status.add(READ.name());
         status.add(DELETED.name());
         return status;
+    }
+
+    public static List<ReadingStatus> getAllStatus() {
+        List<ReadingStatus> status = new ArrayList<>();
+        status.add(UNREAD);
+        status.add(READ);
+        status.add(DELETED);
+        return status;
+    }
+
+    public static List<ReadingStatus> parseStatuses(String statuses) {
+        if (VerifyUtil.isStringEmpty(statuses)) {
+            return new ArrayList<>();
+        }
+        statuses = statuses.toLowerCase().trim();
+        String[] strArray = statuses.split(",");
+
+        List<ReadingStatus> readingStatuses  = new ArrayList<>();
+        for (String tmp : strArray) {
+            ReadingStatus status = parseString(tmp);
+            if (null!=status) {
+                readingStatuses.add(status);
+            }
+        }
+
+        return readingStatuses;
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+<!--
+     1 入院, 2 检查, 3 手术, 4 术后康复, 5 出院
+-->
+    <go2nurse_user_course_relation id="1"  user_id="1" course_id="1" reading_status="0" status="1" time_created="2016-01-10 14:44:44" />
+    <go2nurse_user_course_relation id="2"  user_id="1" course_id="2" reading_status="0" status="1" time_created="2016-01-10 14:44:44" />
+    <go2nurse_user_course_relation id="3"  user_id="1" course_id="3" reading_status="1" status="1" time_created="2016-01-10 14:44:44" />
+    <go2nurse_user_course_relation id="4"  user_id="1" course_id="4" reading_status="2" status="1" time_created="2016-02-10 14:44:44" />
+    <go2nurse_user_course_relation id="5"  user_id="1" course_id="5" reading_status="0" status="0" time_created="2016-02-10 14:44:44" />
+    <go2nurse_user_course_relation id="6"  user_id="2" course_id="1" reading_status="0" status="1" time_created="2016-02-10 14:44:44" />
+    <go2nurse_user_course_relation id="7"  user_id="2" course_id="2" reading_status="0" status="1" time_created="2016-02-10 14:44:44" />
+    <go2nurse_user_course_relation id="8"  user_id="2" course_id="3" reading_status="0" status="1" time_created="2016-03-10 14:44:44" />
+    <go2nurse_user_course_relation id="9"  user_id="2" course_id="4" reading_status="0" status="1" time_created="2016-03-10 14:44:44" />
+    <go2nurse_user_course_relation id="10" user_id="3" course_id="1" reading_status="0" status="1" time_created="2016-03-10 14:44:44" />
+    <go2nurse_user_course_relation id="11" user_id="3" course_id="2" reading_status="0" status="1" time_created="2016-03-10 14:44:44" />
+    <go2nurse_user_course_relation id="12" user_id="3" course_id="2" reading_status="0" status="1" time_created="2016-04-10 14:44:44" />
+    <go2nurse_user_course_relation id="13" user_id="4" course_id="1" reading_status="0" status="1" time_created="2016-04-10 14:44:44" />
+    <go2nurse_user_course_relation id="14" user_id="4" course_id="2" reading_status="0" status="1" time_created="2016-04-10 14:44:44" />
+    <go2nurse_user_course_relation id="15" user_id="4" course_id="3" reading_status="0" status="1" time_created="2016-04-10 14:44:44" />
+    <go2nurse_user_course_relation id="16" user_id="4" course_id="4" reading_status="0" status="1" time_created="2016-05-10 14:44:44" />
+    <go2nurse_user_course_relation id="17" user_id="4" course_id="5" reading_status="0" status="1" time_created="2016-05-10 14:44:44" />
+    <go2nurse_user_course_relation id="18" user_id="4" course_id="6" reading_status="0" status="1" time_created="2016-05-10 14:44:44" />
+</dataset>

@@ -10,7 +10,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -33,10 +32,11 @@ public class CourseManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countCourse(@Context HttpServletRequest request,
+                                @QueryParam("title_like") @DefaultValue("") String titleLike,
                                 @PathParam("status") @DefaultValue("") String status
     ) {
         logger.info("get course count by status={}", status);
-        long count = courseService.countByStatus(status);
+        long count = courseService.countByNameLikeAndStatus(titleLike, status);
         logger.info("count = {}", count);
         return Response.ok(count).build();
     }
@@ -46,12 +46,13 @@ public class CourseManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCourseByStatus(@Context HttpServletRequest request,
+                                      @QueryParam("title_like") @DefaultValue("") String titleLike,
                                       @PathParam("status") @DefaultValue("") String status,
                                       @PathParam("index")  @DefaultValue("0") int index,
                                       @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get course by status={} at page={}, {}/page", status, index, number);
-        List<CourseBean> courses = courseService.getCourseByStatus(status, index, number);
+        List<CourseBean> courses = courseService.getCourseByNameAndStatus(titleLike, status, index, number);
         logger.info("count = {}", courses.size());
         return Response.ok(courses).build();
     }

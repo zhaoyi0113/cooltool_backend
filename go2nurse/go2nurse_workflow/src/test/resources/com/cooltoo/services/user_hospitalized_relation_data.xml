@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <go2nurse_user_hospitalized_relation id="1"  user_id="1" hospital_id="11" department_id="11" status="2" time_created="2016-01-10 14:44:44" />
+    <go2nurse_user_hospitalized_relation id="2"  user_id="1" hospital_id="11" department_id="22" status="0" time_created="2016-01-10 14:44:44" />
+    <go2nurse_user_hospitalized_relation id="3"  user_id="1" hospital_id="22" department_id="11" status="1" time_created="2016-01-10 14:44:44" />
+    <go2nurse_user_hospitalized_relation id="4"  user_id="2" hospital_id="11" department_id="11" status="0" time_created="2016-02-10 14:44:44" />
+    <go2nurse_user_hospitalized_relation id="5"  user_id="2" hospital_id="22" department_id="22" status="2" time_created="2016-02-10 14:44:44" />
+    <go2nurse_user_hospitalized_relation id="6"  user_id="2" hospital_id="33" department_id="33" status="1" time_created="2016-02-10 14:44:44" />
+    <go2nurse_user_hospitalized_relation id="7"  user_id="3" hospital_id="11" department_id="11" status="1" time_created="2016-02-10 14:44:44" />
+    <go2nurse_user_hospitalized_relation id="8"  user_id="4" hospital_id="22" department_id="22" status="1" time_created="2016-03-10 14:44:44" />
+    <go2nurse_user_hospitalized_relation id="9"  user_id="5" hospital_id="33" department_id="33" status="1" time_created="2016-03-10 14:44:44" />
+    <go2nurse_user_hospitalized_relation id="10" user_id="6" hospital_id="44" department_id="44" status="0" time_created="2016-03-10 14:44:44" />
+</dataset>

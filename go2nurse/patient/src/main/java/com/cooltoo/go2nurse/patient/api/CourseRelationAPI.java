@@ -33,7 +33,7 @@ public class CourseRelationAPI {
                               @QueryParam("department_id") @DefaultValue("0") int departmentId,
                               @QueryParam("diagnostic_id") @DefaultValue("0") int diagnosticId
     ) {
-        Map<String, List<CourseBean>> courses = relationManage.getCoursesByConditions(hospitalId, departmentId, diagnosticId, CommonStatus.ENABLED.name(), CourseStatus.ENABLE.name());
+        Map<String, List<CourseBean>> courses = relationManage.getCoursesByConditions(null, hospitalId, departmentId, diagnosticId, CommonStatus.ENABLED.name(), CourseStatus.ENABLE.name());
         return Response.ok(courses).build();
     }
 }

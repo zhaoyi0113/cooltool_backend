@@ -71,27 +71,27 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         int diagnosticId = 0;
         String relationStatus = "";
         String courseStatus = "";
-        Map<String, List<Long>> keyToCourseId = service.getCoursesIdByConditions(hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
+        Map<String, List<Long>> keyToCourseId = service.getCoursesIdByConditions(null, hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
         Assert.assertEquals(0, keyToCourseId.size());
 
         hospitalId = 11;
         relationStatus = "ALL";
         courseStatus = "ALL";
-        keyToCourseId = service.getCoursesIdByConditions(hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
+        keyToCourseId = service.getCoursesIdByConditions(null, hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
         Assert.assertEquals(3, keyToCourseId.size());
         Assert.assertEquals(5, keyToCourseId.get(CourseRelationManageService.key_all_courses_in_hospital).size());
         Assert.assertEquals(0, keyToCourseId.get(CourseRelationManageService.key_department).size());
         Assert.assertEquals(0, keyToCourseId.get(CourseRelationManageService.key_diagnostic).size());
 
         departmentId = 22;
-        keyToCourseId = service.getCoursesIdByConditions(hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
+        keyToCourseId = service.getCoursesIdByConditions(null, hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
         Assert.assertEquals(3, keyToCourseId.size());
         Assert.assertEquals(5, keyToCourseId.get(CourseRelationManageService.key_all_courses_in_hospital).size());
         Assert.assertEquals(3, keyToCourseId.get(CourseRelationManageService.key_department).size());
         Assert.assertEquals(0, keyToCourseId.get(CourseRelationManageService.key_diagnostic).size());
 
         diagnosticId = 2;
-        keyToCourseId = service.getCoursesIdByConditions(hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
+        keyToCourseId = service.getCoursesIdByConditions(null, hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
         Assert.assertEquals(3, keyToCourseId.size());
         Assert.assertEquals(5, keyToCourseId.get(CourseRelationManageService.key_all_courses_in_hospital).size());
         Assert.assertEquals(3, keyToCourseId.get(CourseRelationManageService.key_department).size());
@@ -105,27 +105,27 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         int diagnosticId = 0;
         String relationStatus = "";
         String courseStatus = "";
-        Map<String, List<CourseBean>> keyToCourse = service.getCoursesByConditions(hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
+        Map<String, List<CourseBean>> keyToCourse = service.getCoursesByConditions(null, hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
         Assert.assertEquals(3, keyToCourse.size());
 
         hospitalId = 11;
         relationStatus = "ALL";
         courseStatus = "ALL";
-        keyToCourse = service.getCoursesByConditions(hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
+        keyToCourse = service.getCoursesByConditions(null, hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
         Assert.assertEquals(3, keyToCourse.size());
         Assert.assertEquals(5, keyToCourse.get(CourseRelationManageService.key_all_courses_in_hospital).size());
         Assert.assertEquals(0, keyToCourse.get(CourseRelationManageService.key_department).size());
         Assert.assertEquals(0, keyToCourse.get(CourseRelationManageService.key_diagnostic).size());
 
         departmentId = 22;
-        keyToCourse = service.getCoursesByConditions(hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
+        keyToCourse = service.getCoursesByConditions(null, hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
         Assert.assertEquals(3, keyToCourse.size());
         Assert.assertEquals(5, keyToCourse.get(CourseRelationManageService.key_all_courses_in_hospital).size());
         Assert.assertEquals(3, keyToCourse.get(CourseRelationManageService.key_department).size());
         Assert.assertEquals(0, keyToCourse.get(CourseRelationManageService.key_diagnostic).size());
 
         diagnosticId = 2;
-        keyToCourse = service.getCoursesByConditions(hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
+        keyToCourse = service.getCoursesByConditions(null, hospitalId, departmentId, diagnosticId, relationStatus, courseStatus);
         Assert.assertEquals(3, keyToCourse.size());
         Assert.assertEquals(5, keyToCourse.get(CourseRelationManageService.key_all_courses_in_hospital).size());
         Assert.assertEquals(3, keyToCourse.get(CourseRelationManageService.key_department).size());

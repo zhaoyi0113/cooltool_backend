@@ -60,37 +60,48 @@ public class CourseServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testCountByStatus() {
-        long count = service.countByStatus(statusAll);
+        String name = "";
+        long count = service.countByNameLikeAndStatus(name, statusAll);
         Assert.assertEquals(9, count);
-        count = service.countByStatus(statusDis);
+        count = service.countByNameLikeAndStatus(name, statusDis);
         Assert.assertEquals(3, count);
-        count = service.countByStatus(statusEnb);
+        count = service.countByNameLikeAndStatus(name, statusEnb);
         Assert.assertEquals(5, count);
-        count = service.countByStatus(statusEdt);
+        count = service.countByNameLikeAndStatus(name, statusEdt);
+        Assert.assertEquals(1, count);
+
+        name = "t2";
+        count = service.countByNameLikeAndStatus(name, statusAll);
+        Assert.assertEquals(4, count);
+        count = service.countByNameLikeAndStatus(name, statusDis);
+        Assert.assertEquals(1, count);
+        count = service.countByNameLikeAndStatus(name, statusEnb);
+        Assert.assertEquals(2, count);
+        count = service.countByNameLikeAndStatus(name, statusEdt);
         Assert.assertEquals(1, count);
     }
 
     @Test
     public void testGetCourseByStatus() {
-        List<CourseBean> courses = service.getCourseByStatus(statusAll, 1, 4);
+        List<CourseBean> courses = service.getCourseByNameAndStatus("", statusAll, 1, 4);
         Assert.assertEquals(4, courses.size());
         Assert.assertEquals(5L, courses.get(0).getId());
         Assert.assertEquals(4L, courses.get(1).getId());
         Assert.assertEquals(3L, courses.get(2).getId());
         Assert.assertEquals(2L, courses.get(3).getId());
 
-        courses = service.getCourseByStatus(statusDis, 0, 4);
+        courses = service.getCourseByNameAndStatus("", statusDis, 0, 4);
         Assert.assertEquals(3, courses.size());
         Assert.assertEquals(9L, courses.get(0).getId());
         Assert.assertEquals(8L, courses.get(1).getId());
         Assert.assertEquals(7L, courses.get(2).getId());
 
-        courses = service.getCourseByStatus(statusEnb, 1, 4);
+        courses = service.getCourseByNameAndStatus("", statusEnb, 1, 4);
         Assert.assertEquals(1, courses.size());
         Assert.assertEquals(1L, courses.get(0).getId());
 
 
-        courses = service.getCourseByStatus(statusEdt, 0, 4);
+        courses = service.getCourseByNameAndStatus("", statusEdt, 0, 4);
         Assert.assertEquals(1, courses.size());
         Assert.assertEquals(6L, courses.get(0).getId());
     }
@@ -292,8 +303,8 @@ public class CourseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    public void testGetActivityByName() {
-        String name = "title 2";
+    public void testGetCourseByName() {
+        String name = "title 12";
         String nginxBaseHttpUrl = "http://aaa.fdas.com/ddd/";
         CourseBean page0;
         String content;
@@ -315,7 +326,7 @@ public class CourseServiceTest extends AbstractCooltooTest {
         }
 
         // editing
-        name = "title 6";
+        name = "title 26";
         page0 = service.getCourseByName(name, nginxBaseHttpUrl);
         Assert.assertNotNull(page0);
         Assert.assertEquals(name, page0.getName());

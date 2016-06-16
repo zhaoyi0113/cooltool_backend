@@ -9,7 +9,6 @@ import com.cooltoo.go2nurse.entities.CourseEntity;
 import com.cooltoo.go2nurse.repository.CourseRepository;
 import com.cooltoo.go2nurse.service.file.TemporaryGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
-import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -55,39 +54,34 @@ public class CourseService {
         return exist;
     }
 
-    public long countByStatus(String strStatus) {
+    public long countByNameLikeAndStatus(String title, String strStatus) {
         logger.info("count all course by status={}", strStatus);
-        long count = 0;
         CourseStatus status = CourseStatus.parseString(strStatus);
-        if (null==status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                count = repository.count();
-            }
-        }
-        else {
-            if (null != status) {
-                count = repository.countByStatus(status);
-            }
-        }
+        title = VerifyUtil.isStringEmpty(title) ? null : VerifyUtil.reconstructSQLContentLike(title.trim());
+        long count = repository.countByNameLikeAndStatus(title, status);
         logger.info("count is {}", count);
         return count;
     }
 
-    public List<CourseBean> getCourseByStatus(String strStatus, int pageIndex, int sizePerPage) {
+    public List<CourseBean> getCourseByNameAndStatus(String title, String strStatus) {
+        logger.info("get all course by status={}", strStatus);
+        CourseStatus status = CourseStatus.parseString(strStatus);
+        title = VerifyUtil.isStringEmpty(title) ? null : VerifyUtil.reconstructSQLContentLike(title.trim());
+        List<CourseEntity> resultSet;
+        resultSet = repository.findByNameLikeAndStatus(title, status, sort);
+        List<CourseBean> beans = entities2BeansWithoutContent(resultSet);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
+    public List<CourseBean> getCourseByNameAndStatus(String title, String strStatus, int pageIndex, int sizePerPage) {
         logger.info("get all course by status={} at page={} sizePerPage={}", strStatus, pageIndex, sizePerPage);
         CourseStatus status = CourseStatus.parseString(strStatus);
+        title = VerifyUtil.isStringEmpty(title) ? null : VerifyUtil.reconstructSQLContentLike(title.trim());
         PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
         Page<CourseEntity> resultSet = null;
-        if (null==status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                resultSet = repository.findAll(page);
-            }
-        }
-        else {
-            if (null != status) {
-                resultSet = repository.findByStatus(status, page);
-            }
-        }
+        resultSet = repository.findByNameLikeAndStatus(title, status, page);
         List<CourseBean> beans = entities2BeansWithoutContent(resultSet);
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
