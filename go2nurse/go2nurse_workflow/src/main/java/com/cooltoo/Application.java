@@ -1,5 +1,6 @@
 package com.cooltoo;
 
+import com.cooltoo.go2nurse.features.GoToNurseFeatures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,9 @@ import org.togglz.core.manager.EnumBasedFeatureProvider;
 import org.togglz.core.repository.StateRepository;
 import org.togglz.core.repository.file.FileBasedStateRepository;
 import org.togglz.core.spi.FeatureProvider;
+import org.togglz.core.user.FeatureUser;
+import org.togglz.core.user.SimpleFeatureUser;
+import org.togglz.core.user.UserProvider;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.io.File;
@@ -45,6 +49,15 @@ public class Application {
         return new FileBasedStateRepository(file);
     }
 
+    @Bean
+    public UserProvider getUserProvider() {
+        return new UserProvider() {
+            @Override
+            public FeatureUser getCurrentUser() {
+                return new SimpleFeatureUser("admin", true);
+            }
+        };
+    }
 
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(Application.class, args);
