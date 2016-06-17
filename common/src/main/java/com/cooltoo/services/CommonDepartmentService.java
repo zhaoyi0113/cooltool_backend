@@ -77,7 +77,7 @@ public class CommonDepartmentService {
                 retVal.add(bean);
             }
         }
-        return beans;
+        return retVal;
     }
 
     public List<HospitalDepartmentBean> getTopLevel(boolean checkEnable, int enable, String nginxPrefix) {
