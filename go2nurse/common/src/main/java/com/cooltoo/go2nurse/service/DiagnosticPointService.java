@@ -45,12 +45,26 @@ public class DiagnosticPointService {
     }
 
     public List<DiagnosticEnumerationBean> getAllDiagnostic() {
+        logger.info("get all diagnostic");
         List<DiagnosticEnumerationBean> beans = new ArrayList<>();
         List<DiagnosticEnumeration> diagnostics = DiagnosticEnumeration.getAllDiagnostic();
         for (DiagnosticEnumeration enume : diagnostics) {
             DiagnosticEnumerationBean bean = enumerationBeanConverter.convert(enume);
             beans.add(bean);
         }
+        logger.info("diagnostic is {}", beans);
+        return beans;
+    }
+
+    public List<DiagnosticEnumerationBean> getDiagnosticByIds(List<Long> diagnosticIds) {
+        logger.info("get diagnostic by diagnostic ids ={} ", diagnosticIds);
+        List<DiagnosticEnumerationBean> beans = new ArrayList<>();
+        List<DiagnosticEnumeration> diagnostics = DiagnosticEnumeration.getDiagnosticByTypes(diagnosticIds);
+        for (DiagnosticEnumeration de : diagnostics) {
+            DiagnosticEnumerationBean bean = enumerationBeanConverter.convert(de);
+            beans.add(bean);
+        }
+        logger.info("diagnostic is {}", beans);
         return beans;
     }
 

@@ -30,6 +30,24 @@ public class CourseHospitalRelationServiceTest extends AbstractCooltooTest {
     private CourseHospitalRelationRepository repository;
 
     @Test
+    public void testGetHospitalByCourseId() {
+        long courseId = 5;
+        String status = "ALL";
+        List<Integer> hospitals = service.getHospitalByCourseId(courseId, status);
+        Assert.assertEquals(5, hospitals.size());
+        Assert.assertEquals(55, hospitals.get(0).intValue());
+        Assert.assertEquals(44, hospitals.get(1).intValue());
+        Assert.assertEquals(33, hospitals.get(2).intValue());
+        Assert.assertEquals(22, hospitals.get(3).intValue());
+        Assert.assertEquals(11, hospitals.get(4).intValue());
+
+        status = CommonStatus.DISABLED.name();
+        hospitals = service.getHospitalByCourseId(courseId, status);
+        Assert.assertEquals(1, hospitals.size());
+        Assert.assertEquals(22, hospitals.get(0).intValue());
+    }
+
+    @Test
     public void testGetCourseInHospital() {
         int hospitalId = 22;
         String status = "ALL";

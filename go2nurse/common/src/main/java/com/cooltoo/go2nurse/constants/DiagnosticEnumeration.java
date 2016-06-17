@@ -77,4 +77,18 @@ public enum DiagnosticEnumeration {
         return diagnostics;
     }
 
+    public static List<DiagnosticEnumeration> getDiagnosticByTypes(List<Long> types) {
+        List<DiagnosticEnumeration> retVal = new ArrayList<>();
+        if (null==types || types.isEmpty()) {
+            return  retVal;
+        }
+        for (Long type : types) {
+            DiagnosticEnumeration de = parseInt(type.intValue());
+            if (null==de) {
+                continue;
+            }
+            retVal.add(de);
+        }
+        return retVal;
+    }
 }

@@ -1,14 +1,17 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.beans.CourseBean;
-import com.cooltoo.go2nurse.beans.CourseDepartmentRelationBean;
-import com.cooltoo.go2nurse.beans.CourseDiagnosticRelationBean;
-import com.cooltoo.go2nurse.beans.CourseHospitalRelationBean;
+import com.cooltoo.go2nurse.beans.*;
+import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.repository.HospitalRepository;
+import com.cooltoo.services.CommonDepartmentService;
+import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/6/12.
@@ -34,7 +34,11 @@ public class CourseRelationManageService {
     public static final String key_department = "department";
     public static final String key_others = "others";
 
+    @Autowired private Go2NurseUtility utility;
+
+    @Autowired private CommonHospitalService hospitalService;
     @Autowired private HospitalRepository hospital;
+    @Autowired private CommonDepartmentService departmentService;
     @Autowired private HospitalDepartmentRepository department;
     @Autowired private DiagnosticPointService diagnostic;
     @Autowired private CourseService course;
@@ -56,6 +60,32 @@ public class CourseRelationManageService {
 
     public boolean diagnosticExist(long diagnosticId) {
         return diagnostic.exitsDiagnostic(diagnosticId);
+    }
+
+    public List<HospitalBean> getHospitalByCourseId(long courseId, String strStatus) {
+        logger.info("get hospital by course id={} and status={}", courseId, strStatus);
+        List<Integer> hospitalIds = hospitalRelation.getHospitalByCourseId(courseId, strStatus);
+        List<HospitalBean> hospitals = hospitalService.getHospitalByIds(hospitalIds);
+        logger.info("hospital is {}", hospitals);
+        return hospitals;
+    }
+
+    public List<HospitalDepartmentBean> getDepartmentByCourseId(long courseId, String strStatus) {
+        logger.info("get department by course id={} and status={}", courseId, strStatus);
+        List<Long> courseIds = Arrays.asList(new Long[]{courseId});
+        List<Integer> departmentIds = departmentRelation.getDepartmentByCourseId(courseIds, strStatus);
+        List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefix());
+        logger.info("department is {}", departments);
+        return departments;
+    }
+
+    public List<DiagnosticEnumerationBean> getDiagnosticByCourseId(long courseId, String strStatus) {
+        logger.info("get diagnostic by course id={} and status={}", courseId, strStatus);
+        List<Long> courseIds = Arrays.asList(new Long[]{courseId});
+        List<Long> diagnosticIds = diagnosticRelation.getDiagnosticByCourseId(courseIds, strStatus);
+        List<DiagnosticEnumerationBean> diagnostics = diagnostic.getDiagnosticByIds(diagnosticIds);
+        logger.info("diagnostic is {}", diagnostics);
+        return diagnostics;
     }
 
     public Map<String, List<Long>> getCoursesIdByConditions(List<Long> courseIds,
@@ -224,7 +254,11 @@ public class CourseRelationManageService {
 
     @Transactional
     public boolean addCourseToDiagnostic(long courseId, long diagnosticId) {
-        if (!diagnostic.exists(diagnosticId)) {
+//        if (!diagnostic.exists(diagnosticId)) {
+//            logger.error("diagnostic not exists");
+//            throw new BadRequestException(ErrorCode.DATA_ERROR);
+//        }
+        if (!DiagnosticEnumeration.exists((int)diagnosticId)) {
             logger.error("diagnostic not exists");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

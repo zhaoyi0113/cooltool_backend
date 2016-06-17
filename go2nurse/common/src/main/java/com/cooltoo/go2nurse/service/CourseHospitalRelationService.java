@@ -37,15 +37,20 @@ public class CourseHospitalRelationService {
     //============================================================================
     //                 get
     //============================================================================
+    public List<Integer> getHospitalByCourseId(long courseId, String strStatus) {
+        logger.info("get hospital id by course id ={} and status", courseId, strStatus);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Integer> hospitalIds = repository.findByCourseIdAndStatus(courseId, status, sort);
+        logger.info("hospital id is {}", hospitalIds);
+        return hospitalIds;
+    }
+
     public List<Long> getCourseInHospital(int iHospitalId, String strStatus) {
         logger.info("count course in hospital={} with status={}", iHospitalId, strStatus);
         Integer hospitalId = Integer.valueOf(iHospitalId);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Long> courseIds = null;
-        if (null==status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                courseIds = repository.findByHospitalIdAndStatus(hospitalId, status, sort);
-            }
+        if (null==status && !"ALL".equalsIgnoreCase(strStatus)) {
         }
         else {
             courseIds = repository.findByHospitalIdAndStatus(hospitalId, status, sort);

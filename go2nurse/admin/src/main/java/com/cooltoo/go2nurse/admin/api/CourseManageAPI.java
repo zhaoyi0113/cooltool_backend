@@ -1,6 +1,13 @@
 package com.cooltoo.go2nurse.admin.api;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.CourseBean;
+import com.cooltoo.go2nurse.beans.CourseCategoryBean;
+import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
+import com.cooltoo.go2nurse.service.CourseCategoryService;
+import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import com.cooltoo.go2nurse.service.CourseService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.HtmlParser;
@@ -17,13 +24,17 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("/admin/course")
 public class CourseManageAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(CourseManageAPI.class.getName());
 
+    @Autowired private CourseRelationManageService courseRelationManageService;
+    @Autowired private CourseCategoryService categoryService;
     @Autowired private CourseService courseService;
     @Autowired private Go2NurseUtility utility;
 
@@ -158,7 +169,17 @@ public class CourseManageAPI {
     ) {
         logger.info("get detail course={} nginxPrefix={}", courseId, utility.getHttpPrefix());
         CourseBean course = courseService.getCourseById(courseId, utility.getHttpPrefix());
-        return Response.ok(course).build();
+        List<HospitalBean> hospitals = courseRelationManageService.getHospitalByCourseId(courseId, CommonStatus.ENABLED.name());
+        List<HospitalDepartmentBean> departments = courseRelationManageService.getDepartmentByCourseId(courseId, CommonStatus.ENABLED.name());
+        List<DiagnosticEnumerationBean> diagnostics = courseRelationManageService.getDiagnosticByCourseId(courseId, CommonStatus.ENABLED.name());
+        List<CourseCategoryBean> categories = categoryService.getCategoryByCourseId(CommonStatus.ENABLED.name(), courseId);
+        Map<String, Object> retVal = new HashMap<>();
+        retVal.put("course", course);
+        retVal.put("hospital", hospitals);
+        retVal.put("department", departments);
+        retVal.put("diagnostic", diagnostics);
+        retVal.put("category", categories);
+        return Response.ok(retVal).build();
     }
 
 

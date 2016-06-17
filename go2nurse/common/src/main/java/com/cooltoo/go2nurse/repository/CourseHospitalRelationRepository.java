@@ -19,5 +19,10 @@ public interface CourseHospitalRelationRepository extends JpaRepository<CourseHo
             " AND (?2 IS NULL OR relation.status=?2)")
     List<Long> findByHospitalIdAndStatus(Integer hospitalId, CommonStatus status, Sort sort);
 
+    @Query("SELECT DISTINCT relation.hospitalId FROM CourseHospitalRelationEntity relation" +
+            " WHERE relation.courseId=?1" +
+            " AND (?2 IS NULL OR relation.status=?2)")
+    List<Integer> findByCourseIdAndStatus(Long courseId, CommonStatus status, Sort sort);
+
     List<CourseHospitalRelationEntity> findByHospitalIdAndCourseId(Integer hospitalId, Long courseId, Sort sort);
 }
