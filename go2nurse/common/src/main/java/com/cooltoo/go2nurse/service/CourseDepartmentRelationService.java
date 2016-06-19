@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.beans.CourseDepartmentRelationBean;
 import com.cooltoo.go2nurse.converter.CourseDepartmentRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.CourseDepartmentRelationEntity;
 import com.cooltoo.go2nurse.repository.CourseDepartmentRelationRepository;
+import com.cooltoo.go2nurse.repository.CourseRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class CourseDepartmentRelationService {
             new Sort.Order(Sort.Direction.DESC, "time"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
+    @Autowired private CourseRepository courseRepository;
     @Autowired private CourseDepartmentRelationRepository repository;
     @Autowired private CourseDepartmentRelationBeanConverter beanConverter;
 
@@ -166,5 +169,54 @@ public class CourseDepartmentRelationService {
         CourseDepartmentRelationBean bean = beanConverter.convert(entity);
         logger.info("add relation={}", bean);
         return bean;
+    }
+
+    //=======================================================================
+    //                    set
+    //=======================================================================
+
+    @Transactional
+    public List<Integer> setCourseToDepartmentRelation(long courseId, List<Integer> departmentIds) {
+        logger.info("set course_to_department_relationship courseId={} departmentIds={}",
+                courseId, departmentIds);
+        if (VerifyUtil.isListEmpty(departmentIds)) {
+            logger.info("department is empty");
+            return departmentIds;
+        }
+        if (!courseRepository.exists(courseId)) {
+            logger.error("course not exists");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        List<Integer> settingDepartmentIds = new ArrayList<>();
+        List<Long> courseIds = Arrays.asList(new Long[]{courseId});
+        List<Integer> existedDepartmentIds = repository.findByCourseIdAndStatus(courseIds, null, sort);
+        if (VerifyUtil.isListEmpty(existedDepartmentIds)) {
+            for (Integer departmentId : departmentIds) {
+                if (null!=addCourseToDepartment(courseId, departmentId)) {
+                    settingDepartmentIds.add(departmentId);
+                }
+            }
+        }
+        else {
+            for (Integer existed : existedDepartmentIds) {
+                if (departmentIds.contains(existed)) {
+                    if (null!=updateStatus(courseId, existed, CommonStatus.ENABLED.name())) {
+                        settingDepartmentIds.add(existed);
+                        departmentIds.remove(existed);
+                    }
+                }
+                else {
+                    updateStatus(courseId, existed, CommonStatus.DISABLED.name());
+                }
+            }
+            for (Integer needAdding : departmentIds) {
+                if(null!=addCourseToDepartment(courseId, needAdding)) {
+                    settingDepartmentIds.add(needAdding);
+                }
+            }
+        }
+        logger.info("set department ids is {}", departmentIds);
+        return settingDepartmentIds;
     }
 }

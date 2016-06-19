@@ -99,12 +99,21 @@ public class CourseManageAPI {
                                  @FormParam("name") @DefaultValue("") String name,
                                  @FormParam("introduction") @DefaultValue("") String introduction,
                                  @FormParam("link") @DefaultValue("") String link,
-                                 @FormParam("hospital_id") @DefaultValue("-1") int hospitalId
+                                 @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
+                                 @FormParam("department_ids") @DefaultValue("-1") String strDepartmentIds,
+                                 @FormParam("diagnostic_ids") @DefaultValue("-1") String strDiagnosticIds
 
     ) {
         logger.info("create course");
         CourseBean course = courseService.createCourse(name, introduction, link, hospitalId);
         logger.info("course is {}", course);
+        if (null!=course) {
+            long courseId = course.getId();
+            List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
+            courseRelationManageService.setCourseToDepartmentRelationship(courseId, departmentIds);
+            List<Long> diagnosticIds = VerifyUtil.parseLongIds(strDiagnosticIds);
+            courseRelationManageService.setCourseToDiagnosticRelationship(courseId, diagnosticIds);
+        }
         return Response.ok(course).build();
     }
 
@@ -112,15 +121,25 @@ public class CourseManageAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCourseBasicInfo(@Context HttpServletRequest request,
-                                            @FormParam("course_id")@DefaultValue("0") long courseId,
-                                            @FormParam("name") @DefaultValue("") String name,
-                                            @FormParam("introduction") @DefaultValue("") String introduction,
-                                            @FormParam("link") @DefaultValue("") String link
+                                          @FormParam("course_id")@DefaultValue("0") long courseId,
+                                          @FormParam("name") @DefaultValue("") String name,
+                                          @FormParam("introduction") @DefaultValue("") String introduction,
+                                          @FormParam("link") @DefaultValue("") String link,
+                                          @FormParam("department_ids") @DefaultValue("-1") String strDepartmentIds,
+                                          @FormParam("department_status") @DefaultValue("enabled") String strDepartmentStatus,
+                                          @FormParam("diagnostic_ids") @DefaultValue("-1") String strDiagnosticIds,
+                                          @FormParam("diagnostic_status") @DefaultValue("enabled") String strDiagnosticStatus
 
     ) {
         logger.info("update course basic information");
         CourseBean course = courseService.updateCourseBasicInfo(courseId, name, introduction, null, null, link);
         logger.info("course is {}", course);
+        if (null!=course) {
+            List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
+            courseRelationManageService.setCourseToDepartmentRelationship(courseId, departmentIds);
+            List<Long> diagnosticIds = VerifyUtil.parseLongIds(strDiagnosticIds);
+            courseRelationManageService.setCourseToDiagnosticRelationship(courseId, diagnosticIds);
+        }
         return Response.ok(course).build();
     }
 

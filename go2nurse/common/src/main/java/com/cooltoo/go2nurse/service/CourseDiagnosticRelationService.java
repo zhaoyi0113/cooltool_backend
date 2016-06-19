@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.beans.CourseDiagnosticRelationBean;
 import com.cooltoo.go2nurse.converter.CourseDiagnosticRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.CourseDiagnosticRelationEntity;
 import com.cooltoo.go2nurse.repository.CourseDiagnosticRelationRepository;
+import com.cooltoo.go2nurse.repository.CourseRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class CourseDiagnosticRelationService {
             new Sort.Order(Sort.Direction.DESC, "time"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
+    @Autowired private CourseRepository courseRepository;
     @Autowired private CourseDiagnosticRelationRepository repository;
     @Autowired private CourseDiagnosticRelationBeanConverter beanConverter;
 
@@ -164,5 +167,54 @@ public class CourseDiagnosticRelationService {
         CourseDiagnosticRelationBean bean = beanConverter.convert(entity);
         logger.info("add relation={}", bean);
         return bean;
+    }
+
+    //=======================================================================
+    //                    set
+    //=======================================================================
+
+    @Transactional
+    public List<Long> setCourseToDiagnosticRelation(long courseId, List<Long> diagnosticIds) {
+        logger.info("set course_to_diagnostic_relationship courseId={} diagnosticIds={}",
+                courseId, diagnosticIds);
+        if (VerifyUtil.isListEmpty(diagnosticIds)) {
+            logger.info("diagnostics is empty");
+            return diagnosticIds;
+        }
+        if (!courseRepository.exists(courseId)) {
+            logger.error("course not exists");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        List<Long> settingDiagnosticIds = new ArrayList<>();
+        List<Long> courseIds = Arrays.asList(new Long[]{courseId});
+        List<Long> existedDiagnosticIds = repository.findByCourseIdAndStatus(courseIds, null, sort);
+        if (VerifyUtil.isListEmpty(existedDiagnosticIds)) {
+            for (Long diagnosticId : diagnosticIds) {
+                if (null!=addCourseToDiagnostic(courseId, diagnosticId)) {
+                    settingDiagnosticIds.add(diagnosticId);
+                }
+            }
+        }
+        else {
+            for (Long existed : existedDiagnosticIds) {
+                if (diagnosticIds.contains(existed)) {
+                    if (null!=updateStatus(courseId, existed, CommonStatus.ENABLED.name())) {
+                        settingDiagnosticIds.add(existed);
+                        diagnosticIds.remove(existed);
+                    }
+                }
+                else {
+                    updateStatus(courseId, existed, CommonStatus.DISABLED.name());
+                }
+            }
+            for (Long needAdding : diagnosticIds) {
+                if(null!=addCourseToDiagnostic(courseId, needAdding)) {
+                    settingDiagnosticIds.add(needAdding);
+                }
+            }
+        }
+        logger.info("set diagnostics ids is {}", diagnosticIds);
+        return settingDiagnosticIds;
     }
 }

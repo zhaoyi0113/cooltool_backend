@@ -162,4 +162,25 @@ public class CourseDiagnosticRelationServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(1, relations.size());
         Assert.assertEquals(relation.getId(), relations.get(0).getId());
     }
+
+    @Test
+    public void testSetDiagnosticRelation() {
+        long courseId = 4;
+        List<Long> settingDiagnosticIds = Arrays.asList(new Long[]{0L, 1L, 3L});
+        List<Long> existed = service.getDiagnosticByCourseId(Arrays.asList(new Long(courseId)), "ENABLED");
+        Assert.assertEquals(2, existed.size());
+        Assert.assertTrue(existed.contains(Long.valueOf(2L)));
+        Assert.assertTrue(existed.contains(Long.valueOf(4L)));
+
+
+        service.setCourseToDiagnosticRelation(courseId, settingDiagnosticIds);
+
+        List<Long> newExisted = service.getDiagnosticByCourseId(Arrays.asList(new Long[]{courseId}), "ENABLED");
+        Assert.assertEquals(3, newExisted.size());
+        Assert.assertTrue(newExisted.contains(Long.valueOf(0L)));
+        Assert.assertTrue(newExisted.contains(Long.valueOf(1L)));
+        Assert.assertTrue(newExisted.contains(Long.valueOf(3L)));
+        Assert.assertFalse(newExisted.contains(Long.valueOf(4L)));
+        Assert.assertFalse(newExisted.contains(Long.valueOf(2L)));
+    }
 }

@@ -5,7 +5,6 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.service.UserDiagnosticPointRelationService;
-import com.cooltoo.go2nurse.service.UserService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;

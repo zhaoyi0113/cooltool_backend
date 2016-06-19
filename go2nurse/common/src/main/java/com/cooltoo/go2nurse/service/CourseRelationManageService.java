@@ -220,7 +220,6 @@ public class CourseRelationManageService {
         return relation;
     }
 
-
     //==============================================================================
     //                    add
     //==============================================================================
@@ -268,5 +267,27 @@ public class CourseRelationManageService {
         }
         CourseDiagnosticRelationBean relation = diagnosticRelation.addCourseToDiagnostic(courseId, diagnosticId);
         return null!=relation && relation.getId()>0;
+    }
+
+    //==============================================================================
+    //                    set
+    //==============================================================================
+
+    @Transactional
+    public List<Integer> setCourseToDepartmentRelationship(long courseId, List<Integer> departmentIds) {
+        logger.info("set course_to_department relationship, courseId={} departmentIds={}",
+                courseId, departmentIds);
+        List<Integer> settingDepartmentIds = departmentRelation.setCourseToDepartmentRelation(courseId, departmentIds);
+        logger.info("set department ids is {}", settingDepartmentIds);
+        return settingDepartmentIds;
+    }
+
+    @Transactional
+    public List<Long> setCourseToDiagnosticRelationship(long courseId, List<Long> diagnosticIds) {
+        logger.info("set course_to_diagnostic relationship, courseId={} diagnosticIds={}",
+                courseId, diagnosticIds);
+        List<Long> settingDiagnosticIds = diagnosticRelation.setCourseToDiagnosticRelation(courseId, diagnosticIds);
+        logger.info("set diagnostic ids is {}", settingDiagnosticIds);
+        return settingDiagnosticIds;
     }
 }
