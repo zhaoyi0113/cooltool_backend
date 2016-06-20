@@ -84,9 +84,14 @@ public class VerifyUtil {
 
         String[]      strArray  = ids.split(",");
         List<Integer> recordIds = new ArrayList<>();
-        for (String tmp : strArray) {
-            Integer id = Integer.parseInt(tmp);
-            recordIds.add(id);
+        try {
+            for (String tmp : strArray) {
+                Integer id = Integer.parseInt(tmp);
+                recordIds.add(id);
+            }
+        }
+        catch (Exception ex) {
+            recordIds.clear();
         }
         return recordIds;
     }
@@ -98,9 +103,14 @@ public class VerifyUtil {
 
         String[]   strArray  = ids.split(",");
         List<Long> recordIds = new ArrayList<>();
-        for (String tmp : strArray) {
-            Long id = Long.parseLong(tmp);
-            recordIds.add(id);
+        try {
+            for (String tmp : strArray) {
+                Long id = Long.parseLong(tmp);
+                recordIds.add(id);
+            }
+        }
+        catch (Exception ex) {
+            recordIds.clear();
         }
         return recordIds;
     }
