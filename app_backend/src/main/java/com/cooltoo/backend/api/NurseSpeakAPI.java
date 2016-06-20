@@ -102,6 +102,20 @@ public class NurseSpeakAPI {
         return Response.ok(speak).build();
     }
 
+    @Path("/short_video/callback")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response shortVideoCallback(@Context HttpServletRequest request,
+                                       @QueryParam("videoid") @DefaultValue("") String videoCode,
+                                       @QueryParam("status") @DefaultValue("") String status,
+                                       @QueryParam("duration") @DefaultValue("0") long durationSecond,
+                                       @QueryParam("image") @DefaultValue("") String frontCoverUrl
+    ) {
+        logger.info("short video call back videoCode={} status={} durationSecond={} frontCoverUrl={}",
+                videoCode, status, durationSecond, frontCoverUrl);
+        return Response.ok().build();
+    }
+
 
     @Path("/smug")
     @POST
@@ -142,6 +156,19 @@ public class NurseSpeakAPI {
         NurseSpeakBean nurseSpeak = speakService.addAskQuestion(userId, content, null, null);
         return Response.ok(nurseSpeak).build();
     }
+
+    @Path("/short_video")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response addShortVideo(@Context HttpServletRequest request,
+                                  @FormParam("content") @DefaultValue("") String content,
+                                  @FormParam("video_code") @DefaultValue("") String videoCode
+    ) {
+        logger.info("add shor video content={} video_code={}", content, videoCode);
+        return Response.ok().build();
+    }
+
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
