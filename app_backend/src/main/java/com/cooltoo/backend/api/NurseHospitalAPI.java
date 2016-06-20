@@ -55,7 +55,7 @@ public class NurseHospitalAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response searchHospital(@DefaultValue("") @QueryParam("name") String  name) {
-        List<HospitalBean> hospitals = hospitalService.searchHospital(true, true, name, -1, -1, -1, "", 1, 0, 0);
+        List<HospitalBean> hospitals = hospitalService.searchHospital(true, true, name, -1, -1, -1, "", 1, -1, 0, 0);
         logger.info("get hospital size is {}", hospitals.size());
         if (null == hospitals) {
             Response.ok(new ArrayList<>()).build();

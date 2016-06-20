@@ -84,8 +84,9 @@ public class HospitalAPI {
                                         @DefaultValue("-1")   @FormParam("city")     int     city,
                                         @DefaultValue("-1")   @FormParam("district") int     district,
                                         @DefaultValue("")     @FormParam("address")  String  address,
-                                        @DefaultValue("-1")  @FormParam("status") int status) {
-        List<HospitalBean> hospitals = service.searchHospital(true, andOrOr, name, province, city, district, address, status, -1, -1);
+                                        @DefaultValue("-1")   @FormParam("status")    int     status,
+                                        @DefaultValue("-1")   @FormParam("support_go2nurse") int support) {
+        List<HospitalBean> hospitals = service.searchHospital(true, andOrOr, name, province, city, district, address, status, support, -1, -1);
         logger.info("get hospital size is {}", hospitals.size());
         if (null == hospitals) {
             Response.ok(0).build();
@@ -103,10 +104,11 @@ public class HospitalAPI {
                                    @DefaultValue("-1")   @FormParam("city")     int     city,
                                    @DefaultValue("-1")   @FormParam("district") int     district,
                                    @DefaultValue("")     @FormParam("address")  String  address,
-                                   @DefaultValue("-1")  @FormParam("status") int status,
+                                   @DefaultValue("-1")  @FormParam("status")    int     status,
+                                   @DefaultValue("-1")   @FormParam("support_go2nurse") int support,
                                    @DefaultValue("0")    @FormParam("index")    int     index,
                                    @DefaultValue("10")   @FormParam("number")   int     number) {
-        List<HospitalBean> hospitals = service.searchHospital(false, andOrOr, name, province, city, district, address, status, index, number);
+        List<HospitalBean> hospitals = service.searchHospital(false, andOrOr, name, province, city, district, address, status, support, index, number);
         logger.info("get hospital size is {}", hospitals.size());
         if (null == hospitals) {
             Response.ok().build();
@@ -152,8 +154,9 @@ public class HospitalAPI {
             @DefaultValue("-1") @FormParam("city") int city,
             @DefaultValue("-1") @FormParam("district") int district,
             @DefaultValue("") @FormParam("address") String address,
-            @DefaultValue("-1") @FormParam("enable") int enable) {
-        HospitalBean one = service.update(id, name, aliasName, province, city, district, address, enable);
+            @DefaultValue("-1") @FormParam("enable") int enable,
+            @DefaultValue("-1")   @FormParam("support_go2nurse") int support) {
+        HospitalBean one = service.update(id, name, aliasName, province, city, district, address, enable, support);
         logger.info("update hospital is " + one);
         if (null==one) {
             return Response.ok().build();
@@ -171,9 +174,10 @@ public class HospitalAPI {
             @DefaultValue("-1") @FormParam("city") int city,
             @DefaultValue("-1") @FormParam("district") int district,
             @DefaultValue("") @FormParam("address") String address,
-            @DefaultValue("-1") @FormParam("enable") int enable
+            @DefaultValue("-1") @FormParam("enable") int enable,
+            @DefaultValue("-1")   @FormParam("support_go2nurse") int support
     ) {
-        int id = service.newOne(name, aliasName, province, city, district, address, enable);
+        int id = service.newOne(name, aliasName, province, city, district, address, enable, support);
         logger.info("new hospital id is " + id);
         return Response.ok(id).build();
     }

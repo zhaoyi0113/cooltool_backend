@@ -22,7 +22,8 @@ import java.util.Map;
  */
 @Transactional
 @DatabaseSetups({
-        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_diagnostic_relation_data.xml")
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_diagnostic_relation_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_data.xml")
 })
 public class CourseDiagnosticRelationServiceTest extends AbstractCooltooTest {
 

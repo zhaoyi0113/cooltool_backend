@@ -59,7 +59,7 @@ public class HospitalService {
 
     public List<HospitalBean> getAll() {
         Iterable<HospitalEntity> iterable = repository.findAll();
-        List<HospitalBean> all = new ArrayList<HospitalBean>();
+        List<HospitalBean> all = new ArrayList<>();
         for (HospitalEntity entity : iterable) {
             HospitalBean bean = beanConverter.convert(entity);
             all.add(bean);
@@ -79,7 +79,7 @@ public class HospitalService {
         PageRequest page = new PageRequest(index, number, sort);
 
         Page<HospitalEntity> pageResult = repository.findAll(page);
-        List<HospitalBean>   hospital = new ArrayList<HospitalBean>();
+        List<HospitalBean>   hospital = new ArrayList<>();
         for (HospitalEntity entity : pageResult) {
             HospitalBean bean = beanConverter.convert(entity);
             hospital.add(bean);
@@ -111,7 +111,7 @@ public class HospitalService {
 
     public List<HospitalBean> searchHospital(boolean isCount, boolean isAnd, String name,
                                              int province, int city, int district, String address,
-                                             int status,
+                                             int status, int supportGo2nurse,
                                              int index, int number) {
         List<HospitalBean> allHospitals     = getAll();
         List<HospitalBean> allHospitalMatch = new ArrayList<HospitalBean>();
@@ -123,10 +123,12 @@ public class HospitalService {
         boolean matchDistrict = (district>0);
         boolean matchRegion   = (matchProvince || matchCity || matchDistrict);
         boolean matchStatus   = (1==status || 0==status);
+        boolean matchSupport  = (1==supportGo2nurse || 0==supportGo2nurse);
         boolean condition1    = true;
         boolean condition2    = true;
         boolean condition3    = true;
         boolean condition4    = true;
+        boolean condition5    = true;
         if (null==allHospitals || allHospitals.isEmpty()) {
             return allHospitals;
         }
@@ -135,6 +137,7 @@ public class HospitalService {
             condition1 = (condition1     || (!matchName) || (matchName && !VerifyUtil.isStringEmpty( hospital.getAliasName()) && hospital.getAliasName().contains(name)));
             condition2 = (!matchAddress) || (matchAddress && !VerifyUtil.isStringEmpty( hospital.getAddress()) && hospital.getAddress().contains(address));
             condition4 = (!matchStatus)  || (matchStatus && hospital.getEnable()==status);
+            condition5 = (!matchSupport) || (matchSupport && hospital.getSupportGo2nurse()==supportGo2nurse);
             if (matchRegion) {
                 if (!matchProvince) { province = hospital.getProvince(); }
                 if (!matchCity    ) { city     = hospital.getCity();     }
@@ -148,8 +151,8 @@ public class HospitalService {
                 condition3 = true;
             }
 
-            if (( isAnd && (condition1 && condition2 && condition3 && condition4))
-             || (!isAnd && (condition1 || condition2 || condition3 || condition4))) {
+            if (( isAnd && (condition1 && condition2 && condition3 && condition4 && condition5))
+             || (!isAnd && (condition1 || condition2 || condition3 || condition4 || condition5))) {
                 allHospitalMatch.add(hospital);
             }
         }
@@ -299,9 +302,14 @@ public class HospitalService {
 
 
         int enable = bean.getEnable();
-        enable = enable<0 ? enable : (enable>1 ? 1 : enable);
+        enable = enable<0 ? 0 : (enable>1 ? 1 : enable);
         if (enable>=0) {
-            entity.setEnable(bean.getEnable());
+            entity.setEnable(enable);
+        }
+        int support = bean.getSupportGo2nurse();
+        support = support<0 ? 0 : (support>1 ? 1 : support);
+        if (support>=0) {
+            entity.setSupportGo2nurse(support);
         }
 
         logger.info("update hospital == " + bean);
@@ -310,7 +318,7 @@ public class HospitalService {
     }
 
     @Transactional
-    public HospitalBean update(int id, String name, String aliasName, int province, int city, int district, String address, int enable) {
+    public HospitalBean update(int id, String name, String aliasName, int province, int city, int district, String address, int enable, int supportGo2nurse) {
         HospitalBean bean = new HospitalBean();
         bean.setId(id);
         bean.setName(name);
@@ -320,6 +328,7 @@ public class HospitalService {
         bean.setAddress(address);
         bean.setEnable(enable);
         bean.setAliasName(aliasName);
+        bean.setSupportGo2nurse(supportGo2nurse);
         if (!checkRegion(bean)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -342,14 +351,23 @@ public class HospitalService {
             logger.error("hospital name has been used!");
             throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
         }
+        int enable = bean.getEnable();
+        enable = enable<0 ? 0 : (enable>1 ? 1 : enable);
+        bean.setEnable(enable);
+
+        int support = bean.getSupportGo2nurse();
+        support = support<0 ? 0 : (support>1 ? 1 : support);
+        bean.setSupportGo2nurse(support);
+
         HospitalEntity entity = entityConverter.convert(bean);
+
         logger.info("Add hospital == " + bean);
         entity = repository.save(entity);
         return entity.getId();
     }
 
     @Transactional
-    public Integer newOne(String name, String aliasName, int province, int city, int district, String address, int enable) {
+    public Integer newOne(String name, String aliasName, int province, int city, int district, String address, int enable, int supportGo2nurse) {
         HospitalBean bean = new HospitalBean();
         bean.setName(name);
         bean.setProvince(province);
@@ -358,6 +376,7 @@ public class HospitalService {
         bean.setAddress(address);
         bean.setEnable(enable);
         bean.setAliasName(aliasName);
+        bean.setSupportGo2nurse(supportGo2nurse);
         if (!checkRegion(bean)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

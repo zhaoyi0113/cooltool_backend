@@ -21,7 +21,8 @@ import java.util.List;
  */
 @Transactional
 @DatabaseSetups({
-        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_department_relation_data.xml")
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_department_relation_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_data.xml")
 })
 public class CourseDepartmentRelationServiceTest extends AbstractCooltooTest {
 

@@ -16,6 +16,7 @@ public class HospitalEntity {
     private int district;
     private String address;
     private int enable;
+    private int supportGo2nurse;
 
     @Id
     @GeneratedValue
@@ -91,17 +92,28 @@ public class HospitalEntity {
         this.aliasName = aliasName;
     }
 
+    @Column(name = "support_go2nurse")
+    public int getSupportGo2nurse() {
+        return supportGo2nurse;
+    }
+
+    public void setSupportGo2nurse(int supportGo2nurse) {
+        this.supportGo2nurse = supportGo2nurse;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" , ");
-        msg.append("name=").append(name).append(" , ");
-        msg.append("aliasName=").append(aliasName).append(" , ");
-        msg.append("province=").append(province).append(" , ");
-        msg.append("city=").append(city).append(" , ");
-        msg.append("district=").append(district).append(", ");
-        msg.append("address=").append(address).append(" , ");
-        msg.append("enable=").append(enable).append("]");
+        msg.append("id=").append(id);
+        msg.append(", name=").append(name);
+        msg.append(", aliasName=").append(aliasName);
+        msg.append(", province=").append(province);
+        msg.append(", city=").append(city);
+        msg.append(", district=").append(district);
+        msg.append(", address=").append(address);
+        msg.append(", enable=").append(enable);
+        msg.append(", supportGo2nurse=").append(supportGo2nurse);
+        msg.append("]");
         return msg.toString();
     }
 }

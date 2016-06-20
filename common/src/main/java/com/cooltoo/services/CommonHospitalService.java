@@ -79,7 +79,7 @@ public class CommonHospitalService {
             return new ArrayList<>();
         }
         List<HospitalEntity> resultSet = repository.findByIdIn(hospitalIds);
-        List<HospitalBean> hospitals = new ArrayList<>();
+        List<HospitalBean>   hospitals = new ArrayList<>();
         for (HospitalEntity result : resultSet) {
             HospitalBean bean = beanConverter.convert(result);
             hospitals.add(bean);
@@ -97,7 +97,7 @@ public class CommonHospitalService {
 
     public List<HospitalBean> searchHospital(boolean isCount, boolean isAnd, String name,
                                              int province, int city, int district, String address,
-                                             int status,
+                                             int status, int supportGo2nurse,
                                              int index, int number) {
         List<HospitalBean> allHospitals     = getAll();
         List<HospitalBean> allHospitalMatch = new ArrayList<HospitalBean>();
@@ -109,10 +109,12 @@ public class CommonHospitalService {
         boolean matchDistrict = (district>0);
         boolean matchRegion   = (matchProvince || matchCity || matchDistrict);
         boolean matchStatus   = (1==status || 0==status);
+        boolean matchSupport  = (1==supportGo2nurse || 0==supportGo2nurse);
         boolean condition1    = true;
         boolean condition2    = true;
         boolean condition3    = true;
         boolean condition4    = true;
+        boolean condition5    = true;
         if (null==allHospitals || allHospitals.isEmpty()) {
             return allHospitals;
         }
@@ -121,6 +123,7 @@ public class CommonHospitalService {
             condition1 = (condition1     || (!matchName) || (matchName && !VerifyUtil.isStringEmpty( hospital.getAliasName()) && hospital.getAliasName().contains(name)));
             condition2 = (!matchAddress) || (matchAddress && !VerifyUtil.isStringEmpty( hospital.getAddress()) && hospital.getAddress().contains(address));
             condition4 = (!matchStatus)  || (matchStatus && hospital.getEnable()==status);
+            condition5 = (!matchSupport) || (matchSupport && hospital.getSupportGo2nurse()==supportGo2nurse);
             if (matchRegion) {
                 if (!matchProvince) { province = hospital.getProvince(); }
                 if (!matchCity    ) { city     = hospital.getCity();     }
@@ -134,8 +137,8 @@ public class CommonHospitalService {
                 condition3 = true;
             }
 
-            if (( isAnd && (condition1 && condition2 && condition3 && condition4))
-             || (!isAnd && (condition1 || condition2 || condition3 || condition4))) {
+            if (( isAnd && (condition1 && condition2 && condition3 && condition4 && condition5))
+             || (!isAnd && (condition1 || condition2 || condition3 || condition4 || condition5))) {
                 allHospitalMatch.add(hospital);
             }
         }
@@ -169,6 +172,17 @@ public class CommonHospitalService {
         List<HospitalBean> allHospitalEnable = new ArrayList<HospitalBean>();
         for (HospitalBean hospital : allHospitals) {
             if (hospital.getEnable()>0) {
+                allHospitalEnable.add(hospital);
+            }
+        }
+        return allHospitalEnable;
+    }
+
+    public List<HospitalBean> getAllHospitalEnableSupportGo2nurse() {
+        List<HospitalBean> allHospitals      = getAll();
+        List<HospitalBean> allHospitalEnable = new ArrayList<HospitalBean>();
+        for (HospitalBean hospital : allHospitals) {
+            if (hospital.getEnable()>0 && hospital.getSupportGo2nurse()>0) {
                 allHospitalEnable.add(hospital);
             }
         }

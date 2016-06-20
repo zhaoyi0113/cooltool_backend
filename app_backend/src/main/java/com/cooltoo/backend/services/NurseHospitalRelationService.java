@@ -232,7 +232,7 @@ public class NurseHospitalRelationService {
             logger.error("hospital is exist");
             throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
         }
-        Integer hospitalId = hospitalService.newOne(hospitalName, "", -1, -1, -1, "", 0);
+        Integer hospitalId = hospitalService.newOne(hospitalName, "", -1, -1, -1, "", 0, 0);
         return newOne(nurseId, hospitalId, -1);
     }
 
