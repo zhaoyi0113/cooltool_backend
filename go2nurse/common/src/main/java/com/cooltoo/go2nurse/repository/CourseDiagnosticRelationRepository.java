@@ -31,5 +31,7 @@ public interface CourseDiagnosticRelationRepository extends JpaRepository<Course
             " AND (?2 IS NULL OR relation.status=?2)")
     List<Long> findByCourseIdAndStatus(List<Long> courseIds, CommonStatus status, Sort sort);
 
+    List<CourseDiagnosticRelationEntity> findByStatusAndCourseIdIn(CommonStatus status, List<Long> courseIds, Sort sort);
+
     List<CourseDiagnosticRelationEntity> findByDiagnosticIdAndCourseId(Long diagnosticId, Long courseId, Sort sort);
 }

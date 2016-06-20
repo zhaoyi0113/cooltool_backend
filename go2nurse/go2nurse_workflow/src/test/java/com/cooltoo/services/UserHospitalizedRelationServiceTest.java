@@ -142,4 +142,26 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(1, count);
     }
+
+    @Test
+    public void test() {
+        long userId = 1;
+        int hospitalId = 11;
+        int departmentId = 11;
+        CommonStatus status = CommonStatus.DELETED;
+        boolean exists = relationService.existsRelation(userId, hospitalId, departmentId, status);
+        Assert.assertTrue(exists);
+
+        hospitalId = 11;
+        departmentId = 22;
+        status = CommonStatus.DISABLED;
+        exists = relationService.existsRelation(userId, hospitalId, departmentId, status);
+        Assert.assertTrue(exists);
+
+        hospitalId = 22;
+        departmentId = 11;
+        status = CommonStatus.ENABLED;
+        exists = relationService.existsRelation(userId, hospitalId, departmentId, status);
+        Assert.assertTrue(exists);
+    }
 }

@@ -4,6 +4,8 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.service.CourseRelationManageService;
+import com.cooltoo.go2nurse.service.UserCourseRelationService;
 import com.cooltoo.go2nurse.service.UserHospitalizedRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +22,8 @@ import java.util.List;
 @Path("/hospitalized_relation")
 public class UserHospitalizedAPI {
 
+    @Autowired private CourseRelationManageService courseManageService;
+    @Autowired private UserCourseRelationService userCourseService;
     @Autowired private UserHospitalizedRelationService relationService;
 
     @Path("/get")
@@ -42,6 +46,8 @@ public class UserHospitalizedAPI {
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospitalId, departmentId);
+        List<Long> courseInHospitalDepartment = courseManageService.getCourseEnabledByHospitalIdAndDepartmentId(hospitalId, departmentId);
+        userCourseService.addUserCourseRelation(userId, courseInHospitalDepartment);
         return Response.ok(relation).build();
     }
 

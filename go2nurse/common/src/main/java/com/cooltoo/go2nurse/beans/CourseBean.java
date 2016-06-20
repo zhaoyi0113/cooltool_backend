@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.go2nurse.constants.CourseStatus;
 
 import java.util.Date;
@@ -18,6 +19,7 @@ public class CourseBean {
     private long frontCover;
     private String frontCoverUrl;
     private String link;
+    private ReadingStatus reading;
 
     public long getId() {
         return id;
@@ -91,6 +93,14 @@ public class CourseBean {
         this.link = link;
     }
 
+    public ReadingStatus getReading() {
+        return reading;
+    }
+
+    public void setReading(ReadingStatus reading) {
+        this.reading = reading;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -103,6 +113,7 @@ public class CourseBean {
         msg.append(", frontCover=").append(frontCover);
         msg.append(", frontCoverUrl=").append(frontCoverUrl);
         msg.append(", link=").append(link);
+        msg.append(", reading=").append(reading);
         msg.append("]");
         return msg.toString();
     }

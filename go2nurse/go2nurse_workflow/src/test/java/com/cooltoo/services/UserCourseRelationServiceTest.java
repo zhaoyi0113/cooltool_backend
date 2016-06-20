@@ -3,7 +3,11 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ReadingStatus;
+import com.cooltoo.go2nurse.beans.CourseBean;
+import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
 import com.cooltoo.go2nurse.beans.UserCourseRelationBean;
+import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.converter.DiagnosticEnumerationBeanConverter;
 import com.cooltoo.go2nurse.service.UserCourseRelationService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
@@ -12,22 +16,30 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hp on 2016/6/16.
  */
 @Transactional
 @DatabaseSetups({
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_hospital_relation_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_department_relation_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/course_diagnostic_relation_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/hospital_department_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/diagnostic_point.xml"),
+
         @DatabaseSetup("classpath:/com/cooltoo/services/user_course_relation_data.xml"),
+        @DatabaseSetup("classpath:/com/cooltoo/services/user_hospitalized_relation_data.xml"),
         @DatabaseSetup("classpath:/com/cooltoo/services/course_data.xml"),
         @DatabaseSetup("classpath:/com/cooltoo/services/user_data.xml")
 })
 public class UserCourseRelationServiceTest extends AbstractCooltooTest {
     @Autowired
     private UserCourseRelationService relationService;
+    @Autowired
+    private DiagnosticEnumerationBeanConverter diagnosticBeanConverter;
 
     @Test
     public void testCountByUserAndReadStatusAndStatus() {
@@ -216,5 +228,30 @@ public class UserCourseRelationServiceTest extends AbstractCooltooTest {
         String readingStatus = ReadingStatus.UNREAD.name();
         count = relationService.countByUserAndReadStatusAndStatus(userId, readingStatus, status);
         Assert.assertEquals(5, count);
+    }
+
+    @Test
+    public void testGetCourseByHospitalAndDepartment() {
+        long userId = 1;
+        Integer hospitalId = 33;
+        Integer departmentId = 22;
+        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = relationService.getCourseByHospitalAndDepartment(userId, hospitalId, departmentId);
+        Assert.assertEquals(0, courses.size());
+
+        hospitalId = 22;
+        departmentId = 11;
+        courses = relationService.getCourseByHospitalAndDepartment(userId, hospitalId, departmentId);
+        Assert.assertEquals(0, courses.size());
+
+        userId = 4;
+        hospitalId = 22;
+        departmentId = 22;
+        courses = relationService.getCourseByHospitalAndDepartment(userId, hospitalId, departmentId);
+        Assert.assertEquals(2, courses.size());
+        Set<DiagnosticEnumerationBean> keys = courses.keySet();
+        for (DiagnosticEnumerationBean key : keys) {
+            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
+            Assert.assertEquals(4, courses.get(key).get(0).getId());
+        }
     }
 }

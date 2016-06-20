@@ -24,6 +24,14 @@ public class DiagnosticEnumerationBean {
         this.name = name;
     }
 
+    public boolean equals(Object obj) {
+        if (obj instanceof DiagnosticEnumerationBean) {
+            DiagnosticEnumerationBean bean = (DiagnosticEnumerationBean) obj;
+            return bean.getId()==id && name.equals(bean.getName());
+        }
+        return false;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");

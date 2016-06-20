@@ -65,6 +65,13 @@ public class UserHospitalizedRelationService {
         return count;
     }
 
+    public boolean existsRelation(long userId, int hospitalId, int departmentId, CommonStatus status) {
+        logger.info("judge exists of relation by userId={} hospitalId={} departmentId={} status={}",
+                userId, hospitalId, departmentId, status);
+        List<UserHospitalizedRelationEntity> relations = repository.findByStatusAndUserIdAndHospitalIdAndDepartmentId(status, userId, hospitalId, departmentId);
+        return !VerifyUtil.isListEmpty(relations);
+    }
+
     public List<UserHospitalizedRelationBean> getRelation(long userId, String strStatus) {
         logger.info("get the hospitalized with user={} status={}",
                 userId, strStatus);

@@ -4,9 +4,10 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.beans.CourseBean;
-import com.cooltoo.go2nurse.beans.CourseCategoryBean;
-import com.cooltoo.go2nurse.beans.UserCourseRelationBean;
+import com.cooltoo.go2nurse.beans.*;
+import com.cooltoo.go2nurse.constants.CourseStatus;
+import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.converter.DiagnosticEnumerationBeanConverter;
 import com.cooltoo.go2nurse.converter.UserCourseRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.UserCourseRelationEntity;
 import com.cooltoo.go2nurse.repository.CourseRepository;
@@ -22,9 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hp on 2016/6/15.
@@ -39,12 +38,16 @@ public class UserCourseRelationService {
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 
+    @Autowired private UserHospitalizedRelationService userHospitalizedRelationService;
     @Autowired private CourseRelationManageService courseRelationManageService;
     @Autowired private CourseCategoryService courseCategoryService;
+    @Autowired private DiagnosticEnumerationBeanConverter diagnosticBeanConverter;
+
     @Autowired private UserCourseRelationRepository repository;
     @Autowired private UserCourseRelationBeanConverter beanConverter;
     @Autowired private UserRepository userRepository;
     @Autowired private CourseRepository courseRepository;
+    @Autowired private CourseService courseService;
 
     //===================================================
     //               get
@@ -56,6 +59,61 @@ public class UserCourseRelationService {
             courseIds.add(tmp.getCourseId());
         }
         return courseCategoryService.getCategoryByCourseId(strStatus, courseIds);
+    }
+
+    public Map<DiagnosticEnumerationBean, List<CourseBean>> getCourseByHospitalAndDepartment(long userId, Integer hospitalId, Integer departmentId) {
+        logger.info("get course by userId={} hospitalId={} departmentId={}", userId, hospitalId, departmentId);
+        Map<DiagnosticEnumerationBean, List<CourseBean>> retVal = new HashMap<>();
+        boolean exist = userHospitalizedRelationService.existsRelation(userId, hospitalId, departmentId, CommonStatus.ENABLED);
+        if (!exist) {
+            return retVal;
+        }
+        // get courses added by user
+        String readUnread = ReadingStatus.UNREAD.name()+","+ReadingStatus.READ;
+        List<UserCourseRelationBean> userCourses = getRelation(userId, readUnread, CommonStatus.ENABLED.name());
+        Map<Long, UserCourseRelationBean> userCoursesIdAndStatus = new HashMap<>();
+        for (UserCourseRelationBean userCourse : userCourses) {
+            userCoursesIdAndStatus.put(Long.valueOf(userCourse.getCourseId()), userCourse);
+        }
+
+        // get courses in hospital and department
+        Map<Long, List<Long>> diagnosticIdCourseIds = courseRelationManageService.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        Set<Long> diagnosticIds = diagnosticIdCourseIds.keySet();
+        for (Long diagnosticId : diagnosticIds) {
+            List<CourseBean> courses = courseService.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), diagnosticIdCourseIds.get(diagnosticId));
+            for (int i=0, count=courses.size(); i<count; i++) {
+                CourseBean course = courses.get(i);
+                // remove the course not in user's courses
+                if (!userCoursesIdAndStatus.containsKey(course.getId())) {
+                    courses.remove(course);
+                    i --;
+                    count --;
+                    continue;
+                }
+                // set course reading status
+                UserCourseRelationBean userCourseRelation = userCoursesIdAndStatus.get(course.getId());
+                course.setReading(userCourseRelation.getReadingStatus());
+            }
+            // backup the user's course in to diagnostic point
+            DiagnosticEnumerationBean diagnostic = diagnosticBeanConverter.convert(DiagnosticEnumeration.parseInt(diagnosticId.intValue()));
+            retVal.put(diagnostic, courses);
+        }
+
+        logger.info("course in hospital and department count is {}", retVal.size());
+        return retVal;
+    }
+
+    public Map<UserHospitalizedRelationBean, Map<DiagnosticEnumerationBean, List<CourseBean>>> getUserCourses(long userId, String strStatus) {
+        logger.info("get user's courses, user is {}", userId);
+        List<UserHospitalizedRelationBean> userHospitalized =  userHospitalizedRelationService.getRelation(userId, strStatus);
+
+        Map<UserHospitalizedRelationBean, Map<DiagnosticEnumerationBean, List<CourseBean>>> hospitalizedToDiagnosticCourses = new HashMap<>();
+        for (UserHospitalizedRelationBean hospitalized : userHospitalized) {
+            Map<DiagnosticEnumerationBean, List<CourseBean>> diagnosticCourses = getCourseByHospitalAndDepartment(userId, hospitalized.getHospitalId(), hospitalized.getDepartmentId());
+            hospitalizedToDiagnosticCourses.put(hospitalized, diagnosticCourses);
+        }
+        logger.info("get user's course, count={}", hospitalizedToDiagnosticCourses.size());
+        return hospitalizedToDiagnosticCourses;
     }
 
     public long countByUserAndReadStatusAndStatus(long userId, String strReadingStatuses, String strStatus) {

@@ -198,4 +198,53 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(3, keyToCourse.get(CourseRelationManageService.key_department).size());
         Assert.assertEquals(1, keyToCourse.get(CourseRelationManageService.key_diagnostic).size());
     }
+
+    @Test
+    public void testGetCourseEnabledByHospitalIdAndDepartmentId() {
+        Integer hospitalId = 22;
+        Integer departmentId = 11;
+        List<Long> coursesId = service.getCourseEnabledByHospitalIdAndDepartmentId(hospitalId, departmentId);
+        Assert.assertEquals(2, coursesId.size());
+        Assert.assertEquals(3L, coursesId.get(0).longValue());
+        Assert.assertEquals(2L, coursesId.get(1).longValue());
+
+        departmentId = 22;
+        coursesId = service.getCourseEnabledByHospitalIdAndDepartmentId(hospitalId, departmentId);
+        Assert.assertEquals(3, coursesId.size());
+        Assert.assertEquals(4L, coursesId.get(0).longValue());
+        Assert.assertEquals(3L, coursesId.get(1).longValue());
+        Assert.assertEquals(2L, coursesId.get(2).longValue());
+    }
+
+    @Test
+    public void testGetDiagnosticToCoursesMapInDepartment() {
+        Integer hospitalId = 33;
+        Integer departmentId = 33;
+        Map<Long, List<Long>> coursesId = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        Assert.assertEquals(4, coursesId.size());
+        Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(2L)));
+        Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(3L)));
+        Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(4L)));
+        Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(5L)));
+        Assert.assertEquals(1, coursesId.get(Long.valueOf(2L)).size());
+        Assert.assertEquals(Long.valueOf(4), coursesId.get(Long.valueOf(2L)).get(0));
+        Assert.assertEquals(2, coursesId.get(Long.valueOf(3L)).size());
+        Assert.assertEquals(Long.valueOf(7), coursesId.get(Long.valueOf(3L)).get(0));
+        Assert.assertEquals(Long.valueOf(6), coursesId.get(Long.valueOf(3L)).get(1));
+        Assert.assertEquals(2, coursesId.get(Long.valueOf(4L)).size());
+        Assert.assertEquals(Long.valueOf(5), coursesId.get(Long.valueOf(4L)).get(0));
+        Assert.assertEquals(Long.valueOf(4), coursesId.get(Long.valueOf(4L)).get(1));
+        Assert.assertEquals(1, coursesId.get(Long.valueOf(5L)).size());
+        Assert.assertEquals(Long.valueOf(5), coursesId.get(Long.valueOf(5L)).get(0));
+
+        departmentId = 22;
+        coursesId = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        Assert.assertEquals(2, coursesId.size());
+        Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(2L)));
+        Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(4L)));
+        Assert.assertEquals(1, coursesId.get(Long.valueOf(2L)).size());
+        Assert.assertEquals(Long.valueOf(4), coursesId.get(Long.valueOf(2L)).get(0));
+        Assert.assertEquals(1, coursesId.get(Long.valueOf(4L)).size());
+        Assert.assertEquals(Long.valueOf(4), coursesId.get(Long.valueOf(4L)).get(0));
+    }
 }

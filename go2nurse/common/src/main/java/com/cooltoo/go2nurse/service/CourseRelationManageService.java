@@ -88,6 +88,30 @@ public class CourseRelationManageService {
         return diagnostics;
     }
 
+    public List<Long> getCourseEnabledByHospitalIdAndDepartmentId(Integer hospitalId, Integer departmentId) {
+        logger.info("get course ids by hospitalId={} departmentId={}", hospitalId, departmentId);
+        if (!hospitalExist(hospitalId)) {
+            logger.error("hospital not exists!");
+            return new ArrayList<>();
+        }
+        if (!departmentExist(departmentId)) {
+            logger.error("department not exists!");
+            return new ArrayList<>();
+        }
+        List<Long> coursesInHospital = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
+        List<Long> coursesInHospitalDepartment = departmentRelation.judgeCourseInDepartment(departmentId, coursesInHospital, CommonStatus.ENABLED.name());
+        logger.info("course in hospital and department={}", coursesInHospitalDepartment);
+        return coursesInHospitalDepartment;
+    }
+
+    public Map<Long, List<Long>> getDiagnosticToCoursesMapInDepartment(Integer hospitalId, Integer departmentId) {
+        logger.info("get diagnostic to courses map in department by hospitalId={} departmentId={}", hospitalId, departmentId);
+        List<Long> courseInDepartment = getCourseEnabledByHospitalIdAndDepartmentId(hospitalId, departmentId);
+        Map<Long, List<Long>> diagnosticToCourses = diagnosticRelation.getDiagnosticToCourseIds(courseInDepartment, CommonStatus.ENABLED);
+        logger.info("diagnostic to courses map in department is {}", diagnosticToCourses);
+        return diagnosticToCourses;
+    }
+
     public Map<String, List<Long>> getCoursesIdByConditions(List<Long> courseIds,
                                                             int hospitalId, int departmentId, long diagnosticId,
                                                             String strHospitalRelationStatus, String strCourseStatus

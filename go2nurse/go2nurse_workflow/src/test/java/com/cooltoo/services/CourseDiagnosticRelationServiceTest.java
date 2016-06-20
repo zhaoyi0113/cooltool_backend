@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/6/12.
@@ -182,5 +183,40 @@ public class CourseDiagnosticRelationServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(newExisted.contains(Long.valueOf(3L)));
         Assert.assertFalse(newExisted.contains(Long.valueOf(4L)));
         Assert.assertFalse(newExisted.contains(Long.valueOf(2L)));
+    }
+
+    @Test
+    public void testGetDiagnosticToCourseIds() {
+        List<Long> coursesId = Arrays.asList(new Long[]{5L, 6L});
+        CommonStatus status = null;
+        Map<Long, List<Long>> diagnosticToCourses = service.getDiagnosticToCourseIds(coursesId, status);
+        Assert.assertEquals(0, diagnosticToCourses.size());
+
+        status = CommonStatus.ENABLED;
+        diagnosticToCourses = service.getDiagnosticToCourseIds(coursesId, status);
+        Assert.assertEquals(3, diagnosticToCourses.size());
+        Assert.assertTrue(diagnosticToCourses.keySet().contains(Long.valueOf(3L)));
+        Assert.assertTrue(diagnosticToCourses.keySet().contains(Long.valueOf(4L)));
+        Assert.assertTrue(diagnosticToCourses.keySet().contains(Long.valueOf(5L)));
+        Assert.assertEquals(1, diagnosticToCourses.get(Long.valueOf(3L)).size());
+        Assert.assertEquals(Long.valueOf(6), diagnosticToCourses.get(Long.valueOf(3L)).get(0));
+        Assert.assertEquals(1, diagnosticToCourses.get(Long.valueOf(4L)).size());
+        Assert.assertEquals(Long.valueOf(5), diagnosticToCourses.get(Long.valueOf(4L)).get(0));
+        Assert.assertEquals(1, diagnosticToCourses.get(Long.valueOf(5L)).size());
+        Assert.assertEquals(Long.valueOf(5), diagnosticToCourses.get(Long.valueOf(5L)).get(0));
+
+        status = CommonStatus.DISABLED;
+        diagnosticToCourses = service.getDiagnosticToCourseIds(coursesId, status);
+        Assert.assertEquals(1, diagnosticToCourses.size());
+        Assert.assertTrue(diagnosticToCourses.keySet().contains(Long.valueOf(2L)));
+        Assert.assertEquals(1, diagnosticToCourses.get(Long.valueOf(2L)).size());
+        Assert.assertEquals(Long.valueOf(5), diagnosticToCourses.get(Long.valueOf(2L)).get(0));
+
+        status = CommonStatus.DELETED;
+        diagnosticToCourses = service.getDiagnosticToCourseIds(coursesId, status);
+        Assert.assertEquals(1, diagnosticToCourses.size());
+        Assert.assertTrue(diagnosticToCourses.keySet().contains(Long.valueOf(2L)));
+        Assert.assertEquals(1, diagnosticToCourses.get(Long.valueOf(2L)).size());
+        Assert.assertEquals(Long.valueOf(6), diagnosticToCourses.get(Long.valueOf(2L)).get(0));
     }
 }

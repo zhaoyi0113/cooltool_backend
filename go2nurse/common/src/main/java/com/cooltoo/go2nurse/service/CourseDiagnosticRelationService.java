@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Created by hp on 2016/6/12.
@@ -78,6 +80,28 @@ public class CourseDiagnosticRelationService {
         }
         logger.info("count is {}", courseIds.size());
         return courseIds;
+    }
+
+    public Map<Long, List<Long>> getDiagnosticToCourseIds(List<Long> courseIds, CommonStatus status) {
+        logger.info("get diagnostic to course ids map by courseIds={} status={}", courseIds, status);
+        List<CourseDiagnosticRelationEntity> relations = repository.findByStatusAndCourseIdIn(status, courseIds, sort);
+        Map<Long, List<Long>> diagnosticToCourses = new HashMap<>();
+        if (!VerifyUtil.isListEmpty(relations)) {
+            for (CourseDiagnosticRelationEntity relation : relations) {
+                Long diagnosticId = relation.getDiagnosticId();
+                Long courseId = relation.getCourseId();
+                List<Long> courseIdsInDiagnostic = diagnosticToCourses.get(diagnosticId);
+                if (null==courseIdsInDiagnostic) {
+                    courseIdsInDiagnostic = new ArrayList<>();
+                    diagnosticToCourses.put(diagnosticId, courseIdsInDiagnostic);
+                }
+                if (!courseIdsInDiagnostic.contains(courseId)) {
+                    courseIdsInDiagnostic.add(courseId);
+                }
+            }
+        }
+        logger.info("diagnostic to courses map is {}", diagnosticToCourses);
+        return diagnosticToCourses;
     }
 
     public List<Long> getDiagnosticByCourseId(List<Long> courseIds, String strStatus) {
