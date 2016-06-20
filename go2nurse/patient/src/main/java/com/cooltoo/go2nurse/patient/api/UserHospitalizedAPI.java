@@ -2,6 +2,8 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.go2nurse.beans.CourseBean;
+import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
 import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
@@ -15,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/6/16.
@@ -63,4 +66,18 @@ public class UserHospitalizedAPI {
         UserHospitalizedRelationBean relation = relationService.updateRelation(relationId, true, userId, status);
         return Response.ok(relation).build();
     }
+
+    @Path("/get_courses/{hospital_id}/{department_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUserHospitalizedCourses(@Context HttpServletRequest request,
+                                   @PathParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                   @PathParam("department_id") @DefaultValue("0") int departmentId
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = userCourseService.getCourseByHospitalAndDepartment(userId, hospitalId, departmentId);
+        return Response.ok(courses).build();
+    }
+
 }
