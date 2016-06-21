@@ -57,6 +57,13 @@ public class HospitalService {
         return hospitalBeans;
     }
 
+    public List<HospitalBean> getHospitalByUniqueId(String uniqueId) {
+        List<HospitalEntity> hospitals = repository.findByUniqueId(uniqueId);
+        List<HospitalBean> hospitalBeans = entities2Beans(hospitals);
+        fillOtherProperties(hospitalBeans);
+        return hospitalBeans;
+    }
+
     public List<HospitalBean> getAll() {
         Iterable<HospitalEntity> iterable = repository.findAll();
         List<HospitalBean> all = new ArrayList<>();
@@ -111,7 +118,7 @@ public class HospitalService {
 
     public List<HospitalBean> searchHospital(boolean isCount, boolean isAnd, String name,
                                              int province, int city, int district, String address,
-                                             int status, int supportGo2nurse,
+                                             int status, int supportGo2nurse, //String uniqueId,
                                              int index, int number) {
         List<HospitalBean> allHospitals     = getAll();
         List<HospitalBean> allHospitalMatch = new ArrayList<HospitalBean>();
@@ -124,11 +131,13 @@ public class HospitalService {
         boolean matchRegion   = (matchProvince || matchCity || matchDistrict);
         boolean matchStatus   = (1==status || 0==status);
         boolean matchSupport  = (1==supportGo2nurse || 0==supportGo2nurse);
+        //boolean matchUniqueId = !VerifyUtil.isStringEmpty(uniqueId);
         boolean condition1    = true;
         boolean condition2    = true;
         boolean condition3    = true;
         boolean condition4    = true;
         boolean condition5    = true;
+        //boolean condition6    = true;
         if (null==allHospitals || allHospitals.isEmpty()) {
             return allHospitals;
         }
@@ -138,6 +147,7 @@ public class HospitalService {
             condition2 = (!matchAddress) || (matchAddress && !VerifyUtil.isStringEmpty( hospital.getAddress()) && hospital.getAddress().contains(address));
             condition4 = (!matchStatus)  || (matchStatus && hospital.getEnable()==status);
             condition5 = (!matchSupport) || (matchSupport && hospital.getSupportGo2nurse()==supportGo2nurse);
+            //condition6 = (!matchUniqueId)|| (matchUniqueId && !VerifyUtil.isStringEmpty(hospital.getUniqueId()) && hospital.getUniqueId().contains(uniqueId));
             if (matchRegion) {
                 if (!matchProvince) { province = hospital.getProvince(); }
                 if (!matchCity    ) { city     = hospital.getCity();     }
@@ -151,8 +161,8 @@ public class HospitalService {
                 condition3 = true;
             }
 
-            if (( isAnd && (condition1 && condition2 && condition3 && condition4 && condition5))
-             || (!isAnd && (condition1 || condition2 || condition3 || condition4 || condition5))) {
+            if (( isAnd && (condition1 && condition2 && condition3 && condition4 && condition5 /*&& condition6*/))
+             || (!isAnd && (condition1 || condition2 || condition3 || condition4 || condition5 /*&& condition6*/))) {
                 allHospitalMatch.add(hospital);
             }
         }
@@ -358,6 +368,14 @@ public class HospitalService {
         int support = bean.getSupportGo2nurse();
         support = support<0 ? 0 : (support>1 ? 1 : support);
         bean.setSupportGo2nurse(support);
+
+        String uniqueId = System.currentTimeMillis()+"_"+System.nanoTime();
+        try {
+            uniqueId = VerifyUtil.sha1(bean.getName())+"_"+uniqueId;
+        }
+        catch (Exception ex) {
+        }
+        bean.setUniqueId(uniqueId);
 
         HospitalEntity entity = entityConverter.convert(bean);
 

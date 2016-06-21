@@ -15,6 +15,7 @@ public class HospitalDepartmentEntity {
     private long imageId;
     private long disableImageId;
     private int parentId;
+    private String uniqueId;
 
     @Id
     @GeneratedValue
@@ -81,16 +82,27 @@ public class HospitalDepartmentEntity {
         this.parentId = parentId;
     }
 
+    @Column(name = "unique_id")
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" , ");
-        msg.append("name=").append(name).append(" , ");
-        msg.append("description=").append(description).append(" , ");
-        msg.append("enable=").append(enable).append(" , ");
-        msg.append("imageId=").append(imageId).append(" , ");
-        msg.append("disableImageId=").append(disableImageId).append(" , ");
-        msg.append("parentId=").append(parentId).append("]");
+        msg.append("id=").append(id);
+        msg.append(", name=").append(name);
+        msg.append(", description=").append(description);
+        msg.append(", enable=").append(enable);
+        msg.append(", imageId=").append(imageId);
+        msg.append(", disableImageId=").append(disableImageId);
+        msg.append(", parentId=").append(parentId);
+        msg.append(", uniqueId=").append(uniqueId);
+        msg.append("]");
         return msg.toString();
     }
 }

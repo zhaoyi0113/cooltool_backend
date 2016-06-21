@@ -22,6 +22,7 @@ public class HospitalBeanConverter implements Converter<HospitalEntity, Hospital
         bean.setEnable(source.getEnable());
         bean.setAliasName(source.getAliasName());
         bean.setSupportGo2nurse(source.getSupportGo2nurse());
+        bean.setUniqueId(source.getUniqueId());
         return bean;
     }
 }

@@ -16,7 +16,7 @@ public interface HospitalRepository extends CrudRepository<HospitalEntity, Integ
     Page<HospitalEntity> findAll(Pageable page);
     List<HospitalEntity> findByIdIn(List<Integer> ids);
     List<HospitalEntity> findByName(String name);
-
+    List<HospitalEntity> findByUniqueId(String uniqueId);
     List<HospitalEntity> findByProvinceAndEnable(int provinceId, int enable);
 //    @Query("FROM HospitalEntity h WHERE ")
 //    List<HospitalEntity> findByNameAddressAndRegion(@Param)

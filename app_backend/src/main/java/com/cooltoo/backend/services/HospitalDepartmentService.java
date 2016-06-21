@@ -346,6 +346,14 @@ public class HospitalDepartmentService {
         HospitalDepartmentEntity entity = new HospitalDepartmentEntity();
         entity.setName(name);
 
+        String uniqueId = System.currentTimeMillis()+"_"+System.nanoTime();
+        try {
+            uniqueId = VerifyUtil.sha1(name)+"_"+uniqueId;
+        }
+        catch (Exception ex) {
+        }
+        entity.setUniqueId(uniqueId);
+
         if (!VerifyUtil.isStringEmpty(description)) {
             entity.setDescription(description);
         }

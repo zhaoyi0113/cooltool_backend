@@ -20,6 +20,7 @@ public class HospitalDepartmentBeanConverter implements Converter<HospitalDepart
         bean.setImageId(source.getImageId());
         bean.setDisableImageId(source.getDisableImageId());
         bean.setParentId(source.getParentId());
+        bean.setUniqueId(source.getUniqueId());
         return bean;
     }
 }

@@ -16,6 +16,7 @@ public class HospitalBean {
     private String address;
     private int enable;
     private int supportGo2nurse;
+    private String uniqueId;
 
     public int getId() {
         return id;
@@ -113,6 +114,14 @@ public class HospitalBean {
         this.supportGo2nurse = supportGo2nurse;
     }
 
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -125,6 +134,7 @@ public class HospitalBean {
         msg.append(", address=").append(address);
         msg.append(", enable=").append(enable);
         msg.append(", supportGo2nurse=").append(supportGo2nurse);
+        msg.append(", uniqueId=").append(uniqueId);
         msg.append("]");
         return msg.toString();
     }

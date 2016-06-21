@@ -17,6 +17,7 @@ public class HospitalDepartmentBean {
     private String disableImageUrl;
     private int parentId;
     private boolean parentValid;
+    private String uniqueId;
     private List<HospitalDepartmentBean> subDepartment;
 
     public int getId() {
@@ -99,6 +100,14 @@ public class HospitalDepartmentBean {
         this.parentValid = parentValid;
     }
 
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
     public List<HospitalDepartmentBean> getSubDepartment() {
         return this.subDepartment;
     }
@@ -118,7 +127,9 @@ public class HospitalDepartmentBean {
         msg.append(", imageUrl=").append(imageUrl);
         msg.append(", disableImageId=").append(disableImageId);
         msg.append(", disableImageUrl=").append(disableImageUrl);
-        msg.append("parentId=").append(parentId).append("]");
+        msg.append(", parentId=").append(parentId);
+        msg.append(", uniqueId=").append(uniqueId);
+        msg.append("]");
         return msg.toString();
     }
 }
