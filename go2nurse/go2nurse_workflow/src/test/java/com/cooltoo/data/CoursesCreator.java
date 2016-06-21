@@ -3,14 +3,12 @@ package com.cooltoo.data;
 import com.cooltoo.Application;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.converter.DiagnosticEnumerationBeanConverter;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import com.cooltoo.go2nurse.service.CourseService;
-import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
@@ -25,7 +23,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by hp on 6/21/16.
@@ -33,7 +33,7 @@ import java.util.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebAppConfiguration
-/*@Ignore*/
+@Ignore
 @TestExecutionListeners({
         DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
