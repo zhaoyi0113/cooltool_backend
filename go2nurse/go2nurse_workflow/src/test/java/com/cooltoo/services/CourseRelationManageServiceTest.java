@@ -14,9 +14,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by hp on 2016/6/12.
@@ -203,13 +203,13 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
     public void testGetCourseEnabledByHospitalIdAndDepartmentId() {
         Integer hospitalId = 22;
         Integer departmentId = 11;
-        List<Long> coursesId = service.getCourseEnabledByHospitalIdAndDepartmentId(hospitalId, departmentId);
+        List<Long> coursesId = service.getEnabledCoursesIdByHospitalIdAndDepartmentId(hospitalId, departmentId);
         Assert.assertEquals(2, coursesId.size());
         Assert.assertEquals(3L, coursesId.get(0).longValue());
         Assert.assertEquals(2L, coursesId.get(1).longValue());
 
         departmentId = 22;
-        coursesId = service.getCourseEnabledByHospitalIdAndDepartmentId(hospitalId, departmentId);
+        coursesId = service.getEnabledCoursesIdByHospitalIdAndDepartmentId(hospitalId, departmentId);
         Assert.assertEquals(3, coursesId.size());
         Assert.assertEquals(4L, coursesId.get(0).longValue());
         Assert.assertEquals(3L, coursesId.get(1).longValue());
@@ -220,7 +220,7 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
     public void testGetDiagnosticToCoursesMapInDepartment() {
         Integer hospitalId = 33;
         Integer departmentId = 33;
-        Map<Long, List<Long>> coursesId = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        Map<Long, List<Long>> coursesId = service.getDiagnosticIdToCoursesIdMapInDepartment(hospitalId, departmentId);
         Assert.assertEquals(4, coursesId.size());
         Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(2L)));
         Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(3L)));
@@ -238,7 +238,7 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(Long.valueOf(5), coursesId.get(Long.valueOf(5L)).get(0));
 
         departmentId = 22;
-        coursesId = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        coursesId = service.getDiagnosticIdToCoursesIdMapInDepartment(hospitalId, departmentId);
         Assert.assertEquals(2, coursesId.size());
         Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(2L)));
         Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(4L)));
@@ -246,5 +246,44 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(Long.valueOf(4), coursesId.get(Long.valueOf(2L)).get(0));
         Assert.assertEquals(1, coursesId.get(Long.valueOf(4L)).size());
         Assert.assertEquals(Long.valueOf(4), coursesId.get(Long.valueOf(4L)).get(0));
+    }
+
+    @Test
+    public void testGetEnabledCourseIdInExtensionNursing() {
+        List<Long> coursesId = service.getEnabledCoursesIdInExtensionNursing();
+        Assert.assertEquals(2, coursesId.size());
+        Assert.assertTrue(coursesId.contains(Long.valueOf(8)));
+        Assert.assertTrue(coursesId.contains(Long.valueOf(9)));
+
+        List<CourseBean> courses = service.getEnabledCoursesInExtensionNursing();
+        Assert.assertEquals(0, courses.size());
+    }
+
+    @Test
+    public void testGetCourseByHospitalAndDepartment() {
+        Integer hospitalId = 33;
+        Integer departmentId = 22;
+        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        Assert.assertEquals(2, courses.size());
+        Set<DiagnosticEnumerationBean> keys = courses.keySet();
+        for (DiagnosticEnumerationBean key : keys) {
+            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
+            Assert.assertEquals(4, courses.get(key).get(0).getId());
+        }
+
+        hospitalId = 22;
+        departmentId = 11;
+        courses = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        Assert.assertEquals(0, courses.size());
+
+        hospitalId = 22;
+        departmentId = 22;
+        courses = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        Assert.assertEquals(2, courses.size());
+        keys = courses.keySet();
+        for (DiagnosticEnumerationBean key : keys) {
+            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
+            Assert.assertEquals(4, courses.get(key).get(0).getId());
+        }
     }
 }

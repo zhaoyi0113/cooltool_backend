@@ -297,7 +297,7 @@ public class CourseService {
         entity.setTime(new Date());
         entity = repository.save(entity);
         if (entity.getId()>0) {
-            if (relationManageService.hospitalExist(hospitalId)){
+            if (relationManageService.hospitalExist(hospitalId) || -1==hospitalId){
                 boolean success = relationManageService.addCourseToHospital(entity.getId(), hospitalId);
                 if (!success) {
                     logger.error("add course to hospital failed!");

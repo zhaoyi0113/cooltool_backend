@@ -35,4 +35,6 @@ public interface UserCourseRelationRepository extends JpaRepository<UserCourseRe
             " AND (relation.readingStatus IN (?2))" +
             " AND (?3 IS NULL OR relation.status=?3)")
     Page<UserCourseRelationEntity> findByUserIdAndReadStatusAndStatus(Long userId, List<ReadingStatus> readingStatus, CommonStatus status, Pageable page);
+
+    List<UserCourseRelationEntity> findByUserIdAndCourseId(Long userId, Long courseId, Sort sort);
 }

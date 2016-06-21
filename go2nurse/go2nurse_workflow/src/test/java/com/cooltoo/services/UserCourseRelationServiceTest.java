@@ -229,29 +229,4 @@ public class UserCourseRelationServiceTest extends AbstractCooltooTest {
         count = relationService.countByUserAndReadStatusAndStatus(userId, readingStatus, status);
         Assert.assertEquals(5, count);
     }
-
-    @Test
-    public void testGetCourseByHospitalAndDepartment() {
-        long userId = 1;
-        Integer hospitalId = 33;
-        Integer departmentId = 22;
-        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = relationService.getCourseByHospitalAndDepartment(userId, hospitalId, departmentId);
-        Assert.assertEquals(0, courses.size());
-
-        hospitalId = 22;
-        departmentId = 11;
-        courses = relationService.getCourseByHospitalAndDepartment(userId, hospitalId, departmentId);
-        Assert.assertEquals(0, courses.size());
-
-        userId = 4;
-        hospitalId = 22;
-        departmentId = 22;
-        courses = relationService.getCourseByHospitalAndDepartment(userId, hospitalId, departmentId);
-        Assert.assertEquals(2, courses.size());
-        Set<DiagnosticEnumerationBean> keys = courses.keySet();
-        for (DiagnosticEnumerationBean key : keys) {
-            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
-            Assert.assertEquals(4, courses.get(key).get(0).getId());
-        }
-    }
 }

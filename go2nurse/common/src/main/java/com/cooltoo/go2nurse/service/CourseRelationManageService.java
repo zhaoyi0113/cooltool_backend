@@ -6,7 +6,9 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
+import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.converter.DiagnosticEnumerationBeanConverter;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.repository.HospitalRepository;
@@ -35,6 +37,7 @@ public class CourseRelationManageService {
     public static final String key_others = "others";
 
     @Autowired private Go2NurseUtility utility;
+    @Autowired private DiagnosticEnumerationBeanConverter diagnosticBeanConverter;
 
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private HospitalRepository hospital;
@@ -88,7 +91,22 @@ public class CourseRelationManageService {
         return diagnostics;
     }
 
-    public List<Long> getCourseEnabledByHospitalIdAndDepartmentId(Integer hospitalId, Integer departmentId) {
+    public List<Long> getEnabledCoursesIdInExtensionNursing() {
+        logger.info("get course ids in extension nursing");
+        List<Long> coursesId = hospitalRelation.getCourseInHospital(-1, CommonStatus.ENABLED.name());
+        logger.info("count is {}", coursesId.size());
+        return coursesId;
+    }
+
+    public List<CourseBean> getEnabledCoursesInExtensionNursing() {
+        logger.info("get course ids in extension nursing");
+        List<Long> coursesId = hospitalRelation.getCourseInHospital(-1, CommonStatus.ENABLED.name());
+        List<CourseBean> courses = course.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), coursesId);
+        logger.info("count is {}", courses.size());
+        return courses;
+    }
+
+    public List<Long> getEnabledCoursesIdByHospitalIdAndDepartmentId(Integer hospitalId, Integer departmentId) {
         logger.info("get course ids by hospitalId={} departmentId={}", hospitalId, departmentId);
         if (!hospitalExist(hospitalId)) {
             logger.error("hospital not exists!");
@@ -104,11 +122,38 @@ public class CourseRelationManageService {
         return coursesInHospitalDepartment;
     }
 
-    public Map<Long, List<Long>> getDiagnosticToCoursesMapInDepartment(Integer hospitalId, Integer departmentId) {
-        logger.info("get diagnostic to courses map in department by hospitalId={} departmentId={}", hospitalId, departmentId);
-        List<Long> courseInDepartment = getCourseEnabledByHospitalIdAndDepartmentId(hospitalId, departmentId);
+    public Map<Long, List<Long>> getDiagnosticIdToCoursesIdMapInDepartment(Integer hospitalId, Integer departmentId) {
+        logger.info("get diagnostic id to courses ids map in department by hospitalId={} departmentId={}", hospitalId, departmentId);
+        List<Long> courseInDepartment = getEnabledCoursesIdByHospitalIdAndDepartmentId(hospitalId, departmentId);
         Map<Long, List<Long>> diagnosticToCourses = diagnosticRelation.getDiagnosticToCourseIds(courseInDepartment, CommonStatus.ENABLED);
-        logger.info("diagnostic to courses map in department is {}", diagnosticToCourses);
+        logger.info("diagnostic to courses map in department size is {}", diagnosticToCourses.size());
+        return diagnosticToCourses;
+    }
+
+    public Map<DiagnosticEnumerationBean, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(Integer hospitalId, Integer departmentId) {
+        logger.info("get diagnostic to courses map in department by hospitalId={} departmentId={}", hospitalId, departmentId);
+        List<Long> coursesIdInDepartment = getEnabledCoursesIdByHospitalIdAndDepartmentId(hospitalId, departmentId);
+        List<CourseBean> coursesBeanInDepartment = course.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), coursesIdInDepartment);
+        Map<Long, CourseBean> courseIdToBean = new HashMap<>();
+        for (CourseBean course : coursesBeanInDepartment) {
+            courseIdToBean.put(course.getId(), course);
+        }
+        Map<Long, List<Long>> diagnosticIdToCoursesId = diagnosticRelation.getDiagnosticToCourseIds(coursesIdInDepartment, CommonStatus.ENABLED);
+        Map<DiagnosticEnumerationBean, List<CourseBean>> diagnosticToCourses = new HashMap<>();
+        Set<Long> keys = diagnosticIdToCoursesId.keySet();
+        for (Long key : keys) {
+            List<Long> coursesId = diagnosticIdToCoursesId.get(key);
+            DiagnosticEnumerationBean diagnostic = diagnosticBeanConverter.convert(DiagnosticEnumeration.parseInt(key.intValue()));
+            List<CourseBean> courses = new ArrayList<>();
+            for (Long courseId : coursesId) {
+                CourseBean course = courseIdToBean.get(courseId);
+                if (null!=course) {
+                    courses.add(course);
+                }
+            }
+            diagnosticToCourses.put(diagnostic, courses);
+        }
+        logger.info("diagnostic to courses map in department size is {}", diagnosticToCourses.size());
         return diagnosticToCourses;
     }
 
@@ -121,13 +166,12 @@ public class CourseRelationManageService {
         logger.info("course id must in {}", courseIds);
 
         Map<String, List<Long>> hospitalDepartmentDiagnostic = new HashMap<>();
-        boolean hospitalExists = hospitalExist(hospitalId);
-        if (!hospitalExists) {
-            logger.error("hospital not exists!");
+
+        List<Long> courseInHospital = hospitalRelation.getCourseInHospital(hospitalId, strHospitalRelationStatus);
+        if (VerifyUtil.isListEmpty(courseInHospital)) {
             return hospitalDepartmentDiagnostic;
         }
 
-        List<Long> courseInHospital = hospitalRelation.getCourseInHospital(hospitalId, strHospitalRelationStatus);
         if (!VerifyUtil.isListEmpty(courseIds)) {
             List<Long> coursesIdNotInHospital = new ArrayList<>();
             List<Long> validCoursesInHospital = new ArrayList<>();
@@ -249,7 +293,7 @@ public class CourseRelationManageService {
     //==============================================================================
     @Transactional
     public boolean addCourseToHospital(long courseId, int hospitalId) {
-        if (!hospitalExist(hospitalId)) {
+        if (!hospitalExist(hospitalId) && -1!=hospitalId) {
             logger.error("hospital not exists");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

@@ -75,11 +75,11 @@ public class UserCourseAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response editCourseRelation(@Context HttpServletRequest request,
-                                       @FormParam("relation_id") @DefaultValue("0") long relationId,
+                                       @FormParam("course_id") @DefaultValue("0") long courseId,
                                        @FormParam("read_status") @DefaultValue("") String readingStatus
                                        ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserCourseRelationBean relation = userCourseRelation.updateUserCourseRelation(relationId, true, userId, readingStatus, "");
+        UserCourseRelationBean relation = userCourseRelation.updateUserCourseRelation(courseId, userId, readingStatus);
         return Response.ok(relation).build();
     }
 }

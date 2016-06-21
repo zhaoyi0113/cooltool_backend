@@ -49,8 +49,6 @@ public class UserHospitalizedAPI {
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospitalId, departmentId);
-        List<Long> courseInHospitalDepartment = courseManageService.getCourseEnabledByHospitalIdAndDepartmentId(hospitalId, departmentId);
-        userCourseService.addUserCourseRelation(userId, courseInHospitalDepartment);
         return Response.ok(relation).build();
     }
 
@@ -71,12 +69,32 @@ public class UserHospitalizedAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public Response getUserHospitalizedCourses(@Context HttpServletRequest request,
-                                   @PathParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                   @PathParam("department_id") @DefaultValue("0") int departmentId
+    public Response getCoursesInDepartment(@Context HttpServletRequest request,
+                                           @PathParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                           @PathParam("department_id") @DefaultValue("0") int departmentId
     ) {
+        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = courseManageService.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        return Response.ok(courses).build();
+    }
+
+    @Path("/get_courses")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public  Response getUserHospitalizedCourses(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = userCourseService.getCourseByHospitalAndDepartment(userId, hospitalId, departmentId);
+        Map<UserHospitalizedRelationBean, Map<DiagnosticEnumerationBean, List<CourseBean>>> courses
+                = userCourseService.getUserCourses(userId, CommonStatus.ENABLED.name());
+        return Response.ok(courses).build();
+    }
+
+    @Path("/get_courses/extension_nursing")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUserExtensionNursingCourses(@Context HttpServletRequest request) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<CourseBean> courses = userCourseService.getUserCoursesInExtensionNursing(userId);
         return Response.ok(courses).build();
     }
 
