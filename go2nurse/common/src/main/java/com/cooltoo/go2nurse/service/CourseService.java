@@ -293,7 +293,7 @@ public class CourseService {
         if (!VerifyUtil.isStringEmpty(link)) {
             entity.setLink(link);
         }
-        entity.setStatus(CourseStatus.DISABLE);
+        entity.setStatus(CourseStatus.ENABLE);
         entity.setTime(new Date());
         entity = repository.save(entity);
         if (entity.getId()>0) {
