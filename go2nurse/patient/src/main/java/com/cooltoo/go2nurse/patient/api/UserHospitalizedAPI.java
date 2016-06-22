@@ -110,7 +110,7 @@ public class UserHospitalizedAPI {
             element.forEach((key, value) ->{
                 UserHospitalizedCorusesBean bean = new UserHospitalizedCorusesBean();
                 bean.setId(key.getId());
-                bean.setName(key.getName());
+                bean.setType(key.getName());
                 bean.setCourses(value);
                 beans.add(bean);
             });

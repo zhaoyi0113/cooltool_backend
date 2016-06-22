@@ -11,7 +11,7 @@ import java.util.List;
 public class UserHospitalizedCorusesBean {
 
     private long id;
-    private String name;
+    private String type;
     private List<CourseBean> courses = new ArrayList<>();
 
     public long getId() {
@@ -22,12 +22,12 @@ public class UserHospitalizedCorusesBean {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public List<CourseBean> getCourses() {
