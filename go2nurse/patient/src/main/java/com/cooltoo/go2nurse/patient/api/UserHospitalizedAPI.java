@@ -18,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -102,7 +103,13 @@ public class UserHospitalizedAPI {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Map<UserHospitalizedRelationBean, Map<DiagnosticEnumerationBean, List<CourseBean>>> courses
                 = userCourseService.getUserCourses(userId, CommonStatus.ENABLED.name());
-        return Response.ok(courses).build();
+        Map<String, List<CourseBean>> ret = new Hashtable<>();
+        courses.values().forEach((element) -> {
+            element.forEach((key, value) ->{
+                ret.put(key.getName(), value);
+            });
+        });
+        return Response.ok(ret).build();
     }
 
     @Path("/get_courses/extension_nursing")
