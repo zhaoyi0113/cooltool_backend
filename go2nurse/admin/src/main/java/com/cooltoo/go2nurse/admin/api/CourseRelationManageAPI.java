@@ -23,6 +23,17 @@ public class CourseRelationManageAPI {
 
     @Autowired private CourseRelationManageService relationManage;
 
+    @Path("/conditions/by_hospital_department")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCourseByHospitalOrDepartmentId(@Context HttpServletRequest request,
+                                                      @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                                      @QueryParam("department_id") @DefaultValue("0") int departmentId
+    ) {
+        List<CourseBean> courses = relationManage.getAllCourseByHospitalOrDepartmentId(hospitalId, departmentId);
+        return Response.ok(courses).build();
+    }
+
     @Path("/conditions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

@@ -317,4 +317,24 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
             Assert.assertEquals(4, courses.get(key).get(0).getId());
         }
     }
+
+    @Test
+    public void testGetAllCourseByHospitalOrDepartmentId() {
+        int hospitalId = 11;
+        int departmentId = 0;
+        List<CourseBean> courses = service.getAllCourseByHospitalOrDepartmentId(hospitalId, departmentId);
+        Assert.assertEquals(5, courses.size());
+
+        departmentId = 11;
+        courses = service.getAllCourseByHospitalOrDepartmentId(hospitalId, departmentId);
+        Assert.assertEquals(3, courses.size());
+
+        hospitalId = 0;
+        courses = service.getAllCourseByHospitalOrDepartmentId(hospitalId, departmentId);
+        Assert.assertEquals(3, courses.size());
+
+        departmentId = 33;
+        courses = service.getAllCourseByHospitalOrDepartmentId(hospitalId, departmentId);
+        Assert.assertEquals(5, courses.size());
+    }
 }

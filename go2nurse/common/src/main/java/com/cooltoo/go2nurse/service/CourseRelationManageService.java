@@ -132,6 +132,30 @@ public class CourseRelationManageService {
         return diagnosticToCourses;
     }
 
+    public List<CourseBean> getAllCourseByHospitalOrDepartmentId(int hospitalId, int departmentId) {
+        logger.info("get course in hospital={} department={}", hospitalId, departmentId);
+        boolean searchHospital = hospital.exists(hospitalId) || -1==hospitalId;
+        boolean searchDepartment = department.exists(departmentId);
+
+        List<Long> courseIds;
+        if (!searchHospital && !searchDepartment) {
+            courseIds = null;
+        }
+        else if (searchHospital && !searchDepartment) {
+            courseIds = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
+        }
+        else if (!searchHospital && searchDepartment) {
+            courseIds = departmentRelation.getCourseInDepartment(departmentId, CommonStatus.ENABLED.name());
+        }
+        else {
+            courseIds = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
+            courseIds = departmentRelation.judgeCourseInDepartment(departmentId, courseIds, CommonStatus.ENABLED.name());
+        }
+        List<CourseBean> courses = course.getCourseByIds(courseIds);
+        logger.info("count is {}", courses.size());
+        return courses;
+    }
+
     public Map<DiagnosticEnumerationBean, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(String hospitalUniqueId, String departmentUniqueId) {
         logger.info("get diagnostic to courses map in department by hospitalUniqueId={} departmentUniqueId={}",
                 hospitalUniqueId, departmentUniqueId);

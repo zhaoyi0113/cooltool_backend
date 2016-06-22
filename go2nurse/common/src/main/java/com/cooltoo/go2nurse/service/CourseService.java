@@ -1,9 +1,9 @@
 package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.CourseBean;
+import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.go2nurse.converter.CourseBeanConverter;
 import com.cooltoo.go2nurse.entities.CourseEntity;
 import com.cooltoo.go2nurse.repository.CourseRepository;
@@ -136,6 +136,9 @@ public class CourseService {
 
     public List<CourseBean> getCourseByIds(List<Long> courseIds) {
         logger.info("get course by ids={}", courseIds);
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return new ArrayList<>();
+        }
         List<CourseEntity> resultSet = repository.findAll(courseIds);
         List<CourseBean>   beans = entities2BeansWithoutContent(resultSet);
         fillOtherProperties(beans);
