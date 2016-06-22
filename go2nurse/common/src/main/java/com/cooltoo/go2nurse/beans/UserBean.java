@@ -24,6 +24,7 @@ public class UserBean {
     private String profilePhotoUrl;
     private UserAuthority authority;
     private UserType type;
+    private String uniqueId;
 
     public long getId() {
         return id;
@@ -67,6 +68,10 @@ public class UserBean {
 
     public UserType getType() {
         return type;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
     }
 
     public void setId(long id) {
@@ -121,6 +126,10 @@ public class UserBean {
         this.profilePhotoUrl = profilePhotoUrl;
     }
 
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -134,6 +143,7 @@ public class UserBean {
         msg.append(", password=").append(password);
         msg.append(", authority=").append(authority);
         msg.append(", type=").append(type);
+        msg.append(", uniqueId=").append(uniqueId);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

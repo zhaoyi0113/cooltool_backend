@@ -24,6 +24,7 @@ public class UserBeanConverter implements Converter<UserEntity, UserBean> {
         bean.setPassword(source.getPassword());
         bean.setAuthority(source.getAuthority());
         bean.setType(source.getType());
+        bean.setUniqueId(source.getUniqueId());
         return bean;
     }
 }

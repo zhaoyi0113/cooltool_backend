@@ -43,6 +43,13 @@ public class CommonHospitalService {
         return hospitalBeans;
     }
 
+    public List<HospitalBean> getHospitalByUniqueId(String uniqueId) {
+        List<HospitalEntity> hospitals = repository.findByUniqueId(uniqueId);
+        List<HospitalBean> hospitalBeans = entities2Beans(hospitals);
+        fillOtherProperties(hospitalBeans);
+        return hospitalBeans;
+    }
+
     public List<HospitalBean> getAll() {
         Iterable<HospitalEntity> iterable = repository.findAll();
         List<HospitalBean> all = new ArrayList<>();

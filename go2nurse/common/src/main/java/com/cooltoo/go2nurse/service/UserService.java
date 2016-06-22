@@ -6,14 +6,17 @@ import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.converter.UserBeanConverter;
+import com.cooltoo.go2nurse.entities.CourseEntity;
 import com.cooltoo.go2nurse.entities.UserEntity;
 import com.cooltoo.go2nurse.repository.UserRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.leancloud.LeanCloudService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
+import org.apache.tomcat.util.buf.UEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,9 @@ public class UserService {
     private static boolean isInitDenyUserIds = false;
     private static final List<Long> denyUserIds = new ArrayList<>();
 
+
+    private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
+
     @Autowired private UserRepository repository;
     @Autowired private UserBeanConverter beanConverter;
     @Autowired private UserGo2NurseFileStorageService userStorage;
@@ -65,6 +71,22 @@ public class UserService {
         if (null==genderType) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+
+        String uniqueId = null;
+        for (int i = 10; i>0; i--) {
+            uniqueId = NumberUtil.randomIdentity();
+            if (repository.countByUniqueId(uniqueId)<=0) {
+                break;
+            }
+            else {
+                uniqueId = null;
+            }
+        }
+        if (VerifyUtil.isStringEmpty(uniqueId)) {
+            logger.info("unique id generated failed");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
         Date birthday = new Date(NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS));
 
         UserEntity entity = new UserEntity();
@@ -75,6 +97,7 @@ public class UserService {
         entity.setPassword(password);
         entity.setAuthority(UserAuthority.AGREE_ALL);
         entity.setType(UserType.NORMAL_USER);
+        entity.setUniqueId(uniqueId);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity = repository.save(entity);
@@ -101,6 +124,15 @@ public class UserService {
         }
         logger.info("denied users' id is={}", tmp);
         return tmp;
+    }
+
+    public List<UserBean> getUserByUniqueId(String uniqueId) {
+        logger.info("get user by uniqueId={}", uniqueId);
+        List<UserEntity> resultSet = repository.findByUniqueId(uniqueId, sort);
+        List<UserBean> beans = entities2Beans(resultSet);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
     }
 
     public boolean existUser(long userId) {

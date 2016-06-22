@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,14 +36,18 @@ public class HospitalServiceTest extends AbstractCooltooTest {
         bean.setDistrict(382);
         int id = service.newOne(bean);
         Assert.assertTrue(id>0);
-        List<HospitalBean> all = service.getAll();
-        Assert.assertTrue(all.size()>0);
+        List<HospitalBean> all = service.getHospitalByIds(Arrays.asList(new Integer[]{id}));
+        Assert.assertEquals(1, all.size());
+        Assert.assertNotNull(all.get(0).getUniqueId());
     }
 
     @Test
     public void testNew2() {
         int id = service.newOne("name111", "aliasName111", 2, 33, 382, null, -1, -1);
         Assert.assertTrue(id > 0);
+        List<HospitalBean> all = service.getHospitalByIds(Arrays.asList(new Integer[]{id}));
+        Assert.assertEquals(1, all.size());
+        Assert.assertNotNull(all.get(0).getUniqueId());
     }
 
     @Test
@@ -55,6 +60,14 @@ public class HospitalServiceTest extends AbstractCooltooTest {
     public void testGetOne() {
         HospitalBean one = service.getOneById(33);
         Assert.assertEquals(33, one.getId());
+    }
+
+    @Test
+    public void testGetHospitalByUniqueId() {
+        String uniqueId = "111111";
+        List<HospitalBean> beans = service.getHospitalByUniqueId(uniqueId);
+        Assert.assertEquals(1, beans.size());
+        Assert.assertEquals(11, beans.get(0).getId());
     }
 
     @Test

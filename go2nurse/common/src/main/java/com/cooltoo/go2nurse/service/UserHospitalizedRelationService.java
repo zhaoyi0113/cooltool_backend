@@ -171,23 +171,17 @@ public class UserHospitalizedRelationService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        List<UserHospitalizedRelationEntity> entities = repository.findByUserIdAndHospitalIdAndDepartmentId(userId, hospitalId, departmentId, sort);
         UserHospitalizedRelationEntity entity;
-        if (VerifyUtil.isListEmpty(entities)) {
-            entity = new UserHospitalizedRelationEntity();
-            entity.setUserId(userId);
-            entity.setHospitalId(hospitalId);
-            entity.setDepartmentId(departmentId);
-        }
-        else {
-            entity = entities.get(0);
-            entities.remove(entity);
-        }
+        entity = new UserHospitalizedRelationEntity();
+        entity.setUserId(userId);
+        entity.setHospitalId(hospitalId);
+        entity.setDepartmentId(departmentId);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity = repository.save(entity);
         long relationId = entity.getId();
 
+        List<UserHospitalizedRelationEntity> entities;
         entities = repository.findByUserIdAndHospitalIdAndDepartmentId(userId, hospitalId, departmentId, sort);
         boolean changed = false;
         for (int i = 0, count = entities.size(); i < count; i ++) {

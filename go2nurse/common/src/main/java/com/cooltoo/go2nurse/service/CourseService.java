@@ -10,6 +10,7 @@ import com.cooltoo.go2nurse.repository.CourseRepository;
 import com.cooltoo.go2nurse.service.file.TemporaryGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.util.HtmlParser;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,14 @@ public class CourseService {
         long count = repository.countByNameLikeAndStatus(title, status);
         logger.info("count is {}", count);
         return count;
+    }
+
+    public List<CourseBean> getCourseByUniqueId(String uniqueId) {
+        logger.info("get course by uniqueId={}", uniqueId);
+        List<CourseEntity> resultSet = repository.findByUniqueId(uniqueId, sort);
+        List<CourseBean> beans = entities2BeansWithoutContent(resultSet);
+        fillOtherProperties(beans);
+        return beans;
     }
 
     public List<CourseBean> getCourseByNameAndStatus(String title, String strStatus) {
@@ -293,6 +302,23 @@ public class CourseService {
         if (!VerifyUtil.isStringEmpty(link)) {
             entity.setLink(link);
         }
+
+        String uniqueId = null;
+        for (int i = 10; i>0; i--) {
+            uniqueId = NumberUtil.randomIdentity();
+            if (repository.countByUniqueId(uniqueId)<=0) {
+                break;
+            }
+            else {
+                uniqueId = null;
+            }
+        }
+        if (VerifyUtil.isStringEmpty(uniqueId)) {
+            logger.info("unique id generated failed");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        entity.setUniqueId(uniqueId);
+
         entity.setStatus(CourseStatus.ENABLE);
         entity.setTime(new Date());
         entity = repository.save(entity);

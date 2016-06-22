@@ -11,6 +11,7 @@ import com.cooltoo.beans.RegionBean;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.RegionService;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -369,11 +370,19 @@ public class HospitalService {
         support = support<0 ? 0 : (support>1 ? 1 : support);
         bean.setSupportGo2nurse(support);
 
-        String uniqueId = System.currentTimeMillis()+"_"+System.nanoTime();
-        try {
-            uniqueId = VerifyUtil.sha1(bean.getName())+"_"+uniqueId;
+        String uniqueId = null;
+        for (int i = 10; i>0; i--) {
+            uniqueId = NumberUtil.randomIdentity();
+            if (repository.countByUniqueId(uniqueId)<=0) {
+                break;
+            }
+            else {
+                uniqueId = null;
+            }
         }
-        catch (Exception ex) {
+        if (VerifyUtil.isStringEmpty(uniqueId)) {
+            logger.info("unique id generated failed");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         bean.setUniqueId(uniqueId);
 

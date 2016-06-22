@@ -53,6 +53,18 @@ public class CommonDepartmentService {
         return beans;
     }
 
+    public List<HospitalDepartmentBean> getDepartmentByUniqueId(String uniqueId, String nginxPrefix) {
+        List<HospitalDepartmentBean> all = getAll(nginxPrefix);
+        List<HospitalDepartmentBean> departments = new ArrayList<>();
+        for (int i=0, count=all.size(); i<count; i++) {
+            HospitalDepartmentBean bean = all.get(i);
+            if (bean.getUniqueId().equals(uniqueId)) {
+                departments.add(bean);
+            }
+        }
+        return departments;
+    }
+
     public HospitalDepartmentBean getById(Integer id, String nginxPrefix) {
         HospitalDepartmentBean   bean       = null;
         HospitalDepartmentEntity department = repository.findOne(id);

@@ -20,6 +20,7 @@ public class CourseBean {
     private String frontCoverUrl;
     private String link;
     private ReadingStatus reading;
+    private String uniqueId;
 
     public long getId() {
         return id;
@@ -101,6 +102,14 @@ public class CourseBean {
         this.reading = reading;
     }
 
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -113,6 +122,7 @@ public class CourseBean {
         msg.append(", frontCover=").append(frontCover);
         msg.append(", frontCoverUrl=").append(frontCoverUrl);
         msg.append(", link=").append(link);
+        msg.append(", uniqueId=").append(uniqueId);
         msg.append(", reading=").append(reading);
         msg.append("]");
         return msg.toString();

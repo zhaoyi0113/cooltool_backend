@@ -20,6 +20,7 @@ public class CourseEntity {
     private String content;
     private long frontCover;
     private String link;
+    private String uniqueId;
 
     @Id
     @GeneratedValue
@@ -64,6 +65,11 @@ public class CourseEntity {
         return link;
     }
 
+    @Column(name = "unique_id")
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -96,6 +102,10 @@ public class CourseEntity {
         this.link = link;
     }
 
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -107,6 +117,7 @@ public class CourseEntity {
         msg.append(", content=").append(content);
         msg.append(", frontCover=").append(frontCover);
         msg.append(", link=").append(link);
+        msg.append(", uniqueId=").append(uniqueId);
         msg.append("]");
         return msg.toString();
     }

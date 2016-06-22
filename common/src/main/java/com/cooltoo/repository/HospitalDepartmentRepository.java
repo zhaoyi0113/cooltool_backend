@@ -13,4 +13,6 @@ public interface HospitalDepartmentRepository extends CrudRepository<HospitalDep
     List<HospitalDepartmentEntity> findByIdIn(List<Integer> ids, Sort sort);
     List<HospitalDepartmentEntity> findByName(String name);
     List<HospitalDepartmentEntity> findAll(Sort sort);
+    List<HospitalDepartmentEntity> findByUniqueId(String uniqueId);
+    long countByUniqueId(String uniqueId);
 }

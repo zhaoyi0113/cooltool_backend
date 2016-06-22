@@ -9,6 +9,8 @@ import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import com.cooltoo.go2nurse.service.UserCourseRelationService;
 import com.cooltoo.go2nurse.service.UserHospitalizedRelationService;
+import com.cooltoo.util.NumberUtil;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,6 +76,21 @@ public class UserHospitalizedAPI {
                                            @PathParam("department_id") @DefaultValue("0") int departmentId
     ) {
         Map<DiagnosticEnumerationBean, List<CourseBean>> courses = courseManageService.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        return Response.ok(courses).build();
+    }
+
+
+    @Path("/get_courses/{hospital_department_unique_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getCoursesInDepartment(@Context HttpServletRequest request,
+                                           @PathParam("hospital_department_unique_id") @DefaultValue("0") String hospitalDepartmentUniqueId
+    ) {
+        List<String> uniqueIds = NumberUtil.parseRandomIdentity(hospitalDepartmentUniqueId);
+        String hospitalUniqueId = uniqueIds.size()>=1 ? uniqueIds.get(0) : "";
+        String departmentUniqueId = uniqueIds.size()>=2 ? uniqueIds.get(1) : "";
+        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = courseManageService.getDiagnosticToCoursesMapInDepartment(hospitalUniqueId, departmentUniqueId);
         return Response.ok(courses).build();
     }
 

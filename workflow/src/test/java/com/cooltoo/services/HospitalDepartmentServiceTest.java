@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,8 +34,9 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
     public void testNew1() {
         int id = service.createHospitalDepartment("name111", "department111", -1, -1, null, null);
         Assert.assertTrue(id>0);
-        List<HospitalDepartmentBean> all = service.getAll();
-        Assert.assertTrue(all.size()>0);
+        List<HospitalDepartmentBean> all = service.getDepartmentsByIds(Arrays.asList(new Integer[]{id}));
+        Assert.assertEquals(1, all.size());
+        Assert.assertNotNull(all.get(0).getUniqueId());
     }
 
     @Test
@@ -47,6 +49,14 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
     public void testGetOne() {
         HospitalDepartmentBean one = service.getOneById(33);
         Assert.assertEquals(33, one.getId());
+    }
+
+    @Test
+    public void testGetDepartmentByUniqueId() {
+        String uniqueId = "111111";
+        List<HospitalDepartmentBean> beans = service.getDepartmentByUniqueId(uniqueId);
+        Assert.assertEquals(1, beans.size());
+        Assert.assertEquals(11, beans.get(0).getId());
     }
 
     @Test

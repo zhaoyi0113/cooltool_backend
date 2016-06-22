@@ -82,6 +82,14 @@ public class CourseServiceTest extends AbstractCooltooTest {
     }
 
     @Test
+    public void testGetCourseByUniqueId() {
+        String uniqueId = "111111";
+        List<CourseBean> benas = service.getCourseByUniqueId(uniqueId);
+        Assert.assertEquals(1, benas.size());
+        Assert.assertEquals(1, benas.get(0).getId());
+    }
+
+    @Test
     public void testGetCourseByStatus() {
         List<CourseBean> courses = service.getCourseByNameAndStatus("", statusAll, 1, 4);
         Assert.assertEquals(4, courses.size());
@@ -152,6 +160,7 @@ public class CourseServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(introduction, bean.getIntroduction());
         Assert.assertEquals(link, bean.getLink());
+        Assert.assertNotNull(bean.getUniqueId());
     }
 
     @Test

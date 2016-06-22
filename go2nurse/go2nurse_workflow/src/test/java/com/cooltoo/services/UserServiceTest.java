@@ -47,8 +47,9 @@ public class UserServiceTest extends AbstractCooltooTest {
         String smsCode = "aaaa";
         long id = service.registerUser(name, gender, "", mobile, password, smsCode);
         Assert.assertTrue(id>0);
-        List<UserBean> all = service.getAllByAuthorityAndFuzzyName("", name, 0, 100);
-        Assert.assertTrue(all.size()>0);
+        UserBean all = service.getUser(id);
+        Assert.assertEquals(name, all.getName());
+        Assert.assertNotNull(all.getUniqueId());
     }
 
     @Test
@@ -209,5 +210,13 @@ public class UserServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(ids.contains(13L));
         Assert.assertTrue(ids.contains(15L));
         Assert.assertTrue(ids.contains(16L));
+    }
+
+    @Test
+    public void testGetUserByUniqueId() {
+        String uniqueId = "111111";
+        List<UserBean> benas = service.getUserByUniqueId(uniqueId);
+        Assert.assertEquals(1, benas.size());
+        Assert.assertEquals(1, benas.get(0).getId());
     }
 }

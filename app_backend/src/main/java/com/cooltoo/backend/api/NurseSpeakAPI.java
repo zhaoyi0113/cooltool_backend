@@ -165,7 +165,7 @@ public class NurseSpeakAPI {
                                   @FormParam("content") @DefaultValue("") String content,
                                   @FormParam("video_code") @DefaultValue("") String videoCode
     ) {
-        logger.info("add shor video content={} video_code={}", content, videoCode);
+        logger.info("add short video content={} video_code={}", content, videoCode);
         return Response.ok().build();
     }
 

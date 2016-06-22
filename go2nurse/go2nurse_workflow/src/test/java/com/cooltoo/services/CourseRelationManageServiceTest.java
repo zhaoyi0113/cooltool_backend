@@ -286,4 +286,35 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
             Assert.assertEquals(4, courses.get(key).get(0).getId());
         }
     }
+
+
+    @Test
+    public void testGetCourseByHospitalUniqueIdAndDepartmentUniqueId() {
+        String hospitalUniqueId = "333333";
+        String departmentUniqueId = "222222";
+        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = service.getDiagnosticToCoursesMapInDepartment(
+                hospitalUniqueId, departmentUniqueId
+        );
+        Assert.assertEquals(2, courses.size());
+        Set<DiagnosticEnumerationBean> keys = courses.keySet();
+        for (DiagnosticEnumerationBean key : keys) {
+            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
+            Assert.assertEquals(4, courses.get(key).get(0).getId());
+        }
+
+        hospitalUniqueId = "222222";
+        departmentUniqueId = "111111";
+        courses = service.getDiagnosticToCoursesMapInDepartment(hospitalUniqueId, departmentUniqueId);
+        Assert.assertEquals(0, courses.size());
+
+        hospitalUniqueId = "222222";
+        departmentUniqueId = "222222";
+        courses = service.getDiagnosticToCoursesMapInDepartment(hospitalUniqueId, departmentUniqueId);
+        Assert.assertEquals(2, courses.size());
+        keys = courses.keySet();
+        for (DiagnosticEnumerationBean key : keys) {
+            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
+            Assert.assertEquals(4, courses.get(key).get(0).getId());
+        }
+    }
 }

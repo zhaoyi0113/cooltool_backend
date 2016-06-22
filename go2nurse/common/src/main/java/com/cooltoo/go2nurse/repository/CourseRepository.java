@@ -34,5 +34,6 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
             " WHERE (?1 IS NULL OR course.status=?1)" +
             " AND course.id IN (?2)")
     List<Long> findCourseIdByStatusAndIdIn(CourseStatus status, List<Long> ids, Sort sort);
-
+    long countByUniqueId(String uniqueId);
+    List<CourseEntity> findByUniqueId(String uniqueId, Sort sort);
 }

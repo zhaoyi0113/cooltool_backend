@@ -26,6 +26,7 @@ public class UserEntity {
     private long profilePhoto;
     private UserAuthority authority;
     private UserType type;
+    private String uniqueId;
 
     @Id
     @GeneratedValue
@@ -87,6 +88,11 @@ public class UserEntity {
         return type;
     }
 
+    @Column(name = "unique_id")
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -131,6 +137,10 @@ public class UserEntity {
         this.type = type;
     }
 
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -143,6 +153,7 @@ public class UserEntity {
         msg.append(", password=").append(password);
         msg.append(", authority=").append(authority);
         msg.append(", type=").append(type);
+        msg.append(", uniqueId=").append(uniqueId);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

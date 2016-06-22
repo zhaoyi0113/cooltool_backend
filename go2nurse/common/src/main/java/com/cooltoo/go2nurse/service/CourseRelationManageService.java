@@ -3,6 +3,8 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.entities.HospitalDepartmentEntity;
+import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
@@ -128,6 +130,30 @@ public class CourseRelationManageService {
         Map<Long, List<Long>> diagnosticToCourses = diagnosticRelation.getDiagnosticToCourseIds(courseInDepartment, CommonStatus.ENABLED);
         logger.info("diagnostic to courses map in department size is {}", diagnosticToCourses.size());
         return diagnosticToCourses;
+    }
+
+    public Map<DiagnosticEnumerationBean, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(String hospitalUniqueId, String departmentUniqueId) {
+        logger.info("get diagnostic to courses map in department by hospitalUniqueId={} departmentUniqueId={}",
+                hospitalUniqueId, departmentUniqueId);
+        List<HospitalEntity> hospitals = hospital.findByUniqueId(hospitalUniqueId);
+        int hospitalSize = VerifyUtil.isListEmpty(hospitals) ? 0 : hospitals.size();
+        if (hospitalSize!=1) {
+            logger.info("hospital size is not 1, size is {}", hospitalSize);
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        int hospitalId = hospitals.get(0).getId();
+        logger.info("hospitalId={}", hospitalId);
+
+        List<HospitalDepartmentEntity> departments = department.findByUniqueId(departmentUniqueId);
+        int departmentSize = VerifyUtil.isListEmpty(departments) ? 0 : departments.size();
+        if (departmentSize!=1) {
+            logger.info("department size is not 1, size is {}", departmentSize);
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        int departmentId = departments.get(0).getId();
+        logger.info("departmentId={}", departmentId);
+
+        return getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
     }
 
     public Map<DiagnosticEnumerationBean, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(Integer hospitalId, Integer departmentId) {

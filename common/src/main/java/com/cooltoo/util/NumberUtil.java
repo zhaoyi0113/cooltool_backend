@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by lg380357 on 2016/3/2.
@@ -50,5 +53,45 @@ public class NumberUtil {
         catch (Exception ex) {
             return null;
         }
+    }
+
+
+    private static final String seed = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final char[] charSeed = seed.toCharArray();
+    public static int uniqueIdSize = 6;
+    public static String randomIdentity() {
+        StringBuilder uniqueId = new StringBuilder();
+        int temp = -1;
+
+        //采用一个简单的算法以保证生成随机数的不同
+        Random rand = new Random(System.currentTimeMillis()+System.nanoTime());
+        for (int i = 1; i < uniqueIdSize + 1; i++) {
+            int t = rand.nextInt(charSeed.length);
+            uniqueId.append(charSeed[t]);
+        }
+        return uniqueId.toString();
+    }
+
+    public static List<String> parseRandomIdentity(String randomIdentity) {
+        List<String> identities = new ArrayList<>();
+        if (randomIdentity instanceof String) {
+            char[] chars = randomIdentity.toCharArray();
+            StringBuilder identity = new StringBuilder();
+            for (int i=0, count=chars.length; i<count; i++) {
+                char tmpChar = chars[i];
+                int charIndex = seed.indexOf(tmpChar);
+                if (charIndex>=0) {
+                    identity.append(tmpChar);
+                }
+                if (i+1==count || charIndex<0){
+                    String validIdentity = identity.toString();
+                    identity.setLength(0);
+                    if (validIdentity.length()==uniqueIdSize) {
+                        identities.add(validIdentity);
+                    }
+                }
+            }
+        }
+        return identities;
     }
 }

@@ -136,7 +136,7 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
 
         status = "ALL";
         count = relationService.countByUserAndStatus(userId, status);
-        Assert.assertEquals(1, count);
+        Assert.assertEquals(2, count);
 
         status = CommonStatus.ENABLED.name();
         count = relationService.countByUserAndStatus(userId, status);
@@ -144,7 +144,7 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    public void test() {
+    public void testExistsRelation() {
         long userId = 1;
         int hospitalId = 11;
         int departmentId = 11;
