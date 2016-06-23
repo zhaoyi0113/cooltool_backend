@@ -27,6 +27,7 @@ public class UserEntity {
     private UserAuthority authority;
     private UserType type;
     private String uniqueId;
+    private String address;
 
     @Id
     @GeneratedValue
@@ -93,6 +94,11 @@ public class UserEntity {
         return uniqueId;
     }
 
+    @Column(name = "address")
+    public String getAddress() {
+        return address;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -141,6 +147,10 @@ public class UserEntity {
         this.uniqueId = uniqueId;
     }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -154,6 +164,7 @@ public class UserEntity {
         msg.append(", authority=").append(authority);
         msg.append(", type=").append(type);
         msg.append(", uniqueId=").append(uniqueId);
+        msg.append(", address=").append(address);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

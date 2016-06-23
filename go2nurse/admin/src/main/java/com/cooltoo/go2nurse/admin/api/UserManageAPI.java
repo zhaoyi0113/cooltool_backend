@@ -34,9 +34,10 @@ public class UserManageAPI {
                                 @FormParam("name") @DefaultValue("") String name,
                                 @FormParam("gender") @DefaultValue("2") int gender,
                                 @FormParam("birthday") @DefaultValue("") String birthday,
+                                @FormParam("address") @DefaultValue("") String address,
                                 @FormParam("authority") @DefaultValue("1") int authority
     ) {
-        UserBean user = service.updateUser(userId, name, gender, birthday, authority);
+        UserBean user = service.updateUser(userId, name, gender, birthday, authority, address);
         logger.info("update user is " + user);
         if (null == user) {
             return Response.ok().build();

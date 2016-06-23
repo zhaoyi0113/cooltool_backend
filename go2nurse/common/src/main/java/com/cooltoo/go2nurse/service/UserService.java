@@ -284,7 +284,7 @@ public class UserService {
     //         update
     //==================================================================
     @Transactional
-    public UserBean updateUser(long userId, String name, int iGender, String strBirthday, int iAuthority) {
+    public UserBean updateUser(long userId, String name, int iGender, String strBirthday, int iAuthority, String address) {
         UserEntity entity = repository.findOne(userId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
@@ -309,6 +309,14 @@ public class UserService {
         if(null!=gender) {
             entity.setGender(gender);
             changed = true;
+        }
+
+        if (!VerifyUtil.isStringEmpty(address)) {
+            address = address.trim();
+            if (!address.equals(entity.getAddress())) {
+                entity.setAddress(address);
+                changed = true;
+            }
         }
 
         boolean authorityChanged = false;

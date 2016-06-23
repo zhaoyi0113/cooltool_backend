@@ -59,14 +59,16 @@ public class UserServiceTest extends AbstractCooltooTest {
         int gender = 2;
         String birthday = "2013-04-14 14:44:44";
         int authority = 0;
+        String address = "address testing";
 
         long lBirthday = NumberUtil.getTime(birthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        UserBean bean = service.updateUser(userId, name, gender, birthday, authority);
+        UserBean bean = service.updateUser(userId, name, gender, birthday, authority, address);
         Assert.assertNotNull(bean);
         Assert.assertEquals(1, bean.getId());
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(lBirthday,  bean.getBirthday().getTime());
         Assert.assertEquals(GenderType.SECRET, bean.getGender());
+        Assert.assertEquals(address, bean.getAddress());
         Assert.assertNotEquals("4321654312", bean.getMobile());
     }
 

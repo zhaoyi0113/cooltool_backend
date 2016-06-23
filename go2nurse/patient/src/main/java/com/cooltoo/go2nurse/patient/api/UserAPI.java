@@ -49,10 +49,11 @@ public class UserAPI {
     public Response updateUser(@Context HttpServletRequest request,
                                 @FormParam("name") @DefaultValue("") String name,
                                 @FormParam("gender") @DefaultValue("2") int gender,
-                                @FormParam("birthday") @DefaultValue("") String birthday
+                                @FormParam("birthday") @DefaultValue("") String birthday,
+                                @FormParam("address") @DefaultValue("") String address
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserBean user = service.updateUser(userId, name, gender, birthday, -1);
+        UserBean user = service.updateUser(userId, name, gender, birthday, -1, address);
         logger.info("update user is " + user);
         if (null == user) {
             return Response.ok().build();
