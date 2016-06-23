@@ -7,6 +7,7 @@ import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.backend.services.VideoInSpeakService;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.SpeakType;
+import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +118,12 @@ public class NurseSpeakAPI {
         logger.info("short video call back videoCode={} status={} durationSecond={} frontCoverUrl={}",
                 videoCode, status, durationSecond, frontCoverUrl);
         List<VideoInSpeakBean> videosUpdated = videoInSpeakService.updateVideoStatus(videoCode, status);
-        return Response.ok(videosUpdated).build();
+        if (!VerifyUtil.isListEmpty(videosUpdated)) {
+            return Response.ok(VerifyUtil.CC_VIDEO_CALLBACK_MESSAGE).build();
+        }
+        else {
+            return Response.ok().build();
+        }
     }
 
 
