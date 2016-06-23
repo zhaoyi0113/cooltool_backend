@@ -164,6 +164,7 @@ public class NurseSpeakAPI {
     @Path("/short_video")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @LoginAuthentication(requireNurseLogin = true)
     public Response addShortVideo(@Context HttpServletRequest request,
                                   @FormDataParam("content") @DefaultValue("") String content,
@@ -184,7 +185,7 @@ public class NurseSpeakAPI {
             videosInSpeak.add(video);
             nurseSpeak.setVideos(videosInSpeak);
         }
-        return Response.ok().build();
+        return Response.ok(nurseSpeak).build();
     }
 
 
