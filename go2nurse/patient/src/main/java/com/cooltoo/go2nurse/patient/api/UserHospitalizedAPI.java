@@ -62,8 +62,8 @@ public class UserHospitalizedAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addRelationByUniqueId(@Context HttpServletRequest request,
-                                @FormParam("hospital_unique_id") @DefaultValue("") String hospitalUniqueId,
-                                @FormParam("department_unique_id") @DefaultValue("") String departmentUniqueId
+                                          @FormParam("hospital_unique_id") @DefaultValue("") String hospitalUniqueId,
+                                          @FormParam("department_unique_id") @DefaultValue("") String departmentUniqueId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospitalUniqueId, departmentUniqueId);
@@ -140,6 +140,5 @@ public class UserHospitalizedAPI {
         List<CourseBean> courses = userCourseService.getUserCoursesInExtensionNursing(userId);
         return Response.ok(courses).build();
     }
-
 
 }
