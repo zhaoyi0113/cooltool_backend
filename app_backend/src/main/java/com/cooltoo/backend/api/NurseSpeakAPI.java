@@ -4,6 +4,7 @@ import com.cooltoo.backend.beans.*;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseSpeakComplaintService;
 import com.cooltoo.backend.services.NurseSpeakService;
+import com.cooltoo.backend.services.VideoInSpeakService;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.SpeakType;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +31,7 @@ public class NurseSpeakAPI {
 
     @Autowired private NurseSpeakService speakService;
     @Autowired private NurseSpeakComplaintService complaintService;
+    @Autowired private VideoInSpeakService videoInSpeakService;
 
     @Path("/query/all/{type}/{index}/{number}")
     @GET
@@ -113,7 +116,8 @@ public class NurseSpeakAPI {
     ) {
         logger.info("short video call back videoCode={} status={} durationSecond={} frontCoverUrl={}",
                 videoCode, status, durationSecond, frontCoverUrl);
-        return Response.ok().build();
+        List<VideoInSpeakBean> videosUpdated = videoInSpeakService.updateVideoStatus(videoCode, status);
+        return Response.ok(videosUpdated).build();
     }
 
 
@@ -162,10 +166,24 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response addShortVideo(@Context HttpServletRequest request,
-                                  @FormParam("content") @DefaultValue("") String content,
-                                  @FormParam("video_code") @DefaultValue("") String videoCode
+                                  @FormDataParam("content") @DefaultValue("") String content,
+                                  @FormDataParam("video_code") @DefaultValue("") String videoCode,
+                                  @FormDataParam("background_image_name") @DefaultValue("") String backgroundImageName,
+                                  @FormDataParam("background_image") InputStream backgroundImage,
+                                  @FormDataParam("snapshot_image_name") @DefaultValue("") String snapshotImageName,
+                                  @FormDataParam("snapshot_image") InputStream snapshotImage
     ) {
         logger.info("add short video content={} video_code={}", content, videoCode);
+        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseSpeakBean nurseSpeak = speakService.addShortVideo(userId, content);
+        if (null!=nurseSpeak) {
+            VideoInSpeakBean video = videoInSpeakService.addVideo(nurseSpeak.getId(), videoCode,
+                    backgroundImageName, backgroundImage,
+                    snapshotImageName, snapshotImage);
+            List<VideoInSpeakBean> videosInSpeak = new ArrayList<>();
+            videosInSpeak.add(video);
+            nurseSpeak.setVideos(videosInSpeak);
+        }
         return Response.ok().build();
     }
 

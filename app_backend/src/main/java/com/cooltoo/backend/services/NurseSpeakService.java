@@ -50,6 +50,7 @@ public class NurseSpeakService {
     @Autowired private OfficialConfigService officialConfigService;
     @Autowired private SpeakAbilityTypeConverter speakAbilityTypeConverter;
     @Autowired private NurseSpeakTopicService topicService;
+    @Autowired private VideoInSpeakService speakVideoService;
 
     //===============================================================
     //             get ----  admin using
@@ -275,7 +276,6 @@ public class NurseSpeakService {
         //
         // speak ids/file ids cache
         List<Long> userIds = new ArrayList<>();
-        List<Long> fileIds = new ArrayList<>();
 
         SpeakTypeBean        cathartSpeak  = speakTypeService.getSpeakTypeByType(SpeakType.CATHART);
         SpeakTypeBean        officialSpeak = speakTypeService.getSpeakTypeByType(SpeakType.OFFICIAL);
@@ -402,6 +402,16 @@ public class NurseSpeakService {
             }
         }
 
+        // fill video of speak
+        Map<Long, List<VideoInSpeakBean>> speakId2Videos = speakVideoService.getVideoInSpeak(speakIds);
+        if (!VerifyUtil.isMapEmpty(speakId2Videos)) {
+            for (NurseSpeakBean tmp : beans) {
+                List<VideoInSpeakBean> videos = speakId2Videos.get(tmp.getId());
+                if (!VerifyUtil.isListEmpty(videos)) {
+                    tmp.setVideos(videos);
+                }
+            }
+        }
 
         // construct return values
         List<Object> countTarget = null;
@@ -437,8 +447,13 @@ public class NurseSpeakService {
     }
 
     public NurseSpeakBean addOfficial(long userId, String content, String fileName, InputStream file) {
-        logger.info("add SMUG : userId=" + userId + " content="+content+" fileName="+fileName);
+        logger.info("add OFFICIAL : userId=" + userId + " content="+content+" fileName="+fileName);
         return addNurseSpeak(userId, content, SpeakType.OFFICIAL.name(), "", fileName, file);
+    }
+
+    public NurseSpeakBean addShortVideo(long userId, String content) {
+        logger.info("add SHORT_VIDEO : userId=" + userId + " content="+content);
+        return addNurseSpeak(userId, content, SpeakType.SHORT_VIDEO.name(), "", null, null);
     }
 
     @Transactional

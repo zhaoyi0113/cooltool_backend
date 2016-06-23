@@ -14,7 +14,10 @@ public enum SpeakType {
     /* 提问 */
     ASK_QUESTION("提问"),
     /* 官方发言 */
-    OFFICIAL("官方发言");
+    OFFICIAL("官方发言"),
+    /* 快拍 */
+    SHORT_VIDEO("快拍"),
+    ;
 
     private String value;
 
@@ -44,6 +47,9 @@ public enum SpeakType {
         else if (OFFICIAL.name().equalsIgnoreCase(speak)) {
             retVal = OFFICIAL;
         }
+        else if (SHORT_VIDEO.name().equalsIgnoreCase(speak)) {
+            retVal = SHORT_VIDEO;
+        }
         return retVal;
     }
 
@@ -61,6 +67,9 @@ public enum SpeakType {
         else if (OFFICIAL.ordinal()==(speak)) {
             retVal = OFFICIAL;
         }
+        else if (SHORT_VIDEO.ordinal()==(speak)) {
+            retVal = SHORT_VIDEO;
+        }
         return retVal;
     }
 
@@ -69,7 +78,8 @@ public enum SpeakType {
         values.append(SMUG.name()).append(",");
         values.append(CATHART.name()).append(",");
         values.append(ASK_QUESTION.name()).append(",");
-        values.append(OFFICIAL.name());
+        values.append(OFFICIAL.name()).append(",");
+        values.append(SHORT_VIDEO.name());
         return values.toString();
     }
 }

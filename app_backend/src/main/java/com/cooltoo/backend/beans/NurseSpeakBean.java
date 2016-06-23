@@ -26,6 +26,7 @@ public class NurseSpeakBean {
     private int thumbsUpsCount;
     private CommonStatus status;
     private List<NurseSpeakTopicBean> topics = new ArrayList<>();
+    private List<VideoInSpeakBean> videos = new ArrayList<>();
 
     public long getId() {
         return id;
@@ -141,6 +142,14 @@ public class NurseSpeakBean {
 
     public void setTopics(List<NurseSpeakTopicBean> topics) {
         this.topics = topics;
+    }
+
+    public List<VideoInSpeakBean> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<VideoInSpeakBean> videos) {
+        this.videos = videos;
     }
 
     public String toString() {
