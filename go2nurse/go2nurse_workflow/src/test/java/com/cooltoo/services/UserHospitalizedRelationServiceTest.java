@@ -144,6 +144,48 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
     }
 
     @Test
+    public void addRelationByUniqueId() {
+        UserHospitalizedRelationBean relations;
+        long userId = 7;
+        int hospitalId = 11;
+        String hospitalUniqueId = "111111";
+        int departmentId = 11;
+        String departmentUniqueId ="111111";
+        String status = "ALL";
+
+        long count = relationService.countByUserAndStatus(userId, status);
+        Assert.assertEquals(0, count);
+
+        relations = relationService.addRelation(userId, hospitalUniqueId, departmentUniqueId);
+        Assert.assertNotNull(relations);
+        Assert.assertEquals(userId, relations.getUserId());
+        Assert.assertEquals(hospitalId, relations.getHospitalId());
+        Assert.assertEquals(departmentId, relations.getDepartmentId());
+
+        status = "ALL";
+        count = relationService.countByUserAndStatus(userId, status);
+        Assert.assertEquals(1, count);
+
+        status = CommonStatus.ENABLED.name();
+        count = relationService.countByUserAndStatus(userId, status);
+        Assert.assertEquals(1, count);
+
+        relations = relationService.addRelation(userId, hospitalUniqueId, departmentUniqueId);
+        Assert.assertNotNull(relations);
+        Assert.assertEquals(userId, relations.getUserId());
+        Assert.assertEquals(hospitalId, relations.getHospitalId());
+        Assert.assertEquals(departmentId, relations.getDepartmentId());
+
+        status = "ALL";
+        count = relationService.countByUserAndStatus(userId, status);
+        Assert.assertEquals(2, count);
+
+        status = CommonStatus.ENABLED.name();
+        count = relationService.countByUserAndStatus(userId, status);
+        Assert.assertEquals(1, count);
+    }
+
+    @Test
     public void testExistsRelation() {
         long userId = 1;
         int hospitalId = 11;

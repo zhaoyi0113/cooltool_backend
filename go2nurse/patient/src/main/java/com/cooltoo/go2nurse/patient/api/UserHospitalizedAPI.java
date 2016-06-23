@@ -46,11 +46,24 @@ public class UserHospitalizedAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addRelation(@Context HttpServletRequest request,
-                                            @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                            @FormParam("department_id") @DefaultValue("0") int departmentId
+                                @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                @FormParam("department_id") @DefaultValue("0") int departmentId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospitalId, departmentId);
+        return Response.ok(relation).build();
+    }
+
+    @Path("/add/by_unique_id")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response addRelationByUniqueId(@Context HttpServletRequest request,
+                                @FormParam("hospital_unique_id") @DefaultValue("") String hospitalUniqueId,
+                                @FormParam("department_unique_id") @DefaultValue("") String departmentUniqueId
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospitalUniqueId, departmentUniqueId);
         return Response.ok(relation).build();
     }
 

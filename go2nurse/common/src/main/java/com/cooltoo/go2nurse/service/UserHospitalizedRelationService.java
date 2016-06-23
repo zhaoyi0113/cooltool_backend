@@ -3,6 +3,8 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.entities.HospitalDepartmentEntity;
+import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
@@ -155,6 +157,32 @@ public class UserHospitalizedRelationService {
     //===================================================
     //               add
     //===================================================
+    @Transactional
+    public UserHospitalizedRelationBean addRelation(long userId, String hospitalUniqueId, String departmentUniqueId) {
+        logger.info("add hospitalized relation to user={} hospitalUniqueId={} departmentUniqueId={}",
+                userId, hospitalUniqueId, departmentUniqueId);
+
+        List<HospitalEntity> hospital = hospitalRepository.findByUniqueId(hospitalUniqueId);
+        int hospitalSize = VerifyUtil.isListEmpty(hospital) ? 0 : hospital.size();
+        if (hospitalSize!=1) {
+            logger.error("hospital size is not 1, size is {}", hospitalSize);
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        int hospitalId = hospital.get(0).getId();
+        logger.info("hospitalId={}", hospitalId);
+
+        List<HospitalDepartmentEntity> department = departmentRepository.findByUniqueId(departmentUniqueId);
+        int departmentSize = VerifyUtil.isListEmpty(department) ? 0 : department.size();
+        if (departmentSize!=1) {
+            logger.error("department size is not 1, size is {}", departmentSize);
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        int departmentId = department.get(0).getId();
+        logger.info("departmentId={}", departmentId);
+
+        return addRelation(userId, hospitalId, departmentId);
+    }
+
     @Transactional
     public UserHospitalizedRelationBean addRelation(long userId, int hospitalId, int departmentId) {
         logger.info("add hospitalized relation to user={}, hospitalId={}, departmentId={}", userId, hospitalId, departmentId);
