@@ -6,6 +6,7 @@ import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
 import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.patient.beans.UserHospitalizedCorusesBean;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import com.cooltoo.go2nurse.service.UserCourseRelationService;
 import com.cooltoo.go2nurse.service.UserHospitalizedRelationService;
@@ -18,6 +19,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -115,7 +118,17 @@ public class UserHospitalizedAPI {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Map<UserHospitalizedRelationBean, Map<DiagnosticEnumerationBean, List<CourseBean>>> courses
                 = userCourseService.getUserCourses(userId, CommonStatus.ENABLED.name());
-        return Response.ok(courses).build();
+        List<UserHospitalizedCorusesBean> beans = new ArrayList<>();
+        courses.values().forEach((element) -> {
+            element.forEach((key, value) ->{
+                UserHospitalizedCorusesBean bean = new UserHospitalizedCorusesBean();
+                bean.setId(key.getId());
+                bean.setType(key.getName());
+                bean.setCourses(value);
+                beans.add(bean);
+            });
+        });
+        return Response.ok(beans).build();
     }
 
     @Path("/get_courses/extension_nursing")
@@ -127,5 +140,6 @@ public class UserHospitalizedAPI {
         List<CourseBean> courses = userCourseService.getUserCoursesInExtensionNursing(userId);
         return Response.ok(courses).build();
     }
+
 
 }
