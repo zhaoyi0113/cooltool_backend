@@ -141,7 +141,10 @@ public class NurseSpeakAOPService {
             return;
         }
         try{
-            integrationService.addNurseThumbsUpIntegration(speakThumbsUpBean);
+            if (speakThumbsUpBean.getThumbsUpUserId()>0
+             && NurseSpeakThumbsUpBean.THUMBS_UP_ADD.equalsIgnoreCase(speakThumbsUpBean.getThumbsUpAddOrDelete())) {
+                integrationService.addNurseThumbsUpIntegration(speakThumbsUpBean);
+            }
         }catch(NumberFormatException e){
             logger.error(e.getMessage());
         }
