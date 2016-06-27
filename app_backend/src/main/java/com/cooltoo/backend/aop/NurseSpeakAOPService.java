@@ -180,7 +180,7 @@ public class NurseSpeakAOPService {
     }
 
     private void addMessage(NurseSpeakThumbsUpBean retVal) {
-        logger.info("add comment message to table, value={}", retVal);
+        logger.info("add thumbs up message to table, value={}", retVal);
         if (null==retVal) {
             return;
         }
@@ -188,7 +188,8 @@ public class NurseSpeakAOPService {
         // 给晒图/吐槽/提问的用户添加消息
         long userIdBeenThumbsUp = retVal.getUserIdBeenThumbsUp();
         long thumbsUpUserId = retVal.getThumbsUpUserId();
-        if (thumbsUpUserId!=userIdBeenThumbsUp && userIdBeenThumbsUp>0) {
+        if (thumbsUpUserId!=userIdBeenThumbsUp && userIdBeenThumbsUp>0
+         && NurseSpeakThumbsUpBean.THUMBS_UP_ADD.equalsIgnoreCase(retVal.getThumbsUpAddOrDelete())) {
             messageService.addMessage(retVal.getUserIdBeenThumbsUp(), UserType.NURSE, ability.getAbilityType(), ability.getAbilityId(), retVal.getId());
         }
     }
