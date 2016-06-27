@@ -263,4 +263,37 @@ public class UserHospitalizedRelationService {
         UserHospitalizedRelationBean bean = beanConverter.convert(entity);
         return bean;
     }
+
+    @Transactional
+    public UserHospitalizedRelationBean updateRelation(int hospitalId, int departmentId, long userId, String strStatus) {
+        logger.info("user={} update hospital={} department={} relation with readingStatus={} and status={}",
+                userId, hospitalId, departmentId, strStatus);
+        List<UserHospitalizedRelationEntity> entities = repository.findByUserIdAndHospitalIdAndDepartmentId(userId, hospitalId, departmentId, sort);
+        if (VerifyUtil.isListEmpty(entities)) {
+            logger.error("relation not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        UserHospitalizedRelationEntity entity = entities.get(0);
+        boolean changed = false;
+
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null!=status && !status.equals(entity.getStatus())) {
+            entity.setStatus(status);
+            changed = true;
+        }
+
+        if (changed) {
+            for (UserHospitalizedRelationEntity tmp : entities) {
+                if (tmp.getId() != entity.getId()) {
+                    tmp.setStatus(CommonStatus.DISABLED);
+                }
+            }
+            entities = repository.save(entities);
+            entity = entities.get(0);
+            logger.info("after updating is {}", entity);
+        }
+        UserHospitalizedRelationBean bean = beanConverter.convert(entity);
+        return bean;
+    }
 }

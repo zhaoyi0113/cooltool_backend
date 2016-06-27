@@ -80,7 +80,6 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
     @Test
     public void getUpdateStatus() {
         long relationId = 1;
-        Date pointTime = new Date();
         String status = CommonStatus.DISABLED.name();
         UserHospitalizedRelationBean bean;
 
@@ -96,6 +95,27 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
 
         userId = 1;
         bean = relationService.updateRelation(relationId, true, userId, status);
+        Assert.assertEquals(relationId, bean.getId());
+        Assert.assertEquals(status, bean.getStatus().name());
+
+        count = relationService.countByUserAndStatus(userId, status);
+        Assert.assertEquals(2, count);
+    }
+
+    @Test
+    public void getUpdateStatusByUserIdHospitalIdDepartmentId() {
+        long relationId = 1;
+        int hospitalId = 11;
+        int departmentId = 11;
+        String status = CommonStatus.DISABLED.name();
+        UserHospitalizedRelationBean bean;
+
+        long userId = 1;
+        long count = relationService.countByUserAndStatus(userId, status);
+        Assert.assertEquals(1, count);
+
+        userId = 1;
+        bean = relationService.updateRelation(hospitalId, departmentId, userId, status);
         Assert.assertEquals(relationId, bean.getId());
         Assert.assertEquals(status, bean.getStatus().name());
 

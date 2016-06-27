@@ -135,4 +135,26 @@ public class UserDiagnosticPointRelationServiceTest extends AbstractCooltooTest 
         count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(5, count);
     }
+
+    @Test
+    public void getUpdateStatusByDiagnosticIdAndUserId() {
+        long diagnosticId = 1;
+        Date pointTime = new Date();
+        String status = CommonStatus.DISABLED.name();
+        UserDiagnosticPointRelationBean bean;
+
+        long userId = 1;
+        long count = relationService.countByUserAndStatus(userId, status);
+        Assert.assertEquals(0, count);
+
+        userId = 1;
+        bean = relationService.updateUserDiagnosticRelation(diagnosticId, userId, pointTime, status);
+        Assert.assertEquals(userId, bean.getUserId());
+        Assert.assertEquals(diagnosticId, bean.getDiagnosticId());
+        Assert.assertEquals(pointTime, bean.getDiagnosticTime());
+        Assert.assertEquals(status, bean.getStatus().name());
+
+        count = relationService.countByUserAndStatus(userId, status);
+        Assert.assertEquals(1, count);
+    }
 }

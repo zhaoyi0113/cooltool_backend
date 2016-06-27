@@ -75,11 +75,25 @@ public class UserHospitalizedAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response updateRelation(@Context HttpServletRequest request,
-                                            @FormParam("relation_id") @DefaultValue("0") long relationId,
-                                            @FormParam("status") @DefaultValue("disabled") String status
+                                   @FormParam("relation_id") @DefaultValue("0") long relationId,
+                                   @FormParam("status") @DefaultValue("disabled") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserHospitalizedRelationBean relation = relationService.updateRelation(relationId, true, userId, status);
+        return Response.ok(relation).build();
+    }
+
+    @Path("/edit/by_hospital_department_id")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response updateRelation(@Context HttpServletRequest request,
+                                   @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                   @FormParam("department_id") @DefaultValue("0") int departmentId,
+                                   @FormParam("status") @DefaultValue("disabled") String status
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        UserHospitalizedRelationBean relation = relationService.updateRelation(hospitalId, departmentId, userId, status);
         return Response.ok(relation).build();
     }
 

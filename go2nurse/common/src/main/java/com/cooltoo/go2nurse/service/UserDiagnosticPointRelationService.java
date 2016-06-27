@@ -151,4 +151,39 @@ public class UserDiagnosticPointRelationService {
         return bean;
     }
 
+    @Transactional
+    public UserDiagnosticPointRelationBean updateUserDiagnosticRelation(long diagnosticId, long userId, Date pointTime, String strStatus) {
+        logger.info("user={} update diagnostic={} with pointTime={} and status={}", userId, diagnosticId, pointTime, strStatus);
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndDiagnosticId(userId, diagnosticId, sort);
+        if (VerifyUtil.isListEmpty(entities)) {
+            logger.info("not user's diagnostic point relation");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        UserDiagnosticPointRelationEntity entity = entities.get(entities.size() - 1);
+        boolean changed = false;
+
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null!=status && !status.equals(entity.getStatus())) {
+            entity.setStatus(status);
+            changed = true;
+        }
+
+        if (null!=pointTime && !pointTime.equals(entity.getDiagnosticTime())) {
+            entity.setDiagnosticTime(pointTime);
+            changed = true;
+        }
+
+        if (changed) {
+            for (UserDiagnosticPointRelationEntity tmp : entities) {
+                if (tmp.getId()!=entity.getId()) {
+                    tmp.setStatus(CommonStatus.DISABLED);
+                }
+            }
+            entities = repository.save(entities);
+            logger.info("after updating is {}", entities);
+        }
+        UserDiagnosticPointRelationBean bean = beanConverter.convert(entity);
+        return bean;
+    }
 }

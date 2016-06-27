@@ -73,6 +73,22 @@ public class UserDiagnosticPointAPI {
         return Response.ok(relation).build();
     }
 
+    @Path("/edit/by_diagnostic_id")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response updateRelationByDiagnosticId(@Context HttpServletRequest request,
+                                                 @FormParam("diagnostic_id") @DefaultValue("-1") long diagnosticId,
+                                                 @FormParam("point_time") @DefaultValue("") String pointTime,
+                                                 @FormParam("status") @DefaultValue("disabled") String status
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long time = NumberUtil.getTime(pointTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date newTime = time<0 ? null : new Date(time);
+        UserDiagnosticPointRelationBean relation = relationService.updateUserDiagnosticRelation(diagnosticId, userId, newTime, status);
+        return Response.ok(relation).build();
+    }
+
     private void parseTime(String hospitalizedDate,
                            String examinationDate,
                            String operationDate,
