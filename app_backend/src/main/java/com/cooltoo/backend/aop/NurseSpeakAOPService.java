@@ -227,7 +227,8 @@ public class NurseSpeakAOPService {
         }
         long userIdBeenThumbsUp = retVal.getUserIdBeenThumbsUp();
         long thumbsUpUserId = retVal.getThumbsUpUserId();
-        if (thumbsUpUserId!=userIdBeenThumbsUp && userIdBeenThumbsUp>0) {
+        if (thumbsUpUserId!=userIdBeenThumbsUp && userIdBeenThumbsUp>0
+         && NurseSpeakThumbsUpBean.THUMBS_UP_ADD.equalsIgnoreCase(retVal.getThumbsUpAddOrDelete())) {
             Map<String, String> fields = new Hashtable<>();
             NurseBean nurse = nurseService.getNurse(retVal.getThumbsUpUserId());
             String bodyText = null==nurse ? "你获得一个赞" : (nurse.getName() + " 赞了你");
