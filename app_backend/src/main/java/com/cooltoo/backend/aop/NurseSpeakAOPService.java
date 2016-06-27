@@ -225,10 +225,14 @@ public class NurseSpeakAOPService {
         if (retVal == null) {
             return;
         }
-        Map<String, String> fields = new Hashtable<>();
-        NurseBean nurse = nurseService.getNurse(retVal.getThumbsUpUserId());
-        String bodyText = null==nurse ? "你获得一个赞" : (nurse.getName() + " 赞了你");
-        // 发送给被点赞的用户
-        notificationCenter.publishToUser(retVal.getUserIdBeenThumbsUp(), bodyText, fields, code, NotificationType.ALERT);
+        long userIdBeenThumbsUp = retVal.getUserIdBeenThumbsUp();
+        long thumbsUpUserId = retVal.getThumbsUpUserId();
+        if (thumbsUpUserId!=userIdBeenThumbsUp && userIdBeenThumbsUp>0) {
+            Map<String, String> fields = new Hashtable<>();
+            NurseBean nurse = nurseService.getNurse(retVal.getThumbsUpUserId());
+            String bodyText = null==nurse ? "你获得一个赞" : (nurse.getName() + " 赞了你");
+            // 发送给被点赞的用户
+            notificationCenter.publishToUser(retVal.getUserIdBeenThumbsUp(), bodyText, fields, code, NotificationType.ALERT);
+        }
     }
 }

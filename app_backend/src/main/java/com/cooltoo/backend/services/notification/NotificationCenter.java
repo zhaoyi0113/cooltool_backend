@@ -63,6 +63,8 @@ public class NotificationCenter {
 
     public void publishToUser(long userId, String bodyText, Map<String, String> customFields, String actionCode, NotificationType type) {
         List<NurseDeviceTokensBean> tokens = deviceTokensService.getNurseDeviceTokens(userId);
+        logger.info("user={} receive text={} customFields={} actionCode={} notificationType={} tokens={}",
+                userId, bodyText, customFields, actionCode, type, tokens);
         if (tokens.isEmpty()) {
             logger.warn("the user " + userId + " doesn't have any registered device.");
             return;
