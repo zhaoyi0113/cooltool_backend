@@ -94,12 +94,14 @@ public class NurseSpeakThumbsUpBean {
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" ,");
-        msg.append("nurseSpeakId=").append(nurseSpeakId).append(" ,");
-        msg.append("thumbsUpUserId=").append(thumbsUpUserId).append(" ,");
-        msg.append("thumbsUpUserName=").append(thumbsUpUserName).append(" ,");
-        msg.append("thumbsUpUserHeadImageUrl=").append(thumbsUpUserHeadImageUrl).append(" ,");
-        msg.append("time=").append(time);
+        msg.append("id=").append(id);
+        msg.append(", nurseSpeakId=").append(nurseSpeakId);
+        msg.append(", thumbsUpUserId=").append(thumbsUpUserId);
+        msg.append(", thumbsUpUserName=").append(thumbsUpUserName);
+        msg.append(", thumbsUpUserHeadImageUrl=").append(thumbsUpUserHeadImageUrl);
+        msg.append(", time=").append(time);
+        msg.append(", userIdBeenThumbsUp=").append(userIdBeenThumbsUp);
+        msg.append(", thumbsUpAddOrDelete=").append(thumbsUpAddOrDelete);
         msg.append(" ]");
         return msg.toString();
     }
