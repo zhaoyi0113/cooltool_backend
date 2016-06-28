@@ -58,7 +58,7 @@ public class UserQuestionnaireAnswerService {
         return questionnaires;
     }
 
-    private QuestionnaireBean getUserQuestionnaireWithAnswer(long userId, long questionnaireId) {
+    public QuestionnaireBean getUserQuestionnaireWithAnswer(long userId, long questionnaireId) {
         logger.info("get user{} 's questionnaire={}", userId, questionnaireId);
         List<UserQuestionnaireAnswerBean> questionnaireAnswers = getUserQuestionnaireAnswer(userId, questionnaireId);
         List<QuestionnaireBean> questionnaire = fillQuestionnaireAnswer(questionnaireAnswers, true);
@@ -87,6 +87,7 @@ public class UserQuestionnaireAnswerService {
     }
 
     private List<QuestionnaireBean> fillQuestionnaireAnswer(List<UserQuestionnaireAnswerBean> allAnswers, boolean fillAnswer) {
+        logger.info("fill answer ={}", fillAnswer);
         if (VerifyUtil.isListEmpty(allAnswers)) {
             logger.info("count is {}", 0);
             return new ArrayList<>();
@@ -106,7 +107,7 @@ public class UserQuestionnaireAnswerService {
 
         // get questionnaires with questions
         List<QuestionnaireBean> questionnaires;
-        if (fillAnswer) {
+        if (!fillAnswer) {
             questionnaires = questionnaireService.getQuestionnaireByIds(questionnaireIds);
             logger.info("count is {}", questionnaires.size());
             return questionnaires;
@@ -126,7 +127,9 @@ public class UserQuestionnaireAnswerService {
             }
             for (QuestionBean question : questions) {
                 UserQuestionnaireAnswerBean answer = questionIdToAnswer.get(question.getId());
-                question.setUserAnswer(answer.getAnswer());
+                if(null!=answer) {
+                    question.setUserAnswer(answer.getAnswer());
+                }
             }
         }
 
@@ -153,7 +156,30 @@ public class UserQuestionnaireAnswerService {
         logger.info("delete by userId={}", userId);
         List<UserQuestionnaireAnswerEntity> entities = repository.findByUserId(userId, sort);
         List<UserQuestionnaireAnswerBean> beans = entitiesToBeans(entities);
-        repository.delete(entities);
+        if (!VerifyUtil.isListEmpty(entities)) {
+            repository.delete(entities);
+        }
+        return beans;
+    }
+
+    public List<UserQuestionnaireAnswerBean> deleteByUserIdAndQuestionIds(long userId, String strQuestionIds) {
+        logger.info("delete by userId={} and questionIds={}", userId, strQuestionIds);
+        List<Long> questionIds = VerifyUtil.parseLongIds(strQuestionIds);
+        List<UserQuestionnaireAnswerEntity> entities = repository.findByUserIdAndQuestionIdIn(userId, questionIds, sort);
+        List<UserQuestionnaireAnswerBean> beans = entitiesToBeans(entities);
+        if (!VerifyUtil.isListEmpty(entities)) {
+            repository.delete(entities);
+        }
+        return beans;
+    }
+
+    public List<UserQuestionnaireAnswerBean> deleteByUserIdAndQuestionnaireId(long userId, long questionnaireId) {
+        logger.info("delete by userId={} and questionnaireId={}", userId, questionnaireId);
+        List<UserQuestionnaireAnswerEntity> entities = repository.findByUserIdAndQuestionnaireId(userId, questionnaireId, sort);
+        List<UserQuestionnaireAnswerBean> beans = entitiesToBeans(entities);
+        if (!VerifyUtil.isListEmpty(entities)) {
+            repository.delete(entities);
+        }
         return beans;
     }
 
@@ -162,7 +188,9 @@ public class UserQuestionnaireAnswerService {
         List<Long> questionIds = VerifyUtil.parseLongIds(strQuestionIds);
         List<UserQuestionnaireAnswerEntity> entities = repository.findByQuestionIdIn(questionIds, sort);
         List<UserQuestionnaireAnswerBean> beans = entitiesToBeans(entities);
-        repository.delete(entities);
+        if (!VerifyUtil.isListEmpty(entities)) {
+            repository.delete(entities);
+        }
         return beans;
     }
 
