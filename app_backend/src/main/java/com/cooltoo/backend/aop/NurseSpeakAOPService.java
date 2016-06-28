@@ -6,8 +6,6 @@ import com.cooltoo.backend.beans.NurseSpeakCommentBean;
 import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;
 import com.cooltoo.backend.converter.social_ability.CommentAbilityTypeConverter;
 import com.cooltoo.backend.converter.social_ability.ThumbsUpAbilityTypeConverter;
-import com.cooltoo.backend.entities.NurseIntegrationEntity;
-import com.cooltoo.backend.repository.NurseIntegrationRepository;
 import com.cooltoo.backend.services.NurseIntegrationService;
 import com.cooltoo.backend.services.NurseMessageService;
 import com.cooltoo.backend.services.NurseService;
@@ -15,24 +13,17 @@ import com.cooltoo.backend.services.notification.NotificationCenter;
 import com.cooltoo.backend.services.notification.NotificationCode;
 import com.cooltoo.backend.services.notification.NotificationType;
 import com.cooltoo.beans.SpecificSocialAbility;
-import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.constants.UserType;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.util.VerifyUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Calendar;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -82,6 +73,7 @@ public class NurseSpeakAOPService {
         sendPublishNotification(retVal, NotificationCode.PUBLISH_MESSAGE_COUNT_CODE);
     }
 
+//    @Around("execution(* *(..))")
     @AfterReturning(pointcut = "execution(* com.cooltoo.backend.services.NurseSpeakService.setNurseSpeakThumbsUp(..))",
             returning = "retVal")
     public void addComment(JoinPoint joinPoint, NurseSpeakThumbsUpBean retVal) {
