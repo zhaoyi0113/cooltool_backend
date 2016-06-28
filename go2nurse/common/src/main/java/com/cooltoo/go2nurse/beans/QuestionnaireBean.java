@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.constants.CommonStatus;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by hp on 2016/6/28.
@@ -12,6 +13,7 @@ public class QuestionnaireBean {
     private String title;
     private String description;
     private int hospitalId;
+    private List<QuestionBean> questions;
     private Date time;
     private CommonStatus status;
 
@@ -63,6 +65,14 @@ public class QuestionnaireBean {
         this.status = status;
     }
 
+    public List<QuestionBean> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<QuestionBean> questions) {
+        this.questions = questions;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -70,6 +80,7 @@ public class QuestionnaireBean {
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", title=").append(title);
         msg.append(", description=").append(description);
+        msg.append(", questions count=").append(null==questions ? 0 : questions.size());
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");
