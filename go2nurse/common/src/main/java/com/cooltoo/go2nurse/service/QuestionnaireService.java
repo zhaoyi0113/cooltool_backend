@@ -38,7 +38,7 @@ public class QuestionnaireService {
     );
 
     private static final Sort questionnaireSort = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "time_created")
+            new Sort.Order(Sort.Direction.DESC, "time")
     );
 
     @Autowired private QuestionRepository questionRep;
@@ -67,13 +67,12 @@ public class QuestionnaireService {
 
     public QuestionBean getQuestion(long questionId) {
         logger.info("get question by id {}", questionId);
-        QuestionEntity tag = questionRep.findOne(questionId);
-        if (null==tag) {
+        QuestionEntity entity = questionRep.findOne(questionId);
+        if (null==entity) {
             logger.info("get question by id, doesn't exist!");
             return null;
         }
-        QuestionBean tagB = questionConverter.convert(tag);
-        return tagB;
+        return questionConverter.convert(entity);
     }
 
     public List<QuestionBean> getQuestionByIds(String strQuestionIds) {
@@ -183,7 +182,7 @@ public class QuestionnaireService {
             questionnaires = new ArrayList<>();
         }
         logger.info("get questionnaire with question count is {}", questionnaires.size());
-        return new ArrayList<>();
+        return questionnaires;
     }
 
     public List<QuestionnaireBean> getQuestionnaireWithQuestionsByIds(List<Long> questionnaireIds) {
@@ -210,7 +209,7 @@ public class QuestionnaireService {
             questionnaires = new ArrayList<>();
         }
         logger.info("get questionnaire with question count is {}", questionnaires.size());
-        return new ArrayList<>();
+        return questionnaires;
     }
 
     private List<QuestionBean> questionEntitiesToBeans(Iterable<QuestionEntity> entities) {
@@ -325,6 +324,7 @@ public class QuestionnaireService {
             List<Long> questionIds = VerifyUtil.parseLongIds(strQuestionIds);
             List<QuestionEntity> entities = questionRep.findByIdIn(questionIds, questionSort);
             questionRep.delete(entities);
+            return questionIds.toString();
         }
         throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
@@ -337,8 +337,8 @@ public class QuestionnaireService {
             // set questionnaire id = 0
             List<QuestionEntity> questions = questionRep.findByQuestionnaireId(questionnaireId, questionSort);
             if (null!=questions) {
-                for (QuestionEntity tagE : questions) {
-                    tagE.setQuestionnaireId(0);
+                for (QuestionEntity tmpE : questions) {
+                    tmpE.setQuestionnaireId(0);
                 }
                 questionRep.save(questions);
             }
@@ -357,8 +357,8 @@ public class QuestionnaireService {
             // set questionnaire id = 0
             List<QuestionEntity> questions = questionRep.findByQuestionnaireIdIn(questionnaireIds, questionSort);
             if (null!=questions) {
-                for (QuestionEntity tagE : questions) {
-                    tagE.setQuestionnaireId(0);
+                for (QuestionEntity tmpE : questions) {
+                    tmpE.setQuestionnaireId(0);
                 }
                 questionRep.save(questions);
             }
@@ -366,7 +366,7 @@ public class QuestionnaireService {
             List<QuestionnaireEntity> questionnaires = questionnaireRep.findByIdIn(questionnaireIds, questionnaireSort);
             questionnaireRep.delete(questionnaires);
 
-            return strQuestionnaireIds;
+            return questionnaireIds.toString();
         }
         throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
