@@ -2,6 +2,8 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
 import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
@@ -11,16 +13,20 @@ import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import com.cooltoo.go2nurse.service.UserCourseRelationService;
 import com.cooltoo.go2nurse.service.UserHospitalizedRelationService;
 import com.cooltoo.util.NumberUtil;
-import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +73,22 @@ public class UserHospitalizedAPI {
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospitalUniqueId, departmentUniqueId);
+        return Response.ok(relation).build();
+    }
+
+    @Path("/add/by_hospital_department_unique_id")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response addRelationByUniqueId(@Context HttpServletRequest request,
+                                          @FormParam("hospital_department_unique_id") @DefaultValue("") String hospitalAndDepartmentUniqueId
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        String[] hospital_department = hospitalAndDepartmentUniqueId.split("_");
+        if (hospital_department.length!=2) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospital_department[0].trim(), hospital_department[1].trim());
         return Response.ok(relation).build();
     }
 
