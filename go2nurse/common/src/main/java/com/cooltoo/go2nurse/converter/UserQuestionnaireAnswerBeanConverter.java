@@ -3,10 +3,12 @@ package com.cooltoo.go2nurse.converter;
 import com.cooltoo.go2nurse.beans.UserQuestionnaireAnswerBean;
 import com.cooltoo.go2nurse.entities.UserQuestionnaireAnswerEntity;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by hp on 2016/6/28.
  */
+@Component
 public class UserQuestionnaireAnswerBeanConverter implements Converter<UserQuestionnaireAnswerEntity, UserQuestionnaireAnswerBean> {
     @Override
     public UserQuestionnaireAnswerBean convert(UserQuestionnaireAnswerEntity source) {

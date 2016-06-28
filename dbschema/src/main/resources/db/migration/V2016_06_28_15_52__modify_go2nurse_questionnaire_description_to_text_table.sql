@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_questionnaire` CHANGE COLUMN `description` `description` TEXT NULL;

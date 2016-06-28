@@ -15,6 +15,7 @@ public class QuestionBean {
     private String content;
     private String options;
     private QuestionType type;
+    private String userAnswer;
     private Date time;
     private CommonStatus status;
 
@@ -74,6 +75,14 @@ public class QuestionBean {
         this.status = status;
     }
 
+    public String getUserAnswer() {
+        return userAnswer;
+    }
+
+    public void setUserAnswer(String userAnswer) {
+        this.userAnswer = userAnswer;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -82,6 +91,7 @@ public class QuestionBean {
         msg.append(", content=").append(content);
         msg.append(", options=").append(options);
         msg.append(", type=").append(type);
+        msg.append(", userAnswer={}").append(userAnswer);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

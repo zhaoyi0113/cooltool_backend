@@ -57,9 +57,11 @@ public class QuestionnaireService {
     }
 
     public List<QuestionBean> getQuestionByPage(int pageIndex, int sizeOfPage) {
+        logger.info("get question by pageIndex={} sizePerPage={}", pageIndex, sizeOfPage);
         PageRequest page = new PageRequest(pageIndex, sizeOfPage, questionSort);
         Page<QuestionEntity> resultSet = questionRep.findAll(page);
         List<QuestionBean> beans = questionEntitiesToBeans(resultSet);
+        logger.info("count is {}", beans.size());
         return beans;
     }
 
@@ -67,7 +69,7 @@ public class QuestionnaireService {
         logger.info("get question by id {}", questionId);
         QuestionEntity tag = questionRep.findOne(questionId);
         if (null==tag) {
-            logger.info("get tag by id, doesn't exist!");
+            logger.info("get question by id, doesn't exist!");
             return null;
         }
         QuestionBean tagB = questionConverter.convert(tag);
@@ -75,17 +77,26 @@ public class QuestionnaireService {
     }
 
     public List<QuestionBean> getQuestionByIds(String strQuestionIds) {
+        logger.info("get question by ids={}", strQuestionIds);
+
+        List<QuestionBean> beans;
         if (VerifyUtil.isIds(strQuestionIds)) {
             List<Long> questionIds = VerifyUtil.parseLongIds(strQuestionIds);
             List<QuestionEntity> resultSet = questionRep.findByIdIn(questionIds, questionSort);
-            List<QuestionBean> beans = questionEntitiesToBeans(resultSet);
+            beans = questionEntitiesToBeans(resultSet);
         }
-        return new ArrayList<>();
+        else {
+            beans = new ArrayList<>();
+        }
+        logger.info("count is {}", beans.size());
+        return beans;
     }
 
     public List<QuestionBean> getQuestionByQuestionnaireId(long questionnaireId) {
+        logger.info("get question by questionnaireId={}", questionnaireId);
         List<QuestionEntity> resultSet = questionRep.findByQuestionnaireId(questionnaireId, questionSort);
         List<QuestionBean> beans = questionEntitiesToBeans(resultSet);
+        logger.info("count is {}", beans.size());
         return beans;
     }
 
@@ -97,15 +108,19 @@ public class QuestionnaireService {
 
     public List<QuestionnaireBean> getQuestionnaireByPage(int pageIndex, int sizeOfPage) {
         // get all questionnaire
+        logger.info("get questionnaire at pageIndex={} sizePerPage={}", pageIndex, sizeOfPage);
         PageRequest pageCategory = new PageRequest(pageIndex, sizeOfPage, questionnaireSort);
         Page<QuestionnaireEntity> resultSet = questionnaireRep.findAll(pageCategory);
         List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(resultSet);
+        logger.info("count is {}", beans.size());
         return beans;
     }
 
     public QuestionnaireBean getQuestionnaire(long questionnaireId) {
+        logger.info("get questionnaire by id={}", questionnaireId);
         QuestionnaireEntity entity = questionnaireRep.findOne(questionnaireId);
         if (null==entity) {
+            logger.info("get question by id, doesn't exist!");
             return null;
         }
 
@@ -114,22 +129,37 @@ public class QuestionnaireService {
     }
 
     public List<QuestionnaireBean> getQuestionnaireByIds(String strQuestionnaireIds) {
-        if (VerifyUtil.isIds(strQuestionnaireIds)) {
-            List<Long> questionnaireIds = VerifyUtil.parseLongIds(strQuestionnaireIds);
+        logger.info("get questionnaire by ids={}", strQuestionnaireIds);
+        List<Long> questionnaireIds = VerifyUtil.parseLongIds(strQuestionnaireIds);
+        List<QuestionnaireBean> beans = getQuestionnaireByIds(questionnaireIds);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
+    public List<QuestionnaireBean> getQuestionnaireByIds(List<Long> questionnaireIds) {
+        logger.info("get questionnaire by ids={}", questionnaireIds);
+        List<QuestionnaireBean> beans;
+        if (!VerifyUtil.isListEmpty(questionnaireIds)) {
             List<QuestionnaireEntity> resultSet = questionnaireRep.findByIdIn(questionnaireIds, questionnaireSort);
-            List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(resultSet);
-            return beans;
+            beans = questionnaireEntitiesToBeans(resultSet);
         }
-        return new ArrayList<>();
+        else {
+            beans = new ArrayList<>();
+        }
+        logger.info("count is {}", beans.size());
+        return beans;
     }
 
     public List<QuestionnaireBean> getQuestionnaireByHospitalId(int hospitalId) {
+        logger.info("get questionnaire by hospitalId={}", hospitalId);
         List<QuestionnaireEntity> resultSet = questionnaireRep.findByHospitalId(hospitalId, questionnaireSort);
         List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(resultSet);
+        logger.info("count is {}", beans.size());
         return beans;
     }
 
     public QuestionnaireBean getQuestionnaireWithQuestions(long questionnaireId) {
+        logger.info("get questionnaire with questions by questionnaireId={}", questionnaireId);
         QuestionnaireEntity entity = questionnaireRep.findOne(questionnaireId);
         if (null==entity) {
             return null;
@@ -138,15 +168,31 @@ public class QuestionnaireService {
         QuestionnaireBean bean = questionnaireConverter.convert(entity);
         List<QuestionBean> questions = getQuestionByQuestionnaireId(questionnaireId);
         bean.setQuestions(questions);
+        logger.info("questions count in questionnaire is {}", questions.size());
         return bean;
     }
 
     public List<QuestionnaireBean> getQuestionnaireWithQuestionsByIds(String strQuestionnaireIds) {
+        logger.info("get questionnaire with questions by questionnaireIds={}", strQuestionnaireIds);
+        List<QuestionnaireBean> questionnaires;
         if (VerifyUtil.isIds(strQuestionnaireIds)) {
             List<Long> questionnaireIds = VerifyUtil.parseLongIds(strQuestionnaireIds);
+            questionnaires = getQuestionnaireWithQuestionsByIds(questionnaireIds);
+        }
+        else {
+            questionnaires = new ArrayList<>();
+        }
+        logger.info("get questionnaire with question count is {}", questionnaires.size());
+        return new ArrayList<>();
+    }
+
+    public List<QuestionnaireBean> getQuestionnaireWithQuestionsByIds(List<Long> questionnaireIds) {
+        logger.info("get questionnaire with questions by questionnaireIds={}", questionnaireIds);
+        List<QuestionnaireBean> questionnaires;
+        if (!VerifyUtil.isListEmpty(questionnaireIds)) {
             List<QuestionnaireEntity> questionnaireResultSet = questionnaireRep.findByIdIn(questionnaireIds, questionnaireSort);
             List<QuestionEntity> questionResultSet = questionRep.findByQuestionnaireIdIn(questionnaireIds, questionSort);
-            List<QuestionnaireBean> questionnaires = questionnaireEntitiesToBeans(questionnaireResultSet);
+            questionnaires = questionnaireEntitiesToBeans(questionnaireResultSet);
             List<QuestionBean> questions = questionEntitiesToBeans(questionResultSet);
 
             List<QuestionBean> beans;
@@ -160,6 +206,10 @@ public class QuestionnaireService {
                 questionnaire.setQuestions(beans);
             }
         }
+        else {
+            questionnaires = new ArrayList<>();
+        }
+        logger.info("get questionnaire with question count is {}", questionnaires.size());
         return new ArrayList<>();
     }
 
@@ -259,6 +309,7 @@ public class QuestionnaireService {
 
     @Transactional
     public long deleteQuestion(long questionId) {
+        logger.info("delete question by questionId={}", questionId);
         QuestionEntity entity = questionRep.findOne(questionId);
         if (null!=entity) {
             questionRep.delete(entity);
@@ -269,6 +320,7 @@ public class QuestionnaireService {
 
     @Transactional
     public String deleteQuestionByIds(String strQuestionIds) {
+        logger.info("delete question by questionIds={}", strQuestionIds);
         if (VerifyUtil.isIds(strQuestionIds)) {
             List<Long> questionIds = VerifyUtil.parseLongIds(strQuestionIds);
             List<QuestionEntity> entities = questionRep.findByIdIn(questionIds, questionSort);
@@ -279,6 +331,7 @@ public class QuestionnaireService {
 
     @Transactional
     public long deleteQuestionnaire(long questionnaireId) {
+        logger.info("delete questionnaire by questionnaireId={}", questionnaireId);
         QuestionnaireEntity questionnaire = questionnaireRep.findOne(questionnaireId);
         if (null!=questionnaire) {
             // set questionnaire id = 0
@@ -298,6 +351,7 @@ public class QuestionnaireService {
 
     @Transactional
     public String deleteQuestionnaireByIds(String strQuestionnaireIds) {
+        logger.info("delete questionnaire by questionnaireIds={}", strQuestionnaireIds);
         if (VerifyUtil.isIds(strQuestionnaireIds)) {
             List<Long> questionnaireIds   = VerifyUtil.parseLongIds(strQuestionnaireIds);
             // set questionnaire id = 0
@@ -319,6 +373,7 @@ public class QuestionnaireService {
 
     @Transactional
     public String deleteQuestionnaireAndQuestionByIds(String strQuestionnaireIds) {
+        logger.info("delete questionnaire and questions by questionnaireIds={}", strQuestionnaireIds);
         if (VerifyUtil.isIds(strQuestionnaireIds)) {
             List<Long> questionnaireIds = VerifyUtil.parseLongIds(strQuestionnaireIds);
 
