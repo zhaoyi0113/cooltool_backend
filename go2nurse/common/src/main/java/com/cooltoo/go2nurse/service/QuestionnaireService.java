@@ -273,9 +273,9 @@ public class QuestionnaireService {
     }
 
     @Transactional
-    public QuestionnaireBean updateQuestionnaire(long questionnaireId, String title, String description, int hospitalId) {
-        logger.info("update questionnaire={} with title={} description={} hospitalId={}",
-                questionnaireId, title, description, hospitalId);
+    public QuestionnaireBean updateQuestionnaire(long questionnaireId, String title, String description, String conclusion, int hospitalId) {
+        logger.info("update questionnaire={} with title={} description={} conclusion={} hospitalId={}",
+                questionnaireId, title, description, conclusion, hospitalId);
         boolean changed = false;
 
         QuestionnaireEntity entity = questionnaireRep.findOne(questionnaireId);
@@ -289,6 +289,10 @@ public class QuestionnaireService {
         }
         if (!VerifyUtil.isStringEmpty(description) && !description.equals(entity.getDescription())) {
             entity.setDescription(description);
+            changed = true;
+        }
+        if (!VerifyUtil.isStringEmpty(conclusion) && !conclusion.equals(entity.getConclusion())) {
+            entity.setConclusion(conclusion);
             changed = true;
         }
         if (hospitalId>0 && hospitalId!=entity.getHospitalId()) {
@@ -419,10 +423,9 @@ public class QuestionnaireService {
     }
 
     @Transactional
-    public QuestionnaireBean addQuestionnaire(String title, String description, int hospitalId) {
-        logger.info("add questionnaire : title={} description={} hospitalId={}", title, description, hospitalId);
+    public QuestionnaireBean addQuestionnaire(String title, String description, String conclusion, int hospitalId) {
+        logger.info("add questionnaire : title={} description={} conclusion={} hospitalId={}", title, description, conclusion, hospitalId);
 
-        String imagePath = null;
         QuestionnaireEntity entity = new QuestionnaireEntity();
         if (VerifyUtil.isStringEmpty(title)) {
             logger.error("add questionnaire : title is empty");
@@ -437,6 +440,9 @@ public class QuestionnaireService {
         }
         if (!VerifyUtil.isStringEmpty(description)) {
             entity.setDescription(description);
+        }
+        if (!VerifyUtil.isStringEmpty(conclusion)) {
+            entity.setConclusion(conclusion);
         }
         hospitalId = hospitalId<0 ? 0 : hospitalId;
         entity.setHospitalId(hospitalId);

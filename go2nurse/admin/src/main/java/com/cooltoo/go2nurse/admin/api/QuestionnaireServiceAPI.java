@@ -3,20 +3,10 @@ package com.cooltoo.go2nurse.admin.api;
 import com.cooltoo.go2nurse.beans.QuestionBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
 import com.cooltoo.go2nurse.service.QuestionnaireService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.POST;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.FormParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -28,8 +18,6 @@ import java.util.List;
 @Path("/admin/questionnaire")
 public class QuestionnaireServiceAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuestionnaireServiceAPI.class);
-
     @Autowired private QuestionnaireService questionnaireService;
 
     //=======================================================================
@@ -40,9 +28,7 @@ public class QuestionnaireServiceAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuestionCount(@Context HttpServletRequest request) {
-        logger.info("get all question count");
         long count = questionnaireService.getQuestionCount();
-        logger.info("get all question count is {}", count);
         return Response.ok(count).build();
     }
 
@@ -50,9 +36,7 @@ public class QuestionnaireServiceAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuestionnaireCount(@Context HttpServletRequest request) {
-        logger.info("get all questionnaire count");
         long count = questionnaireService.getQuestionCount();
-        logger.info("get all questionnaire count is {}", count);
         return Response.ok(count).build();
     }
 
@@ -63,9 +47,7 @@ public class QuestionnaireServiceAPI {
                                  @PathParam("index")  @DefaultValue("0")  int index,
                                  @PathParam("number") @DefaultValue("10") int number
     ) {
-        logger.info("get all question at page {} numberOfPage {}", index, number);
         List<QuestionBean> questions = questionnaireService.getQuestionByPage(index, number);
-        logger.info("get all question at page {} numberOfPage {}, count is ", index, number, questions.size());
         return Response.ok(questions).build();
     }
 
@@ -76,9 +58,7 @@ public class QuestionnaireServiceAPI {
                                       @PathParam("index")  @DefaultValue("0")  int index,
                                       @PathParam("number") @DefaultValue("10") int number
     ) {
-        logger.info("get all questionnaire at page {} numberOfPage {}", index, number);
         List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireByPage(index, number);
-        logger.info("get all questionnaire at page {} numberOfPage {}, count is ", index, number, questionnaires.size());
         return Response.ok(questionnaires).build();
     }
 
@@ -88,7 +68,6 @@ public class QuestionnaireServiceAPI {
     public Response getQuestions(@Context HttpServletRequest request,
                                  @QueryParam("question_ids")  @DefaultValue("") String questionIds
     ) {
-        logger.info("get question by ids={}", questionIds);
         List<QuestionBean> questions = questionnaireService.getQuestionByIds(questionIds);
         return Response.ok(questions).build();
     }
@@ -97,7 +76,6 @@ public class QuestionnaireServiceAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuestionsWithoutCategoryId(@Context HttpServletRequest request) {
-        logger.info("get question with no questionnaire belong");
         List<QuestionBean> questions = questionnaireService.getQuestionByQuestionnaireId(0L);
         return Response.ok(questions).build();
     }
@@ -119,7 +97,6 @@ public class QuestionnaireServiceAPI {
     public Response getQuestionnaire(@Context HttpServletRequest request,
                                      @QueryParam("questionnaire_ids") String questionnaireIds
     ) {
-        logger.info("get questionnaire by ids={}", questionnaireIds);
         List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireByIds(questionnaireIds);
         return Response.ok(questionnaires).build();
     }
@@ -130,7 +107,6 @@ public class QuestionnaireServiceAPI {
     public Response getQuestionnaireWithQuestion(@Context HttpServletRequest request,
                                                  @QueryParam("questionnaire_ids") String questionnaireIds
     ) {
-        logger.info("get questionnaire by ids={}", questionnaireIds);
         List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByIds(questionnaireIds);
         return Response.ok(questionnaires).build();
     }
@@ -149,8 +125,6 @@ public class QuestionnaireServiceAPI {
                                    @FormParam("options") @DefaultValue("") String options,
                                    @FormParam("type") @DefaultValue("SINGLE_SELECTION") String type
     ) {
-        logger.info("update question id={} questionnaireId={} content={}, options={} type={}",
-                id, questionnaireId, content, options, type);
         QuestionBean bean = questionnaireService.updateQuestion(id, questionnaireId, content, options, type);
         return Response.ok(bean).build();
     }
@@ -159,14 +133,13 @@ public class QuestionnaireServiceAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateQuestionnaire(@Context HttpServletRequest request,
-                                   @FormParam("id") long id,
-                                   @FormParam("title") @DefaultValue("") String title,
-                                   @FormParam("description") @DefaultValue("") String description,
-                                   @FormParam("hospital_id") @DefaultValue("0") int hospitalId
+                                        @FormParam("id") long id,
+                                        @FormParam("title") @DefaultValue("") String title,
+                                        @FormParam("description") @DefaultValue("") String description,
+                                        @FormParam("conclusion") @DefaultValue("") String conclusion,
+                                        @FormParam("hospital_id") @DefaultValue("0") int hospitalId
     ) {
-        logger.info("update questionnaire id={}  title={}  description={}  hospitalId={}",
-                id, title, description, hospitalId);
-        QuestionnaireBean bean = questionnaireService.updateQuestionnaire(id, title, description, hospitalId);
+        QuestionnaireBean bean = questionnaireService.updateQuestionnaire(id, title, description, conclusion, hospitalId);
         return Response.ok(bean).build();
     }
 
@@ -217,8 +190,6 @@ public class QuestionnaireServiceAPI {
                                 @FormParam("options") @DefaultValue("") String options,
                                 @FormParam("type") @DefaultValue("SINGLE_SELECTION") String type
     ) {
-        logger.info("add question with questionnaireId={} content={} options={} type={}.",
-                questionnaireId, content, options, type);
         QuestionBean bean = questionnaireService.addQuestion(questionnaireId, content, options, type);
         return Response.ok(bean).build();
     }
@@ -229,11 +200,10 @@ public class QuestionnaireServiceAPI {
     public Response addQuestionnaire(@Context HttpServletRequest request,
                                      @FormParam("title") @DefaultValue("") String title,
                                      @FormParam("description") @DefaultValue("") String description,
+                                     @FormParam("conclusion") @DefaultValue("") String conclusion,
                                      @FormParam("hospital_id") @DefaultValue("0") int hospitalId
     ) {
-        logger.info("add questionnaire title={} description={} hospital_id={}",
-                title, description, hospitalId);
-        QuestionnaireBean bean = questionnaireService.addQuestionnaire(title, description, hospitalId);
+        QuestionnaireBean bean = questionnaireService.addQuestionnaire(title, description, conclusion, hospitalId);
         return Response.ok(bean).build();
     }
 }

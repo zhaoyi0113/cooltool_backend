@@ -12,10 +12,17 @@ public class QuestionnaireBean {
     private long id;
     private String title;
     private String description;
+    private String conclusion;
     private int hospitalId;
     private List<QuestionBean> questions;
     private Date time;
     private CommonStatus status;
+
+    //=================================
+    //    user questionnaire score
+    //=================================
+    private int userScore;
+    private QuestionnaireConclusionBean userConclusion;
 
     public long getId() {
         return id;
@@ -27,6 +34,10 @@ public class QuestionnaireBean {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getConclusion() {
+        return conclusion;
     }
 
     public int getHospitalId() {
@@ -53,6 +64,10 @@ public class QuestionnaireBean {
         this.description = description;
     }
 
+    public void setConclusion(String conclusion) {
+        this.conclusion = conclusion;
+    }
+
     public void setHospitalId(int hospitalId) {
         this.hospitalId = hospitalId;
     }
@@ -73,6 +88,22 @@ public class QuestionnaireBean {
         this.questions = questions;
     }
 
+    public int getUserScore() {
+        return userScore;
+    }
+
+    public void setUserScore(int userScore) {
+        this.userScore = userScore;
+    }
+
+    public QuestionnaireConclusionBean getUserConclusion() {
+        return userConclusion;
+    }
+
+    public void setUserConclusion(QuestionnaireConclusionBean userConclusion) {
+        this.userConclusion = userConclusion;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -80,9 +111,12 @@ public class QuestionnaireBean {
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", title=").append(title);
         msg.append(", description=").append(description);
+        msg.append(", conclusion=").append(conclusion);
         msg.append(", questions count=").append(null==questions ? 0 : questions.size());
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
+        msg.append(", userScore=").append(userScore);
+        msg.append(", userConclusion=").append(userConclusion);
         msg.append("]");
         return msg.toString();
     }

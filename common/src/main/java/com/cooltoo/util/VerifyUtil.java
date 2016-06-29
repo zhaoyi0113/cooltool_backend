@@ -20,8 +20,9 @@ public class VerifyUtil {
     public static final String CC_VIDEO_CALLBACK_MESSAGE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<result>OK</result>";
     public static final String ADMIN_USER_NAME_REGEXP = "[a-zA-Z_][a-zA-Z0-9_]{5,64}";
     public static final String ADMIN_USER_PASSWORD_REGEXP = "[a-z|A-Z|0-9]{32,128}";
-    public static final String EMAIL_REGEXP = "^[a-zA-Z][a-zA-Z0-9_\\-]+[@][a-zA-Z_\\-\\.]+[\\.][a-zA-Z]+$";
-    public static final String OCCUPATION_SKILL_ID = "[[0-9]+,]*[0-9]+";
+    public static final String IDS = "[[0-9]+,]*[0-9]+";
+//    public static final String EMAIL_REGEXP = "^[a-zA-Z][a-zA-Z0-9_\\-]+[@][a-zA-Z_\\-\\.]+[\\.][a-zA-Z]+$";
+//    public static final String NUMBERS = "[(-?\\d+)(\\.\\d+)?,]*[(-?\\d+)(\\.\\d+)?]+";
     private static final Logger logger = LoggerFactory.getLogger(VerifyUtil.class);
 
     public static boolean isMapEmpty(Map map) {
@@ -71,9 +72,9 @@ public class VerifyUtil {
     }
 
     public static boolean isIds(String ids) {
-        logger.info("get occupation skill ids "+ids);
+        logger.info("is ids={}", ids);
         if (ids instanceof String) {
-            return ids.matches(OCCUPATION_SKILL_ID);
+            return ids.matches(IDS);
         }
         return false;
     }
@@ -115,6 +116,33 @@ public class VerifyUtil {
         }
         return recordIds;
     }
+
+//    public static boolean isNumbers(String numbers) {
+//        logger.info("is numbers={} ", numbers);
+//        if (numbers instanceof String) {
+//            return numbers.matches(NUMBERS);
+//        }
+//        return false;
+//    }
+//
+//    public static List<Double> parseDoubleNumber(String numbers) {
+//        if (!isNumbers(numbers)) {
+//            return new ArrayList();
+//        }
+//
+//        String[] strArray = numbers.split(",");
+//        List<Double> finalNumbers = new ArrayList<>();
+//        try {
+//            for (String tmp : strArray) {
+//                Double number = Double.parseDouble(tmp);
+//                finalNumbers.add(number);
+//            }
+//        } catch (Exception ex) {
+//            finalNumbers.clear();
+//        }
+//        return finalNumbers;
+//    }
+
 
     public static String numList2String(List ids) {
         if (null==ids||ids.isEmpty()) {

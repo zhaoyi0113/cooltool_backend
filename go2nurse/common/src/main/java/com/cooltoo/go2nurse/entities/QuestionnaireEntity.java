@@ -14,6 +14,7 @@ public class QuestionnaireEntity {
     private long id;
     private String title;
     private String description;
+    private String conclusion;
     private int hospitalId;
     private Date time;
     private CommonStatus status;
@@ -33,6 +34,11 @@ public class QuestionnaireEntity {
     @Column(name = "description")
     public String getDescription() {
         return description;
+    }
+
+    @Column(name = "conclusion")
+    public String getConclusion() {
+        return conclusion;
     }
 
     @Column(name = "hospital_id")
@@ -62,6 +68,10 @@ public class QuestionnaireEntity {
         this.description = description;
     }
 
+    public void setConclusion(String conclusion) {
+        this.conclusion = conclusion;
+    }
+
     public void setHospitalId(int hospitalId) {
         this.hospitalId = hospitalId;
     }
@@ -81,6 +91,7 @@ public class QuestionnaireEntity {
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", title=").append(title);
         msg.append(", description=").append(description);
+        msg.append(", conclusion=").append(conclusion);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

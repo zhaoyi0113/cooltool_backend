@@ -5,13 +5,17 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.QuestionBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
+import com.cooltoo.go2nurse.beans.QuestionnaireConclusionBean;
+import com.cooltoo.go2nurse.beans.QuestionOptionBean;
 import com.cooltoo.go2nurse.beans.UserQuestionnaireAnswerBean;
+import com.cooltoo.go2nurse.constants.QuestionType;
 import com.cooltoo.go2nurse.converter.UserQuestionnaireAnswerBeanConverter;
 import com.cooltoo.go2nurse.entities.QuestionEntity;
 import com.cooltoo.go2nurse.entities.UserQuestionnaireAnswerEntity;
 import com.cooltoo.go2nurse.repository.QuestionRepository;
 import com.cooltoo.go2nurse.repository.UserQuestionnaireAnswerRepository;
 import com.cooltoo.go2nurse.repository.UserRepository;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +40,7 @@ public class UserQuestionnaireAnswerService {
     @Autowired private UserQuestionnaireAnswerRepository repository;
     @Autowired private UserQuestionnaireAnswerBeanConverter beanConverter;
 
+    @Autowired private Go2NurseUtility go2NurseUtility;
     @Autowired private UserRepository userRepository;
     @Autowired private QuestionRepository questionRepository;
     @Autowired private QuestionnaireService questionnaireService;
@@ -120,7 +125,9 @@ public class UserQuestionnaireAnswerService {
         }
 
         // fill answer to question bean
+        int userScore = 0;
         for (QuestionnaireBean questionnaire : questionnaires) {
+            List<QuestionnaireConclusionBean> conclusions = go2NurseUtility.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
             List<QuestionBean> questions = questionnaire.getQuestions();
             if (VerifyUtil.isListEmpty(questions)) {
                 continue;
@@ -129,8 +136,28 @@ public class UserQuestionnaireAnswerService {
                 UserQuestionnaireAnswerBean answer = questionIdToAnswer.get(question.getId());
                 if(null!=answer) {
                     question.setUserAnswer(answer.getAnswer());
+                    if (QuestionType.SINGLE_SELECTION.equals(question.getType())) {
+                        QuestionOptionBean userOption = go2NurseUtility.parseJsonBean(answer.getAnswer(), QuestionOptionBean.class);
+                        if (null != userOption) {
+                            userScore += userOption.getScore();
+                        }
+                    }
+                    else if (QuestionType.MULTI_SELECTION.equals(question.getType())) {
+                        List<QuestionOptionBean> userOptions = go2NurseUtility.parseJsonList(answer.getAnswer(), QuestionOptionBean.class);
+                        for (QuestionOptionBean userOption : userOptions) {
+                            userScore += userOption.getScore();
+                        }
+                    }
                 }
             }
+            questionnaire.setUserScore(userScore);
+            for (QuestionnaireConclusionBean conclusion : conclusions) {
+                if (conclusion.isThisConclusion(userScore)) {
+                    questionnaire.setUserConclusion(conclusion);
+                    break;
+                }
+            }
+            userScore = 0;
         }
 
         logger.info("count is {}", questionnaires.size());

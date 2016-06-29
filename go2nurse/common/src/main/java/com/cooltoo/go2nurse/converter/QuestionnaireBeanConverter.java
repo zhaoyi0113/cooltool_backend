@@ -16,6 +16,7 @@ public class QuestionnaireBeanConverter implements Converter<QuestionnaireEntity
         bean.setId(source.getId());
         bean.setTitle(source.getTitle());
         bean.setDescription(source.getDescription());
+        bean.setConclusion(source.getConclusion());
         bean.setHospitalId(source.getHospitalId());
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
