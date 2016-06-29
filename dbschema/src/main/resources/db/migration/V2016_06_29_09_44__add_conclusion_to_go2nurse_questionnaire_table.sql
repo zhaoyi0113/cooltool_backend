@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_questionnaire` ADD COLUMN `conclusion` TEXT NULL;
