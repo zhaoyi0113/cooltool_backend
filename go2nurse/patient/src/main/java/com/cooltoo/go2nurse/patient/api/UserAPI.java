@@ -38,8 +38,8 @@ public class UserAPI {
                              @FormParam("password") @DefaultValue("") String password,
                              @FormParam("sms_code") @DefaultValue("") String smsCode
     ) {
-        long id = service.registerUser(name, gender, birthday, mobile, password, smsCode);
-        return Response.ok(id).build();
+        UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode);
+        return Response.ok(userBean).build();
     }
 
     @POST

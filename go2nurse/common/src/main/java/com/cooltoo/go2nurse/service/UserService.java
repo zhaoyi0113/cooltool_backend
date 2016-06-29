@@ -6,17 +6,14 @@ import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.converter.UserBeanConverter;
-import com.cooltoo.go2nurse.entities.CourseEntity;
 import com.cooltoo.go2nurse.entities.UserEntity;
 import com.cooltoo.go2nurse.repository.UserRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.leancloud.LeanCloudService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
-import org.apache.tomcat.util.buf.UEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +53,7 @@ public class UserService {
     //         add
     //==================================================================
     @Transactional
-    public long registerUser(String name, int gender, String strBirthday, String mobile, String password, String smsCode) {
+    public UserBean registerUser(String name, int gender, String strBirthday, String mobile, String password, String smsCode) {
         logger.info("register new user with name={} gender={} birthday={} mobile={} password={} smsCode={}",
                 name, gender, strBirthday, mobile, password, smsCode);
         leanCloudService.verifySmsCode(smsCode, mobile);
@@ -103,7 +100,7 @@ public class UserService {
         entity = repository.save(entity);
 
         logger.info("add user={}", entity);
-        return entity.getId();
+        return beanConverter.convert(entity);
     }
 
     //==================================================================
