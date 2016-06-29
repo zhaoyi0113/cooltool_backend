@@ -54,9 +54,9 @@ public class QuestionnaireServiceAPI {
     @Path("/questionnaire/{index}/{number}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCategoryByPage(@Context HttpServletRequest request,
-                                      @PathParam("index")  @DefaultValue("0")  int index,
-                                      @PathParam("number") @DefaultValue("10") int number
+    public Response getQuestionnaireByPage(@Context HttpServletRequest request,
+                                           @PathParam("index")  @DefaultValue("0")  int index,
+                                           @PathParam("number") @DefaultValue("10") int number
     ) {
         List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireByPage(index, number);
         return Response.ok(questionnaires).build();
@@ -75,7 +75,7 @@ public class QuestionnaireServiceAPI {
     @Path("/question/without_questionnaire")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getQuestionsWithoutCategoryId(@Context HttpServletRequest request) {
+    public Response getQuestionsBelongNoQuestionnaire(@Context HttpServletRequest request) {
         List<QuestionBean> questions = questionnaireService.getQuestionByQuestionnaireId(0L);
         return Response.ok(questions).build();
     }
