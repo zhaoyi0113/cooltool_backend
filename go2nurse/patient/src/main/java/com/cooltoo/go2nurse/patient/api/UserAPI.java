@@ -80,11 +80,12 @@ public class UserAPI {
     @Path("/verify")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response verifySmsCode(@Context HttpServletRequest request,
-                                  @FormParam("user_id") @DefaultValue("0") long userId,
                                   @FormParam("sms_code") @DefaultValue("") String smsCode,
                                   @FormParam("mobile") @DefaultValue("") String mobile
     ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         logger.info("verify sms code={}, mobile={}, userId={]", smsCode, mobile, userId);
         UserBean bean = service.validateMobile(userId, smsCode, mobile);
         logger.info("verify sms code, user is " + bean);
@@ -94,11 +95,12 @@ public class UserAPI {
     @Path("/modify/mobile")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response updateMobile(@Context HttpServletRequest request,
-                                 @FormParam("user_id") @DefaultValue("0") long userId,
                                  @FormParam("sms_code") @DefaultValue("") String smsCode,
                                  @FormParam("new_mobile") @DefaultValue("") String newMobile
     ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserBean bean = service.updateMobile(userId, smsCode, newMobile);
         logger.info("update user mobile is " + bean);
         return Response.ok(bean).build();
@@ -107,11 +109,12 @@ public class UserAPI {
     @Path("/modify/password")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response updatePassword(@Context HttpServletRequest request,
-                                   @FormParam("user_id") @DefaultValue("0") long userId,
                                    @FormParam("password") @DefaultValue("") String password,
                                    @FormParam("new_password") @DefaultValue("") String newPassword
     ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserBean bean = service.updatePassword(userId, password, newPassword);
         logger.info("update user password is " + bean);
         return Response.ok(bean).build();

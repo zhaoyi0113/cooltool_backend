@@ -24,23 +24,24 @@ public class UserQuestionnaireAnswerServiceAPI {
     @Autowired private QuestionnaireService questionnaireService;
     @Autowired private UserQuestionnaireAnswerService userAnswerService;
 
-    @Path("/all/{user_id}")
+    @Path("/all")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsersAllQuestionnaire(@Context HttpServletRequest request,
-                                             @PathParam("user_id") @DefaultValue("0") long userId
-    ) {
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUsersAllQuestionnaire(@Context HttpServletRequest request) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<QuestionnaireBean> usersQuestionnaires = userAnswerService.getUserQuestionnaire(userId);
         return Response.ok(usersQuestionnaires).build();
     }
 
-    @Path("/with_answer/{user_id}/{questionnaire_id}")
+    @Path("/with_answer/{questionnaire_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response getUsersQuestionnaire(@Context HttpServletRequest request,
-                                          @PathParam("user_id") @DefaultValue("0") long userId,
                                           @PathParam("questionnaire_id") @DefaultValue("0") long questionnaireId
     ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         QuestionnaireBean usersQuestionnaires = userAnswerService.getUserQuestionnaireWithAnswer(userId, questionnaireId);
         return Response.ok(usersQuestionnaires).build();
     }
@@ -54,7 +55,7 @@ public class UserQuestionnaireAnswerServiceAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response deleteQuestionAnswers(@Context HttpServletRequest request,
-                                       @FormParam("question_ids") @DefaultValue("0") String questionIds
+                                          @FormParam("question_ids") @DefaultValue("0") String questionIds
     ){
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<UserQuestionnaireAnswerBean> userAnswer = userAnswerService.deleteByUserIdAndQuestionIds(userId, questionIds);
