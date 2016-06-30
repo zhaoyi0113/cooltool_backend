@@ -91,17 +91,29 @@ public class UserAPI {
         return Response.ok(bean).build();
     }
 
-    @Path("/modify/mobile_or_password")
+    @Path("/modify/mobile")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
-    public Response updateUser(@Context HttpServletRequest request,
-                                @FormParam("new_mobile") @DefaultValue("") String newMobile,
-                                @FormParam("new_password") @DefaultValue("") String newPassword
+    public Response updateMobile(@Context HttpServletRequest request,
+                                 @FormParam("user_id") @DefaultValue("0") long userId,
+                                 @FormParam("sms_code") @DefaultValue("") String smsCode,
+                                 @FormParam("new_mobile") @DefaultValue("") String newMobile
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserBean bean = service.updateMobilePassword(userId, newMobile, newPassword);
-        logger.info("update user mobile and password is " + bean);
+        UserBean bean = service.updateMobile(userId, smsCode, newMobile);
+        logger.info("update user mobile is " + bean);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/modify/password")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updatePassword(@Context HttpServletRequest request,
+                                   @FormParam("user_id") @DefaultValue("0") long userId,
+                                   @FormParam("password") @DefaultValue("") String password,
+                                   @FormParam("new_password") @DefaultValue("") String newPassword
+    ) {
+        UserBean bean = service.updatePassword(userId, password, newPassword);
+        logger.info("update user password is " + bean);
         return Response.ok(bean).build();
     }
 

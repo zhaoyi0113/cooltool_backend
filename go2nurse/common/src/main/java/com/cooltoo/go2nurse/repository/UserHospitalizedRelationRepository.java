@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface UserHospitalizedRelationRepository extends JpaRepository<UserHospitalizedRelationEntity, Long> {
 
-    List<UserHospitalizedRelationEntity> findByUserIdAndHospitalIdAndDepartmentId(Long userId, Integer hospitalId, Integer departmentId, Sort sort);
+    List<UserHospitalizedRelationEntity> findByUserIdAndHospitalIdAndDepartmentIdAndGroupId(Long userId, Integer hospitalId, Integer departmentId, Long groupId, Sort sort);
 
     @Query("SELECT count(relation.id) FROM UserHospitalizedRelationEntity relation" +
             " WHERE relation.userId=?1" +

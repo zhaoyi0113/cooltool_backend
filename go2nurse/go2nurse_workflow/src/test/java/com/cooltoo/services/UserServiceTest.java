@@ -113,6 +113,38 @@ public class UserServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(bean1.getId(), bean2.getId());
     }
 
+//    @Test
+//    public void testUpdateMobile() {
+//        String mobile = "13423143214";
+//        String smsCode = "123456";
+//        long userId = 1;
+//
+//        UserBean bean1 = service.getUserWithoutOtherInfo(userId);
+//        UserBean bean2 = service.updateMobilePassword(userId, smsCode, mobile);
+//
+//        Assert.assertEquals(mobile, bean2.getMobile());
+//        Assert.assertEquals(userId, bean2.getId());
+//
+//        Assert.assertNotEquals(bean1.getMobile(), bean2.getMobile());
+//        Assert.assertEquals(bean1.getId(), bean2.getId());
+//    }
+
+    @Test
+    public void testUpdatePassword() {
+        String mobile = "13423143214";
+        String password = "12fd3a45b61c9840e40f4f45b6d1c";
+        long userId = 1;
+
+        UserBean bean1 = service.getUserWithoutOtherInfo(userId);
+        UserBean bean2 = service.updateMobilePassword(userId, bean1.getPassword(), password);
+
+        Assert.assertEquals(password, bean2.getPassword());
+        Assert.assertEquals(userId, bean2.getId());
+
+        Assert.assertNotEquals(bean1.getPassword(), bean2.getPassword());
+        Assert.assertEquals(bean1.getId(), bean2.getId());
+    }
+
     @Test
     public void testGetAll(){
         List<UserBean> all = service.getAllByAuthorityAndFuzzyName("", "", 0, 100);

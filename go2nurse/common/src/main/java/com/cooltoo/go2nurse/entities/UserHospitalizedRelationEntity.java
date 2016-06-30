@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,6 +19,8 @@ public class UserHospitalizedRelationEntity {
     private long userId;
     private int hospitalId;
     private int departmentId;
+    private long groupId;
+    private YesNoEnum hasLeave;
 
     @Id
     @GeneratedValue
@@ -52,6 +55,17 @@ public class UserHospitalizedRelationEntity {
         return departmentId;
     }
 
+    @Column(name = "group_id")
+    public long getGroupId() {
+        return groupId;
+    }
+
+    @Column(name = "has_leave")
+    @Enumerated
+    public YesNoEnum getHasLeave() {
+        return hasLeave;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -76,6 +90,14 @@ public class UserHospitalizedRelationEntity {
         this.departmentId = departmentId;
     }
 
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
+    public void setHasLeave(YesNoEnum hasLeave) {
+        this.hasLeave = hasLeave;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -83,6 +105,8 @@ public class UserHospitalizedRelationEntity {
         msg.append(", userId=").append(userId);
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", departmentId=").append(departmentId);
+        msg.append(", groupId=").append(groupId);
+        msg.append(", hasLeave=").append(hasLeave);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

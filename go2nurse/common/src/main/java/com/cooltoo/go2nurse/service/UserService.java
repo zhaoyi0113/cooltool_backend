@@ -401,7 +401,64 @@ public class UserService {
                 changed = true;
             }
         }
-        user = repository.save(user);
+        if (changed) {
+            user = repository.save(user);
+        }
+        UserBean userBean = beanConverter.convert(user);
+        return userBean;
+    }
+
+    @Transactional
+    public UserBean updateMobile(long userId, String smsCode, String newMobile) {
+        logger.info("modify the mobile by userId={} newMobile={} smsCode={}",
+                userId, newMobile, smsCode);
+
+        UserEntity user = repository.getOne(userId);
+        if (null==user) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        // if not modify the mobile
+        boolean changed = false;
+        if (!VerifyUtil.isStringEmpty(newMobile) && !VerifyUtil.isStringEmpty(smsCode)) {
+            leanCloudService.verifySmsCode(smsCode.trim(), newMobile.trim());
+            newMobile = newMobile.trim();
+            if (!newMobile.equals(user.getMobile())) {
+                user.setMobile(newMobile);
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            user = repository.save(user);
+        }
+        UserBean userBean = beanConverter.convert(user);
+        return userBean;
+    }
+
+    @Transactional
+    public UserBean updatePassword(long userId, String oldPassword, String newPassword) {
+        logger.info("modify the password by userId={} oldPwd={} newPwd={}",
+                userId, oldPassword, newPassword);
+
+        UserEntity user = repository.getOne(userId);
+        if (null==user) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        boolean changed = false;
+
+        // check password
+        if (user.getPassword().equals(oldPassword) && !VerifyUtil.isStringEmpty(newPassword)) {
+            newPassword = newPassword.trim();
+            if (!newPassword.equals(user.getPassword())) {
+                user.setPassword(newPassword);
+                changed = true;
+            }
+        }
+        if (changed) {
+            user = repository.save(user);
+        }
         UserBean userBean = beanConverter.convert(user);
         return userBean;
     }

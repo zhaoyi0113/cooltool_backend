@@ -80,6 +80,7 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
     @Test
     public void getUpdateStatus() {
         long relationId = 1;
+        String hasLeave = "YES";
         String status = CommonStatus.DISABLED.name();
         UserHospitalizedRelationBean bean;
 
@@ -89,14 +90,15 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
 
         userId = 2;
         Throwable error = null;
-        try { relationService.updateRelation(relationId, true, userId, status); }
+        try { relationService.updateRelation(relationId, true, userId, hasLeave, status); }
         catch (Exception ex) { error= ex; }
         Assert.assertNotNull(error);
 
         userId = 1;
-        bean = relationService.updateRelation(relationId, true, userId, status);
+        bean = relationService.updateRelation(relationId, true, userId, hasLeave, status);
         Assert.assertEquals(relationId, bean.getId());
         Assert.assertEquals(status, bean.getStatus().name());
+        Assert.assertEquals(hasLeave, bean.getHasLeave().name());
 
         count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(2, count);
@@ -105,8 +107,10 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
     @Test
     public void getUpdateStatusByUserIdHospitalIdDepartmentId() {
         long relationId = 1;
+        long groupId = 0;
         int hospitalId = 11;
         int departmentId = 11;
+        String hasLeave = "YES";
         String status = CommonStatus.DISABLED.name();
         UserHospitalizedRelationBean bean;
 
@@ -115,9 +119,11 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(1, count);
 
         userId = 1;
-        bean = relationService.updateRelation(hospitalId, departmentId, userId, status);
+        bean = relationService.updateRelation(groupId, hospitalId, departmentId, userId, hasLeave, status);
         Assert.assertEquals(relationId, bean.getId());
         Assert.assertEquals(status, bean.getStatus().name());
+        Assert.assertEquals(hasLeave, bean.getHasLeave().name());
+        Assert.assertEquals(groupId, bean.getGroupId());
 
         count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(2, count);
@@ -127,6 +133,7 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
     public void addRelation() {
         UserHospitalizedRelationBean relations;
         long userId = 7;
+        long groupId = 1;
         int hospitalId = 11;
         int departmentId =11;
         String status = "ALL";
@@ -134,9 +141,10 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         long count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(0, count);
 
-        relations = relationService.addRelation(userId, hospitalId, departmentId);
+        relations = relationService.addRelation(userId, groupId, hospitalId, departmentId);
         Assert.assertNotNull(relations);
         Assert.assertEquals(userId, relations.getUserId());
+        Assert.assertEquals(groupId, relations.getGroupId());
         Assert.assertEquals(hospitalId, relations.getHospitalId());
         Assert.assertEquals(departmentId, relations.getDepartmentId());
 
@@ -148,9 +156,10 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(1, count);
 
-        relations = relationService.addRelation(userId, hospitalId, departmentId);
+        relations = relationService.addRelation(userId, groupId, hospitalId, departmentId);
         Assert.assertNotNull(relations);
         Assert.assertEquals(userId, relations.getUserId());
+        Assert.assertEquals(groupId, relations.getGroupId());
         Assert.assertEquals(hospitalId, relations.getHospitalId());
         Assert.assertEquals(departmentId, relations.getDepartmentId());
 
@@ -167,6 +176,7 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
     public void addRelationByUniqueId() {
         UserHospitalizedRelationBean relations;
         long userId = 7;
+        long groupId = 7;
         int hospitalId = 11;
         String hospitalUniqueId = "111111";
         int departmentId = 11;
@@ -176,9 +186,10 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         long count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(0, count);
 
-        relations = relationService.addRelation(userId, hospitalUniqueId, departmentUniqueId);
+        relations = relationService.addRelation(userId, groupId, hospitalUniqueId, departmentUniqueId);
         Assert.assertNotNull(relations);
         Assert.assertEquals(userId, relations.getUserId());
+        Assert.assertEquals(groupId, relations.getGroupId());
         Assert.assertEquals(hospitalId, relations.getHospitalId());
         Assert.assertEquals(departmentId, relations.getDepartmentId());
 
@@ -190,9 +201,10 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(1, count);
 
-        relations = relationService.addRelation(userId, hospitalUniqueId, departmentUniqueId);
+        relations = relationService.addRelation(userId, groupId, hospitalUniqueId, departmentUniqueId);
         Assert.assertNotNull(relations);
         Assert.assertEquals(userId, relations.getUserId());
+        Assert.assertEquals(groupId, relations.getGroupId());
         Assert.assertEquals(hospitalId, relations.getHospitalId());
         Assert.assertEquals(departmentId, relations.getDepartmentId());
 

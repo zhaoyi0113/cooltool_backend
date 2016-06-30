@@ -55,11 +55,12 @@ public class UserHospitalizedAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addRelation(@Context HttpServletRequest request,
+                                @FormParam("group_id") @DefaultValue("0") long groupId,
                                 @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
                                 @FormParam("department_id") @DefaultValue("0") int departmentId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospitalId, departmentId);
+        UserHospitalizedRelationBean relation = relationService.addRelation(userId, groupId, hospitalId, departmentId);
         return Response.ok(relation).build();
     }
 
@@ -68,11 +69,12 @@ public class UserHospitalizedAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addRelationByUniqueId(@Context HttpServletRequest request,
+                                          @FormParam("group_id") @DefaultValue("0") long groupId,
                                           @FormParam("hospital_unique_id") @DefaultValue("") String hospitalUniqueId,
                                           @FormParam("department_unique_id") @DefaultValue("") String departmentUniqueId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospitalUniqueId, departmentUniqueId);
+        UserHospitalizedRelationBean relation = relationService.addRelation(userId, groupId, hospitalUniqueId, departmentUniqueId);
         return Response.ok(relation).build();
     }
 
@@ -81,6 +83,7 @@ public class UserHospitalizedAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addRelationByUniqueId(@Context HttpServletRequest request,
+                                          @FormParam("group_id") @DefaultValue("0") long groupId,
                                           @FormParam("hospital_department_unique_id") @DefaultValue("") String hospitalAndDepartmentUniqueId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
@@ -88,7 +91,7 @@ public class UserHospitalizedAPI {
         if (hospital_department.length!=2) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospital_department[0].trim(), hospital_department[1].trim());
+        UserHospitalizedRelationBean relation = relationService.addRelation(userId, groupId, hospital_department[0].trim(), hospital_department[1].trim());
         return Response.ok(relation).build();
     }
 
@@ -98,10 +101,11 @@ public class UserHospitalizedAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response updateRelation(@Context HttpServletRequest request,
                                    @FormParam("relation_id") @DefaultValue("0") long relationId,
+                                   @FormParam("has_leave") @DefaultValue("no") String hasLeave,
                                    @FormParam("status") @DefaultValue("disabled") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserHospitalizedRelationBean relation = relationService.updateRelation(relationId, true, userId, status);
+        UserHospitalizedRelationBean relation = relationService.updateRelation(relationId, true, userId, hasLeave, status);
         return Response.ok(relation).build();
     }
 
@@ -110,12 +114,14 @@ public class UserHospitalizedAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response updateRelation(@Context HttpServletRequest request,
+                                   @FormParam("group_id") @DefaultValue("0") long groupId,
                                    @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
                                    @FormParam("department_id") @DefaultValue("0") int departmentId,
+                                   @FormParam("has_leave") @DefaultValue("no") String hasLeave,
                                    @FormParam("status") @DefaultValue("disabled") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserHospitalizedRelationBean relation = relationService.updateRelation(hospitalId, departmentId, userId, status);
+        UserHospitalizedRelationBean relation = relationService.updateRelation(groupId, hospitalId, departmentId, userId, hasLeave, status);
         return Response.ok(relation).build();
     }
 

@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.entities.HospitalDepartmentEntity;
 import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.exception.BadRequestException;
@@ -40,6 +41,7 @@ public class UserHospitalizedRelationService {
     private static final Logger logger = LoggerFactory.getLogger(UserHospitalizedRelationService.class);
 
     private static final Sort sort = new Sort(
+            new Sort.Order(Sort.Direction.DESC, "groupId"),
             new Sort.Order(Sort.Direction.DESC, "time"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
@@ -158,9 +160,9 @@ public class UserHospitalizedRelationService {
     //               add
     //===================================================
     @Transactional
-    public UserHospitalizedRelationBean addRelation(long userId, String hospitalUniqueId, String departmentUniqueId) {
-        logger.info("add hospitalized relation to user={} hospitalUniqueId={} departmentUniqueId={}",
-                userId, hospitalUniqueId, departmentUniqueId);
+    public UserHospitalizedRelationBean addRelation(long userId, long groupId, String hospitalUniqueId, String departmentUniqueId) {
+        logger.info("add hospitalized relation to user={} with groupId={} hospitalUniqueId={} departmentUniqueId={}",
+                userId, groupId, hospitalUniqueId, departmentUniqueId);
 
         List<HospitalEntity> hospital = hospitalRepository.findByUniqueId(hospitalUniqueId);
         int hospitalSize = VerifyUtil.isListEmpty(hospital) ? 0 : hospital.size();
@@ -180,12 +182,13 @@ public class UserHospitalizedRelationService {
         int departmentId = department.get(0).getId();
         logger.info("departmentId={}", departmentId);
 
-        return addRelation(userId, hospitalId, departmentId);
+        return addRelation(userId, groupId, hospitalId, departmentId);
     }
 
     @Transactional
-    public UserHospitalizedRelationBean addRelation(long userId, int hospitalId, int departmentId) {
-        logger.info("add hospitalized relation to user={}, hospitalId={}, departmentId={}", userId, hospitalId, departmentId);
+    public UserHospitalizedRelationBean addRelation(long userId, long groupId, int hospitalId, int departmentId) {
+        logger.info("add hospitalized relation to user={} with groupId={} hospitalId={} departmentId={}",
+                userId, groupId, hospitalId, departmentId);
         if (!userRepository.exists(userId)) {
             logger.error("user not exist");
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
@@ -202,6 +205,7 @@ public class UserHospitalizedRelationService {
         UserHospitalizedRelationEntity entity;
         entity = new UserHospitalizedRelationEntity();
         entity.setUserId(userId);
+        entity.setGroupId(groupId);
         entity.setHospitalId(hospitalId);
         entity.setDepartmentId(departmentId);
         entity.setTime(new Date());
@@ -210,7 +214,7 @@ public class UserHospitalizedRelationService {
         long relationId = entity.getId();
 
         List<UserHospitalizedRelationEntity> entities;
-        entities = repository.findByUserIdAndHospitalIdAndDepartmentId(userId, hospitalId, departmentId, sort);
+        entities = repository.findByUserIdAndHospitalIdAndDepartmentIdAndGroupId(userId, hospitalId, departmentId, groupId, sort);
         boolean changed = false;
         for (int i = 0, count = entities.size(); i < count; i ++) {
             UserHospitalizedRelationEntity tmp = entities.get(i);
@@ -236,8 +240,9 @@ public class UserHospitalizedRelationService {
     //               update
     //===================================================
     @Transactional
-    public UserHospitalizedRelationBean updateRelation(long relationId, boolean checkUser, long userId, String strStatus) {
-        logger.info("user={} update relation={} with readingStatus={} and status={}", userId, relationId, strStatus);
+    public UserHospitalizedRelationBean updateRelation(long relationId, boolean checkUser, long userId, String strHasLeave, String strStatus) {
+        logger.info("user={} update relation={} with readingStatus={} and hasLeave={} status={}",
+                userId, relationId, strHasLeave, strStatus);
         UserHospitalizedRelationEntity entity = repository.findOne(relationId);
         if (null==entity) {
             logger.error("relation not exist");
@@ -256,6 +261,12 @@ public class UserHospitalizedRelationService {
             changed = true;
         }
 
+        YesNoEnum yesOrNo = YesNoEnum.parseString(strHasLeave);
+        if (null!=yesOrNo && !yesOrNo.equals(entity.getHasLeave())) {
+            entity.setHasLeave(yesOrNo);
+            changed = true;
+        }
+
         if (changed) {
             entity = repository.save(entity);
             logger.info("after updating is {}", entity);
@@ -265,10 +276,10 @@ public class UserHospitalizedRelationService {
     }
 
     @Transactional
-    public UserHospitalizedRelationBean updateRelation(int hospitalId, int departmentId, long userId, String strStatus) {
-        logger.info("user={} update hospital={} department={} relation with readingStatus={} and status={}",
-                userId, hospitalId, departmentId, strStatus);
-        List<UserHospitalizedRelationEntity> entities = repository.findByUserIdAndHospitalIdAndDepartmentId(userId, hospitalId, departmentId, sort);
+    public UserHospitalizedRelationBean updateRelation(long groupId, int hospitalId, int departmentId, long userId, String strHasLeave, String strStatus) {
+        logger.info("user={} update groupId={} hospital={} department={} relation with hasLeave={} and status={}",
+                userId, groupId, hospitalId, departmentId, strHasLeave, strStatus);
+        List<UserHospitalizedRelationEntity> entities = repository.findByUserIdAndHospitalIdAndDepartmentIdAndGroupId(userId, hospitalId, departmentId, groupId, sort);
         if (VerifyUtil.isListEmpty(entities)) {
             logger.error("relation not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -280,6 +291,12 @@ public class UserHospitalizedRelationService {
         CommonStatus status = CommonStatus.parseString(strStatus);
         if (null!=status && !status.equals(entity.getStatus())) {
             entity.setStatus(status);
+            changed = true;
+        }
+
+        YesNoEnum yesOrNo = YesNoEnum.parseString(strHasLeave);
+        if (null!=yesOrNo && !yesOrNo.equals(entity.getHasLeave())) {
+            entity.setHasLeave(yesOrNo);
             changed = true;
         }
 

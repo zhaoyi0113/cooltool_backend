@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import java.util.Date;
 
@@ -19,6 +20,8 @@ public class UserHospitalizedRelationBean {
     private HospitalBean hospital;
     private int departmentId;
     private HospitalDepartmentBean department;
+    private long groupId;
+    private YesNoEnum hasLeave;
 
     public long getId() {
         return id;
@@ -84,6 +87,22 @@ public class UserHospitalizedRelationBean {
         this.department = department;
     }
 
+    public long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
+    public YesNoEnum getHasLeave() {
+        return hasLeave;
+    }
+
+    public void setHasLeave(YesNoEnum hasLeave) {
+        this.hasLeave = hasLeave;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -91,6 +110,8 @@ public class UserHospitalizedRelationBean {
         msg.append(", userId=").append(userId);
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", departmentId=").append(departmentId);
+        msg.append(", groupId=").append(groupId);
+        msg.append(", hasLeave=").append(hasLeave);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append(", hospital=").append(hospital);

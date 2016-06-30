@@ -19,6 +19,8 @@ public class UserHospitalizedRelationBeanConverter implements Converter<UserHosp
         bean.setUserId(source.getUserId());
         bean.setHospitalId(source.getHospitalId());
         bean.setDepartmentId(source.getDepartmentId());
+        bean.setGroupId(source.getGroupId());
+        bean.setHasLeave(source.getHasLeave());
         return bean;
     }
 }
