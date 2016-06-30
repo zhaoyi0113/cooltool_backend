@@ -1,9 +1,6 @@
 package com.cooltoo.go2nurse.beans;
 
-import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.GenderType;
-import com.cooltoo.constants.UserAuthority;
-import com.cooltoo.constants.UserType;
+import com.cooltoo.constants.*;
 
 import java.util.Date;
 
@@ -26,6 +23,7 @@ public class UserBean {
     private UserType type;
     private String uniqueId;
     private String address;
+    private YesNoEnum hasDecide;
 
     public long getId() {
         return id;
@@ -77,6 +75,10 @@ public class UserBean {
 
     public String getAddress() {
         return address;
+    }
+
+    public YesNoEnum getHasDecide() {
+        return hasDecide;
     }
 
     public void setId(long id) {
@@ -139,6 +141,10 @@ public class UserBean {
         this.address = address;
     }
 
+    public void setHasDecide(YesNoEnum hasDecide) {
+        this.hasDecide = hasDecide;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -154,6 +160,7 @@ public class UserBean {
         msg.append(", type=").append(type);
         msg.append(", uniqueId=").append(uniqueId);
         msg.append(", address=").append(address);
+        msg.append(", hasDecide=").append(hasDecide);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

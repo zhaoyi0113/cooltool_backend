@@ -30,14 +30,15 @@ public class UserManageAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(@Context HttpServletRequest request,
-                                @FormParam("user_id") @DefaultValue("0") long userId,
-                                @FormParam("name") @DefaultValue("") String name,
-                                @FormParam("gender") @DefaultValue("2") int gender,
-                                @FormParam("birthday") @DefaultValue("") String birthday,
-                                @FormParam("address") @DefaultValue("") String address,
-                                @FormParam("authority") @DefaultValue("1") int authority
+                               @FormParam("user_id") @DefaultValue("0") long userId,
+                               @FormParam("name") @DefaultValue("") String name,
+                               @FormParam("gender") @DefaultValue("2") int gender,
+                               @FormParam("birthday") @DefaultValue("") String birthday,
+                               @FormParam("address") @DefaultValue("") String address,
+                               @FormParam("authority") @DefaultValue("1") int authority,
+                               @FormParam("has_decide") @DefaultValue("NO") String hasDecide
     ) {
-        UserBean user = service.updateUser(userId, name, gender, birthday, authority, address);
+        UserBean user = service.updateUser(userId, name, gender, birthday, authority, address, hasDecide);
         logger.info("update user is " + user);
         if (null == user) {
             return Response.ok().build();

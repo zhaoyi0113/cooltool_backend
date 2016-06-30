@@ -33,6 +33,7 @@ public class UserDiagnosticPointRelationService {
     private static final Logger logger = LoggerFactory.getLogger(UserDiagnosticPointRelationService.class);
 
     private static final Sort sort = new Sort(
+            new Sort.Order(Sort.Direction.DESC, "groupId"),
             new Sort.Order(Sort.Direction.ASC, "time"),
             new Sort.Order(Sort.Direction.ASC, "id")
     );
@@ -89,8 +90,9 @@ public class UserDiagnosticPointRelationService {
     //               add
     //===================================================
     @Transactional
-    public List<UserDiagnosticPointRelationBean> addUserDiagnosticRelation(long userId, List<DiagnosticEnumeration> diagnosticPoints, List<Date> pointTimes) {
-        logger.info("add diagnostic point to user={}, diagnostic_point={}, point_time={}", userId, diagnosticPoints, pointTimes);
+    public List<UserDiagnosticPointRelationBean> addUserDiagnosticRelation(long userId, long groupId, List<DiagnosticEnumeration> diagnosticPoints, List<Date> pointTimes) {
+        logger.info("add diagnostic point to user={}, groupId={}, diagnostic_point={}, point_time={}",
+                userId, groupId, diagnosticPoints, pointTimes);
         if (!userRepository.exists(userId)) {
             logger.error("user not exist");
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
@@ -106,6 +108,7 @@ public class UserDiagnosticPointRelationService {
             Date pointTime = pointTimes.get(i);
             entity = new UserDiagnosticPointRelationEntity();
             entity.setUserId(userId);
+            entity.setGroupId(groupId);
             entity.setDiagnosticId(diagnosticPoint.ordinal());
             entity.setDiagnosticTime(pointTime);
             entity.setTime(new Date());
@@ -123,7 +126,8 @@ public class UserDiagnosticPointRelationService {
     //===================================================
     @Transactional
     public UserDiagnosticPointRelationBean updateUserDiagnosticRelation(long relationId, boolean checkUser, long userId, Date pointTime, String strStatus) {
-        logger.info("user={} update relation={} with pointTime={} and status={}", userId, relationId, pointTime, strStatus);
+        logger.info("user={} update relation={} with pointTime={} and status={}",
+                userId, relationId, pointTime, strStatus);
         UserDiagnosticPointRelationEntity entity = repository.findOne(relationId);
         if (checkUser && entity.getUserId()!=userId) {
             logger.info("not user's diagnostic point relation");
@@ -152,9 +156,10 @@ public class UserDiagnosticPointRelationService {
     }
 
     @Transactional
-    public UserDiagnosticPointRelationBean updateUserDiagnosticRelation(long diagnosticId, long userId, Date pointTime, String strStatus) {
-        logger.info("user={} update diagnostic={} with pointTime={} and status={}", userId, diagnosticId, pointTime, strStatus);
-        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndDiagnosticId(userId, diagnosticId, sort);
+    public UserDiagnosticPointRelationBean updateUserDiagnosticRelation(long groupId, long diagnosticId, long userId, Date pointTime, String strStatus) {
+        logger.info("user={} update diagnostic={} with groupId={} pointTime={} and status={}",
+                userId, diagnosticId, groupId, pointTime, strStatus);
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndDiagnosticIdAndGroupId(userId, diagnosticId, groupId, sort);
         if (VerifyUtil.isListEmpty(entities)) {
             logger.info("not user's diagnostic point relation");
             throw new BadRequestException(ErrorCode.DATA_ERROR);

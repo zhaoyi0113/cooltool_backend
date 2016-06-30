@@ -53,7 +53,8 @@ public class UserDiagnosticPointAPI {
         List<Date> pointTimes = new ArrayList<>();
         parseTime(hospitalizedDate, examinationDate, operationDate, rehabilitationDate, dischargedDate, diagnosticPoints, pointTimes);
 
-        List<UserDiagnosticPointRelationBean> relations = relationService.addUserDiagnosticRelation(userId, diagnosticPoints, pointTimes);
+        long groupId = System.currentTimeMillis();
+        List<UserDiagnosticPointRelationBean> relations = relationService.addUserDiagnosticRelation(userId, groupId, diagnosticPoints, pointTimes);
         return Response.ok(relations).build();
     }
 
@@ -78,6 +79,7 @@ public class UserDiagnosticPointAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response updateRelationByDiagnosticId(@Context HttpServletRequest request,
+                                                 @FormParam("group_id") @DefaultValue("-1") long groupId,
                                                  @FormParam("diagnostic_id") @DefaultValue("-1") long diagnosticId,
                                                  @FormParam("point_time") @DefaultValue("") String pointTime,
                                                  @FormParam("status") @DefaultValue("disabled") String status
@@ -85,7 +87,7 @@ public class UserDiagnosticPointAPI {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long time = NumberUtil.getTime(pointTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         Date newTime = time<0 ? null : new Date(time);
-        UserDiagnosticPointRelationBean relation = relationService.updateUserDiagnosticRelation(diagnosticId, userId, newTime, status);
+        UserDiagnosticPointRelationBean relation = relationService.updateUserDiagnosticRelation(groupId, diagnosticId, userId, newTime, status);
         return Response.ok(relation).build();
     }
 

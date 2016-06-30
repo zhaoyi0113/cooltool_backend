@@ -18,6 +18,7 @@ public class UserDiagnosticPointRelationEntity {
     private long userId;
     private long diagnosticId;
     private Date diagnosticTime;
+    private long groupId;
 
     @Id
     @GeneratedValue
@@ -52,6 +53,11 @@ public class UserDiagnosticPointRelationEntity {
         return diagnosticTime;
     }
 
+    @Column(name = "group_id")
+    public long getGroupId() {
+        return groupId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -76,6 +82,10 @@ public class UserDiagnosticPointRelationEntity {
         this.diagnosticTime = diagnosticTime;
     }
 
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -83,6 +93,7 @@ public class UserDiagnosticPointRelationEntity {
         msg.append(", userId=").append(userId);
         msg.append(", diagnosticId=").append(diagnosticId);
         msg.append(", diagnosticTime=").append(diagnosticTime);
+        msg.append(", groupId=").append(groupId);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

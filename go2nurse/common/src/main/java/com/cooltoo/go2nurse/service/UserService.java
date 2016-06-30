@@ -1,9 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.GenderType;
-import com.cooltoo.constants.UserAuthority;
-import com.cooltoo.constants.UserType;
+import com.cooltoo.constants.*;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.UserBean;
@@ -97,6 +94,7 @@ public class UserService {
         entity.setUniqueId(uniqueId);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
+        entity.setHasDecide(YesNoEnum.NO);
         entity = repository.save(entity);
 
         logger.info("add user={}", entity);
@@ -173,12 +171,14 @@ public class UserService {
     }
 
     public UserBean getUser(long userId) {
+        logger.info("get user={} without information", userId);
         UserBean user = getUserWithoutOtherInfo(userId);
         fillOtherProperties(user);
         return user;
     }
 
     public UserBean getUser(String mobile) {
+        logger.info("get user without information by mobile={}", mobile);
         UserBean user = getUserWithoutOtherInfo(mobile);
         fillOtherProperties(user);
         return user;
@@ -281,7 +281,9 @@ public class UserService {
     //         update
     //==================================================================
     @Transactional
-    public UserBean updateUser(long userId, String name, int iGender, String strBirthday, int iAuthority, String address) {
+    public UserBean updateUser(long userId, String name, int iGender, String strBirthday, int iAuthority, String address, String strHasDecide) {
+        logger.info("update user={} with name={} gender={} birthday={} authority={} address={} hasDecide={}",
+                userId, name, iGender, strBirthday, iAuthority, address, strHasDecide);
         UserEntity entity = repository.findOne(userId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
@@ -307,6 +309,11 @@ public class UserService {
             entity.setGender(gender);
             changed = true;
         }
+        YesNoEnum hasDecide = YesNoEnum.parseString(strHasDecide);
+        if(null!=hasDecide) {
+            entity.setHasDecide(hasDecide);
+            changed = true;
+        }
 
         if (!VerifyUtil.isStringEmpty(address)) {
             address = address.trim();
@@ -330,7 +337,9 @@ public class UserService {
         if (authorityChanged) {
             modifyDenyUserIdsCache(entity);
         }
-        return beanConverter.convert(entity);
+        UserBean bean = beanConverter.convert(entity);
+        logger.info("after updating user is {}", bean);
+        return bean;
     }
 
     @Transactional

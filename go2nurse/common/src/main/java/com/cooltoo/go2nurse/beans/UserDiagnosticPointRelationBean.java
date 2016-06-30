@@ -17,6 +17,7 @@ public class UserDiagnosticPointRelationBean {
     private long diagnosticId;
     private DiagnosticEnumeration diagnostic;
     private Date diagnosticTime;
+    private long groupId;
 
     public long getId() {
         return id;
@@ -46,6 +47,10 @@ public class UserDiagnosticPointRelationBean {
         return diagnosticTime;
     }
 
+    public long getGroupId() {
+        return groupId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -71,6 +76,10 @@ public class UserDiagnosticPointRelationBean {
         this.diagnosticTime = diagnosticTime;
     }
 
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -78,6 +87,7 @@ public class UserDiagnosticPointRelationBean {
         msg.append(", userId=").append(userId);
         msg.append(", diagnosticId=").append(diagnosticId);
         msg.append(", diagnosticTime=").append(diagnosticTime);
+        msg.append(", groupId=").append(groupId);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

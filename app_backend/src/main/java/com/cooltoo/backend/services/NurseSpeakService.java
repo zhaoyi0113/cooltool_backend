@@ -471,14 +471,14 @@ public class NurseSpeakService {
 
         NurseSpeakEntity entity = new NurseSpeakEntity();
         // check speak content
-        if (!SpeakType.SMUG.equals(speakType)) {
+        if (!SpeakType.SMUG.equals(speakType) && !SpeakType.SHORT_VIDEO.equals(speakType)) {
             if (VerifyUtil.isStringEmpty(content)) {
                 logger.error("speak content is empty");
                 throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
             }
         }
         else {
-            if (VerifyUtil.isStringEmpty(content) && null==image) {
+            if (SpeakType.SMUG.equals(speakType) && VerifyUtil.isStringEmpty(content) && null==image){
                 logger.error("smug's content and image is empty ");
                 throw new BadRequestException(ErrorCode.SPEAK_CONTENT_IS_EMPTY);
             }
