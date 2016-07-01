@@ -110,6 +110,13 @@ public class CourseBean {
         this.uniqueId = uniqueId;
     }
 
+    public boolean equals(Object obj) {
+        if (obj instanceof CourseBean) {
+            return ((CourseBean)obj).getId() == getId();
+        }
+        return false;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");

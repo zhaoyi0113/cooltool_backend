@@ -1,9 +1,13 @@
 package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.constants.*;
+import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.UserBean;
+import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.converter.UserBeanConverter;
 import com.cooltoo.go2nurse.entities.UserEntity;
 import com.cooltoo.go2nurse.repository.UserRepository;
@@ -94,7 +98,7 @@ public class UserService {
         entity.setUniqueId(uniqueId);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
-        entity.setHasDecide(YesNoEnum.NO);
+        entity.setHasDecide(UserHospitalizedStatus.NONE);
         entity = repository.save(entity);
 
         logger.info("add user={}", entity);
@@ -309,7 +313,7 @@ public class UserService {
             entity.setGender(gender);
             changed = true;
         }
-        YesNoEnum hasDecide = YesNoEnum.parseString(strHasDecide);
+        UserHospitalizedStatus hasDecide = UserHospitalizedStatus.parseString(strHasDecide);
         if(null!=hasDecide) {
             entity.setHasDecide(hasDecide);
             changed = true;

@@ -7,8 +7,8 @@ package com.cooltoo.constants;
  * Created by Test111 on 2016/3/17.
  */
 public enum SpeakType {
-    /* 臭美 */
-    SMUG("臭美"),
+    /* 晒图 */
+    SMUG("晒图"),
     /* 吐槽 */
     CATHART("吐槽"),
     /* 提问 */

@@ -108,6 +108,15 @@ public class CourseRelationManageService {
         return courses;
     }
 
+    public List<CourseBean> getEnabledCoursesByHospitalIdAndDiagnosticId(int hospitalId, long diagnosticId) {
+        logger.info("get courses by hospitalId={} diagnosticId={}", hospitalId, diagnosticId);
+        List<Long> coursesId = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
+        List<Long> coursesIdInDiagnostic = diagnosticRelation.judgeCourseInDiagnostic(diagnosticId, coursesId, CommonStatus.ENABLED.name());
+        List<CourseBean> coursesInDiagnostic = course.getCourseByIds(coursesIdInDiagnostic);
+        logger.info("count is {}", coursesInDiagnostic.size());
+        return coursesInDiagnostic;
+    }
+
     public List<Long> getEnabledCoursesIdByHospitalIdAndDepartmentId(Integer hospitalId, Integer departmentId) {
         logger.info("get course ids by hospitalId={} departmentId={}", hospitalId, departmentId);
         if (!hospitalExist(hospitalId)) {
@@ -156,7 +165,7 @@ public class CourseRelationManageService {
         return courses;
     }
 
-    public Map<DiagnosticEnumerationBean, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(String hospitalUniqueId, String departmentUniqueId) {
+    public Map<DiagnosticEnumeration, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(String hospitalUniqueId, String departmentUniqueId) {
         logger.info("get diagnostic to courses map in department by hospitalUniqueId={} departmentUniqueId={}",
                 hospitalUniqueId, departmentUniqueId);
         List<HospitalEntity> hospitals = hospital.findByUniqueId(hospitalUniqueId);
@@ -180,7 +189,7 @@ public class CourseRelationManageService {
         return getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
     }
 
-    public Map<DiagnosticEnumerationBean, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(Integer hospitalId, Integer departmentId) {
+    public Map<DiagnosticEnumeration, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(Integer hospitalId, Integer departmentId) {
         logger.info("get diagnostic to courses map in department by hospitalId={} departmentId={}", hospitalId, departmentId);
         List<Long> coursesIdInDepartment = getEnabledCoursesIdByHospitalIdAndDepartmentId(hospitalId, departmentId);
         List<CourseBean> coursesBeanInDepartment = course.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), coursesIdInDepartment);
@@ -189,11 +198,11 @@ public class CourseRelationManageService {
             courseIdToBean.put(course.getId(), course);
         }
         Map<Long, List<Long>> diagnosticIdToCoursesId = diagnosticRelation.getDiagnosticToCourseIds(coursesIdInDepartment, CommonStatus.ENABLED);
-        Map<DiagnosticEnumerationBean, List<CourseBean>> diagnosticToCourses = new HashMap<>();
+        Map<DiagnosticEnumeration, List<CourseBean>> diagnosticToCourses = new HashMap<>();
         Set<Long> keys = diagnosticIdToCoursesId.keySet();
         for (Long key : keys) {
             List<Long> coursesId = diagnosticIdToCoursesId.get(key);
-            DiagnosticEnumerationBean diagnostic = diagnosticBeanConverter.convert(DiagnosticEnumeration.parseInt(key.intValue()));
+            DiagnosticEnumeration diagnostic = DiagnosticEnumeration.parseInt(key.intValue());
             List<CourseBean> courses = new ArrayList<>();
             for (Long courseId : coursesId) {
                 CourseBean course = courseIdToBean.get(courseId);

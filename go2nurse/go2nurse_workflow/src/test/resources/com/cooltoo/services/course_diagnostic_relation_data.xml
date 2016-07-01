@@ -9,5 +9,4 @@
     <go2nurse_course_diagnostic_relation id="25" time_created="2016-04-16 14:44:44" status="1" course_id="7" diagnostic_id="3" />
     <go2nurse_course_diagnostic_relation id="26" time_created="2016-04-17 14:44:44" status="1" course_id="4" diagnostic_id="4" />
     <go2nurse_course_diagnostic_relation id="27" time_created="2016-04-18 14:44:44" status="1" course_id="5" diagnostic_id="4" />
-    <go2nurse_course_diagnostic_relation id="28" time_created="2016-04-19 14:44:44" status="1" course_id="5" diagnostic_id="5" />
 </dataset>

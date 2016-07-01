@@ -3,22 +3,24 @@
 <!--
      diagnostic_point_id =====> 1 入院, 2 检查, 3 手术, 4 术后康复, 5 出院
 -->
-    <go2nurse_user_diagnostic_point_relation id="1"  user_id="1" diagnostic_point_id="1" diagnostic_point_time="2016-01-10 14:44:44" status="1" time_created="2016-01-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="2"  user_id="1" diagnostic_point_id="3" diagnostic_point_time="2016-02-10 14:44:44" status="1" time_created="2016-01-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="3"  user_id="1" diagnostic_point_id="5" diagnostic_point_time="2016-03-10 14:44:44" status="1" time_created="2016-01-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="4"  user_id="2" diagnostic_point_id="1" diagnostic_point_time="2016-02-11 14:44:44" status="1" time_created="2016-02-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="5"  user_id="2" diagnostic_point_id="2" diagnostic_point_time="2016-03-11 14:44:44" status="1" time_created="2016-02-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="6"  user_id="2" diagnostic_point_id="3" diagnostic_point_time="2016-04-11 14:44:44" status="0" time_created="2016-02-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="7"  user_id="2" diagnostic_point_id="5" diagnostic_point_time="2016-05-11 14:44:44" status="1" time_created="2016-02-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="8"  user_id="3" diagnostic_point_id="1" diagnostic_point_time="2016-03-12 14:44:44" status="1" time_created="2016-03-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="9"  user_id="3" diagnostic_point_id="2" diagnostic_point_time="2016-04-12 14:44:44" status="1" time_created="2016-03-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="10" user_id="3" diagnostic_point_id="3" diagnostic_point_time="2016-05-12 14:44:44" status="0" time_created="2016-03-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="11" user_id="3" diagnostic_point_id="5" diagnostic_point_time="2016-06-12 14:44:44" status="1" time_created="2016-03-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="12" user_id="4" diagnostic_point_id="1" diagnostic_point_time="2016-04-13 14:44:44" status="1" time_created="2016-04-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="13" user_id="4" diagnostic_point_id="2" diagnostic_point_time="2016-04-13 14:44:44" status="1" time_created="2016-04-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="14" user_id="4" diagnostic_point_id="3" diagnostic_point_time="2016-04-13 14:44:44" status="1" time_created="2016-04-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="15" user_id="4" diagnostic_point_id="5" diagnostic_point_time="2016-04-13 14:44:44" status="1" time_created="2016-04-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="16" user_id="5" diagnostic_point_id="1" diagnostic_point_time="2016-05-14 14:44:44" status="1" time_created="2016-05-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="17" user_id="5" diagnostic_point_id="3" diagnostic_point_time="2016-05-14 14:44:44" status="1" time_created="2016-05-10 14:44:44" />
-    <go2nurse_user_diagnostic_point_relation id="18" user_id="5" diagnostic_point_id="5" diagnostic_point_time="2016-05-14 14:44:44" status="1" time_created="2016-05-10 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="1"  user_id="1" group_id="1" diagnostic_point_id="1" diagnostic_point_time="2016-01-10 14:44:44" status="1" time_created="2016-01-10 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="2"  user_id="1" group_id="1" diagnostic_point_id="3" diagnostic_point_time="2016-02-10 14:44:44" status="1" time_created="2016-01-15 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="3"  user_id="1" group_id="1" diagnostic_point_id="5" diagnostic_point_time="2016-03-10 14:44:44" status="1" time_created="2016-01-19 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="4"  user_id="2" group_id="3" diagnostic_point_id="1" diagnostic_point_time="2016-02-11 14:44:44" status="1" time_created="2016-02-10 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="5"  user_id="2" group_id="3" diagnostic_point_id="2" diagnostic_point_time="2016-03-11 14:44:44" status="1" time_created="2016-02-15 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="6"  user_id="2" group_id="3" diagnostic_point_id="3" diagnostic_point_time="2016-04-11 14:44:44" status="0" time_created="2016-02-17 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="7"  user_id="2" group_id="3" diagnostic_point_id="5" diagnostic_point_time="2016-05-11 14:44:44" status="1" time_created="2016-02-19 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="8"  user_id="3" group_id="4" diagnostic_point_id="1" diagnostic_point_time="2016-03-12 14:44:44" status="1" time_created="2016-03-10 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="9"  user_id="3" group_id="4" diagnostic_point_id="2" diagnostic_point_time="2016-04-12 14:44:44" status="1" time_created="2016-03-12 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="10" user_id="3" group_id="4" diagnostic_point_id="3" diagnostic_point_time="2016-05-12 14:44:44" status="0" time_created="2016-03-14 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="11" user_id="3" group_id="4" diagnostic_point_id="5" diagnostic_point_time="2016-06-12 14:44:44" status="1" time_created="2016-03-17 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="12" user_id="4" group_id="5" diagnostic_point_id="1" diagnostic_point_time="2016-04-13 14:44:44" status="1" time_created="2016-04-10 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="13" user_id="4" group_id="5" diagnostic_point_id="2" diagnostic_point_time="2016-04-13 14:44:44" status="1" time_created="2016-04-12 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="14" user_id="4" group_id="5" diagnostic_point_id="3" diagnostic_point_time="2016-04-13 14:44:44" status="1" time_created="2016-04-16 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="15" user_id="4" group_id="5" diagnostic_point_id="5" diagnostic_point_time="2016-04-13 14:44:44" status="1" time_created="2016-04-17 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="16" user_id="5" group_id="6" diagnostic_point_id="1" diagnostic_point_time="2016-05-14 14:44:44" status="1" time_created="2016-05-10 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="17" user_id="5" group_id="6" diagnostic_point_id="3" diagnostic_point_time="2016-05-14 14:44:44" status="1" time_created="2016-05-15 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="18" user_id="5" group_id="6" diagnostic_point_id="5" diagnostic_point_time="2016-05-14 14:44:44" status="1" time_created="2016-05-18 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="19"  user_id="1" group_id="2" diagnostic_point_id="1" diagnostic_point_time="2016-01-10 14:44:44" status="1" time_created="2016-01-20 14:44:44" />
+    <go2nurse_user_diagnostic_point_relation id="20"  user_id="1" group_id="2" diagnostic_point_id="5" diagnostic_point_time="2016-03-10 14:44:44" status="1" time_created="2016-01-25 14:44:44" />
 </dataset>

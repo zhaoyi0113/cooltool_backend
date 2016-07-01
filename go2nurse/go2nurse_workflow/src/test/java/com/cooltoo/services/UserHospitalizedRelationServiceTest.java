@@ -31,6 +31,26 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
     @Autowired private UserHospitalizedRelationService relationService;
 
     @Test
+    public void testGetUserHospitalizedRelationByGroupId() {
+        long userId = 1;
+        long groupId = 1;
+        List<UserHospitalizedRelationBean> relations = relationService.getUserHospitalizedRelationByGroupId(userId, groupId);
+        Assert.assertEquals(2, relations.size());
+        Assert.assertEquals(2, relations.get(0).getId());
+        Assert.assertEquals(1, relations.get(1).getId());
+    }
+
+    @Test
+    public void testGetUserAllHospitalizedRelation() {
+        long userId = 1;
+        List<UserHospitalizedRelationBean> relations = relationService.getUserAllHospitalizedRelation(userId);
+        Assert.assertEquals(3, relations.size());
+        Assert.assertEquals(3, relations.get(0).getId());
+        Assert.assertEquals(2, relations.get(1).getId());
+        Assert.assertEquals(1, relations.get(2).getId());
+    }
+
+    @Test
     public void testCountByUserAndStatus() {
         long userId = 2;
         String status = "ALL";
@@ -85,8 +105,7 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         UserHospitalizedRelationBean bean;
 
         long userId = 1;
-        long count = relationService.countByUserAndStatus(userId, status);
-        Assert.assertEquals(1, count);
+        long count = 0;
 
         userId = 2;
         Throwable error = null;
@@ -101,13 +120,13 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(hasLeave, bean.getHasLeave().name());
 
         count = relationService.countByUserAndStatus(userId, status);
-        Assert.assertEquals(2, count);
+        Assert.assertEquals(1, count);
     }
 
     @Test
     public void getUpdateStatusByUserIdHospitalIdDepartmentId() {
         long relationId = 1;
-        long groupId = 0;
+        long groupId = 1;
         int hospitalId = 11;
         int departmentId = 11;
         String hasLeave = "YES";
@@ -116,9 +135,8 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
 
         long userId = 1;
         long count = relationService.countByUserAndStatus(userId, status);
-        Assert.assertEquals(1, count);
+        Assert.assertEquals(0, count);
 
-        userId = 1;
         bean = relationService.updateRelation(groupId, hospitalId, departmentId, userId, hasLeave, status);
         Assert.assertEquals(relationId, bean.getId());
         Assert.assertEquals(status, bean.getStatus().name());
@@ -126,7 +144,7 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(groupId, bean.getGroupId());
 
         count = relationService.countByUserAndStatus(userId, status);
-        Assert.assertEquals(2, count);
+        Assert.assertEquals(1, count);
     }
 
     @Test
@@ -215,27 +233,5 @@ public class UserHospitalizedRelationServiceTest extends AbstractCooltooTest {
         status = CommonStatus.ENABLED.name();
         count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(1, count);
-    }
-
-    @Test
-    public void testExistsRelation() {
-        long userId = 1;
-        int hospitalId = 11;
-        int departmentId = 11;
-        CommonStatus status = CommonStatus.DELETED;
-        boolean exists = relationService.existsRelation(userId, hospitalId, departmentId, status);
-        Assert.assertTrue(exists);
-
-        hospitalId = 11;
-        departmentId = 22;
-        status = CommonStatus.DISABLED;
-        exists = relationService.existsRelation(userId, hospitalId, departmentId, status);
-        Assert.assertTrue(exists);
-
-        hospitalId = 22;
-        departmentId = 11;
-        status = CommonStatus.ENABLED;
-        exists = relationService.existsRelation(userId, hospitalId, departmentId, status);
-        Assert.assertTrue(exists);
     }
 }

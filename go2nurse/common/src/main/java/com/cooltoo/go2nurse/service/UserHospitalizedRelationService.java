@@ -46,18 +46,41 @@ public class UserHospitalizedRelationService {
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 
-    @Autowired private Go2NurseUtility utility;
     @Autowired private UserHospitalizedRelationRepository repository;
     @Autowired private UserHospitalizedRelationBeanConverter beanConverter;
+
+    @Autowired private UserDiagnosticPointRelationService userDiagnosticRelationService;
     @Autowired private UserRepository userRepository;
     @Autowired private HospitalRepository hospitalRepository;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private HospitalDepartmentRepository departmentRepository;
     @Autowired private CommonDepartmentService departmentService;
+    @Autowired private Go2NurseUtility utility;
 
 
     //===================================================
-    //               get
+    //               getting for user
+    //===================================================
+    public List<UserHospitalizedRelationBean> getUserHospitalizedRelationByGroupId(long userId, long currentGroupId) {
+        logger.info("get user={}'s current hospitalized hospital and department by current groupId={}", userId, currentGroupId);
+        List<UserHospitalizedRelationEntity> entities = repository.findByUserIdAndGroupIdAndStatus(userId, currentGroupId, CommonStatus.ENABLED, sort);
+        List<UserHospitalizedRelationBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
+        logger.info("user current hospitalized relation count is {}", beans.size());
+        return beans;
+    }
+
+    public List<UserHospitalizedRelationBean> getUserAllHospitalizedRelation(long userId) {
+        logger.info("get user={}'s all hospitalized hospital and department", userId);
+        List<UserHospitalizedRelationEntity> entities = repository.findByUserIdAndStatus(userId, CommonStatus.ENABLED, sort);
+        List<UserHospitalizedRelationBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
+        logger.info("user all hospitalized relation count is {}", beans.size());
+        return beans;
+    }
+
+    //===================================================
+    //               getting for admin user
     //===================================================
     public long countByUserAndStatus(long userId, String strStatus) {
         logger.info("count the hospitalized with user={} status={}",
@@ -67,13 +90,6 @@ public class UserHospitalizedRelationService {
         long count = repository.countByUserIdAndStatus(userId, status);
         logger.info("count is {}", count);
         return count;
-    }
-
-    public boolean existsRelation(long userId, int hospitalId, int departmentId, CommonStatus status) {
-        logger.info("judge exists of relation by userId={} hospitalId={} departmentId={} status={}",
-                userId, hospitalId, departmentId, status);
-        List<UserHospitalizedRelationEntity> relations = repository.findByStatusAndUserIdAndHospitalIdAndDepartmentId(status, userId, hospitalId, departmentId);
-        return !VerifyUtil.isListEmpty(relations);
     }
 
     public List<UserHospitalizedRelationBean> getRelation(long userId, String strStatus) {
@@ -157,8 +173,20 @@ public class UserHospitalizedRelationService {
     }
 
     //===================================================
-    //               add
+    //               adding for user
     //===================================================
+    @Transactional
+    public UserHospitalizedRelationBean addRelation(long userId, String hospitalUniqueId, String departmentUniqueId) {
+        logger.info("user={} add hospitalized relation with hospitalUniqueId={} and departmentUniqueId={}",
+                userId, hospitalUniqueId, departmentUniqueId);
+        long groupId = userDiagnosticRelationService.getUserCurrentGroupId(userId, System.currentTimeMillis());
+        return addRelation(userId, groupId, hospitalUniqueId, departmentUniqueId);
+    }
+
+    //===================================================
+    //               adding for admin user
+    //===================================================
+
     @Transactional
     public UserHospitalizedRelationBean addRelation(long userId, long groupId, String hospitalUniqueId, String departmentUniqueId) {
         logger.info("add hospitalized relation to user={} with groupId={} hospitalUniqueId={} departmentUniqueId={}",

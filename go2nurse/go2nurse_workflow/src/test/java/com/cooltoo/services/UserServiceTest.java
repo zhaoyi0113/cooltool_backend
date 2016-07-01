@@ -60,7 +60,7 @@ public class UserServiceTest extends AbstractCooltooTest {
         String birthday = "2013-04-14 14:44:44";
         int authority = 0;
         String address = "address testing";
-        String hasDecide = "YES";
+        String hasDecide = "IN_HOME";
 
         long lBirthday = NumberUtil.getTime(birthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         UserBean bean = service.updateUser(userId, name, gender, birthday, authority, address, hasDecide);

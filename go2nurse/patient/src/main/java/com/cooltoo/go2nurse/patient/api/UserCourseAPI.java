@@ -40,21 +40,14 @@ public class UserCourseAPI {
         return Response.ok(categories).build();
     }
 
-    @Path("/get/course")
+    @Path("/get/my_read_courses")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public Response getCourse(@Context HttpServletRequest request,
-                              @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
-                              @QueryParam("department_id") @DefaultValue("0") int departmentId,
-                              @QueryParam("diagnostic_id") @DefaultValue("0") long diagnosticId,
-                              @QueryParam("read_statuses") @DefaultValue("unread,read") String readingStatus
-    ) {
+    public Response getUserReadCourse(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<Long> coursesIds = userCourseRelation.getRelationCourseId(userId, readingStatus, CommonStatus.ENABLED.name());
-        Map<String, List<CourseBean>> hospitalDepartmentDiagnostic2Course = courseRelationManage.getCoursesByConditions(
-                coursesIds, hospitalId, departmentId, diagnosticId, CommonStatus.ENABLED.name(), CommonStatus.ENABLED.name());
-        return Response.ok(hospitalDepartmentDiagnostic2Course).build();
+        List<CourseBean> coursesUserRead = userCourseRelation.getUserAllCoursesRead(userId);
+        return Response.ok(coursesUserRead).build();
     }
 
     @Path("/add_courses")

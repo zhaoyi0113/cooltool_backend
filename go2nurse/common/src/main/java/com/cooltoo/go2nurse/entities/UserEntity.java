@@ -1,6 +1,10 @@
 package com.cooltoo.go2nurse.entities;
 
-import com.cooltoo.constants.*;
+import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.constants.UserType;
+import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -25,7 +29,7 @@ public class UserEntity {
     private UserType type;
     private String uniqueId;
     private String address;
-    private YesNoEnum hasDecide;
+    private UserHospitalizedStatus hasDecide;
 
     @Id
     @GeneratedValue
@@ -99,7 +103,7 @@ public class UserEntity {
 
     @Column(name = "has_decide")
     @Enumerated
-    public YesNoEnum getHasDecide() {
+    public UserHospitalizedStatus getHasDecide() {
         return hasDecide;
     }
 
@@ -155,7 +159,7 @@ public class UserEntity {
         this.address = address;
     }
 
-    public void setHasDecide(YesNoEnum hasDecide) {
+    public void setHasDecide(UserHospitalizedStatus hasDecide) {
         this.hasDecide = hasDecide;
     }
 

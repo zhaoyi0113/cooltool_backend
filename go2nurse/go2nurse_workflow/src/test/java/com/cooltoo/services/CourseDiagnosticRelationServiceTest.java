@@ -90,16 +90,14 @@ public class CourseDiagnosticRelationServiceTest extends AbstractCooltooTest {
         List<Long> courseIds = Arrays.asList(new Long[]{2L, 5L});
         String status = "ALL";
         List<Long> diagnosticIds = service.getDiagnosticByCourseId(courseIds, status);
-        Assert.assertEquals(3, diagnosticIds.size());
-        Assert.assertEquals(5, diagnosticIds.get(0).longValue());
-        Assert.assertEquals(4, diagnosticIds.get(1).longValue());
-        Assert.assertEquals(2, diagnosticIds.get(2).longValue());
+        Assert.assertEquals(2, diagnosticIds.size());
+        Assert.assertEquals(4, diagnosticIds.get(0).longValue());
+        Assert.assertEquals(2, diagnosticIds.get(1).longValue());
 
         status = CommonStatus.ENABLED.name();
         diagnosticIds = service.getDiagnosticByCourseId(courseIds, status);
-        Assert.assertEquals(2, diagnosticIds.size());
-        Assert.assertEquals(5, diagnosticIds.get(0).longValue());
-        Assert.assertEquals(4, diagnosticIds.get(1).longValue());
+        Assert.assertEquals(1, diagnosticIds.size());
+        Assert.assertEquals(4, diagnosticIds.get(0).longValue());
 
         status = CommonStatus.DISABLED.name();
         diagnosticIds = service.getDiagnosticByCourseId(courseIds, status);
@@ -195,16 +193,13 @@ public class CourseDiagnosticRelationServiceTest extends AbstractCooltooTest {
 
         status = CommonStatus.ENABLED;
         diagnosticToCourses = service.getDiagnosticToCourseIds(coursesId, status);
-        Assert.assertEquals(3, diagnosticToCourses.size());
+        Assert.assertEquals(2, diagnosticToCourses.size());
         Assert.assertTrue(diagnosticToCourses.keySet().contains(Long.valueOf(3L)));
         Assert.assertTrue(diagnosticToCourses.keySet().contains(Long.valueOf(4L)));
-        Assert.assertTrue(diagnosticToCourses.keySet().contains(Long.valueOf(5L)));
         Assert.assertEquals(1, diagnosticToCourses.get(Long.valueOf(3L)).size());
         Assert.assertEquals(Long.valueOf(6), diagnosticToCourses.get(Long.valueOf(3L)).get(0));
         Assert.assertEquals(1, diagnosticToCourses.get(Long.valueOf(4L)).size());
         Assert.assertEquals(Long.valueOf(5), diagnosticToCourses.get(Long.valueOf(4L)).get(0));
-        Assert.assertEquals(1, diagnosticToCourses.get(Long.valueOf(5L)).size());
-        Assert.assertEquals(Long.valueOf(5), diagnosticToCourses.get(Long.valueOf(5L)).get(0));
 
         status = CommonStatus.DISABLED;
         diagnosticToCourses = service.getDiagnosticToCourseIds(coursesId, status);

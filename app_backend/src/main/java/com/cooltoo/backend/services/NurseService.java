@@ -202,7 +202,7 @@ public class NurseService {
         }
         catch (Exception ex) {}
         // add speak count
-        String speakType = "SMUG,ASK_QUESTION";
+        String speakType = "SMUG,ASK_QUESTION,SHORT_VIDEO";
         long speakCount = speakService.countSpeak(true, userId, speakType);
         nurse.setProperty(NurseBean.SPEAK_COUNT, speakCount);
         // add skill nominated count

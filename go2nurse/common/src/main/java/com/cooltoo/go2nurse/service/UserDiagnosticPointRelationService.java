@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by hp on 2016/6/15.
@@ -34,8 +33,8 @@ public class UserDiagnosticPointRelationService {
 
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "groupId"),
-            new Sort.Order(Sort.Direction.ASC, "time"),
-            new Sort.Order(Sort.Direction.ASC, "id")
+            new Sort.Order(Sort.Direction.DESC, "time"),
+            new Sort.Order(Sort.Direction.DESC, "id")
     );
 
     @Autowired private UserRepository userRepository;
@@ -43,8 +42,63 @@ public class UserDiagnosticPointRelationService {
     @Autowired private UserDiagnosticPointRelationBeanConverter beanConverter;
 
     //===================================================
-    //               get
+    //               getting for user
     //===================================================
+    public long getUserCurrentGroupId(long userId, long currentTime) {
+        logger.info("get user={} current hospitalized group ID");
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndStatus(userId, CommonStatus.ENABLED, sort);
+        if (VerifyUtil.isListEmpty(entities)) {
+            logger.error("there is no diagnostic point for user");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        long groupId = Long.MIN_VALUE;
+        for (UserDiagnosticPointRelationEntity entity : entities) {
+            Date diagnosticTime = entity.getDiagnosticTime();
+            if (null!=diagnosticTime && diagnosticTime.getTime()>currentTime) {
+                groupId = entity.getGroupId();
+                break;
+            }
+        }
+        if (Long.MIN_VALUE==groupId) {
+            logger.error("there is no valid group ID for user");
+        }
+        logger.info("group ID is {}", groupId);
+        return groupId;
+    }
+
+    public List<Long> getUserAllGroupIds(long userId) {
+        logger.info("get user={} hospitalized group IDs");
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndStatus(userId, CommonStatus.ENABLED, sort);
+        if (VerifyUtil.isListEmpty(entities)) {
+            logger.error("there is no diagnostic point for user");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        List<Long> groupIds = new ArrayList<>();
+        for (UserDiagnosticPointRelationEntity entity : entities) {
+            if (!groupIds.contains(entity.getGroupId())) {
+                groupIds.add(entity.getGroupId());
+            }
+        }
+        if (groupIds.isEmpty()) {
+            logger.error("there is no valid group IDs for user");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        logger.info("group IDs are {}", groupIds);
+        return groupIds;
+    }
+
+    public List<UserDiagnosticPointRelationBean> getUserDiagnosticRelationByGroupId(long userId, long groupId) {
+        logger.info("get user={}'s hospitalized group diagnostic point by groupId={}", userId, groupId);
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndGroupIdAndStatus(userId, groupId, CommonStatus.ENABLED, sort);
+        List<UserDiagnosticPointRelationBean> beans = entitiesToBeans(entities);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
+    //==========================================================================
+    //                  getting for admin user
+    //==========================================================================
+
     public long countByUserAndStatus(long userId, String strStatus) {
         logger.info("count the diagnostic point with user={} status={}", userId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
@@ -159,13 +213,13 @@ public class UserDiagnosticPointRelationService {
     public UserDiagnosticPointRelationBean updateUserDiagnosticRelation(long groupId, long diagnosticId, long userId, Date pointTime, String strStatus) {
         logger.info("user={} update diagnostic={} with groupId={} pointTime={} and status={}",
                 userId, diagnosticId, groupId, pointTime, strStatus);
-        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndDiagnosticIdAndGroupId(userId, diagnosticId, groupId, sort);
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndGroupIdAndDiagnosticId(userId, groupId, diagnosticId, sort);
         if (VerifyUtil.isListEmpty(entities)) {
             logger.info("not user's diagnostic point relation");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        UserDiagnosticPointRelationEntity entity = entities.get(entities.size() - 1);
+        UserDiagnosticPointRelationEntity entity = entities.get(0);
         boolean changed = false;
 
         CommonStatus status = CommonStatus.parseString(strStatus);
@@ -186,6 +240,7 @@ public class UserDiagnosticPointRelationService {
                 }
             }
             entities = repository.save(entities);
+            entity = entities.get(0);
             logger.info("after updating is {}", entities);
         }
         UserDiagnosticPointRelationBean bean = beanConverter.convert(entity);

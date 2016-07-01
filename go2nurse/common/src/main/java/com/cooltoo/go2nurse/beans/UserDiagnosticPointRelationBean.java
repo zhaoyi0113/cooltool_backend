@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.converter.DiagnosticPointBeanConverter;
 
 import java.util.Date;
 
@@ -16,6 +17,7 @@ public class UserDiagnosticPointRelationBean {
     private long userId;
     private long diagnosticId;
     private DiagnosticEnumeration diagnostic;
+    private DiagnosticEnumerationBean diagnosticBean;
     private Date diagnosticTime;
     private long groupId;
 
@@ -70,6 +72,11 @@ public class UserDiagnosticPointRelationBean {
     public void setDiagnosticId(long diagnosticId) {
         this.diagnosticId = diagnosticId;
         this.diagnostic = DiagnosticEnumeration.parseInt((int)diagnosticId);
+        if (null!=diagnostic) {
+            this.diagnosticBean = new DiagnosticEnumerationBean();
+            this.diagnosticBean.setName(this.diagnostic.name());
+            this.diagnosticBean.setId(this.diagnostic.ordinal());
+        }
     }
 
     public void setDiagnosticTime(Date diagnosticTime) {

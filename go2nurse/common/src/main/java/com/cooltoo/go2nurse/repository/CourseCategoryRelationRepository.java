@@ -24,6 +24,11 @@ public interface CourseCategoryRelationRepository  extends JpaRepository<CourseC
             " AND relation.courseId IN (?2)")
     List<Long> findCategoryIdByStatusAndCourseIdIn(CommonStatus status, List<Long> courseIds);
 
+    @Query("FROM CourseCategoryRelationEntity relation" +
+            " WHERE (relation.status=?1 OR ?1 IS NULL)" +
+            " AND relation.courseId IN (?2)")
+    List<CourseCategoryRelationEntity> findByStatusAndCourseIdIn(CommonStatus status, List<Long> courseIds);
+
     @Query("SELECT DISTINCT relation.courseId FROM CourseCategoryRelationEntity relation" +
             " WHERE (relation.status=?1 OR ?1 IS NULL)" +
             " AND relation.courseCategoryId=?2")

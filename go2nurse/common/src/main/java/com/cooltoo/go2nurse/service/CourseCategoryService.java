@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/6/8.
@@ -83,6 +80,88 @@ public class CourseCategoryService {
         logger.info("count is {}", categories.size());
         return categories;
     }
+
+    public Map<CourseCategoryBean, List<CourseBean>> getCategoryRelationByCourseId(List<Long> courseIds) {
+        logger.info("get course category at status={} by courseIds={}", courseIds);
+        List<CourseCategoryRelationEntity> relations = relationRepository.findByStatusAndCourseIdIn(CommonStatus.ENABLED, courseIds);
+
+        Map<Long, List<Long>> courseIdToCategoryIds = new HashMap<>();
+        List<Long> categoriesId = new ArrayList<>();
+
+        for (CourseCategoryRelationEntity relation : relations) {
+            Long courseId = relation.getCourseId();
+            List<Long> tmpCategoriesId = courseIdToCategoryIds.get(courseId);
+            if (null==tmpCategoriesId) {
+                tmpCategoriesId = new ArrayList<>();
+                courseIdToCategoryIds.put(courseId, tmpCategoriesId);
+            }
+
+            Long categoryId = relation.getCourseCategoryId();
+            if (!tmpCategoriesId.contains(categoryId)) {
+                tmpCategoriesId.add(categoryId);
+            }
+
+            if (!categoriesId.contains(categoryId)) {
+                categoriesId.add(categoryId);
+            }
+        }
+
+        Map<CourseCategoryBean, List<CourseBean>> returnValue =
+                fillCategoryToCourseMap(courseIdToCategoryIds, categoriesId, courseIds);
+        logger.info("count is {}", returnValue.size());
+        return returnValue;
+    }
+
+    private Map<CourseCategoryBean, List<CourseBean>> fillCategoryToCourseMap(
+            Map<Long, List<Long>> courseIdToCategoriesId,
+            List<Long> categoriesId,
+            List<Long> coursesId) {
+
+        Map<Long, CourseCategoryBean> categoryIdToBean = new HashMap<>();
+        List<CourseBean> courses = courseService.getCourseByIds(coursesId);
+        List<CourseCategoryBean> categories = getCategoryByStatusAndIds("ALL", categoriesId);
+        for (CourseCategoryBean category : categories) {
+            categoryIdToBean.put(category.getId(), category);
+        }
+
+        CourseCategoryBean others = new CourseCategoryBean();
+        others.setName("others");
+
+        Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = new HashMap<>();
+
+        for (CourseBean course : courses) {
+            Long tmpCourseId = course.getId();
+            List<Long> tmpCategoriesId = courseIdToCategoriesId.get(tmpCourseId);
+
+            // belong no category
+            if (VerifyUtil.isListEmpty(tmpCategoriesId)) {
+                List<CourseBean> tmpCourses = categoryToCourses.get(others);
+                if (null==tmpCourses) {
+                    tmpCourses = new ArrayList<>();
+                    categoryToCourses.put(others, tmpCourses);
+                }
+                tmpCourses.add(course);
+                continue;
+            }
+
+            for (Long tmpCategoryId : tmpCategoriesId) {
+                CourseCategoryBean tmpCategory = categoryIdToBean.get(tmpCategoryId);
+                if (null==tmpCategory) {
+                    tmpCategory = others;
+                }
+
+                List<CourseBean> tmpCourses = categoryToCourses.get(tmpCategory);
+                if (null==tmpCourses) {
+                    tmpCourses = new ArrayList<>();
+                    categoryToCourses.put(tmpCategory, tmpCourses);
+                }
+                tmpCourses.add(course);
+            }
+        }
+
+        return categoryToCourses;
+    }
+
 
     public List<CourseBean> getCourseByCategoryId(String strCourseStatus, long categoryId) {
         logger.info("get course at status={} by categoryId={}",

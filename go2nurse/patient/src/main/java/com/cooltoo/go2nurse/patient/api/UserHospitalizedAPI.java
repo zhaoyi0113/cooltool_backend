@@ -4,14 +4,12 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.beans.CourseBean;
-import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
-import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
+import com.cooltoo.go2nurse.beans.*;
+import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.patient.beans.UserHospitalizedCorusesBean;
-import com.cooltoo.go2nurse.service.CourseRelationManageService;
-import com.cooltoo.go2nurse.service.UserCourseRelationService;
-import com.cooltoo.go2nurse.service.UserHospitalizedRelationService;
+import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.util.NumberUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,9 +34,11 @@ import java.util.Map;
 @Path("/hospitalized_relation")
 public class UserHospitalizedAPI {
 
+    @Autowired private UserService userService;
     @Autowired private CourseRelationManageService courseManageService;
     @Autowired private UserCourseRelationService userCourseService;
     @Autowired private UserHospitalizedRelationService relationService;
+    @Autowired private UserDiagnosticPointRelationService diagnosticRelationService;
 
     @Path("/get")
     @GET
@@ -46,36 +46,9 @@ public class UserHospitalizedAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response getRelation(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserHospitalizedRelationBean> relations = relationService.getRelation(userId, CommonStatus.ENABLED.name());
+        long currentDiagnosticGroupId =diagnosticRelationService.getUserCurrentGroupId(userId, System.currentTimeMillis());
+        List<UserHospitalizedRelationBean> relations = relationService.getUserHospitalizedRelationByGroupId(userId, currentDiagnosticGroupId);
         return Response.ok(relations).build();
-    }
-
-    @Path("/add")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
-    public Response addRelation(@Context HttpServletRequest request,
-                                @FormParam("group_id") @DefaultValue("0") long groupId,
-                                @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                @FormParam("department_id") @DefaultValue("0") int departmentId
-    ) {
-        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserHospitalizedRelationBean relation = relationService.addRelation(userId, groupId, hospitalId, departmentId);
-        return Response.ok(relation).build();
-    }
-
-    @Path("/add/by_unique_id")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
-    public Response addRelationByUniqueId(@Context HttpServletRequest request,
-                                          @FormParam("group_id") @DefaultValue("0") long groupId,
-                                          @FormParam("hospital_unique_id") @DefaultValue("") String hospitalUniqueId,
-                                          @FormParam("department_unique_id") @DefaultValue("") String departmentUniqueId
-    ) {
-        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserHospitalizedRelationBean relation = relationService.addRelation(userId, groupId, hospitalUniqueId, departmentUniqueId);
-        return Response.ok(relation).build();
     }
 
     @Path("/add/by_hospital_department_unique_id")
@@ -83,7 +56,6 @@ public class UserHospitalizedAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addRelationByUniqueId(@Context HttpServletRequest request,
-                                          @FormParam("group_id") @DefaultValue("0") long groupId,
                                           @FormParam("hospital_department_unique_id") @DefaultValue("") String hospitalAndDepartmentUniqueId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
@@ -91,7 +63,7 @@ public class UserHospitalizedAPI {
         if (hospital_department.length!=2) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        UserHospitalizedRelationBean relation = relationService.addRelation(userId, groupId, hospital_department[0].trim(), hospital_department[1].trim());
+        UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospital_department[0].trim(), hospital_department[1].trim());
         return Response.ok(relation).build();
     }
 
@@ -133,7 +105,7 @@ public class UserHospitalizedAPI {
                                            @PathParam("hospital_id") @DefaultValue("0") int hospitalId,
                                            @PathParam("department_id") @DefaultValue("0") int departmentId
     ) {
-        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = courseManageService.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        Map<DiagnosticEnumeration, List<CourseBean>> courses = courseManageService.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
         return Response.ok(courses).build();
     }
 
@@ -148,7 +120,7 @@ public class UserHospitalizedAPI {
         List<String> uniqueIds = NumberUtil.parseRandomIdentity(hospitalDepartmentUniqueId);
         String hospitalUniqueId = uniqueIds.size()>=1 ? uniqueIds.get(0) : "";
         String departmentUniqueId = uniqueIds.size()>=2 ? uniqueIds.get(1) : "";
-        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = courseManageService.getDiagnosticToCoursesMapInDepartment(hospitalUniqueId, departmentUniqueId);
+        Map<DiagnosticEnumeration, List<CourseBean>> courses = courseManageService.getDiagnosticToCoursesMapInDepartment(hospitalUniqueId, departmentUniqueId);
         return Response.ok(courses).build();
     }
 
@@ -158,29 +130,34 @@ public class UserHospitalizedAPI {
     @LoginAuthentication(requireUserLogin = true)
     public  Response getUserHospitalizedCourses(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        Map<UserHospitalizedRelationBean, Map<DiagnosticEnumerationBean, List<CourseBean>>> courses
-                = userCourseService.getUserCourses(userId, CommonStatus.ENABLED.name());
+        UserBean user = userService.getUser(userId);
+
         List<UserHospitalizedCorusesBean> beans = new ArrayList<>();
-        courses.values().forEach((element) -> {
-            element.forEach((key, value) ->{
+
+        if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide())) {
+            Map<DiagnosticEnumeration, List<CourseBean>> courses
+                    = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
+            courses.forEach((key, value) -> {
                 UserHospitalizedCorusesBean bean = new UserHospitalizedCorusesBean();
-                bean.setId(key.getId());
-                bean.setType(key.getName());
+                bean.setId(key.ordinal());
+                bean.setType(key.name());
                 bean.setCourses(value);
                 beans.add(bean);
             });
-        });
+        }
+        else {
+            Map<CourseCategoryBean, List<CourseBean>> courses
+                    = userCourseService.getAllPublicExtensionNursingCourses();
+            courses.forEach((key, value) -> {
+                UserHospitalizedCorusesBean bean = new UserHospitalizedCorusesBean();
+                bean.setId(key.getId());
+                bean.setType(key.getName());
+                bean.setDescription(key.getIntroduction());
+                bean.setCourses(value);
+                beans.add(bean);
+            });
+        }
         return Response.ok(beans).build();
-    }
-
-    @Path("/get_courses/extension_nursing")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
-    public Response getUserExtensionNursingCourses(@Context HttpServletRequest request) {
-        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<CourseBean> courses = userCourseService.getUserCoursesInExtensionNursing(userId);
-        return Response.ok(courses).build();
     }
 
 }

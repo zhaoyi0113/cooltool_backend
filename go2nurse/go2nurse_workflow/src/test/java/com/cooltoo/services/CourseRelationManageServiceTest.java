@@ -6,6 +6,7 @@ import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
+import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
@@ -114,16 +115,14 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         long courseId = 5;
         String status = "ALL";
         List<DiagnosticEnumerationBean> diagnostics = service.getDiagnosticByCourseId(courseId, status);
-        Assert.assertEquals(3, diagnostics.size());
-        Assert.assertEquals(5, diagnostics.get(0).getId());
-        Assert.assertEquals(4, diagnostics.get(1).getId());
-        Assert.assertEquals(2, diagnostics.get(2).getId());
+        Assert.assertEquals(2, diagnostics.size());
+        Assert.assertEquals(4, diagnostics.get(0).getId());
+        Assert.assertEquals(2, diagnostics.get(1).getId());
 
         status = CommonStatus.ENABLED.name();
         diagnostics = service.getDiagnosticByCourseId(courseId, status);
-        Assert.assertEquals(2, diagnostics.size());
-        Assert.assertEquals(5, diagnostics.get(0).getId());
-        Assert.assertEquals(4, diagnostics.get(1).getId());
+        Assert.assertEquals(1, diagnostics.size());
+        Assert.assertEquals(4, diagnostics.get(0).getId());
 
         status = CommonStatus.DISABLED.name();
         diagnostics = service.getDiagnosticByCourseId(courseId, status);
@@ -221,11 +220,10 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         Integer hospitalId = 33;
         Integer departmentId = 33;
         Map<Long, List<Long>> coursesId = service.getDiagnosticIdToCoursesIdMapInDepartment(hospitalId, departmentId);
-        Assert.assertEquals(4, coursesId.size());
+        Assert.assertEquals(3, coursesId.size());
         Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(2L)));
         Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(3L)));
         Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(4L)));
-        Assert.assertTrue(coursesId.keySet().contains(Long.valueOf(5L)));
         Assert.assertEquals(1, coursesId.get(Long.valueOf(2L)).size());
         Assert.assertEquals(Long.valueOf(4), coursesId.get(Long.valueOf(2L)).get(0));
         Assert.assertEquals(2, coursesId.get(Long.valueOf(3L)).size());
@@ -234,8 +232,6 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(2, coursesId.get(Long.valueOf(4L)).size());
         Assert.assertEquals(Long.valueOf(5), coursesId.get(Long.valueOf(4L)).get(0));
         Assert.assertEquals(Long.valueOf(4), coursesId.get(Long.valueOf(4L)).get(1));
-        Assert.assertEquals(1, coursesId.get(Long.valueOf(5L)).size());
-        Assert.assertEquals(Long.valueOf(5), coursesId.get(Long.valueOf(5L)).get(0));
 
         departmentId = 22;
         coursesId = service.getDiagnosticIdToCoursesIdMapInDepartment(hospitalId, departmentId);
@@ -260,14 +256,24 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
     }
 
     @Test
+    public void testGetEnabledCoursesByHospitalIdAndDiagnosticId() {
+        int hospitalId = 33;
+        long diagnosticId = 4;
+        List<CourseBean> courses = service.getEnabledCoursesByHospitalIdAndDiagnosticId(hospitalId, diagnosticId);
+        Assert.assertEquals(2, courses.size());
+        Assert.assertEquals(4, courses.get(0).getId());
+        Assert.assertEquals(5, courses.get(1).getId());
+    }
+
+    @Test
     public void testGetCourseByHospitalAndDepartment() {
         Integer hospitalId = 33;
         Integer departmentId = 22;
-        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        Map<DiagnosticEnumeration, List<CourseBean>> courses = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
         Assert.assertEquals(2, courses.size());
-        Set<DiagnosticEnumerationBean> keys = courses.keySet();
-        for (DiagnosticEnumerationBean key : keys) {
-            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
+        Set<DiagnosticEnumeration> keys = courses.keySet();
+        for (DiagnosticEnumeration key : keys) {
+            Assert.assertTrue(key.ordinal() == 2 || key.ordinal() == 4);
             Assert.assertEquals(4, courses.get(key).get(0).getId());
         }
 
@@ -281,8 +287,8 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         courses = service.getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
         Assert.assertEquals(2, courses.size());
         keys = courses.keySet();
-        for (DiagnosticEnumerationBean key : keys) {
-            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
+        for (DiagnosticEnumeration key : keys) {
+            Assert.assertTrue(key.ordinal() == 2 || key.ordinal() == 4);
             Assert.assertEquals(4, courses.get(key).get(0).getId());
         }
     }
@@ -292,13 +298,13 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
     public void testGetCourseByHospitalUniqueIdAndDepartmentUniqueId() {
         String hospitalUniqueId = "333333";
         String departmentUniqueId = "222222";
-        Map<DiagnosticEnumerationBean, List<CourseBean>> courses = service.getDiagnosticToCoursesMapInDepartment(
+        Map<DiagnosticEnumeration, List<CourseBean>> courses = service.getDiagnosticToCoursesMapInDepartment(
                 hospitalUniqueId, departmentUniqueId
         );
         Assert.assertEquals(2, courses.size());
-        Set<DiagnosticEnumerationBean> keys = courses.keySet();
-        for (DiagnosticEnumerationBean key : keys) {
-            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
+        Set<DiagnosticEnumeration> keys = courses.keySet();
+        for (DiagnosticEnumeration key : keys) {
+            Assert.assertTrue(key.ordinal() == 2 || key.ordinal() == 4);
             Assert.assertEquals(4, courses.get(key).get(0).getId());
         }
 
@@ -312,8 +318,8 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         courses = service.getDiagnosticToCoursesMapInDepartment(hospitalUniqueId, departmentUniqueId);
         Assert.assertEquals(2, courses.size());
         keys = courses.keySet();
-        for (DiagnosticEnumerationBean key : keys) {
-            Assert.assertTrue(key.getId() == 2 || key.getId() == 4);
+        for (DiagnosticEnumeration key : keys) {
+            Assert.assertTrue(key.ordinal() == 2 || key.ordinal() == 4);
             Assert.assertEquals(4, courses.get(key).get(0).getId());
         }
     }

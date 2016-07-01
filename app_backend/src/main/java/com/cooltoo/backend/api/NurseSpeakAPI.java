@@ -79,7 +79,7 @@ public class NurseSpeakAPI {
                              @PathParam("number") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        String type = "smug,ask_question";
+        String type = "smug,ask_question,SHORT_VIDEO";
         logger.info("user {} get speak by type={} at page={} {}/page", userId, type, index, number);
 
         List<NurseSpeakBean> speak = speakService.getSpeak(true, userId, type, index, number);

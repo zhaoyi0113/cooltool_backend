@@ -22,6 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by zhaolisong on 16/4/8.
@@ -121,6 +123,34 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
         courses = service.getCourseByCategoryId(CourseEditing, categoryId);
         Assert.assertEquals(1, courses.size());
         Assert.assertEquals(6L, courses.get(0).getId());
+    }
+
+    @Test
+    public void testGetCategoryRelationByCourseId() {
+        List<Long> coursesId = Arrays.asList(new Long[]{
+                1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L
+        });
+        Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = service.getCategoryRelationByCourseId(coursesId);
+        Assert.assertEquals(5, categoryToCourses.size());
+        Set<CourseCategoryBean> categories = categoryToCourses.keySet();
+        for (CourseCategoryBean category : categories) {
+            List<CourseBean> courses = categoryToCourses.get(category);
+            if (category.getId()==1) {
+                Assert.assertEquals(5, courses.size());
+            }
+            else if (category.getId()==2) {
+                Assert.assertEquals(2, courses.size());
+            }
+            else if (category.getId()==6) {
+                Assert.assertEquals(1, courses.size());
+            }
+            else if (category.getId()==8) {
+                Assert.assertEquals(1, courses.size());
+            }
+            else if (category.getId()==0) {
+                Assert.assertEquals(4, courses.size());
+            }
+        }
     }
 
     //==========================================

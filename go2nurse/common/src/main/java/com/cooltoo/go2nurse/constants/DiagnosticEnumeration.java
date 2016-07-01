@@ -8,11 +8,10 @@ import java.util.List;
  */
 public enum DiagnosticEnumeration {
 
-    EXTENSION_NURSING,      // 延伸护理
+    EXTENSION_NURSING,      // 健康宣教
     HOSPITALIZED_DATE,      // 入院
     PHYSICAL_EXAMINATION,   // 检查
     OPERATION,                  // 手术
-    REHABILITATION,         // 术后康复
     DISCHARGED_FROM_THE_HOSPITAL    // 出院
     ;
 
@@ -29,9 +28,6 @@ public enum DiagnosticEnumeration {
         }
         else if (OPERATION.name().equalsIgnoreCase(type)) {
             diagnostic = OPERATION;
-        }
-        else if (REHABILITATION.name().equalsIgnoreCase(type)) {
-            diagnostic = REHABILITATION;
         }
         else if (DISCHARGED_FROM_THE_HOSPITAL.name().equalsIgnoreCase(type)) {
             diagnostic = DISCHARGED_FROM_THE_HOSPITAL;
@@ -53,9 +49,6 @@ public enum DiagnosticEnumeration {
         else if (OPERATION.ordinal() == type) {
             diagnostic = OPERATION;
         }
-        else if (REHABILITATION.ordinal() == type) {
-            diagnostic = REHABILITATION;
-        }
         else if (DISCHARGED_FROM_THE_HOSPITAL.ordinal() == type) {
             diagnostic = DISCHARGED_FROM_THE_HOSPITAL;
         }
@@ -72,7 +65,6 @@ public enum DiagnosticEnumeration {
         diagnostics.add(HOSPITALIZED_DATE);
         diagnostics.add(PHYSICAL_EXAMINATION);
         diagnostics.add(OPERATION);
-        diagnostics.add(REHABILITATION);
         diagnostics.add(DISCHARGED_FROM_THE_HOSPITAL);
         return diagnostics;
     }

@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.UserDiagnosticPointRelationService;
 import com.cooltoo.util.NumberUtil;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,18 @@ public class UserDiagnosticPointAPI {
     public Response getRelation(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<UserDiagnosticPointRelationBean> relations = relationService.getRelation(userId, CommonStatus.ENABLED.name());
+        return Response.ok(relations).build();
+    }
+
+    @Path("/get/latest_group_diagnostic_points")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getLatestRelation(@Context HttpServletRequest request) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<Long> allGroups = relationService.getUserAllGroupIds(userId);
+        Long groupId = VerifyUtil.isListEmpty(allGroups) ? 0L : allGroups.get(0);
+        List<UserDiagnosticPointRelationBean> relations = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
         return Response.ok(relations).build();
     }
 
@@ -111,17 +124,17 @@ public class UserDiagnosticPointAPI {
         }
         long timeOperation = NumberUtil.getTime(operationDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (timeOperation>0) {
-            diagnosticPoints.add(DiagnosticEnumeration.HOSPITALIZED_DATE);
+            diagnosticPoints.add(DiagnosticEnumeration.OPERATION);
             pointTimes.add(new Date(timeOperation));
         }
-        long timeRehabilitation = NumberUtil.getTime(rehabilitationDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (timeRehabilitation>0) {
-            diagnosticPoints.add(DiagnosticEnumeration.HOSPITALIZED_DATE);
-            pointTimes.add(new Date(timeRehabilitation));
-        }
+//        long timeRehabilitation = NumberUtil.getTime(rehabilitationDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+//        if (timeRehabilitation>0) {
+//            diagnosticPoints.add(DiagnosticEnumeration.HOSPITALIZED_DATE);
+//            pointTimes.add(new Date(timeRehabilitation));
+//        }
         long timeDischarged = NumberUtil.getTime(dischargedDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (timeDischarged>0) {
-            diagnosticPoints.add(DiagnosticEnumeration.HOSPITALIZED_DATE);
+            diagnosticPoints.add(DiagnosticEnumeration.DISCHARGED_FROM_THE_HOSPITAL);
             pointTimes.add(new Date(timeDischarged));
         }
     }
