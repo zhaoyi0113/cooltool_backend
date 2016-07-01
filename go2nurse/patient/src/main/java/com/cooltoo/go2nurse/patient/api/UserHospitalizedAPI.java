@@ -147,7 +147,7 @@ public class UserHospitalizedAPI {
         }
         else {
             Map<CourseCategoryBean, List<CourseBean>> courses
-                    = userCourseService.getAllPublicExtensionNursingCourses();
+                    = userCourseService.getAllPublicExtensionNursingCourses(userId);
             courses.forEach((key, value) -> {
                 UserHospitalizedCorusesBean bean = new UserHospitalizedCorusesBean();
                 bean.setId(key.getId());

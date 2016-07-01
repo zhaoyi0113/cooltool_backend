@@ -51,11 +51,22 @@ public class UserCourseRelationService {
     //===================================================
     //               getting for user
     //===================================================
-    public Map<CourseCategoryBean, List<CourseBean>> getAllPublicExtensionNursingCourses() {
+    public Map<CourseCategoryBean, List<CourseBean>> getAllPublicExtensionNursingCourses(long userId) {
         logger.info("get all public extension nursing courses");
         List<Long> coursesId = courseRelationManageService.getEnabledCoursesIdInExtensionNursing();
         Map<CourseCategoryBean, List<CourseBean>> returnValue =
                 courseCategoryService.getCategoryRelationByCourseId(coursesId);
+
+        List<Long> readCourseIds = getRelationCourseId(userId, "read", CommonStatus.ENABLED.name());
+
+        Set<CourseCategoryBean> keys = returnValue.keySet();
+        for (CourseCategoryBean key : keys) {
+            List<CourseBean> courses = returnValue.get(key);
+            for (CourseBean course : courses) {
+                course.setReading(readCourseIds.contains(course.getId()) ? ReadingStatus.READ : ReadingStatus.UNREAD);
+            }
+        }
+
         return returnValue;
     }
 
@@ -99,6 +110,7 @@ public class UserCourseRelationService {
                 for (CourseBean course : courses) {
                     if (!finalCourses.contains(course)) {
                         finalCourses.add(course);
+                        course.setReading(readCourseIds.contains(course.getId()) ? ReadingStatus.READ : ReadingStatus.UNREAD);
                     }
                 }
             }
@@ -115,6 +127,7 @@ public class UserCourseRelationService {
                 for (CourseBean course : coursesOfExtensionNursing) {
                     if (!finalCourses.contains(course)) {
                         finalCourses.add(course);
+                        course.setReading(readCourseIds.contains(course.getId()) ? ReadingStatus.READ : ReadingStatus.UNREAD);
                     }
                 }
             }
