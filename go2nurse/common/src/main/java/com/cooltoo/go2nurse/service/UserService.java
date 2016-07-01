@@ -427,6 +427,10 @@ public class UserService {
         if (!VerifyUtil.isStringEmpty(newMobile) && !VerifyUtil.isStringEmpty(smsCode)) {
             leanCloudService.verifySmsCode(smsCode.trim(), newMobile.trim());
             newMobile = newMobile.trim();
+            List<UserEntity> userExist = repository.findByMobile(newMobile);
+            if(null!=userExist && !userExist.isEmpty()){
+                throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
+            }
             if (!newMobile.equals(user.getMobile())) {
                 user.setMobile(newMobile);
                 changed = true;
