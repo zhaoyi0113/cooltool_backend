@@ -18,6 +18,7 @@ public class QuestionEntity {
     private String content;
     private String options;
     private QuestionType type;
+    private int grade;
     private Date time;
     private CommonStatus status;
 
@@ -47,6 +48,11 @@ public class QuestionEntity {
     @Enumerated
     public QuestionType getType() {
         return type;
+    }
+
+    @Column(name = "grade")
+    public int getGrade() {
+        return grade;
     }
 
     @Column(name = "time_created")
@@ -79,6 +85,10 @@ public class QuestionEntity {
         this.type = type;
     }
 
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
     public void setTime(Date time) {
         this.time = time;
     }
@@ -95,6 +105,7 @@ public class QuestionEntity {
         msg.append(", content=").append(content);
         msg.append(", options=").append(options);
         msg.append(", type=").append(type);
+        msg.append(", grade=").append(grade);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

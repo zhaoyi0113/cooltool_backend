@@ -34,6 +34,7 @@ public class QuestionnaireService {
     private static final Logger logger = LoggerFactory.getLogger(QuestionnaireService.class.getName());
 
     private static final Sort questionSort = new Sort(
+            new Sort.Order(Sort.Direction.DESC, "grade"),
             new Sort.Order(Sort.Direction.ASC, "id")
     );
 
@@ -239,7 +240,7 @@ public class QuestionnaireService {
     //=================================================================
 
     @Transactional
-    public QuestionBean updateQuestion(long questionId, long questionnaireId, String content, String options, String strType) {
+    public QuestionBean updateQuestion(long questionId, long questionnaireId, String content, String options, String strType, int grade) {
         logger.info("update question={} with questionnaireId={} content={} options={} type={}",
                 questionId, questionnaireId, content, options, strType);
         boolean changed = false;
@@ -263,6 +264,10 @@ public class QuestionnaireService {
         QuestionType type = QuestionType.parseString(strType);
         if (null!=type && !type.equals(entity.getType())) {
             entity.setType(type);
+            changed = true;
+        }
+        if (grade>=0 && grade != entity.getGrade()) {
+            entity.setGrade(grade);
             changed = true;
         }
 
@@ -396,9 +401,9 @@ public class QuestionnaireService {
     //         add question and questionnaire
     //=================================================================
     @Transactional
-    public QuestionBean addQuestion(long questionnaireId, String content, String options, String strType) {
-        logger.info("add question : questionnaireId={} content={} options={} strType={}",
-                questionnaireId, content, options, strType);
+    public QuestionBean addQuestion(long questionnaireId, String content, String options, String strType, int grade) {
+        logger.info("add question : questionnaireId={} content={} options={} strType={} grade={}",
+                questionnaireId, content, options, strType, grade);
 
         String imagePath = null;
         QuestionEntity entity = new QuestionEntity();
@@ -415,6 +420,8 @@ public class QuestionnaireService {
         if (null!=type) {
             entity.setType(type);
         }
+        grade = grade<=0 ? 0 : grade;
+        entity.setGrade(grade);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity = questionRep.save(entity);

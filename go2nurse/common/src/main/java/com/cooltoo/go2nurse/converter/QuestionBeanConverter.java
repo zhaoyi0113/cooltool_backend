@@ -18,6 +18,7 @@ public class QuestionBeanConverter implements Converter<QuestionEntity, Question
         bean.setContent(source.getContent());
         bean.setOptions(source.getOptions());
         bean.setType(source.getType());
+        bean.setGrade(source.getGrade());
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
         return bean;

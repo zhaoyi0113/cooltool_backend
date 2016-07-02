@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_question` CHANGE COLUMN `grade` `grade` INT(11) NULL DEFAULT '0' ;

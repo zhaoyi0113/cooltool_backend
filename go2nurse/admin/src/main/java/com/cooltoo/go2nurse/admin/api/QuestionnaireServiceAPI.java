@@ -123,9 +123,10 @@ public class QuestionnaireServiceAPI {
                                    @FormParam("questionnaire_id") @DefaultValue("0") long questionnaireId,
                                    @FormParam("content") @DefaultValue("") String content,
                                    @FormParam("options") @DefaultValue("") String options,
-                                   @FormParam("type") @DefaultValue("SINGLE_SELECTION") String type
-    ) {
-        QuestionBean bean = questionnaireService.updateQuestion(id, questionnaireId, content, options, type);
+                                   @FormParam("type") @DefaultValue("SINGLE_SELECTION") String type,
+                                   @FormParam("grade") @DefaultValue("-1") int grade
+                                   ) {
+        QuestionBean bean = questionnaireService.updateQuestion(id, questionnaireId, content, options, type, grade);
         return Response.ok(bean).build();
     }
 
@@ -188,9 +189,10 @@ public class QuestionnaireServiceAPI {
                                 @FormParam("questionnaire_id") @DefaultValue("0") long questionnaireId,
                                 @FormParam("content") @DefaultValue("") String content,
                                 @FormParam("options") @DefaultValue("") String options,
-                                @FormParam("type") @DefaultValue("SINGLE_SELECTION") String type
+                                @FormParam("type") @DefaultValue("SINGLE_SELECTION") String type,
+                                @FormParam("grade") @DefaultValue("-1") int grade
     ) {
-        QuestionBean bean = questionnaireService.addQuestion(questionnaireId, content, options, type);
+        QuestionBean bean = questionnaireService.addQuestion(questionnaireId, content, options, type, grade);
         return Response.ok(bean).build();
     }
 

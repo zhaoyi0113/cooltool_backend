@@ -15,6 +15,7 @@ public class QuestionBean {
     private String content;
     private String options;
     private QuestionType type;
+    private int grade;
     private String userAnswer;
     private Date time;
     private CommonStatus status;
@@ -37,6 +38,10 @@ public class QuestionBean {
 
     public QuestionType getType() {
         return type;
+    }
+
+    public int getGrade() {
+        return grade;
     }
 
     public Date getTime() {
@@ -67,6 +72,10 @@ public class QuestionBean {
         this.type = type;
     }
 
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
     public void setTime(Date time) {
         this.time = time;
     }
@@ -91,6 +100,7 @@ public class QuestionBean {
         msg.append(", content=").append(content);
         msg.append(", options=").append(options);
         msg.append(", type=").append(type);
+        msg.append(", grade=").append(grade);
         msg.append(", userAnswer={}").append(userAnswer);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
