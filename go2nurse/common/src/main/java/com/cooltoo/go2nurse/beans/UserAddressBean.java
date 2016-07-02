@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.RegionBean;
 import com.cooltoo.constants.CommonStatus;
 
 import java.util.Date;
@@ -14,7 +15,9 @@ public class UserAddressBean {
     private CommonStatus status;
     private long userId;
     private int provinceId;
+    private RegionBean province;
     private int cityId;
+    private RegionBean city;
     private String address;
     private int grade;
 
@@ -82,6 +85,22 @@ public class UserAddressBean {
         this.grade = grade;
     }
 
+    public RegionBean getProvince() {
+        return province;
+    }
+
+    public void setProvince(RegionBean province) {
+        this.province = province;
+    }
+
+    public RegionBean getCity() {
+        return city;
+    }
+
+    public void setCity(RegionBean city) {
+        this.city = city;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -91,6 +110,8 @@ public class UserAddressBean {
         msg.append(", cityId=").append(cityId);
         msg.append(", address=").append(address);
         msg.append(", grade=").append(grade);
+        msg.append(", province=").append(province);
+        msg.append(", city=").append(city);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append("]");

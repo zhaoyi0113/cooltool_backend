@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <go2nurse_user_address id="1"  user_id="1" province_id="2" city_id="3" grade="0" address="address 01" status="1" time_created="2016-05-10 12:25:00" />
+    <go2nurse_user_address id="2"  user_id="2" province_id="2" city_id="3" grade="0" address="address 02" status="1" time_created="2016-05-11 12:25:00" />
+    <go2nurse_user_address id="3"  user_id="2" province_id="2" city_id="4" grade="0" address="address 03" status="1" time_created="2016-05-12 12:25:00" />
+    <go2nurse_user_address id="4"  user_id="3" province_id="2" city_id="3" grade="1" address="address 04" status="1" time_created="2016-05-13 12:25:00" />
+    <go2nurse_user_address id="5"  user_id="3" province_id="2" city_id="4" grade="0" address="address 05" status="1" time_created="2016-05-14 12:25:00" />
+    <go2nurse_user_address id="6"  user_id="3" province_id="2" city_id="5" grade="0" address="address 06" status="1" time_created="2016-05-15 12:25:00" />
+    <go2nurse_user_address id="7"  user_id="4" province_id="6" city_id="7" grade="0" address="address 07" status="1" time_created="2016-05-16 12:25:00" />
+    <go2nurse_user_address id="8"  user_id="4" province_id="6" city_id="7" grade="0" address="address 08" status="1" time_created="2016-05-17 12:25:00" />
+    <go2nurse_user_address id="9"  user_id="4" province_id="6" city_id="8" grade="0" address="address 09" status="1" time_created="2016-05-18 12:25:00" />
+    <go2nurse_user_address id="10" user_id="4" province_id="6" city_id="8" grade="0" address="address 10" status="1" time_created="2016-05-19 12:25:00" />
+    <go2nurse_user_address id="11" user_id="5" province_id="6" city_id="7" grade="0" address="address 11" status="1" time_created="2016-05-20 12:25:00" />
+    <go2nurse_user_address id="12" user_id="5" province_id="6" city_id="7" grade="0" address="address 12" status="1" time_created="2016-05-21 12:25:00" />
+    <go2nurse_user_address id="13" user_id="5" province_id="6" city_id="8" grade="0" address="address 13" status="1" time_created="2016-05-22 12:25:00" />
+    <go2nurse_user_address id="14" user_id="5" province_id="6" city_id="8" grade="0" address="address 14" status="1" time_created="2016-05-23 12:25:00" />
+    <go2nurse_user_address id="15" user_id="5" province_id="6" city_id="9" grade="0" address="address 15" status="1" time_created="2016-05-24 12:25:00" />
+</dataset>

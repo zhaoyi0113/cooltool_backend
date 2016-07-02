@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <cooltoo_region id="1" code="100000" name="china"      en_name="CN" short_en_name="CN" parent_id="-1" />
+    <cooltoo_region id="2" code="100000" name="beijing"    en_name="BJ" short_en_name="BJ" parent_id="1" />
+    <cooltoo_region id="3" code="100000" name="fang shan"  en_name="FS" short_en_name="FS" parent_id="2" />
+    <cooltoo_region id="4" code="100000" name="chang ping" en_name="CP" short_en_name="CP" parent_id="2" />
+    <cooltoo_region id="5" code="100000" name="dong cheng" en_name="DC" short_en_name="DC" parent_id="2" />
+    <cooltoo_region id="6" code="100000" name="tianjin"    en_name="TJ" short_en_name="TJ" parent_id="1" />
+    <cooltoo_region id="7" code="100000" name="he ping"    en_name="HP" short_en_name="HP" parent_id="6" />
+    <cooltoo_region id="8" code="100000" name="he xi"      en_name="HX" short_en_name="HX" parent_id="6" />
+    <cooltoo_region id="9" code="100000" name="he bei"     en_name="HB" short_en_name="HB" parent_id="6" />
+
+</dataset>
