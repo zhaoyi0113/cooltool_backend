@@ -232,6 +232,7 @@ public class CourseCategoryService {
         }
         List<CourseCategoryBean> beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
+        logger.info("get course category is {}", beans);
         return beans;
     }
 
