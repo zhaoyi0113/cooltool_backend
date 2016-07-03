@@ -399,7 +399,7 @@ public class CourseCategoryService {
             logger.info("category not exists");
             return null;
         }
-        if (!courseService.existCourse(categoryId)) {
+        if (!courseService.existCourse(courseId)) {
             logger.info("course not exists");
             return null;
         }
