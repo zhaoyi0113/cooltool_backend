@@ -101,8 +101,11 @@ public class PatientService {
         return beans;
     }
 
+    //====================================================================
+    //                     add
+    //====================================================================
     @Transactional
-    public long create(String name, int iGender, Date birthday, String identityCard, String mobile) {
+    public PatientBean create(String name, int iGender, Date birthday, String identityCard, String mobile) {
         logger.info("create patient with name={} gender={} birthday={} identityCard={} mobile={}",
                 name, iGender, birthday, identityCard, mobile);
         if (VerifyUtil.isStringEmpty(name)) {
@@ -123,7 +126,7 @@ public class PatientService {
         }
         identityCard = identityCard.trim();
 
-        if (VerifyUtil.isStringEmpty(mobile) || !NumberUtil.isMobileValid(mobile)) {
+        if (VerifyUtil.isStringEmpty(mobile)) {
             logger.info("mobile is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -140,9 +143,13 @@ public class PatientService {
 
         entity = repository.save(entity);
         logger.info("add patient={}", entity);
-        return entity.getId();
+        PatientBean bean = beanConverter.convert(entity);
+        return bean;
     }
 
+    //====================================================================
+    //                     update
+    //====================================================================
     @Transactional
     public PatientBean update(long id, String name, int iGender, Date birthday, String identityCard, String mobile, String strStatus) {
         logger.info("update patient={} by name={} gender={} birthday={} identityCard={} mobile={} status={}",
@@ -170,7 +177,7 @@ public class PatientService {
             entity.setIdentityCard(identityCard.trim());
             changed = true;
         }
-        if (NumberUtil.isMobileValid(mobile) && !mobile.trim().equals(entity.getMobile())) {
+        if (!VerifyUtil.isStringEmpty(mobile) && !mobile.trim().equals(entity.getMobile())) {
             entity.setMobile(mobile.trim());
             changed = true;
         }
