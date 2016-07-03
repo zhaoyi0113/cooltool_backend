@@ -1,9 +1,8 @@
 package com.cooltoo.go2nurse.admin.api;
 
-import com.cooltoo.go2nurse.beans.CourseBean;
-import com.cooltoo.go2nurse.beans.CourseDepartmentRelationBean;
-import com.cooltoo.go2nurse.beans.CourseDiagnosticRelationBean;
-import com.cooltoo.go2nurse.beans.CourseHospitalRelationBean;
+import com.cooltoo.go2nurse.beans.*;
+import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.converter.DiagnosticEnumerationBeanConverter;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,6 +11,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +22,7 @@ import java.util.Map;
 public class CourseRelationManageAPI {
 
     @Autowired private CourseRelationManageService relationManage;
+    @Autowired private DiagnosticEnumerationBeanConverter diagnosticEnumBeanConverter;
 
     @Path("/conditions/by_hospital_department")
     @GET
@@ -118,5 +119,29 @@ public class CourseRelationManageAPI {
     ) {
         boolean success = relationManage.addCourseToDiagnostic(courseId, diagnosticId);
         return Response.ok(success).build();
+    }
+
+    @Path("/diagnostic/name")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addDiagnosticRelation(@Context HttpServletRequest request,
+                                          @FormParam("diagnostic_name") @DefaultValue("") String diagnosticName,
+                                          @FormParam("course_id") @DefaultValue("0") long courseId
+    ) {
+        DiagnosticEnumeration diagnostic = DiagnosticEnumeration.parseString(diagnosticName);
+        boolean success = relationManage.addCourseToDiagnostic(courseId, diagnostic.ordinal());
+        return Response.ok(success).build();
+    }
+
+    @Path("/diagnostic/all_enumeration")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllDiagnosticEnum(@Context HttpServletRequest request) {
+        List<DiagnosticEnumeration> diagnosticEnum = DiagnosticEnumeration.getAllDiagnostic();
+        List<DiagnosticEnumerationBean> diagnosticEnumBean = new ArrayList<>();
+        for (DiagnosticEnumeration diagnostic : diagnosticEnum) {
+            diagnosticEnumBean.add(diagnosticEnumBeanConverter.convert(diagnostic));
+        }
+        return Response.ok(diagnosticEnumBean).build();
     }
 }
