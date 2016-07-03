@@ -34,9 +34,8 @@ public class PatientServiceTest extends AbstractCooltooTest {
         String identity = "13414321432143554321432";
         String mobile = "15811663430";
 
-        long id = service.create(name, gender, birthday, identity, mobile);
-        PatientBean bean = service.getOneById(id);
-        Assert.assertTrue(id>0);
+        PatientBean bean = service.create(name, gender, birthday, identity, mobile);
+        Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(gender, bean.getGender().ordinal());
         Assert.assertEquals(birthday, bean.getBirthday());

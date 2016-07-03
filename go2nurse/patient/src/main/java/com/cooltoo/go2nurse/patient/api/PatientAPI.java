@@ -80,12 +80,12 @@ public class PatientAPI {
         if (time > 0) {
             date = new Date(time);
         }
-        long patientId = service.create(name, gender, date, identityCard, mobile);
-        if (patientId>0) {
-            UserPatientRelationBean relation = userPatientRelation.addPatientToUser(patientId, userId);
+        PatientBean patient = service.create(name, gender, date, identityCard, mobile);
+        if (null!=patient && patient.getId()>0) {
+            UserPatientRelationBean relation = userPatientRelation.addPatientToUser(patient.getId(), userId);
             logger.info("user patient relation is {}", relation);
         }
-        return Response.ok(patientId).build();
+        return Response.ok(patient).build();
     }
 
     @Path("/update")
