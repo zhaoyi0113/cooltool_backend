@@ -82,4 +82,16 @@ public class UserAddressAPI {
         UserAddressBean userAddress = userAddressService.update(addressId, provinceId, cityId, grade, address, CommonStatus.parseString(status));
         return Response.ok(userAddress).build();
     }
+
+    @Path("/delete")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response deleteAddress(@Context HttpServletRequest request,
+                                  @FormParam("address_id") @DefaultValue("0") long addressId
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        UserAddressBean userAddress = userAddressService.deleteById(addressId);
+        return Response.ok(userAddress).build();
+    }
 }
