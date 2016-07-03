@@ -1,5 +1,8 @@
 package com.cooltoo.constants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by yzzhao on 12/23/15.
  */
@@ -32,5 +35,13 @@ public enum CommonStatus {
             retVal = DELETED;
         }
         return retVal;
+    }
+
+    public static List<CommonStatus> getAll() {
+        List<CommonStatus> all = new ArrayList<>();
+        all.add(CommonStatus.DISABLED);
+        all.add(CommonStatus.ENABLED);
+        all.add(CommonStatus.DELETED);
+        return all;
     }
 }

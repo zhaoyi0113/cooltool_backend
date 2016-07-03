@@ -1,16 +1,13 @@
-package com.cooltoo.go2nurse.entities;
+package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by hp on 2016/7/3.
  */
-@Entity
-@Table(name = "go2nurse_user_re_examination")
-public class UserReExaminationEntity {
+public class UserReExaminationDateBean {
 
     private long id;
     private Date time;
@@ -18,38 +15,34 @@ public class UserReExaminationEntity {
     private long userId;
     private long hospitalizedGroupId;
     private Date reExaminationDate;
+    private CommonStatus ignore;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
     public long getId() {
         return id;
     }
 
-    @Column(name = "time_created")
     public Date getTime() {
         return time;
     }
 
-    @Column(name = "status")
-    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }
 
-    @Column(name = "user_id")
     public long getUserId() {
         return userId;
     }
 
-    @Column(name = "hospitalized_group_id")
     public long getHospitalizedGroupId() {
         return hospitalizedGroupId;
     }
 
-    @Column(name = "re_examination_date")
     public Date getReExaminationDate() {
         return reExaminationDate;
+    }
+
+    public CommonStatus getIgnore() {
+        return ignore;
     }
 
     public void setId(long id) {
@@ -76,6 +69,10 @@ public class UserReExaminationEntity {
         this.reExaminationDate = reExaminationDate;
     }
 
+    public void setIgnore(CommonStatus ignore) {
+        this.ignore = ignore;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -84,6 +81,7 @@ public class UserReExaminationEntity {
         msg.append(", userId=").append(userId);
         msg.append(", hospitalizedGroupId=").append(hospitalizedGroupId);
         msg.append(", reExaminationDate=").append(reExaminationDate);
+        msg.append(", ignore=").append(ignore);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append("]");
