@@ -82,7 +82,7 @@ public class UserCourseRelationService {
                 userHospitalizedRelationService.getUserHospitalizedRelationByGroupId(userId, currentDiagnosticGroupId);
 
         // construct hospitalized courses in hospital---department
-        Map<DiagnosticEnumeration, List<CourseBean>> returnVal = null;
+        Map<DiagnosticEnumeration, List<CourseBean>> returnVal = new HashMap<>();
         for (UserHospitalizedRelationBean hospitalized : userHospitalized) {
             // has leave this department
             if (YesNoEnum.YES.equals(hospitalized.getHasLeave())) {
