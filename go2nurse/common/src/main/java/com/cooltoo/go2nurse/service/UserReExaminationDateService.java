@@ -275,6 +275,45 @@ public class UserReExaminationDateService {
         return bean;
     }
 
+    @Transactional
+    public List<UserReExaminationDateBean> updateReExaminationStartDate(long userId, long groupId, Date reExaminationStartDate) {
+        logger.info("user={} update re-examination date by groupId={} reExaminationStartDate={}",
+                userId, groupId, reExaminationStartDate);
+        List<UserReExaminationDateBean> beans = new ArrayList<>();
+        if (null==reExaminationStartDate) {
+            logger.warn("re-examination start date is empty");
+            return beans;
+        }
+
+        List<CommonStatus> statuses = CommonStatus.getAll();
+        List<UserReExaminationDateEntity> entities = repository.findByUserIdAndGroupIdAndStatusIn(userId, groupId, statuses, sort);
+        if (VerifyUtil.isListEmpty(entities)) {
+            logger.warn("there is no re-examination date to update");
+            return beans;
+        }
+
+        long deltaWithStart = 0;
+        for (UserReExaminationDateEntity tmp : entities) {
+            if (YesNoEnum.YES.equals(tmp.getIsStartDate())) {
+                deltaWithStart = reExaminationStartDate.getTime() - tmp.getReExaminationDate().getTime();
+                break;
+            }
+        }
+        if (deltaWithStart==0) {
+            logger.warn("re-examination start date is the same");
+            return beans;
+        }
+
+        for (UserReExaminationDateEntity tmp : entities) {
+            Date reExamDate = tmp.getReExaminationDate();
+            tmp.setReExaminationDate(new Date(reExamDate.getTime() + deltaWithStart));
+        }
+
+        entities = repository.save(entities);
+        beans = entitiesToBeans(entities);
+        return beans;
+    }
+
     //===============================================================
     //                           delete
     //===============================================================
