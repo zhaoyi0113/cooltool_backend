@@ -31,7 +31,7 @@ public class PatientService {
     private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.ASC, "id")
+            new Sort.Order(Sort.Direction.DESC, "id")
     );
 
     @Autowired private PatientRepository repository;
