@@ -80,8 +80,8 @@ public class PatientServiceTest extends AbstractCooltooTest {
         status = CommonStatus.DISABLED;
         beans = service.getAllByStatusAndIds(ids, status);
         Assert.assertEquals(2, beans.size());
-        Assert.assertEquals(7L, beans.get(0).getId());
-        Assert.assertEquals(8L, beans.get(1).getId());
+        Assert.assertEquals(8L, beans.get(0).getId());
+        Assert.assertEquals(7L, beans.get(1).getId());
     }
 
     @Test
