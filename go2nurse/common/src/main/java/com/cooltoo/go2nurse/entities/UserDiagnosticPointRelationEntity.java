@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,6 +20,7 @@ public class UserDiagnosticPointRelationEntity {
     private long diagnosticId;
     private Date diagnosticTime;
     private long groupId;
+    private YesNoEnum cancelled;
 
     @Id
     @GeneratedValue
@@ -58,6 +60,12 @@ public class UserDiagnosticPointRelationEntity {
         return groupId;
     }
 
+    @Column(name = "cancelled")
+    @Enumerated
+    public YesNoEnum getCancelled() {
+        return cancelled;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -86,6 +94,10 @@ public class UserDiagnosticPointRelationEntity {
         this.groupId = groupId;
     }
 
+    public void setCancelled(YesNoEnum cancelled) {
+        this.cancelled = cancelled;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -94,6 +106,7 @@ public class UserDiagnosticPointRelationEntity {
         msg.append(", diagnosticId=").append(diagnosticId);
         msg.append(", diagnosticTime=").append(diagnosticTime);
         msg.append(", groupId=").append(groupId);
+        msg.append(", cancelled=").append(cancelled);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

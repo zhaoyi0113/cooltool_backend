@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -41,6 +42,18 @@ public class NumberUtil {
             return time.getTime();
         } catch (Exception e) {
             return -1;
+        }
+    }
+
+    public static String timeToString(Date time, String pattern) {
+        if (null==time) {
+            return "";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        try {
+            return sdf.format(time);
+        } catch (Exception e) {
+            return "";
         }
     }
 

@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,9 +17,11 @@ public class UserReExaminationDateEntity {
     private Date time;
     private CommonStatus status;
     private long userId;
+    private long groupId;
     private long hospitalizedGroupId;
     private Date reExaminationDate;
     private CommonStatus ignore;
+    private YesNoEnum isStartDate;
 
     @Id
     @GeneratedValue
@@ -43,6 +46,11 @@ public class UserReExaminationDateEntity {
         return userId;
     }
 
+    @Column(name = "group_id")
+    public long getGroupId() {
+        return groupId;
+    }
+
     @Column(name = "hospitalized_group_id")
     public long getHospitalizedGroupId() {
         return hospitalizedGroupId;
@@ -53,10 +61,16 @@ public class UserReExaminationDateEntity {
         return reExaminationDate;
     }
 
-    @Column(name = "ignore")
+    @Column(name = "is_ignore")
     @Enumerated
     public CommonStatus getIgnore() {
         return ignore;
+    }
+
+    @Column(name = "is_start")
+    @Enumerated
+    public YesNoEnum getIsStartDate() {
+        return isStartDate;
     }
 
     public void setId(long id) {
@@ -75,6 +89,10 @@ public class UserReExaminationDateEntity {
         this.userId = userId;
     }
 
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
     public void setHospitalizedGroupId(long hospitalizedGroupId) {
         this.hospitalizedGroupId = hospitalizedGroupId;
     }
@@ -87,12 +105,18 @@ public class UserReExaminationDateEntity {
         this.ignore = ignore;
     }
 
+    public void setIsStartDate(YesNoEnum isStartDate) {
+        this.isStartDate = isStartDate;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", userId=").append(userId);
+        msg.append(", isStartDate=").append(isStartDate);
+        msg.append(", groupId=").append(groupId);
         msg.append(", hospitalizedGroupId=").append(hospitalizedGroupId);
         msg.append(", reExaminationDate=").append(reExaminationDate);
         msg.append(", ignore=").append(ignore);

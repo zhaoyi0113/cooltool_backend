@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import java.util.Date;
 
@@ -13,9 +14,12 @@ public class UserReExaminationDateBean {
     private Date time;
     private CommonStatus status;
     private long userId;
+    private long groupId;
     private long hospitalizedGroupId;
     private Date reExaminationDate;
+    private String strReExaminationDate;
     private CommonStatus ignore;
+    private YesNoEnum isStartDate;
 
     public long getId() {
         return id;
@@ -33,6 +37,10 @@ public class UserReExaminationDateBean {
         return userId;
     }
 
+    public long getGroupId() {
+        return groupId;
+    }
+
     public long getHospitalizedGroupId() {
         return hospitalizedGroupId;
     }
@@ -41,8 +49,16 @@ public class UserReExaminationDateBean {
         return reExaminationDate;
     }
 
+    public String getStrReExaminationDate() {
+        return strReExaminationDate;
+    }
+
     public CommonStatus getIgnore() {
         return ignore;
+    }
+
+    public YesNoEnum getIsStartDate() {
+        return isStartDate;
     }
 
     public void setId(long id) {
@@ -61,6 +77,10 @@ public class UserReExaminationDateBean {
         this.userId = userId;
     }
 
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
     public void setHospitalizedGroupId(long hospitalizedGroupId) {
         this.hospitalizedGroupId = hospitalizedGroupId;
     }
@@ -69,8 +89,16 @@ public class UserReExaminationDateBean {
         this.reExaminationDate = reExaminationDate;
     }
 
+    public void setStrReExaminationDate(String strReExaminationDate) {
+        this.strReExaminationDate = strReExaminationDate;
+    }
+
     public void setIgnore(CommonStatus ignore) {
         this.ignore = ignore;
+    }
+
+    public void setIsStartDate(YesNoEnum isStartDate) {
+        this.isStartDate = isStartDate;
     }
 
     @Override
@@ -79,6 +107,8 @@ public class UserReExaminationDateBean {
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", userId=").append(userId);
+        msg.append(", isStartDate=").append(isStartDate);
+        msg.append(", groupId=").append(groupId);
         msg.append(", hospitalizedGroupId=").append(hospitalizedGroupId);
         msg.append(", reExaminationDate=").append(reExaminationDate);
         msg.append(", ignore=").append(ignore);

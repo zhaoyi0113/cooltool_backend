@@ -3,9 +3,11 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
+import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.UserDiagnosticPointRelationService;
+import com.cooltoo.go2nurse.service.UserReExaminationDateService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import java.util.List;
 public class UserDiagnosticPointAPI {
 
     @Autowired private UserDiagnosticPointRelationService relationService;
+    @Autowired private UserReExaminationDateService reExaminationService;
 
     @Path("/get")
     @GET
@@ -102,6 +105,31 @@ public class UserDiagnosticPointAPI {
         Date newTime = time<0 ? null : new Date(time);
         UserDiagnosticPointRelationBean relation = relationService.updateUserDiagnosticRelation(groupId, diagnosticId, userId, newTime, status);
         return Response.ok(relation).build();
+    }
+
+    @Path("/confirm/discharge_from_hospital")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response userDischargeFromHospital(@Context HttpServletRequest request) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<Long> allGroups = relationService.getUserAllGroupIds(userId);
+        Long groupId = VerifyUtil.isListEmpty(allGroups) ? 0L : allGroups.get(0);
+        List<UserDiagnosticPointRelationBean> relations = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
+        List<UserReExaminationDateBean> reExamDates = reExaminationService.addReExaminationByDiagnosticDates(userId, relations);
+        return Response.ok(reExamDates).build();
+    }
+
+    @Path("/cancel")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response userCancelDiagnostic(@Context HttpServletRequest request) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<Long> allGroups = relationService.getUserAllGroupIds(userId);
+        Long groupId = VerifyUtil.isListEmpty(allGroups) ? 0L : allGroups.get(0);
+        List<UserDiagnosticPointRelationBean> relations = relationService.cancelUserDiagnosticRelation(userId, groupId);
+        return Response.ok(relations).build();
     }
 
     private void parseTime(String hospitalizedDate,

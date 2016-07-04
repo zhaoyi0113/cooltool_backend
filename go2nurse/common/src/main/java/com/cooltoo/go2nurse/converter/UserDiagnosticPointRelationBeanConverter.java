@@ -20,6 +20,7 @@ public class UserDiagnosticPointRelationBeanConverter implements Converter<UserD
         bean.setDiagnosticId(source.getDiagnosticId());
         bean.setDiagnosticTime(source.getDiagnosticTime());
         bean.setGroupId(source.getGroupId());
+        bean.setCancelled(source.getCancelled());
         return bean;
     }
 }

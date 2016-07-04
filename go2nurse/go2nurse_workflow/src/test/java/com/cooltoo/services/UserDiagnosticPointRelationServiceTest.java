@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.service.UserDiagnosticPointRelationService;
@@ -203,5 +204,22 @@ public class UserDiagnosticPointRelationServiceTest extends AbstractCooltooTest 
 
         count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(1, count);
+    }
+
+    @Test
+    public void testCancelUserDiagnosticRelation() {
+        long userId = 1;
+        long groupId = 1;
+        List<UserDiagnosticPointRelationBean> beans = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
+        for (UserDiagnosticPointRelationBean bean : beans) {
+            Assert.assertEquals(YesNoEnum.NO, bean.getCancelled());
+        }
+
+        relationService.cancelUserDiagnosticRelation(userId, groupId);
+
+        beans = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
+        for (UserDiagnosticPointRelationBean bean : beans) {
+            Assert.assertEquals(YesNoEnum.YES, bean.getCancelled());
+        }
     }
 }

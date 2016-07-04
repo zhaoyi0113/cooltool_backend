@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
@@ -33,7 +34,7 @@ public class UserDiagnosticPointRelationService {
 
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "groupId"),
-            new Sort.Order(Sort.Direction.DESC, "time"),
+            new Sort.Order(Sort.Direction.DESC, "diagnosticId"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 
@@ -167,6 +168,7 @@ public class UserDiagnosticPointRelationService {
             entity.setDiagnosticTime(pointTime);
             entity.setTime(new Date());
             entity.setStatus(CommonStatus.ENABLED);
+            entity.setCancelled(YesNoEnum.NO);
             entity = repository.save(entity);
             relations.add(beanConverter.convert(entity));
         }
@@ -245,5 +247,21 @@ public class UserDiagnosticPointRelationService {
         }
         UserDiagnosticPointRelationBean bean = beanConverter.convert(entity);
         return bean;
+    }
+
+    @Transactional
+    public List<UserDiagnosticPointRelationBean> cancelUserDiagnosticRelation(long userId, long groupId) {
+        logger.info("user={} cancel diagnostic point date with groupId={}", userId, groupId);
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndGroupId(userId, groupId, sort);
+        if (VerifyUtil.isListEmpty(entities)) {
+            logger.info("not user's diagnostic point relation");
+            return new ArrayList<>();
+        }
+
+        for (UserDiagnosticPointRelationEntity entity : entities) {
+            entity.setCancelled(YesNoEnum.YES);
+        }
+        List<UserDiagnosticPointRelationBean> beans = entitiesToBeans(repository.save(entities));
+        return beans;
     }
 }

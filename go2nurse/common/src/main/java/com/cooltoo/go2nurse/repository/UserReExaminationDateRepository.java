@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface UserReExaminationDateRepository extends JpaRepository<UserReExaminationDateEntity, Long> {
 
-    List<UserReExaminationDateEntity> findByUserIdAndHospitalizedGroupIdAndStatusIn(Long userId, Long hospitalizedGroupId, List<CommonStatus> status, Sort sort);
+    List<UserReExaminationDateEntity> findByUserIdAndGroupIdAndStatusIn(Long userId, Long groupId, List<CommonStatus> status, Sort sort);
 
     List<UserReExaminationDateEntity> findByUserIdAndStatusIn(Long userId, List<CommonStatus> status, Sort sort);
 }

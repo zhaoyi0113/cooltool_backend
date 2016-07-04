@@ -27,6 +27,7 @@ public interface UserDiagnosticPointRelationRepository extends JpaRepository<Use
             " AND (?2 IS NULL OR relation.status=?2)")
     Page<UserDiagnosticPointRelationEntity> findByUserIdAndStatus(Long userId, CommonStatus status, Pageable page);
 
+    List<UserDiagnosticPointRelationEntity> findByUserIdAndGroupId(Long userId, Long groupId, Sort sort);
     List<UserDiagnosticPointRelationEntity> findByUserIdAndGroupIdAndStatus(Long userId, Long groupId, CommonStatus status, Sort sort);
     List<UserDiagnosticPointRelationEntity> findByUserIdAndGroupIdAndDiagnosticId(Long userId, Long groupId, Long diagnosticId, Sort sort);
 }
