@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class QuestionnaireBean {
     private long id;
+    private long categoryId;
     private String title;
     private String description;
     private String conclusion;
@@ -30,6 +31,10 @@ public class QuestionnaireBean {
 
     public long getId() {
         return id;
+    }
+
+    public long getCategoryId() {
+        return categoryId;
     }
 
     public String getTitle() {
@@ -58,6 +63,10 @@ public class QuestionnaireBean {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public void setTitle(String title) {
@@ -127,6 +136,7 @@ public class QuestionnaireBean {
     public QuestionnaireBean clone() {
         QuestionnaireBean bean = new QuestionnaireBean();
         bean.setId(id);
+        bean.setCategoryId(categoryId);
         bean.setTitle(title);
         bean.setDescription(description);
         bean.setConclusion(conclusion);
@@ -152,6 +162,7 @@ public class QuestionnaireBean {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", categoryId=").append(categoryId);
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", title=").append(title);
         msg.append(", description=").append(description);

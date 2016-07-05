@@ -12,6 +12,7 @@ import java.util.Date;
 @Table(name = "go2nurse_questionnaire")
 public class QuestionnaireEntity {
     private long id;
+    private long categoryId;
     private String title;
     private String description;
     private String conclusion;
@@ -24,6 +25,11 @@ public class QuestionnaireEntity {
     @Column(name = "id")
     public long getId() {
         return id;
+    }
+
+    @Column(name = "category_id")
+    public long getCategoryId() {
+        return categoryId;
     }
 
     @Column(name = "title")
@@ -60,6 +66,10 @@ public class QuestionnaireEntity {
         this.id = id;
     }
 
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -88,6 +98,7 @@ public class QuestionnaireEntity {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", categoryId=").append(categoryId);
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", title=").append(title);
         msg.append(", description=").append(description);

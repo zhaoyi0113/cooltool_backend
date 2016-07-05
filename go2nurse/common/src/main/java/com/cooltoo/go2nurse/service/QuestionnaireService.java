@@ -6,13 +6,17 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.QuestionBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
+import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
 import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
 import com.cooltoo.go2nurse.constants.QuestionType;
 import com.cooltoo.go2nurse.converter.QuestionBeanConverter;
 import com.cooltoo.go2nurse.converter.QuestionnaireBeanConverter;
+import com.cooltoo.go2nurse.converter.QuestionnaireCategoryBeanConverter;
 import com.cooltoo.go2nurse.entities.QuestionEntity;
+import com.cooltoo.go2nurse.entities.QuestionnaireCategoryEntity;
 import com.cooltoo.go2nurse.entities.QuestionnaireEntity;
 import com.cooltoo.go2nurse.repository.QuestionRepository;
+import com.cooltoo.go2nurse.repository.QuestionnaireCategoryRepository;
 import com.cooltoo.go2nurse.repository.QuestionnaireRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -46,10 +50,16 @@ public class QuestionnaireService {
             new Sort.Order(Sort.Direction.DESC, "time")
     );
 
+    private static final Sort questionnaireCategorySort = new Sort(
+            new Sort.Order(Sort.Direction.DESC, "time")
+    );
+
     @Autowired private QuestionRepository questionRep;
     @Autowired private QuestionnaireRepository questionnaireRep;
+    @Autowired private QuestionnaireCategoryRepository questionnaireCategoryRep;
     @Autowired private QuestionBeanConverter questionConverter;
     @Autowired private QuestionnaireBeanConverter questionnaireConverter;
+    @Autowired private QuestionnaireCategoryBeanConverter questionnaireCategoryConverter;
 
     //=================================================================
     //         getter
@@ -163,29 +173,7 @@ public class QuestionnaireService {
         return beans;
     }
 
-    public List<QuestionnaireBean> getQuestionnaireByUserHospitalizedBean(List<UserHospitalizedRelationBean> userHospitalizedBeans) {
-        logger.info("get questionnaire by user hospitalized relation={}", userHospitalizedBeans);
-        List<QuestionnaireBean> beans = new ArrayList<>();
-        if (VerifyUtil.isListEmpty(userHospitalizedBeans)) {
-            for (UserHospitalizedRelationBean userHospitalized : userHospitalizedBeans) {
-                if (YesNoEnum.YES.equals(userHospitalized.getHasLeave())) {
-                    continue;
-                }
-                List<QuestionnaireBean> tmpBeans = getQuestionnaireByHospitalId(userHospitalized.getHospitalId());
-                for (QuestionnaireBean tmp : tmpBeans) {
-                    beans.add(tmp);
-                }
-            }
-        }
-        else {
-            beans = getQuestionnaireByHospitalId(0);
-            logger.info("get questionnaire without hospital");
-        }
-        logger.info("count is {}",beans.size());
-        return beans;
-    }
-
-    public List<QuestionnaireBean> getQuestionnaireByHospitalId(int hospitalId) {
+    private List<QuestionnaireBean> getQuestionnaireByHospitalId(int hospitalId) {
         logger.info("get questionnaire by hospitalId={}", hospitalId);
         List<QuestionnaireEntity> resultSet = questionnaireRep.findByHospitalId(hospitalId, questionnaireSort);
         List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(resultSet);
@@ -193,35 +181,15 @@ public class QuestionnaireService {
         return beans;
     }
 
-    public QuestionnaireBean getQuestionnaireWithQuestions(long questionnaireId) {
-        logger.info("get questionnaire with questions by questionnaireId={}", questionnaireId);
-        QuestionnaireEntity entity = questionnaireRep.findOne(questionnaireId);
-        if (null==entity) {
-            return null;
-        }
-
-        QuestionnaireBean bean = questionnaireConverter.convert(entity);
-        List<QuestionBean> questions = getQuestionByQuestionnaireId(questionnaireId);
-        bean.setQuestions(questions);
-        logger.info("questions count in questionnaire is {}", questions.size());
-        return bean;
-    }
-
     public List<QuestionnaireBean> getQuestionnaireWithQuestionsByIds(String strQuestionnaireIds) {
         logger.info("get questionnaire with questions by questionnaireIds={}", strQuestionnaireIds);
-        List<QuestionnaireBean> questionnaires;
-        if (VerifyUtil.isIds(strQuestionnaireIds)) {
-            List<Long> questionnaireIds = VerifyUtil.parseLongIds(strQuestionnaireIds);
-            questionnaires = getQuestionnaireWithQuestionsByIds(questionnaireIds);
-        }
-        else {
-            questionnaires = new ArrayList<>();
-        }
+        List<Long> questionnaireIds = VerifyUtil.parseLongIds(strQuestionnaireIds);
+        List<QuestionnaireBean> questionnaires = getQuestionnaireWithQuestionsByIds(questionnaireIds);
         logger.info("get questionnaire with question count is {}", questionnaires.size());
         return questionnaires;
     }
 
-    public List<QuestionnaireBean> getQuestionnaireWithQuestionsByIds(List<Long> questionnaireIds) {
+    private List<QuestionnaireBean> getQuestionnaireWithQuestionsByIds(List<Long> questionnaireIds) {
         logger.info("get questionnaire with questions by questionnaireIds={}", questionnaireIds);
         List<QuestionnaireBean> questionnaires;
         if (!VerifyUtil.isListEmpty(questionnaireIds)) {
@@ -248,6 +216,108 @@ public class QuestionnaireService {
         return questionnaires;
     }
 
+    public long getCategoryCount() {
+        long count = questionnaireCategoryRep.count();
+        logger.info("get questionnaire category count={}", count);
+        return count;
+    }
+
+    public List<QuestionnaireCategoryBean> getCategoryByPage(int pageIndex, int sizeOfPage) {
+        // get all questionnaire category
+        logger.info("get questionnaire category at pageIndex={} sizePerPage={}", pageIndex, sizeOfPage);
+        PageRequest pageCategory = new PageRequest(pageIndex, sizeOfPage, questionnaireCategorySort);
+        Page<QuestionnaireCategoryEntity> resultSet = questionnaireCategoryRep.findAll(pageCategory);
+        List<QuestionnaireCategoryBean> beans = questionnaireCategoryEntitiesToBeans(resultSet);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
+    private List<QuestionnaireCategoryBean> getCategoryByIds(List<Long> categoryIds) {
+        logger.info("get questionnaire category by category ids={}", categoryIds);
+        List<QuestionnaireCategoryEntity> categoryResultSet = questionnaireCategoryRep.findByIdIn(categoryIds, questionnaireSort);
+        List<QuestionnaireCategoryBean> categories = questionnaireCategoryEntitiesToBeans(categoryResultSet);
+        logger.info("get questionnaire category count is {}", categories.size());
+        return categories;
+    }
+
+    public List<QuestionnaireCategoryBean> getCategoryWithQuestionnaireByIds(String strCategoriesId) {
+        logger.info("get questionnaire category with questionnaire by category ids={}", strCategoriesId);
+        List<Long> categoryIds = VerifyUtil.parseLongIds(strCategoriesId);
+        List<QuestionnaireCategoryBean> categories = getCategoryWithQuestionnaireByIds(categoryIds);
+        logger.info("get questionnaire category with questionnaire count is {}", categories.size());
+        return categories;
+    }
+
+    public List<QuestionnaireCategoryBean> getCategoryWithQuestionnaireByIds(List<Long> categoriesId) {
+        logger.info("get questionnaire category with questionnaire by category ids={}", categoriesId);
+        List<QuestionnaireCategoryBean> categories;
+        if (!VerifyUtil.isListEmpty(categoriesId)) {
+            List<QuestionnaireCategoryEntity> categoryResultSet = questionnaireCategoryRep.findByIdIn(categoriesId, questionnaireSort);
+            List<QuestionnaireEntity> questionnaireResultSet = questionnaireRep.findByCategoryIdIn(categoriesId, questionSort);
+            categories = questionnaireCategoryEntitiesToBeans(categoryResultSet);
+            List<QuestionnaireBean> questionnaires = questionnaireEntitiesToBeans(questionnaireResultSet);
+
+            List<QuestionnaireBean> beans;
+            for (QuestionnaireCategoryBean category : categories) {
+                beans = new ArrayList<>();
+                for (QuestionnaireBean questionnaire : questionnaires) {
+                    if (category.getId() == questionnaire.getCategoryId()) {
+                        beans.add(questionnaire);
+                    }
+                }
+                category.setQuestionnaires(beans);
+            }
+        }
+        else {
+            categories = new ArrayList<>();
+        }
+        logger.info("get questionnaire category with questionnaire count is {}", categories.size());
+        return categories;
+    }
+
+    public List<QuestionnaireCategoryBean> getCategoryWithQuestionnaireByUserHospitalizedBean(
+            List<UserHospitalizedRelationBean> userHospitalizedBeans) {
+        logger.info("get questionnaire category by user hospitalized relation={}", userHospitalizedBeans);
+        List<QuestionnaireBean> questionnaires = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(userHospitalizedBeans)) {
+            for (UserHospitalizedRelationBean userHospitalized : userHospitalizedBeans) {
+                if (YesNoEnum.YES.equals(userHospitalized.getHasLeave())) {
+                    continue;
+                }
+                List<QuestionnaireBean> tmpBeans = getQuestionnaireByHospitalId(userHospitalized.getHospitalId());
+                for (QuestionnaireBean tmp : tmpBeans) {
+                    questionnaires.add(tmp);
+                }
+            }
+        }
+        else {
+            questionnaires = getQuestionnaireByHospitalId(0);
+            logger.info("get questionnaire without hospital");
+        }
+
+        List<Long> categoryIds = new ArrayList<>();
+        for (QuestionnaireBean tmp : questionnaires) {
+            if (!categoryIds.contains(tmp.getCategoryId())) {
+                categoryIds.add(tmp.getCategoryId());
+            }
+        }
+
+        List<QuestionnaireCategoryBean> categories = getCategoryByIds(categoryIds);
+        List<QuestionnaireBean> beans;
+        for (QuestionnaireCategoryBean category : categories) {
+            beans = new ArrayList<>();
+            for (QuestionnaireBean questionnaire : questionnaires) {
+                if (category.getId() == questionnaire.getCategoryId()) {
+                    beans.add(questionnaire);
+                }
+            }
+            category.setQuestionnaires(beans);
+        }
+
+        logger.info("count is {}",categories.size());
+        return categories;
+    }
+
     private List<QuestionBean> questionEntitiesToBeans(Iterable<QuestionEntity> entities) {
         List<QuestionBean> beans = new ArrayList<>();
         if (null!=entities) {
@@ -264,6 +334,17 @@ public class QuestionnaireService {
         if (null!=entities) {
             for (QuestionnaireEntity entity : entities) {
                 QuestionnaireBean bean = questionnaireConverter.convert(entity);
+                beans.add(bean);
+            }
+        }
+        return beans;
+    }
+
+    private List<QuestionnaireCategoryBean> questionnaireCategoryEntitiesToBeans(Iterable<QuestionnaireCategoryEntity> entities) {
+        List<QuestionnaireCategoryBean> beans = new ArrayList<>();
+        if (null!=entities) {
+            for (QuestionnaireCategoryEntity entity : entities) {
+                QuestionnaireCategoryBean bean = questionnaireCategoryConverter.convert(entity);
                 beans.add(bean);
             }
         }
@@ -313,7 +394,7 @@ public class QuestionnaireService {
     }
 
     @Transactional
-    public QuestionnaireBean updateQuestionnaire(long questionnaireId, String title, String description, String conclusion, int hospitalId) {
+    public QuestionnaireBean updateQuestionnaire(long questionnaireId, String title, String description, String conclusion, int hospitalId, long categoryId) {
         logger.info("update questionnaire={} with title={} description={} conclusion={} hospitalId={}",
                 questionnaireId, title, description, conclusion, hospitalId);
         boolean changed = false;
@@ -339,11 +420,41 @@ public class QuestionnaireService {
             entity.setHospitalId(hospitalId);
             changed = true;
         }
+        if (categoryId>0 && categoryId!=entity.getCategoryId()) {
+            entity.setCategoryId(categoryId);
+            changed = true;
+        }
 
         if (changed) {
             entity = questionnaireRep.save(entity);
         }
         return questionnaireConverter.convert(entity);
+    }
+
+    @Transactional
+    public QuestionnaireCategoryBean updateCategory(long questionnaireCategoryId, String name, String instruction) {
+        logger.info("update questionnaireCategory={} with name={} instruction={}",
+                questionnaireCategoryId, name, instruction);
+        boolean changed = false;
+
+        QuestionnaireCategoryEntity entity = questionnaireCategoryRep.findOne(questionnaireCategoryId);
+        if (null==entity) {
+            logger.info("questionnaire category not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (!VerifyUtil.isStringEmpty(name) && !name.trim().equals(entity.getName())) {
+            entity.setName(name.trim());
+            changed = true;
+        }
+        if (!VerifyUtil.isStringEmpty(instruction) && !instruction.equals(entity.getInstruction())) {
+            entity.setInstruction(instruction);
+            changed = true;
+        }
+
+        if (changed) {
+            entity = questionnaireCategoryRep.save(entity);
+        }
+        return questionnaireCategoryConverter.convert(entity);
     }
 
     //=================================================================
@@ -431,9 +542,33 @@ public class QuestionnaireService {
         throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
 
+    @Transactional
+    public String deleteCategoryByIds(String strQuestionnaireCategoryIds) {
+        logger.info("delete questionnaire category by questionnaireCategoryIds={}",
+                strQuestionnaireCategoryIds);
+        if (VerifyUtil.isIds(strQuestionnaireCategoryIds)) {
+            List<Long> questionnaireCategoryIds = VerifyUtil.parseLongIds(strQuestionnaireCategoryIds);
+            // set questionnaire id = 0
+            List<QuestionnaireEntity> questionnaires = questionnaireRep.findByCategoryIdIn(questionnaireCategoryIds, questionnaireSort);
+            if (null!=questionnaires) {
+                for (QuestionnaireEntity tmpE : questionnaires) {
+                    tmpE.setCategoryId(0);
+                }
+                questionnaireRep.save(questionnaires);
+            }
+            // delete questionnaire
+            List<QuestionnaireCategoryEntity> questionnaireCategories =
+                    questionnaireCategoryRep.findByIdIn(questionnaireCategoryIds, questionnaireCategorySort);
+            questionnaireCategoryRep.delete(questionnaireCategories);
+
+            return questionnaireCategoryIds.toString();
+        }
+        throw new BadRequestException(ErrorCode.DATA_ERROR);
+    }
+
 
     //=================================================================
-    //         add question and questionnaire
+    //         add question, questionnaire and questionnaire category
     //=================================================================
     @Transactional
     public QuestionBean addQuestion(long questionnaireId, String content, String options, String strType, int grade) {
@@ -495,4 +630,29 @@ public class QuestionnaireService {
         return questionnaireConverter.convert(entity);
     }
 
+    @Transactional
+    public QuestionnaireCategoryBean addCategory(String name, String instruction) {
+        logger.info("add questionnaire category by name={} instruction={}", name, instruction);
+
+        QuestionnaireCategoryEntity entity = new QuestionnaireCategoryEntity();
+        if (VerifyUtil.isStringEmpty(name)) {
+            logger.error("add questionnaire category : name is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        else if (questionnaireCategoryRep.countByName(name.trim())>0) {
+            logger.error("add questionnaire : title is exist");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        else {
+            entity.setName(name.trim());
+        }
+        if (!VerifyUtil.isStringEmpty(instruction)) {
+            entity.setInstruction(instruction);
+        }
+        entity.setTime(new Date());
+        entity.setStatus(CommonStatus.ENABLED);
+        entity = questionnaireCategoryRep.save(entity);
+
+        return questionnaireCategoryConverter.convert(entity);
+    }
 }

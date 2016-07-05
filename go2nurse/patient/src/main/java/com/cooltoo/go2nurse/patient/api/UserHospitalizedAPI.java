@@ -1,6 +1,5 @@
 package com.cooltoo.go2nurse.patient.api;
 
-import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -11,6 +10,9 @@ import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.patient.beans.UserHospitalizedCorusesBean;
 import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.util.NumberUtil;
+import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,8 @@ import java.util.Map;
  */
 @Path("/hospitalized_relation")
 public class UserHospitalizedAPI {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserHospitalizedAPI.class);
 
     @Autowired private UserService userService;
     @Autowired private CourseRelationManageService courseManageService;
@@ -59,11 +63,13 @@ public class UserHospitalizedAPI {
                                           @FormParam("hospital_department_unique_id") @DefaultValue("") String hospitalAndDepartmentUniqueId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        String[] hospital_department = hospitalAndDepartmentUniqueId.split("_");
-        if (hospital_department.length!=2) {
+        if (VerifyUtil.isStringEmpty(hospitalAndDepartmentUniqueId) || hospitalAndDepartmentUniqueId.length()!=12) {
+            logger.error("hospital department unique ids={} is invalid", hospitalAndDepartmentUniqueId);
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospital_department[0].trim(), hospital_department[1].trim());
+        String hospitalUniqueId = hospitalAndDepartmentUniqueId.substring(0, 6);
+        String departmentUniqueId = hospitalAndDepartmentUniqueId.substring(6);
+        UserHospitalizedRelationBean relation = relationService.addRelation(userId, hospitalUniqueId, departmentUniqueId);
         return Response.ok(relation).build();
     }
 
@@ -131,10 +137,10 @@ public class UserHospitalizedAPI {
     public  Response getUserHospitalizedCourses(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserBean user = userService.getUser(userId);
+        boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
 
         List<UserHospitalizedCorusesBean> beans = new ArrayList<>();
-
-        if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide())) {
+        if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
             Map<DiagnosticEnumeration, List<CourseBean>> courses
                     = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
             courses.forEach((key, value) -> {

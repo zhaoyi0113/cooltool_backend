@@ -14,6 +14,7 @@ public class QuestionnaireBeanConverter implements Converter<QuestionnaireEntity
     public QuestionnaireBean convert(QuestionnaireEntity source) {
         QuestionnaireBean bean = new QuestionnaireBean();
         bean.setId(source.getId());
+        bean.setCategoryId(source.getCategoryId());
         bean.setTitle(source.getTitle());
         bean.setDescription(source.getDescription());
         bean.setConclusion(source.getConclusion());

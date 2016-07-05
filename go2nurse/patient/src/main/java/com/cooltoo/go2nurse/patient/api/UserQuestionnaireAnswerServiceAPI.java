@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
+import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
 import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
 import com.cooltoo.go2nurse.beans.UserQuestionnaireAnswerBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
@@ -29,7 +30,7 @@ public class UserQuestionnaireAnswerServiceAPI {
     @Autowired private QuestionnaireService questionnaireService;
     @Autowired private UserQuestionnaireAnswerService userAnswerService;
 
-    @Path("/questionnaire_in_hospital")
+    @Path("/questionnaire_of_hospital_or_not")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
@@ -37,7 +38,7 @@ public class UserQuestionnaireAnswerServiceAPI {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long groupId = userDiagnosticService.getUserCurrentGroupId(userId, System.currentTimeMillis());
         List<UserHospitalizedRelationBean> userHospitalizedBeans = userHospitalizedService.getUserHospitalizedRelationByGroupId(userId, groupId);
-        List<QuestionnaireBean> returnValue = questionnaireService.getQuestionnaireByUserHospitalizedBean(userHospitalizedBeans);
+        List<QuestionnaireCategoryBean> returnValue = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(userHospitalizedBeans);
         return Response.ok(returnValue).build();
     }
 

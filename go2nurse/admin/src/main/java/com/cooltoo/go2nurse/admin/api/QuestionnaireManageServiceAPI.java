@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.go2nurse.beans.QuestionBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
+import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
 import com.cooltoo.go2nurse.service.QuestionnaireService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * Created by zhaolisong on 16/6/28.
  */
 @Path("/admin/questionnaire")
-public class QuestionnaireServiceAPI {
+public class QuestionnaireManageServiceAPI {
 
     @Autowired private QuestionnaireService questionnaireService;
 
@@ -36,7 +37,15 @@ public class QuestionnaireServiceAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuestionnaireCount(@Context HttpServletRequest request) {
-        long count = questionnaireService.getQuestionCount();
+        long count = questionnaireService.getQuestionnaireCount();
+        return Response.ok(count).build();
+    }
+
+    @Path("/questionnaire_category/count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireCategoryCount(@Context HttpServletRequest request) {
+        long count = questionnaireService.getCategoryCount();
         return Response.ok(count).build();
     }
 
@@ -59,6 +68,17 @@ public class QuestionnaireServiceAPI {
                                            @PathParam("number") @DefaultValue("10") int number
     ) {
         List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireByPage(index, number);
+        return Response.ok(questionnaires).build();
+    }
+
+    @Path("/questionnaire_category/{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireCategoryByPage(@Context HttpServletRequest request,
+                                                   @PathParam("index")  @DefaultValue("0")  int index,
+                                                   @PathParam("number") @DefaultValue("10") int number
+    ) {
+        List<QuestionnaireCategoryBean> questionnaires = questionnaireService.getCategoryByPage(index, number);
         return Response.ok(questionnaires).build();
     }
 
@@ -111,6 +131,16 @@ public class QuestionnaireServiceAPI {
         return Response.ok(questionnaires).build();
     }
 
+    @Path("/questionnaire_category/with_questionnaire")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireCategoryWithQuestionnaire(@Context HttpServletRequest request,
+                                                              @QueryParam("category_ids") String categoryIds
+    ) {
+        List<QuestionnaireCategoryBean> categories = questionnaireService.getCategoryWithQuestionnaireByIds(categoryIds);
+        return Response.ok(categories).build();
+    }
+
     //=======================================================================
     //    update
     //=======================================================================
@@ -138,9 +168,22 @@ public class QuestionnaireServiceAPI {
                                         @FormParam("title") @DefaultValue("") String title,
                                         @FormParam("description") @DefaultValue("") String description,
                                         @FormParam("conclusion") @DefaultValue("") String conclusion,
-                                        @FormParam("hospital_id") @DefaultValue("0") int hospitalId
+                                        @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                        @FormParam("category_id") @DefaultValue("0") long categoryId
     ) {
-        QuestionnaireBean bean = questionnaireService.updateQuestionnaire(id, title, description, conclusion, hospitalId);
+        QuestionnaireBean bean = questionnaireService.updateQuestionnaire(id, title, description, conclusion, hospitalId, categoryId);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/update/questionnaire_category")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateQuestionnaireCategory(@Context HttpServletRequest request,
+                                                @FormParam("id") long id,
+                                                @FormParam("name") @DefaultValue("") String name,
+                                                @FormParam("instruction") @DefaultValue("") String instruction
+    ) {
+        QuestionnaireCategoryBean bean = questionnaireService.updateCategory(id, name, instruction);
         return Response.ok(bean).build();
     }
 
@@ -178,6 +221,16 @@ public class QuestionnaireServiceAPI {
         return Response.ok(deleteIds).build();
     }
 
+    @Path("/questionnaire_category")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteQuestionnaireCategory(@Context HttpServletRequest request,
+                                                @FormParam("ids") @DefaultValue("") String ids
+    ) {
+        String deleteIds = questionnaireService.deleteCategoryByIds(ids);
+        return Response.ok(deleteIds).build();
+    }
+
     //=======================================================================
     //    add
     //=======================================================================
@@ -206,6 +259,17 @@ public class QuestionnaireServiceAPI {
                                      @FormParam("hospital_id") @DefaultValue("0") int hospitalId
     ) {
         QuestionnaireBean bean = questionnaireService.addQuestionnaire(title, description, conclusion, hospitalId);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/questionnaire_category/add")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addQuestionnaireCategory(@Context HttpServletRequest request,
+                                             @FormParam("name") @DefaultValue("") String name,
+                                             @FormParam("instruction") @DefaultValue("") String instruction
+    ) {
+        QuestionnaireCategoryBean bean = questionnaireService.addCategory(name, instruction);
         return Response.ok(bean).build();
     }
 }

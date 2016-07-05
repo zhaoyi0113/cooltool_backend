@@ -70,6 +70,25 @@ public class UserCourseRelationService {
         return returnValue;
     }
 
+    public boolean isUserSelectedHospitalCoursesNow(long userId) {
+        logger.info("Is user={} selected hospital courses now", userId);
+        boolean userHasSelectedHospitalCourse = false;
+        // get current diagnostic group ID
+        long currentDiagnosticGroupId = userDiagnosticRelationService.getUserCurrentGroupId(userId, System.currentTimeMillis());
+        // the hospital that user hospitalized
+        List<UserHospitalizedRelationBean> userHospitalized =
+                userHospitalizedRelationService.getUserHospitalizedRelationByGroupId(userId, currentDiagnosticGroupId);
+        for (UserHospitalizedRelationBean hospitalized : userHospitalized) {
+            // has leave this department
+            if (!YesNoEnum.YES.equals(hospitalized.getHasLeave())) {
+                userHasSelectedHospitalCourse = true;
+                break;
+            }
+        }
+        logger.info("user has selected={} now", userHasSelectedHospitalCourse);
+        return userHasSelectedHospitalCourse;
+    }
+
     public Map<DiagnosticEnumeration, List<CourseBean>> getUserCurrentCoursesWithExtensionNursingOfHospital(long userId) {
         logger.info("get current hospitalized relation courses by userId={}", userId);
 
@@ -94,16 +113,11 @@ public class UserCourseRelationService {
                             hospitalized.getHospitalId(), hospitalized.getDepartmentId()
                     );
 
-            if (null==returnVal) {
-                returnVal = coursesInDepartment;
-                continue;
-            }
-
             Set<DiagnosticEnumeration> keys = coursesInDepartment.keySet();
             for (DiagnosticEnumeration key : keys) {
                 List<CourseBean> courses = coursesInDepartment.get(key);
                 List<CourseBean> finalCourses = returnVal.get(key);
-                if (null==finalCourses) {
+                if (null == finalCourses) {
                     returnVal.put(key, courses);
                     continue;
                 }

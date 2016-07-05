@@ -13,4 +13,5 @@ public interface QuestionnaireRepository extends JpaRepository<QuestionnaireEnti
     long countByTitle(String title);
     List<QuestionnaireEntity> findByIdIn(List<Long> ids, Sort sort);
     List<QuestionnaireEntity> findByHospitalId(Integer hospitalId, Sort sort);
+    List<QuestionnaireEntity> findByCategoryIdIn(List<Long> categoryIds, Sort sort);
 }
