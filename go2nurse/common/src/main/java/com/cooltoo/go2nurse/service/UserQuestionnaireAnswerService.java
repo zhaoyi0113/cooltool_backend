@@ -3,12 +3,7 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.beans.QuestionBean;
-import com.cooltoo.go2nurse.beans.QuestionnaireBean;
-import com.cooltoo.go2nurse.beans.QuestionnaireConclusionBean;
-import com.cooltoo.go2nurse.beans.QuestionOptionBean;
-import com.cooltoo.go2nurse.beans.UserQuestionnaireAnswerBean;
-import com.cooltoo.go2nurse.constants.QuestionType;
+import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.converter.UserQuestionnaireAnswerBeanConverter;
 import com.cooltoo.go2nurse.entities.QuestionEntity;
 import com.cooltoo.go2nurse.entities.UserQuestionnaireAnswerEntity;
@@ -34,7 +29,8 @@ public class UserQuestionnaireAnswerService {
     private static final Logger logger = LoggerFactory.getLogger(UserQuestionnaireAnswerService.class);
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "id")
+            new Sort.Order(Sort.Direction.DESC, "groupId"),
+            new Sort.Order(Sort.Direction.ASC, "questionId")
     );
 
     @Autowired private UserQuestionnaireAnswerRepository repository;
@@ -44,10 +40,16 @@ public class UserQuestionnaireAnswerService {
     @Autowired private UserRepository userRepository;
     @Autowired private QuestionRepository questionRepository;
     @Autowired private QuestionnaireService questionnaireService;
+    @Autowired private PatientService patientService;
 
     //==========================================================================
     //                        getting
     //==========================================================================
+    public long newQuestionnaireGroupId() {
+        long groupId = System.currentTimeMillis();
+        logger.info("get user-questionnaire-answer group id={}", groupId);
+        return groupId;
+    }
 
     public List<QuestionnaireBean> getUserQuestionnaire(long userId) {
         logger.info("get all user={} 's questionnaire", userId);
@@ -58,7 +60,7 @@ public class UserQuestionnaireAnswerService {
             return new ArrayList<>();
         }
 
-        List<QuestionnaireBean> questionnaires = fillQuestionnaireAnswer(allAnswers, false);
+        List<QuestionnaireBean> questionnaires = fillQuestionnaireAnswer(allAnswers);
         logger.info("count of user's questionnaire is {}", questionnaires.size());
         return questionnaires;
     }
@@ -66,7 +68,7 @@ public class UserQuestionnaireAnswerService {
     public QuestionnaireBean getUserQuestionnaireWithAnswer(long userId, long questionnaireId) {
         logger.info("get user{} 's questionnaire={}", userId, questionnaireId);
         List<UserQuestionnaireAnswerBean> questionnaireAnswers = getUserQuestionnaireAnswer(userId, questionnaireId);
-        List<QuestionnaireBean> questionnaire = fillQuestionnaireAnswer(questionnaireAnswers, true);
+        List<QuestionnaireBean> questionnaire = fillQuestionnaireAnswer(questionnaireAnswers);
         if (VerifyUtil.isListEmpty(questionnaire)) {
             return null;
         }
@@ -91,77 +93,106 @@ public class UserQuestionnaireAnswerService {
         return beans;
     }
 
-    private List<QuestionnaireBean> fillQuestionnaireAnswer(List<UserQuestionnaireAnswerBean> allAnswers, boolean fillAnswer) {
-        logger.info("fill answer ={}", fillAnswer);
+    private List<QuestionnaireBean> fillQuestionnaireAnswer(List<UserQuestionnaireAnswerBean> allAnswers) {
         if (VerifyUtil.isListEmpty(allAnswers)) {
             logger.info("count is {}", 0);
             return new ArrayList<>();
         }
-        // cache the answer and questionnaire id
-        Map<Long, UserQuestionnaireAnswerBean> questionIdToAnswer = new HashMap<>();
-        List<Long> questionnaireIds = new ArrayList<>();
-        for (UserQuestionnaireAnswerBean answer : allAnswers) {
-            if (!questionIdToAnswer.containsKey(answer.getId())) {
-                questionIdToAnswer.put(answer.getQuestionId(), answer);
+
+        // sort the answer by userId and groupId
+        Comparator sorter = new Comparator<UserQuestionnaireAnswerBean>() {
+            @Override
+            public int compare(UserQuestionnaireAnswerBean obj1, UserQuestionnaireAnswerBean obj2) {
+                if (obj1.getUserId() == obj2.getUserId()) {
+                    if (obj1.getGroupId()==obj2.getGroupId()) {
+                        return (int)(obj1.getQuestionId() - obj2.getQuestionId());
+                    }
+                    return (int) (obj2.getGroupId() - obj1.getGroupId());// 倒序
+                }
+                return (int) (obj1.getUserId() - obj2.getUserId());
             }
-            if (questionnaireIds.contains(answer.getQuestionnaireId())) {
+        };
+        Collections.sort(allAnswers, sorter);
+
+        // cache groupId patientId questionnaireId
+        List<Long> questionnaireIds = new ArrayList<>();
+        List<Long> patientIds = new ArrayList<>();
+        for (int i=0, count=allAnswers.size(); i<count; i ++) {
+            UserQuestionnaireAnswerBean answer = allAnswers.get(i);
+            if (!questionnaireIds.contains(answer.getQuestionnaireId())) {
+                questionnaireIds.add(answer.getQuestionnaireId());
+            }
+            if (!patientIds.contains(answer.getPatientId())) {
+                patientIds.add(answer.getPatientId());
+            }
+        }
+
+        // get questionnaires and patients
+        Map<Long, QuestionnaireBean> questionnairesIdToBean;
+        questionnairesIdToBean = questionnaireService.getQuestionnaireIdToBeanMapByIds(questionnaireIds);
+        Map<Long, PatientBean> patientsIdToBean;
+        patientsIdToBean= patientService.getAllIdToBeanByStatusAndIds(patientIds, CommonStatus.ENABLED);
+
+        // construct the return value
+        List<QuestionnaireBean> returnValue = new ArrayList<>();
+        Long currentGroupId = 0L;
+        QuestionnaireBean currentQuestionnaire = null;
+        int userScore = 0;
+        for (int i=0, count=allAnswers.size(); i<count; i++) {
+            UserQuestionnaireAnswerBean currentAnswer = allAnswers.get(i);
+            if (currentGroupId!=currentAnswer.getGroupId()) {
+                if (null!=currentQuestionnaire) {
+                    currentQuestionnaire.setUserScore(userScore);
+                }
+                currentQuestionnaire = questionnairesIdToBean.get(currentAnswer.getQuestionnaireId());
+                if (null!=currentQuestionnaire) {
+                    currentQuestionnaire = currentQuestionnaire.clone();
+                    currentQuestionnaire.setPatient(patientsIdToBean.get(currentAnswer.getPatientId()));
+                    currentQuestionnaire.setGroupId(currentAnswer.getGroupId());
+                    returnValue.add(currentQuestionnaire);
+                }
+
+                // reset groupId and userScore for another cycle
+                currentGroupId = currentAnswer.getGroupId();
+                userScore = 0;
+            }
+            if (null==currentQuestionnaire) {
                 continue;
             }
-            questionnaireIds.add(answer.getQuestionnaireId());
-        }
 
-        // get questionnaires with questions
-        List<QuestionnaireBean> questionnaires;
-        if (!fillAnswer) {
-            questionnaires = questionnaireService.getQuestionnaireByIds(questionnaireIds);
-            logger.info("count is {}", questionnaires.size());
-            return questionnaires;
+            // calculate  score
+            String answer = currentAnswer.getAnswer();
+            boolean single = answer.indexOf('{')==answer.lastIndexOf('{');
+            if (single) {
+                QuestionOptionBean userOption = go2NurseUtility.parseJsonBean(answer, QuestionOptionBean.class);
+                if (null != userOption) {
+                    userScore += userOption.getScore();
+                }
+            }
+            else {
+                List<QuestionOptionBean> userOptions = go2NurseUtility.parseJsonList(answer, QuestionOptionBean.class);
+                for (QuestionOptionBean userOption : userOptions) {
+                    userScore += userOption.getScore();
+                }
+            }
         }
-
-        questionnaires = questionnaireService.getQuestionnaireWithQuestionsByIds(questionnaireIds);
-        if (VerifyUtil.isListEmpty(questionnaires)) {
-            logger.info("count is {}", 0);
-            return new ArrayList<>();
+        if (null!=currentQuestionnaire) {
+            currentQuestionnaire.setUserScore(userScore);
         }
 
         // fill answer to question bean
-        int userScore = 0;
-        for (QuestionnaireBean questionnaire : questionnaires) {
+        for (QuestionnaireBean questionnaire : returnValue) {
             List<QuestionnaireConclusionBean> conclusions = go2NurseUtility.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
-            List<QuestionBean> questions = questionnaire.getQuestions();
-            if (VerifyUtil.isListEmpty(questions)) {
-                continue;
-            }
-            for (QuestionBean question : questions) {
-                UserQuestionnaireAnswerBean answer = questionIdToAnswer.get(question.getId());
-                if(null!=answer) {
-                    question.setUserAnswer(answer.getAnswer());
-                    if (QuestionType.SINGLE_SELECTION.equals(question.getType())) {
-                        QuestionOptionBean userOption = go2NurseUtility.parseJsonBean(answer.getAnswer(), QuestionOptionBean.class);
-                        if (null != userOption) {
-                            userScore += userOption.getScore();
-                        }
-                    }
-                    else if (QuestionType.MULTI_SELECTION.equals(question.getType())) {
-                        List<QuestionOptionBean> userOptions = go2NurseUtility.parseJsonList(answer.getAnswer(), QuestionOptionBean.class);
-                        for (QuestionOptionBean userOption : userOptions) {
-                            userScore += userOption.getScore();
-                        }
-                    }
-                }
-            }
-            questionnaire.setUserScore(userScore);
             for (QuestionnaireConclusionBean conclusion : conclusions) {
-                if (conclusion.isThisConclusion(userScore)) {
+                if (conclusion.isThisConclusion(questionnaire.getUserScore())) {
                     questionnaire.setUserConclusion(conclusion);
                     break;
                 }
             }
-            userScore = 0;
         }
 
-        logger.info("count is {}", questionnaires.size());
-        return questionnaires;
+        logger.info("count is {}", returnValue.size());
+        return returnValue;
     }
 
     public List<UserQuestionnaireAnswerBean> entitiesToBeans(Iterable<UserQuestionnaireAnswerEntity> entities) {
@@ -200,6 +231,16 @@ public class UserQuestionnaireAnswerService {
         return beans;
     }
 
+    public List<UserQuestionnaireAnswerBean> deleteByUserIdAndGroupId(long userId, long groupId) {
+        logger.info("delete by userId={} and groupId={}", userId, groupId);
+        List<UserQuestionnaireAnswerEntity> entities = repository.findByUserIdAndGroupId(userId, groupId, sort);
+        List<UserQuestionnaireAnswerBean> beans = entitiesToBeans(entities);
+        if (!VerifyUtil.isListEmpty(entities)) {
+            repository.delete(entities);
+        }
+        return beans;
+    }
+
     public List<UserQuestionnaireAnswerBean> deleteByUserIdAndQuestionnaireId(long userId, long questionnaireId) {
         logger.info("delete by userId={} and questionnaireId={}", userId, questionnaireId);
         List<UserQuestionnaireAnswerEntity> entities = repository.findByUserIdAndQuestionnaireId(userId, questionnaireId, sort);
@@ -224,9 +265,10 @@ public class UserQuestionnaireAnswerService {
     //==========================================================================
     //                        updating
     //==========================================================================
-    public UserQuestionnaireAnswerBean updateAnswer(long userId, long questionId, String answer, String strStatus) {
-        logger.info("update answer by userId={} questionId={} answer={} and status={}");
-        List<UserQuestionnaireAnswerEntity> entities = repository.findByUserIdAndQuestionId(userId, questionId, sort);
+    public UserQuestionnaireAnswerBean updateAnswer(long userId, long groupId, long questionId, String answer, String strStatus) {
+        logger.info("update answer by userId={} groupId={} questionId={} answer={} and status={}",
+                userId, groupId, questionId, answer, strStatus);
+        List<UserQuestionnaireAnswerEntity> entities = repository.findByUserIdAndGroupIdAndQuestionId(userId, groupId, questionId, sort);
         if (!VerifyUtil.isListEmpty(entities)) {
             CommonStatus status = CommonStatus.parseString(strStatus);
             answer = VerifyUtil.isStringEmpty(answer) ? "" : answer.trim();
@@ -243,9 +285,9 @@ public class UserQuestionnaireAnswerService {
     //==========================================================================
     //                        adding
     //==========================================================================
-    public UserQuestionnaireAnswerBean addAnswer(long userId, long questionId, String answer) {
-        logger.info("add user={} answer question={} with answer={}",
-                userId, questionId, answer);
+    public UserQuestionnaireAnswerBean addAnswer(long userId, long patientId, long groupId, long questionId, String answer) {
+        logger.info("add user={} patient={} in groupId={} answer question={} with answer={}",
+                userId, patientId, groupId, questionId, answer);
         QuestionEntity question = questionRepository.findOne(questionId);
         if (null==question) {
             logger.error("question not exist");
@@ -259,8 +301,13 @@ public class UserQuestionnaireAnswerService {
         long questionnaireId = question.getQuestionnaireId();
         question = null;
 
+        groupId = groupId<0 ? 0 : groupId;
+        patientId = patientId<0 ? 0 : patientId;
+
         UserQuestionnaireAnswerEntity entity = new UserQuestionnaireAnswerEntity();
         entity.setUserId(userId);
+        entity.setPatientId(patientId);
+        entity.setGroupId(groupId);
         entity.setQuestionnaireId(questionnaireId);
         entity.setQuestionId(questionId);
         entity.setAnswer(answer);
@@ -268,7 +315,7 @@ public class UserQuestionnaireAnswerService {
         entity.setStatus(CommonStatus.ENABLED);
         entity = repository.save(entity);
 
-        List<UserQuestionnaireAnswerEntity> answers = repository.findByUserIdAndQuestionId(userId, questionId, sort);
+        List<UserQuestionnaireAnswerEntity> answers = repository.findByUserIdAndGroupIdAndQuestionId(userId, groupId, questionId, sort);
         if (!VerifyUtil.isListEmpty(answers)) {
             List<UserQuestionnaireAnswerEntity> deleteAnswer = new ArrayList<>();
             for (UserQuestionnaireAnswerEntity tmp : answers) {

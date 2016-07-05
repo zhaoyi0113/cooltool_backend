@@ -15,6 +15,8 @@ public class UserQuestionnaireAnswerBeanConverter implements Converter<UserQuest
         UserQuestionnaireAnswerBean bean = new UserQuestionnaireAnswerBean();
         bean.setId(source.getId());
         bean.setUserId(source.getUserId());
+        bean.setGroupId(source.getGroupId());
+        bean.setPatientId(source.getPatientId());
         bean.setQuestionnaireId(source.getQuestionnaireId());
         bean.setQuestionId(source.getQuestionId());
         bean.setAnswer(source.getAnswer());

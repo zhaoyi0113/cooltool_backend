@@ -20,6 +20,7 @@ public class UserReExaminationDateBean {
     private String strReExaminationDate;
     private CommonStatus ignore;
     private YesNoEnum isStartDate;
+    private int hasOperation;
 
     public long getId() {
         return id;
@@ -59,6 +60,10 @@ public class UserReExaminationDateBean {
 
     public YesNoEnum getIsStartDate() {
         return isStartDate;
+    }
+
+    public int getHasOperation() {
+        return hasOperation;
     }
 
     public void setId(long id) {
@@ -101,6 +106,10 @@ public class UserReExaminationDateBean {
         this.isStartDate = isStartDate;
     }
 
+    public void setHasOperation(int hasOperation) {
+        this.hasOperation = hasOperation;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -108,6 +117,7 @@ public class UserReExaminationDateBean {
         msg.append("id=").append(id);
         msg.append(", userId=").append(userId);
         msg.append(", isStartDate=").append(isStartDate);
+        msg.append(", hasOperation=").append(hasOperation);
         msg.append(", groupId=").append(groupId);
         msg.append(", hospitalizedGroupId=").append(hospitalizedGroupId);
         msg.append(", reExaminationDate=").append(reExaminationDate);

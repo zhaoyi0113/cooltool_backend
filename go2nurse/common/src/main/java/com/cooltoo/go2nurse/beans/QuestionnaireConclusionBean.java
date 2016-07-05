@@ -31,6 +31,12 @@ public class QuestionnaireConclusionBean {
     public boolean isThisConclusion(int score) {
         int[] interval = getIntInterval();
         if (interval.length==2) {
+            if (Integer.MIN_VALUE==interval[0]) {
+                return score<interval[1];
+            }
+            else if (Integer.MAX_VALUE==interval[1]) {
+                return score>interval[0];
+            }
             return interval[0]<=score && score<=interval[1];
         }
         return false;

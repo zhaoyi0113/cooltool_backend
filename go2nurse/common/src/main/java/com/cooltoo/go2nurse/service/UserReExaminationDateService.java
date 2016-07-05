@@ -105,7 +105,7 @@ public class UserReExaminationDateService {
     //                           add
     //===============================================================
     @Transactional
-    public UserReExaminationDateBean addReExamination(long userId, long groupId, long hospitalizedGroupId, Date reExaminationDate, YesNoEnum isStartDate) {
+    public UserReExaminationDateBean addReExamination(long userId, long groupId, long hospitalizedGroupId, Date reExaminationDate, YesNoEnum isStartDate, YesNoEnum hasOperation) {
         logger.info("user={} add re-examination date groupId={} hospitalizedGroupId={} reExaminationDate={}, isStartDate={}",
                 userId, groupId, hospitalizedGroupId, reExaminationDate, isStartDate);
         if (!userRepository.exists(userId)) {
@@ -126,6 +126,7 @@ public class UserReExaminationDateService {
 
         UserReExaminationDateEntity entity = new UserReExaminationDateEntity();
         entity.setUserId(userId);
+        entity.setHasOperation(YesNoEnum.YES.equals(hasOperation) ? 1 : 0);
         entity.setIsStartDate(null==isStartDate ? YesNoEnum.NONE : isStartDate);
         entity.setGroupId(groupId);
         entity.setHospitalizedGroupId(hospitalizedGroupId);
@@ -206,10 +207,10 @@ public class UserReExaminationDateService {
         // add re_examination dates
         List<UserReExaminationDateBean> reExaminationDateBeans = new ArrayList<>();
         UserReExaminationDateBean bean;
-        bean = addReExamination(userId, reExamDateGroupId, hospitalizedGroupId, startDate, YesNoEnum.YES);
+        bean = addReExamination(userId, reExamDateGroupId, hospitalizedGroupId, startDate, YesNoEnum.YES, hasOperation);
         reExaminationDateBeans.add(bean);
         for (Date date : reExamDates) {
-            bean = addReExamination(userId, reExamDateGroupId, hospitalizedGroupId, date, YesNoEnum.NO);
+            bean = addReExamination(userId, reExamDateGroupId, hospitalizedGroupId, date, YesNoEnum.NO, hasOperation);
             reExaminationDateBeans.add(bean);
         }
 

@@ -1,10 +1,12 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.QuestionBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
+import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
 import com.cooltoo.go2nurse.constants.QuestionType;
 import com.cooltoo.go2nurse.converter.QuestionBeanConverter;
 import com.cooltoo.go2nurse.converter.QuestionnaireBeanConverter;
@@ -25,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Created by zhaolisong on 16/4/6.
@@ -136,6 +140,15 @@ public class QuestionnaireService {
         return beans;
     }
 
+    public Map<Long, QuestionnaireBean> getQuestionnaireIdToBeanMapByIds(List<Long> questionnaireIds) {
+        List<QuestionnaireBean> beans = getQuestionnaireByIds(questionnaireIds);
+        Map<Long, QuestionnaireBean> idToBean = new HashMap<>();
+        for (QuestionnaireBean bean : beans) {
+            idToBean.put(bean.getId(), bean);
+        }
+        return idToBean;
+    }
+
     public List<QuestionnaireBean> getQuestionnaireByIds(List<Long> questionnaireIds) {
         logger.info("get questionnaire by ids={}", questionnaireIds);
         List<QuestionnaireBean> beans;
@@ -147,6 +160,28 @@ public class QuestionnaireService {
             beans = new ArrayList<>();
         }
         logger.info("count is {}", beans.size());
+        return beans;
+    }
+
+    public List<QuestionnaireBean> getQuestionnaireByUserHospitalizedBean(List<UserHospitalizedRelationBean> userHospitalizedBeans) {
+        logger.info("get questionnaire by user hospitalized relation={}", userHospitalizedBeans);
+        List<QuestionnaireBean> beans = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(userHospitalizedBeans)) {
+            for (UserHospitalizedRelationBean userHospitalized : userHospitalizedBeans) {
+                if (YesNoEnum.YES.equals(userHospitalized.getHasLeave())) {
+                    continue;
+                }
+                List<QuestionnaireBean> tmpBeans = getQuestionnaireByHospitalId(userHospitalized.getHospitalId());
+                for (QuestionnaireBean tmp : tmpBeans) {
+                    beans.add(tmp);
+                }
+            }
+        }
+        else {
+            beans = getQuestionnaireByHospitalId(0);
+            logger.info("get questionnaire without hospital");
+        }
+        logger.info("count is {}",beans.size());
         return beans;
     }
 

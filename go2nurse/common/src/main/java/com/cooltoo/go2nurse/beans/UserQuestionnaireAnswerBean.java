@@ -10,7 +10,10 @@ import java.util.Date;
 public class UserQuestionnaireAnswerBean {
 
     private long id;
+    private long groupId;
     private long userId;
+    private long patientId;
+    private PatientBean patient;
     private long questionnaireId;
     private long questionId;
     private String answer;
@@ -21,8 +24,16 @@ public class UserQuestionnaireAnswerBean {
         return id;
     }
 
+    public long getGroupId() {
+        return groupId;
+    }
+
     public long getUserId() {
         return userId;
+    }
+
+    public long getPatientId() {
+        return patientId;
     }
 
     public long getQuestionnaireId() {
@@ -49,8 +60,16 @@ public class UserQuestionnaireAnswerBean {
         this.id = id;
     }
 
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public void setPatientId(long patientId) {
+        this.patientId = patientId;
     }
 
     public void setQuestionnaireId(long questionnaireId) {
@@ -73,11 +92,21 @@ public class UserQuestionnaireAnswerBean {
         this.status = status;
     }
 
+    public PatientBean getPatient() {
+        return patient;
+    }
+
+    public void setPatient(PatientBean patient) {
+        this.patient = patient;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", groupId=").append(groupId);
         msg.append(", userId=").append(userId);
+        msg.append(", patientId=").append(patientId);
         msg.append(", questionnaireId=").append(questionnaireId);
         msg.append(", questionId=").append(questionId);
         msg.append(", answer=").append(answer);

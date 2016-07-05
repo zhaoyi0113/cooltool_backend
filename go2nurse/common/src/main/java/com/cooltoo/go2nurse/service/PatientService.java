@@ -8,7 +8,6 @@ import com.cooltoo.go2nurse.converter.PatientBeanConverter;
 import com.cooltoo.go2nurse.entities.PatientEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +81,15 @@ public class PatientService {
             return null;
         }
         return beanConverter.convert(entity);
+    }
+
+    public Map<Long, PatientBean> getAllIdToBeanByStatusAndIds(List<Long> ids, CommonStatus status) {
+        List<PatientBean> beans = getAllByStatusAndIds(ids, status);
+        Map<Long, PatientBean> idToBean = new HashMap<>();
+        for (PatientBean bean : beans) {
+            idToBean.put(bean.getId(), bean);
+        }
+        return idToBean;
     }
 
     public List<PatientBean> getAllByStatusAndIds(List<Long> ids, CommonStatus status) {

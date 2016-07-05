@@ -16,9 +16,13 @@ public class QuestionBean {
     private String options;
     private QuestionType type;
     private int grade;
-    private String userAnswer;
     private Date time;
     private CommonStatus status;
+
+    //===================================
+    //         user answer
+    //===================================
+    private String userAnswer;
 
     public long getId() {
         return id;
@@ -90,6 +94,20 @@ public class QuestionBean {
 
     public void setUserAnswer(String userAnswer) {
         this.userAnswer = userAnswer;
+    }
+
+    public QuestionBean clone() {
+        QuestionBean bean = new QuestionBean();
+        bean.setId(id);
+        bean.setQuestionnaireId(questionnaireId);
+        bean.setContent(content);
+        bean.setOptions(options);
+        bean.setType(type);
+        bean.setGrade(grade);
+        bean.setTime(time);
+        bean.setStatus(status);
+        bean.setUserAnswer(userAnswer);
+        return bean;
     }
 
     public String toString() {

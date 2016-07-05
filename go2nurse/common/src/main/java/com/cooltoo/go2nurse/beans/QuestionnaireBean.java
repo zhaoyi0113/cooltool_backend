@@ -1,7 +1,9 @@
 package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.util.VerifyUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +23,8 @@ public class QuestionnaireBean {
     //=================================
     //    user questionnaire score
     //=================================
+    private long groupId;
+    private PatientBean patient;
     private int userScore;
     private QuestionnaireConclusionBean userConclusion;
 
@@ -88,6 +92,22 @@ public class QuestionnaireBean {
         this.questions = questions;
     }
 
+    public long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
+    public PatientBean getPatient() {
+        return patient;
+    }
+
+    public void setPatient(PatientBean patient) {
+        this.patient = patient;
+    }
+
     public int getUserScore() {
         return userScore;
     }
@@ -104,6 +124,30 @@ public class QuestionnaireBean {
         this.userConclusion = userConclusion;
     }
 
+    public QuestionnaireBean clone() {
+        QuestionnaireBean bean = new QuestionnaireBean();
+        bean.setId(id);
+        bean.setTitle(title);
+        bean.setDescription(description);
+        bean.setConclusion(conclusion);
+        bean.setHospitalId(hospitalId);
+        bean.setTime(time);
+        bean.setStatus(status);
+
+        List<QuestionBean> questions = new ArrayList<>();
+        bean.setQuestions(questions);
+        if (!VerifyUtil.isListEmpty(this.questions)) {
+            for (QuestionBean question : this.questions) {
+                questions.add(question.clone());
+            }
+        }
+
+        bean.setGroupId(groupId);
+        bean.setUserScore(userScore);
+        bean.setUserConclusion(userConclusion);
+        return bean;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -115,6 +159,8 @@ public class QuestionnaireBean {
         msg.append(", questions count=").append(null==questions ? 0 : questions.size());
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
+        msg.append(", groupId=").append(groupId);
+        msg.append(", patient=").append(patient);
         msg.append(", userScore=").append(userScore);
         msg.append(", userConclusion=").append(userConclusion);
         msg.append("]");

@@ -13,7 +13,9 @@ import java.util.Date;
 public class UserQuestionnaireAnswerEntity {
 
     private long id;
+    private long groupId;
     private long userId;
+    private long patientId;
     private long questionnaireId;
     private long questionId;
     private String answer;
@@ -27,9 +29,19 @@ public class UserQuestionnaireAnswerEntity {
         return id;
     }
 
+    @Column(name = "group_id")
+    public long getGroupId() {
+        return groupId;
+    }
+
     @Column(name = "user_id")
     public long getUserId() {
         return userId;
+    }
+
+    @Column(name = "patient_id")
+    public long getPatientId() {
+        return patientId;
     }
 
     @Column(name = "questionnaire_id")
@@ -61,8 +73,16 @@ public class UserQuestionnaireAnswerEntity {
         this.id = id;
     }
 
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public void setPatientId(long patientId) {
+        this.patientId = patientId;
     }
 
     public void setQuestionnaireId(long questionnaireId) {
@@ -89,6 +109,7 @@ public class UserQuestionnaireAnswerEntity {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", groupId=").append(groupId);
         msg.append(", userId=").append(userId);
         msg.append(", questionnaireId=").append(questionnaireId);
         msg.append(", questionId=").append(questionId);

@@ -55,8 +55,9 @@ public class UserReExaminationDateAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response addUserReExaminationDate(@Context HttpServletRequest request,
                                              @FormParam("group_id") @DefaultValue("-1") long groupId,
-                                             @FormParam("hospitalized_group_id") @DefaultValue("-1") long hospitalizedGroupId,
-                                             @FormParam("re_examination_date") @DefaultValue("") String reExamDate
+                                             @FormParam("hospitalized_group_id") @DefaultValue("0") long hospitalizedGroupId,
+                                             @FormParam("re_examination_date") @DefaultValue("") String reExamDate,
+                                             @FormParam("has_operation") @DefaultValue("0") int iHasOperation
     ){
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long dateTime = NumberUtil.getTime(reExamDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
@@ -67,7 +68,8 @@ public class UserReExaminationDateAPI {
         else {
             date = new Date(dateTime);
         }
-        UserReExaminationDateBean bean = userReExamDateService.addReExamination(userId, groupId, hospitalizedGroupId, date, YesNoEnum.NO);
+        YesNoEnum hasOperation = YesNoEnum.parseInt(iHasOperation);
+        UserReExaminationDateBean bean = userReExamDateService.addReExamination(userId, groupId, hospitalizedGroupId, date, YesNoEnum.NO, hasOperation);
         return Response.ok(bean).build();
     }
 

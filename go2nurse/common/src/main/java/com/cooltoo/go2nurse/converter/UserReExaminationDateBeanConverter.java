@@ -17,6 +17,7 @@ public class UserReExaminationDateBeanConverter implements Converter<UserReExami
         bean.setId(source.getId());
         bean.setUserId(source.getUserId());
         bean.setIsStartDate(source.getIsStartDate());
+        bean.setHasOperation(source.getHasOperation());
         bean.setGroupId(source.getGroupId());
         bean.setHospitalizedGroupId(source.getHospitalizedGroupId());
         bean.setReExaminationDate(source.getReExaminationDate());

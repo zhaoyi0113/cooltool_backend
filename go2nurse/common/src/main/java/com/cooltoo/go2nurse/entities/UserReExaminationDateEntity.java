@@ -22,6 +22,7 @@ public class UserReExaminationDateEntity {
     private Date reExaminationDate;
     private CommonStatus ignore;
     private YesNoEnum isStartDate;
+    private int hasOperation;
 
     @Id
     @GeneratedValue
@@ -73,6 +74,11 @@ public class UserReExaminationDateEntity {
         return isStartDate;
     }
 
+    @Column(name = "has_operation")
+    public int getHasOperation() {
+        return hasOperation;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -109,6 +115,10 @@ public class UserReExaminationDateEntity {
         this.isStartDate = isStartDate;
     }
 
+    public void setHasOperation(int hasOperation) {
+        this.hasOperation = hasOperation;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -116,6 +126,7 @@ public class UserReExaminationDateEntity {
         msg.append("id=").append(id);
         msg.append(", userId=").append(userId);
         msg.append(", isStartDate=").append(isStartDate);
+        msg.append(", isStartDate=").append(hasOperation);
         msg.append(", groupId=").append(groupId);
         msg.append(", hospitalizedGroupId=").append(hospitalizedGroupId);
         msg.append(", reExaminationDate=").append(reExaminationDate);
