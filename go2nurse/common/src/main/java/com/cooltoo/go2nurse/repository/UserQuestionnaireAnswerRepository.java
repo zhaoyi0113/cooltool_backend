@@ -13,9 +13,9 @@ public interface UserQuestionnaireAnswerRepository extends JpaRepository<UserQue
 
     List<UserQuestionnaireAnswerEntity> findByUserIdAndGroupId(Long userId, Long questionnaireId, Sort sort);
 
-    List<UserQuestionnaireAnswerEntity> findByUserIdAndQuestionnaireId(Long userId, Long questionnaireId, Sort sort);
-
     List<UserQuestionnaireAnswerEntity> findByUserIdAndGroupIdAndQuestionId(Long userId, Long groupId, Long questionId, Sort sort);
+
+    List<UserQuestionnaireAnswerEntity> findByUserIdAndQuestionnaireId(Long userId, Long questionnaireId, Sort sort);
 
     List<UserQuestionnaireAnswerEntity> findByUserIdAndQuestionIdIn(Long userId, List<Long> questionIds, Sort sort);
 

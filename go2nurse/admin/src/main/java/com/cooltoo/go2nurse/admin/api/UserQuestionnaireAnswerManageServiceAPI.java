@@ -15,7 +15,7 @@ import java.util.List;
  * Created by hp on 2016/6/28.
  */
 @Path("/admin/user/questionnaire")
-public class UserQuestionnaireServiceAPI {
+public class UserQuestionnaireAnswerManageServiceAPI {
 
     @Autowired private UserQuestionnaireAnswerService userAnswerService;
 
@@ -29,14 +29,14 @@ public class UserQuestionnaireServiceAPI {
         return Response.ok(usersQuestionnaires).build();
     }
 
-    @Path("/with_answer/{user_id}/{questionnaire_id}")
+    @Path("/with_answer/{user_id}/{group_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsersQuestionnaire(@Context HttpServletRequest request,
                                           @PathParam("user_id") @DefaultValue("0") long userId,
-                                          @PathParam("questionnaire_id") @DefaultValue("0") long questionnaireId
+                                          @PathParam("group_id") @DefaultValue("0") long groupId
     ) {
-        QuestionnaireBean usersQuestionnaires = userAnswerService.getUserQuestionnaireWithAnswer(userId, questionnaireId);
+        QuestionnaireBean usersQuestionnaires = userAnswerService.getUserQuestionnaireWithAnswer(userId, groupId);
         return Response.ok(usersQuestionnaires).build();
     }
 }

@@ -48,7 +48,7 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
         register(UserHospitalizedAPI.class);
         register(QuestionnaireManageServiceAPI.class);
         register(UserQuestionnaireAnswerServiceAPI.class);
-        register(UserQuestionnaireServiceAPI.class);
+        register(UserQuestionnaireAnswerManageServiceAPI.class);
         register(UserAddressAPI.class);
         register(UserReExaminationDateAPI.class);
 

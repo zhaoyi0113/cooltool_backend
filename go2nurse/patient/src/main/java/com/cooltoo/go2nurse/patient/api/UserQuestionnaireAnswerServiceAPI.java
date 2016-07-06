@@ -42,7 +42,19 @@ public class UserQuestionnaireAnswerServiceAPI {
         return Response.ok(returnValue).build();
     }
 
-    @Path("/all_answered")
+    @Path("/questionnaire_answered")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUsersQuestionnaireByGroupId(@Context HttpServletRequest request,
+                                                   @QueryParam("group_id") @DefaultValue("0") long groupId) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        QuestionnaireBean usersQuestionnaire = userAnswerService.getUserQuestionnaireWithAnswer(userId, groupId);
+        return Response.ok(usersQuestionnaire).build();
+    }
+
+
+    @Path("/all_questionnaire_answered")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
