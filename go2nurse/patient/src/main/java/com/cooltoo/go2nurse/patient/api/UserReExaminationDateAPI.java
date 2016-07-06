@@ -44,17 +44,8 @@ public class UserReExaminationDateAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response getUserReExaminationDate(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        Map<Long, List<UserReExaminationDateBean>> reExamDates = userReExamDateService.getUserReExamination(userId);
-        List<UserReExaminationDateSortBean> beans = new ArrayList<>();
-        reExamDates.forEach((key, value) -> {
-            UserReExaminationDateSortBean bean = new UserReExaminationDateSortBean();
-            bean.setGroupId(key);
-            bean.setReExaminationDate(value);
-            beans.add(bean);
-        });
-        Comparator<UserReExaminationDateSortBean> comparator = (o1, o2) -> -((int)(o1.getGroupId()-o2.getGroupId()));
-        Collections.sort(beans, comparator);
-        return Response.ok(beans).build();
+        List<List<UserReExaminationDateBean>> reExamDates = userReExamDateService.getUserReExamination(userId);
+        return Response.ok(reExamDates).build();
     }
 
     @Path("/add")

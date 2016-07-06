@@ -56,7 +56,7 @@ public class UserReExaminationDateService {
     }
 
     /** @return hospitalized group id to re-examination date*/
-    public Map<Long, List<UserReExaminationDateBean>> getUserReExamination(long userId) {
+    public List<List<UserReExaminationDateBean>> getUserReExamination(long userId) {
         logger.info("get user={} 's re-examination date", userId);
         List<CommonStatus> enabled = Arrays.asList(new CommonStatus[]{CommonStatus.ENABLED});
         List<UserReExaminationDateEntity> reExaminationDates = repository.findByUserIdAndStatusIn(userId, enabled, sort);
@@ -74,15 +74,15 @@ public class UserReExaminationDateService {
             tmpBeans.add(bean);
         }
 
-        Map<Long, List<UserReExaminationDateBean>> returnValue = new HashMap<>();
-        for (int i=0; i<groupIds.size(); i++) {
-            Long groupId = groupIds.get(i);
-            List<UserReExaminationDateBean> tmpBeans = groupReExaminationDates.get(i);
-            returnValue.put(groupId, tmpBeans);
-        }
+//        Map<Long, List<UserReExaminationDateBean>> returnValue = new HashMap<>();
+//        for (int i=0; i<groupIds.size(); i++) {
+//            Long groupId = groupIds.get(i);
+//            List<UserReExaminationDateBean> tmpBeans = groupReExaminationDates.get(i);
+//            returnValue.put(groupId, tmpBeans);
+//        }
 
-        logger.info("count is {}", returnValue.size());
-        return returnValue;
+        logger.info("count is {}", groupReExaminationDates.size());
+        return groupReExaminationDates;
     }
 
     //===============================================================
