@@ -125,6 +125,8 @@ public class QuestionBean {
         bean.setTime(time);
         bean.setStatus(status);
         bean.setUserAnswer(userAnswer);
+        bean.setImageId(imageId);
+        bean.setImageUrl(imageUrl);
         return bean;
     }
 
