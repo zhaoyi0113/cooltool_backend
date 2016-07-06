@@ -279,7 +279,7 @@ public class QuestionnaireService {
             List<UserHospitalizedRelationBean> userHospitalizedBeans) {
         logger.info("get questionnaire category by user hospitalized relation={}", userHospitalizedBeans);
         List<QuestionnaireBean> questionnaires = new ArrayList<>();
-        if (VerifyUtil.isListEmpty(userHospitalizedBeans)) {
+        if (!VerifyUtil.isListEmpty(userHospitalizedBeans)) {
             for (UserHospitalizedRelationBean userHospitalized : userHospitalizedBeans) {
                 if (YesNoEnum.YES.equals(userHospitalized.getHasLeave())) {
                     continue;

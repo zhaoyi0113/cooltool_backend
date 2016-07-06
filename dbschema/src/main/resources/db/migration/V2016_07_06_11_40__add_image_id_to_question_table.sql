@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_question` ADD COLUMN `image_id` BIGINT(64) NULL DEFAULT 0;
