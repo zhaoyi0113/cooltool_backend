@@ -1,7 +1,6 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
-import org.aspectj.lang.annotation.control.CodeGenerationHint;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,7 +16,7 @@ public class QuestionnaireCategoryEntity {
     private Date time;
     private CommonStatus status;
     private String name;
-    private String instruction;
+    private String introduction;
 
     @Id
     @GeneratedValue
@@ -41,9 +40,9 @@ public class QuestionnaireCategoryEntity {
         return name;
     }
 
-    @Column(name = "instruction")
-    public String getInstruction() {
-        return instruction;
+    @Column(name = "introduction")
+    public String getIntroduction() {
+        return introduction;
     }
 
     public void setId(long id) {
@@ -62,8 +61,8 @@ public class QuestionnaireCategoryEntity {
         this.name = name;
     }
 
-    public void setInstruction(String instruction) {
-        this.instruction = instruction;
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
     }
 
     public String toString() {
@@ -71,7 +70,7 @@ public class QuestionnaireCategoryEntity {
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", name=").append(name);
-        msg.append(", instruction=").append(instruction);
+        msg.append(", introduction=").append(introduction);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

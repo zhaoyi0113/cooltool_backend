@@ -1,7 +1,6 @@
 package com.cooltoo.go2nurse.converter;
 
 import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
-import com.cooltoo.go2nurse.beans.QuestionnaireConclusionBean;
 import com.cooltoo.go2nurse.entities.QuestionnaireCategoryEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -18,7 +17,7 @@ public class QuestionnaireCategoryBeanConverter implements Converter<Questionnai
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
         bean.setName(source.getName());
-        bean.setInstruction(source.getInstruction());
+        bean.setIntroduction(source.getIntroduction());
         return bean;
     }
 }

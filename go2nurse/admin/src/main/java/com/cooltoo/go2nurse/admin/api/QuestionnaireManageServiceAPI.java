@@ -181,9 +181,9 @@ public class QuestionnaireManageServiceAPI {
     public Response updateQuestionnaireCategory(@Context HttpServletRequest request,
                                                 @FormParam("id") long id,
                                                 @FormParam("name") @DefaultValue("") String name,
-                                                @FormParam("instruction") @DefaultValue("") String instruction
+                                                @FormParam("introduction") @DefaultValue("") String introduction
     ) {
-        QuestionnaireCategoryBean bean = questionnaireService.updateCategory(id, name, instruction);
+        QuestionnaireCategoryBean bean = questionnaireService.updateCategory(id, name, introduction);
         return Response.ok(bean).build();
     }
 
@@ -256,9 +256,10 @@ public class QuestionnaireManageServiceAPI {
                                      @FormParam("title") @DefaultValue("") String title,
                                      @FormParam("description") @DefaultValue("") String description,
                                      @FormParam("conclusion") @DefaultValue("") String conclusion,
-                                     @FormParam("hospital_id") @DefaultValue("0") int hospitalId
+                                     @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                     @FormParam("category_id") @DefaultValue("0") long categoryId
     ) {
-        QuestionnaireBean bean = questionnaireService.addQuestionnaire(title, description, conclusion, hospitalId);
+        QuestionnaireBean bean = questionnaireService.addQuestionnaire(title, description, conclusion, hospitalId, categoryId);
         return Response.ok(bean).build();
     }
 
@@ -267,9 +268,9 @@ public class QuestionnaireManageServiceAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addQuestionnaireCategory(@Context HttpServletRequest request,
                                              @FormParam("name") @DefaultValue("") String name,
-                                             @FormParam("instruction") @DefaultValue("") String instruction
+                                             @FormParam("introduction") @DefaultValue("") String introduction
     ) {
-        QuestionnaireCategoryBean bean = questionnaireService.addCategory(name, instruction);
+        QuestionnaireCategoryBean bean = questionnaireService.addCategory(name, introduction);
         return Response.ok(bean).build();
     }
 }

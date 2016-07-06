@@ -234,7 +234,7 @@ public class QuestionnaireService {
 
     private List<QuestionnaireCategoryBean> getCategoryByIds(List<Long> categoryIds) {
         logger.info("get questionnaire category by category ids={}", categoryIds);
-        List<QuestionnaireCategoryEntity> categoryResultSet = questionnaireCategoryRep.findByIdIn(categoryIds, questionnaireSort);
+        List<QuestionnaireCategoryEntity> categoryResultSet = questionnaireCategoryRep.findByIdIn(categoryIds, questionnaireCategorySort);
         List<QuestionnaireCategoryBean> categories = questionnaireCategoryEntitiesToBeans(categoryResultSet);
         logger.info("get questionnaire category count is {}", categories.size());
         return categories;
@@ -252,8 +252,8 @@ public class QuestionnaireService {
         logger.info("get questionnaire category with questionnaire by category ids={}", categoriesId);
         List<QuestionnaireCategoryBean> categories;
         if (!VerifyUtil.isListEmpty(categoriesId)) {
-            List<QuestionnaireCategoryEntity> categoryResultSet = questionnaireCategoryRep.findByIdIn(categoriesId, questionnaireSort);
-            List<QuestionnaireEntity> questionnaireResultSet = questionnaireRep.findByCategoryIdIn(categoriesId, questionSort);
+            List<QuestionnaireCategoryEntity> categoryResultSet = questionnaireCategoryRep.findByIdIn(categoriesId, questionnaireCategorySort);
+            List<QuestionnaireEntity> questionnaireResultSet = questionnaireRep.findByCategoryIdIn(categoriesId, questionnaireSort);
             categories = questionnaireCategoryEntitiesToBeans(categoryResultSet);
             List<QuestionnaireBean> questionnaires = questionnaireEntitiesToBeans(questionnaireResultSet);
 
@@ -432,9 +432,9 @@ public class QuestionnaireService {
     }
 
     @Transactional
-    public QuestionnaireCategoryBean updateCategory(long questionnaireCategoryId, String name, String instruction) {
-        logger.info("update questionnaireCategory={} with name={} instruction={}",
-                questionnaireCategoryId, name, instruction);
+    public QuestionnaireCategoryBean updateCategory(long questionnaireCategoryId, String name, String introduction) {
+        logger.info("update questionnaireCategory={} with name={} introduction={}",
+                questionnaireCategoryId, name, introduction);
         boolean changed = false;
 
         QuestionnaireCategoryEntity entity = questionnaireCategoryRep.findOne(questionnaireCategoryId);
@@ -446,8 +446,8 @@ public class QuestionnaireService {
             entity.setName(name.trim());
             changed = true;
         }
-        if (!VerifyUtil.isStringEmpty(instruction) && !instruction.equals(entity.getInstruction())) {
-            entity.setInstruction(instruction);
+        if (!VerifyUtil.isStringEmpty(introduction) && !introduction.equals(entity.getIntroduction())) {
+            entity.setIntroduction(introduction);
             changed = true;
         }
 
@@ -600,8 +600,9 @@ public class QuestionnaireService {
     }
 
     @Transactional
-    public QuestionnaireBean addQuestionnaire(String title, String description, String conclusion, int hospitalId) {
-        logger.info("add questionnaire : title={} description={} conclusion={} hospitalId={}", title, description, conclusion, hospitalId);
+    public QuestionnaireBean addQuestionnaire(String title, String description, String conclusion, int hospitalId, long categoryId) {
+        logger.info("add questionnaire : categoryId={} title={} description={} conclusion={} hospitalId={}",
+                categoryId, title, description, conclusion, hospitalId);
 
         QuestionnaireEntity entity = new QuestionnaireEntity();
         if (VerifyUtil.isStringEmpty(title)) {
@@ -622,6 +623,8 @@ public class QuestionnaireService {
             entity.setConclusion(conclusion);
         }
         hospitalId = hospitalId<0 ? 0 : hospitalId;
+        categoryId = categoryId<0 ? 0 : categoryId;
+        entity.setCategoryId(categoryId);
         entity.setHospitalId(hospitalId);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
@@ -631,8 +634,8 @@ public class QuestionnaireService {
     }
 
     @Transactional
-    public QuestionnaireCategoryBean addCategory(String name, String instruction) {
-        logger.info("add questionnaire category by name={} instruction={}", name, instruction);
+    public QuestionnaireCategoryBean addCategory(String name, String introduction) {
+        logger.info("add questionnaire category by name={} introduction={}", name, introduction);
 
         QuestionnaireCategoryEntity entity = new QuestionnaireCategoryEntity();
         if (VerifyUtil.isStringEmpty(name)) {
@@ -646,8 +649,8 @@ public class QuestionnaireService {
         else {
             entity.setName(name.trim());
         }
-        if (!VerifyUtil.isStringEmpty(instruction)) {
-            entity.setInstruction(instruction);
+        if (!VerifyUtil.isStringEmpty(introduction)) {
+            entity.setIntroduction(introduction);
         }
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);

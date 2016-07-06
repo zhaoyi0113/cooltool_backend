@@ -2,7 +2,6 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
 
-import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +14,7 @@ public class QuestionnaireCategoryBean {
     private Date time;
     private CommonStatus status;
     private String name;
-    private String instruction;
+    private String introduction;
     private List<QuestionnaireBean> questionnaires;
 
     public long getId() {
@@ -34,8 +33,8 @@ public class QuestionnaireCategoryBean {
         return name;
     }
 
-    public String getInstruction() {
-        return instruction;
+    public String getIntroduction() {
+        return introduction;
     }
 
     public List<QuestionnaireBean> getQuestionnaires() {
@@ -58,8 +57,8 @@ public class QuestionnaireCategoryBean {
         this.name = name;
     }
 
-    public void setInstruction(String instruction) {
-        this.instruction = instruction;
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
     }
 
     public void setQuestionnaires(List<QuestionnaireBean> questionnaires) {
@@ -71,7 +70,7 @@ public class QuestionnaireCategoryBean {
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", name=").append(name);
-        msg.append(", instruction=").append(instruction);
+        msg.append(", introduction=").append(introduction);
         msg.append(", questionnaire=").append(questionnaires);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
