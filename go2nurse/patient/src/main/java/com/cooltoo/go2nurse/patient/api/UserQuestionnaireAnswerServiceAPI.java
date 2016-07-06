@@ -42,6 +42,16 @@ public class UserQuestionnaireAnswerServiceAPI {
         return Response.ok(returnValue).build();
     }
 
+    @Path("/questionnaire_with_question")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireWithQuestion(@Context HttpServletRequest request,
+                                                 @QueryParam("questionnaire_ids") String questionnaireIds
+    ) {
+        List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByIds(questionnaireIds);
+        return Response.ok(questionnaires).build();
+    }
+
     @Path("/questionnaire_answered")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
