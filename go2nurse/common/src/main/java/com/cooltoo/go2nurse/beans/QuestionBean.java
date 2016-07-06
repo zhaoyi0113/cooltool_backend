@@ -16,6 +16,8 @@ public class QuestionBean {
     private String options;
     private QuestionType type;
     private int grade;
+    private long imageId;
+    private String imageUrl="";
     private Date time;
     private CommonStatus status;
 
@@ -46,6 +48,10 @@ public class QuestionBean {
 
     public int getGrade() {
         return grade;
+    }
+
+    public long getImageId() {
+        return imageId;
     }
 
     public Date getTime() {
@@ -80,6 +86,10 @@ public class QuestionBean {
         this.grade = grade;
     }
 
+    public void setImageId(long imageId) {
+        this.imageId = imageId;
+    }
+
     public void setTime(Date time) {
         this.time = time;
     }
@@ -94,6 +104,14 @@ public class QuestionBean {
 
     public void setUserAnswer(String userAnswer) {
         this.userAnswer = userAnswer;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public QuestionBean clone() {

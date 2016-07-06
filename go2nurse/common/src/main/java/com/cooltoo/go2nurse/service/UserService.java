@@ -362,7 +362,7 @@ public class UserService {
             entity = repository.save(entity);
         }
         UserBean bean = beanConverter.convert(entity);
-        bean.setName(imageUrl);
+        bean.setProfilePhotoUrl(imageUrl);
         return bean;
     }
 

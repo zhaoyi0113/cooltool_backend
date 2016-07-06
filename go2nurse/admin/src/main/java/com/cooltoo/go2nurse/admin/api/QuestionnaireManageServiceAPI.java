@@ -4,6 +4,8 @@ import com.cooltoo.go2nurse.beans.QuestionBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
 import com.cooltoo.go2nurse.service.QuestionnaireService;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -144,6 +147,19 @@ public class QuestionnaireManageServiceAPI {
     //=======================================================================
     //    update
     //=======================================================================
+    @Path("/update/question_image")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateQuestionImage(@Context HttpServletRequest request,
+                                        @FormDataParam("id") @DefaultValue("0") long id,
+                                        @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                        @FormDataParam("image") InputStream image,
+                                        @FormDataParam("image") FormDataContentDisposition disposition
+    ) {
+        QuestionBean bean = questionnaireService.updateQuestionImage(id, imageName, image);
+        return Response.ok(bean).build();
+    }
 
     @Path("/update/question")
     @POST

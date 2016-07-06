@@ -19,6 +19,7 @@ public class QuestionEntity {
     private String options;
     private QuestionType type;
     private int grade;
+    private long imageId;
     private Date time;
     private CommonStatus status;
 
@@ -55,6 +56,11 @@ public class QuestionEntity {
         return grade;
     }
 
+    @Column(name = "image_id")
+    public long getImageId() {
+        return imageId;
+    }
+
     @Column(name = "time_created")
     public Date getTime() {
         return time;
@@ -89,6 +95,10 @@ public class QuestionEntity {
         this.grade = grade;
     }
 
+    public void setImageId(long imageId) {
+        this.imageId = imageId;
+    }
+
     public void setTime(Date time) {
         this.time = time;
     }
@@ -106,6 +116,7 @@ public class QuestionEntity {
         msg.append(", options=").append(options);
         msg.append(", type=").append(type);
         msg.append(", grade=").append(grade);
+        msg.append(", imageId=").append(imageId);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

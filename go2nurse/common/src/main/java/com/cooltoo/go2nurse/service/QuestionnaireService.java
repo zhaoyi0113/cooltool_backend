@@ -18,6 +18,7 @@ import com.cooltoo.go2nurse.entities.QuestionnaireEntity;
 import com.cooltoo.go2nurse.repository.QuestionRepository;
 import com.cooltoo.go2nurse.repository.QuestionnaireCategoryRepository;
 import com.cooltoo.go2nurse.repository.QuestionnaireRepository;
+import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -60,6 +62,8 @@ public class QuestionnaireService {
     @Autowired private QuestionBeanConverter questionConverter;
     @Autowired private QuestionnaireBeanConverter questionnaireConverter;
     @Autowired private QuestionnaireCategoryBeanConverter questionnaireCategoryConverter;
+
+    @Autowired private UserGo2NurseFileStorageService userStorageService;
 
     //=================================================================
     //         getter
@@ -321,9 +325,18 @@ public class QuestionnaireService {
     private List<QuestionBean> questionEntitiesToBeans(Iterable<QuestionEntity> entities) {
         List<QuestionBean> beans = new ArrayList<>();
         if (null!=entities) {
+            List<Long> imageIds = new ArrayList<>();
             for (QuestionEntity entity : entities) {
                 QuestionBean bean = questionConverter.convert(entity);
                 beans.add(bean);
+                imageIds.add(bean.getImageId());
+            }
+            Map<Long, String> imageIdToUrl = userStorageService.getFileUrl(imageIds);
+            for (QuestionBean bean : beans) {
+                String imageUrl = imageIdToUrl.get(bean.getImageId());
+                if (!VerifyUtil.isStringEmpty(imageUrl)) {
+                    bean.setImageUrl(imageUrl);
+                }
             }
         }
         return beans;
@@ -354,11 +367,38 @@ public class QuestionnaireService {
     //=================================================================
     //         update
     //=================================================================
+    @Transactional
+    public QuestionBean updateQuestionImage(long questionId, String imageName, InputStream image){
+        logger.info("update question image for questionId={}, imageName={}, image={}", questionId, imageName, image);
+        QuestionEntity entity = questionRep.findOne(questionId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (null==image) {
+            logger.error("image is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        long imageId = 0;
+        String imageUrl = "";
+        if (VerifyUtil.isStringEmpty(imageName)) {
+            imageName = "question_image_"+System.nanoTime();
+        }
+        imageId = userStorageService.addFile(entity.getImageId(), imageName, image);
+        if (imageId>0) {
+            entity.setImageId(imageId);
+            imageUrl = userStorageService.getFileURL(imageId);
+            entity = questionRep.save(entity);
+        }
+        QuestionBean bean = questionConverter.convert(entity);
+        bean.setImageUrl(imageUrl);
+        return bean;
+    }
 
     @Transactional
-    public QuestionBean updateQuestion(long questionId, long questionnaireId, String content, String options, String strType, int grade) {
-        logger.info("update question={} with questionnaireId={} content={} options={} type={}",
-                questionId, questionnaireId, content, options, strType);
+    public QuestionBean updateQuestion(long questionId, long questionnaireId, String content,
+                                       String options, String strType, int grade) {
+        logger.info("update question={} with questionnaireId={} content={} options={} type={} grade={}",
+                questionId, questionnaireId, content, options, strType, grade);
         boolean changed = false;
         QuestionEntity entity = questionRep.findOne(questionId);
         if (null==entity) {
