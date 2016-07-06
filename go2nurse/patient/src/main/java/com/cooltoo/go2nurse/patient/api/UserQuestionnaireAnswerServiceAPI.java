@@ -45,6 +45,7 @@ public class UserQuestionnaireAnswerServiceAPI {
     @Path("/questionnaire_with_question")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response getQuestionnaireWithQuestion(@Context HttpServletRequest request,
                                                  @QueryParam("questionnaire_ids") String questionnaireIds
     ) {

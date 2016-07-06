@@ -5,6 +5,7 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.patient.beans.UserReExaminationDateSortBean;
 import com.cooltoo.go2nurse.service.UserReExaminationDateService;
 import com.cooltoo.util.NumberUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/7/3.
@@ -46,7 +45,16 @@ public class UserReExaminationDateAPI {
     public Response getUserReExaminationDate(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Map<Long, List<UserReExaminationDateBean>> reExamDates = userReExamDateService.getUserReExamination(userId);
-        return Response.ok(reExamDates).build();
+        List<UserReExaminationDateSortBean> beans = new ArrayList<>();
+        reExamDates.forEach((key, value) -> {
+            UserReExaminationDateSortBean bean = new UserReExaminationDateSortBean();
+            bean.setGroupId(key);
+            bean.setReExaminationDate(value);
+            beans.add(bean);
+        });
+        Comparator<UserReExaminationDateSortBean> comparator = (o1, o2) -> -((int)(o1.getGroupId()-o2.getGroupId()));
+        Collections.sort(beans, comparator);
+        return Response.ok(beans).build();
     }
 
     @Path("/add")
