@@ -236,6 +236,7 @@ public class UserHospitalizedRelationService {
         entity.setGroupId(groupId);
         entity.setHospitalId(hospitalId);
         entity.setDepartmentId(departmentId);
+        entity.setHasLeave(YesNoEnum.NO);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity = repository.save(entity);
