@@ -48,11 +48,10 @@ public class UserDiagnosticPointRelationService {
     public long getUserCurrentGroupId(long userId, long currentTime) {
         logger.info("get user={} current hospitalized group ID");
         List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndStatus(userId, CommonStatus.ENABLED, sort);
+        long groupId = Long.MIN_VALUE;
         if (VerifyUtil.isListEmpty(entities)) {
             logger.error("there is no diagnostic point for user");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        long groupId = Long.MIN_VALUE;
         for (UserDiagnosticPointRelationEntity entity : entities) {
             Date diagnosticTime = entity.getDiagnosticTime();
             if (null!=diagnosticTime && diagnosticTime.getTime()>currentTime) {
