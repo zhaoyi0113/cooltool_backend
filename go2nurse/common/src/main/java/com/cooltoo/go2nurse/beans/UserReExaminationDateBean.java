@@ -18,7 +18,8 @@ public class UserReExaminationDateBean {
     private long hospitalizedGroupId;
     private Date reExaminationDate;
     private String strReExaminationDate;
-    private CommonStatus ignore;
+    private CommonStatus isIgnore;
+    private int ignore;
     private YesNoEnum isStartDate;
     private int hasOperation;
 
@@ -54,8 +55,12 @@ public class UserReExaminationDateBean {
         return strReExaminationDate;
     }
 
-    public CommonStatus getIgnore() {
+    public int getIgnore() {
         return ignore;
+    }
+
+    public CommonStatus getIsIgnore() {
+        return isIgnore;
     }
 
     public YesNoEnum getIsStartDate() {
@@ -98,8 +103,9 @@ public class UserReExaminationDateBean {
         this.strReExaminationDate = strReExaminationDate;
     }
 
-    public void setIgnore(CommonStatus ignore) {
-        this.ignore = ignore;
+    public void setIsIgnore(CommonStatus ignore) {
+        this.isIgnore = ignore;
+        this.ignore = null==ignore ? 0 : ignore.ordinal();
     }
 
     public void setIsStartDate(YesNoEnum isStartDate) {
@@ -121,7 +127,7 @@ public class UserReExaminationDateBean {
         msg.append(", groupId=").append(groupId);
         msg.append(", hospitalizedGroupId=").append(hospitalizedGroupId);
         msg.append(", reExaminationDate=").append(reExaminationDate);
-        msg.append(", ignore=").append(ignore);
+        msg.append(", ignore=").append(isIgnore);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append("]");

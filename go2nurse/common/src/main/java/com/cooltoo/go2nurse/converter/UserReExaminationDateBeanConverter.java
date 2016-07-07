@@ -21,7 +21,7 @@ public class UserReExaminationDateBeanConverter implements Converter<UserReExami
         bean.setGroupId(source.getGroupId());
         bean.setHospitalizedGroupId(source.getHospitalizedGroupId());
         bean.setReExaminationDate(source.getReExaminationDate());
-        bean.setIgnore(source.getIgnore());
+        bean.setIsIgnore(source.getIgnore());
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
         String strReExamDate = NumberUtil.timeToString(bean.getReExaminationDate(), NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);

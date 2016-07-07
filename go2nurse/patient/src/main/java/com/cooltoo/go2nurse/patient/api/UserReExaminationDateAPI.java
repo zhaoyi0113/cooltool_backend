@@ -5,7 +5,6 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
-import com.cooltoo.go2nurse.patient.beans.UserReExaminationDateSortBean;
 import com.cooltoo.go2nurse.service.UserReExaminationDateService;
 import com.cooltoo.util.NumberUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +102,7 @@ public class UserReExaminationDateAPI {
     public Response editUserReExaminationDate(@Context HttpServletRequest request,
                                               @FormParam("re_examination_date_id") @DefaultValue("0") long reExamDateId,
                                               @FormParam("re_examination_date") @DefaultValue("") String reExamDate,
-                                              @FormParam("ignore") @DefaultValue("disabled") String strIgnore,
+                                              @FormParam("ignore") @DefaultValue("0") int iIgnore,
                                               @FormParam("status") @DefaultValue("enabled") String strStatus
     ){
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
@@ -113,7 +112,7 @@ public class UserReExaminationDateAPI {
         if (dateTime>0) {
             date = new Date(dateTime);
         }
-        CommonStatus ignore = CommonStatus.parseString(strIgnore);
+        CommonStatus ignore = CommonStatus.parseInt(iIgnore);
         CommonStatus status = CommonStatus.parseString(strStatus);
         UserReExaminationDateBean bean = userReExamDateService.updateReExamination(reExamDateId, date, ignore, status);
         return Response.ok(bean).build();
