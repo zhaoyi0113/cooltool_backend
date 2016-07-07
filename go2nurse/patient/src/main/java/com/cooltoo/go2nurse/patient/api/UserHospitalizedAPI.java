@@ -147,6 +147,7 @@ public class UserHospitalizedAPI {
                 UserHospitalizedCorusesBean bean = new UserHospitalizedCorusesBean();
                 bean.setId(key.ordinal());
                 bean.setType(key.name());
+                bean.setDescription("");
                 bean.setCourses(value);
                 beans.add(bean);
             });
