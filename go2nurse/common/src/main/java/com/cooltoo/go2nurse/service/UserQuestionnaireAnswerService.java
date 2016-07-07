@@ -197,11 +197,16 @@ public class UserQuestionnaireAnswerService {
         // fill answer to question bean
         for (QuestionnaireBean questionnaire : returnValue) {
             List<QuestionnaireConclusionBean> conclusions = go2NurseUtility.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
+            boolean set = false;
             for (QuestionnaireConclusionBean conclusion : conclusions) {
                 if (conclusion.isThisConclusion(questionnaire.getUserScore())) {
                     questionnaire.setUserConclusion(conclusion);
+                    set = true;
                     break;
                 }
+            }
+            if (!set) {
+                questionnaire.setUserConclusion(new QuestionnaireConclusionBean());
             }
         }
 

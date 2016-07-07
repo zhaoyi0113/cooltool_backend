@@ -9,8 +9,8 @@ import java.io.Serializable;
  */
 public class QuestionnaireConclusionBean {
 
-    private String item;
-    private String interval;
+    private String item="";
+    private String interval="";
 
     public String getItem() {
         return item;
