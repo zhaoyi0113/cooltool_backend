@@ -1,15 +1,10 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.go2nurse.beans.QuestionnaireBean;
-import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
-import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
-import com.cooltoo.go2nurse.beans.UserQuestionnaireAnswerBean;
+import com.cooltoo.go2nurse.beans.*;
+import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
-import com.cooltoo.go2nurse.service.QuestionnaireService;
-import com.cooltoo.go2nurse.service.UserDiagnosticPointRelationService;
-import com.cooltoo.go2nurse.service.UserHospitalizedRelationService;
-import com.cooltoo.go2nurse.service.UserQuestionnaireAnswerService;
+import com.cooltoo.go2nurse.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +24,7 @@ public class UserQuestionnaireAnswerServiceAPI {
     @Autowired private UserHospitalizedRelationService userHospitalizedService;
     @Autowired private QuestionnaireService questionnaireService;
     @Autowired private UserQuestionnaireAnswerService userAnswerService;
+    @Autowired private UserService userService;
 
     @Path("/questionnaire_of_hospital_or_not")
     @GET
@@ -36,8 +32,12 @@ public class UserQuestionnaireAnswerServiceAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response getQuestionnaireOfHospitalUserHospitalizedIn(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        long groupId = userDiagnosticService.getUserCurrentGroupId(userId, System.currentTimeMillis());
-        List<UserHospitalizedRelationBean> userHospitalizedBeans = userHospitalizedService.getUserHospitalizedRelationByGroupId(userId, groupId);
+        UserBean user = userService.getUser(userId);
+        List<UserHospitalizedRelationBean> userHospitalizedBeans = null;
+        if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide())) {
+            long groupId = userDiagnosticService.getUserCurrentGroupId(userId, System.currentTimeMillis());
+            userHospitalizedBeans = userHospitalizedService.getUserHospitalizedRelationByGroupId(userId, groupId);
+        }
         List<QuestionnaireCategoryBean> returnValue = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(userHospitalizedBeans);
         return Response.ok(returnValue).build();
     }
