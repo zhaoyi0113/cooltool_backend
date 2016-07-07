@@ -126,6 +126,7 @@ public class CourseCategoryService {
 
         CourseCategoryBean others = new CourseCategoryBean();
         others.setName("others");
+        others.setIntroduction("others");
 
         Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = new HashMap<>();
 
