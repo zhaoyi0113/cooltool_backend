@@ -248,7 +248,7 @@ public class CourseRelationManageService {
         List<Long> courseInStatus = course.getCourseIdByStatusAndIds(strCourseStatus, courseInHospital);
         hospitalDepartmentDiagnostic.put(key_all_courses_in_hospital, courseInStatus);
 
-        List<Long> courseInDepartment = null;
+        List<Long> courseInDepartment = new ArrayList<>();
         boolean checkCoursesInDepartment = departmentId>0;
         if (checkCoursesInDepartment) {
             courseInDepartment = departmentRelation.judgeCourseInDepartment(departmentId, courseInHospital, CommonStatus.ENABLED.name());
@@ -258,10 +258,9 @@ public class CourseRelationManageService {
             hospitalDepartmentDiagnostic.put(key_department, new ArrayList<>());
         }
 
-        List<Long> courseInDiagnostic = null;
         boolean checkCoursesInDiagnostic = diagnosticId>=0;
         if (checkCoursesInDiagnostic) {
-            courseInDiagnostic = diagnosticRelation.judgeCourseInDiagnostic(diagnosticId, courseInDepartment, CommonStatus.ENABLED.name());
+            List<Long> courseInDiagnostic = diagnosticRelation.judgeCourseInDiagnostic(diagnosticId, courseInDepartment, CommonStatus.ENABLED.name());
             hospitalDepartmentDiagnostic.put(key_diagnostic, courseInDiagnostic);
         }
         else {

@@ -99,8 +99,12 @@ public class CourseService {
 
     public List<Long> getCourseIdByStatusAndIds(String strStatus, List<Long> courseIds) {
         logger.info("get courseId by status={} ids={}", strStatus, courseIds);
+        List<Long> resultSet = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return resultSet;
+        }
+
         CourseStatus status = CourseStatus.parseString(strStatus);
-        List<Long> resultSet = null;
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 resultSet = repository.findCourseIdByStatusAndIdIn(status, courseIds, sort);
@@ -109,15 +113,16 @@ public class CourseService {
         else {
             resultSet = repository.findCourseIdByStatusAndIdIn(status, courseIds, sort);
         }
-        if (null==resultSet) {
-            resultSet = new ArrayList<>();
-        }
         logger.info("count is {}", resultSet.size());
         return resultSet;
     }
 
     public List<CourseBean> getCourseByStatusAndIds(String strStatus, List<Long> courseIds) {
         logger.info("get course by status={} ids={}", strStatus, courseIds);
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return new ArrayList<>();
+        }
+
         CourseStatus status = CourseStatus.parseString(strStatus);
         List<CourseEntity> resultSet = null;
         if (null==status) {

@@ -44,9 +44,13 @@ public class CourseDiagnosticRelationService {
     //============================================================================
     public List<Long> judgeCourseInDiagnostic(long lDiagnosticId, List<Long> coursesId, String strStatus) {
         logger.info("judge course={} in diagnostic={} with status={}", coursesId, lDiagnosticId, strStatus);
+        List<Long> validCourseIds = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(coursesId)) {
+            return validCourseIds;
+        }
+
         Long diagnosticId = Long.valueOf(lDiagnosticId);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<Long> validCourseIds = null;
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 validCourseIds = repository.findByDiagnosticIdAndStatusAndCoursesId(diagnosticId, status, coursesId, sort);
@@ -54,9 +58,6 @@ public class CourseDiagnosticRelationService {
         }
         else {
             validCourseIds = repository.findByDiagnosticIdAndStatusAndCoursesId(diagnosticId, status, coursesId, sort);
-        }
-        if (null==validCourseIds) {
-            validCourseIds = new ArrayList<>();
         }
         logger.info("count is {}", validCourseIds.size());
         return validCourseIds;
@@ -66,7 +67,7 @@ public class CourseDiagnosticRelationService {
         logger.info("count course in diagnostic={} with status={}", lDiagnosticId, strStatus);
         Long diagnosticId = Long.valueOf(lDiagnosticId);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<Long> courseIds = null;
+        List<Long> courseIds = new ArrayList<>();
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 courseIds = repository.findByDiagnosticIdAndStatus(diagnosticId, status, sort);
@@ -75,15 +76,16 @@ public class CourseDiagnosticRelationService {
         else {
             courseIds = repository.findByDiagnosticIdAndStatus(diagnosticId, status, sort);
         }
-        if (null==courseIds) {
-            courseIds = new ArrayList<>();
-        }
         logger.info("count is {}", courseIds.size());
         return courseIds;
     }
 
     public Map<Long, List<Long>> getDiagnosticToCourseIds(List<Long> courseIds, CommonStatus status) {
         logger.info("get diagnostic to course ids map by courseIds={} status={}", courseIds, status);
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return new HashMap<>();
+        }
+
         List<CourseDiagnosticRelationEntity> relations = repository.findByStatusAndCourseIdIn(status, courseIds, sort);
         Map<Long, List<Long>> diagnosticToCourses = new HashMap<>();
         if (!VerifyUtil.isListEmpty(relations)) {
@@ -111,7 +113,7 @@ public class CourseDiagnosticRelationService {
         }
 
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<Long> diagnosticIds = null;
+        List<Long> diagnosticIds = new ArrayList<>();
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 diagnosticIds = repository.findByCourseIdAndStatus(courseIds, status, sort);
@@ -119,9 +121,6 @@ public class CourseDiagnosticRelationService {
         }
         else {
             diagnosticIds = repository.findByCourseIdAndStatus(courseIds, status, sort);
-        }
-        if (null==diagnosticIds) {
-            diagnosticIds = new ArrayList<>();
         }
         logger.info("count is {}", diagnosticIds.size());
         return diagnosticIds;

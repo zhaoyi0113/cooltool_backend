@@ -42,9 +42,13 @@ public class CourseDepartmentRelationService {
     //============================================================================
     public List<Long> judgeCourseInDepartment(int iDepartmentId, List<Long> coursesId, String strStatus) {
         logger.info("judge course={} in department={} with status={}", coursesId, iDepartmentId, strStatus);
+        List<Long> validCourseIds = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(coursesId)) {
+            return validCourseIds;
+        }
+
         Integer departmentId = Integer.valueOf(iDepartmentId);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<Long> validCourseIds = null;
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 validCourseIds = repository.findByDepartmentIdAndStatusAndCoursesId(departmentId, status, coursesId, sort);
@@ -53,18 +57,15 @@ public class CourseDepartmentRelationService {
         else {
             validCourseIds = repository.findByDepartmentIdAndStatusAndCoursesId(departmentId, status, coursesId, sort);
         }
-        if (null==validCourseIds) {
-            validCourseIds = new ArrayList<>();
-        }
         logger.info("count is {}", validCourseIds.size());
         return validCourseIds;
     }
 
     public List<Long> getCourseInDepartment(int iDepartmentId, String strStatus) {
         logger.info("get course in department={} with status={}", iDepartmentId, strStatus);
+        List<Long> courseIds = new ArrayList<>();
         Integer departmentId = Integer.valueOf(iDepartmentId);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<Long> courseIds = null;
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 courseIds = repository.findByDepartmentIdAndStatus(departmentId, status, sort);
@@ -72,9 +73,6 @@ public class CourseDepartmentRelationService {
         }
         else {
             courseIds = repository.findByDepartmentIdAndStatus(departmentId, status, sort);
-        }
-        if (null==courseIds) {
-            courseIds = new ArrayList<>();
         }
         logger.info("count is {}", courseIds.size());
         return courseIds;
@@ -87,7 +85,7 @@ public class CourseDepartmentRelationService {
         }
 
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<Integer> departmentIds = null;
+        List<Integer> departmentIds = new ArrayList<>();
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 departmentIds = repository.findByCourseIdAndStatus(courseIds, status, sort);
@@ -95,9 +93,6 @@ public class CourseDepartmentRelationService {
         }
         else {
             departmentIds = repository.findByCourseIdAndStatus(courseIds, status, sort);
-        }
-        if (null==departmentIds) {
-            departmentIds = new ArrayList<>();
         }
         logger.info("count is {}", departmentIds.size());
         return departmentIds;

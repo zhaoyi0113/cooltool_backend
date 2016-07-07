@@ -7,7 +7,6 @@ import com.cooltoo.go2nurse.beans.UserPatientRelationBean;
 import com.cooltoo.go2nurse.converter.UserPatientRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.UserPatientRelationEntity;
 import com.cooltoo.go2nurse.repository.UserPatientRelationRepository;
-import com.cooltoo.go2nurse.repository.UserRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +41,7 @@ public class UserPatientRelationService {
     public List<Long> getPatientByUser(long lUserId, String strStatus) {
         logger.info("get patients by userId={} with status={}", lUserId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<Long> patientIds = null;
+        List<Long> patientIds = new ArrayList<>();
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 patientIds = repository.findPatientIdByUserIdAndStatus(lUserId, status, sort);
@@ -51,17 +50,18 @@ public class UserPatientRelationService {
         else {
             patientIds = repository.findPatientIdByUserIdAndStatus(lUserId, status, sort);
         }
-        if (null==patientIds) {
-            patientIds = new ArrayList<>();
-        }
         logger.info("count is {}", patientIds.size());
         return patientIds;
     }
 
     public List<Long> getUserIdByPatient(List<Long> patientIds, String strStatus) {
         logger.info("get user by patientIds={} with status={}", patientIds, strStatus);
+        if (VerifyUtil.isListEmpty(patientIds)) {
+            return new ArrayList<>();
+        }
+
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<Long> userIds = null;
+        List<Long> userIds = new ArrayList<>();
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
                 userIds = repository.findUserIdByPatientIdAndStatus(patientIds, status, sort);
@@ -69,9 +69,6 @@ public class UserPatientRelationService {
         }
         else {
             userIds = repository.findUserIdByPatientIdAndStatus(patientIds, status, sort);
-        }
-        if (null==userIds) {
-            userIds = new ArrayList<>();
         }
         logger.info("count is {}", userIds.size());
         return userIds;

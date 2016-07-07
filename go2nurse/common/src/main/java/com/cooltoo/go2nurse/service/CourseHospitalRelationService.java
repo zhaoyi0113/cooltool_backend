@@ -49,14 +49,11 @@ public class CourseHospitalRelationService {
         logger.info("count course in hospital={} with status={}", iHospitalId, strStatus);
         Integer hospitalId = Integer.valueOf(iHospitalId);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<Long> courseIds = null;
+        List<Long> courseIds = new ArrayList<>();
         if (null==status && !"ALL".equalsIgnoreCase(strStatus)) {
         }
         else {
             courseIds = repository.findByHospitalIdAndStatus(hospitalId, status, sort);
-        }
-        if (null==courseIds) {
-            courseIds = new ArrayList<>();
         }
         logger.info("count is {}", courseIds.size());
         return courseIds;

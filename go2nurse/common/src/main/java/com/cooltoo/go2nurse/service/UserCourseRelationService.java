@@ -261,7 +261,7 @@ public class UserCourseRelationService {
                 userId, strReadingStatuses, strStatus);
 
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<ReadingStatus> readingStatuses = null;
+        List<ReadingStatus> readingStatuses;
         if ("ALL".equalsIgnoreCase(strReadingStatuses)) {
             readingStatuses = ReadingStatus.getAllStatus();
         }
@@ -279,7 +279,7 @@ public class UserCourseRelationService {
                 userId, strReadingStatuses, strStatus);
 
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<ReadingStatus> readingStatuses = null;
+        List<ReadingStatus> readingStatuses;
         if ("ALL".equalsIgnoreCase(strReadingStatuses)) {
             readingStatuses = ReadingStatus.getAllStatus();
         }
@@ -297,7 +297,7 @@ public class UserCourseRelationService {
                 userId, strReadingStatuses, strStatus);
 
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<ReadingStatus> readingStatuses = null;
+        List<ReadingStatus> readingStatuses;
         if ("ALL".equalsIgnoreCase(strReadingStatuses)) {
             readingStatuses = ReadingStatus.getAllStatus();
         }
@@ -316,7 +316,7 @@ public class UserCourseRelationService {
                 userId, strReadingStatuses, strStatus, pageIndex, sizePerPage);
 
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<ReadingStatus> readingStatuses = null;
+        List<ReadingStatus> readingStatuses;
         if ("ALL".equalsIgnoreCase(strReadingStatuses)) {
             readingStatuses = ReadingStatus.getAllStatus();
         }
