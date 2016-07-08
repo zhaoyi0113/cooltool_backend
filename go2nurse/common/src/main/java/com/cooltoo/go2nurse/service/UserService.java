@@ -466,9 +466,10 @@ public class UserService {
         }
         if (changed) {
             user = repository.save(user);
+            UserBean userBean = beanConverter.convert(user);
+            return userBean;
         }
-        UserBean userBean = beanConverter.convert(user);
-        return userBean;
+        throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
 
     private void modifyDenyUserIdsCache(UserEntity user) {
