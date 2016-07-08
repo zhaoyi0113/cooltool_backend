@@ -99,9 +99,10 @@ public class CourseManageAPI {
                                  @FormParam("name") @DefaultValue("") String name,
                                  @FormParam("introduction") @DefaultValue("") String introduction,
                                  @FormParam("link") @DefaultValue("") String link,
+                                 @FormParam("category_id") @DefaultValue("-1") long categoryId,
                                  @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                 @FormParam("department_ids") @DefaultValue("-1") String strDepartmentIds,
-                                 @FormParam("diagnostic_ids") @DefaultValue("-1") String strDiagnosticIds
+                                 @FormParam("department_ids") @DefaultValue("") String strDepartmentIds,
+                                 @FormParam("diagnostic_ids") @DefaultValue("") String strDiagnosticIds
 
     ) {
         logger.info("create course");
@@ -109,6 +110,7 @@ public class CourseManageAPI {
         logger.info("course is {}", course);
         if (null!=course) {
             long courseId = course.getId();
+            categoryService.addCourseRelation(courseId, categoryId);
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
             courseRelationManageService.setCourseToDepartmentRelationship(courseId, departmentIds);
             List<Long> diagnosticIds = VerifyUtil.parseLongIds(strDiagnosticIds);
