@@ -237,7 +237,7 @@ public class CourseDiagnosticRelationService {
                 }
             }
         }
-        logger.info("set diagnostics ids is {}", diagnosticIds);
+        logger.info("set diagnostics ids is {}", settingDiagnosticIds);
         return settingDiagnosticIds;
     }
 }

@@ -2,8 +2,6 @@ package com.cooltoo.go2nurse.repository;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.entities.CourseHospitalRelationEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

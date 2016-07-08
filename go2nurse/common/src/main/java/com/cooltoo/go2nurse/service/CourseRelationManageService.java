@@ -400,6 +400,15 @@ public class CourseRelationManageService {
     //==============================================================================
 
     @Transactional
+    public List<Integer> setCourseToHospitalRelationship(long courseId, List<Integer> hospitalIds) {
+        logger.info("set course_to_hospital relationship, courseId={} hospitalIds={}",
+                courseId, hospitalIds);
+        List<Integer> settingDepartmentIds = hospitalRelation.setCourseToHospitalRelation(courseId, hospitalIds);
+        logger.info("set hospital ids is {}", settingDepartmentIds);
+        return settingDepartmentIds;
+    }
+
+    @Transactional
     public List<Integer> setCourseToDepartmentRelationship(long courseId, List<Integer> departmentIds) {
         logger.info("set course_to_department relationship, courseId={} departmentIds={}",
                 courseId, departmentIds);

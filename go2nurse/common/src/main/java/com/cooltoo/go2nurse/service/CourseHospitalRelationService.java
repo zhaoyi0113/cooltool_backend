@@ -1,12 +1,15 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.CourseHospitalRelationBean;
 import com.cooltoo.go2nurse.converter.CourseHospitalRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.CourseHospitalRelationEntity;
 import com.cooltoo.go2nurse.repository.CourseHospitalRelationRepository;
+import com.cooltoo.go2nurse.repository.CourseRepository;
+import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -31,8 +35,11 @@ public class CourseHospitalRelationService {
             new Sort.Order(Sort.Direction.DESC, "time"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
+
     @Autowired private CourseHospitalRelationRepository repository;
     @Autowired private CourseHospitalRelationBeanConverter beanConverter;
+    @Autowired private CourseRepository courseRepository;
+    @Autowired private HospitalRepository hospitalRepository;
 
     //============================================================================
     //                 get
@@ -122,5 +129,58 @@ public class CourseHospitalRelationService {
         CourseHospitalRelationBean bean = beanConverter.convert(entity);
         logger.info("add relation={}", bean);
         return bean;
+    }
+
+    //=======================================================================
+    //                    set
+    //=======================================================================
+
+    @Transactional
+    public List<Integer> setCourseToHospitalRelation(long courseId, List<Integer> hospitalIds) {
+        logger.info("set course_to_hospital_relationship courseId={} hospitalIds={}",
+                courseId, hospitalIds);
+        if (VerifyUtil.isListEmpty(hospitalIds)) {
+            logger.info("hospitalIds is empty");
+            return hospitalIds;
+        }
+        if (!courseRepository.exists(courseId)) {
+            logger.error("course not exists");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        List<HospitalEntity> existsHospital = hospitalRepository.findByIdIn(hospitalIds);
+        if (VerifyUtil.isListEmpty(existsHospital)) {
+            logger.error("hospitals not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        List<Integer> settingHospitalIds = new ArrayList<>();
+        List<Integer> existedHospitalIds = repository.findByCourseIdAndStatus(courseId, null, sort);
+        if (VerifyUtil.isListEmpty(existedHospitalIds)) {
+            for (Integer hospitalId : hospitalIds) {
+                if (null!=addCourseToHospital(courseId, hospitalId)) {
+                    settingHospitalIds.add(hospitalId);
+                }
+            }
+        }
+        else {
+            for (Integer existed : existedHospitalIds) {
+                if (hospitalIds.contains(existed)) {
+                    if (null!=updateStatus(courseId, existed, CommonStatus.ENABLED.name())) {
+                        settingHospitalIds.add(existed);
+                        hospitalIds.remove(existed);
+                    }
+                }
+                else {
+                    updateStatus(courseId, existed, CommonStatus.DELETED.name());
+                }
+            }
+            for (Integer needAdding : hospitalIds) {
+                if(null!=addCourseToHospital(courseId, needAdding)) {
+                    settingHospitalIds.add(needAdding);
+                }
+            }
+        }
+        logger.info("set hospitalIds ids is {}", settingHospitalIds);
+        return settingHospitalIds;
     }
 }

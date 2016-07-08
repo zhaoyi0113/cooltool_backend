@@ -202,7 +202,7 @@ public class CourseDepartmentRelationService {
                     }
                 }
                 else {
-                    updateStatus(courseId, existed, CommonStatus.DISABLED.name());
+                    updateStatus(courseId, existed, CommonStatus.DELETED.name());
                 }
             }
             for (Integer needAdding : departmentIds) {
@@ -211,7 +211,7 @@ public class CourseDepartmentRelationService {
                 }
             }
         }
-        logger.info("set department ids is {}", departmentIds);
+        logger.info("set department ids is {}", settingDepartmentIds);
         return settingDepartmentIds;
     }
 }
