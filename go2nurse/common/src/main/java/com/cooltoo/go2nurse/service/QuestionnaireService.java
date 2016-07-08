@@ -304,7 +304,7 @@ public class QuestionnaireService {
             }
         }
         else {
-            questionnaires = getQuestionnaireByHospitalId(0);
+            questionnaires = getQuestionnaireByHospitalId(-1/*cooltoo's hospital*/ );
             logger.info("get questionnaire without hospital");
         }
 
@@ -465,7 +465,7 @@ public class QuestionnaireService {
             entity.setConclusion(conclusion);
             changed = true;
         }
-        if (hospitalId>0 && hospitalId!=entity.getHospitalId()) {
+        if (hospitalId==-1 || (hospitalId>0 && hospitalId!=entity.getHospitalId())) {
             entity.setHospitalId(hospitalId);
             changed = true;
         }
@@ -671,7 +671,7 @@ public class QuestionnaireService {
         if (!VerifyUtil.isStringEmpty(conclusion)) {
             entity.setConclusion(conclusion);
         }
-        hospitalId = hospitalId<0 ? 0 : hospitalId;
+        hospitalId = hospitalId>0 ? hospitalId : (hospitalId == -1/*cooltoo's hospital*/ ? hospitalId : 0);
         categoryId = categoryId<0 ? 0 : categoryId;
         entity.setCategoryId(categoryId);
         entity.setHospitalId(hospitalId);

@@ -184,7 +184,7 @@ public class QuestionnaireManageServiceAPI {
                                         @FormParam("title") @DefaultValue("") String title,
                                         @FormParam("description") @DefaultValue("") String description,
                                         @FormParam("conclusion") @DefaultValue("") String conclusion,
-                                        @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                        @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
                                         @FormParam("category_id") @DefaultValue("0") long categoryId
     ) {
         QuestionnaireBean bean = questionnaireService.updateQuestionnaire(id, title, description, conclusion, hospitalId, categoryId);
@@ -272,7 +272,7 @@ public class QuestionnaireManageServiceAPI {
                                      @FormParam("title") @DefaultValue("") String title,
                                      @FormParam("description") @DefaultValue("") String description,
                                      @FormParam("conclusion") @DefaultValue("") String conclusion,
-                                     @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                     @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
                                      @FormParam("category_id") @DefaultValue("0") long categoryId
     ) {
         QuestionnaireBean bean = questionnaireService.addQuestionnaire(title, description, conclusion, hospitalId, categoryId);
