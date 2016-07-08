@@ -127,7 +127,7 @@ public class CourseCategoryManageAPI {
                                               @FormParam("course_id") @DefaultValue("0") long courseId
     ) {
         logger.info("add course category relation");
-        CourseCategoryRelationBean relation = categoryService.addCourseRelation(courseId, categoryId);
+        CourseCategoryRelationBean relation = categoryService.setCourseRelation(courseId, categoryId);
         logger.info("relation is {}", relation);
         return Response.ok(relation).build();
     }

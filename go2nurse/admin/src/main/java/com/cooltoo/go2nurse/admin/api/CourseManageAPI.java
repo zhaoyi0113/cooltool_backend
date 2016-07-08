@@ -110,7 +110,7 @@ public class CourseManageAPI {
         logger.info("course is {}", course);
         if (null!=course) {
             long courseId = course.getId();
-            categoryService.addCourseRelation(courseId, categoryId);
+            categoryService.setCourseRelation(courseId, categoryId);
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
             courseRelationManageService.setCourseToDepartmentRelationship(courseId, departmentIds);
             List<Long> diagnosticIds = VerifyUtil.parseLongIds(strDiagnosticIds);
@@ -137,7 +137,7 @@ public class CourseManageAPI {
         CourseBean course = courseService.updateCourseBasicInfo(courseId, name, introduction, null, null, link);
         logger.info("course is {}", course);
         if (null!=course) {
-            categoryService.addCourseRelation(courseId, categoryId);
+            categoryService.setCourseRelation(courseId, categoryId);
             List<Integer> hospitalIds = VerifyUtil.parseIntIds(strHospitalIds);
             courseRelationManageService.setCourseToHospitalRelationship(courseId, hospitalIds);
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);

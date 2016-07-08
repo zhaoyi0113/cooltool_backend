@@ -416,8 +416,8 @@ public class CourseCategoryService {
     }
 
     @Transactional
-    public CourseCategoryRelationBean addCourseRelation(long courseId, long categoryId) {
-        logger.info("add course relation courseId={} categoryId={}", courseId, categoryId);
+    public CourseCategoryRelationBean setCourseRelation(long courseId, long categoryId) {
+        logger.info("set course relation courseId={} categoryId={}", courseId, categoryId);
         if (!existsCategory(categoryId)) {
             logger.info("category not exists");
             return null;
@@ -427,24 +427,42 @@ public class CourseCategoryService {
             return null;
         }
         CourseCategoryRelationBean relationBean;
-        List<CourseCategoryRelationEntity> relations = relationRepository.findByCourseIdAndCourseCategoryId(courseId, categoryId, relationSort);
+        List<CourseCategoryRelationEntity> relations = relationRepository.findByCourseId(courseId, relationSort);
         if (VerifyUtil.isListEmpty(relations)) {
-            CourseCategoryRelationEntity entity = new CourseCategoryRelationEntity();
-            entity.setCourseId(courseId);
-            entity.setCourseCategoryId(categoryId);
-            entity.setTime(new Date());
-            entity.setStatus(CommonStatus.ENABLED);
+            CourseCategoryRelationEntity entity = createEntity(courseId, categoryId);
             entity = relationRepository.save(entity);
             relationBean = relationBeanConverter.convert(entity);
         }
         else {
+            CourseCategoryRelationEntity relationAdded = null;
             for (CourseCategoryRelationEntity relation : relations) {
-                relation.setStatus(CommonStatus.ENABLED);
-                relation.setTime(new Date());
+                if (relation.getCourseCategoryId()==categoryId) {
+                    relationAdded = relation;
+                }
             }
-            relationRepository.save(relations);
-            relationBean = relationBeanConverter.convert(relations.get(0));
+            if (null!=relationAdded) {
+                relations.remove(relationAdded);
+            }
+            if (!VerifyUtil.isListEmpty(relations)) {
+                relationRepository.delete(relations);
+            }
+            if (null==relationAdded) {
+                relationAdded = createEntity(courseId, categoryId);
+            }
+            relationAdded.setStatus(CommonStatus.ENABLED);
+            relationRepository.save(relationAdded);
+
+            relationBean = relationBeanConverter.convert(relationAdded);
         }
         return relationBean;
+    }
+
+    private CourseCategoryRelationEntity createEntity(long courseId, long categoryId) {
+        CourseCategoryRelationEntity entity = new CourseCategoryRelationEntity();
+        entity.setCourseId(courseId);
+        entity.setCourseCategoryId(categoryId);
+        entity.setTime(new Date());
+        entity.setStatus(CommonStatus.ENABLED);
+        return entity;
     }
 }

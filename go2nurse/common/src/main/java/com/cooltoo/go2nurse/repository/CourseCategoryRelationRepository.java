@@ -14,6 +14,8 @@ import java.util.List;
 public interface CourseCategoryRelationRepository  extends JpaRepository<CourseCategoryRelationEntity, Long> {
     List<CourseCategoryRelationEntity> findByCourseIdAndCourseCategoryId(long courseId, long categoryId, Sort sort);
 
+    List<CourseCategoryRelationEntity> findByCourseId(long courseId, Sort sort);
+
     @Query("SELECT DISTINCT relation.courseCategoryId FROM CourseCategoryRelationEntity relation" +
             " WHERE (relation.status=?1 OR ?1 IS NULL)" +
             " AND relation.courseId=?2")

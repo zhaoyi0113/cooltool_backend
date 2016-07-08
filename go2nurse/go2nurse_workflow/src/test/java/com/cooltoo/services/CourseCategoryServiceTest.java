@@ -8,7 +8,6 @@ import com.cooltoo.go2nurse.beans.CourseCategoryRelationBean;
 import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.go2nurse.service.CourseCategoryService;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -301,7 +300,7 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
         CourseCategoryRelationBean relation = service.getRelation(courseId, categoryId);
         Assert.assertNotNull(relation);
         Assert.assertEquals(CommonStatus.DISABLED, relation.getStatus());
-        service.addCourseRelation(courseId, categoryId);
+        service.setCourseRelation(courseId, categoryId);
         relation = service.getRelation(courseId, categoryId);
         Assert.assertNotNull(relation);
         Assert.assertEquals(CommonStatus.ENABLED, relation.getStatus());
@@ -309,7 +308,7 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
         courseId = 9;
         relation = service.getRelation(courseId, categoryId);
         Assert.assertNull(relation);
-        service.addCourseRelation(courseId, categoryId);
+        service.setCourseRelation(courseId, categoryId);
         relation = service.getRelation(courseId, categoryId);
         Assert.assertNotNull(relation);
         Assert.assertEquals(CommonStatus.ENABLED, relation.getStatus());
