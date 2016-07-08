@@ -228,7 +228,7 @@ public class CourseDiagnosticRelationService {
                     }
                 }
                 else {
-                    updateStatus(courseId, existed, CommonStatus.DISABLED.name());
+                    updateStatus(courseId, existed, CommonStatus.DELETED.name());
                 }
             }
             for (Long needAdding : diagnosticIds) {
