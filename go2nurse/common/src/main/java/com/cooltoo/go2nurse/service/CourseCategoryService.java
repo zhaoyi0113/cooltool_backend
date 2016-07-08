@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.CourseBean;
@@ -124,13 +125,25 @@ public class CourseCategoryService {
             categoryIdToBean.put(category.getId(), category);
         }
 
+        // all courses sor
+        List<CourseBean> allCourseSortedByReadStatus = new ArrayList<>();
+        CourseCategoryBean courseCategoryAllSortedByReadStatus = new CourseCategoryBean();
+        courseCategoryAllSortedByReadStatus.setName("all");
+        courseCategoryAllSortedByReadStatus.setIntroduction("all");
+        // all course without any category property
         CourseCategoryBean others = new CourseCategoryBean();
         others.setName("others");
         others.setIntroduction("others");
 
         Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = new HashMap<>();
+        categoryToCourses.put(courseCategoryAllSortedByReadStatus, allCourseSortedByReadStatus);
 
         for (CourseBean course : courses) {
+            // construct all course sorted by read status
+            if (!ReadingStatus.READ.equals(course.getReading())) {
+                allCourseSortedByReadStatus.add(course);
+            }
+
             Long tmpCourseId = course.getId();
             List<Long> tmpCategoriesId = courseIdToCategoriesId.get(tmpCourseId);
 
@@ -157,6 +170,13 @@ public class CourseCategoryService {
                     categoryToCourses.put(tmpCategory, tmpCourses);
                 }
                 tmpCourses.add(course);
+            }
+        }
+
+        for (CourseBean course : courses) {
+            // construct all course sorted by read status
+            if (ReadingStatus.READ.equals(course.getReading())) {
+                allCourseSortedByReadStatus.add(course);
             }
         }
 
