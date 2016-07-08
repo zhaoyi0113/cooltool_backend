@@ -131,7 +131,7 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
                 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L
         });
         Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = service.getCategoryRelationByCourseId(coursesId);
-        Assert.assertEquals(5, categoryToCourses.size());
+        Assert.assertEquals(6, categoryToCourses.size());
         Set<CourseCategoryBean> categories = categoryToCourses.keySet();
         for (CourseCategoryBean category : categories) {
             List<CourseBean> courses = categoryToCourses.get(category);
@@ -149,6 +149,9 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
             }
             else if (category.getId()==0) {
                 Assert.assertEquals(4, courses.size());
+            }
+            else if (category.getId()==-1) {
+                Assert.assertEquals(9, courses.size());
             }
         }
     }

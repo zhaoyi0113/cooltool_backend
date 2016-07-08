@@ -128,10 +128,12 @@ public class CourseCategoryService {
         // all courses sor
         List<CourseBean> allCourseSortedByReadStatus = new ArrayList<>();
         CourseCategoryBean courseCategoryAllSortedByReadStatus = new CourseCategoryBean();
+        courseCategoryAllSortedByReadStatus.setId(-1);
         courseCategoryAllSortedByReadStatus.setName("all");
         courseCategoryAllSortedByReadStatus.setIntroduction("all");
         // all course without any category property
         CourseCategoryBean others = new CourseCategoryBean();
+        others.setId(0);
         others.setName("others");
         others.setIntroduction("others");
 
