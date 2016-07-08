@@ -148,6 +148,7 @@ public class UserHospitalizedAPI {
                 bean.setId(key.ordinal());
                 bean.setType(key.name());
                 bean.setDescription("");
+                bean.setImageUrl("");
                 bean.setCourses(value);
                 beans.add(bean);
             });
@@ -160,6 +161,7 @@ public class UserHospitalizedAPI {
                 bean.setId(key.getId());
                 bean.setType(key.getName());
                 bean.setDescription(key.getIntroduction());
+                bean.setImageUrl(key.getImageUrl());
                 bean.setCourses(value);
                 beans.add(bean);
             });
