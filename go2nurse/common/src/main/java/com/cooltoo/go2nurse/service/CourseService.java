@@ -294,12 +294,12 @@ public class CourseService {
             logger.error("the name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        // stop check the title is exist or not
-        long count = repository.countByName(name);
-        if (count>0) {
-            logger.error("the name is exist already");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+//// stop check the title is exist or not
+//        long count = repository.countByName(name);
+//        if (count>0) {
+//            logger.error("the name is exist already");
+//            throw new BadRequestException(ErrorCode.DATA_ERROR);
+//        }
 
         CourseEntity entity = new CourseEntity();
         entity.setName(name);
