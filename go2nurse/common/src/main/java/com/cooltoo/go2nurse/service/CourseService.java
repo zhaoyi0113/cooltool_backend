@@ -369,11 +369,11 @@ public class CourseService {
 
         if (!VerifyUtil.isStringEmpty(name)) {
             if (!name.equals(entity.getName())) {
-                long count = repository.countByName(name);
-                if (count<=0) {
+//                long count = repository.countByName(name);
+//                if (count<=0) {
                     entity.setName(name);
                     changed = true;
-                }
+//                }
             }
         }
 
