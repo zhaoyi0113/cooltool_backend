@@ -82,9 +82,40 @@ public class CourseCategoryService {
         return categories;
     }
 
-    public Map<CourseCategoryBean, List<CourseBean>> getCategoryRelationByCourseId(List<Long> courseIds) {
-        logger.info("get course category at status={} by courseIds={}", courseIds);
+    public Map<CourseCategoryBean, List<CourseBean>> getCategoryRelationByCourse(List<CourseBean> courses) {
+        logger.info("get course category to course Map by courses", courses);
+        if (VerifyUtil.isListEmpty(courses)) {
+            logger.info("courses is empty");
+            return new HashMap<>();
+        }
+        List<Long> courseIds = new ArrayList<>();
+        for (CourseBean course : courses) {
+            if (courseIds.contains(course.getId())) {
+                continue;
+            }
+            courseIds.add(course.getId());
+        }
         List<CourseCategoryRelationEntity> relations = relationRepository.findByStatusAndCourseIdIn(CommonStatus.ENABLED, courseIds);
+        return getCategoryRelationByCourseAndRelation(relations, courses);
+    }
+
+    public Map<CourseCategoryBean, List<CourseBean>> getCategoryRelationByCourseId(List<Long> courseIds) {
+        logger.info("get course category to course Map by courseIds={}", courseIds);
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            logger.info("courseIds is empty");
+            return new HashMap<>();
+        }
+        List<CourseBean> courses = courseService.getCourseByIds(courseIds);
+        List<CourseCategoryRelationEntity> relations = relationRepository.findByStatusAndCourseIdIn(CommonStatus.ENABLED, courseIds);
+        return getCategoryRelationByCourseAndRelation(relations, courses);
+    }
+
+    private Map<CourseCategoryBean, List<CourseBean>> getCategoryRelationByCourseAndRelation(
+            List<CourseCategoryRelationEntity> relations, List<CourseBean> courses) {
+        logger.info("get course category to course Map by relations and courses");
+        if (VerifyUtil.isListEmpty(relations) || VerifyUtil.isListEmpty(courses)) {
+            return new HashMap<>();
+        }
 
         Map<Long, List<Long>> courseIdToCategoryIds = new HashMap<>();
         List<Long> categoriesId = new ArrayList<>();
@@ -108,7 +139,7 @@ public class CourseCategoryService {
         }
 
         Map<CourseCategoryBean, List<CourseBean>> returnValue =
-                fillCategoryToCourseMap(courseIdToCategoryIds, categoriesId, courseIds);
+                fillCategoryToCourseMap(courseIdToCategoryIds, categoriesId, courses);
         logger.info("count is {}", returnValue.size());
         return returnValue;
     }
@@ -116,10 +147,9 @@ public class CourseCategoryService {
     private Map<CourseCategoryBean, List<CourseBean>> fillCategoryToCourseMap(
             Map<Long, List<Long>> courseIdToCategoriesId,
             List<Long> categoriesId,
-            List<Long> coursesId) {
+            List<CourseBean> courses) {
 
         Map<Long, CourseCategoryBean> categoryIdToBean = new HashMap<>();
-        List<CourseBean> courses = courseService.getCourseByIds(coursesId);
         List<CourseCategoryBean> categories = getCategoryByStatusAndIds("ALL", categoriesId);
         for (CourseCategoryBean category : categories) {
             categoryIdToBean.put(category.getId(), category);

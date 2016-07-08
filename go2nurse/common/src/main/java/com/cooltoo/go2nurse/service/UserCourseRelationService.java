@@ -52,22 +52,39 @@ public class UserCourseRelationService {
     //               getting for user
     //===================================================
     public Map<CourseCategoryBean, List<CourseBean>> getAllPublicExtensionNursingCourses(long userId) {
-        logger.info("get all public extension nursing courses");
+        logger.info("user={} get all public extension nursing courses", userId);
         List<Long> coursesId = courseRelationManageService.getEnabledCoursesIdInExtensionNursing();
         Map<CourseCategoryBean, List<CourseBean>> returnValue =
                 courseCategoryService.getCategoryRelationByCourseId(coursesId);
 
-        List<Long> readCourseIds = getRelationCourseId(userId, "read", CommonStatus.ENABLED.name());
+        setCourseReadStatusForCategoryToCourseBeans(userId, returnValue);
+        return returnValue;
+    }
 
-        Set<CourseCategoryBean> keys = returnValue.keySet();
+    public Map<CourseCategoryBean, List<CourseBean>> getAllCategoryToCoursesByCourses(List<CourseBean> courses) {
+        logger.info("get all course_category to courses map");
+        Map<CourseCategoryBean, List<CourseBean>> returnValue = courseCategoryService.getCategoryRelationByCourse(courses);
+        return returnValue;
+    }
+
+    private void setCourseReadStatusForCategoryToCourseBeans(long userId, Map<CourseCategoryBean, List<CourseBean>> categoryToCourses) {
+        logger.info("set user={} course read status", userId);
+        if (VerifyUtil.isMapEmpty(categoryToCourses)) {
+            return;
+        }
+
+        List<Long> readCourseIds = getRelationCourseId(userId, "read", CommonStatus.ENABLED.name());
+        if (VerifyUtil.isListEmpty(readCourseIds)) {
+            return;
+        }
+
+        Set<CourseCategoryBean> keys = categoryToCourses.keySet();
         for (CourseCategoryBean key : keys) {
-            List<CourseBean> courses = returnValue.get(key);
+            List<CourseBean> courses = categoryToCourses.get(key);
             for (CourseBean course : courses) {
                 course.setReading(readCourseIds.contains(course.getId()) ? ReadingStatus.READ : ReadingStatus.UNREAD);
             }
         }
-
-        return returnValue;
     }
 
     public boolean isUserSelectedHospitalCoursesNow(long userId) {

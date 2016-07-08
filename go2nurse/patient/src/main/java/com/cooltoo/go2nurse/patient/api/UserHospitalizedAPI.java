@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by hp on 2016/6/16.
@@ -143,7 +144,10 @@ public class UserHospitalizedAPI {
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
             Map<DiagnosticEnumeration, List<CourseBean>> courses
                     = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
-            courses.forEach((key, value) -> {
+            List<CourseBean> extensionNursingCourses=null;
+            Set<DiagnosticEnumeration> keys = courses.keySet();
+            for (DiagnosticEnumeration key : keys) {
+                List<CourseBean> value = courses.get(key);
                 UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
                 bean.setId(key.ordinal());
                 bean.setType(key.name());
@@ -151,7 +155,23 @@ public class UserHospitalizedAPI {
                 bean.setImageUrl("");
                 bean.setCourses(value);
                 beans.add(bean);
-            });
+                if (DiagnosticEnumeration.EXTENSION_NURSING.equals(key)) {
+                    extensionNursingCourses = value;
+                }
+            }
+            if (!VerifyUtil.isListEmpty(extensionNursingCourses)) {
+                Map<CourseCategoryBean, List<CourseBean>> extensionNursingMap
+                        = userCourseService.getAllCategoryToCoursesByCourses(extensionNursingCourses);
+                extensionNursingMap.forEach((key, value) -> {
+                    UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
+                    bean.setId(key.getId());
+                    bean.setType(key.getName());
+                    bean.setDescription(key.getIntroduction());
+                    bean.setImageUrl(key.getImageUrl());
+                    bean.setCourses(value);
+                    beans.add(bean);
+                });
+            }
         }
         else {
             Map<CourseCategoryBean, List<CourseBean>> courses
