@@ -7,7 +7,7 @@ import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
-import com.cooltoo.go2nurse.patient.beans.UserHospitalizedCorusesBean;
+import com.cooltoo.go2nurse.patient.beans.UserHospitalizedCoursesBean;
 import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -139,12 +139,12 @@ public class UserHospitalizedAPI {
         UserBean user = userService.getUser(userId);
         boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
 
-        List<UserHospitalizedCorusesBean> beans = new ArrayList<>();
+        List<UserHospitalizedCoursesBean> beans = new ArrayList<>();
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
             Map<DiagnosticEnumeration, List<CourseBean>> courses
                     = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
             courses.forEach((key, value) -> {
-                UserHospitalizedCorusesBean bean = new UserHospitalizedCorusesBean();
+                UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
                 bean.setId(key.ordinal());
                 bean.setType(key.name());
                 bean.setDescription("");
@@ -157,7 +157,7 @@ public class UserHospitalizedAPI {
             Map<CourseCategoryBean, List<CourseBean>> courses
                     = userCourseService.getAllPublicExtensionNursingCourses(userId);
             courses.forEach((key, value) -> {
-                UserHospitalizedCorusesBean bean = new UserHospitalizedCorusesBean();
+                UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
                 bean.setId(key.getId());
                 bean.setType(key.getName());
                 bean.setDescription(key.getIntroduction());

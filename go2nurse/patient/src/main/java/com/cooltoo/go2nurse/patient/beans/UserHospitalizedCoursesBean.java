@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by yzzhao on 6/22/16.
  */
-public class UserHospitalizedCorusesBean {
+public class UserHospitalizedCoursesBean {
 
     private long id;
     private String type;
