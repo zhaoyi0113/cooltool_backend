@@ -125,6 +125,7 @@ public class CourseManageAPI {
                                           @FormParam("name") @DefaultValue("") String name,
                                           @FormParam("introduction") @DefaultValue("") String introduction,
                                           @FormParam("link") @DefaultValue("") String link,
+                                          @FormParam("category_id") @DefaultValue("-1") long categoryId,
                                           @FormParam("hospital_ids") @DefaultValue("") String strHospitalIds,
                                           @FormParam("department_ids") @DefaultValue("") String strDepartmentIds,
                                           @FormParam("diagnostic_ids") @DefaultValue("") String strDiagnosticIds
@@ -134,6 +135,7 @@ public class CourseManageAPI {
         CourseBean course = courseService.updateCourseBasicInfo(courseId, name, introduction, null, null, link);
         logger.info("course is {}", course);
         if (null!=course) {
+            categoryService.addCourseRelation(courseId, categoryId);
             List<Integer> hospitalIds = VerifyUtil.parseIntIds(strHospitalIds);
             courseRelationManageService.setCourseToHospitalRelationship(courseId, hospitalIds);
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
