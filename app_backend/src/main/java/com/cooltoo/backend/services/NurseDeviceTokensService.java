@@ -5,12 +5,14 @@ import com.cooltoo.backend.converter.NurseDeviceTokensBeanConverter;
 import com.cooltoo.backend.entities.NurseDeviceTokensEntity;
 import com.cooltoo.backend.repository.NurseDeviceTokensRepository;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,58 +48,79 @@ public class NurseDeviceTokensService {
         for (NurseDeviceTokensEntity entity : tokens) {
             entity.setUserId(-1);
             deviceTokensRepository.save(entity);
-
         }
     }
 
     public List<NurseDeviceTokensBean> getNurseDeviceTokens(long userId) {
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndStatus(userId, CommonStatus.ENABLED);
-        return getNurseDeviceTokensBeans(tokens);
+        return entitiesToBeans(tokens);
     }
 
-    private List<NurseDeviceTokensBean> getNurseDeviceTokensBeans(List<NurseDeviceTokensEntity> tokens) {
+    public List<NurseDeviceTokensBean> getAllActiveDeviceTokens() {
+        List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByStatus(CommonStatus.ENABLED);
+        return entitiesToBeans(tokens);
+    }
+
+    private List<NurseDeviceTokensBean> entitiesToBeans(List<NurseDeviceTokensEntity> entities) {
         List<NurseDeviceTokensBean> beans = new ArrayList<>();
-        for (NurseDeviceTokensEntity entity : tokens) {
+        for (NurseDeviceTokensEntity entity : entities) {
             NurseDeviceTokensBean bean = beanConverter.convert(entity);
             beans.add(bean);
         }
         return beans;
     }
 
-    public List<NurseDeviceTokensBean> getAllActiveDeviceTokens() {
-        List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByStatus(CommonStatus.ENABLED);
-        return getNurseDeviceTokensBeans(tokens);
-    }
-
+    @Transactional
     private long saveDeviceToken(long userId, String token) {
-
-        if (userId != ANONYMOUS_USER_ID) {
-
-            //make sure one device token only belones to one user
-            List<NurseDeviceTokensEntity> deviceTokens = deviceTokensRepository.findByDeviceToken(token);
-            for (NurseDeviceTokensEntity entity : deviceTokens) {
-                if (entity.getUserId() == ANONYMOUS_USER_ID) {
-                    entity.setUserId(userId);
-                    deviceTokensRepository.save(entity);
-                } else if (entity.getUserId() != userId) {
-                    entity.setStatus(CommonStatus.DISABLED);
-                    deviceTokensRepository.save(entity);
-                } else if (entity.getUserId() == userId && !entity.getStatus().equals(CommonStatus.ENABLED)) {
-                    entity.setStatus(CommonStatus.ENABLED);
-                    deviceTokensRepository.save(entity);
-                }
+        //make sure one device token only one on activity status
+        //make sure one device token only belongs to one user
+        List<NurseDeviceTokensEntity> anonymousDeviceTokens = new ArrayList<>();
+        List<NurseDeviceTokensEntity> nurseDeviceTokens = new ArrayList<>();
+        List<NurseDeviceTokensEntity> deviceTokens = deviceTokensRepository.findByDeviceToken(token);
+        for (NurseDeviceTokensEntity deviceToken : deviceTokens) {
+            if (deviceToken.getUserId()==ANONYMOUS_USER_ID) {
+                anonymousDeviceTokens.add(deviceToken);
             }
-            List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);
-            if (!tokens.isEmpty()) {
-                return tokens.get(0).getId();
+            if (deviceToken.getUserId()==userId) {
+                nurseDeviceTokens.add(deviceToken);
             }
+            deviceToken.setStatus(CommonStatus.DISABLED);
+        }
+        if (!VerifyUtil.isListEmpty(deviceTokens)) {
+            deviceTokensRepository.save(deviceTokens);
+        }
 
+        // add anonymous device token to user device
+        for (NurseDeviceTokensEntity deviceToken : anonymousDeviceTokens) {
+            nurseDeviceTokens.add(deviceToken);
+        }
+
+        if (!VerifyUtil.isListEmpty(nurseDeviceTokens)) {
+            NurseDeviceTokensEntity nurseDeviceToken = nurseDeviceTokens.get(0);
+            nurseDeviceTokens.remove(0);
+            // if the first device token is marked by anonymous user
+            if (nurseDeviceToken.getUserId()!=userId) {
+                nurseDeviceToken.setUserId(userId);
+            }
+            nurseDeviceToken.setStatus(CommonStatus.ENABLED);
+            nurseDeviceToken.setTimeCreated(new Date());
+
+            nurseDeviceToken = deviceTokensRepository.save(nurseDeviceToken);
+            if (!VerifyUtil.isListEmpty(nurseDeviceTokens)) {
+                deviceTokensRepository.delete(nurseDeviceTokens);
+            }
+            if (userId == ANONYMOUS_USER_ID) {
+                return userId;
+            }
+            else {
+                return nurseDeviceToken.getId();
+            }
         }
 
         return registerNewDeviceToken(userId, token);
-
     }
 
+    @Transactional
     private long registerNewDeviceToken(long userId, String token) {
         List<NurseDeviceTokensEntity> existed = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);
         if (existed != null && !existed.isEmpty()){
