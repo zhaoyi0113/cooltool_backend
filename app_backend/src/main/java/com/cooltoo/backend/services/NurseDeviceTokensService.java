@@ -6,6 +6,8 @@ import com.cooltoo.backend.entities.NurseDeviceTokensEntity;
 import com.cooltoo.backend.repository.NurseDeviceTokensRepository;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,16 +23,11 @@ import java.util.List;
 @Component
 public class NurseDeviceTokensService {
 
-    @Autowired
-    private NurseDeviceTokensRepository deviceTokensRepository;
-
-    @Autowired
-    private NurseService nurseService;
-
+    private static final Logger logger = LoggerFactory.getLogger(NurseDeviceTokensService.class);
     private static final int ANONYMOUS_USER_ID = -1;
 
-    @Autowired
-    private NurseDeviceTokensBeanConverter beanConverter;
+    @Autowired private NurseDeviceTokensRepository deviceTokensRepository;
+    @Autowired private NurseDeviceTokensBeanConverter beanConverter;
 
     @Transactional
     public long registerAnonymousDeviceToken(String token) {
@@ -39,11 +36,13 @@ public class NurseDeviceTokensService {
 
     @Transactional
     public long registerUserDeviceToken(long userId, String token) {
+        logger.info("register user device token, userId={} deviceToken={}", userId, token);
         return saveDeviceToken(userId, token);
     }
 
     @Transactional
     public void inactiveUserDeviceToken(long userId, String token) {
+        logger.info("inactive user device token, userId={} deviceToken={}", userId, token);
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);
         for (NurseDeviceTokensEntity entity : tokens) {
             entity.setUserId(-1);
@@ -52,13 +51,19 @@ public class NurseDeviceTokensService {
     }
 
     public List<NurseDeviceTokensBean> getNurseDeviceTokens(long userId) {
+        logger.info("get user active device token, userId={}", userId);
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByUserIdAndStatus(userId, CommonStatus.ENABLED);
-        return entitiesToBeans(tokens);
+        List<NurseDeviceTokensBean> beans = entitiesToBeans(tokens);
+        logger.info("get user active device token, count={}", beans.size());
+        return beans;
     }
 
     public List<NurseDeviceTokensBean> getAllActiveDeviceTokens() {
+        logger.info("get all active device token");
         List<NurseDeviceTokensEntity> tokens = deviceTokensRepository.findByStatus(CommonStatus.ENABLED);
-        return entitiesToBeans(tokens);
+        List<NurseDeviceTokensBean> beans = entitiesToBeans(tokens);
+        logger.info("get all active device token, count={}", beans.size());
+        return beans;
     }
 
     private List<NurseDeviceTokensBean> entitiesToBeans(List<NurseDeviceTokensEntity> entities) {
