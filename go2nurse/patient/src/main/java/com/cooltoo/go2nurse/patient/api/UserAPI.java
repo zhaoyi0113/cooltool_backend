@@ -48,7 +48,7 @@ public class UserAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response updateUser(@Context HttpServletRequest request,
                                @FormParam("name") @DefaultValue("") String name,
-                               @FormParam("gender") @DefaultValue("2") int gender,
+                               @FormParam("gender") @DefaultValue("-1") int gender,
                                @FormParam("birthday") @DefaultValue("") String birthday,
                                @FormParam("address") @DefaultValue("") String address,
                                @FormParam("has_decide") @DefaultValue("NO") String hasDecide
