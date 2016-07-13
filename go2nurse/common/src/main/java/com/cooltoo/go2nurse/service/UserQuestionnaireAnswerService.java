@@ -77,6 +77,25 @@ public class UserQuestionnaireAnswerService {
         }
     }
 
+    public List<QuestionnaireStatisticsBean> getQuestionnaireStatistics(long questionnaireId) {
+        logger.info("get questionnaire statistics by questionnaireId={}", questionnaireId);
+        List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByIds(""+questionnaireId);
+        if (VerifyUtil.isListEmpty(questionnaires)) {
+            logger.warn("there is no questionnaire");
+            return new ArrayList<>();
+        }
+        if (1==questionnaires.size()) {
+            logger.warn("there is more than one questionnaire, questionnaire are {}", questionnaires);
+            return new ArrayList<>();
+        }
+        QuestionnaireBean questionnaire = questionnaires.get(0);
+        List<UserQuestionnaireAnswerEntity> userAnswerEntities = repository.findByQuestionnaireId(questionnaireId, sort);
+        List<UserQuestionnaireAnswerBean> userAnswers = entitiesToBeans(userAnswerEntities);
+        List<QuestionnaireStatisticsBean> questionnaireStatistics = fillQuestionnaireStatistics(questionnaire, userAnswers);
+        logger.info("get questionnaire statistics, count={}", questionnaireStatistics.size());
+        return questionnaireStatistics;
+    }
+
     private List<UserQuestionnaireAnswerBean> getAllUsersAnswers(long userId) {
         logger.info("get all users' answer by userId={}", userId);
         List<UserQuestionnaireAnswerEntity> entities = repository.findByUserId(userId, sort);
@@ -91,6 +110,72 @@ public class UserQuestionnaireAnswerService {
         List<UserQuestionnaireAnswerBean> beans = entitiesToBeans(entities);
         logger.info("count is {}", beans.size());
         return beans;
+    }
+
+    private List<QuestionnaireStatisticsBean> fillQuestionnaireStatistics(QuestionnaireBean questionnaire, List<UserQuestionnaireAnswerBean> userAnswers) {
+        if (null==questionnaire || VerifyUtil.isListEmpty(userAnswers)) {
+            return new ArrayList<>();
+        }
+        int questionNumber = VerifyUtil.isListEmpty(questionnaire.getQuestions()) ? 0 : questionnaire.getQuestions().size();
+        List<QuestionnaireConclusionBean> conclusions = go2NurseUtility.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
+
+        // construct the return value
+        List<QuestionnaireStatisticsBean> returnValue = new ArrayList<>();
+        QuestionnaireStatisticsBean currentStatistics = null;
+        int currentGroupScore = 0;
+        int currentGroupAnswer = 0;
+        Long currentGroupId = 0L;
+        for (int i=0, count=userAnswers.size(); i<count; i++) {
+            UserQuestionnaireAnswerBean currentAnswer = userAnswers.get(i);
+            currentGroupAnswer ++;
+            if (currentGroupId!=currentAnswer.getGroupId()) {
+                // set the score and conclusion, when group changed
+                if (null!=currentStatistics) {
+                    currentStatistics.setAnswerNumber(currentGroupAnswer);
+                    currentStatistics.setCompleted(currentGroupAnswer==questionNumber);
+                    currentStatistics.setScore(currentGroupScore);
+                    for (QuestionnaireConclusionBean conclusion : conclusions) {
+                        if (conclusion.isThisConclusion(currentGroupScore)) {
+                            currentStatistics.setConclusion(conclusion.getItem());
+                            break;
+                        }
+                    }
+                }
+
+                // create a statistics for another cycle
+                currentStatistics = new QuestionnaireStatisticsBean();
+                currentStatistics.setUserId(currentAnswer.getUserId());
+                currentStatistics.setPatientId(currentAnswer.getPatientId());
+                currentStatistics.setQuestionNumber(questionNumber);
+                returnValue.add(currentStatistics);
+
+                // reset groupId and groupScore and groupAnswer for another cycle
+                currentGroupId = currentAnswer.getGroupId();
+                currentGroupScore = 0;
+                currentGroupAnswer = 0;
+            }
+            if (null==currentStatistics) {
+                continue;
+            }
+
+            // calculate  score
+            String answer = currentAnswer.getAnswer();
+            currentGroupScore += parseUserAnswerScore(answer);
+        }
+
+        if (null!=currentStatistics) {
+            currentStatistics.setAnswerNumber(currentGroupAnswer);
+            currentStatistics.setCompleted(currentGroupAnswer==questionNumber);
+            currentStatistics.setScore(currentGroupScore);
+            for (QuestionnaireConclusionBean conclusion : conclusions) {
+                if (conclusion.isThisConclusion(currentGroupScore)) {
+                    currentStatistics.setConclusion(conclusion.getItem());
+                    break;
+                }
+            }
+        }
+
+        return returnValue;
     }
 
     private List<QuestionnaireBean> fillQuestionnaireAnswer(List<UserQuestionnaireAnswerBean> allAnswers) {
@@ -162,22 +247,10 @@ public class UserQuestionnaireAnswerService {
 
             // calculate  score
             String answer = currentAnswer.getAnswer();
-            long questionId = currentAnswer.getQuestionId();
-            boolean single = answer.indexOf('{')==answer.lastIndexOf('{');
-            if (single) {
-                QuestionOptionBean userOption = go2NurseUtility.parseJsonBean(answer, QuestionOptionBean.class);
-                if (null != userOption) {
-                    userScore += userOption.getScore();
-                }
-            }
-            else {
-                List<QuestionOptionBean> userOptions = go2NurseUtility.parseJsonList(answer, QuestionOptionBean.class);
-                for (QuestionOptionBean userOption : userOptions) {
-                    userScore += userOption.getScore();
-                }
-            }
+            userScore += parseUserAnswerScore(answer);
 
             // set answer to question
+            long questionId = currentAnswer.getQuestionId();
             List<QuestionBean> questions = currentQuestionnaire.getQuestions();
             if (VerifyUtil.isListEmpty(questions)) {
                 continue;
@@ -224,6 +297,30 @@ public class UserQuestionnaireAnswerService {
             beans.add(bean);
         }
         return beans;
+    }
+
+    private int parseUserAnswerScore(String answer) {
+        int userScore = 0;
+        if (VerifyUtil.isStringEmpty(answer)) {
+            return userScore;
+        }
+
+        // calculate  score
+        boolean single = answer.indexOf('{')==answer.lastIndexOf('{');
+        if (single) {
+            QuestionOptionBean userOption = go2NurseUtility.parseJsonBean(answer, QuestionOptionBean.class);
+            if (null != userOption) {
+                userScore += userOption.getScore();
+            }
+        }
+        else {
+            List<QuestionOptionBean> userOptions = go2NurseUtility.parseJsonList(answer, QuestionOptionBean.class);
+            for (QuestionOptionBean userOption : userOptions) {
+                userScore += userOption.getScore();
+            }
+        }
+
+        return userScore;
     }
 
     //==========================================================================

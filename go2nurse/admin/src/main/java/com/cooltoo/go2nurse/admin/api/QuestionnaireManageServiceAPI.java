@@ -3,11 +3,14 @@ package com.cooltoo.go2nurse.admin.api;
 import com.cooltoo.go2nurse.beans.QuestionBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
+import com.cooltoo.go2nurse.beans.QuestionnaireStatisticsBean;
 import com.cooltoo.go2nurse.service.QuestionnaireService;
+import com.cooltoo.go2nurse.service.UserQuestionnaireAnswerService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.security.DeclareRoles;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -23,6 +26,7 @@ import java.util.List;
 public class QuestionnaireManageServiceAPI {
 
     @Autowired private QuestionnaireService questionnaireService;
+    @Autowired private UserQuestionnaireAnswerService userQuestionnaireAnswerService;
 
     //=======================================================================
     //    get
@@ -131,6 +135,28 @@ public class QuestionnaireManageServiceAPI {
                                                  @QueryParam("questionnaire_ids") String questionnaireIds
     ) {
         List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByIds(questionnaireIds);
+        return Response.ok(questionnaires).build();
+    }
+
+    @Path("/questionnaire/statistics")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireStatistics(@Context HttpServletRequest request,
+                                               @QueryParam("questionnaire_id") @DefaultValue("0") long questionnaireId
+    ) {
+        List<QuestionnaireStatisticsBean> questionnaireStatistics = userQuestionnaireAnswerService.getQuestionnaireStatistics(questionnaireId);
+        return Response.ok(questionnaireStatistics).build();
+    }
+
+    @Path("/questionnaire/by_hospital_id")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireByHospitalId(@Context HttpServletRequest request,
+                                                 @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                                 @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                                 @QueryParam("number") @DefaultValue("10") int sizePerPage
+    ) {
+        List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireByHospitalId(hospitalId, pageIndex, sizePerPage);
         return Response.ok(questionnaires).build();
     }
 

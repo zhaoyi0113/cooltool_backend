@@ -127,8 +127,8 @@ public class QuestionnaireService {
     public List<QuestionnaireBean> getQuestionnaireByPage(int pageIndex, int sizeOfPage) {
         // get all questionnaire
         logger.info("get questionnaire at pageIndex={} sizePerPage={}", pageIndex, sizeOfPage);
-        PageRequest pageCategory = new PageRequest(pageIndex, sizeOfPage, questionnaireSort);
-        Page<QuestionnaireEntity> resultSet = questionnaireRep.findAll(pageCategory);
+        PageRequest pageRequest = new PageRequest(pageIndex, sizeOfPage, questionnaireSort);
+        Page<QuestionnaireEntity> resultSet = questionnaireRep.findAll(pageRequest);
         List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(resultSet);
         logger.info("count is {}", beans.size());
         return beans;
@@ -174,6 +174,15 @@ public class QuestionnaireService {
             beans = new ArrayList<>();
         }
         logger.info("count is {}", beans.size());
+        return beans;
+    }
+
+    public List<QuestionnaireBean> getQuestionnaireByHospitalId(int hospitalId, int pageIndex, int sizePerPage) {
+        logger.info("get questionnaire by hospitalId={} at page={} sizePerPage={}", hospitalId, pageIndex, sizePerPage);
+        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, questionnaireSort);
+        Page<QuestionnaireEntity> entities = questionnaireRep.findByHospitalId(hospitalId, pageRequest);
+        List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(entities);
+        logger.info("get questionnaire count is {}", beans.size());
         return beans;
     }
 

@@ -1,6 +1,8 @@
 package com.cooltoo.go2nurse.repository;
 
 import com.cooltoo.go2nurse.entities.QuestionnaireEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,5 +15,6 @@ public interface QuestionnaireRepository extends JpaRepository<QuestionnaireEnti
     long countByTitle(String title);
     List<QuestionnaireEntity> findByIdIn(List<Long> ids, Sort sort);
     List<QuestionnaireEntity> findByHospitalId(Integer hospitalId, Sort sort);
+    Page<QuestionnaireEntity> findByHospitalId(Integer hospitalId, Pageable page);
     List<QuestionnaireEntity> findByCategoryIdIn(List<Long> categoryIds, Sort sort);
 }
