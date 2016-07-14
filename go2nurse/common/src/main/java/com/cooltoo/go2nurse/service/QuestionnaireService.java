@@ -222,7 +222,6 @@ public class QuestionnaireService {
         List<QuestionnaireBean> questionnaires;
         if (!VerifyUtil.isListEmpty(questionnaireIds)) {
             List<QuestionnaireEntity> questionnaireResultSet = questionnaireRep.findByIdIn(questionnaireIds, questionnaireSort);
-            List<QuestionEntity> questionResultSet = questionRep.findByQuestionnaireIdIn(questionnaireIds, questionSort);
             questionnaires = questionnaireEntitiesToBeans(questionnaireResultSet);
             questionnaireFillOtherProperties(questionnaires);
         }

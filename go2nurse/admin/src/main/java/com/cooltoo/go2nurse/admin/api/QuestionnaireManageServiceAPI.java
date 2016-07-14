@@ -138,17 +138,6 @@ public class QuestionnaireManageServiceAPI {
         return Response.ok(questionnaires).build();
     }
 
-    @Path("/questionnaire/statistics")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getQuestionnaireStatistics(@Context HttpServletRequest request,
-                                               @QueryParam("hospital_id") @DefaultValue("0") int hospitalId
-    ) {
-        List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByHospitalId(hospitalId);
-        userQuestionnaireAnswerService.getQuestionnaireStatistics(questionnaires);
-        return Response.ok(questionnaires).build();
-    }
-
     @Path("/questionnaire/by_hospital_id")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -158,6 +147,28 @@ public class QuestionnaireManageServiceAPI {
                                                  @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireByHospitalId(hospitalId, pageIndex, sizePerPage);
+        return Response.ok(questionnaires).build();
+    }
+
+    @Path("/questionnaire/statistics")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireStatistics(@Context HttpServletRequest request,
+                                               @QueryParam("questionnaire_id") @DefaultValue("0") long questionnaireId
+    ) {
+        List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByIds(questionnaireId+"");
+        userQuestionnaireAnswerService.getQuestionnaireStatistics(questionnaires);
+        return Response.ok(questionnaires).build();
+    }
+
+    @Path("/questionnaire/statistics/by_hospital_id")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireStatisticsByHospitalId(@Context HttpServletRequest request,
+                                                           @QueryParam("hospital_id") @DefaultValue("0") int hospitalId
+    ) {
+        List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByHospitalId(hospitalId);
+        userQuestionnaireAnswerService.getQuestionnaireStatistics(questionnaires);
         return Response.ok(questionnaires).build();
     }
 
