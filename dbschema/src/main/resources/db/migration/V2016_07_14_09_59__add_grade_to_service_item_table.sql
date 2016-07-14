@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_service_item` ADD COLUMN `grade` INT(11) NULL DEFAULT 0;

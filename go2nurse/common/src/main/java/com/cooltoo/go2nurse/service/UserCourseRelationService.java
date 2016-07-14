@@ -408,7 +408,7 @@ public class UserCourseRelationService {
 //
 //    private UserDiagnosticPointRelationBean createDiagnosticRelationBean(long userId, long groupId, long diagnosticId) {
 //        UserDiagnosticPointRelationBean returnValue = new UserDiagnosticPointRelationBean();
-//        returnValue.setUserId(userId);
+//        returnValue.setAnswerTimes(userId);
 //        returnValue.setGroupId(groupId);
 //        returnValue.setDiagnosticId(diagnosticId);
 //        return returnValue;

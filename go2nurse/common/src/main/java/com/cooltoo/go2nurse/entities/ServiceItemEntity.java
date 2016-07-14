@@ -25,6 +25,7 @@ public class ServiceItemEntity {
     private BigDecimal servicePrice;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
+    private int grade;
 
     @Id
     @GeneratedValue
@@ -85,6 +86,11 @@ public class ServiceItemEntity {
         return serviceTimeUnit;
     }
 
+    @Column(name = "grade")
+    public int getGrade() {
+        return grade;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -129,6 +135,10 @@ public class ServiceItemEntity {
         this.serviceTimeUnit = serviceTimeUnit;
     }
 
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -144,6 +154,7 @@ public class ServiceItemEntity {
         msg.append(", servicePrice=").append(servicePrice);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);
+        msg.append(", grade=").append(grade);
         msg.append("]");
         return msg.toString();
     }

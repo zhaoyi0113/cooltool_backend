@@ -15,6 +15,7 @@ public class ServiceCategoryBean {
     private String name;
     private String description;
     private long imageId;
+    private String imageUrl;
     private int grade;
     private long parentId;
     private ServiceCategoryBean parent;
@@ -41,6 +42,10 @@ public class ServiceCategoryBean {
 
     public long getImageId() {
         return imageId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public int getGrade() {
@@ -77,6 +82,10 @@ public class ServiceCategoryBean {
 
     public void setImageId(long imageId) {
         this.imageId = imageId;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public void setGrade(int grade) {

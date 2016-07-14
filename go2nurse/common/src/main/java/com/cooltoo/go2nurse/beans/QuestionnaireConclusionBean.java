@@ -11,6 +11,7 @@ public class QuestionnaireConclusionBean {
 
     private String item="";
     private String interval="";
+    private int[] iInterval;
 
     public String getItem() {
         return item;
@@ -43,8 +44,12 @@ public class QuestionnaireConclusionBean {
     }
 
     private int[] getIntInterval() {
+        if (null!=iInterval) {
+            return iInterval;
+        }
         if (VerifyUtil.isStringEmpty(interval)) {
-            return new int[0];
+            iInterval = new int[0];
+            return iInterval;
         }
         try {
             String strMinMax = interval;
@@ -62,10 +67,12 @@ public class QuestionnaireConclusionBean {
                 min = Integer.valueOf(minMax[0]);
                 max = Integer.valueOf(minMax[1]);
             }
-            return new int[]{min, max};
+            iInterval = new int[]{min, max};
+            return iInterval;
         }
         catch (Exception ex) {
-            return new int[0];
+            iInterval = new int[0];
+            return iInterval;
         }
     }
 

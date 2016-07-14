@@ -19,9 +19,11 @@ public class ServiceItemBean {
     private ServiceClass clazz;
     private String description;
     private long imageId;
+    private String imageUrl;
     private BigDecimal servicePrice;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
+    private int grade;
 
     public long getId() {
         return id;
@@ -55,6 +57,10 @@ public class ServiceItemBean {
         return imageId;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
     public BigDecimal getServicePrice() {
         return servicePrice;
     }
@@ -65,6 +71,10 @@ public class ServiceItemBean {
 
     public TimeUnit getServiceTimeUnit() {
         return serviceTimeUnit;
+    }
+
+    public int getGrade() {
+        return grade;
     }
 
     public void setId(long id) {
@@ -99,6 +109,10 @@ public class ServiceItemBean {
         this.imageId = imageId;
     }
 
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public void setServicePrice(BigDecimal servicePrice) {
         this.servicePrice = servicePrice;
     }
@@ -109,6 +123,10 @@ public class ServiceItemBean {
 
     public void setServiceTimeUnit(TimeUnit serviceTimeUnit) {
         this.serviceTimeUnit = serviceTimeUnit;
+    }
+
+    public void setGrade(int grade) {
+        this.grade = grade;
     }
 
     @Override
@@ -126,6 +144,7 @@ public class ServiceItemBean {
         msg.append(", servicePrice=").append(servicePrice);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);
+        msg.append(", grade=").append(grade);
         msg.append("]");
         return msg.toString();
     }

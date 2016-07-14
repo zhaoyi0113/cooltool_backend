@@ -194,6 +194,12 @@ public class QuestionnaireService {
         return beans;
     }
 
+    public List<QuestionnaireBean> getQuestionnaireWithQuestionsByHospitalId(int hospitalId) {
+        List<QuestionnaireBean> beans = getQuestionnaireByHospitalId(hospitalId);
+        questionnaireFillOtherProperties(beans);
+        return beans;
+    }
+
     public List<QuestionnaireBean> getQuestionnaireWithQuestionsByIds(String strQuestionnaireIds) {
         logger.info("get questionnaire with questions by questionnaireIds={}", strQuestionnaireIds);
         List<Long> questionnaireIds = VerifyUtil.parseLongIds(strQuestionnaireIds);
@@ -218,18 +224,7 @@ public class QuestionnaireService {
             List<QuestionnaireEntity> questionnaireResultSet = questionnaireRep.findByIdIn(questionnaireIds, questionnaireSort);
             List<QuestionEntity> questionResultSet = questionRep.findByQuestionnaireIdIn(questionnaireIds, questionSort);
             questionnaires = questionnaireEntitiesToBeans(questionnaireResultSet);
-            List<QuestionBean> questions = questionEntitiesToBeans(questionResultSet);
-
-            List<QuestionBean> beans;
-            for (QuestionnaireBean questionnaire : questionnaires) {
-                beans = new ArrayList<>();
-                for (QuestionBean question : questions) {
-                    if (questionnaire.getId() == question.getQuestionnaireId()) {
-                        beans.add(question);
-                    }
-                }
-                questionnaire.setQuestions(beans);
-            }
+            questionnaireFillOtherProperties(questionnaires);
         }
         else {
             questionnaires = new ArrayList<>();
@@ -369,6 +364,34 @@ public class QuestionnaireService {
             }
         }
         return beans;
+    }
+
+    private void questionnaireFillOtherProperties(List<QuestionnaireBean> beans) {
+        if (VerifyUtil.isListEmpty(beans)) {
+            return;
+        }
+
+        List<Long> questionnaireIds = new ArrayList<>();
+        for (QuestionnaireBean bean : beans) {
+            if (questionnaireIds.contains(bean.getId())) {
+                continue;
+            }
+            questionnaireIds.add(bean.getId());
+        }
+
+        List<QuestionEntity> questionResultSet = questionRep.findByQuestionnaireIdIn(questionnaireIds, questionSort);
+        List<QuestionBean> questions = questionEntitiesToBeans(questionResultSet);
+
+        List<QuestionBean> propertyQuestion;
+        for (QuestionnaireBean questionnaire : beans) {
+            propertyQuestion = new ArrayList<>();
+            for (QuestionBean question : questions) {
+                if (questionnaire.getId() == question.getQuestionnaireId()) {
+                    propertyQuestion.add(question);
+                }
+            }
+            questionnaire.setQuestions(propertyQuestion);
+        }
     }
 
     private List<QuestionnaireCategoryBean> questionnaireCategoryEntitiesToBeans(Iterable<QuestionnaireCategoryEntity> entities) {

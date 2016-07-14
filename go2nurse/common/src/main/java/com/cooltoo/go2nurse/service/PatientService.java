@@ -38,6 +38,10 @@ public class PatientService {
     @Autowired private PatientRepository repository;
     @Autowired private PatientBeanConverter beanConverter;
 
+    public boolean existPatient(long patientId) {
+        return repository.exists(patientId);
+    }
+
     public long countAll(String name, int iGender, String mobile, String identityCard, String strStatus){
         logger.info("count all by name={} gender={} mobile={} identity={} status={}",
                 name, iGender, mobile, identityCard, strStatus);

@@ -11,6 +11,8 @@ import java.util.List;
  */
 public interface UserQuestionnaireAnswerRepository extends JpaRepository<UserQuestionnaireAnswerEntity, Long> {
 
+    List<UserQuestionnaireAnswerEntity> findByQuestionnaireIdIn(List<Long> questionnaireIds, Sort sort);
+
     List<UserQuestionnaireAnswerEntity> findByQuestionnaireId(Long questionnaireId, Sort sort);
 
     List<UserQuestionnaireAnswerEntity> findByUserIdAndGroupId(Long userId, Long groupId, Sort sort);

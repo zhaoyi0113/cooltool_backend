@@ -29,6 +29,11 @@ public class QuestionnaireBean {
     private int userScore;
     private QuestionnaireConclusionBean userConclusion;
 
+    //=================================
+    //  questionnaire statistics data
+    //=================================
+    private QuestionnaireStatisticsBean statistics;
+
     public long getId() {
         return id;
     }
@@ -131,6 +136,14 @@ public class QuestionnaireBean {
 
     public void setUserConclusion(QuestionnaireConclusionBean userConclusion) {
         this.userConclusion = userConclusion;
+    }
+
+    public QuestionnaireStatisticsBean getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(QuestionnaireStatisticsBean statistics) {
+        this.statistics = statistics;
     }
 
     public QuestionnaireBean clone() {

@@ -142,10 +142,11 @@ public class QuestionnaireManageServiceAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuestionnaireStatistics(@Context HttpServletRequest request,
-                                               @QueryParam("questionnaire_id") @DefaultValue("0") long questionnaireId
+                                               @QueryParam("hospital_id") @DefaultValue("0") int hospitalId
     ) {
-        List<QuestionnaireStatisticsBean> questionnaireStatistics = userQuestionnaireAnswerService.getQuestionnaireStatistics(questionnaireId);
-        return Response.ok(questionnaireStatistics).build();
+        List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByHospitalId(hospitalId);
+        userQuestionnaireAnswerService.getQuestionnaireStatistics(questionnaires);
+        return Response.ok(questionnaires).build();
     }
 
     @Path("/questionnaire/by_hospital_id")

@@ -43,6 +43,11 @@ public class UserAddressService {
     //=======================================================
     //        get
     //=======================================================
+
+    public boolean existAddress(long addressId) {
+        return repository.exists(addressId);
+    }
+
     public List<UserAddressBean> getUserAddress(long userId) {
         logger.info("get user={} 's addresses", userId);
         List<UserAddressEntity> userAddress = repository.findByUserId(userId, sort);

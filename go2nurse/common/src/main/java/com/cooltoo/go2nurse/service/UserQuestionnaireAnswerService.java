@@ -77,23 +77,24 @@ public class UserQuestionnaireAnswerService {
         }
     }
 
-    public List<QuestionnaireStatisticsBean> getQuestionnaireStatistics(long questionnaireId) {
-        logger.info("get questionnaire statistics by questionnaireId={}", questionnaireId);
-        List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByIds(""+questionnaireId);
+    public void getQuestionnaireStatistics(List<QuestionnaireBean> questionnaires) {
+        logger.info("get questionnaire statistics by questionnaires size = {}", VerifyUtil.isListEmpty(questionnaires) ? 0 : questionnaires.size());
         if (VerifyUtil.isListEmpty(questionnaires)) {
-            logger.warn("there is no questionnaire");
-            return new ArrayList<>();
+            return;
         }
-        if (1==questionnaires.size()) {
-            logger.warn("there is more than one questionnaire, questionnaire are {}", questionnaires);
-            return new ArrayList<>();
+        List<Long> questionnaireIds = new ArrayList<>();
+        for (QuestionnaireBean questionnaire : questionnaires) {
+            if (questionnaireIds.contains(questionnaire.getId())) {
+                continue;
+            }
+            questionnaireIds.add(questionnaire.getId());
         }
-        QuestionnaireBean questionnaire = questionnaires.get(0);
-        List<UserQuestionnaireAnswerEntity> userAnswerEntities = repository.findByQuestionnaireId(questionnaireId, sort);
+        List<UserQuestionnaireAnswerEntity> userAnswerEntities = repository.findByQuestionnaireIdIn(questionnaireIds, sort);
         List<UserQuestionnaireAnswerBean> userAnswers = entitiesToBeans(userAnswerEntities);
-        List<QuestionnaireStatisticsBean> questionnaireStatistics = fillQuestionnaireStatistics(questionnaire, userAnswers);
-        logger.info("get questionnaire statistics, count={}", questionnaireStatistics.size());
-        return questionnaireStatistics;
+        for (QuestionnaireBean questionnaire : questionnaires) {
+            fillQuestionnaireStatistics(questionnaire, userAnswers);
+        }
+        return;
     }
 
     private List<UserQuestionnaireAnswerBean> getAllUsersAnswers(long userId) {
@@ -112,70 +113,59 @@ public class UserQuestionnaireAnswerService {
         return beans;
     }
 
-    private List<QuestionnaireStatisticsBean> fillQuestionnaireStatistics(QuestionnaireBean questionnaire, List<UserQuestionnaireAnswerBean> userAnswers) {
+    private void fillQuestionnaireStatistics(QuestionnaireBean questionnaire, List<UserQuestionnaireAnswerBean> userAnswers) {
         if (null==questionnaire || VerifyUtil.isListEmpty(userAnswers)) {
-            return new ArrayList<>();
+            return;
         }
+        QuestionnaireStatisticsBean statistics = new QuestionnaireStatisticsBean();
         int questionNumber = VerifyUtil.isListEmpty(questionnaire.getQuestions()) ? 0 : questionnaire.getQuestions().size();
+
+        // construct statistics conclusion
         List<QuestionnaireConclusionBean> conclusions = go2NurseUtility.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
+        List<QuestionnaireStatisticsBean.ConclusionBean> statisticsConclusions = new ArrayList<>();
+        for (QuestionnaireConclusionBean conclusion : conclusions) {
+            QuestionnaireStatisticsBean.ConclusionBean sc = new QuestionnaireStatisticsBean.ConclusionBean();
+            sc.setConclusion(conclusion);
+            sc.setResultCount(0);
+            statisticsConclusions.add(sc);
+        }
+        statistics.settConclusions(statisticsConclusions);
 
         // construct the return value
-        List<QuestionnaireStatisticsBean> returnValue = new ArrayList<>();
-        QuestionnaireStatisticsBean currentStatistics = null;
-        int currentGroupScore = 0;
-        int currentGroupAnswer = 0;
-        Long currentGroupId = 0L;
+        boolean needCalculate = false;
+        List<String> currentGroupAnswer = new ArrayList<>();
         for (int i=0, count=userAnswers.size(); i<count; i++) {
             UserQuestionnaireAnswerBean currentAnswer = userAnswers.get(i);
-            currentGroupAnswer ++;
-            if (currentGroupId!=currentAnswer.getGroupId()) {
-                // set the score and conclusion, when group changed
-                if (null!=currentStatistics) {
-                    currentStatistics.setAnswerNumber(currentGroupAnswer);
-                    currentStatistics.setCompleted(currentGroupAnswer==questionNumber);
-                    currentStatistics.setScore(currentGroupScore);
-                    for (QuestionnaireConclusionBean conclusion : conclusions) {
-                        if (conclusion.isThisConclusion(currentGroupScore)) {
-                            currentStatistics.setConclusion(conclusion.getItem());
+            if (currentAnswer.getQuestionnaireId()!=questionnaire.getId()) {
+                continue;
+            }
+
+            UserQuestionnaireAnswerBean nextAnswer = (i+1<count) ? userAnswers.get(i+1) : null;
+            needCalculate = (null==nextAnswer) || (nextAnswer.getGroupId()!=currentAnswer.getGroupId());
+
+            // record answer
+            currentGroupAnswer.add(currentAnswer.getAnswer());
+
+            if (needCalculate) {
+                // set the answer times and conclusion, when group changed
+                if (currentGroupAnswer.size()==questionNumber) {
+                    // set answer times
+                    statistics.setAnswerTimes(statistics.getAnswerTimes()+1);
+                    int totalScore = parseUserAnswersScore(currentGroupAnswer);
+                    // set the conclusion
+                    for (QuestionnaireStatisticsBean.ConclusionBean conclusion : statisticsConclusions) {
+                        if (conclusion.getConclusion().isThisConclusion(totalScore)) {
+                            conclusion.setResultCount(conclusion.getResultCount()+1);
                             break;
                         }
                     }
                 }
 
-                // create a statistics for another cycle
-                currentStatistics = new QuestionnaireStatisticsBean();
-                currentStatistics.setUserId(currentAnswer.getUserId());
-                currentStatistics.setPatientId(currentAnswer.getPatientId());
-                currentStatistics.setQuestionNumber(questionNumber);
-                returnValue.add(currentStatistics);
-
-                // reset groupId and groupScore and groupAnswer for another cycle
-                currentGroupId = currentAnswer.getGroupId();
-                currentGroupScore = 0;
-                currentGroupAnswer = 0;
-            }
-            if (null==currentStatistics) {
-                continue;
-            }
-
-            // calculate  score
-            String answer = currentAnswer.getAnswer();
-            currentGroupScore += parseUserAnswerScore(answer);
-        }
-
-        if (null!=currentStatistics) {
-            currentStatistics.setAnswerNumber(currentGroupAnswer);
-            currentStatistics.setCompleted(currentGroupAnswer==questionNumber);
-            currentStatistics.setScore(currentGroupScore);
-            for (QuestionnaireConclusionBean conclusion : conclusions) {
-                if (conclusion.isThisConclusion(currentGroupScore)) {
-                    currentStatistics.setConclusion(conclusion.getItem());
-                    break;
-                }
+                // reset groupAnswer for another cycle
+                currentGroupAnswer.clear();
             }
         }
-
-        return returnValue;
+        return;
     }
 
     private List<QuestionnaireBean> fillQuestionnaireAnswer(List<UserQuestionnaireAnswerBean> allAnswers) {
@@ -297,6 +287,17 @@ public class UserQuestionnaireAnswerService {
             beans.add(bean);
         }
         return beans;
+    }
+
+    private int parseUserAnswersScore(List<String> userAnswers) {
+        if (VerifyUtil.isListEmpty(userAnswers)) {
+            return 0;
+        }
+        int answerScore = 0;
+        for (String answer : userAnswers) {
+            answerScore += parseUserAnswerScore(answer);
+        }
+        return answerScore;
     }
 
     private int parseUserAnswerScore(String answer) {

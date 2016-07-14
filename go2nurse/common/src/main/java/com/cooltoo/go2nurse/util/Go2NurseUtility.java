@@ -29,7 +29,11 @@ public class Go2NurseUtility {
         try {
             ObjectMapper mapper = new ObjectMapper();
             TypeFactory typeFactory = mapper.getTypeFactory();
-            return mapper.readValue(content, typeFactory.constructCollectionType(List.class, clazz));
+            T returnValue =  mapper.readValue(content, typeFactory.constructCollectionType(List.class, clazz));
+            if (null==returnValue) {
+                return (T) new ArrayList<T>();
+            }
+            return returnValue;
         }
         catch (Exception ex) {
             logger.error("parse the json list error, json={}, class={}", content, clazz);
