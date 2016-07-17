@@ -115,10 +115,10 @@ public class ServiceCategoryAndItemManageAPI {
                                    @FormParam("clazz") @DefaultValue("") String clazz,
                                    @FormParam("description") @DefaultValue("") String description,
                                    @FormParam("price") @DefaultValue("") String price,
-                                   @FormParam("timeDuration") @DefaultValue("0") int timeDuration,
-                                   @FormParam("timeUnit") @DefaultValue("") String timeUnit,
+                                   @FormParam("time_duration") @DefaultValue("0") int timeDuration,
+                                   @FormParam("time_unit") @DefaultValue("") String timeUnit,
                                    @FormParam("grade") @DefaultValue("0") int grade,
-                                   @FormParam("categoryId") @DefaultValue("0") long categoryId
+                                   @FormParam("category_id") @DefaultValue("0") long categoryId
     ) {
         ServiceItemBean serviceItem = categoryAndItemService.addItem(name, clazz, description, price, timeDuration, timeUnit, grade, categoryId);
         return Response.ok(serviceItem).build();
@@ -166,10 +166,10 @@ public class ServiceCategoryAndItemManageAPI {
                                     @FormParam("clazz") @DefaultValue("") String clazz,
                                     @FormParam("description") @DefaultValue("") String description,
                                     @FormParam("price") @DefaultValue("") String price,
-                                    @FormParam("timeDuration") @DefaultValue("0") int timeDuration,
-                                    @FormParam("timeUnit") @DefaultValue("") String timeUnit,
+                                    @FormParam("time_duration") @DefaultValue("0") int timeDuration,
+                                    @FormParam("time_unit") @DefaultValue("") String timeUnit,
                                     @FormParam("grade") @DefaultValue("0") int grade,
-                                    @FormParam("categoryId") @DefaultValue("0") long categoryId,
+                                    @FormParam("category_id") @DefaultValue("0") long categoryId,
                                     @FormParam("status") @DefaultValue("") String status
     ) {
         ServiceItemBean serviceItem = categoryAndItemService.updateItem(itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, status);
