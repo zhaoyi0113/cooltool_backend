@@ -62,10 +62,11 @@ public class UserAPI {
         return Response.ok(user).build();
     }
 
-    @POST
     @Path("/edit_head_photo")
-    @LoginAuthentication(requireUserLogin = true)
+    @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
     public Response addHeadPhoto(@Context HttpServletRequest request,
                                  @FormDataParam("image_name") @DefaultValue("") String imageName,
                                  @FormDataParam("file") InputStream image,

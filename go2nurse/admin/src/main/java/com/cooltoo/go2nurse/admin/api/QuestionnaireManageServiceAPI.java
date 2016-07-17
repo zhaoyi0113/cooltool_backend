@@ -161,6 +161,16 @@ public class QuestionnaireManageServiceAPI {
         return Response.ok(questionnaires).build();
     }
 
+    @Path("/questionnaire/statistics/by_hospital_id/count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response countQuestionnaireStatisticsByHospitalId(@Context HttpServletRequest request,
+                                                             @QueryParam("hospital_id") @DefaultValue("0") int hospitalId
+    ){
+        long questionnairesCount = questionnaireService.countQuestionnaireByHospitalId(hospitalId);
+        return Response.ok(questionnairesCount).build();
+    }
+
     @Path("/questionnaire/statistics/by_hospital_id")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

@@ -177,6 +177,12 @@ public class QuestionnaireService {
         return beans;
     }
 
+    public long countQuestionnaireByHospitalId(int hospitalId) {
+        long count = questionnaireRep.countByHospitalId(hospitalId);
+        logger.info("count questionnaire by hospitalId={}, count is {}", hospitalId, count);
+        return count;
+    }
+
     public List<QuestionnaireBean> getQuestionnaireByHospitalId(int hospitalId, int pageIndex, int sizePerPage) {
         logger.info("get questionnaire by hospitalId={} at page={} sizePerPage={}", hospitalId, pageIndex, sizePerPage);
         PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, questionnaireSort);

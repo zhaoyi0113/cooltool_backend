@@ -14,7 +14,10 @@ import java.util.List;
 public interface QuestionnaireRepository extends JpaRepository<QuestionnaireEntity, Long> {
     long countByTitle(String title);
     List<QuestionnaireEntity> findByIdIn(List<Long> ids, Sort sort);
+
+    long countByHospitalId(Integer hospitalId);
     List<QuestionnaireEntity> findByHospitalId(Integer hospitalId, Sort sort);
     Page<QuestionnaireEntity> findByHospitalId(Integer hospitalId, Pageable page);
+
     List<QuestionnaireEntity> findByCategoryIdIn(List<Long> categoryIds, Sort sort);
 }
