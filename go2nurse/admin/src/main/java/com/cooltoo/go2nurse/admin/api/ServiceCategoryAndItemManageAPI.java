@@ -28,6 +28,8 @@ public class ServiceCategoryAndItemManageAPI {
     //==============================================================
 
     @Path("/category/top/count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response countTopServiceCategory(@Context HttpServletRequest request) {
         long topServiceCategoryCount = categoryAndItemService.countTopCategory();
         return Response.ok(topServiceCategoryCount).build();
@@ -45,6 +47,8 @@ public class ServiceCategoryAndItemManageAPI {
     }
 
     @Path("/category/sub/count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response countSubServiceCategory(@Context HttpServletRequest request,
                                             @QueryParam("category_id") @DefaultValue("0") long categoryId) {
         long subServiceCategoryCount = categoryAndItemService.countCategoryByParentId(categoryId);
@@ -65,6 +69,8 @@ public class ServiceCategoryAndItemManageAPI {
     }
 
     @Path("/item/count")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response countServiceItem(@Context HttpServletRequest request,
                                      @QueryParam("category_id") @DefaultValue("0") long categoryId) {
         long serviceItemCount = categoryAndItemService.countItemByCategoryId(categoryId);
@@ -154,7 +160,6 @@ public class ServiceCategoryAndItemManageAPI {
     @Path("/item/edit")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response editServiceItem(@Context HttpServletRequest request,
                                     @FormParam("item_id") @DefaultValue("0") long itemId,
                                     @FormParam("name") @DefaultValue("") String name,
