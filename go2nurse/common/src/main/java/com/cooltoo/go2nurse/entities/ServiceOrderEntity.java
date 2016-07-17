@@ -1,8 +1,6 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.go2nurse.beans.PatientBean;
-import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 
@@ -20,10 +18,10 @@ public class ServiceOrderEntity {
     private long id;
     private Date time;
     private CommonStatus status;
-    private long serviceItemId;
+    private String serviceItem;
     private long userId;
-    private long patientId;
-    private long addressId;
+    private String patient;
+    private String address;
     private Date serviceStartTime;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
@@ -50,9 +48,9 @@ public class ServiceOrderEntity {
         return status;
     }
 
-    @Column(name = "service_item_id")
-    public long getServiceItemId() {
-        return serviceItemId;
+    @Column(name = "service_item")
+    public String getServiceItem() {
+        return serviceItem;
     }
 
     @Column(name = "user_id")
@@ -60,14 +58,14 @@ public class ServiceOrderEntity {
         return userId;
     }
 
-    @Column(name = "patient_id")
-    public long getPatientId() {
-        return patientId;
+    @Column(name = "patient")
+    public String getPatient() {
+        return patient;
     }
 
-    @Column(name = "address_id")
-    public long getAddressId() {
-        return addressId;
+    @Column(name = "address")
+    public String getAddress() {
+        return address;
     }
 
     @Column(name = "service_start_time")
@@ -119,20 +117,20 @@ public class ServiceOrderEntity {
         this.status = status;
     }
 
-    public void setServiceItemId(long serviceItemId) {
-        this.serviceItemId = serviceItemId;
+    public void setServiceItem(String serviceItem) {
+        this.serviceItem = serviceItem;
     }
 
     public void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public void setPatientId(long patientId) {
-        this.patientId = patientId;
+    public void setPatient(String patient) {
+        this.patient = patient;
     }
 
-    public void setAddressId(long addressId) {
-        this.addressId = addressId;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public void setServiceStartTime(Date serviceStartTime) {
@@ -170,10 +168,10 @@ public class ServiceOrderEntity {
         msg.append("id=").append(id);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
-        msg.append(", serviceItemId=").append(serviceItemId);
+        msg.append(", serviceItem=").append(serviceItem);
         msg.append(", userId=").append(userId);
-        msg.append(", patientId=").append(patientId);
-        msg.append(", addressId=").append(addressId);
+        msg.append(", patient=").append(patient);
+        msg.append(", address=").append(address);
         msg.append(", serviceStartTime=").append(serviceStartTime);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);

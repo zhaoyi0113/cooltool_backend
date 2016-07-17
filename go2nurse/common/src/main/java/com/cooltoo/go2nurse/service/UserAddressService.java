@@ -48,6 +48,20 @@ public class UserAddressService {
         return repository.exists(addressId);
     }
 
+    public UserAddressBean getOneById(long addressId) {
+        logger.info("get address by addressId={}", addressId);
+        UserAddressEntity userAddress = repository.findOne(addressId);
+        if (null==userAddress) {
+            return null;
+        }
+        List<UserAddressEntity> addresses = new ArrayList<>();
+        addresses.add(userAddress);
+        List<UserAddressBean> beans = entities2Beans(addresses);
+        fillOtherProperties(beans);
+        logger.info("count is {}", addresses);
+        return beans.get(0);
+    }
+
     public List<UserAddressBean> getUserAddress(long userId) {
         logger.info("get user={} 's addresses", userId);
         List<UserAddressEntity> userAddress = repository.findByUserId(userId, sort);

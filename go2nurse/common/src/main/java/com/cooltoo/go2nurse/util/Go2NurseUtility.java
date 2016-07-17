@@ -51,4 +51,14 @@ public class Go2NurseUtility {
             return null;
         }
     }
+
+    public String toJsonString(Object obj) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(obj);
+        }
+        catch (Exception ex) {
+            return null;
+        }
+    }
 }

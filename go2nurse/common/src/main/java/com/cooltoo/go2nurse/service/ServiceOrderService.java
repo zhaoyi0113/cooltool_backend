@@ -3,12 +3,16 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.beans.PatientBean;
+import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
+import com.cooltoo.go2nurse.beans.UserAddressBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 import com.cooltoo.go2nurse.converter.ServiceOrderBeanConverter;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
 import com.cooltoo.go2nurse.repository.ServiceOrderRepository;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.NumberUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +48,7 @@ public class ServiceOrderService {
     @Autowired private UserService userService;
     @Autowired private PatientService patientService;
     @Autowired private UserAddressService addressService;
+    @Autowired private Go2NurseUtility go2NurseUtility;
     @Autowired private ServiceOrderPingPPService orderPingPPService;
 
     //=====================================================================
@@ -96,7 +101,7 @@ public class ServiceOrderService {
     public ServiceOrderBean updateOrder(long orderId, long patientId, long addressId,
                                      String strStartTime, int timeDuration, String timeUnit, String totalConsumption) {
         logger.info("update service order={} by patientId={} addressId={} strStartTime={} timeDuration={} timeUnit={} totalConsumption={}",
-                serviceItemId, userId, patientId, addressId, strStartTime, timeDuration, timeUnit, totalConsumption);
+                orderId, patientId, addressId, strStartTime, timeDuration, timeUnit, totalConsumption);
 
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null==entity) {
@@ -112,12 +117,16 @@ public class ServiceOrderService {
 
         boolean changed = false;
         if (patientId!=0 && patientService.existPatient(patientId)) {
-            entity.setPatientId(patientId);
+            PatientBean patient = patientService.getOneById(patientId);
+            String patientJson = go2NurseUtility.toJsonString(patient);
+            entity.setPatient(patientJson);
             changed = true;
         }
 
         if (addressId!=0 && addressService.existAddress(addressId)) {
-            entity.setAddressId(addressId);
+            UserAddressBean address = addressService.getOneById(addressId);
+            String addressJson = go2NurseUtility.toJsonString(address);
+            entity.setAddress(addressJson);
             changed = true;
         }
 
@@ -193,25 +202,6 @@ public class ServiceOrderService {
     //=====================================================================
     //                   adding
     //=====================================================================
-    private long id;
-    private Date time;
-    private CommonStatus status;
-
-
-    private long serviceItemId;
-    private long userId;
-    private long patientId;
-    private long addressId;
-    private Date serviceStartTime;
-    private int serviceTimeDuration;
-    private TimeUnit serviceTimeUnit;
-    private BigDecimal totalConsumption;
-
-
-    private OrderStatus orderStatus;
-    private Date payTime;
-    private BigDecimal paymentAmount;
-
     @Transactional
     public ServiceOrderBean addOrder(long serviceItemId, long userId, long patientId, long addressId,
                                      String strStartTime, int timeDuration, String timeUnit, String totalConsumption) {
@@ -253,11 +243,18 @@ public class ServiceOrderService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
+        ServiceItemBean serviceItem = serviceCategoryItemService.getItemById(serviceItemId);
+        String serviceItemJson = go2NurseUtility.toJsonString(serviceItem);
+        PatientBean patient = patientService.getOneById(patientId);
+        String patientJson = go2NurseUtility.toJsonString(patient);
+        UserAddressBean address = addressService.getOneById(addressId);
+        String addressJson = go2NurseUtility.toJsonString(address);
+
         ServiceOrderEntity entity = new ServiceOrderEntity();
-        entity.setServiceItemId(serviceItemId);
+        entity.setServiceItem(serviceItemJson);
         entity.setUserId(userId);
-        entity.setPatientId(patientId);
-        entity.setAddressId(addressId);
+        entity.setPatient(patientJson);
+        entity.setAddress(addressJson);
         entity.setServiceStartTime(new Date(lStartTime));
         entity.setServiceTimeDuration(timeDuration);
         entity.setServiceTimeUnit(serviceTimeUnit);

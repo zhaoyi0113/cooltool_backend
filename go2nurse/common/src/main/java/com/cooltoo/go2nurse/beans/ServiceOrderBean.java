@@ -15,10 +15,10 @@ public class ServiceOrderBean {
     private long id;
     private Date time;
     private CommonStatus status;
-    private long serviceItemId;
+    private ServiceItemBean serviceItem;
     private long userId;
-    private long patientId;
-    private long addressId;
+    private PatientBean patient;
+    private UserAddressBean address;
     private Date serviceStartTime;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
@@ -39,20 +39,20 @@ public class ServiceOrderBean {
         return status;
     }
 
-    public long getServiceItemId() {
-        return serviceItemId;
+    public ServiceItemBean getServiceItem() {
+        return serviceItem;
     }
 
     public long getUserId() {
         return userId;
     }
 
-    public long getPatientId() {
-        return patientId;
+    public PatientBean getPatient() {
+        return patient;
     }
 
-    public long getAddressId() {
-        return addressId;
+    public UserAddressBean getAddress() {
+        return address;
     }
 
     public Date getServiceStartTime() {
@@ -95,20 +95,20 @@ public class ServiceOrderBean {
         this.status = status;
     }
 
-    public void setServiceItemId(long serviceItemId) {
-        this.serviceItemId = serviceItemId;
+    public void setServiceItem(ServiceItemBean serviceItem) {
+        this.serviceItem = serviceItem;
     }
 
     public void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public void setPatientId(long patientId) {
-        this.patientId = patientId;
+    public void setPatient(PatientBean patient) {
+        this.patient = patient;
     }
 
-    public void setAddressId(long addressId) {
-        this.addressId = addressId;
+    public void setAddress(UserAddressBean address) {
+        this.address = address;
     }
 
     public void setServiceStartTime(Date serviceStartTime) {
@@ -146,10 +146,10 @@ public class ServiceOrderBean {
         msg.append("id=").append(id);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
-        msg.append(", serviceItemId=").append(serviceItemId);
+        msg.append(", serviceItem=").append(serviceItem);
         msg.append(", userId=").append(userId);
-        msg.append(", patientId=").append(patientId);
-        msg.append(", addressId=").append(addressId);
+        msg.append(", patient=").append(patient);
+        msg.append(", address=").append(address);
         msg.append(", serviceStartTime=").append(serviceStartTime);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);

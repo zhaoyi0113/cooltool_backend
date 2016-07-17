@@ -119,6 +119,20 @@ public class ServiceCategoryAndItemService {
         return beans;
     }
 
+    public ServiceItemBean getItemById(Long itemId) {
+        logger.info("get service item by id={}", itemId);
+        ServiceItemEntity entity = itemRep.findOne(itemId);
+        if (null==entity) {
+            return null;
+        }
+        List<ServiceItemEntity> entities = new ArrayList<>();
+        entities.add(entity);
+        List<ServiceItemBean> beans = serviceItemEntitiesToBeans(entities);
+        fillItemOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans.get(0);
+    }
+
     public List<ServiceItemBean> getItemByIdIn(List<Long> itemIds) {
         logger.info("get service item by ids");
         List<ServiceItemEntity> entities = itemRep.findByIdIn(itemIds);
@@ -432,7 +446,9 @@ public class ServiceCategoryAndItemService {
             if (VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "service_item_image_" + System.nanoTime();
             }
-            long imageId = userFileStorage.addFile(entity.getImageId(), imageName, image);
+            long imageId = userFileStorage.addFile(
+                    0/*entity.getImageId();  can not delete the image, because the service order service_item json use it*/
+                    , imageName, image);
             imageUrl = userFileStorage.getFileURL(imageId);
             entity.setImageId(imageId);
         }
