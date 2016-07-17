@@ -1,6 +1,8 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.beans.PatientBean;
+import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 

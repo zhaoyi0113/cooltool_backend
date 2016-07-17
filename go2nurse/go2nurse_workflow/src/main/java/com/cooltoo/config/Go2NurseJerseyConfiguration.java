@@ -51,7 +51,9 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
         register(UserQuestionnaireAnswerManageServiceAPI.class);
         register(UserAddressAPI.class);
         register(UserReExaminationDateAPI.class);
-
+        register(UserServiceOrderAPI.class);
+        register(ServiceCategoryAndItemManageAPI.class);
+        register(ServiceOrderManageAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 
