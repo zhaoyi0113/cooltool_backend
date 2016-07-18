@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_patient` ADD COLUMN `is_default` INT(11) NULL DEFAULT 0 AFTER `birthday`;
