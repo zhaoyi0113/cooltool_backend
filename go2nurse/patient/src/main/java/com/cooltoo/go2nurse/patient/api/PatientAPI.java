@@ -73,8 +73,7 @@ public class PatientAPI {
                            @FormParam("gender") @DefaultValue("2") int gender,
                            @FormParam("birthday") @DefaultValue("") String strBirthday,
                            @FormParam("identityCard") @DefaultValue("") String identityCard,
-                           @FormParam("mobile") @DefaultValue("") String mobile,
-                           @FormParam("is_default") @DefaultValue("") String strIsDefault
+                           @FormParam("mobile") @DefaultValue("") String mobile
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Date date = null;
@@ -82,8 +81,7 @@ public class PatientAPI {
         if (time > 0) {
             date = new Date(time);
         }
-        YesNoEnum isDefault = YesNoEnum.parseString(strIsDefault);
-        PatientBean patient = service.create(name, gender, date, identityCard, mobile, isDefault);
+        PatientBean patient = service.create(name, gender, date, identityCard, mobile, null);
         if (null!=patient && patient.getId()>0) {
             UserPatientRelationBean relation = userPatientRelation.addPatientToUser(patient.getId(), userId);
             logger.info("user patient relation is {}", relation);
