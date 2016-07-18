@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -21,6 +22,7 @@ public class PatientEntity {
     private Date birthday;
     private String identityCard;
     private String mobile;
+    private YesNoEnum isDefault;
 
     @Id
     @Column(name = "id")
@@ -69,6 +71,15 @@ public class PatientEntity {
         this.mobile = mobile;
     }
 
+    @Column(name = "is_default")
+    @Enumerated
+    public YesNoEnum getIsDefault() {
+        return isDefault;
+    }
+    public void setIsDefault(YesNoEnum isDefault) {
+        this.isDefault = isDefault;
+    }
+
     @Column(name = "time_created")
     public Date getTime() {
         return time;
@@ -97,6 +108,7 @@ public class PatientEntity {
         msg.append(", birthday=").append(birthday);
         msg.append(", identityCard=").append(identityCard);
         msg.append(", mobile=").append(mobile);
+        msg.append(", isDefault=").append(isDefault);
         msg.append("]");
         return msg.toString();
     }

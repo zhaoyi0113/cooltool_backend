@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.service.PatientService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -33,14 +34,16 @@ public class PatientServiceTest extends AbstractCooltooTest {
         Date birthday = new Date(System.currentTimeMillis());
         String identity = "13414321432143554321432";
         String mobile = "15811663430";
+        YesNoEnum isDefault = YesNoEnum.YES;
 
-        PatientBean bean = service.create(name, gender, birthday, identity, mobile);
+        PatientBean bean = service.create(name, gender, birthday, identity, mobile, isDefault);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(gender, bean.getGender().ordinal());
         Assert.assertEquals(birthday, bean.getBirthday());
         Assert.assertEquals(mobile, bean.getMobile());
         Assert.assertEquals(CommonStatus.ENABLED, bean.getStatus());
+        Assert.assertEquals(isDefault, bean.getIsDefault());
     }
 
     @Test
@@ -52,8 +55,9 @@ public class PatientServiceTest extends AbstractCooltooTest {
         String identity = "xxxxxxxxxxxxxxxxxxxxxxxx";
         String mobile = "15811663430";
         String status = CommonStatus.DISABLED.name();
+        YesNoEnum isDefault = YesNoEnum.NO;
 
-        PatientBean bean = service.update(id, name, gender, birthday, identity, mobile, status);
+        PatientBean bean = service.update(0, id, name, gender, birthday, identity, mobile, isDefault, status);
         Assert.assertNotNull(bean);
         Assert.assertEquals(id, bean.getId());
         Assert.assertEquals(name, bean.getName());
@@ -62,6 +66,7 @@ public class PatientServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(identity,  bean.getIdentityCard());
         Assert.assertEquals(mobile,  bean.getMobile());
         Assert.assertEquals(status,  bean.getStatus().name());
+        Assert.assertEquals(isDefault, bean.getIsDefault());
     }
 
     @Test

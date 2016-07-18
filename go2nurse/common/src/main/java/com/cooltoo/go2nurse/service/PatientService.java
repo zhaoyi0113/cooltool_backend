@@ -2,12 +2,15 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.go2nurse.entities.UserPatientRelationEntity;
 import com.cooltoo.go2nurse.repository.PatientRepository;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.converter.PatientBeanConverter;
 import com.cooltoo.go2nurse.entities.PatientEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.repository.UserPatientRelationRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +38,13 @@ public class PatientService {
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 
+    public static final Sort userPatientRelationSort = new Sort(
+            new Sort.Order(Sort.Direction.DESC, "id")
+    );
+
     @Autowired private PatientRepository repository;
     @Autowired private PatientBeanConverter beanConverter;
+    @Autowired private UserPatientRelationRepository userPatientRelationRep;
 
     public boolean existPatient(long patientId) {
         return repository.exists(patientId);
@@ -119,9 +127,9 @@ public class PatientService {
     //                     add
     //====================================================================
     @Transactional
-    public PatientBean create(String name, int iGender, Date birthday, String identityCard, String mobile) {
-        logger.info("create patient with name={} gender={} birthday={} identityCard={} mobile={}",
-                name, iGender, birthday, identityCard, mobile);
+    public PatientBean create(String name, int iGender, Date birthday, String identityCard, String mobile, YesNoEnum isDefault) {
+        logger.info("create patient with name={} gender={} birthday={} identityCard={} mobile={} isDefault={}",
+                name, iGender, birthday, identityCard, mobile, isDefault);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.info("name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -130,18 +138,19 @@ public class PatientService {
 
         GenderType gender = GenderType.parseInt(iGender);
         if (null==gender) {
-            logger.info("gender is invalid");
+            logger.warn("gender is invalid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
         if (VerifyUtil.isStringEmpty(identityCard)) {
-            logger.info("identityCard is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            logger.warn("identityCard is empty");
         }
-        identityCard = identityCard.trim();
+        else {
+            identityCard = identityCard.trim();
+        }
 
         if (VerifyUtil.isStringEmpty(mobile)) {
-            logger.info("mobile is empty");
+            logger.warn("mobile is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         mobile = mobile.trim();
@@ -152,6 +161,7 @@ public class PatientService {
         entity.setBirthday(birthday);
         entity.setIdentityCard(identityCard);
         entity.setMobile(mobile);
+        entity.setIsDefault(isDefault==null ? YesNoEnum.NO : isDefault);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
 
@@ -165,12 +175,12 @@ public class PatientService {
     //                     update
     //====================================================================
     @Transactional
-    public PatientBean update(long id, String name, int iGender, Date birthday, String identityCard, String mobile, String strStatus) {
-        logger.info("update patient={} by name={} gender={} birthday={} identityCard={} mobile={} status={}",
-                id, name, iGender, birthday, identityCard, mobile, strStatus);
-        PatientEntity entity = repository.findOne(id);
+    public PatientBean update(long userId, long patientId, String name, int iGender, Date birthday, String identityCard, String mobile, YesNoEnum isDefault, String strStatus) {
+        logger.info("update patient={} by userId={} name={} gender={} birthday={} identityCard={} mobile={} isDefault={} status={}",
+                patientId, userId, name, iGender, birthday, identityCard, mobile, isDefault, strStatus);
+        PatientEntity entity = repository.findOne(patientId);
         if (null==entity) {
-            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
         boolean changed = false;
@@ -200,10 +210,37 @@ public class PatientService {
             entity.setStatus(status);
             changed = true;
         }
+        boolean isSetDefault = false;
+        if (null!=isDefault && !isDefault.equals(entity.getIsDefault())) {
+            entity.setIsDefault(isDefault);
+            changed = true;
+            isSetDefault = true;
+        }
         if (changed) {
             entity = repository.save(entity);
+            if (isSetDefault) {
+                setDefault(userId, entity.getId(), isDefault);
+            }
         }
         logger.info("patient is {}", entity);
         return beanConverter.convert(entity);
+    }
+
+    @Transactional
+    private void setDefault(long userId, long patientId, YesNoEnum isDefault) {
+        logger.info("update user={} 's patient={} by isDefault={}", userId, patientId, isDefault);
+        if (!YesNoEnum.YES.equals(isDefault)) {
+            logger.info("not set the default patient");
+            return;
+        }
+        List<Long> patientsId = userPatientRelationRep.findPatientIdByUserIdAndStatus(
+                userId, CommonStatus.ENABLED, userPatientRelationSort);
+        List<PatientEntity> patients = repository.findAll(patientsId);
+
+        for (PatientEntity patient : patients) {
+            patient.setIsDefault(patient.getId()!=patientId ? YesNoEnum.NO : YesNoEnum.YES);
+        }
+
+        repository.save(patients);
     }
 }

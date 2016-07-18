@@ -1,8 +1,12 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.service.PatientService;
+import com.cooltoo.go2nurse.service.UserPatientRelationService;
 import com.cooltoo.go2nurse.service.UserService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -26,6 +30,8 @@ public class UserAPI {
     private static final Logger logger = LoggerFactory.getLogger(UserAPI.class.getName());
 
     @Autowired private UserService service;
+    @Autowired private UserPatientRelationService userPatientRelationService;
+    @Autowired private PatientService patientService;
 
     @POST
     @Path("/register")
@@ -39,6 +45,8 @@ public class UserAPI {
                              @FormParam("sms_code") @DefaultValue("") String smsCode
     ) {
         UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode);
+        PatientBean patientBean = patientService.create(name, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES);
+        userPatientRelationService.addPatientToUser(patientBean.getId(), userBean.getId());
         return Response.ok(userBean).build();
     }
 

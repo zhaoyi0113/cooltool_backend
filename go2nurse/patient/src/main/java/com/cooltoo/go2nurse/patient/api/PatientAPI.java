@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserPatientRelationBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
@@ -72,7 +73,8 @@ public class PatientAPI {
                            @FormParam("gender") @DefaultValue("2") int gender,
                            @FormParam("birthday") @DefaultValue("") String strBirthday,
                            @FormParam("identityCard") @DefaultValue("") String identityCard,
-                           @FormParam("mobile") @DefaultValue("") String mobile
+                           @FormParam("mobile") @DefaultValue("") String mobile,
+                           @FormParam("is_default") @DefaultValue("") String strIsDefault
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Date date = null;
@@ -80,7 +82,8 @@ public class PatientAPI {
         if (time > 0) {
             date = new Date(time);
         }
-        PatientBean patient = service.create(name, gender, date, identityCard, mobile);
+        YesNoEnum isDefault = YesNoEnum.parseString(strIsDefault);
+        PatientBean patient = service.create(name, gender, date, identityCard, mobile, isDefault);
         if (null!=patient && patient.getId()>0) {
             UserPatientRelationBean relation = userPatientRelation.addPatientToUser(patient.getId(), userId);
             logger.info("user patient relation is {}", relation);
@@ -93,20 +96,23 @@ public class PatientAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response update(@Context HttpServletRequest request,
-                           @FormParam("id") @DefaultValue("-1") long id,
+                           @FormParam("id") @DefaultValue("-1") long patientId,
                            @FormParam("name") @DefaultValue("") String name,
                            @FormParam("gender") @DefaultValue("2") int gender,
                            @FormParam("birthday") @DefaultValue("") String strBirthday,
                            @FormParam("identityCard") @DefaultValue("") String identityCard,
                            @FormParam("mobile") @DefaultValue("") String mobile,
+                           @FormParam("is_default") @DefaultValue("") String strIsDefault,
                            @FormParam("status") @DefaultValue("ENABLED") String status
     ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Date birthday = null;
         long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (time > 0) {
             birthday = new Date(time);
         }
-        PatientBean one = service.update(id, name, gender, birthday, identityCard, mobile, status);
+        YesNoEnum isDefault = YesNoEnum.parseString(strIsDefault);
+        PatientBean one = service.update(userId, patientId, name, gender, birthday, identityCard, mobile, isDefault, status);
         return Response.ok(one).build();
     }
 
