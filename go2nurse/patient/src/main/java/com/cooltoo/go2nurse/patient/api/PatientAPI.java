@@ -96,12 +96,12 @@ public class PatientAPI {
     public Response update(@Context HttpServletRequest request,
                            @FormParam("id") @DefaultValue("-1") long patientId,
                            @FormParam("name") @DefaultValue("") String name,
-                           @FormParam("gender") @DefaultValue("2") int gender,
+                           @FormParam("gender") @DefaultValue("-1") int gender,
                            @FormParam("birthday") @DefaultValue("") String strBirthday,
                            @FormParam("identityCard") @DefaultValue("") String identityCard,
                            @FormParam("mobile") @DefaultValue("") String mobile,
                            @FormParam("is_default") @DefaultValue("") String strIsDefault,
-                           @FormParam("status") @DefaultValue("ENABLED") String status
+                           @FormParam("status") @DefaultValue("") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Date birthday = null;
