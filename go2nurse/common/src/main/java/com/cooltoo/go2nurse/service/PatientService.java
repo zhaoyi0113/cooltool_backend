@@ -35,7 +35,6 @@ public class PatientService {
     private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "isDefault"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 
