@@ -150,8 +150,8 @@ public class ServiceCategoryAndItemManageAPI {
     public Response editServiceCategoryImage(@Context HttpServletRequest request,
                                              @FormDataParam("category_id") @DefaultValue("0") long categoryId,
                                              @FormDataParam("image_name") @DefaultValue("") String imageName,
-                                             @FormDataParam("description") InputStream image,
-                                             @FormDataParam("grade")FormDataContentDisposition disposition
+                                             @FormDataParam("image") InputStream image,
+                                             @FormDataParam("image")FormDataContentDisposition disposition
     ) {
         ServiceCategoryBean category = categoryAndItemService.updateCategoryImage(categoryId, imageName, image);
         return Response.ok(category).build();
@@ -181,10 +181,10 @@ public class ServiceCategoryAndItemManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response editServiceItemImage(@Context HttpServletRequest request,
-                                         @FormParam("item_id") @DefaultValue("0") long itemId,
+                                         @FormDataParam("item_id") @DefaultValue("0") long itemId,
                                          @FormDataParam("image_name") @DefaultValue("") String imageName,
-                                         @FormDataParam("description") InputStream image,
-                                         @FormDataParam("grade")FormDataContentDisposition disposition
+                                         @FormDataParam("image") InputStream image,
+                                         @FormDataParam("image")FormDataContentDisposition disposition
     ) {
         ServiceItemBean serviceItem = categoryAndItemService.updateItemImage(itemId, imageName, image);
         return Response.ok(serviceItem).build();
