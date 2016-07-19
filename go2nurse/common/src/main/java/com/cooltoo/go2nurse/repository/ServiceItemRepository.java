@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -18,4 +20,9 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
     Page<ServiceItemEntity> findByCategoryId(Long categoryId, Pageable sort);
 
     List<ServiceItemEntity> findByIdIn(List<Long> ids);
+
+    @Modifying
+    @Query("UPDATE ServiceItemEntity item SET item.categoryId=0" +
+            " WHERE item.categoryId IN ?2 ")
+    int setCategoryIdToNone(List<Long> categoryId);
 }

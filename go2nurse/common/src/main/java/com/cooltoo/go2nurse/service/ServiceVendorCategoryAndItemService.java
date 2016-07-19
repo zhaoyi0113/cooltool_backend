@@ -5,14 +5,18 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
+import com.cooltoo.go2nurse.beans.ServiceVendorBean;
 import com.cooltoo.go2nurse.constants.ServiceClass;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 import com.cooltoo.go2nurse.converter.ServiceCategoryBeanConverter;
 import com.cooltoo.go2nurse.converter.ServiceItemBeanConverter;
+import com.cooltoo.go2nurse.converter.ServiceVendorBeanConverter;
 import com.cooltoo.go2nurse.entities.ServiceCategoryEntity;
 import com.cooltoo.go2nurse.entities.ServiceItemEntity;
+import com.cooltoo.go2nurse.entities.ServiceVendorEntity;
 import com.cooltoo.go2nurse.repository.ServiceCategoryRepository;
 import com.cooltoo.go2nurse.repository.ServiceItemRepository;
+import com.cooltoo.go2nurse.repository.ServiceVendorRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -33,9 +37,13 @@ import java.util.*;
  * Created by hp on 2016/7/13.
  */
 @Service("ServiceCategoryAndItemService")
-public class ServiceCategoryAndItemService {
+public class ServiceVendorCategoryAndItemService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServiceCategoryAndItemService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServiceVendorCategoryAndItemService.class);
+
+    private static final Sort vendorSort = new Sort(
+            new Sort.Order(Sort.Direction.DESC, "id")
+    );
 
     private static final Sort categorySort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "grade"),
@@ -52,10 +60,27 @@ public class ServiceCategoryAndItemService {
     @Autowired private ServiceItemRepository itemRep;
     @Autowired private ServiceItemBeanConverter itemBeanConverter;
     @Autowired private UserGo2NurseFileStorageService userFileStorage;
+    @Autowired private ServiceVendorRepository vendorRep;
+    @Autowired private ServiceVendorBeanConverter vendorBeanConverter;
 
     //=====================================================================
     //                   getting
     //=====================================================================
+    public long countVendor() {
+        long count = vendorRep.count();
+        logger.info("count service vendor size is {}", count);
+        return count;
+    }
+
+    public List<ServiceVendorBean> getVendor(int pageIndex, int sizePerPage) {
+        logger.info("get service vendor at page={} size={}", pageIndex, sizePerPage);
+        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, vendorSort);
+        Page<ServiceVendorEntity> entities = vendorRep.findAll(pageRequest);
+        List<ServiceVendorBean> beans = serviceVendorEntitiesToBeans(entities);
+        fillVendorOtherProperties(beans);
+        logger.info("count is ={}");
+        return beans;
+    }
 
     public long countTopCategory() {
         return countCategoryByParentId(0L);
@@ -175,6 +200,18 @@ public class ServiceCategoryAndItemService {
         return beans;
     }
 
+    private List<ServiceVendorBean> serviceVendorEntitiesToBeans(Iterable<ServiceVendorEntity> entities) {
+        List<ServiceVendorBean> beans = new ArrayList<>();
+        if (null==entities) {
+            return beans;
+        }
+        for (ServiceVendorEntity entity : entities) {
+            ServiceVendorBean bean = vendorBeanConverter.convert(entity);
+            beans.add(bean);
+        }
+        return beans;
+    }
+
     private void fillItemOtherProperties(List<ServiceItemBean> items) {
         if (VerifyUtil.isListEmpty(items)) {
             return;
@@ -221,9 +258,56 @@ public class ServiceCategoryAndItemService {
         }
     }
 
+    private void fillVendorOtherProperties(List<ServiceVendorBean> items) {
+        if (VerifyUtil.isListEmpty(items)) {
+            return;
+        }
+
+        List<Long> imagesId = new ArrayList<>();
+        for (ServiceVendorBean item : items) {
+            if (imagesId.contains(item.getLogoId())) {
+                continue;
+            }
+            imagesId.add(item.getLogoId());
+        }
+
+        Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
+        for (ServiceVendorBean item : items) {
+            String imageUrl = imageIdToUrl.get(item.getLogoId());
+            if (VerifyUtil.isStringEmpty(imageUrl)) {
+                continue;
+            }
+            item.setLogoUrl(imageUrl);
+        }
+    }
     //=====================================================================
     //                   deleting
     //=====================================================================
+    @Transactional
+    public List<Long> deleteVendorByIds(List<Long> vendorIds) {
+        logger.info("delete service vendor by vendorIds={}", vendorIds);
+        if (VerifyUtil.isListEmpty(vendorIds)) {
+            return vendorIds;
+        }
+        List<ServiceVendorEntity> entities = vendorRep.findAll(vendorIds);
+        if (VerifyUtil.isListEmpty(entities)) {
+            return vendorIds;
+        }
+
+        List<Long> imagesId = new ArrayList<>();
+        for (ServiceVendorEntity entity : entities) {
+            if (imagesId.contains(entity.getLogoId())) {
+                continue;
+            }
+            imagesId.add(entity.getLogoId());
+        }
+        userFileStorage.deleteFiles(imagesId);
+        vendorRep.delete(entities);
+
+        logger.info("delete service category={}", entities);
+        return vendorIds;
+    }
+
     @Transactional
     public List<Long> deleteCategoryByIds(List<Long> categoryIds) {
         logger.info("delete service category by categoryIds={}", categoryIds);
@@ -245,6 +329,7 @@ public class ServiceCategoryAndItemService {
         userFileStorage.deleteFiles(imagesId);
         categoryRep.delete(entities);
         categoryRep.setPatentIdToNone(categoryIds);
+        itemRep.setCategoryIdToNone(categoryIds);
 
         logger.info("delete service category={}", entities);
         return categoryIds;
@@ -300,6 +385,66 @@ public class ServiceCategoryAndItemService {
     //=====================================================================
     //                   updating
     //=====================================================================
+    @Transactional
+    public ServiceVendorBean updateVendor(long vendorId, String name, String description, String strStatus) {
+        logger.info("update service vendor={} by name={} description={} status={}",
+                vendorId, name, description, strStatus);
+
+        ServiceVendorEntity entity = vendorRep.findOne(vendorId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        boolean changed = false;
+        if (!VerifyUtil.isStringEmpty(name)) {
+            entity.setName(name.trim());
+            changed = true;
+        }
+        if (!VerifyUtil.isStringEmpty(description)) {
+            entity.setDescription(description);
+            changed = true;
+        }
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null!=status) {
+            entity.setStatus(status);
+            changed = true;
+        }
+
+        if (changed) {
+            entity = vendorRep.save(entity);
+        }
+
+        ServiceVendorBean bean = vendorBeanConverter.convert(entity);
+        logger.info("service vendor updated is {}", bean);
+        return bean;
+    }
+
+    @Transactional
+    public ServiceVendorBean updateVendorLogoImage(long vendorId, String imageName, InputStream image) {
+        logger.info("update service vendor={} by imageName={} image={}",
+                vendorId, imageName, null!=image);
+
+        ServiceVendorEntity entity = vendorRep.findOne(vendorId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        String imageUrl = "";
+        if (null!=image) {
+            if (VerifyUtil.isStringEmpty(imageName)) {
+                imageName = "service_vendor_logo_" + System.nanoTime();
+            }
+            long imageId = userFileStorage.addFile(entity.getLogoId(), imageName, image);
+            imageUrl = userFileStorage.getFileURL(imageId);
+            entity.setLogoId(imageId);
+        }
+
+        ServiceVendorBean bean = vendorBeanConverter.convert(entity);
+        bean.setLogoUrl(imageUrl);
+        logger.info("service vendor updated is {}", bean);
+        return bean;
+    }
+
     @Transactional
     public ServiceCategoryBean updateCategory(long categoryId, String name, String description, int grade, long parentId, String strStatus) {
         logger.info("update service category={} by name={} description={} grade={} parentId={} status={}",
@@ -462,6 +607,28 @@ public class ServiceCategoryAndItemService {
     //=====================================================================
     //                   adding
     //=====================================================================
+
+    @Transactional
+    public ServiceVendorBean addVendor(String name, String description) {
+        logger.info("add service vendor by name={} description={}",
+                name, description);
+        if (VerifyUtil.isStringEmpty(name)) {
+            logger.error("name is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        name = name.trim();
+        ServiceVendorEntity entity = new ServiceVendorEntity();
+        if (!VerifyUtil.isStringEmpty(description)) {
+            entity.setDescription(description);
+        }
+        entity.setName(name);
+        entity.setStatus(CommonStatus.ENABLED);
+        entity.setTime(new Date());
+        entity = vendorRep.save(entity);
+        ServiceVendorBean bean = vendorBeanConverter.convert(entity);
+        logger.info("service vendor added is {}", bean);
+        return bean;
+    }
 
     @Transactional
     public ServiceCategoryBean addCategory(String name, String description, int grade, long parentId) {

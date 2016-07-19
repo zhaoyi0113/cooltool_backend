@@ -6,7 +6,7 @@ import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
-import com.cooltoo.go2nurse.service.ServiceCategoryAndItemService;
+import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,7 +24,7 @@ import java.util.List;
 public class UserServiceOrderAPI {
 
     @Autowired private ServiceOrderService orderService;
-    @Autowired private ServiceCategoryAndItemService serviceCategoryItemService;
+    @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
 
     @Path("/category/top")
     @Produces(MediaType.APPLICATION_JSON)

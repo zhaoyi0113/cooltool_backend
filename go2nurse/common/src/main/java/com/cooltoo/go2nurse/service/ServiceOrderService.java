@@ -44,7 +44,7 @@ public class ServiceOrderService {
     @Autowired private ServiceOrderRepository repository;
     @Autowired private ServiceOrderBeanConverter beanConverter;
 
-    @Autowired private ServiceCategoryAndItemService serviceCategoryItemService;
+    @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
     @Autowired private UserService userService;
     @Autowired private PatientService patientService;
     @Autowired private UserAddressService addressService;
