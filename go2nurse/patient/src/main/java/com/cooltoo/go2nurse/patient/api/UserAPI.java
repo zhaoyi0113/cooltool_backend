@@ -59,7 +59,7 @@ public class UserAPI {
                                @FormParam("gender") @DefaultValue("-1") int gender,
                                @FormParam("birthday") @DefaultValue("") String birthday,
                                @FormParam("address") @DefaultValue("") String address,
-                               @FormParam("has_decide") @DefaultValue("NO") String hasDecide
+                               @FormParam("has_decide") @DefaultValue("") String hasDecide
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserBean user = service.updateUser(userId, name, gender, birthday, -1, address, hasDecide);
