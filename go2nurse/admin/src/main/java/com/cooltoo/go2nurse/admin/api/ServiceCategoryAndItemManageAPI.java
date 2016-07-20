@@ -88,22 +88,45 @@ public class ServiceCategoryAndItemManageAPI {
         return Response.ok(serviceCategories).build();
     }
 
-    @Path("/item/count")
+    @Path("/item/count_by_vendor")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response countServiceItem(@Context HttpServletRequest request,
-                                     @QueryParam("category_id") @DefaultValue("0") long categoryId) {
+    public Response countServiceItemByVendor(@Context HttpServletRequest request,
+                                             @QueryParam("vendor_id") @DefaultValue("0") long vendorId
+    ) {
+        long serviceItemCount = vendorCategoryAndItemService.countItemByVendorId(vendorId);
+        return Response.ok(serviceItemCount).build();
+    }
+
+    @Path("/item/by_vendor")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getServiceItemByVendor(@Context HttpServletRequest request,
+                                           @QueryParam("vendor_id") @DefaultValue("0") long vendorId,
+                                           @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                           @QueryParam("number") @DefaultValue("10") int sizePerPage
+    ) {
+        List<ServiceItemBean> serviceItems = vendorCategoryAndItemService.getItemByVendorId(
+                vendorId, pageIndex, sizePerPage);
+        return Response.ok(serviceItems).build();
+    }
+
+    @Path("/item/count_by_category")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response countServiceItemByCategory(@Context HttpServletRequest request,
+                                               @QueryParam("category_id") @DefaultValue("0") long categoryId) {
         long serviceItemCount = vendorCategoryAndItemService.countItemByCategoryId(categoryId);
         return Response.ok(serviceItemCount).build();
     }
 
-    @Path("/item")
+    @Path("/item/by_category")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getServiceItem(@Context HttpServletRequest request,
-                                   @QueryParam("category_id") @DefaultValue("0") long categoryId,
-                                   @QueryParam("index") @DefaultValue("0") int pageIndex,
-                                   @QueryParam("number") @DefaultValue("10") int sizePerPage
+    public Response getServiceItemByCategory(@Context HttpServletRequest request,
+                                             @QueryParam("category_id") @DefaultValue("0") long categoryId,
+                                             @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                             @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         List<ServiceItemBean> serviceItems = vendorCategoryAndItemService.getItemByCategoryId(
                 categoryId, pageIndex, sizePerPage);
@@ -149,9 +172,10 @@ public class ServiceCategoryAndItemManageAPI {
                                    @FormParam("time_duration") @DefaultValue("0") int timeDuration,
                                    @FormParam("time_unit") @DefaultValue("") String timeUnit,
                                    @FormParam("grade") @DefaultValue("0") int grade,
-                                   @FormParam("category_id") @DefaultValue("0") long categoryId
+                                   @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                   @FormParam("vendor_id") @DefaultValue("0") long vendorId
     ) {
-        ServiceItemBean serviceItem = vendorCategoryAndItemService.addItem(name, clazz, description, price, timeDuration, timeUnit, grade, categoryId);
+        ServiceItemBean serviceItem = vendorCategoryAndItemService.addItem(name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId);
         return Response.ok(serviceItem).build();
     }
 
@@ -228,9 +252,10 @@ public class ServiceCategoryAndItemManageAPI {
                                     @FormParam("time_unit") @DefaultValue("") String timeUnit,
                                     @FormParam("grade") @DefaultValue("0") int grade,
                                     @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                    @FormParam("vendor_id") @DefaultValue("0") long vendorId,
                                     @FormParam("status") @DefaultValue("") String status
     ) {
-        ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItem(itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, status);
+        ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItem(itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, status);
         return Response.ok(serviceItem).build();
     }
 

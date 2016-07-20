@@ -82,6 +82,23 @@ public class ServiceVendorCategoryAndItemService {
         return beans;
     }
 
+    private List<ServiceVendorBean> getVendorByIds(List<Long> vendorIds) {
+        logger.info("get vendor information by vendorIds, vendors id size={}", VerifyUtil.isListEmpty(vendorIds) ? 0 : vendorIds.size());
+        List<ServiceVendorEntity> resultSet = vendorRep.findAll(vendorIds);
+        List<ServiceVendorBean> beans = serviceVendorEntitiesToBeans(resultSet);
+        logger.info("get vendor information size={}", beans.size());
+        return beans;
+    }
+
+    private Map<Long, ServiceVendorBean> getVendorIdToBeanMapByIds(List<Long> vendorIds) {
+        List<ServiceVendorBean> beans  = getVendorByIds(vendorIds);
+        Map<Long, ServiceVendorBean> map = new HashMap<>();
+        for (ServiceVendorBean bean : beans) {
+            map.put(bean.getId(), bean);
+        }
+        return map;
+    }
+
     public long countTopCategory() {
         return countCategoryByParentId(0L);
     }
@@ -144,6 +161,31 @@ public class ServiceVendorCategoryAndItemService {
         return beans;
     }
 
+    public long countItemByVendorId(long vendorId) {
+        long count = itemRep.countByVendorId(vendorId);
+        logger.info("count service item by vendorId={}, size is {}", vendorId, count);
+        return count;
+    }
+
+    public List<ServiceItemBean> getItemByVendorId(long vendorId) {
+        logger.info("get service item by vendorId={}", vendorId);
+        List<ServiceItemEntity> entities = itemRep.findByVendorId(vendorId, itemSort);
+        List<ServiceItemBean> beans = serviceItemEntitiesToBeans(entities);
+        fillItemOtherProperties(beans);
+        logger.info("count is ={}");
+        return beans;
+    }
+
+    public List<ServiceItemBean> getItemByVendorId(long vendorId, int pageIndex, int sizePerPage) {
+        logger.info("get service item by vendorId={}, at page={} size={}", vendorId, pageIndex, sizePerPage);
+        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, itemSort);
+        Page<ServiceItemEntity> entities = itemRep.findByVendorId(vendorId, pageRequest);
+        List<ServiceItemBean> beans = serviceItemEntitiesToBeans(entities);
+        fillItemOtherProperties(beans);
+        logger.info("count is ={}");
+        return beans;
+    }
+
     public ServiceItemBean getItemById(Long itemId) {
         logger.info("get service item by id={}", itemId);
         ServiceItemEntity entity = itemRep.findOne(itemId);
@@ -167,7 +209,7 @@ public class ServiceVendorCategoryAndItemService {
         return beans;
     }
 
-    public Map<Long, ServiceItemBean> getItemIdToBeanMap(List<Long> itemIds) {
+    private Map<Long, ServiceItemBean> getItemIdToBeanMap(List<Long> itemIds) {
         List<ServiceItemBean> beans = getItemByIdIn(itemIds);
         Map<Long, ServiceItemBean> itemIdToBean = new HashMap<>();
         for (ServiceItemBean bean : beans) {
@@ -218,20 +260,27 @@ public class ServiceVendorCategoryAndItemService {
         }
 
         List<Long> imagesId = new ArrayList<>();
+        List<Long> vendorsId = new ArrayList<>();
         for (ServiceItemBean item : items) {
-            if (imagesId.contains(item.getImageId())) {
-                continue;
+            if (!imagesId.contains(item.getImageId())) {
+                imagesId.add(item.getImageId());
             }
-            imagesId.add(item.getImageId());
+            if (!vendorsId.contains(item.getVendorId())) {
+                vendorsId.add(item.getVendorId());
+            }
         }
 
         Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
+        Map<Long, ServiceVendorBean> vendorIdToBean = getVendorIdToBeanMapByIds(vendorsId);
         for (ServiceItemBean item : items) {
             String imageUrl = imageIdToUrl.get(item.getImageId());
-            if (VerifyUtil.isStringEmpty(imageUrl)) {
-                continue;
+            ServiceVendorBean vendor = vendorIdToBean.get(item.getVendorId());
+            if (!VerifyUtil.isStringEmpty(imageUrl)) {
+                item.setImageUrl(imageUrl);
             }
-            item.setImageUrl(imageUrl);
+            if (null!=vendor) {
+                item.setVendor(vendor);
+            }
         }
     }
 
@@ -303,8 +352,9 @@ public class ServiceVendorCategoryAndItemService {
         }
         userFileStorage.deleteFiles(imagesId);
         vendorRep.delete(entities);
+        itemRep.setVendorIdToNone(vendorIds);
 
-        logger.info("delete service category={}", entities);
+        logger.info("delete service vendor={}", entities);
         return vendorIds;
     }
 
@@ -516,9 +566,9 @@ public class ServiceVendorCategoryAndItemService {
     @Transactional
     public ServiceItemBean updateItem(long itemId, String name, String clazz, String description,
                                       String price, int timeDuration, String timeUnit,
-                                      int grade, long categoryId, String strStatus) {
-        logger.info("update service item={} by name={} clazz={} description={} price={} timeDuration={} timeUnit={} grade={} categoryId={} status={}",
-                itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, strStatus);
+                                      int grade, long categoryId, long vendorId, String strStatus) {
+        logger.info("update service item={} by name={} clazz={} description={} price={} timeDuration={} timeUnit={} grade={} categoryId={} vendorId={} status={}",
+                itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, strStatus);
 
         ServiceItemEntity entity = itemRep.findOne(itemId);
         if (null==entity) {
@@ -559,6 +609,10 @@ public class ServiceVendorCategoryAndItemService {
         }
         if (categoryId>=0 && categoryId!=entity.getCategoryId()) {
             entity.setCategoryId(categoryId);
+            changed = true;
+        }
+        if (vendorId>=0 && vendorId!=entity.getVendorId()) {
+            entity.setVendorId(vendorId);
             changed = true;
         }
         CommonStatus status = CommonStatus.parseString(strStatus);
@@ -655,8 +709,8 @@ public class ServiceVendorCategoryAndItemService {
     }
 
     @Transactional
-    public ServiceItemBean addItem(String name, String clazz, String description, String price, int timeDuration, String timeUnit, int grade, long categoryId) {
-        logger.info("add service item by name={} clazz={} description={} price={} timeDuration={} timeUnit={} grade={} categoryId={}",
+    public ServiceItemBean addItem(String name, String clazz, String description, String price, int timeDuration, String timeUnit, int grade, long categoryId, long vendorId) {
+        logger.info("add service item by name={} clazz={} description={} price={} timeDuration={} timeUnit={} grade={} categoryId={} vendorId={}",
                 name, clazz, description, price, timeDuration, timeUnit, grade, categoryId);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
@@ -678,6 +732,7 @@ public class ServiceVendorCategoryAndItemService {
         entity.setServiceTimeUnit(serviceTimeUnit);
         entity.setGrade(grade<0 ? 0 : grade);
         entity.setCategoryId(categoryId<0 ? 0 : categoryId);
+        entity.setVendorId(vendorId<0 ? 0 : vendorId);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = itemRep.save(entity);

@@ -19,10 +19,19 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
     List<ServiceItemEntity> findByCategoryId(Long categoryId, Sort sort);
     Page<ServiceItemEntity> findByCategoryId(Long categoryId, Pageable sort);
 
+    long countByVendorId(Long vendorId);
+    List<ServiceItemEntity> findByVendorId(Long vendorId, Sort sort);
+    Page<ServiceItemEntity> findByVendorId(Long vendorId, Pageable sort);
+
     List<ServiceItemEntity> findByIdIn(List<Long> ids);
 
     @Modifying
     @Query("UPDATE ServiceItemEntity item SET item.categoryId=0" +
             " WHERE item.categoryId IN ?2 ")
     int setCategoryIdToNone(List<Long> categoryId);
+
+    @Modifying
+    @Query("UPDATE ServiceItemEntity item SET item.vendorId=0" +
+            " WHERE item.vendorId IN ?2 ")
+    int setVendorIdToNone(List<Long> vendorId);
 }

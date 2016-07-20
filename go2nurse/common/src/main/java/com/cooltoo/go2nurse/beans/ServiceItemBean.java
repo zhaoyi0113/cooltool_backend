@@ -14,6 +14,8 @@ public class ServiceItemBean {
     private long id;
     private Date time;
     private CommonStatus status;
+    private long vendorId;
+    private ServiceVendorBean vendor;
     private long categoryId;
     private String name;
     private ServiceClass clazz;
@@ -35,6 +37,14 @@ public class ServiceItemBean {
 
     public CommonStatus getStatus() {
         return status;
+    }
+
+    public long getVendorId() {
+        return vendorId;
+    }
+
+    public ServiceVendorBean getVendor() {
+        return vendor;
     }
 
     public long getCategoryId() {
@@ -89,6 +99,14 @@ public class ServiceItemBean {
         this.status = status;
     }
 
+    public void setVendorId(long vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public void setVendor(ServiceVendorBean vendor) {
+        this.vendor = vendor;
+    }
+
     public void setCategoryId(long categoryId) {
         this.categoryId = categoryId;
     }
@@ -136,6 +154,8 @@ public class ServiceItemBean {
         msg.append("id=").append(id);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
+        msg.append(", vendorId=").append(vendorId);
+        msg.append(", vendor=").append(vendor);
         msg.append(", categoryId=").append(categoryId);
         msg.append(", name=").append(name);
         msg.append(", clazz=").append(clazz);

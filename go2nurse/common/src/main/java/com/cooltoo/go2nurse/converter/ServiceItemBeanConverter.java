@@ -16,6 +16,7 @@ public class ServiceItemBeanConverter implements Converter<ServiceItemEntity, Se
         bean.setId(source.getId());
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
+        bean.setVendorId(source.getVendorId());
         bean.setCategoryId(source.getCategoryId());
         bean.setName(source.getName());
         bean.setClazz(source.getClazz());
