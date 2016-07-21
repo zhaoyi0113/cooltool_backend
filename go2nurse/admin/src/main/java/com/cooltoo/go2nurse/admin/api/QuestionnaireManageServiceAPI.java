@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.admin.api;
 
+import com.cooltoo.constants.GenderType;
 import com.cooltoo.go2nurse.beans.QuestionBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
@@ -180,6 +181,23 @@ public class QuestionnaireManageServiceAPI {
         List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireWithQuestionsByHospitalId(hospitalId);
         userQuestionnaireAnswerService.getQuestionnaireStatistics(questionnaires);
         return Response.ok(questionnaires).build();
+    }
+
+    @Path("/questionnaire/statistics")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireStatisticByConditions(@Context HttpServletRequest request,
+                                                          @QueryParam("user_id") @DefaultValue("null") Long userId,
+                                                          @QueryParam("patient_id") @DefaultValue("null") Long patientId,
+                                                          @QueryParam("gender") @DefaultValue("-1") int iGender,
+                                                          @QueryParam("hospital_id") @DefaultValue("null") Integer hospitalId,
+                                                          @QueryParam("questionnaire_id") @DefaultValue("null") Long questionnaireId,
+                                                          @QueryParam("age_start") @DefaultValue("null") Integer ageStart,
+                                                          @QueryParam("age_end") @DefaultValue("null") Integer ageEnd
+    ) {
+        GenderType gender = GenderType.parseInt(iGender);
+        String statisticsFileUrl = userQuestionnaireAnswerService.exportQuestionnaireStatisticsToFile(userId, patientId, gender, hospitalId, null, questionnaireId, ageStart, ageEnd);
+        return Response.ok(statisticsFileUrl).build();
     }
 
     @Path("/questionnaire_category/with_questionnaire")

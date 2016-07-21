@@ -60,8 +60,9 @@ public class UserQuestionnaireAnswerServiceAPI {
     public Response getUsersQuestionnaireByGroupId(@Context HttpServletRequest request,
                                                    @QueryParam("group_id") @DefaultValue("0") long groupId) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        QuestionnaireBean usersQuestionnaire = userAnswerService.getUserQuestionnaireWithAnswer(userId, groupId);
-        return Response.ok(usersQuestionnaire).build();
+        QuestionnaireBean userQuestionnaire = userAnswerService.getUserQuestionnaireWithAnswer(userId, groupId, true);
+
+        return Response.ok(userQuestionnaire).build();
     }
 
 

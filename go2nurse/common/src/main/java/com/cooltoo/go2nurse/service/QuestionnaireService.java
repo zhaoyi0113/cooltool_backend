@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
@@ -19,6 +20,7 @@ import com.cooltoo.go2nurse.repository.QuestionRepository;
 import com.cooltoo.go2nurse.repository.QuestionnaireCategoryRepository;
 import com.cooltoo.go2nurse.repository.QuestionnaireRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +66,7 @@ public class QuestionnaireService {
     @Autowired private QuestionnaireCategoryBeanConverter questionnaireCategoryConverter;
 
     @Autowired private UserGo2NurseFileStorageService userStorageService;
+    @Autowired private CommonHospitalService hospitalService;
 
     //=================================================================
     //         getter
@@ -130,6 +133,7 @@ public class QuestionnaireService {
         PageRequest pageRequest = new PageRequest(pageIndex, sizeOfPage, questionnaireSort);
         Page<QuestionnaireEntity> resultSet = questionnaireRep.findAll(pageRequest);
         List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(resultSet);
+        questionnaireFillOtherProperties(beans, true, false);
         logger.info("count is {}", beans.size());
         return beans;
     }
@@ -141,8 +145,9 @@ public class QuestionnaireService {
             logger.info("get question by id, doesn't exist!");
             return null;
         }
-
         QuestionnaireBean bean = questionnaireConverter.convert(entity);
+        HospitalBean hospital = hospitalService.getOneById(bean.getHospitalId());
+        bean.setHospital(hospital);
         return bean;
     }
 
@@ -169,6 +174,7 @@ public class QuestionnaireService {
         if (!VerifyUtil.isListEmpty(questionnaireIds)) {
             List<QuestionnaireEntity> resultSet = questionnaireRep.findByIdIn(questionnaireIds, questionnaireSort);
             beans = questionnaireEntitiesToBeans(resultSet);
+            questionnaireFillOtherProperties(beans, true, false);
         }
         else {
             beans = new ArrayList<>();
@@ -200,9 +206,21 @@ public class QuestionnaireService {
         return beans;
     }
 
+    public QuestionnaireBean getQuestionnaireWithQuestions(long questionnaireId) {
+        logger.info("get questionnaire with question by id={}", questionnaireId);
+        List<QuestionnaireBean> questionnaire = getQuestionnaireWithQuestionsByIds(questionnaireId+"");
+        if (VerifyUtil.isListEmpty(questionnaire)) {
+            return null;
+        }
+        return questionnaire.get(0);
+    }
+
     public List<QuestionnaireBean> getQuestionnaireWithQuestionsByHospitalId(int hospitalId) {
-        List<QuestionnaireBean> beans = getQuestionnaireByHospitalId(hospitalId);
-        questionnaireFillOtherProperties(beans);
+        logger.info("get questionnaire with questions by hospitalId={}", hospitalId);
+        List<QuestionnaireEntity> resultSet = questionnaireRep.findByHospitalId(hospitalId, questionnaireSort);
+        List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(resultSet);
+        questionnaireFillOtherProperties(beans, false, true);
+        logger.info("count is {}", beans.size());
         return beans;
     }
 
@@ -229,7 +247,7 @@ public class QuestionnaireService {
         if (!VerifyUtil.isListEmpty(questionnaireIds)) {
             List<QuestionnaireEntity> questionnaireResultSet = questionnaireRep.findByIdIn(questionnaireIds, questionnaireSort);
             questionnaires = questionnaireEntitiesToBeans(questionnaireResultSet);
-            questionnaireFillOtherProperties(questionnaires);
+            questionnaireFillOtherProperties(questionnaires, true, true);
         }
         else {
             questionnaires = new ArrayList<>();
@@ -371,21 +389,29 @@ public class QuestionnaireService {
         return beans;
     }
 
-    private void questionnaireFillOtherProperties(List<QuestionnaireBean> beans) {
+    private void questionnaireFillOtherProperties(List<QuestionnaireBean> beans, boolean fillHospital, boolean fillQuestion) {
         if (VerifyUtil.isListEmpty(beans)) {
             return;
         }
 
         List<Long> questionnaireIds = new ArrayList<>();
+        List<Integer> hospitalIds = new ArrayList<>();
         for (QuestionnaireBean bean : beans) {
-            if (questionnaireIds.contains(bean.getId())) {
-                continue;
+            if (!questionnaireIds.contains(bean.getId())) {
+                questionnaireIds.add(bean.getId());
             }
-            questionnaireIds.add(bean.getId());
+            if (!hospitalIds.contains(bean.getHospitalId())) {
+                hospitalIds.add(bean.getHospitalId());
+            }
         }
 
-        List<QuestionEntity> questionResultSet = questionRep.findByQuestionnaireIdIn(questionnaireIds, questionSort);
+        List<HospitalBean> hospitals = hospitalService.getHospitalByIds(hospitalIds);
+        List<QuestionEntity> questionResultSet = null;
+        if (fillQuestion) {
+            questionResultSet = questionRep.findByQuestionnaireIdIn(questionnaireIds, questionSort);
+        }
         List<QuestionBean> questions = questionEntitiesToBeans(questionResultSet);
+
 
         List<QuestionBean> propertyQuestion;
         for (QuestionnaireBean questionnaire : beans) {
@@ -396,6 +422,12 @@ public class QuestionnaireService {
                 }
             }
             questionnaire.setQuestions(propertyQuestion);
+            for (HospitalBean hospital : hospitals) {
+                if (questionnaire.getHospitalId()==hospital.getId()) {
+                    questionnaire.setHospital(hospital);
+                    break;
+                }
+            }
         }
     }
 

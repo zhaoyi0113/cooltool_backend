@@ -84,4 +84,12 @@ public class QuestionnaireConclusionBean {
         msg.append("]");
         return msg.toString();
     }
+
+    public String toJson() {
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"item\":\"").append(item).append("\"");
+        json.append(", \"interval\":\"").append(interval).append("\"");
+        return json.toString();
+    }
 }

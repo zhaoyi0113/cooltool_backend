@@ -36,7 +36,7 @@ public class UserQuestionnaireAnswerManageServiceAPI {
                                           @PathParam("user_id") @DefaultValue("0") long userId,
                                           @PathParam("group_id") @DefaultValue("0") long groupId
     ) {
-        QuestionnaireBean usersQuestionnaires = userAnswerService.getUserQuestionnaireWithAnswer(userId, groupId);
+        QuestionnaireBean usersQuestionnaires = userAnswerService.getUserQuestionnaireWithAnswer(userId, groupId, false);
         return Response.ok(usersQuestionnaires).build();
     }
 }

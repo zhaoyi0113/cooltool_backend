@@ -1,6 +1,8 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
@@ -10,6 +12,7 @@ import com.cooltoo.go2nurse.entities.UserQuestionnaireAnswerEntity;
 import com.cooltoo.go2nurse.repository.QuestionRepository;
 import com.cooltoo.go2nurse.repository.UserQuestionnaireAnswerRepository;
 import com.cooltoo.go2nurse.repository.UserRepository;
+import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -17,7 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.*;
 
 /**
@@ -42,6 +49,9 @@ public class UserQuestionnaireAnswerService {
     @Autowired private QuestionnaireService questionnaireService;
     @Autowired private PatientService patientService;
 
+    @Autowired private UserGo2NurseFileStorageService userFileStorage;
+    @Autowired private Go2NurseUtility utility;
+
     //==========================================================================
     //                        getting
     //==========================================================================
@@ -59,21 +69,40 @@ public class UserQuestionnaireAnswerService {
             logger.info("count of user's questionnaire is {}", 0);
             return new ArrayList<>();
         }
+        List<UserQuestionnaireAnswerBean> allCompleteAnswers = filterOnlyCompletedAnswer(allAnswers);
 
-        List<QuestionnaireBean> questionnaires = fillQuestionnaireAnswer(allAnswers);
+        List<QuestionnaireBean> questionnaires = fillQuestionnaireAnswer(allCompleteAnswers);
         logger.info("count of user's questionnaire is {}", questionnaires.size());
         return questionnaires;
     }
 
-    public QuestionnaireBean getUserQuestionnaireWithAnswer(long userId, long groupId) {
+    @Transactional
+    public QuestionnaireBean getUserQuestionnaireWithAnswer(long userId, long groupId, boolean isPatientCompleteQuestionnaire) {
         logger.info("get user{} 's questionnaire={}", userId, groupId);
         List<UserQuestionnaireAnswerBean> questionnaireAnswers = getUserQuestionnaireAnswer(userId, groupId);
+        if (!isPatientCompleteQuestionnaire) {
+            questionnaireAnswers = filterOnlyCompletedAnswer(questionnaireAnswers);
+        }
         List<QuestionnaireBean> questionnaire = fillQuestionnaireAnswer(questionnaireAnswers);
         if (VerifyUtil.isListEmpty(questionnaire)) {
             return null;
         }
         else {
-            return questionnaire.get(0);
+            QuestionnaireBean userQuestionnaire = questionnaire.get(0);
+            if (!isPatientCompleteQuestionnaire) {
+                // do nothing
+            }
+            else {
+                // set patient questionnaire conclusion, and complete flag
+                if (!YesNoEnum.YES.equals(questionnaireAnswers.get(0).getAnswerCompleted())) {
+                    String conclusion = "" + userQuestionnaire.getUserScore();
+                    if (null != userQuestionnaire.getUserConclusion()) {
+                        conclusion = userQuestionnaire.getUserConclusion().toJson();
+                    }
+                    patientCompleteQuestionnaire(userId, groupId, conclusion);
+                }
+            }
+            return userQuestionnaire;
         }
     }
 
@@ -95,6 +124,55 @@ public class UserQuestionnaireAnswerService {
             fillQuestionnaireStatistics(questionnaire, userAnswers);
         }
         return;
+    }
+
+    public String exportQuestionnaireStatisticsToFile(Long userId, Long patientId, GenderType gender,
+                                                      Integer hospitalId, Integer departmentId, Long questionnaireId,
+                                                      Integer ageStart, Integer ageEnd
+                                                    //, Date timeStart, Date timeEnd
+    ) {
+        List<UserQuestionnaireAnswerEntity> allAnswers = repository.findAnswerToExport(YesNoEnum.YES,
+                userId, patientId, gender,
+                hospitalId, departmentId, questionnaireId,
+                ageStart, ageEnd, sort);
+        StringBuilder oneQuestionnaireAnswer = new StringBuilder();
+        File statisticsFile = userFileStorage.createFileInBaseStorage("statistics", ".csv");
+        // write title
+        oneQuestionnaireAnswer.append("序号").append("\t");
+        oneQuestionnaireAnswer.append("医院").append("\t");
+        oneQuestionnaireAnswer.append("姓名").append("\t");
+        oneQuestionnaireAnswer.append("性别").append("\t");
+        oneQuestionnaireAnswer.append("年龄").append("\t");
+        oneQuestionnaireAnswer.append("手机").append("\t");
+        oneQuestionnaireAnswer.append("问卷").append("\t");
+        oneQuestionnaireAnswer.append("问题").append("\t");
+        oneQuestionnaireAnswer.append("答案").append("\t");
+        oneQuestionnaireAnswer.append("结论").append("\t");
+        oneQuestionnaireAnswer.append("时间").append("\r\n");
+        try {
+            FileWriter writer = new FileWriter(statisticsFile);
+            writer.write(oneQuestionnaireAnswer.toString());
+            oneQuestionnaireAnswer.setLength(0);
+            for (UserQuestionnaireAnswerEntity answer : allAnswers) {
+                oneQuestionnaireAnswer.append(answer.getGroupId()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getHospitalName()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getPatientName()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getPatientGender()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getPatientAge()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getPatientMobile()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getQuestionnaireName()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getQuestionContent()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getAnswer()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getQuestionnaireConclusion()).append("\t");
+                oneQuestionnaireAnswer.append(answer.getTime()).append("\r\n");
+                writer.write(oneQuestionnaireAnswer.toString());
+                oneQuestionnaireAnswer.setLength(0);
+            }
+        }
+        catch (Exception ex) {
+            return "";
+        }
+        return utility.getHttpPrefix()+statisticsFile.getName();
     }
 
     private List<UserQuestionnaireAnswerBean> getAllUsersAnswers(long userId) {
@@ -289,6 +367,19 @@ public class UserQuestionnaireAnswerService {
         return beans;
     }
 
+    private List<UserQuestionnaireAnswerBean> filterOnlyCompletedAnswer(List<UserQuestionnaireAnswerBean> beans) {
+        if (VerifyUtil.isListEmpty(beans)) {
+            return null==beans ? new ArrayList<>() : beans;
+        }
+        List<UserQuestionnaireAnswerBean> completedAnswer = new ArrayList<>();
+        for (UserQuestionnaireAnswerBean answer : beans) {
+            if (YesNoEnum.YES.equals(answer.getAnswerCompleted())) {
+                completedAnswer.add(answer);
+            }
+        }
+        return completedAnswer;
+    }
+
     private int parseUserAnswersScore(List<String> userAnswers) {
         if (VerifyUtil.isListEmpty(userAnswers)) {
             return 0;
@@ -399,37 +490,104 @@ public class UserQuestionnaireAnswerService {
         throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
     }
 
+    /**
+     * Invoke just by patient when complete the questionnaire
+     */
+    @Transactional
+    public void patientCompleteQuestionnaire(long userId, long groupId, String questionnaireConclusion) {
+        logger.info("patient complete questionnaire answer by userId={} groupId={} questionnaireConclusion={}",
+                userId, groupId, questionnaireConclusion);
+        if (null==questionnaireConclusion) {
+            logger.error("conclusion is null");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (VerifyUtil.isStringEmpty(questionnaireConclusion)) {
+            logger.warn("conclusion is empty string");
+        }
+        List<UserQuestionnaireAnswerEntity> entities = repository.findByUserIdAndGroupId(userId, groupId, sort);
+        if (!VerifyUtil.isListEmpty(entities)) {
+            // set questionnaire conclusion, and answer completed flag
+            for (UserQuestionnaireAnswerEntity tmp : entities) {
+                tmp.setQuestionnaireConclusion(questionnaireConclusion);
+                tmp.setAnswerCompleted(YesNoEnum.YES);
+            }
+            repository.save(entities);
+
+            // remove all un_completed answer
+            entities = repository.findByUserIdAndAnswerCompleted(userId, YesNoEnum.NO);
+            repository.delete(entities);
+        }
+        throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+    }
+
     //==========================================================================
     //                        adding
     //==========================================================================
     public UserQuestionnaireAnswerBean addAnswer(long userId, long patientId, long groupId, long questionId, String answer) {
         logger.info("add user={} patient={} in groupId={} answer question={} with answer={}",
                 userId, patientId, groupId, questionId, answer);
-        QuestionEntity question = questionRepository.findOne(questionId);
-        if (null==question) {
-            logger.error("question not exist");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
         if (!userRepository.exists(userId)) {
             logger.error("user not exists");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        long questionnaireId = question.getQuestionnaireId();
-        question = null;
-
-        groupId = groupId<0 ? 0 : groupId;
-        patientId = patientId<0 ? 0 : patientId;
+        QuestionEntity question = questionRepository.findOne(questionId);
+        PatientBean patient = patientService.getOneById(patientId);
+        QuestionnaireBean questionnaire = null == question ? null : questionnaireService.getQuestionnaire(question.getQuestionnaireId());
+        if (null == question) {
+            logger.error("question not exist");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (null == patient) {
+            logger.error("patient not exist");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (null == questionnaire) {
+            logger.error("questionnaire not exist");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        groupId = groupId < 0 ? 0 : groupId;
+        int patientAge = 0;
+        if (patient.getBirthday() != null) {
+            Calendar birthday = Calendar.getInstance();
+            birthday.setTime(patient.getBirthday());
+            Calendar currentYear = Calendar.getInstance();
+            patientAge = currentYear.get(Calendar.YEAR) - birthday.get(Calendar.YEAR);
+        }
 
         UserQuestionnaireAnswerEntity entity = new UserQuestionnaireAnswerEntity();
+        entity.setGroupId(groupId);
         entity.setUserId(userId);
         entity.setPatientId(patientId);
-        entity.setGroupId(groupId);
-        entity.setQuestionnaireId(questionnaireId);
-        entity.setQuestionId(questionId);
+        entity.setPatientName(patient.getName());
+        entity.setPatientGender(patient.getGender());
+        entity.setPatientAge(patientAge);
+        entity.setPatientMobile(patient.getMobile());
+        entity.setQuestionnaireId(questionnaire.getId());
+        entity.setQuestionnaireName(questionnaire.getTitle());
+        entity.setQuestionnaireConclusion(null);
+        entity.setQuestionId(question.getId());
+        entity.setQuestionContent(question.getContent());
         entity.setAnswer(answer);
+        entity.setAnswerCompleted(YesNoEnum.NO);
+        if (-1==questionnaire.getHospitalId()) {
+            entity.setHospitalId(questionnaire.getHospitalId());
+            entity.setHospitalName("cooltoo");
+        }
+        else if (null != questionnaire.getHospital()) {
+            entity.setHospitalId(questionnaire.getHospitalId());
+            entity.setHospitalName(questionnaire.getHospital().getName());
+        }
+        else {
+            entity.setHospitalId(questionnaire.getHospitalId());
+            entity.setHospitalName("unknown");
+        }
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
+        // TODO -- department information reversed
+        entity.setDepartmentId(0);
+        entity.setDepartmentName(null);
+
         entity = repository.save(entity);
 
         List<UserQuestionnaireAnswerEntity> answers = repository.findByUserIdAndGroupIdAndQuestionId(userId, groupId, questionId, sort);

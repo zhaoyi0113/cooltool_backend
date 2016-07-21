@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.util.VerifyUtil;
 
@@ -17,6 +18,7 @@ public class QuestionnaireBean {
     private String description;
     private String conclusion;
     private int hospitalId;
+    private HospitalBean hospital;
     private List<QuestionBean> questions;
     private Date time;
     private CommonStatus status;
@@ -58,6 +60,10 @@ public class QuestionnaireBean {
         return hospitalId;
     }
 
+    public HospitalBean getHospital() {
+        return hospital;
+    }
+
     public Date getTime() {
         return time;
     }
@@ -88,6 +94,10 @@ public class QuestionnaireBean {
 
     public void setHospitalId(int hospitalId) {
         this.hospitalId = hospitalId;
+    }
+
+    public void setHospital(HospitalBean hospital) {
+        this.hospital = hospital;
     }
 
     public void setTime(Date time) {

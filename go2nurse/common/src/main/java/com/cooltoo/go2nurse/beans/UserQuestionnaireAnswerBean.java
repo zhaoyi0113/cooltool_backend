@@ -1,6 +1,8 @@
 package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.YesNoEnum;
 
 import java.util.Date;
 
@@ -10,18 +12,37 @@ import java.util.Date;
 public class UserQuestionnaireAnswerBean {
 
     private long id;
+    private Date time;
+    private CommonStatus status;
     private long groupId;
     private long userId;
     private long patientId;
-    private PatientBean patient;
+    private String patientName;
+    private GenderType patientGender;
+    private int patientAge;
+    private String patientMobile;
     private long questionnaireId;
+    private String questionnaireName;
+    private String questionnaireConclusion;
     private long questionId;
+    private String questionContent;
     private String answer;
-    private Date time;
-    private CommonStatus status;
+    private YesNoEnum answerCompleted;
+    private long hospitalId;
+    private String hospitalName;
+    private long departmentId;
+    private String departmentName;
 
     public long getId() {
         return id;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public CommonStatus getStatus() {
+        return status;
     }
 
     public long getGroupId() {
@@ -36,28 +57,76 @@ public class UserQuestionnaireAnswerBean {
         return patientId;
     }
 
+    private String getPatientName() {
+        return patientName;
+    }
+
+    public GenderType getPatientGender() {
+        return patientGender;
+    }
+
+    private int getPatientAge() {
+        return patientAge;
+    }
+
+    private String getPatientMobile() {
+        return patientMobile;
+    }
+
     public long getQuestionnaireId() {
         return questionnaireId;
+    }
+
+    public String getQuestionnaireName() {
+        return questionnaireName;
+    }
+
+    public String getQuestionnaireConclusion() {
+        return questionnaireConclusion;
     }
 
     public long getQuestionId() {
         return questionId;
     }
 
+    public String getQuestionContent() {
+        return questionContent;
+    }
+
     public String getAnswer() {
         return answer;
     }
 
-    public Date getTime() {
-        return time;
+    public YesNoEnum getAnswerCompleted() {
+        return answerCompleted;
     }
 
-    public CommonStatus getStatus() {
-        return status;
+    public long getHospitalId() {
+        return hospitalId;
+    }
+
+    public String getHospitalName() {
+        return hospitalName;
+    }
+
+    public long getDepartmentId() {
+        return departmentId;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
     }
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public void setStatus(CommonStatus status) {
+        this.status = status;
     }
 
     public void setGroupId(long groupId) {
@@ -72,32 +141,64 @@ public class UserQuestionnaireAnswerBean {
         this.patientId = patientId;
     }
 
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public void setPatientGender(GenderType patientGender) {
+        this.patientGender = patientGender;
+    }
+
+    public void setPatientAge(int patientAge) {
+        this.patientAge = patientAge;
+    }
+
+    public void setPatientMobile(String patientMobile) {
+        this.patientMobile = patientMobile;
+    }
+
     public void setQuestionnaireId(long questionnaireId) {
         this.questionnaireId = questionnaireId;
+    }
+
+    public void setQuestionnaireName(String questionnaireName) {
+        this.questionnaireName = questionnaireName;
+    }
+
+    public void setQuestionnaireConclusion(String questionnaireConclusion) {
+        this.questionnaireConclusion = questionnaireConclusion;
     }
 
     public void setQuestionId(long questionId) {
         this.questionId = questionId;
     }
 
+    public void setQuestionContent(String questionContent) {
+        this.questionContent = questionContent;
+    }
+
     public void setAnswer(String answer) {
         this.answer = answer;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setAnswerCompleted(YesNoEnum answerCompleted) {
+        this.answerCompleted = answerCompleted;
     }
 
-    public void setStatus(CommonStatus status) {
-        this.status = status;
+    public void setHospitalId(long hospitalId) {
+        this.hospitalId = hospitalId;
     }
 
-    public PatientBean getPatient() {
-        return patient;
+    public void setHospitalName(String hospitalName) {
+        this.hospitalName = hospitalName;
     }
 
-    public void setPatient(PatientBean patient) {
-        this.patient = patient;
+    public void setDepartmentId(long departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 
     public String toString() {
@@ -109,7 +210,10 @@ public class UserQuestionnaireAnswerBean {
         msg.append(", patientId=").append(patientId);
         msg.append(", questionnaireId=").append(questionnaireId);
         msg.append(", questionId=").append(questionId);
+        msg.append(", departmentId=").append(departmentId);
+        msg.append(", hospitalId=").append(hospitalId);
         msg.append(", answer=").append(answer);
+        msg.append(", answerCompleted=").append(answerCompleted);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

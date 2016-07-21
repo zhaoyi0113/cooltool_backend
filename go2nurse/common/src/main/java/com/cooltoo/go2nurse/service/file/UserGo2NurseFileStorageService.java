@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.service.file;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.FileUtil;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 16/4/26.
@@ -108,5 +106,18 @@ public class UserGo2NurseFileStorageService extends AbstractGo2NurseFileStorageS
             rollbackFileMoved(successMoved);
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+    }
+
+    public File createFileInBaseStorage(String prefix, String suffix) {
+        String uniqueId = NumberUtil.timeToString(new Date(), NumberUtil.DATE_YYYY_MM_DD);
+        uniqueId = uniqueId+"_"+System.nanoTime();
+        if (!VerifyUtil.isStringEmpty(prefix)) {
+            uniqueId = prefix.trim()+uniqueId;
+        }
+        if (!VerifyUtil.isStringEmpty(suffix)) {
+            uniqueId = uniqueId+suffix;
+        }
+        File file = new File(super.getStoragePath()+uniqueId);
+        return file;
     }
 }
