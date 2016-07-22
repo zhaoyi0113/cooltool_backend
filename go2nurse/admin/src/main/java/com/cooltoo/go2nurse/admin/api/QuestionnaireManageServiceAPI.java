@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireStatisticsBean;
 import com.cooltoo.go2nurse.service.QuestionnaireService;
 import com.cooltoo.go2nurse.service.UserQuestionnaireAnswerService;
+import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -183,19 +184,25 @@ public class QuestionnaireManageServiceAPI {
         return Response.ok(questionnaires).build();
     }
 
-    @Path("/questionnaire/statistics")
+    @Path("/questionnaire/statistics/export")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuestionnaireStatisticByConditions(@Context HttpServletRequest request,
-                                                          @QueryParam("user_id") @DefaultValue("null") Long userId,
-                                                          @QueryParam("patient_id") @DefaultValue("null") Long patientId,
+                                                          @QueryParam("user_id") @DefaultValue("") String strUserId,
+                                                          @QueryParam("patient_id") @DefaultValue("") String strPatientId,
                                                           @QueryParam("gender") @DefaultValue("-1") int iGender,
-                                                          @QueryParam("hospital_id") @DefaultValue("null") Integer hospitalId,
-                                                          @QueryParam("questionnaire_id") @DefaultValue("null") Long questionnaireId,
-                                                          @QueryParam("age_start") @DefaultValue("null") Integer ageStart,
-                                                          @QueryParam("age_end") @DefaultValue("null") Integer ageEnd
+                                                          @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
+                                                          @QueryParam("questionnaire_id") @DefaultValue("") String strQuestionnaireId,
+                                                          @QueryParam("age_start") @DefaultValue("") String strAgeStart,
+                                                          @QueryParam("age_end") @DefaultValue("") String strAgeEnd
     ) {
+        Long userId = VerifyUtil.isIds(strUserId) ? null : Long.parseLong(strUserId);
+        Long patientId = VerifyUtil.isIds(strPatientId) ? null : Long.parseLong(strPatientId);
         GenderType gender = GenderType.parseInt(iGender);
+        Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? null : Integer.parseInt(strHospitalId);
+        Long questionnaireId = VerifyUtil.isIds(strQuestionnaireId) ? null : Long.parseLong(strQuestionnaireId);
+        Integer ageStart = VerifyUtil.isIds(strAgeStart) ? null : Integer.parseInt(strAgeStart);
+        Integer ageEnd = VerifyUtil.isIds(strAgeStart) ? null : Integer.parseInt(strAgeStart);
         String statisticsFileUrl = userQuestionnaireAnswerService.exportQuestionnaireStatisticsToFile(userId, patientId, gender, hospitalId, null, questionnaireId, ageStart, ageEnd);
         return Response.ok(statisticsFileUrl).build();
     }
