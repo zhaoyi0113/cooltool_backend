@@ -504,20 +504,11 @@ public class UserQuestionnaireAnswerService {
         if (VerifyUtil.isStringEmpty(questionnaireConclusion)) {
             logger.warn("conclusion is empty string");
         }
-        List<UserQuestionnaireAnswerEntity> entities = repository.findByUserIdAndGroupId(userId, groupId, sort);
-        if (!VerifyUtil.isListEmpty(entities)) {
-            // set questionnaire conclusion, and answer completed flag
-            for (UserQuestionnaireAnswerEntity tmp : entities) {
-                tmp.setQuestionnaireConclusion(questionnaireConclusion);
-                tmp.setAnswerCompleted(YesNoEnum.YES);
-            }
-            repository.save(entities);
+        // set questionnaire conclusion, and answer completed flag
+        repository.completeUserQuestionnaire(userId, groupId, questionnaireConclusion);
 
-            // remove all un_completed answer
-            entities = repository.findByUserIdAndAnswerCompleted(userId, YesNoEnum.NO);
-            repository.delete(entities);
-            return;
-        }
+        // remove all un_completed answer
+        repository.deleteByUserIdAndAnswerCompleted(userId, YesNoEnum.NO);
     }
 
     //==========================================================================

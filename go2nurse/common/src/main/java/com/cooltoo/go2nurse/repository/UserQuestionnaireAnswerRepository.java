@@ -5,6 +5,7 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.entities.UserQuestionnaireAnswerEntity;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
@@ -29,7 +30,15 @@ public interface UserQuestionnaireAnswerRepository extends JpaRepository<UserQue
 
     List<UserQuestionnaireAnswerEntity> findByQuestionIdIn(List<Long> questionIds, Sort sort);
 
-    List<UserQuestionnaireAnswerEntity> findByUserIdAndAnswerCompleted(Long userId, YesNoEnum answerCompleted);
+    void deleteByUserIdAndAnswerCompleted(Long userId, YesNoEnum answerCompleted);
+
+    @Modifying
+    @Query("UPDATE UserQuestionnaireAnswerEntity answer" +
+            " SET answer.answerCompleted=1, answer.questionnaireConclusion=?3" +
+            " WHERE answer.answerCompleted=0" +
+            " AND answer.userId=?1" +
+            " AND answer.groupId=?2")
+    List<UserQuestionnaireAnswerEntity> completeUserQuestionnaire(Long userId, Long groupId, String conclusion);
 
 //            + " AND   (answer.time IS NULL OR answer.time>=?10)"
 //            + " AND   (answer.time IS NULL OR answer.time<=?11)"
