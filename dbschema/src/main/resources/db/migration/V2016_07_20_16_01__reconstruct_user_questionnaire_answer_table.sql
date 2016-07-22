@@ -1,22 +1,18 @@
-DROP TABLE IF EXISTS `go2nurse_user_questionnaire_answer`;
-CREATE TABLE `go2nurse_user_questionnaire_answer` (
-  `id` BIGINT(64) NOT NULL AUTO_INCREMENT,
-  `time_created` DATETIME NULL DEFAULT now(),
-  `status` INT(11) NULL DEFAULT '0',
-  `group_id` BIGINT(64) NULL DEFAULT '0',
-  `patient_id` BIGINT(64) NULL DEFAULT '0',
-  `patient_name` VARCHAR(45) NULL DEFAULT '',
-  `patient_gender` INT(11) NULL DEFAULT 0,
-  `patient_age` INT(11) NULL DEFAULT 0,
-  `patient_mobile` VARCHAR(45) NULL DEFAULT '',
-  `questionnaire_id` BIGINT(64) NULL DEFAULT '0',
-  `questionnaire_name` VARCHAR(200) NULL DEFAULT '',
-  `question_id` BIGINT(64) NULL DEFAULT '0',
-  `question_content` VARCHAR(500) NULL DEFAULT '',
-  `patient_answer` VARCHAR(500) NULL DEFAULT '',
-  `hospital_id` INT(11) NULL DEFAULT 0,
-  `hospital_name` VARCHAR(45) NULL DEFAULT '',
-  `department_id` INT(11) NULL DEFAULT 0,
-  `departname_name` VARCHAR(45) NULL DEFAULT '',
-  PRIMARY KEY (`id`))
-DEFAULT CHARACTER SET = utf8;
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `patient_name`    VARCHAR(45) NULL DEFAULT '' AFTER `patient_id`;
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `patient_gender`  INT(11)      NULL DEFAULT 0  AFTER `patient_name`;
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `patient_age`     INT(11)      NULL DEFAULT 0  AFTER `patient_gender`;
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `patient_mobile`  VARCHAR(32) NULL DEFAULT '' AFTER `patient_age`;
+
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `hospital_id`     INT(11)      NULL DEFAULT 0  AFTER `answer`;
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `hospital_name`   VARCHAR(45) NULL DEFAULT '' AFTER `hospital_id`;
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `department_id`   INT(11)      NULL DEFAULT 0  AFTER `hospital_name`;
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `department_name` VARCHAR(45) NULL DEFAULT '' AFTER `department_id`;
+
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `answer_completed` INT(11)    NULL DEFAULT 0  AFTER `answer`;
+
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `questionnaire_name`        VARCHAR(200) NULL DEFAULT '' AFTER `questionnaire_id`;
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `questionnaire_conclusion` TEXT          NULL             AFTER `questionnaire_name`;
+
+ALTER TABLE `go2nurse_user_questionnaire_answer` ADD COLUMN `question_content`          VARCHAR(500) NULL DEFAULT '' AFTER `question_id`;
+
+

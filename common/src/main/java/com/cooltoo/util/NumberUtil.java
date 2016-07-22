@@ -35,6 +35,7 @@ public class NumberUtil {
     }
 
     public static final String DATE_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_YYYY_MM_DD = "yyyy-MM-dd";
     public static long getTime(String datetime, String pattern) {
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         try {
