@@ -79,7 +79,7 @@ public class UserQuestionnaireAnswerService {
 
     @Transactional
     public QuestionnaireBean getUserQuestionnaireWithAnswer(long userId, long groupId, boolean isPatientCompleteQuestionnaire) {
-        logger.info("get user{} 's questionnaire={}", userId, groupId);
+        logger.info("get user{} 's questionnaire={} isPatientCompleteQuestionnaire={}", userId, groupId, isPatientCompleteQuestionnaire);
         List<UserQuestionnaireAnswerBean> questionnaireAnswers = getUserQuestionnaireAnswer(userId, groupId);
         if (!isPatientCompleteQuestionnaire) {
             questionnaireAnswers = filterOnlyCompletedAnswer(questionnaireAnswers);

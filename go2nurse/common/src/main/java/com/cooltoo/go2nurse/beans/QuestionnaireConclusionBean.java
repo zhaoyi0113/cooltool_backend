@@ -90,6 +90,7 @@ public class QuestionnaireConclusionBean {
         json.append("{");
         json.append("\"item\":\"").append(item).append("\"");
         json.append(", \"interval\":\"").append(interval).append("\"");
+        json.append("}");
         return json.toString();
     }
 }
