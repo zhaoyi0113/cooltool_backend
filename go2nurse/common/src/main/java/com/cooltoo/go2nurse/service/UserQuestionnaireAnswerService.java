@@ -23,7 +23,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
@@ -517,8 +516,8 @@ public class UserQuestionnaireAnswerService {
             // remove all un_completed answer
             entities = repository.findByUserIdAndAnswerCompleted(userId, YesNoEnum.NO);
             repository.delete(entities);
+            return;
         }
-        throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
     }
 
     //==========================================================================
