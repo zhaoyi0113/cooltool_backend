@@ -8,6 +8,7 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.converter.UserQuestionnaireAnswerBeanConverter;
 import com.cooltoo.go2nurse.entities.QuestionEntity;
+import com.cooltoo.go2nurse.entities.UserEntity;
 import com.cooltoo.go2nurse.entities.UserQuestionnaireAnswerEntity;
 import com.cooltoo.go2nurse.repository.QuestionRepository;
 import com.cooltoo.go2nurse.repository.UserQuestionnaireAnswerRepository;
@@ -531,6 +532,7 @@ public class UserQuestionnaireAnswerService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
+        UserEntity user = userRepository.findOne(userId);
         QuestionEntity question = questionRepository.findOne(questionId);
         PatientBean patient = patientService.getOneById(patientId);
         QuestionnaireBean questionnaire = null == question ? null : questionnaireService.getQuestionnaire(question.getQuestionnaireId());
@@ -539,30 +541,43 @@ public class UserQuestionnaireAnswerService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if (null == patient) {
-            logger.error("patient not exist");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            logger.warn("patient not exist, record user information");
         }
         if (null == questionnaire) {
             logger.error("questionnaire not exist");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         groupId = groupId < 0 ? 0 : groupId;
-        int patientAge = 0;
-        if (patient.getBirthday() != null) {
-            Calendar birthday = Calendar.getInstance();
+
+        // calculate age
+        int patientAge;
+        Calendar currentYear = Calendar.getInstance();
+        Calendar birthday = Calendar.getInstance();
+        if (null!=patient && patient.getBirthday() != null) {
             birthday.setTime(patient.getBirthday());
-            Calendar currentYear = Calendar.getInstance();
-            patientAge = currentYear.get(Calendar.YEAR) - birthday.get(Calendar.YEAR);
         }
+        else {
+            birthday.setTime(user.getBirthday());
+        }
+        patientAge = currentYear.get(Calendar.YEAR) - birthday.get(Calendar.YEAR);
 
         UserQuestionnaireAnswerEntity entity = new UserQuestionnaireAnswerEntity();
         entity.setGroupId(groupId);
         entity.setUserId(userId);
-        entity.setPatientId(patientId);
-        entity.setPatientName(patient.getName());
-        entity.setPatientGender(patient.getGender());
-        entity.setPatientAge(patientAge);
-        entity.setPatientMobile(patient.getMobile());
+        if (null!=patient) {
+            entity.setPatientId(patientId);
+            entity.setPatientName(patient.getName());
+            entity.setPatientGender(patient.getGender());
+            entity.setPatientAge(patientAge);
+            entity.setPatientMobile(patient.getMobile());
+        }
+        else {
+            entity.setPatientId(0);
+            entity.setPatientName(user.getName());
+            entity.setPatientGender(user.getGender());
+            entity.setPatientAge(patientAge);
+            entity.setPatientMobile(user.getMobile());
+        }
         entity.setQuestionnaireId(questionnaire.getId());
         entity.setQuestionnaireName(questionnaire.getTitle());
         entity.setQuestionnaireConclusion(null);
