@@ -14,6 +14,7 @@ public class UserHospitalizedCoursesBean {
     private String type;
     private String description;
     private String imageUrl;
+    private String name;
     private List<CourseBean> courses = new ArrayList<>();
 
     public long getId() {
@@ -53,6 +54,16 @@ public class UserHospitalizedCoursesBean {
     }
 
     public void setCourses(List<CourseBean> courses) {
+
+
         this.courses = courses;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
