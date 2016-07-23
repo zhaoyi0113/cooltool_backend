@@ -167,6 +167,7 @@ public class UserHospitalizedAPI {
                     UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
                     bean.setId(key.getId());
                     bean.setType(key.getName());
+                    bean.setType(key.getName());
                     bean.setDescription(key.getIntroduction());
                     bean.setImageUrl(key.getImageUrl());
                     bean.setCourses(value);
