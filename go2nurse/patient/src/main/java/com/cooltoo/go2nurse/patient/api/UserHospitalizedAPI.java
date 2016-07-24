@@ -166,6 +166,9 @@ public class UserHospitalizedAPI {
                         = userCourseService.getAllCategoryToCoursesByCourses(extensionNursingCourses);
                 Set<CourseCategoryBean> keySet = extensionNursingMap.keySet();
                 for (CourseCategoryBean key : keySet) {
+                    if (CourseCategoryService.category_all.equals(key.getName())) {
+                        continue;
+                    }
                     List<CourseBean> value = extensionNursingMap.get(key);
                     UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
                     bean.setId(key.getId());

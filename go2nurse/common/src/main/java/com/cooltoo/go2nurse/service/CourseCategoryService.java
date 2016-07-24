@@ -35,6 +35,9 @@ public class CourseCategoryService {
 
     private static final Logger logger = LoggerFactory.getLogger(CourseCategoryService.class);
 
+    public static final String category_all = "all";
+    public static final String category_others = "others";
+
     private static final Sort categorySort = new Sort(
             new Sort.Order(Sort.Direction.ASC, "id")
     );
@@ -159,13 +162,13 @@ public class CourseCategoryService {
         List<CourseBean> allCourseSortedByReadStatus = new ArrayList<>();
         CourseCategoryBean courseCategoryAllSortedByReadStatus = new CourseCategoryBean();
         courseCategoryAllSortedByReadStatus.setId(-1);
-        courseCategoryAllSortedByReadStatus.setName("all");
-        courseCategoryAllSortedByReadStatus.setIntroduction("all");
+        courseCategoryAllSortedByReadStatus.setName(category_all);
+        courseCategoryAllSortedByReadStatus.setIntroduction(category_all);
         // all course without any category property
         CourseCategoryBean others = new CourseCategoryBean();
         others.setId(0);
-        others.setName("others");
-        others.setIntroduction("others");
+        others.setName(category_others);
+        others.setIntroduction(category_others);
 
         Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = new HashMap<>();
         categoryToCourses.put(courseCategoryAllSortedByReadStatus, allCourseSortedByReadStatus);
