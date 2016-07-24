@@ -94,7 +94,8 @@ public class UserQuestionnaireAnswerService {
             }
             else {
                 // set patient questionnaire conclusion, and complete flag
-                if (!YesNoEnum.YES.equals(questionnaireAnswers.get(0).getAnswerCompleted())) {
+                int lastAnswerIndex = questionnaireAnswers.size() - 1;
+                if (!YesNoEnum.YES.equals(questionnaireAnswers.get(lastAnswerIndex).getAnswerCompleted())) {
                     String conclusion = "" + userQuestionnaire.getUserScore();
                     if (null != userQuestionnaire.getUserConclusion()) {
                         conclusion = userQuestionnaire.getUserConclusion().toJson();
