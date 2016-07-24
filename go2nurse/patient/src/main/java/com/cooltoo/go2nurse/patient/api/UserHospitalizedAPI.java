@@ -3,7 +3,10 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.beans.*;
+import com.cooltoo.go2nurse.beans.CourseBean;
+import com.cooltoo.go2nurse.beans.CourseCategoryBean;
+import com.cooltoo.go2nurse.beans.UserBean;
+import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
@@ -16,13 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -189,9 +186,13 @@ public class UserHospitalizedAPI {
                     = userCourseService.getAllPublicExtensionNursingCourses(userId);
             courses.forEach((key, value) -> {
                 UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
+                String name = key.getName();
+                if (CourseCategoryService.category_all.equals(key.getName())) {
+                    name = DiagnosticEnumeration.EXTENSION_NURSING.name();
+                }
                 bean.setId(key.getId());
-                bean.setType(key.getName());
-                bean.setName(key.getName());
+                bean.setType(name);
+                bean.setName(name);
                 bean.setDescription(key.getIntroduction());
                 bean.setImageUrl(key.getImageUrl());
                 bean.setCourses(value);
