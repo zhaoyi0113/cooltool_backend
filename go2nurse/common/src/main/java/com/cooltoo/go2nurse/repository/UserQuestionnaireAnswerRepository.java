@@ -34,8 +34,7 @@ public interface UserQuestionnaireAnswerRepository extends JpaRepository<UserQue
     @Modifying
     @Query("UPDATE UserQuestionnaireAnswerEntity answer" +
             " SET answer.answerCompleted=1, answer.questionnaireConclusion=?3" +
-            " WHERE answer.answerCompleted<>1" +
-            " AND answer.userId=?1" +
+            " WHERE answer.userId=?1" +
             " AND answer.groupId=?2")
     int completeUserQuestionnaire(Long userId, Long groupId, String conclusion);
 
