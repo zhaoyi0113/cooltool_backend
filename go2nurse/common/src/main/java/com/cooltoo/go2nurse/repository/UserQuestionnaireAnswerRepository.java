@@ -42,16 +42,14 @@ public interface UserQuestionnaireAnswerRepository extends JpaRepository<UserQue
 //            + " AND   (answer.time IS NULL OR answer.time<=?11)"
     @Query("FROM UserQuestionnaireAnswerEntity answer" +
             " WHERE answer.answerCompleted=?1" +
-            " AND   (answer.userId IS NULL OR answer.userId=?2)" +
-            " AND   (answer.patientId IS NULL OR answer.patientId=?3)" +
-            " AND   (answer.patientGender IS NULL OR answer.patientGender=?4)" +
-            " AND   (answer.hospitalId IS NULL OR answer.hospitalId=?5)" +
-            " AND   (answer.departmentId IS NULL OR answer.departmentId=?6)" +
-            " AND   (answer.questionnaireId IS NULL OR answer.questionnaireId=?7)" +
-            " AND   (answer.patientAge IS NULL OR answer.patientAge>=?8)" +
-            " AND   (answer.patientAge IS NULL OR answer.patientAge<=?9)"
-
-    )
+            " AND   (?2 IS NULL OR answer.userId=?2)" +
+            " AND   (?3 IS NULL OR answer.patientId=?3)" +
+            " AND   (?4 IS NULL OR answer.patientGender=?4)" +
+            " AND   (?5 IS NULL OR answer.hospitalId=?5)" +
+            " AND   (?6 IS NULL OR answer.departmentId=?6)" +
+            " AND   (?7 IS NULL OR answer.questionnaireId=?7)" +
+            " AND   (?8 IS NULL OR answer.patientAge>=?8)" +
+            " AND   (?9 IS NULL OR answer.patientAge<=?9)")
     List<UserQuestionnaireAnswerEntity> findAnswerToExport(YesNoEnum answerCompleted,
                                                            Long userId, Long patientId, GenderType gender,
                                                            Integer hospitalId, Integer departmentId, Long questionnaireId,

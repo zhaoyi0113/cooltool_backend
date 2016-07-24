@@ -31,9 +31,9 @@ public class UserQuestionnaireAnswerEntity {
     private String questionContent;
     private String answer;
     private YesNoEnum answerCompleted;
-    private long hospitalId;
+    private int hospitalId;
     private String hospitalName;
-    private long departmentId;
+    private int departmentId;
     private String departmentName;
 
     @Id
@@ -125,7 +125,7 @@ public class UserQuestionnaireAnswerEntity {
     }
 
     @Column(name = "hospital_id")
-    public long getHospitalId() {
+    public int getHospitalId() {
         return hospitalId;
     }
 
@@ -135,7 +135,7 @@ public class UserQuestionnaireAnswerEntity {
     }
 
     @Column(name = "department_id")
-    public long getDepartmentId() {
+    public int getDepartmentId() {
         return departmentId;
     }
 
@@ -212,7 +212,7 @@ public class UserQuestionnaireAnswerEntity {
         this.answerCompleted = answerCompleted;
     }
 
-    public void setHospitalId(long hospitalId) {
+    public void setHospitalId(int hospitalId) {
         this.hospitalId = hospitalId;
     }
 
@@ -220,7 +220,7 @@ public class UserQuestionnaireAnswerEntity {
         this.hospitalName = hospitalName;
     }
 
-    public void setDepartmentId(long departmentId) {
+    public void setDepartmentId(int departmentId) {
         this.departmentId = departmentId;
     }
 

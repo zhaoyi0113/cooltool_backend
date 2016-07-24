@@ -196,13 +196,13 @@ public class QuestionnaireManageServiceAPI {
                                                           @QueryParam("age_start") @DefaultValue("") String strAgeStart,
                                                           @QueryParam("age_end") @DefaultValue("") String strAgeEnd
     ) {
-        Long userId = VerifyUtil.isIds(strUserId) ? null : Long.parseLong(strUserId);
-        Long patientId = VerifyUtil.isIds(strPatientId) ? null : Long.parseLong(strPatientId);
+        Long userId = !VerifyUtil.isIds(strUserId) ? null : Long.parseLong(strUserId);
+        Long patientId = !VerifyUtil.isIds(strPatientId) ? null : Long.parseLong(strPatientId);
         GenderType gender = GenderType.parseInt(iGender);
-        Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? null : Integer.parseInt(strHospitalId);
-        Long questionnaireId = VerifyUtil.isIds(strQuestionnaireId) ? null : Long.parseLong(strQuestionnaireId);
-        Integer ageStart = VerifyUtil.isIds(strAgeStart) ? null : Integer.parseInt(strAgeStart);
-        Integer ageEnd = VerifyUtil.isIds(strAgeStart) ? null : Integer.parseInt(strAgeStart);
+        Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : Integer.parseInt(strHospitalId);
+        Long questionnaireId = !VerifyUtil.isIds(strQuestionnaireId) ? null : Long.parseLong(strQuestionnaireId);
+        Integer ageStart = !VerifyUtil.isIds(strAgeStart) ? null : Integer.parseInt(strAgeStart);
+        Integer ageEnd = !VerifyUtil.isIds(strAgeEnd) ? null : Integer.parseInt(strAgeEnd);
         String statisticsFileUrl = userQuestionnaireAnswerService.exportQuestionnaireStatisticsToFile(userId, patientId, gender, hospitalId, null, questionnaireId, ageStart, ageEnd);
         return Response.ok(statisticsFileUrl).build();
     }

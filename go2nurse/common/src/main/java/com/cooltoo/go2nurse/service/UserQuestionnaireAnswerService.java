@@ -15,6 +15,7 @@ import com.cooltoo.go2nurse.repository.UserQuestionnaireAnswerRepository;
 import com.cooltoo.go2nurse.repository.UserRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,43 +133,89 @@ public class UserQuestionnaireAnswerService {
                                                       Integer ageStart, Integer ageEnd
                                                     //, Date timeStart, Date timeEnd
     ) {
+        logger.info("export answer by userId={} patientId={}, gender={}, hospitalId={}, departId={}, questionnaireId={} ageStart={} ageEnd={}",
+                userId, patientId, gender, hospitalId, departmentId, questionnaireId, ageStart, ageEnd);
         List<UserQuestionnaireAnswerEntity> allAnswers = repository.findAnswerToExport(YesNoEnum.YES,
                 userId, patientId, gender,
                 hospitalId, departmentId, questionnaireId,
                 ageStart, ageEnd, sort);
+        logger.info("answer count={}", VerifyUtil.isListEmpty(allAnswers) ? 0 : allAnswers.size());
         StringBuilder oneQuestionnaireAnswer = new StringBuilder();
         File statisticsFile = userFileStorage.createFileInBaseStorage("statistics", ".csv");
         // write title
-        oneQuestionnaireAnswer.append("序号").append("\t");
-        oneQuestionnaireAnswer.append("医院").append("\t");
-        oneQuestionnaireAnswer.append("姓名").append("\t");
-        oneQuestionnaireAnswer.append("性别").append("\t");
-        oneQuestionnaireAnswer.append("年龄").append("\t");
-        oneQuestionnaireAnswer.append("手机").append("\t");
-        oneQuestionnaireAnswer.append("问卷").append("\t");
-        oneQuestionnaireAnswer.append("问题").append("\t");
-        oneQuestionnaireAnswer.append("答案").append("\t");
-        oneQuestionnaireAnswer.append("结论").append("\t");
-        oneQuestionnaireAnswer.append("时间").append("\r\n");
+        oneQuestionnaireAnswer.append("\"").append("序号").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("医院").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("姓名").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("性别").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("年龄").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("手机").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("问卷").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("问题").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("答案").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("答案分值").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("结论").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("结论分值区间").append("\"\t,");
+        oneQuestionnaireAnswer.append("\"").append("时间").append("\"\r\n");
         try {
             FileWriter writer = new FileWriter(statisticsFile);
             writer.write(oneQuestionnaireAnswer.toString());
+            writer.flush();
             oneQuestionnaireAnswer.setLength(0);
             for (UserQuestionnaireAnswerEntity answer : allAnswers) {
-                oneQuestionnaireAnswer.append(answer.getGroupId()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getHospitalName()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getPatientName()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getPatientGender()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getPatientAge()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getPatientMobile()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getQuestionnaireName()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getQuestionContent()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getAnswer()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getQuestionnaireConclusion()).append("\t");
-                oneQuestionnaireAnswer.append(answer.getTime()).append("\r\n");
+                oneQuestionnaireAnswer.append("\"").append(answer.getGroupId()).append("\"\t,");
+                oneQuestionnaireAnswer.append("\"").append(answer.getHospitalName()).append("\"\t,");
+                oneQuestionnaireAnswer.append("\"").append(answer.getPatientName()).append("\"\t,");
+                oneQuestionnaireAnswer.append("\"").append(answer.getPatientGender()).append("\"\t,");
+                oneQuestionnaireAnswer.append("\"").append(answer.getPatientAge()).append("\"\t,");
+                oneQuestionnaireAnswer.append("\"").append(answer.getPatientMobile()).append("\"\t,");
+                oneQuestionnaireAnswer.append("\"").append(answer.getQuestionnaireName()).append("\"\t,");
+                oneQuestionnaireAnswer.append("\"").append(answer.getQuestionContent()).append("\"\t,");
+                String userAnswer = answer.getAnswer();
+                boolean single = userAnswer.indexOf('{')==userAnswer.lastIndexOf('{');
+                if (single) {
+                    QuestionOptionBean userOption = go2NurseUtility.parseJsonBean(userAnswer, QuestionOptionBean.class);
+                    if (null==userAnswer) {
+                        oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
+                        oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
+                    }
+                    else {
+                        oneQuestionnaireAnswer.append("\"").append(userOption.getItem().replace("\"", "\"\"")).append("\"\t,");
+                        oneQuestionnaireAnswer.append("\"").append(userOption.getScore()).append("\"\t,");
+                    }
+
+                }
+                else {
+                    List<QuestionOptionBean> userOptions = go2NurseUtility.parseJsonList(userAnswer, QuestionOptionBean.class);
+                    StringBuilder items = new StringBuilder();
+                    StringBuilder scores = new StringBuilder();
+                    for (QuestionOptionBean userOption : userOptions) {
+                        items.append(userOption.getItem()).append(",");
+                        scores.append(userOption.getScore()).append(",");
+                    }
+                    if (items.length()==0) {
+                        oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
+                        oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
+                    }
+                    else {
+                        oneQuestionnaireAnswer.append("\"").append(items.substring(0, items.length() - 1).replace("\"", "\"\"")).append("\"\t,");
+                        oneQuestionnaireAnswer.append("\"").append(scores.substring(0, scores.length() - 1)).append("\"\t,");
+                    }
+                }
+                QuestionnaireConclusionBean conclusion = go2NurseUtility.parseJsonBean(answer.getQuestionnaireConclusion(), QuestionnaireConclusionBean.class);
+                if (null==conclusion) {
+                    oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
+                    oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
+                }
+                else {
+                    oneQuestionnaireAnswer.append("\"").append(conclusion.getItem().replace("\"", "\"\"")).append("\"\t,");
+                    oneQuestionnaireAnswer.append("\"").append(conclusion.getInterval().replace("\"", "\"\"")).append("\"\t,");
+                }
+                oneQuestionnaireAnswer.append("\"").append(NumberUtil.timeToString(answer.getTime(), NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS)).append("\"\r\n");
                 writer.write(oneQuestionnaireAnswer.toString());
+                writer.flush();
                 oneQuestionnaireAnswer.setLength(0);
             }
+            writer.close();
         }
         catch (Exception ex) {
             return "";
