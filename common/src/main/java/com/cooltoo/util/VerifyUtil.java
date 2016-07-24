@@ -1,8 +1,8 @@
 package com.cooltoo.util;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.SpeakType;
 import com.cooltoo.constants.ReadingStatus;
+import com.cooltoo.constants.SpeakType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ public class VerifyUtil {
     public static final String CC_VIDEO_CALLBACK_MESSAGE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<result>OK</result>";
     public static final String ADMIN_USER_NAME_REGEXP = "[a-zA-Z_][a-zA-Z0-9_]{5,64}";
     public static final String ADMIN_USER_PASSWORD_REGEXP = "[a-z|A-Z|0-9]{32,128}";
-    public static final String IDS = "[[0-9]+,]*[0-9]+";
+    public static final String IDS = "[[-]{0,1}[0-9]+,]*[-]{0,1}[0-9]+";
 //    public static final String EMAIL_REGEXP = "^[a-zA-Z][a-zA-Z0-9_\\-]+[@][a-zA-Z_\\-\\.]+[\\.][a-zA-Z]+$";
 //    public static final String NUMBERS = "[(-?\\d+)(\\.\\d+)?,]*[(-?\\d+)(\\.\\d+)?]+";
     private static final Logger logger = LoggerFactory.getLogger(VerifyUtil.class);
