@@ -5,6 +5,9 @@ import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.*;
+import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +22,8 @@ import java.util.List;
  */
 @Path("/user/questionnaire")
 public class UserQuestionnaireAnswerServiceAPI {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserQuestionnaireAnswerServiceAPI.class);
 
     @Autowired private UserDiagnosticPointRelationService userDiagnosticService;
     @Autowired private UserHospitalizedRelationService userHospitalizedService;
@@ -39,6 +44,10 @@ public class UserQuestionnaireAnswerServiceAPI {
             userHospitalizedBeans = userHospitalizedService.getUserHospitalizedRelationByGroupId(userId, groupId);
         }
         List<QuestionnaireCategoryBean> returnValue = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(userHospitalizedBeans);
+        if (VerifyUtil.isListEmpty(returnValue)) {
+            logger.warn("no questionnaires for user hospitalized relation is {}", userHospitalizedBeans);
+            returnValue = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(null);
+        }
         return Response.ok(returnValue).build();
     }
 
