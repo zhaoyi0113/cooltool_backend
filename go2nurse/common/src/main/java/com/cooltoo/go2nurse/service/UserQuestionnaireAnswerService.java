@@ -505,7 +505,8 @@ public class UserQuestionnaireAnswerService {
             logger.warn("conclusion is empty string");
         }
         // set questionnaire conclusion, and answer completed flag
-        repository.completeUserQuestionnaire(userId, groupId, questionnaireConclusion);
+        int updateCount = repository.completeUserQuestionnaire(userId, groupId, questionnaireConclusion);
+        logger.info("completing questionnaire affects count={} records in user_questionnaire_answer table", updateCount);
 
         // remove all un_completed answer
         repository.deleteByUserIdAndAnswerCompleted(userId, YesNoEnum.NO);
