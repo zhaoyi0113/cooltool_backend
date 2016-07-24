@@ -140,6 +140,7 @@ public class UserHospitalizedAPI {
         UserBean user = userService.getUser(userId);
         boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
 
+        boolean hasCourses = false;
         List<UserHospitalizedCoursesBean> beans = new ArrayList<>();
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
             Map<DiagnosticEnumeration, List<CourseBean>> courses
@@ -158,11 +159,16 @@ public class UserHospitalizedAPI {
                 if (DiagnosticEnumeration.EXTENSION_NURSING.equals(key)) {
                     extensionNursingCourses = value;
                 }
+                if (!hasCourses) {
+                    hasCourses = !VerifyUtil.isListEmpty(value);
+                }
             }
             if (!VerifyUtil.isListEmpty(extensionNursingCourses)) {
                 Map<CourseCategoryBean, List<CourseBean>> extensionNursingMap
                         = userCourseService.getAllCategoryToCoursesByCourses(extensionNursingCourses);
-                extensionNursingMap.forEach((key, value) -> {
+                Set<CourseCategoryBean> keySet = extensionNursingMap.keySet();
+                for (CourseCategoryBean key : keySet) {
+                    List<CourseBean> value = extensionNursingMap.get(key);
                     UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
                     bean.setId(key.getId());
                     bean.setType(key.getName());
@@ -170,10 +176,13 @@ public class UserHospitalizedAPI {
                     bean.setImageUrl(key.getImageUrl());
                     bean.setCourses(value);
                     beans.add(bean);
-                });
+                    if (!hasCourses) {
+                        hasCourses = !VerifyUtil.isListEmpty(value);
+                    }
+                }
             }
         }
-        else {
+        if (!hasCourses) {
             Map<CourseCategoryBean, List<CourseBean>> courses
                     = userCourseService.getAllPublicExtensionNursingCourses(userId);
             courses.forEach((key, value) -> {

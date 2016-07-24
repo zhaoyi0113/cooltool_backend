@@ -46,7 +46,7 @@ public class UserDiagnosticPointRelationService {
     //               getting for user
     //===================================================
     public long getUserCurrentGroupId(long userId, long currentTime) {
-        logger.info("get user={} current hospitalized group ID");
+        logger.info("get user={} current hospitalized group ID", userId, currentTime);
         List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndStatus(userId, CommonStatus.ENABLED, sort);
         long groupId = Long.MIN_VALUE;
         if (VerifyUtil.isListEmpty(entities)) {
