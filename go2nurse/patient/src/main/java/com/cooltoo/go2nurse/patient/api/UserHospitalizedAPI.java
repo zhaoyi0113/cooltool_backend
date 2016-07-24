@@ -26,10 +26,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by hp on 2016/6/16.
@@ -152,6 +149,7 @@ public class UserHospitalizedAPI {
                 UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
                 bean.setId(key.ordinal());
                 bean.setType(key.name());
+                bean.setName(key.name());
                 bean.setDescription("");
                 bean.setImageUrl("");
                 bean.setCourses(value);
@@ -172,6 +170,7 @@ public class UserHospitalizedAPI {
                     UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
                     bean.setId(key.getId());
                     bean.setType(key.getName());
+                    bean.setName(key.getName());
                     bean.setDescription(key.getIntroduction());
                     bean.setImageUrl(key.getImageUrl());
                     bean.setCourses(value);
@@ -189,6 +188,7 @@ public class UserHospitalizedAPI {
                 UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
                 bean.setId(key.getId());
                 bean.setType(key.getName());
+                bean.setName(key.getName());
                 bean.setDescription(key.getIntroduction());
                 bean.setImageUrl(key.getImageUrl());
                 bean.setCourses(value);
@@ -198,4 +198,15 @@ public class UserHospitalizedAPI {
         return Response.ok(beans).build();
     }
 
+    @Path("/is_select_department")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response isSelectDepartment(@Context HttpServletRequest request){
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
+        Map<String, Boolean> ret = new HashMap<>();
+        ret.put("select_department", userHasSelectedCourses);
+        return Response.ok(ret).build();
+    }
 }
