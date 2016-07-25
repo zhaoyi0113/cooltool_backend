@@ -4,7 +4,9 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceVendorBean;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
+import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +31,26 @@ public class ServiceCategoryAndItemManageAPI {
     //==============================================================
     //                         getting
     //==============================================================
+    private List<CommonStatus> getCommonStatus(String strStatus) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null!=status) {
+            statuses.add(status);
+        }
+        else if ("all".equalsIgnoreCase(strStatus)) {
+            statuses.add(CommonStatus.DISABLED);
+            statuses.add(CommonStatus.ENABLED);
+        }
+        return statuses;
+    }
 
     @Path("/vendor/count")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response countVendor(@Context HttpServletRequest request) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+    public Response countVendor(@Context HttpServletRequest request,
+                                @QueryParam("status") @DefaultValue("ALL") String strStatus
+    ) {
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
         long vendorCount = vendorCategoryAndItemService.countVendor(statuses);
         return Response.ok(vendorCount).build();
     }
@@ -45,12 +59,12 @@ public class ServiceCategoryAndItemManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getVendor(@Context HttpServletRequest request,
+                              @QueryParam("status") @DefaultValue("ALL") String strStatus,
                               @QueryParam("index") @DefaultValue("0") int pageIndex,
                               @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
         List<ServiceVendorBean> serviceVendor = vendorCategoryAndItemService.getVendor(statuses, pageIndex, sizePerPage);
         return Response.ok(serviceVendor).build();
     }
@@ -58,10 +72,11 @@ public class ServiceCategoryAndItemManageAPI {
     @Path("/category/top/count")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response countTopServiceCategory(@Context HttpServletRequest request) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+    public Response countTopServiceCategory(@Context HttpServletRequest request,
+                                            @QueryParam("status") @DefaultValue("ALL") String strStatus
+    ) {
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
         long topServiceCategoryCount = vendorCategoryAndItemService.countTopCategory(statuses);
         return Response.ok(topServiceCategoryCount).build();
     }
@@ -70,12 +85,12 @@ public class ServiceCategoryAndItemManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTopServiceCategory(@Context HttpServletRequest request,
+                                          @QueryParam("status") @DefaultValue("ALL") String strStatus,
                                           @QueryParam("index") @DefaultValue("0") int pageIndex,
                                           @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
         List<ServiceCategoryBean> topServiceCategories = vendorCategoryAndItemService.getTopCategory(statuses, pageIndex, sizePerPage);
         return Response.ok(topServiceCategories).build();
     }
@@ -84,10 +99,11 @@ public class ServiceCategoryAndItemManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countSubServiceCategory(@Context HttpServletRequest request,
-                                            @QueryParam("category_id") @DefaultValue("0") long categoryId) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+                                            @QueryParam("category_id") @DefaultValue("0") long categoryId,
+                                            @QueryParam("status") @DefaultValue("ALL") String strStatus
+    ) {
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
         long subServiceCategoryCount = vendorCategoryAndItemService.countCategoryByParentId(categoryId, statuses);
         return Response.ok(subServiceCategoryCount).build();
     }
@@ -97,12 +113,12 @@ public class ServiceCategoryAndItemManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSubServiceCategory(@Context HttpServletRequest request,
                                           @QueryParam("category_id") @DefaultValue("0") long categoryId,
+                                          @QueryParam("status") @DefaultValue("ALL") String strStatus,
                                           @QueryParam("index") @DefaultValue("0") int pageIndex,
                                           @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
         List<ServiceCategoryBean> serviceCategories = vendorCategoryAndItemService.getCategoryByParentId(
                 categoryId, statuses, pageIndex, sizePerPage);
         return Response.ok(serviceCategories).build();
@@ -112,11 +128,11 @@ public class ServiceCategoryAndItemManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countServiceItemByVendor(@Context HttpServletRequest request,
-                                             @QueryParam("vendor_id") @DefaultValue("0") long vendorId
+                                             @QueryParam("vendor_id") @DefaultValue("0") long vendorId,
+                                             @QueryParam("status") @DefaultValue("ALL") String strStatus
     ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
         long serviceItemCount = vendorCategoryAndItemService.countItemByVendorId(vendorId, statuses);
         return Response.ok(serviceItemCount).build();
     }
@@ -126,12 +142,12 @@ public class ServiceCategoryAndItemManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getServiceItemByVendor(@Context HttpServletRequest request,
                                            @QueryParam("vendor_id") @DefaultValue("0") long vendorId,
+                                           @QueryParam("status") @DefaultValue("ALL") String strStatus,
                                            @QueryParam("index") @DefaultValue("0") int pageIndex,
                                            @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
         List<ServiceItemBean> serviceItems = vendorCategoryAndItemService.getItemByVendorId(
                 vendorId, statuses, pageIndex, sizePerPage);
         return Response.ok(serviceItems).build();
@@ -141,11 +157,11 @@ public class ServiceCategoryAndItemManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countServiceItemByCategory(@Context HttpServletRequest request,
-                                               @QueryParam("category_id") @DefaultValue("0") long categoryId
+                                               @QueryParam("category_id") @DefaultValue("0") long categoryId,
+                                               @QueryParam("status") @DefaultValue("ALL") String strStatus
     ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
         long serviceItemCount = vendorCategoryAndItemService.countItemByCategoryId(categoryId, statuses);
         return Response.ok(serviceItemCount).build();
     }
@@ -155,14 +171,53 @@ public class ServiceCategoryAndItemManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getServiceItemByCategory(@Context HttpServletRequest request,
                                              @QueryParam("category_id") @DefaultValue("0") long categoryId,
+                                             @QueryParam("status") @DefaultValue("ALL") String strStatus,
                                              @QueryParam("index") @DefaultValue("0") int pageIndex,
                                              @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.DISABLED);
-        statuses.add(CommonStatus.ENABLED);
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
         List<ServiceItemBean> serviceItems = vendorCategoryAndItemService.getItemByCategoryId(
                 categoryId, statuses, pageIndex, sizePerPage);
+        return Response.ok(serviceItems).build();
+    }
+
+    @Path("/item/count_by_category_and_vendor")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response countServiceItemByCategory(@Context HttpServletRequest request,
+                                               @QueryParam("category_id") @DefaultValue("") String strCategoryId,
+                                               @QueryParam("vendor_id") @DefaultValue("") String strVendorId,
+                                               @QueryParam("vendor_type") @DefaultValue("") String strVendorType,
+                                               @QueryParam("status") @DefaultValue("ALL") String strStatus
+    ) {
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
+        Long categoryId = !VerifyUtil.isIds(strCategoryId) ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
+        Long vendorId = !VerifyUtil.isIds(strVendorId) ? null : VerifyUtil.parseLongIds(strVendorId).get(0);
+        ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
+        long serviceItemCount = vendorCategoryAndItemService.countItemByCategoryVendorAndStatus(categoryId, vendorId, vendorType, statuses);
+        return Response.ok(serviceItemCount).build();
+    }
+
+    @Path("/item/by_category_and_vendor")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getServiceItemByCategory(@Context HttpServletRequest request,
+                                             @QueryParam("category_id") @DefaultValue("") String strCategoryId,
+                                             @QueryParam("vendor_id") @DefaultValue("") String strVendorId,
+                                             @QueryParam("vendor_type") @DefaultValue("") String strVendorType,
+                                             @QueryParam("status") @DefaultValue("ALL") String strStatus,
+                                             @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                             @QueryParam("number") @DefaultValue("10") int sizePerPage
+    ) {
+        List<CommonStatus> statuses = getCommonStatus(strStatus);
+
+        Long categoryId = !VerifyUtil.isIds(strCategoryId) ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
+        Long vendorId = !VerifyUtil.isIds(strVendorId) ? null : VerifyUtil.parseLongIds(strVendorId).get(0);
+        ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
+        List<ServiceItemBean> serviceItems = vendorCategoryAndItemService.getItemByCategoryVendorAndStatus(
+                categoryId, vendorId, vendorType, statuses, pageIndex, sizePerPage);
         return Response.ok(serviceItems).build();
     }
 
@@ -206,9 +261,10 @@ public class ServiceCategoryAndItemManageAPI {
                                    @FormParam("time_unit") @DefaultValue("") String timeUnit,
                                    @FormParam("grade") @DefaultValue("0") int grade,
                                    @FormParam("category_id") @DefaultValue("0") long categoryId,
-                                   @FormParam("vendor_id") @DefaultValue("0") long vendorId
+                                   @FormParam("vendor_id") @DefaultValue("0") long vendorId,
+                                   @FormParam("vendor_type") @DefaultValue("") String vendorType
     ) {
-        ServiceItemBean serviceItem = vendorCategoryAndItemService.addItem(name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId);
+        ServiceItemBean serviceItem = vendorCategoryAndItemService.addItem(name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, vendorType);
         return Response.ok(serviceItem).build();
     }
 
@@ -286,9 +342,10 @@ public class ServiceCategoryAndItemManageAPI {
                                     @FormParam("grade") @DefaultValue("0") int grade,
                                     @FormParam("category_id") @DefaultValue("0") long categoryId,
                                     @FormParam("vendor_id") @DefaultValue("0") long vendorId,
+                                    @FormParam("vendor_type") @DefaultValue("") String vendorType,
                                     @FormParam("status") @DefaultValue("") String status
     ) {
-        ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItem(itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, status);
+        ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItem(itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, vendorType, status);
         return Response.ok(serviceItem).build();
     }
 

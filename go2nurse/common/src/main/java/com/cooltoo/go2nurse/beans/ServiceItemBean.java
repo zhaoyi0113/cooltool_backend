@@ -1,7 +1,9 @@
 package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.ServiceClass;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 
 import java.math.BigDecimal;
@@ -15,7 +17,9 @@ public class ServiceItemBean {
     private Date time;
     private CommonStatus status;
     private long vendorId;
+    private ServiceVendorType vendorType;
     private ServiceVendorBean vendor;
+    private HospitalBean hospital;
     private long categoryId;
     private String name;
     private ServiceClass clazz;
@@ -43,8 +47,16 @@ public class ServiceItemBean {
         return vendorId;
     }
 
+    public ServiceVendorType getVendorType() {
+        return vendorType;
+    }
+
     public ServiceVendorBean getVendor() {
         return vendor;
+    }
+
+    public HospitalBean getHospital() {
+        return hospital;
     }
 
     public long getCategoryId() {
@@ -103,8 +115,16 @@ public class ServiceItemBean {
         this.vendorId = vendorId;
     }
 
+    public void setVendorType(ServiceVendorType vendorType) {
+        this.vendorType = vendorType;
+    }
+
     public void setVendor(ServiceVendorBean vendor) {
         this.vendor = vendor;
+    }
+
+    public void setHospital(HospitalBean hospital) {
+        this.hospital = hospital;
     }
 
     public void setCategoryId(long categoryId) {
@@ -155,7 +175,9 @@ public class ServiceItemBean {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", vendorId=").append(vendorId);
+        msg.append(", vendorType=").append(vendorType);
         msg.append(", vendor=").append(vendor);
+        msg.append(", hospital=").append(hospital);
         msg.append(", categoryId=").append(categoryId);
         msg.append(", name=").append(name);
         msg.append(", clazz=").append(clazz);

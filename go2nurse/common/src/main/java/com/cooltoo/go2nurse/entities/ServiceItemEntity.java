@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.ServiceClass;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 
 import javax.persistence.*;
@@ -18,6 +19,7 @@ public class ServiceItemEntity {
     private Date time;
     private CommonStatus status;
     private long vendorId;
+    private ServiceVendorType vendorType;
     private long categoryId;
     private String name;
     private ServiceClass clazz;
@@ -49,6 +51,12 @@ public class ServiceItemEntity {
     @Column(name = "vendor_id")
     public long getVendorId() {
         return vendorId;
+    }
+
+    @Column(name = "vendor_type")
+    @Enumerated
+    public ServiceVendorType getVendorType() {
+        return vendorType;
     }
 
     @Column(name = "category_id")
@@ -113,6 +121,10 @@ public class ServiceItemEntity {
         this.vendorId = vendorId;
     }
 
+    public void setVendorType(ServiceVendorType vendorType) {
+        this.vendorType = vendorType;
+    }
+
     public void setCategoryId(long categoryId) {
         this.categoryId = categoryId;
     }
@@ -157,6 +169,7 @@ public class ServiceItemEntity {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", vendorId=").append(vendorId);
+        msg.append(", vendorType=").append(vendorType);
         msg.append(", categoryId=").append(categoryId);
         msg.append(", name=").append(name);
         msg.append(", clazz=").append(clazz);

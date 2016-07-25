@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.repository;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.entities.ServiceItemEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +35,24 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
     int setCategoryIdToNone(List<Long> categoryId);
 
     @Modifying
-    @Query("UPDATE ServiceItemEntity item SET item.vendorId=0" +
+    @Query("UPDATE ServiceItemEntity item SET item.vendorId=0, item.vendorType=0" +
             " WHERE item.vendorId IN ?2 ")
     int setVendorIdToNone(List<Long> vendorId);
+
+
+
+
+    @Query("SELECT count(item.id) FROM ServiceItemEntity item" +
+            " WHERE (?1 IS NULL OR item.categoryId IN (?1))" +
+            " AND (?2 IS NULL OR item.vendorId=?2)" +
+            " AND (?3 IS NULL OR item.vendorType=?3)" +
+            " AND (?4 IS NULL OR item.status IN (?4))")
+   long countByCategoryVendorAndStatus(List<Long> categoryIds, Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses);
+
+    @Query("FROM ServiceItemEntity item" +
+            " WHERE (?1 IS NULL OR item.categoryId IN (?1))" +
+            " AND (?2 IS NULL OR item.vendorId=?2)" +
+            " AND (?3 IS NULL OR item.vendorType=?3)" +
+            " AND (?4 IS NULL OR item.status IN (?4))")
+    Page<ServiceItemEntity> findByCategoryVendorAndStatus(List<Long> categoryIds, Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses, Pageable page);
 }

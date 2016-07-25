@@ -1,6 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.RegionBean;
 import com.cooltoo.converter.HospitalBeanConverter;
 import com.cooltoo.converter.HospitalEntityConverter;
@@ -11,6 +12,7 @@ import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.target.HotSwappableTargetSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +20,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lg380357 on 2016/3/5.
@@ -79,6 +83,15 @@ public class CommonHospitalService {
         }
         fillOtherProperties(hospital);
         return hospital;
+    }
+
+    public Map<Integer, HospitalBean> getHospitalIdToBeanMapByIds(List<Integer> hospitalIds) {
+        List<HospitalBean> hospitals = getHospitalByIds(hospitalIds);
+        Map<Integer, HospitalBean> map = new HashMap<>();
+        for (HospitalBean hospital : hospitals) {
+            map.put(hospital.getId(), hospital);
+        }
+        return map;
     }
 
     public List<HospitalBean> getHospitalByIds(List<Integer> hospitalIds) {
