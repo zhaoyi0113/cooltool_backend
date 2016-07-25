@@ -185,11 +185,11 @@ public class ServiceCategoryAndItemManageAPI {
     @Path("/item/count_by_category_and_vendor")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response countServiceItemByCategory(@Context HttpServletRequest request,
-                                               @QueryParam("category_id") @DefaultValue("") String strCategoryId,
-                                               @QueryParam("vendor_id") @DefaultValue("") String strVendorId,
-                                               @QueryParam("vendor_type") @DefaultValue("") String strVendorType,
-                                               @QueryParam("status") @DefaultValue("ALL") String strStatus
+    public Response countServiceItemByCategoryVendorAndStatus(@Context HttpServletRequest request,
+                                                              @QueryParam("category_id") @DefaultValue("") String strCategoryId,
+                                                              @QueryParam("vendor_id") @DefaultValue("") String strVendorId,
+                                                              @QueryParam("vendor_type") @DefaultValue("") String strVendorType,
+                                                              @QueryParam("status") @DefaultValue("ALL") String strStatus
     ) {
         List<CommonStatus> statuses = getCommonStatus(strStatus);
 
@@ -203,13 +203,13 @@ public class ServiceCategoryAndItemManageAPI {
     @Path("/item/by_category_and_vendor")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getServiceItemByCategory(@Context HttpServletRequest request,
-                                             @QueryParam("category_id") @DefaultValue("") String strCategoryId,
-                                             @QueryParam("vendor_id") @DefaultValue("") String strVendorId,
-                                             @QueryParam("vendor_type") @DefaultValue("") String strVendorType,
-                                             @QueryParam("status") @DefaultValue("ALL") String strStatus,
-                                             @QueryParam("index") @DefaultValue("0") int pageIndex,
-                                             @QueryParam("number") @DefaultValue("10") int sizePerPage
+    public Response getServiceItemByCategoryVendorAndStatus(@Context HttpServletRequest request,
+                                                            @QueryParam("category_id") @DefaultValue("") String strCategoryId,
+                                                            @QueryParam("vendor_id") @DefaultValue("") String strVendorId,
+                                                            @QueryParam("vendor_type") @DefaultValue("") String strVendorType,
+                                                            @QueryParam("status") @DefaultValue("ALL") String strStatus,
+                                                            @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                                            @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         List<CommonStatus> statuses = getCommonStatus(strStatus);
 
