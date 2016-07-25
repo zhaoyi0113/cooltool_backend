@@ -66,19 +66,29 @@ public class ServiceVendorCategoryAndItemService {
     //=====================================================================
     //                   getting
     //=====================================================================
-    public long countVendor() {
-        long count = vendorRep.count();
-        logger.info("count service vendor size is {}", count);
+    public long countVendor(List<CommonStatus> statuses) {
+        long count = 0;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            count = vendorRep.countByStatusIn(statuses);
+        }
+        logger.info("count service vendor by status={}, size is {}", statuses, count);
         return count;
     }
 
-    public List<ServiceVendorBean> getVendor(int pageIndex, int sizePerPage) {
-        logger.info("get service vendor at page={} size={}", pageIndex, sizePerPage);
-        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, vendorSort);
-        Page<ServiceVendorEntity> entities = vendorRep.findAll(pageRequest);
-        List<ServiceVendorBean> beans = serviceVendorEntitiesToBeans(entities);
-        fillVendorOtherProperties(beans);
-        logger.info("count is ={}");
+    public List<ServiceVendorBean> getVendor(List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+        logger.info("get service vendor by status={} at page={} size={}", statuses, pageIndex, sizePerPage);
+        List<ServiceVendorBean> beans;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, vendorSort);
+            Page<ServiceVendorEntity> entities = vendorRep.findByStatusIn(statuses, pageRequest);
+            beans = serviceVendorEntitiesToBeans(entities);
+            fillVendorOtherProperties(beans);
+        }
+        else {
+            logger.warn("statuses is empty");
+            beans = new ArrayList<>();
+        }
+        logger.info("count is ={}", beans.size());
         return beans;
     }
 
@@ -99,36 +109,53 @@ public class ServiceVendorCategoryAndItemService {
         return map;
     }
 
-    public long countTopCategory() {
-        return countCategoryByParentId(0L);
+    public long countTopCategory(List<CommonStatus> statuses) {
+        return countCategoryByParentId(0L, statuses);
     }
 
-    public List<ServiceCategoryBean> getTopCategory(int pageIndex, int sizePerPage) {
-        return getCategoryByParentId(0L, pageIndex, sizePerPage);
+    public List<ServiceCategoryBean> getTopCategory(List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+        return getCategoryByParentId(0L, statuses, pageIndex, sizePerPage);
     }
 
-    public long countCategoryByParentId(long categoryParentId) {
-        long count = categoryRep.countByParentId(categoryParentId);
-        logger.info("count service category by parentId={}, size is {}", categoryParentId, count);
+    public long countCategoryByParentId(long categoryParentId, List<CommonStatus> statuses) {
+        long count = 0;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            count = categoryRep.countByParentIdAndStatusIn(categoryParentId, statuses);
+        }
+        logger.info("count service category by parentId={} and status={}, size is {}", categoryParentId, statuses, count);
         return count;
     }
 
-    public List<ServiceCategoryBean> getCategoryByParentId(long categoryParentId) {
-        logger.info("get service category by parentId={}", categoryParentId);
-        List<ServiceCategoryEntity> entities = categoryRep.findByParentId(categoryParentId, categorySort);
-        List<ServiceCategoryBean> beans = serviceCategoryEntitiesToBeans(entities);
-        fillCategoryOtherProperties(beans);
-        logger.info("count is ={}");
+    public List<ServiceCategoryBean> getCategoryByParentId(long categoryParentId, List<CommonStatus> statuses) {
+        logger.info("get service category by parentId={} status={}", categoryParentId, statuses);
+        List<ServiceCategoryBean> beans;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            List<ServiceCategoryEntity> entities = categoryRep.findByParentIdAndStatusIn(categoryParentId, statuses, categorySort);
+            beans = serviceCategoryEntitiesToBeans(entities);
+            fillCategoryOtherProperties(beans);
+        }
+        else {
+            logger.warn("statuses is empty");
+            beans = new ArrayList<>();
+        }
+        logger.info("count is ={}", beans.size());
         return beans;
     }
 
-    public List<ServiceCategoryBean> getCategoryByParentId(long categoryParentId, int pageIndex, int sizePerPage) {
-        logger.info("get service category by parentId={}, at page={} size={}", categoryParentId, pageIndex, sizePerPage);
-        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, categorySort);
-        Page<ServiceCategoryEntity> entities = categoryRep.findByParentId(categoryParentId, pageRequest);
-        List<ServiceCategoryBean> beans = serviceCategoryEntitiesToBeans(entities);
-        fillCategoryOtherProperties(beans);
-        logger.info("count is ={}");
+    public List<ServiceCategoryBean> getCategoryByParentId(long categoryParentId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+        logger.info("get service category by parentId={} status={}, at page={} size={}", categoryParentId, statuses, pageIndex, sizePerPage);
+        List<ServiceCategoryBean> beans;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, categorySort);
+            Page<ServiceCategoryEntity> entities = categoryRep.findByParentIdAndStatusIn(categoryParentId, statuses, pageRequest);
+            beans = serviceCategoryEntitiesToBeans(entities);
+            fillCategoryOtherProperties(beans);
+        }
+        else {
+            logger.warn("statuses is empty");
+            beans = new ArrayList<>();
+        }
+        logger.info("count is ={}", beans.size());
         return beans;
     }
 
@@ -136,53 +163,88 @@ public class ServiceVendorCategoryAndItemService {
         return itemRep.exists(itemId);
     }
 
-    public long countItemByCategoryId(long categoryId) {
-        long count = itemRep.countByCategoryId(categoryId);
-        logger.info("count service item by categoryId={}, size is {}", categoryId, count);
+    public long countItemByCategoryId(long categoryId, List<CommonStatus> statuses) {
+        long count = 0;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            count = itemRep.countByCategoryIdAndStatusIn(categoryId, statuses);
+        }
+        logger.info("count service item by categoryId={} statuses={}, size is {}", categoryId, statuses, count);
         return count;
     }
 
-    public List<ServiceItemBean> getItemByCategoryId(long categoryId) {
-        logger.info("get service item by categoryId={}", categoryId);
-        List<ServiceItemEntity> entities = itemRep.findByCategoryId(categoryId, itemSort);
-        List<ServiceItemBean> beans = serviceItemEntitiesToBeans(entities);
-        fillItemOtherProperties(beans);
-        logger.info("count is ={}");
+    public List<ServiceItemBean> getItemByCategoryId(long categoryId, List<CommonStatus> statuses) {
+        logger.info("get service item by categoryId={} status={}", categoryId, statuses);
+        List<ServiceItemBean> beans;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            List<ServiceItemEntity> entities = itemRep.findByCategoryIdAndStatusIn(categoryId, statuses, itemSort);
+            beans = serviceItemEntitiesToBeans(entities);
+            fillItemOtherProperties(beans);
+        }
+        else {
+            logger.warn("statuses is empty");
+            beans = new ArrayList<>();
+        }
+
+        logger.info("count is ={}", beans.size());
         return beans;
     }
 
-    public List<ServiceItemBean> getItemByCategoryId(long categoryId, int pageIndex, int sizePerPage) {
-        logger.info("get service item by categoryId={}, at page={} size={}", categoryId, pageIndex, sizePerPage);
-        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, itemSort);
-        Page<ServiceItemEntity> entities = itemRep.findByCategoryId(categoryId, pageRequest);
-        List<ServiceItemBean> beans = serviceItemEntitiesToBeans(entities);
-        fillItemOtherProperties(beans);
-        logger.info("count is ={}");
+    public List<ServiceItemBean> getItemByCategoryId(long categoryId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+        logger.info("get service item by categoryId={} status={}, at page={} size={}", categoryId, statuses, pageIndex, sizePerPage);
+        List<ServiceItemBean> beans;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, itemSort);
+            Page<ServiceItemEntity> entities = itemRep.findByCategoryIdAndStatusIn(categoryId, statuses, pageRequest);
+            beans = serviceItemEntitiesToBeans(entities);
+            fillItemOtherProperties(beans);
+        }
+        else {
+            logger.warn("statuses is empty");
+            beans = new ArrayList<>();
+        }
+        logger.info("count is ={}", beans.size());
         return beans;
     }
 
-    public long countItemByVendorId(long vendorId) {
-        long count = itemRep.countByVendorId(vendorId);
-        logger.info("count service item by vendorId={}, size is {}", vendorId, count);
+    public long countItemByVendorId(long vendorId, List<CommonStatus> statuses) {
+        long count = 0;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            count = itemRep.countByVendorIdAndStatusIn(vendorId, statuses);
+        }
+        logger.info("count service item by vendorId={} status={}, size is {}", vendorId, statuses, count);
         return count;
     }
 
-    public List<ServiceItemBean> getItemByVendorId(long vendorId) {
-        logger.info("get service item by vendorId={}", vendorId);
-        List<ServiceItemEntity> entities = itemRep.findByVendorId(vendorId, itemSort);
-        List<ServiceItemBean> beans = serviceItemEntitiesToBeans(entities);
-        fillItemOtherProperties(beans);
-        logger.info("count is ={}");
+    public List<ServiceItemBean> getItemByVendorId(long vendorId, List<CommonStatus> statuses) {
+        logger.info("get service item by vendorId={} status={}", vendorId, statuses);
+        List<ServiceItemBean> beans;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            List<ServiceItemEntity> entities = itemRep.findByVendorIdAndStatusIn(vendorId, statuses, itemSort);
+            beans = serviceItemEntitiesToBeans(entities);
+            fillItemOtherProperties(beans);
+        }
+        else {
+            logger.warn("statuses is empty");
+            beans = new ArrayList<>();
+        }
+        logger.info("count is ={}", beans.size());
         return beans;
     }
 
-    public List<ServiceItemBean> getItemByVendorId(long vendorId, int pageIndex, int sizePerPage) {
-        logger.info("get service item by vendorId={}, at page={} size={}", vendorId, pageIndex, sizePerPage);
-        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, itemSort);
-        Page<ServiceItemEntity> entities = itemRep.findByVendorId(vendorId, pageRequest);
-        List<ServiceItemBean> beans = serviceItemEntitiesToBeans(entities);
-        fillItemOtherProperties(beans);
-        logger.info("count is ={}");
+    public List<ServiceItemBean> getItemByVendorId(long vendorId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+        logger.info("get service item by vendorId={} status={}, at page={} size={}", vendorId, pageIndex, sizePerPage);
+        List<ServiceItemBean> beans;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, itemSort);
+            Page<ServiceItemEntity> entities = itemRep.findByVendorIdAndStatusIn(vendorId, statuses, pageRequest);
+            beans = serviceItemEntitiesToBeans(entities);
+            fillItemOtherProperties(beans);
+        }
+        else {
+            logger.warn("statuses is empty");
+            beans = new ArrayList<>();
+        }
+        logger.info("count is ={}", beans.size());
         return beans;
     }
 
@@ -388,7 +450,7 @@ public class ServiceVendorCategoryAndItemService {
     @Transactional
     public Long deleteItemByCategoryId(long categoryId) {
         logger.info("delete service item by categoryId={}", categoryId);
-        List<ServiceItemEntity> entities = itemRep.findByCategoryId(categoryId, itemSort);
+        List<ServiceItemEntity> entities = itemRep.findByCategoryId(categoryId);
         if (VerifyUtil.isListEmpty(entities)) {
             return categoryId;
         }

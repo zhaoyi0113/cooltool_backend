@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
@@ -15,6 +16,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +32,9 @@ public class UserServiceOrderAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getServiceCategory(@Context HttpServletRequest request) {
-        List<ServiceCategoryBean> topCategories = serviceCategoryItemService.getCategoryByParentId(0L);
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.ENABLED);
+        List<ServiceCategoryBean> topCategories = serviceCategoryItemService.getCategoryByParentId(0L, statuses);
         return Response.ok(topCategories).build();
     }
 
@@ -40,7 +44,9 @@ public class UserServiceOrderAPI {
     public Response getSubServiceCategory(@Context HttpServletRequest request,
                                           @QueryParam("category_id") @DefaultValue("0") long parentId
     ) {
-        List<ServiceCategoryBean> subCategories = serviceCategoryItemService.getCategoryByParentId(parentId);
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.ENABLED);
+        List<ServiceCategoryBean> subCategories = serviceCategoryItemService.getCategoryByParentId(parentId, statuses);
         return Response.ok(subCategories).build();
     }
 
@@ -50,7 +56,9 @@ public class UserServiceOrderAPI {
     public Response getServiceItemByCategoryId(@Context HttpServletRequest request,
                                                @QueryParam("category_id") @DefaultValue("0") long categoryId
     ) {
-        List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByCategoryId(categoryId);
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.ENABLED);
+        List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByCategoryId(categoryId, statuses);
         return Response.ok(serviceItems).build();
     }
 

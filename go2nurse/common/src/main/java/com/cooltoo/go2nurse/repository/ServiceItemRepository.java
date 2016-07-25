@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.repository;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.entities.ServiceItemEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,13 +16,15 @@ import java.util.List;
  */
 public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, Long> {
 
-    long countByCategoryId(Long categoryId);
-    List<ServiceItemEntity> findByCategoryId(Long categoryId, Sort sort);
-    Page<ServiceItemEntity> findByCategoryId(Long categoryId, Pageable sort);
+    List<ServiceItemEntity> findByCategoryId(Long categoryId);
 
-    long countByVendorId(Long vendorId);
-    List<ServiceItemEntity> findByVendorId(Long vendorId, Sort sort);
-    Page<ServiceItemEntity> findByVendorId(Long vendorId, Pageable sort);
+    long countByCategoryIdAndStatusIn(Long categoryId, List<CommonStatus> statuses);
+    List<ServiceItemEntity> findByCategoryIdAndStatusIn(Long categoryId, List<CommonStatus> statuses, Sort sort);
+    Page<ServiceItemEntity> findByCategoryIdAndStatusIn(Long categoryId, List<CommonStatus> statuses, Pageable sort);
+
+    long countByVendorIdAndStatusIn(Long vendorId, List<CommonStatus> statuses);
+    List<ServiceItemEntity> findByVendorIdAndStatusIn(Long vendorId, List<CommonStatus> statuses, Sort sort);
+    Page<ServiceItemEntity> findByVendorIdAndStatusIn(Long vendorId, List<CommonStatus> statuses, Pageable sort);
 
     List<ServiceItemEntity> findByIdIn(List<Long> ids);
 

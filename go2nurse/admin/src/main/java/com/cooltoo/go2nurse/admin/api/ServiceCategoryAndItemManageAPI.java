@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.admin.api;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceVendorBean;
@@ -14,6 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +34,10 @@ public class ServiceCategoryAndItemManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countVendor(@Context HttpServletRequest request) {
-        long vendorCount = vendorCategoryAndItemService.countVendor();
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
+        long vendorCount = vendorCategoryAndItemService.countVendor(statuses);
         return Response.ok(vendorCount).build();
     }
 
@@ -43,7 +48,10 @@ public class ServiceCategoryAndItemManageAPI {
                               @QueryParam("index") @DefaultValue("0") int pageIndex,
                               @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<ServiceVendorBean> serviceVendor = vendorCategoryAndItemService.getVendor(pageIndex, sizePerPage);
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
+        List<ServiceVendorBean> serviceVendor = vendorCategoryAndItemService.getVendor(statuses, pageIndex, sizePerPage);
         return Response.ok(serviceVendor).build();
     }
 
@@ -51,7 +59,10 @@ public class ServiceCategoryAndItemManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countTopServiceCategory(@Context HttpServletRequest request) {
-        long topServiceCategoryCount = vendorCategoryAndItemService.countTopCategory();
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
+        long topServiceCategoryCount = vendorCategoryAndItemService.countTopCategory(statuses);
         return Response.ok(topServiceCategoryCount).build();
     }
 
@@ -62,7 +73,10 @@ public class ServiceCategoryAndItemManageAPI {
                                           @QueryParam("index") @DefaultValue("0") int pageIndex,
                                           @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        List<ServiceCategoryBean> topServiceCategories = vendorCategoryAndItemService.getTopCategory(pageIndex, sizePerPage);
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
+        List<ServiceCategoryBean> topServiceCategories = vendorCategoryAndItemService.getTopCategory(statuses, pageIndex, sizePerPage);
         return Response.ok(topServiceCategories).build();
     }
 
@@ -71,7 +85,10 @@ public class ServiceCategoryAndItemManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response countSubServiceCategory(@Context HttpServletRequest request,
                                             @QueryParam("category_id") @DefaultValue("0") long categoryId) {
-        long subServiceCategoryCount = vendorCategoryAndItemService.countCategoryByParentId(categoryId);
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
+        long subServiceCategoryCount = vendorCategoryAndItemService.countCategoryByParentId(categoryId, statuses);
         return Response.ok(subServiceCategoryCount).build();
     }
 
@@ -83,8 +100,11 @@ public class ServiceCategoryAndItemManageAPI {
                                           @QueryParam("index") @DefaultValue("0") int pageIndex,
                                           @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
         List<ServiceCategoryBean> serviceCategories = vendorCategoryAndItemService.getCategoryByParentId(
-                categoryId, pageIndex, sizePerPage);
+                categoryId, statuses, pageIndex, sizePerPage);
         return Response.ok(serviceCategories).build();
     }
 
@@ -94,7 +114,10 @@ public class ServiceCategoryAndItemManageAPI {
     public Response countServiceItemByVendor(@Context HttpServletRequest request,
                                              @QueryParam("vendor_id") @DefaultValue("0") long vendorId
     ) {
-        long serviceItemCount = vendorCategoryAndItemService.countItemByVendorId(vendorId);
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
+        long serviceItemCount = vendorCategoryAndItemService.countItemByVendorId(vendorId, statuses);
         return Response.ok(serviceItemCount).build();
     }
 
@@ -106,8 +129,11 @@ public class ServiceCategoryAndItemManageAPI {
                                            @QueryParam("index") @DefaultValue("0") int pageIndex,
                                            @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
         List<ServiceItemBean> serviceItems = vendorCategoryAndItemService.getItemByVendorId(
-                vendorId, pageIndex, sizePerPage);
+                vendorId, statuses, pageIndex, sizePerPage);
         return Response.ok(serviceItems).build();
     }
 
@@ -115,8 +141,12 @@ public class ServiceCategoryAndItemManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countServiceItemByCategory(@Context HttpServletRequest request,
-                                               @QueryParam("category_id") @DefaultValue("0") long categoryId) {
-        long serviceItemCount = vendorCategoryAndItemService.countItemByCategoryId(categoryId);
+                                               @QueryParam("category_id") @DefaultValue("0") long categoryId
+    ) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
+        long serviceItemCount = vendorCategoryAndItemService.countItemByCategoryId(categoryId, statuses);
         return Response.ok(serviceItemCount).build();
     }
 
@@ -128,8 +158,11 @@ public class ServiceCategoryAndItemManageAPI {
                                              @QueryParam("index") @DefaultValue("0") int pageIndex,
                                              @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.DISABLED);
+        statuses.add(CommonStatus.ENABLED);
         List<ServiceItemBean> serviceItems = vendorCategoryAndItemService.getItemByCategoryId(
-                categoryId, pageIndex, sizePerPage);
+                categoryId, statuses, pageIndex, sizePerPage);
         return Response.ok(serviceItems).build();
     }
 
