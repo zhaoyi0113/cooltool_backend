@@ -40,7 +40,7 @@ public class UserQuestionnaireAnswerServiceAPI {
         UserBean user = userService.getUser(userId);
         List<UserHospitalizedRelationBean> userHospitalizedBeans = null;
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide())) {
-            long groupId = userDiagnosticService.getUserCurrentGroupId(userId, System.currentTimeMillis());
+            long groupId = userDiagnosticService.getUserCurrentGroupId(userId);
             userHospitalizedBeans = userHospitalizedService.getUserHospitalizedRelationByGroupId(userId, groupId);
         }
         List<QuestionnaireCategoryBean> returnValue = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(userHospitalizedBeans);

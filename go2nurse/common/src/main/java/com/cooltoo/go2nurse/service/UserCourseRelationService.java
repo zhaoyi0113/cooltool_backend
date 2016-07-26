@@ -91,7 +91,7 @@ public class UserCourseRelationService {
         logger.info("Is user={} selected hospital courses now", userId);
         boolean userHasSelectedHospitalCourse = false;
         // get current diagnostic group ID
-        long currentDiagnosticGroupId = userDiagnosticRelationService.getUserCurrentGroupId(userId, System.currentTimeMillis());
+        long currentDiagnosticGroupId = userDiagnosticRelationService.getUserCurrentGroupId(userId);
         // the hospital that user hospitalized
         List<UserHospitalizedRelationBean> userHospitalized =
                 userHospitalizedRelationService.getUserHospitalizedRelationByGroupId(userId, currentDiagnosticGroupId);
@@ -110,7 +110,7 @@ public class UserCourseRelationService {
         logger.info("get current hospitalized relation courses by userId={}", userId);
 
         // get current diagnostic group ID
-        long currentDiagnosticGroupId = userDiagnosticRelationService.getUserCurrentGroupId(userId, System.currentTimeMillis());
+        long currentDiagnosticGroupId = userDiagnosticRelationService.getUserCurrentGroupId(userId);
         // get user read courses
         List<Long> readCourseIds = getRelationCourseId(userId, "read", CommonStatus.ENABLED.name());
         // the hospital that user hospitalized

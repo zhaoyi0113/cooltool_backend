@@ -7,6 +7,7 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
 import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.constants.ProcessStatus;
 import com.cooltoo.go2nurse.converter.UserReExaminationDateBeanConverter;
 import com.cooltoo.go2nurse.entities.UserReExaminationDateEntity;
 import com.cooltoo.go2nurse.repository.UserReExaminationDateRepository;
@@ -151,7 +152,7 @@ public class UserReExaminationDateService {
             logger.error("there is no user diagnostic point relation dates");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (YesNoEnum.YES.equals(userDiagnosticPointDates.get(0).getCancelled())) {
+        if (ProcessStatus.CANCELED.equals(userDiagnosticPointDates.get(0).getProcessStatus())) {
             logger.error("user's diagnostic point relation dates has been cancelled");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

@@ -6,6 +6,7 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.constants.ProcessStatus;
 import com.cooltoo.go2nurse.converter.UserDiagnosticPointRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.UserDiagnosticPointRelationEntity;
 import com.cooltoo.go2nurse.repository.UserDiagnosticPointRelationRepository;
@@ -45,19 +46,15 @@ public class UserDiagnosticPointRelationService {
     //===================================================
     //               getting for user
     //===================================================
-    public long getUserCurrentGroupId(long userId, long currentTime) {
-        logger.info("get user={} current hospitalized group ID", userId, currentTime);
-        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndStatus(userId, CommonStatus.ENABLED, sort);
+    public long getUserCurrentGroupId(long userId) {
+        logger.info("get user={} current hospitalized group ID", userId);
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdStatusAndProcessStatus(userId, CommonStatus.ENABLED, ProcessStatus.GOING, sort);
         long groupId = Long.MIN_VALUE;
         if (VerifyUtil.isListEmpty(entities)) {
             logger.error("there is no diagnostic point for user");
         }
-        for (UserDiagnosticPointRelationEntity entity : entities) {
-            Date diagnosticTime = entity.getDiagnosticTime();
-            if (null!=diagnosticTime && diagnosticTime.getTime()>currentTime) {
-                groupId = entity.getGroupId();
-                break;
-            }
+        else {
+            groupId = entities.get(0).getGroupId();
         }
         if (Long.MIN_VALUE==groupId) {
             logger.error("there is no valid group ID for user");
@@ -95,6 +92,15 @@ public class UserDiagnosticPointRelationService {
         return beans;
     }
 
+
+    public List<UserDiagnosticPointRelationBean> getUserCurrentDiagnosticRelation(long userId) {
+        logger.info("get user={}'s hospitalized group diagnostic point of current groupId", userId);
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdStatusAndProcessStatus(userId, CommonStatus.ENABLED, ProcessStatus.GOING, sort);
+        List<UserDiagnosticPointRelationBean> beans = entitiesToBeans(entities);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     //==========================================================================
     //                  getting for admin user
     //==========================================================================
@@ -111,17 +117,6 @@ public class UserDiagnosticPointRelationService {
         logger.info("get the diagnostic point with user={} status={}", userId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<UserDiagnosticPointRelationEntity> resultSet = repository.findByUserIdAndStatus(userId, status, sort);
-        List<UserDiagnosticPointRelationBean> relations = entitiesToBeans(resultSet);
-        logger.info("count is {}", relations.size());
-        return relations;
-    }
-
-    public List<UserDiagnosticPointRelationBean> getRelation(long userId, String strStatus, int pageIndex, int sizePerPage) {
-        logger.info("get the diagnostic point with user={} status={} at page={} sizePerPage={}",
-                userId, strStatus, pageIndex, sizePerPage);
-        CommonStatus status = CommonStatus.parseString(strStatus);
-        PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<UserDiagnosticPointRelationEntity> resultSet = repository.findByUserIdAndStatus(userId, status, page);
         List<UserDiagnosticPointRelationBean> relations = entitiesToBeans(resultSet);
         logger.info("count is {}", relations.size());
         return relations;
@@ -167,10 +162,20 @@ public class UserDiagnosticPointRelationService {
             entity.setDiagnosticTime(pointTime);
             entity.setTime(new Date());
             entity.setStatus(CommonStatus.ENABLED);
-            entity.setCancelled(YesNoEnum.NO);
+            entity.setProcessStatus(ProcessStatus.GOING);
             entity = repository.save(entity);
             relations.add(beanConverter.convert(entity));
         }
+
+        // set other going group diagnostic point to canceled
+        List<UserDiagnosticPointRelationEntity> allGoing = repository.findByUserIdStatusAndProcessStatus(userId, CommonStatus.ENABLED, ProcessStatus.GOING, sort);
+        for (UserDiagnosticPointRelationEntity tmp : allGoing) {
+            if (tmp.getGroupId()==groupId) {
+                continue;
+            }
+            tmp.setProcessStatus(ProcessStatus.CANCELED);
+        }
+        repository.save(allGoing);
 
         logger.info("add relations is {}", relations);
         return relations;
@@ -249,16 +254,23 @@ public class UserDiagnosticPointRelationService {
     }
 
     @Transactional
-    public List<UserDiagnosticPointRelationBean> cancelUserDiagnosticRelation(long userId, long groupId) {
-        logger.info("user={} cancel diagnostic point date with groupId={}", userId, groupId);
+    public List<UserDiagnosticPointRelationBean> updateUserDiagnosticGroupProcessStatus(long userId, long groupId, ProcessStatus processStatus) {
+        logger.info("user={} update diagnostic point date relation with groupId={} and processStatus",
+                userId, groupId, processStatus);
+        if (null==processStatus) {
+            logger.info("process status is empty");
+            return new ArrayList<>();
+        }
+
         List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndGroupId(userId, groupId, sort);
         if (VerifyUtil.isListEmpty(entities)) {
             logger.info("not user's diagnostic point relation");
             return new ArrayList<>();
         }
 
+
         for (UserDiagnosticPointRelationEntity entity : entities) {
-            entity.setCancelled(YesNoEnum.YES);
+            entity.setProcessStatus(processStatus);
         }
         List<UserDiagnosticPointRelationBean> beans = entitiesToBeans(repository.save(entities));
         return beans;

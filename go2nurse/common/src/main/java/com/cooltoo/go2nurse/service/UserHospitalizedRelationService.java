@@ -179,7 +179,7 @@ public class UserHospitalizedRelationService {
     public UserHospitalizedRelationBean addRelation(long userId, String hospitalUniqueId, String departmentUniqueId) {
         logger.info("user={} add hospitalized relation with hospitalUniqueId={} and departmentUniqueId={}",
                 userId, hospitalUniqueId, departmentUniqueId);
-        long groupId = userDiagnosticRelationService.getUserCurrentGroupId(userId, System.currentTimeMillis());
+        long groupId = userDiagnosticRelationService.getUserCurrentGroupId(userId);
         return addRelation(userId, groupId, hospitalUniqueId, departmentUniqueId);
     }
 

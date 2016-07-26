@@ -5,6 +5,7 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.constants.ProcessStatus;
 import com.cooltoo.go2nurse.service.UserDiagnosticPointRelationService;
 import com.cooltoo.util.NumberUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -36,12 +37,7 @@ public class UserDiagnosticPointRelationServiceTest extends AbstractCooltooTest 
     @Test
     public void getUserCurrentGroupId() {
         long userId = 1;
-        long currentTime = System.currentTimeMillis();
-        long groupId = relationService.getUserCurrentGroupId(userId, currentTime);
-        Assert.assertEquals(Long.MIN_VALUE, groupId);
-
-        currentTime = NumberUtil.getTime("2016-01-15 14:44:44", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        groupId = relationService.getUserCurrentGroupId(userId, currentTime);
+        long groupId = relationService.getUserCurrentGroupId(userId);
         Assert.assertEquals(2, groupId);
     }
 
@@ -212,14 +208,14 @@ public class UserDiagnosticPointRelationServiceTest extends AbstractCooltooTest 
         long groupId = 1;
         List<UserDiagnosticPointRelationBean> beans = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
         for (UserDiagnosticPointRelationBean bean : beans) {
-            Assert.assertEquals(YesNoEnum.NO, bean.getCancelled());
+            Assert.assertEquals(ProcessStatus.GOING, bean.getProcessStatus());
         }
 
-        relationService.cancelUserDiagnosticRelation(userId, groupId);
+        relationService.updateUserDiagnosticGroupProcessStatus(userId, groupId, ProcessStatus.CANCELED);
 
         beans = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
         for (UserDiagnosticPointRelationBean bean : beans) {
-            Assert.assertEquals(YesNoEnum.YES, bean.getCancelled());
+            Assert.assertEquals(ProcessStatus.CANCELED, bean.getProcessStatus());
         }
     }
 }

@@ -3,7 +3,7 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
-import com.cooltoo.go2nurse.converter.DiagnosticPointBeanConverter;
+import com.cooltoo.go2nurse.constants.ProcessStatus;
 
 import java.util.Date;
 
@@ -21,7 +21,7 @@ public class UserDiagnosticPointRelationBean {
     private DiagnosticEnumerationBean diagnosticBean;
     private Date diagnosticTime;
     private long groupId;
-    private YesNoEnum cancelled;
+    private ProcessStatus processStatus;
 
     public long getId() {
         return id;
@@ -55,8 +55,8 @@ public class UserDiagnosticPointRelationBean {
         return groupId;
     }
 
-    public YesNoEnum getCancelled() {
-        return cancelled;
+    public ProcessStatus getProcessStatus() {
+        return processStatus;
     }
 
     public void setId(long id) {
@@ -93,8 +93,8 @@ public class UserDiagnosticPointRelationBean {
         this.groupId = groupId;
     }
 
-    public void setCancelled(YesNoEnum cancelled) {
-        this.cancelled = cancelled;
+    public void setProcessStatus(ProcessStatus processStatus) {
+        this.processStatus = processStatus;
     }
 
     public String toString() {

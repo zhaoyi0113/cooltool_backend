@@ -45,7 +45,7 @@ public class UserHospitalizedAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response getRelation(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        long currentDiagnosticGroupId =diagnosticRelationService.getUserCurrentGroupId(userId, System.currentTimeMillis());
+        long currentDiagnosticGroupId =diagnosticRelationService.getUserCurrentGroupId(userId);
         List<UserHospitalizedRelationBean> relations = relationService.getUserHospitalizedRelationByGroupId(userId, currentDiagnosticGroupId);
         return Response.ok(relations).build();
     }

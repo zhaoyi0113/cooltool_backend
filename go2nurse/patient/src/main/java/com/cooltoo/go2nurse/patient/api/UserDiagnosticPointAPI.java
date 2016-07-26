@@ -5,6 +5,7 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
 import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
+import com.cooltoo.go2nurse.constants.ProcessStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.UserDiagnosticPointRelationService;
 import com.cooltoo.go2nurse.service.UserReExaminationDateService;
@@ -46,9 +47,7 @@ public class UserDiagnosticPointAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response getLatestRelation(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<Long> allGroups = relationService.getUserAllGroupIds(userId);
-        Long groupId = VerifyUtil.isListEmpty(allGroups) ? 0L : allGroups.get(0);
-        List<UserDiagnosticPointRelationBean> relations = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
+        List<UserDiagnosticPointRelationBean> relations = relationService.getUserCurrentDiagnosticRelation(userId);
         return Response.ok(relations).build();
     }
 
@@ -113,8 +112,8 @@ public class UserDiagnosticPointAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response userDischargeFromHospital(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<Long> allGroups = relationService.getUserAllGroupIds(userId);
-        Long groupId = VerifyUtil.isListEmpty(allGroups) ? 0L : allGroups.get(0);
+        Long groupId = relationService.getUserCurrentGroupId(userId);
+        relationService.updateUserDiagnosticGroupProcessStatus(userId, groupId, ProcessStatus.COMPLETED);
         List<UserDiagnosticPointRelationBean> relations = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
         List<UserReExaminationDateBean> reExamDates = reExaminationService.addReExaminationByDiagnosticDates(userId, relations);
         return Response.ok(reExamDates).build();
@@ -126,9 +125,8 @@ public class UserDiagnosticPointAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response userCancelDiagnostic(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<Long> allGroups = relationService.getUserAllGroupIds(userId);
-        Long groupId = VerifyUtil.isListEmpty(allGroups) ? 0L : allGroups.get(0);
-        List<UserDiagnosticPointRelationBean> relations = relationService.cancelUserDiagnosticRelation(userId, groupId);
+        long groupId = relationService.getUserCurrentGroupId(userId);
+        List<UserDiagnosticPointRelationBean> relations = relationService.updateUserDiagnosticGroupProcessStatus(userId, groupId, ProcessStatus.CANCELED);
         return Response.ok(relations).build();
     }
 
