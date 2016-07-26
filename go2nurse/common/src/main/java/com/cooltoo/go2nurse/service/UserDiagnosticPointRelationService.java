@@ -34,7 +34,7 @@ public class UserDiagnosticPointRelationService {
 
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "groupId"),
-            new Sort.Order(Sort.Direction.DESC, "diagnosticId"),
+            new Sort.Order(Sort.Direction.DESC, "diagnosticTime"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 

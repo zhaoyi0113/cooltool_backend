@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.RegionBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.UserAddressBean;
@@ -123,9 +124,9 @@ public class UserAddressService {
     //=======================================================
 
     @Transactional
-    public UserAddressBean update(long addressId, int provinceId, int cityId, int grade, String address, CommonStatus status) {
-        logger.info("update user address by addressId={} provinceId={} cityId={} grade={} address={} status={}",
-                addressId, provinceId, cityId, grade, address, status);
+    public UserAddressBean update(long addressId, int provinceId, int cityId, int grade, String address, YesNoEnum isDefault, CommonStatus status) {
+        logger.info("update user address by addressId={} provinceId={} cityId={} grade={} address={} isDefault={} status={}",
+                addressId, provinceId, cityId, grade, address, isDefault, status);
 
         UserAddressEntity entity = repository.findOne(addressId);
         if (null==entity) {
@@ -149,6 +150,10 @@ public class UserAddressService {
         }
         if (null!=status && !status.equals(entity.getStatus())) {
             entity.setStatus(status);
+            changed = true;
+        }
+        if (null!=isDefault && !isDefault.equals(entity.getIsDefault())) {
+            entity.setIsDefault(isDefault);
             changed = true;
         }
 
@@ -184,6 +189,7 @@ public class UserAddressService {
         entity.setCityId(cityId);
         entity.setAddress(address.trim());
         entity.setGrade(grade);
+        entity.setIsDefault(YesNoEnum.NO);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
 

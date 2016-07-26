@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.beans.RegionBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserAddressBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.UserAddressService;
@@ -76,10 +77,12 @@ public class UserAddressAPI {
                                   @FormParam("city_id") @DefaultValue("0") int cityId,
                                   @FormParam("address") @DefaultValue("") String address,
                                   @FormParam("grade") @DefaultValue("0") int grade,
+                                  @FormParam("is_default") @DefaultValue("") String isDefault,
                                   @FormParam("status") @DefaultValue("") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserAddressBean userAddress = userAddressService.update(addressId, provinceId, cityId, grade, address, CommonStatus.parseString(status));
+        UserAddressBean userAddress = userAddressService.update(addressId, provinceId, cityId, grade, address,
+                YesNoEnum.parseString(isDefault), CommonStatus.parseString(status));
         return Response.ok(userAddress).build();
     }
 

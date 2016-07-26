@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserAddressBean;
 import com.cooltoo.go2nurse.service.UserAddressService;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -87,13 +88,15 @@ public class UserAddressServiceTest extends AbstractCooltooTest {
         int grade = 8;
         String address = "address test test";
         CommonStatus status = CommonStatus.DELETED;
-        UserAddressBean bean = service.update(addressId, provinceId, cityId, grade, address, status);
+        YesNoEnum isDefault = YesNoEnum.YES;
+        UserAddressBean bean = service.update(addressId, provinceId, cityId, grade, address, isDefault, status);
         Assert.assertEquals(addressId, bean.getId());
         Assert.assertEquals(provinceId, bean.getProvinceId());
         Assert.assertEquals(cityId, bean.getCityId());
         Assert.assertEquals(grade, bean.getGrade());
         Assert.assertEquals(address, bean.getAddress());
         Assert.assertEquals(status, bean.getStatus());
+        Assert.assertEquals(isDefault, bean.getIsDefault());
     }
 
 

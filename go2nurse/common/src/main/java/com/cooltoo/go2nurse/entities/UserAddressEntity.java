@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,6 +26,7 @@ public class UserAddressEntity {
     private int cityId;
     private String address;
     private int grade;
+    private YesNoEnum isDefault;
 
     @Id
     @GeneratedValue
@@ -69,6 +71,10 @@ public class UserAddressEntity {
         return grade;
     }
 
+    @Column(name = "is_default")
+    @Enumerated
+    public YesNoEnum getIsDefault() { return isDefault; }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -101,6 +107,10 @@ public class UserAddressEntity {
         this.grade = grade;
     }
 
+    public void setIsDefault(YesNoEnum isDefault) {
+        this.isDefault = isDefault;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -110,6 +120,7 @@ public class UserAddressEntity {
         msg.append(", cityId=").append(cityId);
         msg.append(", address=").append(address);
         msg.append(", grade=").append(grade);
+        msg.append(", isDefault=").append(isDefault);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append("]");

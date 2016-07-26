@@ -21,6 +21,7 @@ public class UserAddressBeanConverter implements Converter<UserAddressEntity, Us
         bean.setCityId(source.getCityId());
         bean.setAddress(source.getAddress());
         bean.setGrade(source.getGrade());
+        bean.setIsDefault(source.getIsDefault());
         return bean;
     }
 }

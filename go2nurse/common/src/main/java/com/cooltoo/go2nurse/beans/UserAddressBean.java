@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.beans.RegionBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import java.util.Date;
 
@@ -20,6 +21,7 @@ public class UserAddressBean {
     private RegionBean city;
     private String address;
     private int grade;
+    private YesNoEnum isDefault;
 
     public long getId() {
         return id;
@@ -51,6 +53,10 @@ public class UserAddressBean {
 
     public int getGrade() {
         return grade;
+    }
+
+    public YesNoEnum getIsDefault() {
+        return isDefault;
     }
 
     public void setId(long id) {
@@ -85,6 +91,10 @@ public class UserAddressBean {
         this.grade = grade;
     }
 
+    public void setIsDefault(YesNoEnum isDefault) {
+        this.isDefault = isDefault;
+    }
+
     public RegionBean getProvince() {
         return province;
     }
@@ -110,6 +120,7 @@ public class UserAddressBean {
         msg.append(", cityId=").append(cityId);
         msg.append(", address=").append(address);
         msg.append(", grade=").append(grade);
+        msg.append(", isDefault=").append(isDefault);
         msg.append(", province=").append(province);
         msg.append(", city=").append(city);
         msg.append(", time=").append(time);
