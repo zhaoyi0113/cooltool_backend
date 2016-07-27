@@ -175,8 +175,8 @@ public class UserReExaminationDateService {
             }
         }
         if (null==startDate) {
-            logger.error("there is no operation-date or discharged-from-hospital-date");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            logger.error("there is no operation-date or discharged-from-hospital-date, set discharged-from-hospital-date is now");
+            startDate = new Date();
         }
 
         List<UserReExaminationDateBean> reExaminationDateBeans =
