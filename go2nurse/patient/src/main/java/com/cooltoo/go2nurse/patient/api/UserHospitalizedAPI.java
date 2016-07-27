@@ -135,11 +135,12 @@ public class UserHospitalizedAPI {
         boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
 
         boolean hasCourses = false;
+        List<CourseBean> extensionNursingCourses=null;
         List<UserHospitalizedCoursesBean> beans = new ArrayList<>();
+        logger.info("user has selected courses={}, user decide={}", userHasSelectedCourses, user.getHasDecide());
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
             Map<DiagnosticEnumeration, List<CourseBean>> courses
                     = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
-            List<CourseBean> extensionNursingCourses=null;
             Set<DiagnosticEnumeration> keys = courses.keySet();
             for (DiagnosticEnumeration key : keys) {
                 List<CourseBean> value = courses.get(key);
@@ -158,6 +159,7 @@ public class UserHospitalizedAPI {
                     hasCourses = !VerifyUtil.isListEmpty(value);
                 }
             }
+
             if (!VerifyUtil.isListEmpty(extensionNursingCourses)) {
                 Map<CourseCategoryBean, List<CourseBean>> extensionNursingMap
                         = userCourseService.getAllCategoryToCoursesByCourses(extensionNursingCourses);
@@ -181,6 +183,8 @@ public class UserHospitalizedAPI {
                 }
             }
         }
+        logger.info("has_courses={}, extension_nursing_courses={}",
+                hasCourses, null==extensionNursingCourses ? 0 : extensionNursingCourses.size());
         if (!hasCourses) {
             Map<CourseCategoryBean, List<CourseBean>> courses
                     = userCourseService.getAllPublicExtensionNursingCourses(userId);
