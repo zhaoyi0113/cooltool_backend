@@ -8,12 +8,18 @@ import java.util.List;
  */
 public enum DiagnosticEnumeration {
 
-    EXTENSION_NURSING,      // 健康宣教
-    HOSPITALIZED_DATE,      // 入院
-    PHYSICAL_EXAMINATION,   // 检查
-    OPERATION,                  // 手术
-    DISCHARGED_FROM_THE_HOSPITAL    // 出院
+    EXTENSION_NURSING(0),      // 健康宣教
+    HOSPITALIZED_DATE(1),      // 入院
+    PHYSICAL_EXAMINATION(2),   // 检查
+    OPERATION(3),                  // 手术
+    DISCHARGED_FROM_THE_HOSPITAL(5),    // 出院
+    AFTER_OPERATION(4)   // 手术后
     ;
+
+    private int order = 0;
+    DiagnosticEnumeration(int order) {
+        this.order = order;
+    }
 
     public static DiagnosticEnumeration parseString(String type) {
         DiagnosticEnumeration diagnostic = null;
@@ -31,6 +37,9 @@ public enum DiagnosticEnumeration {
         }
         else if (DISCHARGED_FROM_THE_HOSPITAL.name().equalsIgnoreCase(type)) {
             diagnostic = DISCHARGED_FROM_THE_HOSPITAL;
+        }
+        else if (AFTER_OPERATION.name().equalsIgnoreCase(type)) {
+            diagnostic = AFTER_OPERATION;
         }
         return diagnostic;
     }
@@ -52,6 +61,9 @@ public enum DiagnosticEnumeration {
         else if (DISCHARGED_FROM_THE_HOSPITAL.ordinal() == type) {
             diagnostic = DISCHARGED_FROM_THE_HOSPITAL;
         }
+        else if (AFTER_OPERATION.ordinal() == type) {
+            diagnostic = AFTER_OPERATION;
+        }
         return diagnostic;
     }
 
@@ -65,6 +77,7 @@ public enum DiagnosticEnumeration {
         diagnostics.add(HOSPITALIZED_DATE);
         diagnostics.add(PHYSICAL_EXAMINATION);
         diagnostics.add(OPERATION);
+        diagnostics.add(AFTER_OPERATION);
         diagnostics.add(DISCHARGED_FROM_THE_HOSPITAL);
         return diagnostics;
     }
@@ -83,4 +96,6 @@ public enum DiagnosticEnumeration {
         }
         return retVal;
     }
+
+
 }
