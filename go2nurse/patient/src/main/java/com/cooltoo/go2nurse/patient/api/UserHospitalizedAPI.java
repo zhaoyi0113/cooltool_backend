@@ -166,28 +166,28 @@ public class UserHospitalizedAPI {
             }
             beans.add(extensionNursingBean);
 
-            if (!VerifyUtil.isListEmpty(extensionNursingBean.getCourses())) {
-                Map<CourseCategoryBean, List<CourseBean>> extensionNursingMap
-                        = userCourseService.getAllCategoryToCoursesByCourses(extensionNursingBean.getCourses());
-                Set<CourseCategoryBean> keySet = extensionNursingMap.keySet();
-                for (CourseCategoryBean key : keySet) {
-                    if (CourseCategoryService.category_all.equals(key.getName())) {
-                        continue;
-                    }
-                    List<CourseBean> value = extensionNursingMap.get(key);
-                    UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
-                    bean.setId(key.getId());
-                    bean.setType(key.getName());
-                    bean.setName(key.getName());
-                    bean.setDescription(key.getIntroduction());
-                    bean.setImageUrl(key.getImageUrl());
-                    bean.setCourses(value);
-                    beans.add(bean);
-                    if (!hasCourses) {
-                        hasCourses = !VerifyUtil.isListEmpty(value);
-                    }
-                }
-            }
+//            if (!VerifyUtil.isListEmpty(extensionNursingBean.getCourses())) {
+//                Map<CourseCategoryBean, List<CourseBean>> extensionNursingMap
+//                        = userCourseService.getAllCategoryToCoursesByCourses(extensionNursingBean.getCourses());
+//                Set<CourseCategoryBean> keySet = extensionNursingMap.keySet();
+//                for (CourseCategoryBean key : keySet) {
+//                    if (CourseCategoryService.category_all.equals(key.getName())) {
+//                        continue;
+//                    }
+//                    List<CourseBean> value = extensionNursingMap.get(key);
+//                    UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
+//                    bean.setId(key.getId());
+//                    bean.setType(key.getName());
+//                    bean.setName(key.getName());
+//                    bean.setDescription(key.getIntroduction());
+//                    bean.setImageUrl(key.getImageUrl());
+//                    bean.setCourses(value);
+//                    beans.add(bean);
+//                    if (!hasCourses) {
+//                        hasCourses = !VerifyUtil.isListEmpty(value);
+//                    }
+//                }
+//            }
         }
         logger.info("has_courses={}, extension_nursing_courses={}",
                 hasCourses,
