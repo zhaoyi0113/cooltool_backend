@@ -43,7 +43,8 @@ public class CourseDiagnosticRelationService {
     //                 get
     //============================================================================
     public List<Long> judgeCourseInDiagnostic(long lDiagnosticId, List<Long> coursesId, String strStatus) {
-        logger.info("judge course={} in diagnostic={} with status={}", coursesId, lDiagnosticId, strStatus);
+        logger.info("judge course size={} in diagnostic={} with status={}",
+                null==coursesId ? 0 : coursesId.size(), lDiagnosticId, strStatus);
         List<Long> validCourseIds = new ArrayList<>();
         if (VerifyUtil.isListEmpty(coursesId)) {
             return validCourseIds;
