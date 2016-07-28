@@ -758,7 +758,7 @@ public class ServiceVendorCategoryAndItemService {
             entity.setVendorId(vendorId);
             changed = true;
         }
-        ServiceVendorType vendorType = ServiceVendorType.parseString(strStatus);
+        ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
         if (null!=vendorType) {
             entity.setVendorType(vendorType);
             changed = true;
