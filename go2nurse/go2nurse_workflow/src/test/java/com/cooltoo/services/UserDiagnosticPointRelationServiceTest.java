@@ -159,7 +159,7 @@ public class UserDiagnosticPointRelationServiceTest extends AbstractCooltooTest 
         long count = relationService.countByUserAndStatus(userId, status);
         Assert.assertEquals(0, count);
 
-        relations = relationService.addUserDiagnosticRelation(userId, groupId, diagnosticPoints, pointTimes);
+        relations = relationService.addUserDiagnosticRelation(userId, groupId, diagnosticPoints, pointTimes, false);
         Assert.assertEquals(4, relations.size());
         Assert.assertEquals(1, relations.get(0).getDiagnosticId());
         Assert.assertEquals(groupId, relations.get(0).getGroupId());
@@ -211,7 +211,7 @@ public class UserDiagnosticPointRelationServiceTest extends AbstractCooltooTest 
             Assert.assertEquals(ProcessStatus.GOING, bean.getProcessStatus());
         }
 
-        relationService.updateUserDiagnosticGroupProcessStatus(userId, groupId, ProcessStatus.CANCELED);
+        relationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.CANCELED);
 
         beans = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
         for (UserDiagnosticPointRelationBean bean : beans) {
