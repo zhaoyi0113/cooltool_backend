@@ -49,9 +49,9 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
             " AND (item.status IN (?4))")
    long countByCategoryVendorAndStatus(List<Long> categoryIds, Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses);
     @Query("SELECT count(item.id) FROM ServiceItemEntity item" +
-            " WHERE (?2 IS NULL OR item.vendorId=?2)" +
-            " AND (?3 IS NULL OR item.vendorType=?3)" +
-            " AND (item.status IN (?4))")
+            " WHERE (?1 IS NULL OR item.vendorId=?1)" +
+            " AND (?2 IS NULL OR item.vendorType=?2)" +
+            " AND (item.status IN (?3))")
     long countByVendorAndStatus(Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses);
 
     @Query("FROM ServiceItemEntity item" +
@@ -61,8 +61,8 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
             " AND (item.status IN (?4))")
     Page<ServiceItemEntity> findByCategoryVendorAndStatus(List<Long> categoryIds, Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses, Pageable page);
     @Query("FROM ServiceItemEntity item" +
-            " WHERE (?2 IS NULL OR item.vendorId=?2)" +
-            " AND (?3 IS NULL OR item.vendorType=?3)" +
-            " AND (item.status IN (?4))")
+            " WHERE (?1 IS NULL OR item.vendorId=?1)" +
+            " AND (?2 IS NULL OR item.vendorType=?2)" +
+            " AND (item.status IN (?3))")
     Page<ServiceItemEntity> findByVendorAndStatus(Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses, Pageable page);
 }
