@@ -40,6 +40,7 @@ public class ServiceCategoryAndItemManageAPI {
         else if ("all".equalsIgnoreCase(strStatus)) {
             statuses.add(CommonStatus.DISABLED);
             statuses.add(CommonStatus.ENABLED);
+            statuses.add(CommonStatus.DELETED);
         }
         return statuses;
     }
