@@ -181,6 +181,42 @@ public class UserDiagnosticPointRelationService {
         return relations;
     }
 
+    @Transactional
+    private UserDiagnosticPointRelationBean addUserDiagnosticRelation(long userId, long groupId, DiagnosticEnumeration diagnosticPoint, Date pointTime, ProcessStatus processStatus) {
+        logger.info("add diagnostic point to user={}, groupId={}, diagnostic_point={}, point_time={}",
+                userId, groupId, diagnosticPoint, pointTime);
+        if (!userRepository.exists(userId)) {
+            logger.error("user not exist");
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
+        }
+        if (null==diagnosticPoint) {
+            logger.error("diagnostic point is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (null==pointTime) {
+            logger.error("diagnostic point time is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (null==processStatus) {
+            logger.error("process status is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        UserDiagnosticPointRelationEntity entity = null;
+        entity = new UserDiagnosticPointRelationEntity();
+        entity.setUserId(userId);
+        entity.setGroupId(groupId);
+        entity.setDiagnosticId(diagnosticPoint.ordinal());
+        entity.setDiagnosticTime(pointTime);
+        entity.setProcessStatus(processStatus);
+        entity.setTime(new Date());
+        entity.setStatus(CommonStatus.ENABLED);
+        entity = repository.save(entity);
+
+        UserDiagnosticPointRelationBean bean = beanConverter.convert(entity);
+        logger.info("add relations is {}", bean);
+        return bean;
+    }
+
     //===================================================
     //               update
     //===================================================
@@ -216,24 +252,50 @@ public class UserDiagnosticPointRelationService {
     }
 
     @Transactional
-    public List<UserDiagnosticPointRelationBean> updateUserDiagnosticPointTime(String strRelationId, boolean checkUser, long userId, String strPointTime) {
-        logger.info("user={} update relation={} with pointTime={}", userId, strRelationId, strPointTime);
-        List<UserDiagnosticPointRelationBean> relations = new ArrayList<>();
-        List<Long> relationId = VerifyUtil.parseLongIds(strRelationId);
+    public List<UserDiagnosticPointRelationBean> updateUserDiagnosticPointTime(long groupId, long userId, String strDiagnostics, String strPointTime) {
+        logger.info("user={} update diagnostic={} with pointTime={}", userId, strDiagnostics, strPointTime);
+
+        List<DiagnosticEnumeration> diagnostics = DiagnosticEnumeration.getDiagnosticByTypes(strDiagnostics);
         List<Date> pointTime = VerifyUtil.parseDates(strPointTime);
-        if (VerifyUtil.isListEmpty(relationId) || VerifyUtil.isListEmpty(pointTime)) {
+        if (VerifyUtil.isListEmpty(diagnostics) || VerifyUtil.isListEmpty(pointTime)) {
             logger.info("relation_id or point_time is empty");
-            return relations;
+            return new ArrayList<>();
         }
-        if (relationId.size() != pointTime.size()) {
+        if (diagnostics.size() != pointTime.size()) {
             logger.info("relation_id size not equals point_time size");
-            return relations;
+            return new ArrayList<>();
         }
-        for (int i = 0; i < relationId.size(); i ++) {
-            Long id = relationId.get(i);
-            Date newTime = pointTime.get(i);
-            UserDiagnosticPointRelationBean relation = updateUserDiagnosticRelation(id, checkUser, userId, newTime, null);
-            relations.add(relation);
+
+        List<UserDiagnosticPointRelationBean> currentRelations = getUserDiagnosticRelationByGroupId(userId, groupId);
+        if (VerifyUtil.isListEmpty(currentRelations)) {
+            logger.error("user is not hospitalized.");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        // cache the process status
+        ProcessStatus processStatus = currentRelations.get(0).getProcessStatus();
+
+        List<UserDiagnosticPointRelationBean> relations = new ArrayList<>();
+        DiagnosticEnumeration diagnostic;
+        Date newTime;
+        boolean notExist;
+        for (int i = 0; i < diagnostics.size(); i ++) {
+            diagnostic = diagnostics.get(i);
+            newTime = pointTime.get(i);
+            notExist = true;
+            // modify the time if exist
+            for (UserDiagnosticPointRelationBean current : currentRelations) {
+                if (current.getDiagnostic()==diagnostic) {
+                    UserDiagnosticPointRelationBean relation = updateUserDiagnosticRelation(current.getId(), true, userId, newTime, null);
+                    relations.add(relation);
+                    notExist = false;
+                    break;
+                }
+            }
+            // new the relation if not exist
+            if (notExist) {
+                UserDiagnosticPointRelationBean relation = addUserDiagnosticRelation(userId, groupId, diagnostic, newTime, processStatus);
+                relations.add(relation);
+            }
         }
         logger.info("after updating is {}", relations);
         return relations;

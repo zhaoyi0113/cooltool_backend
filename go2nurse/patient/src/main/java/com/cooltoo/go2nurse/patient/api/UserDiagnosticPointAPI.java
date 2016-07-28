@@ -93,16 +93,17 @@ public class UserDiagnosticPointAPI {
         return Response.ok(relation).build();
     }
 
-    @Path("/edit/point_time_by_relation_ids")
+    @Path("/edit/point_times_by_group_id_and_diagnostic")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public Response updateRelationByIds(@Context HttpServletRequest request,
-                                        @FormParam("relation_ids") @DefaultValue("") String relationIds,
-                                        @FormParam("point_times") @DefaultValue("") String pointTimes
+    public Response updateRelationByGroupIdAndDiagnostics(@Context HttpServletRequest request,
+                                                          @FormParam("group_id") @DefaultValue("-1") long groupId,
+                                                          @FormParam("diagnostics") @DefaultValue("") String diagnostics,
+                                                          @FormParam("point_times") @DefaultValue("") String pointTimes
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserDiagnosticPointRelationBean> relation = relationService.updateUserDiagnosticPointTime(relationIds, true, userId, pointTimes);
+        List<UserDiagnosticPointRelationBean> relation = relationService.updateUserDiagnosticPointTime(groupId, userId, diagnostics, pointTimes);
         return Response.ok(relation).build();
     }
 

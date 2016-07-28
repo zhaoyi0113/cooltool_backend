@@ -98,4 +98,21 @@ public enum DiagnosticEnumeration {
     }
 
 
+    public static List<DiagnosticEnumeration> getDiagnosticByTypes(String types) {
+        List<DiagnosticEnumeration> retVal = new ArrayList<>();
+        if (null==types || "".equals(types.trim())) {
+            return  retVal;
+        }
+        String[] strArray = types.split(",");
+        for (String type : strArray) {
+            DiagnosticEnumeration de = parseString(type);
+            if (null==de) {
+                retVal.clear();
+                break;
+            }
+            retVal.add(de);
+        }
+        return retVal;
+    }
+
 }
