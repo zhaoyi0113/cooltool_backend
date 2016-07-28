@@ -289,7 +289,13 @@ public class ServiceVendorCategoryAndItemService {
             return 0;
         }
         List<Long> categoryIds = getSubCategoryId(categoryId, statuses);
-        long count = itemRep.countByCategoryVendorAndStatus(categoryIds, vendorId, vendorType, statuses);
+        long count;
+        if (VerifyUtil.isListEmpty(categoryIds)) {
+            count = itemRep.countByVendorAndStatus(vendorId, vendorType, statuses);
+        }
+        else {
+            count = itemRep.countByCategoryVendorAndStatus(categoryIds, vendorId, vendorType, statuses);
+        }
         logger.info("count is {}", count);
         return count;
     }
@@ -307,7 +313,13 @@ public class ServiceVendorCategoryAndItemService {
         }
         List<Long> categoryIds = getSubCategoryId(categoryId, statuses);
         PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, itemSort);
-        Page<ServiceItemEntity> entities = itemRep.findByCategoryVendorAndStatus(categoryIds, vendorId, vendorType, statuses, pageRequest);
+        Page<ServiceItemEntity> entities;
+        if (VerifyUtil.isListEmpty(categoryIds)) {
+            entities = itemRep.findByVendorAndStatus(vendorId, vendorType, statuses, pageRequest);
+        }
+        else {
+            entities = itemRep.findByCategoryVendorAndStatus(categoryIds, vendorId, vendorType, statuses, pageRequest);
+        }
         List<ServiceItemBean> beans = serviceItemEntitiesToBeans(entities);
         fillItemOtherProperties(beans);
         logger.info("count is {}", beans.size());
