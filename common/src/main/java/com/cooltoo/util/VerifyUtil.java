@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 16/3/22.
@@ -115,6 +112,28 @@ public class VerifyUtil {
             recordIds.clear();
         }
         return recordIds;
+    }
+
+    public static List<Date> parseDates(String dates) {
+        if (isStringEmpty(dates)) {
+            return new ArrayList<>();
+        }
+        String[] strArray = dates.split(",");
+        List<Date> recordDate = new ArrayList<>();
+        try {
+            for (String tmp : strArray) {
+                long time = NumberUtil.getTime(tmp, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+                if (time<0) {
+                    recordDate.clear();
+                    break;
+                }
+                recordDate.add(new Date(time));
+            }
+        }
+        catch (Exception ex) {
+            recordDate.clear();
+        }
+        return recordDate;
     }
 
 //    public static boolean isNumbers(String numbers) {

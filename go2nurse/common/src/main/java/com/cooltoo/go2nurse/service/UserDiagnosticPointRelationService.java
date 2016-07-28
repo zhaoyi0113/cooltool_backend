@@ -216,6 +216,30 @@ public class UserDiagnosticPointRelationService {
     }
 
     @Transactional
+    public List<UserDiagnosticPointRelationBean> updateUserDiagnosticPointTime(String strRelationId, boolean checkUser, long userId, String strPointTime) {
+        logger.info("user={} update relation={} with pointTime={}", userId, strRelationId, strPointTime);
+        List<UserDiagnosticPointRelationBean> relations = new ArrayList<>();
+        List<Long> relationId = VerifyUtil.parseLongIds(strRelationId);
+        List<Date> pointTime = VerifyUtil.parseDates(strPointTime);
+        if (VerifyUtil.isListEmpty(relationId) || VerifyUtil.isListEmpty(pointTime)) {
+            logger.info("relation_id or point_time is empty");
+            return relations;
+        }
+        if (relationId.size() != pointTime.size()) {
+            logger.info("relation_id size not equals point_time size");
+            return relations;
+        }
+        for (int i = 0; i < relationId.size(); i ++) {
+            Long id = relationId.get(i);
+            Date newTime = pointTime.get(i);
+            UserDiagnosticPointRelationBean relation = updateUserDiagnosticRelation(id, checkUser, userId, newTime, null);
+            relations.add(relation);
+        }
+        logger.info("after updating is {}", relations);
+        return relations;
+    }
+
+    @Transactional
     public UserDiagnosticPointRelationBean updateUserDiagnosticRelation(long groupId, long diagnosticId, long userId, Date pointTime, String strStatus) {
         logger.info("user={} update diagnostic={} with groupId={} pointTime={} and status={}",
                 userId, diagnosticId, groupId, pointTime, strStatus);

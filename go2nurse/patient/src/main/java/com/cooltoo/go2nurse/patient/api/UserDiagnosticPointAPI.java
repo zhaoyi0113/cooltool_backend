@@ -48,7 +48,11 @@ public class UserDiagnosticPointAPI {
     public Response getLatestRelation(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<UserDiagnosticPointRelationBean> relations = relationService.getUserCurrentDiagnosticRelation(userId);
-        return Response.ok(relations).build();
+        List<UserDiagnosticPointRelationBean> returnValue = new ArrayList<>();
+        for (int i=relations.size()-1; i>=0; i--) {
+            returnValue.add(relations.get(i));
+        }
+        return Response.ok(returnValue).build();
     }
 
     @Path("/add")
@@ -80,12 +84,25 @@ public class UserDiagnosticPointAPI {
     public Response updateRelation(@Context HttpServletRequest request,
                                    @FormParam("relation_id") @DefaultValue("0") long relationId,
                                    @FormParam("point_time") @DefaultValue("") String pointTime,
-                                   @FormParam("status") @DefaultValue("disabled") String status
+                                   @FormParam("status") @DefaultValue("") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long time = NumberUtil.getTime(pointTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         Date newTime = time<0 ? null : new Date(time);
         UserDiagnosticPointRelationBean relation = relationService.updateUserDiagnosticRelation(relationId, true, userId, newTime, status);
+        return Response.ok(relation).build();
+    }
+
+    @Path("/edit/point_time_by_relation_ids")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response updateRelationByIds(@Context HttpServletRequest request,
+                                        @FormParam("relation_ids") @DefaultValue("") String relationIds,
+                                        @FormParam("point_times") @DefaultValue("") String pointTimes
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<UserDiagnosticPointRelationBean> relation = relationService.updateUserDiagnosticPointTime(relationIds, true, userId, pointTimes);
         return Response.ok(relation).build();
     }
 
@@ -97,7 +114,7 @@ public class UserDiagnosticPointAPI {
                                                  @FormParam("group_id") @DefaultValue("-1") long groupId,
                                                  @FormParam("diagnostic_id") @DefaultValue("-1") long diagnosticId,
                                                  @FormParam("point_time") @DefaultValue("") String pointTime,
-                                                 @FormParam("status") @DefaultValue("disabled") String status
+                                                 @FormParam("status") @DefaultValue("") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long time = NumberUtil.getTime(pointTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
