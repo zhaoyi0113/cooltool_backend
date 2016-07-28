@@ -2,6 +2,7 @@ package com.cooltoo.backend.services.notification;
 
 import com.cooltoo.backend.beans.NurseDeviceTokensBean;
 import com.cooltoo.backend.services.NurseDeviceTokensService;
+import com.cooltoo.features.AppFeatures;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
 import com.notnoop.apns.PayloadBuilder;
@@ -77,6 +78,9 @@ public class NotificationCenter {
     }
 
     private void publishToDevice(final ApnsService apnsService, final String payload, List<NurseDeviceTokensBean> deviceTokens) {
+        if(!AppFeatures.APNS.isActive()){
+            return;
+        }
         for (final NurseDeviceTokensBean token : deviceTokens) {
             executorService.execute(new Runnable() {
                 @Override
