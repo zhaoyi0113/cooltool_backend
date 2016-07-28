@@ -64,7 +64,8 @@ public class UserDiagnosticPointAPI {
                                 @FormParam("physical_examination_date") @DefaultValue("") String examinationDate,
                                 @FormParam("operation_date") @DefaultValue("") String operationDate,
                                 @FormParam("rehabilitation_date") @DefaultValue("") String rehabilitationDate,
-                                @FormParam("discharged_from_hospital_date") @DefaultValue("") String dischargedDate
+                                @FormParam("discharged_from_hospital_date") @DefaultValue("") String dischargedDate,
+                                @FormParam("has_operation") @DefaultValue("true") Boolean hasOperation
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
 
@@ -73,7 +74,7 @@ public class UserDiagnosticPointAPI {
         parseTime(hospitalizedDate, examinationDate, operationDate, rehabilitationDate, dischargedDate, diagnosticPoints, pointTimes);
 
         long groupId = System.currentTimeMillis();
-        List<UserDiagnosticPointRelationBean> relations = relationService.addUserDiagnosticRelation(userId, groupId, diagnosticPoints, pointTimes);
+        List<UserDiagnosticPointRelationBean> relations = relationService.addUserDiagnosticRelation(userId, groupId, diagnosticPoints, pointTimes, hasOperation);
         return Response.ok(relations).build();
     }
 
@@ -98,12 +99,12 @@ public class UserDiagnosticPointAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response updateRelationByGroupIdAndDiagnostics(@Context HttpServletRequest request,
-                                                          @FormParam("group_id") @DefaultValue("-1") long groupId,
                                                           @FormParam("diagnostics") @DefaultValue("") String diagnostics,
                                                           @FormParam("point_times") @DefaultValue("") String pointTimes
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserDiagnosticPointRelationBean> relation = relationService.updateUserDiagnosticPointTime(groupId, userId, diagnostics, pointTimes);
+        long currentGroupId = relationService.getUserCurrentGroupId(userId);
+        List<UserDiagnosticPointRelationBean> relation = relationService.updateUserDiagnosticPointTime(currentGroupId, userId, diagnostics, pointTimes);
         return Response.ok(relation).build();
     }
 
@@ -131,7 +132,7 @@ public class UserDiagnosticPointAPI {
     public Response userDischargeFromHospital(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Long groupId = relationService.getUserCurrentGroupId(userId);
-        relationService.updateUserDiagnosticGroupProcessStatus(userId, groupId, ProcessStatus.COMPLETED);
+        relationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.COMPLETED);
         List<UserDiagnosticPointRelationBean> relations = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
         List<UserReExaminationDateBean> reExamDates = reExaminationService.addReExaminationByDiagnosticDates(userId, relations);
         return Response.ok(reExamDates).build();
@@ -144,7 +145,21 @@ public class UserDiagnosticPointAPI {
     public Response userCancelDiagnostic(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long groupId = relationService.getUserCurrentGroupId(userId);
-        List<UserDiagnosticPointRelationBean> relations = relationService.updateUserDiagnosticGroupProcessStatus(userId, groupId, ProcessStatus.CANCELED);
+        List<UserDiagnosticPointRelationBean> relations = relationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.CANCELED);
+        return Response.ok(relations).build();
+    }
+
+    @Path("/has_operation")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response userCancelDiagnostic(@Context HttpServletRequest request,
+                                         @FormParam("has_operation") @DefaultValue("") String strHasOperation
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long groupId = relationService.getUserCurrentGroupId(userId);
+        Boolean hasOperation = VerifyUtil.isStringEmpty(strHasOperation) ? null : Boolean.valueOf(strHasOperation);
+        List<UserDiagnosticPointRelationBean> relations = relationService.updateHasOperationFlagByUserAndGroup(userId, groupId, hasOperation);
         return Response.ok(relations).build();
     }
 

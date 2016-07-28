@@ -21,6 +21,7 @@ public class UserDiagnosticPointRelationBeanConverter implements Converter<UserD
         bean.setDiagnosticTime(source.getDiagnosticTime());
         bean.setGroupId(source.getGroupId());
         bean.setProcessStatus(source.getProcessStatus());
+        bean.setHasOperation(source.getHasOperation());
         return bean;
     }
 }

@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -707,8 +706,8 @@ public class ServiceVendorCategoryAndItemService {
 
     @Transactional
     public ServiceItemBean updateItem(long itemId, String name, String clazz, String description,
-                                      String price, int timeDuration, String timeUnit,
-                                      int grade, long categoryId, long vendorId, String strVendorType,
+                                      String price, Integer timeDuration, String timeUnit,
+                                      Integer grade, Long categoryId, Long vendorId, String strVendorType,
                                       String strStatus) {
         logger.info("update service item={} by name={} clazz={} description={} price={} timeDuration={} timeUnit={} grade={} categoryId={} vendorId={} vendorType={} status={}",
                 itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, strVendorType, strStatus);
@@ -732,12 +731,12 @@ public class ServiceVendorCategoryAndItemService {
             entity.setDescription(description);
             changed = true;
         }
-        BigDecimal servicePrice = NumberUtil.getDecimal(price, 2);
-        if (null!=servicePrice) {
-            entity.setServicePrice(servicePrice);
+        Integer servicePriceCent = NumberUtil.getCent(price);
+        if (null!=servicePriceCent) {
+            entity.setServicePriceCent(servicePriceCent);
             changed = true;
         }
-        if (timeDuration>=0 && timeDuration!=entity.getServiceTimeDuration()) {
+        if (null!=timeDuration && timeDuration!=entity.getServiceTimeDuration()) {
             entity.setServiceTimeDuration(timeDuration);
             changed = true;
         }
@@ -746,15 +745,15 @@ public class ServiceVendorCategoryAndItemService {
             entity.setServiceTimeUnit(serviceTimeUnit);
             changed = true;
         }
-        if (grade>=0 && grade!=entity.getGrade()) {
+        if (null!=grade && grade!=entity.getGrade()) {
             entity.setGrade(grade);
             changed = true;
         }
-        if (categoryId>=0 && categoryId!=entity.getCategoryId()) {
+        if (null!=categoryId && categoryId!=entity.getCategoryId()) {
             entity.setCategoryId(categoryId);
             changed = true;
         }
-        if (vendorId>=0 && vendorId!=entity.getVendorId()) {
+        if (null!=vendorId && vendorId!=entity.getVendorId()) {
             entity.setVendorId(vendorId);
             changed = true;
         }
@@ -867,7 +866,7 @@ public class ServiceVendorCategoryAndItemService {
         name = name.trim();
         ServiceClass serviceClass = ServiceClass.parseString(clazz);
         ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
-        BigDecimal servicePrice = NumberUtil.getDecimal(price, 2);
+        Integer servicePriceCent = NumberUtil.getCent(price);
         TimeUnit serviceTimeUnit = TimeUnit.parseString(timeUnit);
 
         ServiceItemEntity entity = new ServiceItemEntity();
@@ -876,7 +875,7 @@ public class ServiceVendorCategoryAndItemService {
         }
         entity.setName(name);
         entity.setClazz(serviceClass);
-        entity.setServicePrice(servicePrice);
+        entity.setServicePriceCent(null==servicePriceCent ? 0 : servicePriceCent);
         entity.setServiceTimeDuration(timeDuration);
         entity.setServiceTimeUnit(serviceTimeUnit);
         entity.setGrade(grade<0 ? 0 : grade);

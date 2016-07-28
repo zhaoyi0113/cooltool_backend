@@ -98,8 +98,8 @@ public class ServiceOrderService {
     //                   updating
     //=====================================================================
     @Transactional
-    public ServiceOrderBean updateOrder(long orderId, long patientId, long addressId,
-                                     String strStartTime, int timeDuration, String timeUnit, String totalConsumption) {
+    public ServiceOrderBean updateOrder(long orderId, Long patientId, Long addressId,
+                                     String strStartTime, Integer timeDuration, String timeUnit, String totalConsumption) {
         logger.info("update service order={} by patientId={} addressId={} strStartTime={} timeDuration={} timeUnit={} totalConsumption={}",
                 orderId, patientId, addressId, strStartTime, timeDuration, timeUnit, totalConsumption);
 
@@ -116,14 +116,14 @@ public class ServiceOrderService {
         }
 
         boolean changed = false;
-        if (patientId!=0 && patientService.existPatient(patientId)) {
+        if (patientId!=null && patientService.existPatient(patientId)) {
             PatientBean patient = patientService.getOneById(patientId);
             String patientJson = go2NurseUtility.toJsonString(patient);
             entity.setPatient(patientJson);
             changed = true;
         }
 
-        if (addressId!=0 && addressService.existAddress(addressId)) {
+        if (addressId!=null && addressService.existAddress(addressId)) {
             UserAddressBean address = addressService.getOneById(addressId);
             String addressJson = go2NurseUtility.toJsonString(address);
             entity.setAddress(addressJson);
@@ -147,9 +147,9 @@ public class ServiceOrderService {
             changed = true;
         }
 
-        BigDecimal serviceTotalConsumption = NumberUtil.getDecimal(totalConsumption, 2);
-        if (null!=serviceTotalConsumption) {
-            entity.setTotalConsumption(serviceTotalConsumption);
+        Integer serviceTotalConsumptionCent = NumberUtil.getCent(totalConsumption);
+        if (null!=serviceTotalConsumptionCent) {
+            entity.setTotalConsumptionCent(serviceTotalConsumptionCent);
             changed = true;
         }
 
@@ -184,9 +184,9 @@ public class ServiceOrderService {
             changed = true;
         }
 
-        BigDecimal bdPaymentAmount = NumberUtil.getDecimal(paymentAmount, 2);
-        if (null!=bdPaymentAmount) {
-            entity.setPaymentAmount(bdPaymentAmount);
+        Integer bdPaymentAmountCent = NumberUtil.getCent(paymentAmount);
+        if (null!=bdPaymentAmountCent) {
+            entity.setPaymentAmountCent(bdPaymentAmountCent);
             changed = true;
         }
 
@@ -237,8 +237,8 @@ public class ServiceOrderService {
             logger.error("time unit not valid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        BigDecimal serviceTotalConsumption = NumberUtil.getDecimal(totalConsumption, 2);
-        if (null==serviceTotalConsumption) {
+        Integer serviceTotalConsumptionCent = NumberUtil.getCent(totalConsumption);
+        if (null==serviceTotalConsumptionCent) {
             logger.error("service total consumption not valid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -258,11 +258,11 @@ public class ServiceOrderService {
         entity.setServiceStartTime(new Date(lStartTime));
         entity.setServiceTimeDuration(timeDuration);
         entity.setServiceTimeUnit(serviceTimeUnit);
-        entity.setTotalConsumption(serviceTotalConsumption);
+        entity.setTotalConsumptionCent(serviceTotalConsumptionCent);
 
         entity.setOrderStatus(OrderStatus.TO_PAY);
-//      entity.setPayTime(null);
-//      entity.setPaymentAmount(null);
+        entity.setPayTime(new Date(0));
+        entity.setPaymentAmountCent(0);
 
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());

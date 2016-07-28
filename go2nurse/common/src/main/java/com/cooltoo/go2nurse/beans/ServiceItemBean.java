@@ -5,6 +5,7 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.ServiceClass;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
+import com.cooltoo.util.VerifyUtil;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -26,7 +27,8 @@ public class ServiceItemBean {
     private String description;
     private long imageId;
     private String imageUrl;
-    private BigDecimal servicePrice;
+    private String servicePrice;
+    private int servicePriceCent;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
     private int grade;
@@ -83,8 +85,12 @@ public class ServiceItemBean {
         return imageUrl;
     }
 
-    public BigDecimal getServicePrice() {
+    public String getServicePrice() {
         return servicePrice;
+    }
+
+    public int getServicePriceCent() {
+        return servicePriceCent;
     }
 
     public int getServiceTimeDuration() {
@@ -151,8 +157,9 @@ public class ServiceItemBean {
         this.imageUrl = imageUrl;
     }
 
-    public void setServicePrice(BigDecimal servicePrice) {
-        this.servicePrice = servicePrice;
+    public void setServicePriceCent(int servicePriceCent) {
+        this.servicePriceCent = servicePriceCent;
+        this.servicePrice = VerifyUtil.parsePrice(servicePriceCent);
     }
 
     public void setServiceTimeDuration(int serviceTimeDuration) {
@@ -184,6 +191,7 @@ public class ServiceItemBean {
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
         msg.append(", servicePrice=").append(servicePrice);
+        msg.append(", servicePriceCent=").append(servicePriceCent);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);
         msg.append(", grade=").append(grade);

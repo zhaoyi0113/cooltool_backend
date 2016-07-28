@@ -25,7 +25,7 @@ public class ServiceItemEntity {
     private ServiceClass clazz;
     private String description;
     private long imageId;
-    private BigDecimal servicePrice;
+    private int servicePriceCent;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
     private int grade;
@@ -85,9 +85,9 @@ public class ServiceItemEntity {
         return imageId;
     }
 
-    @Column(name = "service_price")
-    public BigDecimal getServicePrice() {
-        return servicePrice;
+    @Column(name = "service_price_cent")
+    public int getServicePriceCent() {
+        return servicePriceCent;
     }
 
     @Column(name = "service_time_duration")
@@ -145,8 +145,8 @@ public class ServiceItemEntity {
         this.imageId = imageId;
     }
 
-    public void setServicePrice(BigDecimal servicePrice) {
-        this.servicePrice = servicePrice;
+    public void setServicePriceCent(int servicePriceCent) {
+        this.servicePriceCent = servicePriceCent;
     }
 
     public void setServiceTimeDuration(int serviceTimeDuration) {
@@ -175,7 +175,7 @@ public class ServiceItemEntity {
         msg.append(", clazz=").append(clazz);
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
-        msg.append(", servicePrice=").append(servicePrice);
+        msg.append(", servicePriceCent=").append(servicePriceCent);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);
         msg.append(", grade=").append(grade);

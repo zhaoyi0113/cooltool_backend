@@ -1,5 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -8,6 +10,9 @@ import com.cooltoo.go2nurse.converter.DoctorBeanConverter;
 import com.cooltoo.go2nurse.entities.DoctorEntity;
 import com.cooltoo.go2nurse.repository.DoctorRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.services.CommonDepartmentService;
+import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +40,10 @@ public class DoctorService {
     @Autowired private DoctorRepository repository;
     @Autowired private DoctorBeanConverter beanConverter;
     @Autowired private UserGo2NurseFileStorageService userFileStorage;
+
+    @Autowired private CommonHospitalService hospitalService;
+    @Autowired private CommonDepartmentService departmentService;
+    @Autowired private Go2NurseUtility utility;
 
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "grade"),
@@ -117,20 +126,37 @@ public class DoctorService {
         }
 
         List<Long> imagesId = new ArrayList<>();
+        List<Integer> hospitalIds = new ArrayList<>();
+        List<Integer> departmentIds = new ArrayList<>();
         for (DoctorBean item : items) {
-            if (imagesId.contains(item.getImageId())) {
-                continue;
+            if (!imagesId.contains(item.getImageId())) {
+                imagesId.add(item.getImageId());
             }
-            imagesId.add(item.getImageId());
+            if (!hospitalIds.contains(item.getHospitalId())) {
+                hospitalIds.add(item.getHospitalId());
+            }
+            if (!departmentIds.contains(item.getDepartmentId())) {
+                departmentIds.add(item.getDepartmentId());
+            }
         }
 
         Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
+        Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalIds);
+        List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefix());
         for (DoctorBean item : items) {
             String imageUrl = imageIdToUrl.get(item.getImageId());
-            if (VerifyUtil.isStringEmpty(imageUrl)) {
-                continue;
+            if (!VerifyUtil.isStringEmpty(imageUrl)) {
+                item.setImageUrl(imageUrl);
             }
-            item.setImageUrl(imageUrl);
+            HospitalBean hospital = hospitalIdToBean.get(item.getHospitalId());
+            if (null!=hospital) {
+                item.setHospital(hospital);
+            }
+            for (HospitalDepartmentBean tmp : departments) {
+                if (tmp.getId()==item.getDepartmentId()) {
+                    item.setDepartment(tmp);
+                }
+            }
         }
     }
 

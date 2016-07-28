@@ -22,6 +22,7 @@ public class UserDiagnosticPointRelationBean {
     private Date diagnosticTime;
     private long groupId;
     private ProcessStatus processStatus;
+    private YesNoEnum hasOperation;
 
     public long getId() {
         return id;
@@ -47,6 +48,10 @@ public class UserDiagnosticPointRelationBean {
         return diagnostic;
     }
 
+    public DiagnosticEnumerationBean getDiagnosticBean() {
+        return diagnosticBean;
+    }
+
     public Date getDiagnosticTime() {
         return diagnosticTime;
     }
@@ -57,6 +62,10 @@ public class UserDiagnosticPointRelationBean {
 
     public ProcessStatus getProcessStatus() {
         return processStatus;
+    }
+
+    public YesNoEnum getHasOperation() {
+        return hasOperation;
     }
 
     public void setId(long id) {
@@ -97,14 +106,21 @@ public class UserDiagnosticPointRelationBean {
         this.processStatus = processStatus;
     }
 
+    public void setHasOperation(YesNoEnum hasOperation) {
+        this.hasOperation = hasOperation;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", userId=").append(userId);
         msg.append(", diagnosticId=").append(diagnosticId);
+        msg.append(", diagnosticEnum=").append(diagnostic);
         msg.append(", diagnosticTime=").append(diagnosticTime);
         msg.append(", groupId=").append(groupId);
+        msg.append(", processStatus=").append(processStatus);
+        msg.append(", hasOperation=").append(hasOperation);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

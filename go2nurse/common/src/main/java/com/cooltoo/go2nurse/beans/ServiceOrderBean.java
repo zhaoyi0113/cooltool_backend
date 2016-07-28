@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.TimeUnit;
+import com.cooltoo.util.VerifyUtil;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -22,10 +23,12 @@ public class ServiceOrderBean {
     private Date serviceStartTime;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
-    private BigDecimal totalConsumption;
+    private String totalConsumption;
+    private int totalConsumptionCent;
     private OrderStatus orderStatus;
     private Date payTime;
-    private BigDecimal paymentAmount;
+    private String paymentAmount;
+    private int paymentAmountCent;
 
     public long getId() {
         return id;
@@ -67,8 +70,12 @@ public class ServiceOrderBean {
         return serviceTimeUnit;
     }
 
-    public BigDecimal getTotalConsumption() {
+    public String getTotalConsumption() {
         return totalConsumption;
+    }
+
+    public int getTotalConsumptionCent() {
+        return totalConsumptionCent;
     }
 
     public OrderStatus getOrderStatus() {
@@ -79,8 +86,12 @@ public class ServiceOrderBean {
         return payTime;
     }
 
-    public BigDecimal getPaymentAmount() {
+    public String getPaymentAmount() {
         return paymentAmount;
+    }
+
+    public int getPaymentAmountCent() {
+        return paymentAmountCent;
     }
 
     public void setId(long id) {
@@ -123,8 +134,9 @@ public class ServiceOrderBean {
         this.serviceTimeUnit = serviceTimeUnit;
     }
 
-    public void setTotalConsumption(BigDecimal totalConsumption) {
-        this.totalConsumption = totalConsumption;
+    public void setTotalConsumptionCent(int totalConsumptionCent) {
+        this.totalConsumptionCent = totalConsumptionCent;
+        this.totalConsumption = VerifyUtil.parsePrice(totalConsumptionCent);
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
@@ -135,8 +147,9 @@ public class ServiceOrderBean {
         this.payTime = payTime;
     }
 
-    public void setPaymentAmount(BigDecimal paymentAmount) {
-        this.paymentAmount = paymentAmount;
+    public void setPaymentAmountCent(int paymentAmountCent) {
+        this.paymentAmountCent = paymentAmountCent;
+        this.paymentAmount = VerifyUtil.parsePrice(paymentAmountCent);
     }
 
     @Override

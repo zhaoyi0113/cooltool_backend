@@ -40,10 +40,10 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
         bean.setServiceStartTime(source.getServiceStartTime());
         bean.setServiceTimeDuration(source.getServiceTimeDuration());
         bean.setServiceTimeUnit(source.getServiceTimeUnit());
-        bean.setTotalConsumption(source.getTotalConsumption());
+        bean.setTotalConsumptionCent(source.getTotalConsumptionCent());
         bean.setOrderStatus(source.getOrderStatus());
         bean.setPayTime(source.getPayTime());
-        bean.setPaymentAmount(source.getPaymentAmount());
+        bean.setPaymentAmountCent(source.getPaymentAmountCent());
         return bean;
     }
 }

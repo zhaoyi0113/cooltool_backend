@@ -25,10 +25,10 @@ public class ServiceOrderEntity {
     private Date serviceStartTime;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
-    private BigDecimal totalConsumption;
+    private int totalConsumptionCent;
     private OrderStatus orderStatus;
     private Date payTime;
-    private BigDecimal paymentAmount;
+    private int paymentAmountCent;
 
     @Id
     @GeneratedValue
@@ -84,9 +84,9 @@ public class ServiceOrderEntity {
         return serviceTimeUnit;
     }
 
-    @Column(name = "total_consumption")
-    public BigDecimal getTotalConsumption() {
-        return totalConsumption;
+    @Column(name = "total_consumption_cent")
+    public int getTotalConsumptionCent() {
+        return totalConsumptionCent;
     }
 
     @Column(name = "order_status")
@@ -100,9 +100,9 @@ public class ServiceOrderEntity {
         return payTime;
     }
 
-    @Column(name = "payment_amount")
-    public BigDecimal getPaymentAmount() {
-        return paymentAmount;
+    @Column(name = "payment_amount_cent")
+    public int getPaymentAmountCent() {
+        return paymentAmountCent;
     }
 
     public void setId(long id) {
@@ -145,8 +145,8 @@ public class ServiceOrderEntity {
         this.serviceTimeUnit = serviceTimeUnit;
     }
 
-    public void setTotalConsumption(BigDecimal totalConsumption) {
-        this.totalConsumption = totalConsumption;
+    public void setTotalConsumptionCent(int totalConsumptionCent) {
+        this.totalConsumptionCent = totalConsumptionCent;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
@@ -157,8 +157,8 @@ public class ServiceOrderEntity {
         this.payTime = payTime;
     }
 
-    public void setPaymentAmount(BigDecimal paymentAmount) {
-        this.paymentAmount = paymentAmount;
+    public void setPaymentAmountCent(int paymentAmountCent) {
+        this.paymentAmountCent = paymentAmountCent;
     }
 
     @Override
@@ -175,10 +175,10 @@ public class ServiceOrderEntity {
         msg.append(", serviceStartTime=").append(serviceStartTime);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);
-        msg.append(", totalConsumption=").append(totalConsumption);
+        msg.append(", totalConsumptionCent=").append(totalConsumptionCent);
         msg.append(", orderStatus=").append(orderStatus);
         msg.append(", payTime=").append(payTime);
-        msg.append(", paymentAmount=").append(paymentAmount);
+        msg.append(", paymentAmountCent=").append(paymentAmountCent);
         msg.append("]");
         return msg.toString();
     }

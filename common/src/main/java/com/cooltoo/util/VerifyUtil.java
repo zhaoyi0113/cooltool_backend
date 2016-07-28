@@ -114,6 +114,19 @@ public class VerifyUtil {
         return recordIds;
     }
 
+    public static String parsePrice(int price) {
+        int prefix = (price/100);
+        int suffix = (price%100);
+        String strPrice = prefix +".";
+        if (suffix<10) {
+            strPrice = strPrice+"0"+suffix;
+        }
+        else {
+            strPrice = strPrice+suffix;
+        }
+        return strPrice;
+    }
+
     public static List<Date> parseDates(String dates) {
         if (isStringEmpty(dates)) {
             return new ArrayList<>();

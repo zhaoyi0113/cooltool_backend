@@ -1,8 +1,6 @@
 package com.cooltoo.util;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,6 +67,39 @@ public class NumberUtil {
         }
     }
 
+    private static final String PRICE="^\\d{0,7}\\.{0,1}\\d{0,2}$";
+    public static Integer getCent(String price) {
+        if (price instanceof String) {
+            if (!price.matches(PRICE)) {
+                return null;
+            }
+            StringBuilder strCent = new StringBuilder(price);
+            char[] cPrice = price.toCharArray();
+            int dotIndex = price.indexOf('.');
+            if (dotIndex>=0) {
+                if (dotIndex+3!=cPrice.length) {
+                    int zeroAdded = dotIndex + 3 - cPrice.length;
+                    for (int i = 0; i < zeroAdded; i++) {
+                        strCent.append("0");
+                    }
+                }
+            }
+            else {
+                strCent.append(".00");
+                dotIndex = strCent.toString().indexOf('.');
+            }
+            strCent.deleteCharAt(dotIndex);
+
+            try {
+                Integer cent = Integer.parseInt(strCent.toString());
+                return cent;
+            }
+            catch (Exception ex) {
+                return null;
+            }
+        }
+        return null;
+    }
 
     private static final String seed = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final char[] charSeed = seed.toCharArray();

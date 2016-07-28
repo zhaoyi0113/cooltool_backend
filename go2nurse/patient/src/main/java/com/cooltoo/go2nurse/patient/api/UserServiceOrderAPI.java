@@ -9,6 +9,7 @@ import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -94,15 +95,17 @@ public class UserServiceOrderAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response userEditOrder(@Context HttpServletRequest request,
                                   @FormParam("order_id") @DefaultValue("0") long orderId,
-                                  @FormParam("service_item_id") @DefaultValue("0") long serviceItemId,
-                                  @FormParam("patient_id") @DefaultValue("0") long patientId,
-                                  @FormParam("address_id") @DefaultValue("0") long addressId,
+                                  @FormParam("patient_id") @DefaultValue("") String strPatientId,
+                                  @FormParam("address_id") @DefaultValue("") String strAddressId,
                                   @FormParam("start_time") @DefaultValue("") String startTime,
-                                  @FormParam("time_duration") @DefaultValue("0") int timeDuration,
+                                  @FormParam("time_duration") @DefaultValue("") String strTimeDuration,
                                   @FormParam("time_unit") @DefaultValue("") String timeUnit,
                                   @FormParam("total_consumption") @DefaultValue("") String totalConsumption
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        Long patientId = !VerifyUtil.isIds(strPatientId) ? null : VerifyUtil.parseLongIds(strPatientId).get(0);
+        Long addressId = !VerifyUtil.isIds(strAddressId) ? null : VerifyUtil.parseLongIds(strAddressId).get(0);
+        Integer timeDuration = !VerifyUtil.isIds(strTimeDuration) ? null : VerifyUtil.parseIntIds(strTimeDuration).get(0);
         ServiceOrderBean order = orderService.updateOrder(orderId, patientId, addressId, startTime, timeDuration, timeUnit, totalConsumption);
         return Response.ok(order).build();
     }

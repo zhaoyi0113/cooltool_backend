@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.ProcessStatus;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class UserDiagnosticPointRelationEntity {
     private Date diagnosticTime;
     private long groupId;
     private ProcessStatus processStatus;
+    private YesNoEnum hasOperation;
 
     @Id
     @GeneratedValue
@@ -66,6 +68,12 @@ public class UserDiagnosticPointRelationEntity {
         return processStatus;
     }
 
+    @Column(name = "has_operation")
+    @Enumerated
+    public YesNoEnum getHasOperation() {
+        return hasOperation;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -98,6 +106,10 @@ public class UserDiagnosticPointRelationEntity {
         this.processStatus = processStatus;
     }
 
+    public void setHasOperation(YesNoEnum hasOperation) {
+        this.hasOperation = hasOperation;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -107,6 +119,7 @@ public class UserDiagnosticPointRelationEntity {
         msg.append(", diagnosticTime=").append(diagnosticTime);
         msg.append(", groupId=").append(groupId);
         msg.append(", processStatus=").append(processStatus);
+        msg.append(", hasOperation=").append(hasOperation);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

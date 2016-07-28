@@ -338,14 +338,18 @@ public class ServiceCategoryAndItemManageAPI {
                                     @FormParam("clazz") @DefaultValue("") String clazz,
                                     @FormParam("description") @DefaultValue("") String description,
                                     @FormParam("price") @DefaultValue("") String price,
-                                    @FormParam("time_duration") @DefaultValue("0") int timeDuration,
+                                    @FormParam("time_duration") @DefaultValue("") String strTimeDuration,
                                     @FormParam("time_unit") @DefaultValue("") String timeUnit,
-                                    @FormParam("grade") @DefaultValue("0") int grade,
-                                    @FormParam("category_id") @DefaultValue("0") long categoryId,
-                                    @FormParam("vendor_id") @DefaultValue("0") long vendorId,
+                                    @FormParam("grade") @DefaultValue("") String strGrade,
+                                    @FormParam("category_id") @DefaultValue("") String strCategoryId,
+                                    @FormParam("vendor_id") @DefaultValue("") String strVendorId,
                                     @FormParam("vendor_type") @DefaultValue("") String vendorType,
                                     @FormParam("status") @DefaultValue("") String status
     ) {
+        Integer timeDuration = !VerifyUtil.isIds(strTimeDuration) ? null : VerifyUtil.parseIntIds(strTimeDuration).get(0);
+        Integer grade = !VerifyUtil.isIds(strGrade) ? null : VerifyUtil.parseIntIds(strGrade).get(0);
+        Long categoryId = !VerifyUtil.isIds(strCategoryId) ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
+        Long vendorId = !VerifyUtil.isIds(strVendorId) ? null : VerifyUtil.parseLongIds(strVendorId).get(0);
         ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItem(itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, vendorType, status);
         return Response.ok(serviceItem).build();
     }

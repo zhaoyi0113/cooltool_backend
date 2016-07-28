@@ -15,8 +15,6 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -139,9 +137,9 @@ public class UserDiagnosticPointRelationService {
     //               add
     //===================================================
     @Transactional
-    public List<UserDiagnosticPointRelationBean> addUserDiagnosticRelation(long userId, long groupId, List<DiagnosticEnumeration> diagnosticPoints, List<Date> pointTimes) {
-        logger.info("add diagnostic point to user={}, groupId={}, diagnostic_point={}, point_time={}",
-                userId, groupId, diagnosticPoints, pointTimes);
+    public List<UserDiagnosticPointRelationBean> addUserDiagnosticRelation(long userId, long groupId, List<DiagnosticEnumeration> diagnosticPoints, List<Date> pointTimes, boolean boolHasOperation) {
+        logger.info("add diagnostic point to user={}, groupId={}, diagnostic_point={}, point_time={}, hasOperation={}",
+                userId, groupId, diagnosticPoints, pointTimes, boolHasOperation);
         if (!userRepository.exists(userId)) {
             logger.error("user not exist");
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
@@ -150,7 +148,8 @@ public class UserDiagnosticPointRelationService {
             logger.error("diagnostic point is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        UserDiagnosticPointRelationEntity entity = null;
+
+        UserDiagnosticPointRelationEntity entity;
         List<UserDiagnosticPointRelationBean> relations = new ArrayList<>();
         for (int i = 0, count = diagnosticPoints.size(); i < count; i++) {
             DiagnosticEnumeration diagnosticPoint = diagnosticPoints.get(i);
@@ -163,6 +162,7 @@ public class UserDiagnosticPointRelationService {
             entity.setTime(new Date());
             entity.setStatus(CommonStatus.ENABLED);
             entity.setProcessStatus(ProcessStatus.GOING);
+            entity.setHasOperation(boolHasOperation ? YesNoEnum.YES : YesNoEnum.NO);
             entity = repository.save(entity);
             relations.add(beanConverter.convert(entity));
         }
@@ -182,7 +182,7 @@ public class UserDiagnosticPointRelationService {
     }
 
     @Transactional
-    private UserDiagnosticPointRelationBean addUserDiagnosticRelation(long userId, long groupId, DiagnosticEnumeration diagnosticPoint, Date pointTime, ProcessStatus processStatus) {
+    private UserDiagnosticPointRelationBean addUserDiagnosticRelation(long userId, long groupId, DiagnosticEnumeration diagnosticPoint, Date pointTime, ProcessStatus processStatus, YesNoEnum hasOperation) {
         logger.info("add diagnostic point to user={}, groupId={}, diagnostic_point={}, point_time={}",
                 userId, groupId, diagnosticPoint, pointTime);
         if (!userRepository.exists(userId)) {
@@ -208,6 +208,7 @@ public class UserDiagnosticPointRelationService {
         entity.setDiagnosticId(diagnosticPoint.ordinal());
         entity.setDiagnosticTime(pointTime);
         entity.setProcessStatus(processStatus);
+        entity.setHasOperation(hasOperation);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity = repository.save(entity);
@@ -271,8 +272,9 @@ public class UserDiagnosticPointRelationService {
             logger.error("user is not hospitalized.");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        // cache the process status
+        // cache the process status and hasOperation flag
         ProcessStatus processStatus = currentRelations.get(0).getProcessStatus();
+        YesNoEnum hasOperation = currentRelations.get(0).getHasOperation();
 
         List<UserDiagnosticPointRelationBean> relations = new ArrayList<>();
         DiagnosticEnumeration diagnostic;
@@ -293,7 +295,7 @@ public class UserDiagnosticPointRelationService {
             }
             // new the relation if not exist
             if (notExist) {
-                UserDiagnosticPointRelationBean relation = addUserDiagnosticRelation(userId, groupId, diagnostic, newTime, processStatus);
+                UserDiagnosticPointRelationBean relation = addUserDiagnosticRelation(userId, groupId, diagnostic, newTime, processStatus, hasOperation);
                 relations.add(relation);
             }
         }
@@ -340,8 +342,8 @@ public class UserDiagnosticPointRelationService {
     }
 
     @Transactional
-    public List<UserDiagnosticPointRelationBean> updateUserDiagnosticGroupProcessStatus(long userId, long groupId, ProcessStatus processStatus) {
-        logger.info("user={} update diagnostic point date relation with groupId={} and processStatus",
+    public List<UserDiagnosticPointRelationBean> updateProcessStatusByUserAndGroup(long userId, long groupId, ProcessStatus processStatus) {
+        logger.info("user={} update diagnostic point date relation with groupId={} and processStatus={}",
                 userId, groupId, processStatus);
         if (null==processStatus) {
             logger.info("process status is empty");
@@ -350,13 +352,37 @@ public class UserDiagnosticPointRelationService {
 
         List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndGroupId(userId, groupId, sort);
         if (VerifyUtil.isListEmpty(entities)) {
-            logger.info("not user's diagnostic point relation");
+            logger.info("no user's diagnostic point relation");
             return new ArrayList<>();
         }
 
 
         for (UserDiagnosticPointRelationEntity entity : entities) {
             entity.setProcessStatus(processStatus);
+        }
+        List<UserDiagnosticPointRelationBean> beans = entitiesToBeans(repository.save(entities));
+        return beans;
+    }
+
+    @Transactional
+    public List<UserDiagnosticPointRelationBean> updateHasOperationFlagByUserAndGroup(long userId, long groupId, Boolean boolHasOperation) {
+        logger.info("user={} update diagnostic point date relation with groupId={} and hasOperation={}",
+                userId, groupId, boolHasOperation);
+        if (null==boolHasOperation) {
+            logger.info("flag has_operation is empty");
+            return new ArrayList<>();
+        }
+        YesNoEnum hasOperation = boolHasOperation ? YesNoEnum.YES : YesNoEnum.NO;
+
+        List<UserDiagnosticPointRelationEntity> entities = repository.findByUserIdAndGroupId(userId, groupId, sort);
+        if (VerifyUtil.isListEmpty(entities)) {
+            logger.info("no user's diagnostic point relation");
+            return new ArrayList<>();
+        }
+
+
+        for (UserDiagnosticPointRelationEntity entity : entities) {
+            entity.setHasOperation(hasOperation);
         }
         List<UserDiagnosticPointRelationBean> beans = entitiesToBeans(repository.save(entities));
         return beans;
