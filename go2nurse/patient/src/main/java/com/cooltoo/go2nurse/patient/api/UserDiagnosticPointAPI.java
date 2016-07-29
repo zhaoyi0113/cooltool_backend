@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
 import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
@@ -53,6 +54,21 @@ public class UserDiagnosticPointAPI {
             returnValue.add(relations.get(i));
         }
         return Response.ok(returnValue).build();
+    }
+
+    @Path("/did_have_operation")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response disHasOperation(@Context HttpServletRequest request) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<UserDiagnosticPointRelationBean> relations = relationService.getUserCurrentDiagnosticRelation(userId);
+        if (VerifyUtil.isListEmpty(relations)) {
+            return Response.ok(YesNoEnum.NO).build();
+        }
+        else {
+            return Response.ok(relations.get(0).getHasOperation()).build();
+        }
     }
 
     @Path("/add")
