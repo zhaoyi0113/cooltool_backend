@@ -19,9 +19,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hp on 2016/6/16.
@@ -63,12 +61,14 @@ public class UserDiagnosticPointAPI {
     public Response disHasOperation(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<UserDiagnosticPointRelationBean> relations = relationService.getUserCurrentDiagnosticRelation(userId);
+        Map<String, YesNoEnum> ret = new HashMap<>();
         if (VerifyUtil.isListEmpty(relations)) {
-            return Response.ok(YesNoEnum.NO).build();
+            ret.put("did_have_operation", YesNoEnum.NO);
         }
         else {
-            return Response.ok(relations.get(0).getHasOperation()).build();
+            ret.put("did_have_operation", relations.get(0).getHasOperation());
         }
+        return Response.ok(ret).build();
     }
 
     @Path("/add")
