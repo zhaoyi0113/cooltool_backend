@@ -38,5 +38,9 @@ task wrapper(type: Wrapper) {
 subprojects {
     repositories {
         mavenCentral()
+
+        maven {
+            url  "http://jcenter.bintray.com"
+        }
     }
 }

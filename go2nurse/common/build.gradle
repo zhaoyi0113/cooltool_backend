@@ -3,7 +3,11 @@ apply plugin: 'java'
 group = 'com.cooltoo.go2nurse'
 version = '1.0.0-SNAPSHOT'
 
+repositories {
+    mavenCentral()
+}
 
 dependencies {
     compile project(":common")
+    compile 'Pingplusplus:pingpp-java:2.1.7'
 }

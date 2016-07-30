@@ -47,8 +47,6 @@ dependencies {
 
     compile("org.springframework.boot:spring-boot-starter-actuator:1.3.2.RELEASE")
 
-    compile("Pingplusplus:pingpp-java:2.1.7")
-
     testCompile("junit:junit")
     testCompile("org.springframework:spring-test")
     testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
