@@ -1,19 +1,19 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.beans.PatientBean;
-import com.cooltoo.go2nurse.beans.ServiceItemBean;
-import com.cooltoo.go2nurse.beans.ServiceOrderBean;
-import com.cooltoo.go2nurse.beans.UserAddressBean;
+import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.OrderStatus;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 import com.cooltoo.go2nurse.converter.ServiceOrderBeanConverter;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
 import com.cooltoo.go2nurse.repository.ServiceOrderRepository;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.NumberUtil;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +70,33 @@ public class ServiceOrderService {
         return beans;
     }
 
+    public long countOrderByConditions(Long serviceItemId, Long userId,
+                                       Long categoryId, Long topCategoryId,
+                                       Long vendorId, ServiceVendorType vendorType,
+                                       OrderStatus orderStatus
+    ) {
+        logger.info("get order by userId={} itemId={} categoryId={} topCategoryId={} vendorType={} vendorId={} orderStatus={}",
+                userId, serviceItemId, categoryId, topCategoryId, vendorType, vendorId, orderStatus);
+        long count = repository.countByConditions(serviceItemId, userId, categoryId, topCategoryId, vendorType, vendorId, orderStatus);
+        logger.info("count is {}", count);
+        return count;
+    }
+
+    public List<ServiceOrderBean> getOrderByConditions(Long serviceItemId, Long userId,
+                                                       Long categoryId, Long topCategoryId,
+                                                       Long vendorId, ServiceVendorType vendorType,
+                                                       OrderStatus orderStatus,
+                                                       int pageIndex, int sizePerPage
+    ) {
+        logger.info("get order by userId={} itemId={} categoryId={} topCategoryId={} vendorType={} vendorId={} orderStatus={} pageIndex={} sizePerPage={}",
+                userId, serviceItemId, categoryId, topCategoryId, vendorType, vendorId, orderStatus, pageIndex, sizePerPage);
+        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<ServiceOrderEntity> entities = repository.findByConditions(serviceItemId, userId, categoryId, topCategoryId, vendorType, vendorId, orderStatus, pageRequest);
+        List<ServiceOrderBean> beans = entitiesToBeans(entities);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     public List<ServiceOrderBean> getOrderByUserId(long userId) {
         logger.info("get service order by userId={}", userId);
         List<ServiceOrderEntity> entities = repository.findByUserId(userId, sort);
@@ -99,18 +126,16 @@ public class ServiceOrderService {
     //=====================================================================
     @Transactional
     public ServiceOrderBean updateOrder(long orderId, Long patientId, Long addressId,
-                                     String strStartTime, Integer timeDuration, String timeUnit, String totalConsumption) {
-        logger.info("update service order={} by patientId={} addressId={} strStartTime={} timeDuration={} timeUnit={} totalConsumption={}",
-                orderId, patientId, addressId, strStartTime, timeDuration, timeUnit, totalConsumption);
+                                        String strStartTime, Integer count, String leaveAMessage) {
+        logger.info("update service order={} by patientId={} addressId={} strStartTime={} count={} leaveAMessage={}",
+                orderId, patientId, addressId, strStartTime, count, leaveAMessage);
 
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
-        if (OrderStatus.CANCELLED.equals(entity.getOrderStatus())
-                || OrderStatus.COMPLETED.equals(entity.getOrderStatus())
-                || OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())) {
+        if (!OrderStatus.TO_PAY.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be modified", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -119,6 +144,7 @@ public class ServiceOrderService {
         if (patientId!=null && patientService.existPatient(patientId)) {
             PatientBean patient = patientService.getOneById(patientId);
             String patientJson = go2NurseUtility.toJsonString(patient);
+            entity.setPatientId(patientId);
             entity.setPatient(patientJson);
             changed = true;
         }
@@ -126,6 +152,7 @@ public class ServiceOrderService {
         if (addressId!=null && addressService.existAddress(addressId)) {
             UserAddressBean address = addressService.getOneById(addressId);
             String addressJson = go2NurseUtility.toJsonString(address);
+            entity.setAddressId(addressId);
             entity.setAddress(addressJson);
             changed = true;
         }
@@ -136,20 +163,16 @@ public class ServiceOrderService {
             changed = true;
         }
 
-        if (timeDuration>0) {
-            entity.setServiceTimeDuration(timeDuration);
+        if (null!=count) {
+            ServiceOrderBean bean = beanConverter.convert(entity);
+            ServiceItemBean item = bean.getServiceItem();
+            entity.setServiceTimeDuration(item.getServiceTimeDuration()*count);
+            entity.setTotalConsumptionCent(item.getServicePriceCent()*count);
             changed = true;
         }
 
-        TimeUnit serviceTimeUnit = TimeUnit.parseString(timeUnit);
-        if (null!=serviceTimeUnit) {
-            entity.setServiceTimeUnit(serviceTimeUnit);
-            changed = true;
-        }
-
-        Integer serviceTotalConsumptionCent = NumberUtil.getCent(totalConsumption);
-        if (null!=serviceTotalConsumptionCent) {
-            entity.setTotalConsumptionCent(serviceTotalConsumptionCent);
+        if (!VerifyUtil.isStringEmpty(leaveAMessage)) {
+            entity.setLeaveAMessage(leaveAMessage);
             changed = true;
         }
 
@@ -204,15 +227,11 @@ public class ServiceOrderService {
     //=====================================================================
     @Transactional
     public ServiceOrderBean addOrder(long serviceItemId, long userId, long patientId, long addressId,
-                                     String strStartTime, int timeDuration, String timeUnit, String totalConsumption) {
-        logger.info("add service order by serviceItemId={} userId={} patientId={} addressId={} strStartTime={} timeDuration={} timeUnit={} totalConsumption={}",
-                serviceItemId, userId, patientId, addressId, strStartTime, timeDuration, timeUnit, totalConsumption);
+                                     String strStartTime, int count, String leaveAMessage) {
+        logger.info("add service order by serviceItemId={} userId={} patientId={} addressId={} strStartTime={} count={} leaveAMessage={}",
+                serviceItemId, userId, patientId, addressId, strStartTime, count, leaveAMessage);
         if (!serviceCategoryItemService.existItem(serviceItemId)) {
             logger.error("service item not exists");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
-        }
-        if (!userService.existUser(userId)) {
-            logger.error("user not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (patientId!=0 && !patientService.existPatient(patientId)) {
@@ -228,37 +247,101 @@ public class ServiceOrderService {
             logger.error("start time not valid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (timeDuration<0) {
+        if (count<0) {
             logger.error("time duration not valid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        TimeUnit serviceTimeUnit = TimeUnit.parseString(timeUnit);
-        if (null==serviceTimeUnit) {
-            logger.error("time unit not valid");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        Integer serviceTotalConsumptionCent = NumberUtil.getCent(totalConsumption);
-        if (null==serviceTotalConsumptionCent) {
-            logger.error("service total consumption not valid");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
 
+        // get service item
         ServiceItemBean serviceItem = serviceCategoryItemService.getItemById(serviceItemId);
         String serviceItemJson = go2NurseUtility.toJsonString(serviceItem);
+
+        // get vendor
+        ServiceVendorType vendorType = serviceItem.getVendorType();
+        ServiceVendorBean vendor = serviceItem.getVendor();
+        HospitalBean vendorHospital = serviceItem.getHospital();
+        String vendorJson = null;
+        if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
+            vendorJson = go2NurseUtility.toJsonString(vendorHospital);
+        }
+        else if (ServiceVendorType.COMPANY.equals(vendorType)) {
+            vendorJson = go2NurseUtility.toJsonString(vendor);
+        }
+        logger.info("hospital ========= {}", serviceItem.getHospital());
+        logger.info("vendor ========= {}", serviceItem.getVendor());
+
+        // get service category and parent category
+        List<ServiceCategoryBean> serviceCategoryAndParent = serviceCategoryItemService.getCategoryAndParentById(serviceItem.getCategoryId());
+        ServiceCategoryBean serviceCategory = null;
+        ServiceCategoryBean serviceTopCategory = null;
+        String serviceCategoryJson = null;
+        String serviceTopCategoryJson = null;
+        if (!VerifyUtil.isListEmpty(serviceCategoryAndParent)) {
+            serviceCategory = serviceCategoryAndParent.get(0);
+            if (serviceCategoryAndParent.size()==2) {
+                serviceTopCategory = serviceCategoryAndParent.get(1);
+                if (serviceTopCategory.getId()==serviceItem.getCategoryId()) {
+                    ServiceCategoryBean tmp = serviceTopCategory;
+                    serviceTopCategory = serviceCategory;
+                    serviceCategory = tmp;
+                }
+            }
+            if (null!=serviceCategory) {
+                serviceCategoryJson = go2NurseUtility.toJsonString(serviceCategory);
+            }
+            if (null!=serviceTopCategory) {
+                serviceTopCategoryJson = go2NurseUtility.toJsonString(serviceTopCategory);
+            }
+        }
+
+        // get patient
         PatientBean patient = patientService.getOneById(patientId);
         String patientJson = go2NurseUtility.toJsonString(patient);
+
+        // get address
         UserAddressBean address = addressService.getOneById(addressId);
         String addressJson = go2NurseUtility.toJsonString(address);
 
+
+        //===========================================
+        //               new order
+        //===========================================
         ServiceOrderEntity entity = new ServiceOrderEntity();
+        entity.setServiceItemId(serviceItemId);
         entity.setServiceItem(serviceItemJson);
+
+        entity.setVendorId(serviceItem.getVendorId());
+        entity.setVendorType(serviceItem.getVendorType());
+        entity.setVendor(vendorJson);
+
+        entity.setCategoryId(0L);
+        if (null!=serviceCategory) {
+            entity.setCategoryId(serviceCategory.getId());
+            entity.setCategory(serviceCategoryJson);
+        }
+
+        entity.setTopCategoryId(0L);
+        if (null!=serviceTopCategory) {
+            entity.setTopCategoryId(serviceTopCategory.getId());
+            entity.setTopCategory(serviceTopCategoryJson);
+        }
+
         entity.setUserId(userId);
-        entity.setPatient(patientJson);
+
+        entity.setPatientId(0L);
+        if (null!=patient) {
+            entity.setPatientId(patientId);
+            entity.setPatient(patientJson);
+        }
+
+        entity.setAddressId(addressId);
         entity.setAddress(addressJson);
+
         entity.setServiceStartTime(new Date(lStartTime));
-        entity.setServiceTimeDuration(timeDuration);
-        entity.setServiceTimeUnit(serviceTimeUnit);
-        entity.setTotalConsumptionCent(serviceTotalConsumptionCent);
+        entity.setServiceTimeDuration(serviceItem.getServiceTimeDuration()*count);
+        entity.setServiceTimeUnit(serviceItem.getServiceTimeUnit());
+        entity.setTotalConsumptionCent(serviceItem.getServicePriceCent()*count);
+        entity.setLeaveAMessage(leaveAMessage);
 
         entity.setOrderStatus(OrderStatus.TO_PAY);
         entity.setPayTime(new Date(0));
@@ -269,6 +352,7 @@ public class ServiceOrderService {
 
         entity = repository.save(entity);
         ServiceOrderBean bean = beanConverter.convert(entity);
+
         logger.info("service order added is {}", bean);
         return bean;
     }

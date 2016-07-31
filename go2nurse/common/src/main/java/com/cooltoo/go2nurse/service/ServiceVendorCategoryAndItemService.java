@@ -175,6 +175,25 @@ public class ServiceVendorCategoryAndItemService {
         return ids;
     }
 
+    public List<ServiceCategoryBean> getCategoryAndParentById(long categoryId) {
+        logger.info("get service category by categoryId={}", categoryId);
+        List<ServiceCategoryEntity> entities = new ArrayList<>();
+        ServiceCategoryEntity entity = categoryRep.findOne(categoryId);
+        if(null==entity) {
+            return new ArrayList<>();
+        }
+        entities.add(entity);
+
+        ServiceCategoryEntity parentEntity = categoryRep.findOne(entity.getParentId());
+        if(null!=entity) {
+            entities.add(parentEntity);
+        }
+
+        List<ServiceCategoryBean> beans = serviceCategoryEntitiesToBeans(entities);
+        fillCategoryOtherProperties(beans);
+        return beans;
+    }
+
     public boolean existItem(long itemId) {
         return itemRep.exists(itemId);
     }

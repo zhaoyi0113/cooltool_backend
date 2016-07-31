@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.OrderStatus;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 
 import javax.persistence.*;
@@ -18,9 +19,19 @@ public class ServiceOrderEntity {
     private long id;
     private Date time;
     private CommonStatus status;
+    private long serviceItemId;
     private String serviceItem;
+    private ServiceVendorType vendorType;
+    private long vendorId;
+    private String vendor;
+    private long categoryId;
+    private String category;
+    private long topCategoryId;
+    private String topCategory;
     private long userId;
+    private long patientId;
     private String patient;
+    private long addressId;
     private String address;
     private Date serviceStartTime;
     private int serviceTimeDuration;
@@ -29,6 +40,7 @@ public class ServiceOrderEntity {
     private OrderStatus orderStatus;
     private Date payTime;
     private int paymentAmountCent;
+    private String leaveAMessage;
 
     @Id
     @GeneratedValue
@@ -48,9 +60,49 @@ public class ServiceOrderEntity {
         return status;
     }
 
+    @Column(name = "service_item_id")
+    public long getServiceItemId() {
+        return serviceItemId;
+    }
+
     @Column(name = "service_item")
     public String getServiceItem() {
         return serviceItem;
+    }
+
+    @Column(name = "item_vendor_type")
+    public ServiceVendorType getVendorType() {
+        return vendorType;
+    }
+
+    @Column(name = "item_vendor_id")
+    public long getVendorId() {
+        return vendorId;
+    }
+
+    @Column(name = "item_vendor")
+    public String getVendor() {
+        return vendor;
+    }
+
+    @Column(name = "item_category_id")
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    @Column(name = "item_category")
+    public String getCategory() {
+        return category;
+    }
+
+    @Column(name = "item_top_category_id")
+    public long getTopCategoryId() {
+        return topCategoryId;
+    }
+
+    @Column(name = "item_top_category")
+    public String getTopCategory() {
+        return topCategory;
     }
 
     @Column(name = "user_id")
@@ -58,9 +110,19 @@ public class ServiceOrderEntity {
         return userId;
     }
 
+    @Column(name = "patient_id")
+    public long getPatientId() {
+        return patientId;
+    }
+
     @Column(name = "patient")
     public String getPatient() {
         return patient;
+    }
+
+    @Column(name = "address_id")
+    public long getAddressId() {
+        return addressId;
     }
 
     @Column(name = "address")
@@ -105,6 +167,11 @@ public class ServiceOrderEntity {
         return paymentAmountCent;
     }
 
+    @Column(name = "leave_a_message")
+    public String getLeaveAMessage() {
+        return leaveAMessage;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -117,16 +184,56 @@ public class ServiceOrderEntity {
         this.status = status;
     }
 
+    public void setServiceItemId(long serviceItemId) {
+        this.serviceItemId = serviceItemId;
+    }
+
     public void setServiceItem(String serviceItem) {
         this.serviceItem = serviceItem;
+    }
+
+    public void setVendorType(ServiceVendorType vendorType) {
+        this.vendorType = vendorType;
+    }
+
+    public void setVendorId(long vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setTopCategoryId(long topCategoryId) {
+        this.topCategoryId = topCategoryId;
+    }
+
+    public void setTopCategory(String topCategory) {
+        this.topCategory = topCategory;
     }
 
     public void setUserId(long userId) {
         this.userId = userId;
     }
 
+    public void setPatientId(long patientId) {
+        this.patientId = patientId;
+    }
+
     public void setPatient(String patient) {
         this.patient = patient;
+    }
+
+    public void setAddressId(long addressId) {
+        this.addressId = addressId;
     }
 
     public void setAddress(String address) {
@@ -159,6 +266,10 @@ public class ServiceOrderEntity {
 
     public void setPaymentAmountCent(int paymentAmountCent) {
         this.paymentAmountCent = paymentAmountCent;
+    }
+
+    public void setLeaveAMessage(String leaveAMessage) {
+        this.leaveAMessage = leaveAMessage;
     }
 
     @Override

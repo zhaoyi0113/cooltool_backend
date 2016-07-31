@@ -1,11 +1,12 @@
 package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.OrderStatus;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 import com.cooltoo.util.VerifyUtil;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -16,9 +17,20 @@ public class ServiceOrderBean {
     private long id;
     private Date time;
     private CommonStatus status;
+    private long serviceItemId;
     private ServiceItemBean serviceItem;
+    private ServiceVendorType vendorType;
+    private long vendorId;
+    private ServiceVendorBean vendor;
+    private HospitalBean vendorHospital;
+    private long categoryId;
+    private ServiceCategoryBean category;
+    private long topCategoryId;
+    private ServiceCategoryBean topCategory;
     private long userId;
+    private long patientId;
     private PatientBean patient;
+    private long addressId;
     private UserAddressBean address;
     private Date serviceStartTime;
     private int serviceTimeDuration;
@@ -29,6 +41,7 @@ public class ServiceOrderBean {
     private Date payTime;
     private String paymentAmount;
     private int paymentAmountCent;
+    private String leaveAMessage;
 
     public long getId() {
         return id;
@@ -42,16 +55,60 @@ public class ServiceOrderBean {
         return status;
     }
 
+    public long getServiceItemId() {
+        return serviceItemId;
+    }
+
     public ServiceItemBean getServiceItem() {
         return serviceItem;
+    }
+
+    public ServiceVendorType getVendorType() {
+        return vendorType;
+    }
+
+    public long getVendorId() {
+        return vendorId;
+    }
+
+    public ServiceVendorBean getVendor() {
+        return vendor;
+    }
+
+    public HospitalBean getVendorHospital() {
+        return vendorHospital;
+    }
+
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    public ServiceCategoryBean getCategory() {
+        return category;
+    }
+
+    public long getTopCategoryId() {
+        return topCategoryId;
+    }
+
+    public ServiceCategoryBean getTopCategory() {
+        return topCategory;
     }
 
     public long getUserId() {
         return userId;
     }
 
+    public long getPatientId() {
+        return patientId;
+    }
+
     public PatientBean getPatient() {
         return patient;
+    }
+
+    public long getAddressId() {
+        return addressId;
     }
 
     public UserAddressBean getAddress() {
@@ -94,6 +151,10 @@ public class ServiceOrderBean {
         return paymentAmountCent;
     }
 
+    public String getLeaveAMessage() {
+        return leaveAMessage;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -106,16 +167,60 @@ public class ServiceOrderBean {
         this.status = status;
     }
 
+    public void setServiceItemId(long serviceItemId) {
+        this.serviceItemId = serviceItemId;
+    }
+
     public void setServiceItem(ServiceItemBean serviceItem) {
         this.serviceItem = serviceItem;
+    }
+
+    public void setVendorType(ServiceVendorType vendorType) {
+        this.vendorType = vendorType;
+    }
+
+    public void setVendorId(long vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public void setVendor(ServiceVendorBean vendor) {
+        this.vendor = vendor;
+    }
+
+    public void setVendorHospital(HospitalBean vendorHospital) {
+        this.vendorHospital = vendorHospital;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public void setCategory(ServiceCategoryBean category) {
+        this.category = category;
+    }
+
+    public void setTopCategoryId(long topCategoryId) {
+        this.topCategoryId = topCategoryId;
+    }
+
+    public void setTopCategory(ServiceCategoryBean topCategory) {
+        this.topCategory = topCategory;
     }
 
     public void setUserId(long userId) {
         this.userId = userId;
     }
 
+    public void setPatientId(long patientId) {
+        this.patientId = patientId;
+    }
+
     public void setPatient(PatientBean patient) {
         this.patient = patient;
+    }
+
+    public void setAddressId(long addressId) {
+        this.addressId = addressId;
     }
 
     public void setAddress(UserAddressBean address) {
@@ -150,6 +255,10 @@ public class ServiceOrderBean {
     public void setPaymentAmountCent(int paymentAmountCent) {
         this.paymentAmountCent = paymentAmountCent;
         this.paymentAmount = VerifyUtil.parsePrice(paymentAmountCent);
+    }
+
+    public void setLeaveAMessage(String leaveAMessage) {
+        this.leaveAMessage = leaveAMessage;
     }
 
     @Override
