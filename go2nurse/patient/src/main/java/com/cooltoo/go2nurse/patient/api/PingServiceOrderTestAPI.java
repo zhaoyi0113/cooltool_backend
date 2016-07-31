@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.go2nurse.service.PingPPService;
+import com.pingplusplus.model.Charge;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.POST;
@@ -24,11 +25,11 @@ public class PingServiceOrderTestAPI {
         int amount = 100;
         String orderNo="xxxx";
         String channel="ws";
-        String ip="192.168.1.1";
+        String ip="127.0.0.1";
         String subject="test order";
         String body="order description";
         String description="order extra descritpion";
-        com.pingplusplus.model.Charge charge = (com.pingplusplus.model.Charge) pingPPService.createCharge(amount, orderNo, channel, ip, subject, body, description);
+        Charge charge = pingPPService.createCharge(amount, orderNo, channel, ip, subject, body, description);
         return Response.ok(charge).build();
 
     }
