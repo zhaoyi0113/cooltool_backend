@@ -9,5 +9,5 @@ repositories {
 
 dependencies {
     compile project(":common")
-    compile 'Pingplusplus:pingpp-java:2.1.7'
+    compile 'Pingplusplus:pingpp-java:2.1.2'
 }

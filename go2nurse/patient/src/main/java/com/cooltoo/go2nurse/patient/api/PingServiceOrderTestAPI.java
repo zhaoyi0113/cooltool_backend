@@ -24,7 +24,7 @@ public class PingServiceOrderTestAPI {
     public Response createOrder(){
         int amount = 100;
         String orderNo="xxxx";
-        String channel="ws";
+        String channel="wx";
         String ip="127.0.0.1";
         String subject="test order";
         String body="order description";

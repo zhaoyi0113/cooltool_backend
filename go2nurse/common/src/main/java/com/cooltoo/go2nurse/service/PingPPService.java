@@ -71,4 +71,17 @@ public class PingPPService {
         return charge;
     }
 
+//    public static void main(String []args){
+//        String re = Charge.class.getSimpleName().toLowerCase().replace("$", " ");
+//        String baseApi="https://api.pingxx.com";
+//        String format = String.format("%s/v1/%s", Pingpp.getApiBase(), re);
+//        String format1 = String.format("%ss", format);
+//        try {
+//            URL url = new URL(format1);
+//            url.openConnection();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println(format1);
+//    }
 }
