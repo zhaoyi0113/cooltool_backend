@@ -1,5 +1,8 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.go2nurse.constants.AppType;
+import com.cooltoo.go2nurse.constants.ChargeType;
+import com.pingplusplus.model.Charge;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
@@ -7,7 +10,6 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
-import com.cooltoo.go2nurse.constants.TimeUnit;
 import com.cooltoo.go2nurse.converter.ServiceOrderBeanConverter;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
 import com.cooltoo.go2nurse.repository.ServiceOrderRepository;
@@ -23,7 +25,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,11 +46,11 @@ public class ServiceOrderService {
     @Autowired private ServiceOrderBeanConverter beanConverter;
 
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
-    @Autowired private UserService userService;
     @Autowired private PatientService patientService;
     @Autowired private UserAddressService addressService;
     @Autowired private Go2NurseUtility go2NurseUtility;
-    @Autowired private ServiceOrderPingPPService orderPingPPService;
+    @Autowired private ServiceOrderChargePingPPService orderPingPPService;
+    @Autowired private PingPPService pingPPService;
 
     //=====================================================================
     //                   getting
@@ -186,40 +187,47 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    public ServiceOrderBean updateOrder(long orderId, OrderStatus orderStatus, String payTime, String paymentAmount) {
-        logger.info("update service order={} by orderStatus={} payTime={} paymentAmount={}",
-                orderId, orderStatus, payTime, paymentAmount);
-
+    public Charge payForService(Long userId, Long orderId, String channel, String clientIP) {
+        logger.info("create charge object for order={} channel={} clientIp={}", orderId, channel, clientIP);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-
-        boolean changed = false;
-        if (null!=orderStatus) {
-            entity.setOrderStatus(orderStatus);
-            changed = true;
+        if (userId!=entity.getUserId()) {
+            logger.error("this order does not belong to this user");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (VerifyUtil.isStringEmpty(channel)) {
+            logger.warn("channel is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        long lPayTime = NumberUtil.getTime(payTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (lPayTime>0) {
-            entity.setPayTime(new Date(lPayTime));
-            changed = true;
+        ServiceOrderBean order = beanConverter.convert(entity);
+        String orderNo = orderPingPPService.getOrderNo();
+        Charge charge = pingPPService.createCharge(orderNo, channel, order.getPaymentAmountCent(), clientIP,
+                order.getServiceItem().getName(), order.getServiceItem().getDescription(), order.getLeaveAMessage());
+        if (null==charge) {
+            entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
+            repository.save(entity);
+            return charge;
         }
 
-        Integer bdPaymentAmountCent = NumberUtil.getCent(paymentAmount);
-        if (null!=bdPaymentAmountCent) {
-            entity.setPaymentAmountCent(bdPaymentAmountCent);
-            changed = true;
-        }
+        orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, ChargeType.CHARGE, charge.getId(), charge.toString());
 
-        if (changed) {
-            entity = repository.save(entity);
-        }
+        return charge;
+    }
 
-        ServiceOrderBean bean = beanConverter.convert(entity);
-        logger.info("service order added is {}", bean);
-        return bean;
+    @Transactional
+    public ServiceOrderBean orderChargeWebhooks(String chargeId, String webhooksEventId, String webhooksEventJson) {
+        logger.info("order charge webhooks event callback chargeId={} webhooksEventId={} webhooksEventJson={}",
+                chargeId, webhooksEventId, webhooksEventJson);
+        ServiceOrderChargePingPPBean charge = orderPingPPService.orderChargePingPpWebhooks(chargeId, webhooksEventId, webhooksEventJson);
+        long orderId = charge.getOrderId();
+        ServiceOrderEntity order = repository.findOne(orderId);
+        order.setOrderStatus(OrderStatus.TO_DISPATCH);
+        order = repository.save(order);
+        logger.info("order charged is {}", order);
+        return beanConverter.convert(order);
     }
 
     //=====================================================================

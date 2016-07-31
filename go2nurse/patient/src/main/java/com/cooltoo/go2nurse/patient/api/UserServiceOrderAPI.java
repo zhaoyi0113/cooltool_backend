@@ -1,15 +1,17 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.pingplusplus.model.Charge;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
-import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -25,6 +28,8 @@ import java.util.List;
  */
 @Path("/user/order")
 public class UserServiceOrderAPI {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceOrderAPI.class);
 
     @Autowired private ServiceOrderService orderService;
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
@@ -86,6 +91,39 @@ public class UserServiceOrderAPI {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage);
         return Response.ok(order).build();
+    }
+
+    @Path("/get_charge_of_order")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response payForOrder(@Context HttpServletRequest request,
+                                @FormParam("order_id") @DefaultValue("0") long orderId,
+                                @FormParam("channel") @DefaultValue("") String channel
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        String remoteIP = request.getRemoteAddr();
+        Charge charge = orderService.payForService(userId, orderId, channel, remoteIP);
+        return Response.ok(charge).build();
+    }
+
+    @Path("/pingpp/webhooks")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response pingPpWebhooks(@Context HttpServletRequest request) {
+        Enumeration<String> enu = request.getHeaderNames();
+        while (enu.hasMoreElements()) {
+            logger.info("header names --- {}", enu.nextElement());
+        }
+        enu = request.getAttributeNames();
+        while (enu.hasMoreElements()) {
+            logger.info("attribute names --- {}", enu.nextElement());
+        }
+        enu = request.getParameterNames();
+        while (enu.hasMoreElements()) {
+            logger.info("parameter names --- {}", enu.nextElement());
+        }
+        return Response.ok().build();
     }
 
     @Path("/edit")

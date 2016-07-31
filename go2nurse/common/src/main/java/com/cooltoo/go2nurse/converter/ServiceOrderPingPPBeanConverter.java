@@ -1,7 +1,7 @@
 package com.cooltoo.go2nurse.converter;
 
-import com.cooltoo.go2nurse.beans.ServiceOrderPingPPBean;
-import com.cooltoo.go2nurse.entities.ServiceOrderPingPPEntity;
+import com.cooltoo.go2nurse.beans.ServiceOrderChargePingPPBean;
+import com.cooltoo.go2nurse.entities.ServiceOrderChargePingPPEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -9,18 +9,21 @@ import org.springframework.stereotype.Component;
  * Created by hp on 2016/7/15.
  */
 @Component
-public class ServiceOrderPingPPBeanConverter implements Converter<ServiceOrderPingPPEntity, ServiceOrderPingPPBean> {
+public class ServiceOrderPingPPBeanConverter implements Converter<ServiceOrderChargePingPPEntity, ServiceOrderChargePingPPBean> {
     @Override
-    public ServiceOrderPingPPBean convert(ServiceOrderPingPPEntity source) {
-        ServiceOrderPingPPBean bean = new ServiceOrderPingPPBean();
+    public ServiceOrderChargePingPPBean convert(ServiceOrderChargePingPPEntity source) {
+        ServiceOrderChargePingPPBean bean = new ServiceOrderChargePingPPBean();
         bean.setId(source.getId());
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
-        bean.setAppType(source.getAppType());
         bean.setOrderId(source.getOrderId());
-        bean.setPingPPType(source.getPingPPType());
-        bean.setPingPPId(source.getPingPPId());
-        bean.setPingPPJson(source.getPingPPJson());
+        bean.setAppType(source.getAppType());
+        bean.setChargeType(source.getChargeType());
+        bean.setChargeId(source.getChargeId());
+        bean.setChargeJson(source.getChargeJson());
+        bean.setWebhooksEventId(source.getWebhooksEventId());
+        bean.setWebhooksEventJson(source.getWebhooksEventJson());
+        bean.setChargeStatus(source.getChargeStatus());
         return bean;
     }
 }

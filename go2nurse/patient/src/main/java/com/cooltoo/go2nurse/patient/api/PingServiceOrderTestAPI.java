@@ -29,7 +29,7 @@ public class PingServiceOrderTestAPI {
         String subject="test order";
         String body="order description";
         String description="order extra descritpion";
-        Charge charge = pingPPService.createCharge(amount, orderNo, channel, ip, subject, body, description);
+        Charge charge = pingPPService.createCharge(orderNo, channel, amount, ip, subject, body, description);
         return Response.ok(charge).build();
 
     }

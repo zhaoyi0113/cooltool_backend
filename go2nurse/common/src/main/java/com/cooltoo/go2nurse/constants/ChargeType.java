@@ -3,14 +3,14 @@ package com.cooltoo.go2nurse.constants;
 /**
  * Created by hp on 2016/7/15.
  */
-public enum PingPPType {
+public enum ChargeType {
     REFUND, // 退款
     CHARGE, // 支付
     TRANSFER, // 企业转账
     ;
 
-    public static PingPPType parseString(String type) {
-        PingPPType ret = null;
+    public static ChargeType parseString(String type) {
+        ChargeType ret = null;
         if (REFUND.name().equalsIgnoreCase(type)) {
             ret = REFUND;
         }
@@ -23,8 +23,8 @@ public enum PingPPType {
         return ret;
     }
 
-    public static PingPPType parseInt(int type) {
-        PingPPType ret = null;
+    public static ChargeType parseInt(int type) {
+        ChargeType ret = null;
         if (REFUND.ordinal() == type) {
             ret = REFUND;
         }
