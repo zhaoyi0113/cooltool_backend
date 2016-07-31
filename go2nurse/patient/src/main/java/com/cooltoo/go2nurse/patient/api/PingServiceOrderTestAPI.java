@@ -21,7 +21,7 @@ public class PingServiceOrderTestAPI {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createOrder(@FormParam("channel") @DefaultValue("wx_wap") String channel){
+    public Response createOrder(@Context HttpServletRequest request, @FormParam("channel") @DefaultValue("wx") String channel){
         int amount = 100;
         String orderNo="xxxx";
         String ip="127.0.0.1";
