@@ -139,4 +139,11 @@ public class NumberUtil {
         }
         return identities;
     }
+
+    public static String getUniqueString() {
+        StringBuilder ret = new StringBuilder();
+        ret.append(System.currentTimeMillis());
+        ret.append((System.nanoTime()+"").substring(3,10));
+        return ret.toString();
+    }
 }
