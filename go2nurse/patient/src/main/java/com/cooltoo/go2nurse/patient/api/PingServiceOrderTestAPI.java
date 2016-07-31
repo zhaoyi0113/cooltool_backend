@@ -2,6 +2,8 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.go2nurse.service.PingPPService;
 import com.pingplusplus.model.Charge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,12 +18,15 @@ import javax.ws.rs.core.Response;
 @Path("/pingpp-test")
 public class PingServiceOrderTestAPI {
 
+    private static final Logger logger = LoggerFactory.getLogger(PingServiceOrderTestAPI.class);
+
     @Autowired
     private PingPPService pingPPService;
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response createOrder(@Context HttpServletRequest request, @FormParam("channel") @DefaultValue("wx") String channel){
+        logger.info("get channel "+channel);
         int amount = 100;
         String orderNo="xxxx";
         String ip="127.0.0.1";
