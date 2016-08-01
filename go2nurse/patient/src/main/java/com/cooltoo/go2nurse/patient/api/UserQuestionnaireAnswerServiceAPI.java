@@ -15,6 +15,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,6 +48,59 @@ public class UserQuestionnaireAnswerServiceAPI {
         if (VerifyUtil.isListEmpty(returnValue)) {
             logger.warn("no questionnaires for user hospitalized relation is {}", userHospitalizedBeans);
             returnValue = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(null);
+        }
+        return Response.ok(returnValue).build();
+    }
+
+    @Path("/questionnaire_category_of_hospital_or_not")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getQuestionnaireCategoriesOfHospitalUserHospitalizedIn(@Context HttpServletRequest request) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        UserBean user = userService.getUser(userId);
+        List<UserHospitalizedRelationBean> userHospitalizedBeans = null;
+        if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide())) {
+            long groupId = userDiagnosticService.getUserCurrentGroupId(userId);
+            userHospitalizedBeans = userHospitalizedService.getUserHospitalizedRelationByGroupId(userId, groupId);
+        }
+        List<QuestionnaireCategoryBean> returnValue = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(userHospitalizedBeans);
+        if (VerifyUtil.isListEmpty(returnValue)) {
+            logger.warn("no questionnaires for user hospitalized relation is {}", userHospitalizedBeans);
+            returnValue = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(null);
+        }
+        // give up the questionnaire information
+        for (QuestionnaireCategoryBean tmp : returnValue) {
+            tmp.setQuestionnaires(new ArrayList<>());
+        }
+        return Response.ok(returnValue).build();
+    }
+
+    @Path("/get_questionnaire_of_hospital_or_not_by_category_id")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getQuestionnaireOfHospitalUserHospitalizedInByCategoryId(@Context HttpServletRequest request,
+                                                                             @QueryParam("category_id") @DefaultValue("0") long categoryId
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        UserBean user = userService.getUser(userId);
+        List<UserHospitalizedRelationBean> userHospitalizedBeans = null;
+        if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide())) {
+            long groupId = userDiagnosticService.getUserCurrentGroupId(userId);
+            userHospitalizedBeans = userHospitalizedService.getUserHospitalizedRelationByGroupId(userId, groupId);
+        }
+        List<QuestionnaireCategoryBean> categories = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(userHospitalizedBeans);
+        if (VerifyUtil.isListEmpty(categories)) {
+            logger.warn("no questionnaires for user hospitalized relation is {}", userHospitalizedBeans);
+            categories = questionnaireService.getCategoryWithQuestionnaireByUserHospitalizedBean(null);
+        }
+        List<QuestionnaireBean> returnValue = new ArrayList<>();
+        for (QuestionnaireCategoryBean tmp : categories) {
+            if (tmp.getId()==categoryId) {
+                returnValue = tmp.getQuestionnaires();
+                break;
+            }
         }
         return Response.ok(returnValue).build();
     }

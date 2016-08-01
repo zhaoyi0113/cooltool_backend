@@ -1,15 +1,16 @@
 package com.cooltoo.go2nurse.patient.api;
 
-import com.pingplusplus.model.Charge;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
-import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
+import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.util.VerifyUtil;
+import com.pingplusplus.model.Charge;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,8 +111,9 @@ public class UserServiceOrderAPI {
     @Path("/pingpp/webhooks")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response pingPpWebhooks(@Context HttpServletRequest request,
-                                   @FormParam("body") @DefaultValue("") String body
+                                   @FormDataParam("body") @DefaultValue("") String body
     ) {
         Enumeration<String> enu = request.getHeaderNames();
         logger.info("header names === {}", enu);
