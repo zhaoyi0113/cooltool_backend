@@ -110,9 +110,16 @@ public class UserServiceOrderAPI {
     @Path("/pingpp/webhooks")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes("text/plain")
-    public Response pingPpWebhooks(String message) {
-        logger.info("message==={}", message);
+    public Response pingPpWebhooks(@Context HttpServletRequest request,
+                                   @FormParam("body") @DefaultValue("") String body
+    ) {
+        Enumeration<String> enu = request.getHeaderNames();
+        logger.info("header names === {}", enu);
+        enu = request.getAttributeNames();
+        logger.info("attribute names === {}", enu);
+        enu = request.getParameterNames();
+        logger.info("parameter names === {}", enu);
+        logger.info("body is {}", body);
         return Response.ok().build();
     }
 
