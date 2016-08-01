@@ -94,7 +94,7 @@ public class UserServiceOrderAPI {
     }
 
     @Path("/get_charge_of_order")
-    @GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response payForOrder(@Context HttpServletRequest request,
@@ -110,15 +110,9 @@ public class UserServiceOrderAPI {
     @Path("/pingpp/webhooks")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response pingPpWebhooks(@Context HttpServletRequest request) {
-        Enumeration<String> enu = request.getHeaderNames();
-        logger.info("header names --- {}", enu);
-
-        enu = request.getAttributeNames();
-        logger.info("attribute names --- {}", enu);
-
-        enu = request.getParameterNames();
-        logger.info("parameter names --- {}", enu);
+    @Consumes("text/plain")
+    public Response pingPpWebhooks(String message) {
+        logger.info("message==={}", message);
         return Response.ok().build();
     }
 
