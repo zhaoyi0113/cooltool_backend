@@ -43,7 +43,7 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
 
 
     @Query("SELECT count(item.id) FROM ServiceItemEntity item" +
-            " WHERE (?1 IS NULL OR item.categoryId IN (?1))" +
+            " WHERE (item.categoryId IN (?1))" +
             " AND (?2 IS NULL OR item.vendorId=?2)" +
             " AND (?3 IS NULL OR item.vendorType=?3)" +
             " AND (item.status IN (?4))")
@@ -55,7 +55,7 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
     long countByVendorAndStatus(Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses);
 
     @Query("FROM ServiceItemEntity item" +
-            " WHERE (?1 IS NULL OR item.categoryId IN (?1))" +
+            " WHERE (item.categoryId IN (?1))" +
             " AND (?2 IS NULL OR item.vendorId=?2)" +
             " AND (?3 IS NULL OR item.vendorType=?3)" +
             " AND (item.status IN (?4))")
