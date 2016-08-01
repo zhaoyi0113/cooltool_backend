@@ -112,17 +112,13 @@ public class UserServiceOrderAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response pingPpWebhooks(@Context HttpServletRequest request) {
         Enumeration<String> enu = request.getHeaderNames();
-        while (enu.hasMoreElements()) {
-            logger.info("header names --- {}", enu.nextElement());
-        }
+        logger.info("header names --- {}", enu);
+
         enu = request.getAttributeNames();
-        while (enu.hasMoreElements()) {
-            logger.info("attribute names --- {}", enu.nextElement());
-        }
+        logger.info("attribute names --- {}", enu);
+
         enu = request.getParameterNames();
-        while (enu.hasMoreElements()) {
-            logger.info("parameter names --- {}", enu.nextElement());
-        }
+        logger.info("parameter names --- {}", enu);
         return Response.ok().build();
     }
 
