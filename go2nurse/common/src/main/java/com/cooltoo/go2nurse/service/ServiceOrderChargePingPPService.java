@@ -7,9 +7,9 @@ import com.cooltoo.go2nurse.beans.ServiceOrderChargePingPPBean;
 import com.cooltoo.go2nurse.constants.AppType;
 import com.cooltoo.go2nurse.constants.ChargeStatus;
 import com.cooltoo.go2nurse.constants.ChargeType;
-import com.cooltoo.go2nurse.converter.ServiceOrderPingPPBeanConverter;
+import com.cooltoo.go2nurse.converter.ServiceOrderChargePingPPBeanConverter;
 import com.cooltoo.go2nurse.entities.ServiceOrderChargePingPPEntity;
-import com.cooltoo.go2nurse.repository.ServiceOrderPingPPRepository;
+import com.cooltoo.go2nurse.repository.ServiceOrderChargePingPPRepository;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -34,8 +34,8 @@ public class ServiceOrderChargePingPPService {
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 
-    @Autowired private ServiceOrderPingPPRepository repository;
-    @Autowired private ServiceOrderPingPPBeanConverter beanConverter;
+    @Autowired private ServiceOrderChargePingPPRepository repository;
+    @Autowired private ServiceOrderChargePingPPBeanConverter beanConverter;
 
     public String getOrderNo() {
         String orderNo = System.currentTimeMillis()+"";

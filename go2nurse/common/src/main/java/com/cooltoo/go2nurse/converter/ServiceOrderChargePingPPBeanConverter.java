@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * Created by hp on 2016/7/15.
  */
 @Component
-public class ServiceOrderPingPPBeanConverter implements Converter<ServiceOrderChargePingPPEntity, ServiceOrderChargePingPPBean> {
+public class ServiceOrderChargePingPPBeanConverter implements Converter<ServiceOrderChargePingPPEntity, ServiceOrderChargePingPPBean> {
     @Override
     public ServiceOrderChargePingPPBean convert(ServiceOrderChargePingPPEntity source) {
         ServiceOrderChargePingPPBean bean = new ServiceOrderChargePingPPBean();

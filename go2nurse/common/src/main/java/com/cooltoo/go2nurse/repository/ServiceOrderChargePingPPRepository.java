@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * Created by hp on 2016/7/15.
  */
-public interface ServiceOrderPingPPRepository extends JpaRepository<ServiceOrderChargePingPPEntity, Long>{
+public interface ServiceOrderChargePingPPRepository extends JpaRepository<ServiceOrderChargePingPPEntity, Long>{
 
     List<ServiceOrderChargePingPPEntity> findByAppTypeAndOrderId(AppType appType, long orderId, Sort sort);
     List<ServiceOrderChargePingPPEntity> findByAppTypeAndOrderIdIn(AppType appType, List<Long> orderIds, Sort sort);
-    ServiceOrderChargePingPPEntity findByAppTypeAndPingPPTypeAndPingPPId(AppType appType, ChargeType chargeType, String pingPPId);
+    ServiceOrderChargePingPPEntity findByAppTypeAndChargeTypeAndChargeId(AppType appType, ChargeType chargeType, String chargeId);
 
     long countByChargeId(String chargeId);
     ServiceOrderChargePingPPEntity findByChargeId(String chargeId);
