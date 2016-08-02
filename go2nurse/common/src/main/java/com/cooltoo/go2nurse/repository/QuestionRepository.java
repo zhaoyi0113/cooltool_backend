@@ -15,6 +15,8 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
 
     List<QuestionEntity> findByQuestionnaireId(Long questionnaireId, Sort sort);
 
+    long countByQuestionnaireId(Long questionnaireId);
+
     List<QuestionEntity> findByQuestionnaireIdIn(List<Long> questionnaireIds, Sort sort);
 
     void deleteByQuestionnaireId(Long questionnaireId);

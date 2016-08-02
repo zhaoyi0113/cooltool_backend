@@ -107,6 +107,19 @@ public class UserQuestionnaireAnswerServiceAPI {
         return Response.ok(returnValue).build();
     }
 
+    @Path("/question_count_of_questionnaire")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getQuestionnaireWithQuestion(@Context HttpServletRequest request,
+                                                 @QueryParam("questionnaire_id") @DefaultValue("0") long questionnaireId
+    ) {
+        long count = questionnaireService.countQuestionByQuestionnaireId(questionnaireId);
+        Map<String, Long> map = new HashMap<>();
+        map.put("question_count", count);
+        return Response.ok(map).build();
+    }
+
     @Path("/questionnaire_with_question")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

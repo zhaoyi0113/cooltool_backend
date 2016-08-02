@@ -113,6 +113,13 @@ public class QuestionnaireService {
         return beans;
     }
 
+    public long countQuestionByQuestionnaireId(long questionnaireId) {
+        logger.info("count questions size of questionnaire by questionnaireId={}", questionnaireId);
+        long count = questionRep.countByQuestionnaireId(questionnaireId);
+        logger.info("count is {}", count);
+        return count;
+    }
+
     public List<QuestionBean> getQuestionByQuestionnaireId(long questionnaireId) {
         logger.info("get question by questionnaireId={}", questionnaireId);
         List<QuestionEntity> resultSet = questionRep.findByQuestionnaireId(questionnaireId, questionSort);
