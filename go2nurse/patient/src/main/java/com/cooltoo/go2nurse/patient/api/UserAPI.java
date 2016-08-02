@@ -4,10 +4,12 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
+import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
+import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
+import com.cooltoo.go2nurse.constants.ProcessStatus;
+import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
-import com.cooltoo.go2nurse.service.PatientService;
-import com.cooltoo.go2nurse.service.UserPatientRelationService;
-import com.cooltoo.go2nurse.service.UserService;
+import com.cooltoo.go2nurse.service.*;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Created by hp on 2016/6/13.
@@ -32,6 +35,8 @@ public class UserAPI {
     @Autowired private UserService service;
     @Autowired private UserPatientRelationService userPatientRelationService;
     @Autowired private PatientService patientService;
+    @Autowired private UserDiagnosticPointRelationService diagnosticRelationService;
+    @Autowired private UserReExaminationDateService reExaminationService;
 
     @POST
     @Path("/register")
@@ -66,6 +71,11 @@ public class UserAPI {
         logger.info("update user is " + user);
         if (null == user) {
             return Response.ok().build();
+        }
+        if (user.getHasDecide()!= UserHospitalizedStatus.IN_HOSPITAL) {
+            Long groupId = diagnosticRelationService.getUserCurrentGroupId(userId);
+            List<UserDiagnosticPointRelationBean> relations = diagnosticRelationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.COMPLETED);
+            reExaminationService.addReExaminationByDiagnosticDates(userId, relations);
         }
         return Response.ok(user).build();
     }

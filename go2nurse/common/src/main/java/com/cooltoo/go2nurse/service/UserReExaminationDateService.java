@@ -149,12 +149,12 @@ public class UserReExaminationDateService {
                 userId, userDiagnosticPointDates);
 
         if (VerifyUtil.isListEmpty(userDiagnosticPointDates)) {
-            logger.error("there is no user diagnostic point relation dates");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            logger.warn("there is no user diagnostic point relation dates");
+            return new ArrayList<>();
         }
         if (ProcessStatus.CANCELED.equals(userDiagnosticPointDates.get(0).getProcessStatus())) {
-            logger.error("user's diagnostic point relation dates has been cancelled");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            logger.warn("user's diagnostic point relation dates has been cancelled");
+            return new ArrayList<>();
         }
 
         // get operation or discharged_from_hospital date and hospitalized group id

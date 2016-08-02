@@ -7,9 +7,11 @@ import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
 import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.constants.ProcessStatus;
+import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.UserDiagnosticPointRelationService;
 import com.cooltoo.go2nurse.service.UserReExaminationDateService;
+import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,7 @@ import java.util.*;
 public class UserDiagnosticPointAPI {
 
     @Autowired private UserDiagnosticPointRelationService relationService;
-    @Autowired private UserReExaminationDateService reExaminationService;
+    @Autowired private UserService userService;
 
     @Path("/get")
     @GET
@@ -84,6 +86,7 @@ public class UserDiagnosticPointAPI {
                                 @FormParam("has_operation") @DefaultValue("true") Boolean hasOperation
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        userService.updateUser(userId, null, -1, null, -1, null, UserHospitalizedStatus.IN_HOSPITAL.name());
 
         List<DiagnosticEnumeration> diagnosticPoints = new ArrayList<>();
         List<Date> pointTimes = new ArrayList<>();
@@ -141,29 +144,29 @@ public class UserDiagnosticPointAPI {
         return Response.ok(relation).build();
     }
 
-    @Path("/confirm/discharge_from_hospital")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
-    public Response userDischargeFromHospital(@Context HttpServletRequest request) {
-        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        Long groupId = relationService.getUserCurrentGroupId(userId);
-        relationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.COMPLETED);
-        List<UserDiagnosticPointRelationBean> relations = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
-        List<UserReExaminationDateBean> reExamDates = reExaminationService.addReExaminationByDiagnosticDates(userId, relations);
-        return Response.ok(reExamDates).build();
-    }
-
-    @Path("/cancel")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
-    public Response userCancelDiagnostic(@Context HttpServletRequest request) {
-        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        long groupId = relationService.getUserCurrentGroupId(userId);
-        List<UserDiagnosticPointRelationBean> relations = relationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.CANCELED);
-        return Response.ok(relations).build();
-    }
+//    @Path("/confirm/discharge_from_hospital")
+//    @POST
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @LoginAuthentication(requireUserLogin = true)
+//    public Response userDischargeFromHospital(@Context HttpServletRequest request) {
+//        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+//        Long groupId = relationService.getUserCurrentGroupId(userId);
+//        relationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.COMPLETED);
+//        List<UserDiagnosticPointRelationBean> relations = relationService.getUserDiagnosticRelationByGroupId(userId, groupId);
+//        List<UserReExaminationDateBean> reExamDates = reExaminationService.addReExaminationByDiagnosticDates(userId, relations);
+//        return Response.ok(reExamDates).build();
+//    }
+//
+//    @Path("/cancel")
+//    @POST
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @LoginAuthentication(requireUserLogin = true)
+//    public Response userCancelDiagnostic(@Context HttpServletRequest request) {
+//        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+//        long groupId = relationService.getUserCurrentGroupId(userId);
+//        List<UserDiagnosticPointRelationBean> relations = relationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.CANCELED);
+//        return Response.ok(relations).build();
+//    }
 
     @Path("/has_operation")
     @POST
