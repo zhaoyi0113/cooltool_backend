@@ -113,17 +113,25 @@ public class UserDiagnosticPointAPI {
         return Response.ok(relation).build();
     }
 
-    @Path("/edit/point_times_by_group_id_and_diagnostic")
+    @Path("/edit/current_diagnostic_point_times")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response updateRelationByGroupIdAndDiagnostics(@Context HttpServletRequest request,
-                                                          @FormParam("diagnostics") @DefaultValue("") String diagnostics,
-                                                          @FormParam("point_times") @DefaultValue("") String pointTimes
+                                                          @FormParam("hospitalized_date") @DefaultValue("") String hospitalizedDate,
+                                                          @FormParam("physical_examination_date") @DefaultValue("") String examinationDate,
+                                                          @FormParam("operation_date") @DefaultValue("") String operationDate,
+                                                          @FormParam("rehabilitation_date") @DefaultValue("") String rehabilitationDate,
+                                                          @FormParam("discharged_from_hospital_date") @DefaultValue("") String dischargedDate
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long currentGroupId = relationService.getUserCurrentGroupId(userId);
-        List<UserDiagnosticPointRelationBean> relation = relationService.updateUserDiagnosticPointTime(currentGroupId, userId, diagnostics, pointTimes);
+
+        List<DiagnosticEnumeration> diagnosticPoints = new ArrayList<>();
+        List<Date> pointTimes = new ArrayList<>();
+        parseTime(hospitalizedDate, examinationDate, operationDate, rehabilitationDate, dischargedDate, diagnosticPoints, pointTimes);
+
+        List<UserDiagnosticPointRelationBean> relation = relationService.updateUserDiagnosticPointTime(currentGroupId, userId, diagnosticPoints, pointTimes);
         return Response.ok(relation).build();
     }
 

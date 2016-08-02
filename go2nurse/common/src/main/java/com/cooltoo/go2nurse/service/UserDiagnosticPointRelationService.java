@@ -253,24 +253,18 @@ public class UserDiagnosticPointRelationService {
     }
 
     @Transactional
-    public List<UserDiagnosticPointRelationBean> updateUserDiagnosticPointTime(long groupId, long userId, String strDiagnostics, String strPointTime) {
-        logger.info("user={} update diagnostic={} with pointTime={}", userId, strDiagnostics, strPointTime);
+    public List<UserDiagnosticPointRelationBean> updateUserDiagnosticPointTime(long groupId, long userId, List<DiagnosticEnumeration> diagnostics, List<Date> pointTime) {
+        logger.info("user={} update diagnostic={} with pointTime={}", userId, diagnostics, pointTime);
 
-        List<DiagnosticEnumeration> diagnostics = DiagnosticEnumeration.getDiagnosticByTypes(strDiagnostics);
-        List<Date> pointTime = VerifyUtil.parseDates(strPointTime);
         if (VerifyUtil.isListEmpty(diagnostics) || VerifyUtil.isListEmpty(pointTime)) {
             logger.info("relation_id or point_time is empty");
-            return new ArrayList<>();
-        }
-        if (diagnostics.size() != pointTime.size()) {
-            logger.info("relation_id size not equals point_time size");
             return new ArrayList<>();
         }
 
         List<UserDiagnosticPointRelationBean> currentRelations = getUserDiagnosticRelationByGroupId(userId, groupId);
         if (VerifyUtil.isListEmpty(currentRelations)) {
             logger.error("user is not hospitalized.");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            return new ArrayList<>();
         }
         // cache the process status and hasOperation flag
         ProcessStatus processStatus = currentRelations.get(0).getProcessStatus();
