@@ -287,9 +287,9 @@ public class CourseService {
     //===========================================================
 
     @Transactional
-    public CourseBean createCourse(String name, String introduction, String link, int hospitalId) {
-        logger.info("create an course by name={} introduction={} link={} and hospitalId={}",
-                name, introduction, link, hospitalId);
+    public CourseBean createCourse(String name, String introduction, String link, String keyword, int hospitalId) {
+        logger.info("create an course by name={} introduction={} link={} keyword={} and hospitalId={}",
+                name, introduction, link, keyword, hospitalId);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("the name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -327,6 +327,14 @@ public class CourseService {
         }
         entity.setUniqueId(uniqueId);
 
+        if (!VerifyUtil.isStringEmpty(keyword)) {
+            keyword = keyword.trim();
+            if (keyword.length()>1) {
+                keyword = keyword.substring(0, 1);
+            }
+            entity.setKeyword(keyword);
+        }
+
         entity.setStatus(CourseStatus.ENABLE);
         entity.setTime(new Date());
         entity = repository.save(entity);
@@ -354,10 +362,10 @@ public class CourseService {
     public CourseBean updateCourseBasicInfo(long courseId,
                                                 String name, String introduction,
                                                 String frontCoverName, InputStream frontCover,
-                                                String link
+                                                String link, String keyword
     ) {
-        logger.info("update course {} by name={}, introduction={} imageName={} image={} link={}",
-                courseId, name, introduction, frontCoverName, frontCover!=null, link);
+        logger.info("update course {} by name={}, introduction={} imageName={} image={} link={} keyword={}",
+                courseId, name, introduction, frontCoverName, frontCover!=null, link, keyword);
 
         CourseEntity entity = repository.findOne(courseId);
         if (null==entity) {
@@ -395,6 +403,15 @@ public class CourseService {
             long imageId = userStorage.addFile(entity.getFrontCover(), frontCoverName, frontCover);
             imageUrl = userStorage.getFileURL(imageId);
             entity.setFrontCover(imageId);
+            changed = true;
+        }
+
+        if (!VerifyUtil.isStringEmpty(keyword)) {
+            keyword = keyword.trim();
+            if (keyword.length()>1) {
+                keyword = keyword.substring(0, 1);
+            }
+            entity.setKeyword(keyword);
             changed = true;
         }
 

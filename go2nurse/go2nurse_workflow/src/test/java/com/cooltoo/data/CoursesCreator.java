@@ -54,7 +54,7 @@ public class CoursesCreator {
             String name = getRandomString(10);
             String introduction = getRandomString(140);
             String enrollUrl = "http://" + getRandomString(30);
-            CourseBean course = courseService.createCourse(name, introduction, enrollUrl, 0);
+            CourseBean course = courseService.createCourse(name, introduction, enrollUrl, "", 0);
             coursesId.add(course.getId());
         }
         List<HospitalBean> hospitals = hospitalService.searchHospital(true, false, null, -1, -1, -1, null, 1, 1, 0, 0);

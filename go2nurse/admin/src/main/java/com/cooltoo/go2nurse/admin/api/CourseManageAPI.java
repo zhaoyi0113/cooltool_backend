@@ -99,6 +99,7 @@ public class CourseManageAPI {
                                  @FormParam("name") @DefaultValue("") String name,
                                  @FormParam("introduction") @DefaultValue("") String introduction,
                                  @FormParam("link") @DefaultValue("") String link,
+                                 @FormParam("keyword") @DefaultValue("") String keyword,
                                  @FormParam("category_id") @DefaultValue("-1") long categoryId,
                                  @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
                                  @FormParam("department_ids") @DefaultValue("") String strDepartmentIds,
@@ -106,7 +107,7 @@ public class CourseManageAPI {
 
     ) {
         logger.info("create course");
-        CourseBean course = courseService.createCourse(name, introduction, link, hospitalId);
+        CourseBean course = courseService.createCourse(name, introduction, link, keyword, hospitalId);
         logger.info("course is {}", course);
         if (null!=course) {
             long courseId = course.getId();
@@ -127,6 +128,7 @@ public class CourseManageAPI {
                                           @FormParam("name") @DefaultValue("") String name,
                                           @FormParam("introduction") @DefaultValue("") String introduction,
                                           @FormParam("link") @DefaultValue("") String link,
+                                          @FormParam("keyword") @DefaultValue("") String keyword,
                                           @FormParam("category_id") @DefaultValue("-1") long categoryId,
                                           @FormParam("hospital_ids") @DefaultValue("") String strHospitalIds,
                                           @FormParam("department_ids") @DefaultValue("") String strDepartmentIds,
@@ -134,7 +136,7 @@ public class CourseManageAPI {
 
     ) {
         logger.info("update course basic information");
-        CourseBean course = courseService.updateCourseBasicInfo(courseId, name, introduction, null, null, link);
+        CourseBean course = courseService.updateCourseBasicInfo(courseId, name, introduction, null, null, link, keyword);
         logger.info("course is {}", course);
         if (null!=course) {
             categoryService.setCourseRelation(courseId, categoryId);
@@ -160,7 +162,7 @@ public class CourseManageAPI {
 
     ) {
         logger.info("update course front cover");
-        CourseBean course = courseService.updateCourseBasicInfo(courseId, null, null, imageName, image, null);
+        CourseBean course = courseService.updateCourseBasicInfo(courseId, null, null, imageName, image, null, null);
         logger.info("course is {}", course);
         return Response.ok(course).build();
     }

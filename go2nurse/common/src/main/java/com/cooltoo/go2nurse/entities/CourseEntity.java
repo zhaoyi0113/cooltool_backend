@@ -21,6 +21,7 @@ public class CourseEntity {
     private long frontCover;
     private String link;
     private String uniqueId;
+    private String keyword;
 
     @Id
     @GeneratedValue
@@ -70,6 +71,11 @@ public class CourseEntity {
         return uniqueId;
     }
 
+    @Column(name = "keyword")
+    public String getKeyword() {
+        return keyword;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -106,6 +112,10 @@ public class CourseEntity {
         this.uniqueId = uniqueId;
     }
 
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -118,6 +128,7 @@ public class CourseEntity {
         msg.append(", frontCover=").append(frontCover);
         msg.append(", link=").append(link);
         msg.append(", uniqueId=").append(uniqueId);
+        msg.append(", keyword=").append(keyword);
         msg.append("]");
         return msg.toString();
     }

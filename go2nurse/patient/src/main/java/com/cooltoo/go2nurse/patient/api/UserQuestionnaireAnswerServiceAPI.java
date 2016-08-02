@@ -16,7 +16,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/6/28.
@@ -146,6 +148,17 @@ public class UserQuestionnaireAnswerServiceAPI {
     public Response newUserQuestionnaireGroupId(@Context HttpServletRequest request) {
         long newGroupId = userAnswerService.newQuestionnaireGroupId();
         return Response.ok(newGroupId).build();
+    }
+
+    @Path("/new_user_questionnaire_answer_group_id")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response newUserQuestionnaireGroupId2(@Context HttpServletRequest request) {
+        long newGroupId = userAnswerService.newQuestionnaireGroupId();
+        Map<String, Long> map = new HashMap<>();
+        map.put("questionnaire_answer_group_id", newGroupId);
+        return Response.ok(map).build();
     }
 
     //============================================================================

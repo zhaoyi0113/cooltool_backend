@@ -21,6 +21,7 @@ public class CourseBean {
     private String link;
     private ReadingStatus reading;
     private String uniqueId;
+    private String keyword;
 
     public long getId() {
         return id;
@@ -110,6 +111,14 @@ public class CourseBean {
         this.uniqueId = uniqueId;
     }
 
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
     public boolean equals(Object obj) {
         if (obj instanceof CourseBean) {
             return ((CourseBean)obj).getId() == getId();
@@ -130,6 +139,7 @@ public class CourseBean {
         msg.append(", frontCoverUrl=").append(frontCoverUrl);
         msg.append(", link=").append(link);
         msg.append(", uniqueId=").append(uniqueId);
+        msg.append(", keyword=").append(keyword);
         msg.append(", reading=").append(reading);
         msg.append("]");
         return msg.toString();

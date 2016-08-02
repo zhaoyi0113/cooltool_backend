@@ -154,13 +154,15 @@ public class CourseServiceTest extends AbstractCooltooTest {
         String introduction = "描述 0003";
         String link = "http://afdsafds.com/fdsafd9ejkfdsjakfdjisoafkjfi";
         int hospitalId = 11;
-        CourseBean bean = service.createCourse(name, introduction, link, hospitalId);
+        String keyword = "描";
+        CourseBean bean = service.createCourse(name, introduction, link, keyword, hospitalId);
         Assert.assertNotNull(bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(introduction, bean.getIntroduction());
         Assert.assertEquals(link, bean.getLink());
         Assert.assertNotNull(bean.getUniqueId());
+        Assert.assertEquals(keyword, bean.getKeyword());
     }
 
     @Test
@@ -171,14 +173,16 @@ public class CourseServiceTest extends AbstractCooltooTest {
         String imageName = "image.png";
         ByteArrayInputStream image = new ByteArrayInputStream(name.getBytes());
         String link = "http://afdsafds.com/fdsafd9ejkfdsjakfdjisoafkjfi";
+        String keyword = "发";
 
-        CourseBean bean1 = service.updateCourseBasicInfo(id, name, introduction, imageName, image, link);
+        CourseBean bean1 = service.updateCourseBasicInfo(id, name, introduction, imageName, image, link, keyword);
         Assert.assertNotNull(bean1);
         Assert.assertEquals(id, bean1.getId());
         Assert.assertEquals(name, bean1.getName());
         Assert.assertEquals(introduction, bean1.getIntroduction());
         Assert.assertTrue(bean1.getFrontCover()>0);
         Assert.assertEquals(link, bean1.getLink());
+        Assert.assertEquals(keyword, bean1.getKeyword());
         logger.info("Test case ====== image path --> {}", bean1.getFrontCoverUrl());
         Assert.assertTrue(officailStorage.fileExist(bean1.getFrontCoverUrl()));
 

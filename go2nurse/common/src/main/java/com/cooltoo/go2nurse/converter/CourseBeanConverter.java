@@ -22,6 +22,7 @@ public class CourseBeanConverter implements Converter<CourseEntity, CourseBean> 
         bean.setFrontCover(source.getFrontCover());
         bean.setLink(source.getLink());
         bean.setUniqueId(source.getUniqueId());
+        bean.setKeyword(source.getKeyword());
         return bean;
     }
 }
