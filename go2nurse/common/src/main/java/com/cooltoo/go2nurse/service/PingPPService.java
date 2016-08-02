@@ -26,13 +26,13 @@ public class PingPPService {
     @Value("${pingpp_go2nurse_rsa_private_key}")
     private String pingPPRSAPrivateKey;
 
-    public PingPPService(){
+    public PingPPService() {
     }
 
     public Charge createCharge(String orderNo, String channel, int amount, String ip, String subject, String body, String description) {
         Charge charge = null;
         Pingpp.apiKey = pingPPAPIKey;
-        Pingpp.privateKey=pingPPRSAPrivateKey;
+        Pingpp.privateKey = pingPPRSAPrivateKey;
         Map<String, Object> chargeMap = new HashMap<>();
         // 推荐使用 8-20 位，要求数字或字母，不允许其他字符
         chargeMap.put("order_no", orderNo);
@@ -72,17 +72,4 @@ public class PingPPService {
         return charge;
     }
 
-//    public static void main(String []args){
-//        String re = Charge.class.getSimpleName().toLowerCase().replace("$", " ");
-//        String baseApi="https://api.pingxx.com";
-//        String format = String.format("%s/v1/%s", Pingpp.getApiBase(), re);
-//        String format1 = String.format("%ss", format);
-//        try {
-//            URL url = new URL(format1);
-//            url.openConnection();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(format1);
-//    }
 }
