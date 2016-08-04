@@ -149,8 +149,20 @@ public class CourseHospitalRelationService {
         }
         List<HospitalEntity> existsHospital = hospitalRepository.findByIdIn(hospitalIds);
         if (VerifyUtil.isListEmpty(existsHospital)) {
-            logger.error("hospitals not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            if (!hospitalIds.contains(new Integer(-1)/*cooltoo*/)) {
+                throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            }
+            hospitalIds.clear();
+            hospitalIds.add(new Integer(-1));
+        }
+        else {
+            if (hospitalIds.contains(new Integer(-1)/*cooltoo*/)) {
+                hospitalIds.clear();
+                hospitalIds.add(new Integer(-1));
+            }
+            for (HospitalEntity hospital : existsHospital) {
+                hospitalIds.add(hospital.getId());
+            }
         }
 
         List<Integer> settingHospitalIds = new ArrayList<>();
