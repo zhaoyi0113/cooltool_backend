@@ -50,4 +50,5 @@ dependencies {
     compile("com.github.heneke.thymeleaf:thymeleaf-extras-togglz:1.0.1.RELEASE")
 
     compile("com.notnoop.apns:apns:1.0.0.Beta6")
+    compile 'com.google.guava:guava:19.0'
 }
