@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.google.common.io.CharStreams;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
@@ -10,18 +11,21 @@ import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.util.VerifyUtil;
 import com.pingplusplus.model.Charge;
-import org.glassfish.jersey.media.multipart.FormDataParam;
+import com.pingplusplus.model.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -111,17 +115,21 @@ public class UserServiceOrderAPI {
     @Path("/pingpp/webhooks")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response pingPpWebhooks(@Context HttpServletRequest request,
-                                   @FormDataParam("body") @DefaultValue("") String body
-    ) {
-        Enumeration<String> enu = request.getHeaderNames();
-        logger.info("header names === {}", enu);
-        enu = request.getAttributeNames();
-        logger.info("attribute names === {}", enu);
-        enu = request.getParameterNames();
-        logger.info("parameter names === {}", enu);
-        logger.info("body is {}", body);
+    public Response pingPpWebhooks(@Context HttpServletRequest request) {
+        logger.info("receive web hooks");
+        try {
+            ServletInputStream inputStream = request.getInputStream();
+            Reader reader = new InputStreamReader(inputStream);
+            String body = CharStreams.toString(reader);
+            logger.info("receive body "+body);
+            if(body != null) {
+                Event event = Event.GSON.fromJson(body, Event.class);
+                Charge charge = (Charge) event.getData().getObject();
+                orderService.orderChargeWebhooks(event.getId(), charge.getId(), body);
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
         return Response.ok().build();
     }
 
