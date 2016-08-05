@@ -53,9 +53,9 @@ public class PingServiceOrderTestAPI {
         String body = "order description";
         String description = "order extra descritpion";
         ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, "2016-01-01", 1, "");
+        logger.info("service order "+order);
         Charge charge = orderService.payForService(userId, order.getId(), channel, ip);
 //        Charge charge = pingPPService.createCharge(orderNo, channel, amount, ip, subject, body, description);
-
         return Response.ok(charge).build();
     }
 
