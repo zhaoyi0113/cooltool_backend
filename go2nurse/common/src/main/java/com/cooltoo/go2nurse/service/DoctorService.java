@@ -53,6 +53,10 @@ public class DoctorService {
     //=====================================================================
     //                   getting
     //=====================================================================
+    public boolean existDoctor(long doctorId) {
+        return repository.exists(doctorId);
+    }
+
     public long countDoctor(List<CommonStatus> statuses) {
 
         long count = 0;

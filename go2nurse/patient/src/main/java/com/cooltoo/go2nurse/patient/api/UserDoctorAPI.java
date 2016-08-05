@@ -3,7 +3,9 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.go2nurse.beans.DoctorBean;
+import com.cooltoo.go2nurse.beans.DoctorClinicDateBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.service.DoctorClinicDateHoursService;
 import com.cooltoo.go2nurse.service.DoctorService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,16 +28,17 @@ import java.util.List;
 public class UserDoctorAPI {
 
     @Autowired private DoctorService doctorService;
+    @Autowired private DoctorClinicDateHoursService clinicDateHoursService;
 
     @Path("/count/by_hospital_department")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public Response countByHospitalDepartment(@Context HttpServletRequest request,
-                                              @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
-                                              @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
-                                              @QueryParam("index") @DefaultValue("0") int pageIndex,
-                                              @QueryParam("number") @DefaultValue("10") int sizePerPage
+    public Response getDoctorByHospitalDepartment(@Context HttpServletRequest request,
+                                                  @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
+                                                  @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
+                                                  @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                                  @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         List<CommonStatus> statuses = new ArrayList<>();
         statuses.add(CommonStatus.ENABLED);
@@ -42,5 +46,17 @@ public class UserDoctorAPI {
         Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
         List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, pageIndex, sizePerPage);
         return Response.ok(doctors).build();
+    }
+
+    @Path("/clinic_date")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getDoctorClinicDate(@Context HttpServletRequest request,
+                                        @QueryParam("doctor_id") @DefaultValue("0") long doctorId,
+                                        @QueryParam("flag") @DefaultValue("0") int flag
+    ) {
+        List<DoctorClinicDateBean> monthClinicDates = clinicDateHoursService.getClinicDateWithHours(doctorId, flag, CommonStatus.getAll());
+        return Response.ok(monthClinicDates).build();
     }
 }
