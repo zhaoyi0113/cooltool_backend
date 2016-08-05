@@ -1,5 +1,8 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.go2nurse.beans.ServiceOrderBean;
+import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.PingPPService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.google.common.io.CharStreams;
@@ -35,15 +38,23 @@ public class PingServiceOrderTestAPI {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createOrder(@Context HttpServletRequest request, @FormParam("channel") @DefaultValue("wx") String channel) {
+    @LoginAuthentication(requireUserLogin = true)
+    public Response createOrder(@Context HttpServletRequest request,
+                                @FormParam("channel") @DefaultValue("wx") String channel,
+                                @FormParam("patientId") long patientId,
+                                @FormParam("addressId") long addressId,
+                                @FormParam("serviceItemId") long serviceItemId) {
         logger.info("get channel " + channel);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         int amount = 100;
         String orderNo = "xxxx";
         String ip = request.getRemoteHost();
         String subject = "test order";
         String body = "order description";
         String description = "order extra descritpion";
-        Charge charge = pingPPService.createCharge(orderNo, channel, amount, ip, subject, body, description);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, "2016-01-01", 1, "");
+        Charge charge = orderService.payForService(userId, order.getId(), channel, ip);
+//        Charge charge = pingPPService.createCharge(orderNo, channel, amount, ip, subject, body, description);
 
         return Response.ok(charge).build();
     }
