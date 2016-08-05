@@ -209,6 +209,17 @@ public class UserHospitalizedAPI {
                 bean.setCourses(value);
                 beans.add(bean);
             });
+            Collections.sort(beans, new Comparator<UserHospitalizedCoursesBean>() {
+                @Override public int compare(UserHospitalizedCoursesBean o1, UserHospitalizedCoursesBean o2) {
+                    if (o1==null || o1.getId()<0) {
+                        return 1;
+                    }
+                    if (o2==null || o2.getId()<0) {
+                        return -1;
+                    }
+                    return (int)(o1.getId() - o2.getId());
+                }
+            });
         }
         return Response.ok(beans).build();
     }
