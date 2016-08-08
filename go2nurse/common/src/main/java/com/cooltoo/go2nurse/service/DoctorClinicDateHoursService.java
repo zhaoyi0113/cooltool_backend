@@ -231,11 +231,11 @@ public class DoctorClinicDateHoursService {
 
         boolean changed = false;
 
-        long lClinicStart = NumberUtil.getTime(strClinicStart, NumberUtil.TIME_HH_MM);
-        long lClinicEnd = NumberUtil.getTime(strClinicEnd, NumberUtil.TIME_HH_MM);
-        if (lClinicStart>0 || lClinicEnd>0) {
-            Time startTime = (lClinicStart < 0) ? entity.getClinicHourStart() : new Time(lClinicStart);
-            Time endTime = (lClinicEnd < 0) ? entity.getClinicHourEnd() : new Time(lClinicEnd);
+        long lClinicStart = NumberUtil.getHourMin(strClinicStart);
+        long lClinicEnd = NumberUtil.getHourMin(strClinicEnd);
+        if (lClinicStart!=Long.MIN_VALUE || lClinicEnd!=Long.MIN_VALUE) {
+            Time startTime = (lClinicStart==Long.MIN_VALUE) ? entity.getClinicHourStart() : new Time(lClinicStart);
+            Time endTime = (lClinicEnd==Long.MIN_VALUE) ? entity.getClinicHourEnd() : new Time(lClinicEnd);
             for (DoctorClinicHoursEntity tmp : hoursExisted) {
                 if (tmp.getId()==bean.getId()) {
                     continue;
@@ -362,12 +362,12 @@ public class DoctorClinicDateHoursService {
         DoctorClinicHoursEntity hoursEntity;
         DoctorClinicDateEntity date = dateRepository.findOne(clinicDateId);
 
-        long clinicStartMilliSec = NumberUtil.getTime(clinicStart, NumberUtil.TIME_HH_MM);
+        long clinicStartMilliSec = NumberUtil.getHourMin(clinicStart);
         logger.info("clinicStartMilliSec={}", clinicStartMilliSec);
-        long clinicEndMilliSec = NumberUtil.getTime(clinicEnd, NumberUtil.TIME_HH_MM);
+        long clinicEndMilliSec = NumberUtil.getHourMin(clinicEnd);
         logger.info("clinicEndMilliSec={}", clinicEndMilliSec);
 
-        if (clinicStartMilliSec>0 && clinicEndMilliSec>0 && null!=date) {
+        if (clinicStartMilliSec!=Long.MIN_VALUE && clinicEndMilliSec!=Long.MIN_VALUE && null!=date) {
             Time clinicStartTime = new Time(clinicStartMilliSec);
             Time clinicEndTime = new Time(clinicEndMilliSec);
             numberCount = numberCount < 0 ? 0 : numberCount;
