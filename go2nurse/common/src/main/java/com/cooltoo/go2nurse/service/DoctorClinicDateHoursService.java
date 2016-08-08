@@ -363,9 +363,10 @@ public class DoctorClinicDateHoursService {
         DoctorClinicDateEntity date = dateRepository.findOne(clinicDateId);
 
         long clinicStartMilliSec = NumberUtil.getTime(clinicStart, NumberUtil.TIME_HH_MM);
+        logger.info("clinicStartMilliSec={}", clinicStartMilliSec);
         long clinicEndMilliSec = NumberUtil.getTime(clinicEnd, NumberUtil.TIME_HH_MM);
+        logger.info("clinicEndMilliSec={}", clinicEndMilliSec);
 
-        logger.info("clinicDate={} clinicStartMilliSec={} clinicEndMilliSec={}", date, clinicStartMilliSec, clinicEndMilliSec);
         if (clinicStartMilliSec>0 && clinicEndMilliSec>0 && null!=date) {
             Time clinicStartTime = new Time(clinicStartMilliSec);
             Time clinicEndTime = new Time(clinicEndMilliSec);
