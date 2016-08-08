@@ -364,6 +364,8 @@ public class DoctorClinicDateHoursService {
 
         long clinicStartMilliSec = NumberUtil.getTime(clinicStart, NumberUtil.TIME_HH_MM);
         long clinicEndMilliSec = NumberUtil.getTime(clinicEnd, NumberUtil.TIME_HH_MM);
+
+        logger.info("clinicDate={} clinicStartMilliSec={} clinicEndMilliSec={}", date, clinicStartMilliSec, clinicEndMilliSec);
         if (clinicStartMilliSec>0 && clinicEndMilliSec>0 && null!=date) {
             Time clinicStartTime = new Time(clinicStartMilliSec);
             Time clinicEndTime = new Time(clinicEndMilliSec);
@@ -390,6 +392,7 @@ public class DoctorClinicDateHoursService {
             hoursBean = hoursBeanConverter.convert(hoursEntity);
         }
 
+        logger.info("clinicHour={}", hoursBean);
         return hoursBean;
     }
 
