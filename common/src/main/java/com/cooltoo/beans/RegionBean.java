@@ -1,5 +1,6 @@
 package com.cooltoo.beans;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +13,8 @@ public class RegionBean {
     private String name;
     private String enName;
     private int parentId;
+
+    private List<RegionBean> subRegions = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -51,6 +54,14 @@ public class RegionBean {
 
     public void setParentId(int parentId) {
         this.parentId = parentId;
+    }
+
+    public List<RegionBean> getSubRegions() {
+        return subRegions;
+    }
+
+    public void setSubRegions(List<RegionBean> subRegions) {
+        this.subRegions = subRegions;
     }
 
     public String toString() {

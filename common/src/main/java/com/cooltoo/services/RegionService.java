@@ -40,6 +40,29 @@ public class RegionService {
         return countriesB;
     }
 
+    public List<RegionBean> getProvinceWithSubRegion() {
+        Iterable<RegionEntity> resultSet = regionRepository.findAll();
+        List<RegionBean>   provinces = new ArrayList<>();
+        for (RegionEntity tmp : resultSet) {
+            if (tmp.getParentId()!=1) {
+                continue;
+            }
+            provinces.add(beanConverter.convert(tmp));
+        }
+        for (RegionEntity tmp : resultSet) {
+            if (tmp.getParentId()==1) {
+                continue;
+            }
+            for (RegionBean province : provinces) {
+                if (tmp.getParentId() == province.getId()) {
+                    province.getSubRegions().add(beanConverter.convert(tmp));
+                    break;
+                }
+            }
+        }
+        return provinces;
+    }
+
     public List<RegionBean> getSubRegion(int parentId) {
         List<RegionEntity> subRegions  = regionRepository.findByParentId(parentId, sort);
         List<RegionBean>   subRegionsB = new ArrayList<RegionBean>();

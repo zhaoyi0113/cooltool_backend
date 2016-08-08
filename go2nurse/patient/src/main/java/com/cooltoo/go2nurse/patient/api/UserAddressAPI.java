@@ -34,6 +34,14 @@ public class UserAddressAPI {
         return Response.ok(provinces).build();
     }
 
+    @Path("/province_with_sub_region")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllProvinceWithSubRegion(@Context HttpServletRequest request) {
+        List<RegionBean> provinces = regionService.getProvinceWithSubRegion();
+        return Response.ok(provinces).build();
+    }
+
     @Path("/sub_region/{region_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
