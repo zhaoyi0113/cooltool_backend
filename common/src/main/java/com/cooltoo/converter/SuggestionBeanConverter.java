@@ -1,7 +1,7 @@
-package com.cooltoo.backend.converter;
+package com.cooltoo.converter;
 
-import com.cooltoo.backend.beans.SuggestionBean;
-import com.cooltoo.backend.entities.SuggestionEntity;
+import com.cooltoo.beans.SuggestionBean;
+import com.cooltoo.entities.SuggestionEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +14,14 @@ public class SuggestionBeanConverter implements Converter<SuggestionEntity, Sugg
     public SuggestionBean convert(SuggestionEntity source) {
         SuggestionBean bean = new SuggestionBean();
         bean.setId(source.getId());
-        bean.setUserId(source.getUserId());
-        bean.setSuggestion(source.getSuggestion());
         bean.setTimeCreated(source.getTimeCreated());
         bean.setStatus(source.getStatus());
+        bean.setSuggestion(source.getSuggestion());
+        bean.setUserId(source.getUserId());
+        bean.setUserType(source.getUserType());
+        bean.setUserName(source.getUserName());
+        bean.setPlatform(source.getPlatform());
+        bean.setVersion(source.getVersion());
         return bean;
     }
 }

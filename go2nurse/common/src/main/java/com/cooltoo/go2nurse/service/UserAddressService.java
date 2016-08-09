@@ -152,17 +152,38 @@ public class UserAddressService {
             entity.setStatus(status);
             changed = true;
         }
+        boolean settingDefault = false;
         if (null!=isDefault && !isDefault.equals(entity.getIsDefault())) {
             entity.setIsDefault(isDefault);
             changed = true;
+            settingDefault = true;
         }
 
         if (changed) {
             entity = repository.save(entity);
+            if (settingDefault) {
+                setDefault(entity.getUserId(), entity.getId(), isDefault);
+            }
         }
         UserAddressBean bean = beanConverter.convert(entity);
         fillOtherProperties(bean);
         return bean;
+    }
+
+    @Transactional
+    private void setDefault(long userId, long addressId, YesNoEnum isDefault) {
+        logger.info("update user={} 's addressId={} by isDefault={}", userId, addressId, isDefault);
+        if (!YesNoEnum.YES.equals(isDefault)) {
+            logger.info("not set the default address");
+            return;
+        }
+        List<UserAddressEntity> addresses = repository.findByUserId(userId, sort);
+
+        for (UserAddressEntity tmp : addresses) {
+            tmp.setIsDefault(tmp.getId()!=addressId ? YesNoEnum.NO : YesNoEnum.YES);
+        }
+
+        repository.save(addresses);
     }
 
     //=======================================================
@@ -170,7 +191,7 @@ public class UserAddressService {
     //=======================================================
 
     @Transactional
-    public UserAddressBean createAddress(long userId, int provinceId, int cityId, int grade, String address) {
+    public UserAddressBean createAddress(long userId, int provinceId, int cityId, int grade, String address, String isDefault) {
         logger.info("add address to user={} with provinceId={} cityId={} grade={] address={}",
                 userId, provinceId, cityId, grade, address);
         if (!checkRegion(provinceId, cityId)) {
@@ -182,6 +203,8 @@ public class UserAddressService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         grade = grade<0 ? 0 : grade;
+        YesNoEnum defaultAddress = YesNoEnum.parseString(isDefault);
+        defaultAddress = null==defaultAddress ? YesNoEnum.NO : YesNoEnum.YES;
 
         UserAddressEntity entity = new UserAddressEntity();
         entity.setUserId(userId);
@@ -189,7 +212,7 @@ public class UserAddressService {
         entity.setCityId(cityId);
         entity.setAddress(address.trim());
         entity.setGrade(grade);
-        entity.setIsDefault(YesNoEnum.NO);
+        entity.setIsDefault(defaultAddress);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
 

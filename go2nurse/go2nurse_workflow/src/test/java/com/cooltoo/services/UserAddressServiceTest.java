@@ -5,7 +5,6 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserAddressBean;
 import com.cooltoo.go2nurse.service.UserAddressService;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -35,13 +34,15 @@ public class UserAddressServiceTest extends AbstractCooltooTest {
         int cityId = 3;
         String address = "address test";
         int grade = 8;
-        UserAddressBean bean = service.createAddress(userId, provinceId, cityId, grade, address);
+        String isDefault = "yes";
+        UserAddressBean bean = service.createAddress(userId, provinceId, cityId, grade, address, isDefault);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(userId, bean.getUserId());
         Assert.assertEquals(provinceId, bean.getProvinceId());
         Assert.assertEquals(cityId, bean.getCityId());
         Assert.assertEquals(address, bean.getAddress());
         Assert.assertEquals(grade, bean.getGrade());
+        Assert.assertEquals(isDefault, bean.getIsDefault().name().toLowerCase());
     }
 
     @Test

@@ -1,6 +1,8 @@
-package com.cooltoo.backend.beans;
+package com.cooltoo.beans;
 
+import com.cooltoo.constants.PlatformType;
 import com.cooltoo.constants.ReadingStatus;
+import com.cooltoo.constants.UserType;
 
 import java.util.Date;
 
@@ -14,6 +16,9 @@ public class SuggestionBean {
     private String suggestion;
     private Date   timeCreated;
     private ReadingStatus status;
+    private UserType userType;
+    private PlatformType platform;
+    private String version;
 
     public long getId() {
         return this.id;
@@ -63,13 +68,42 @@ public class SuggestionBean {
         this.status = status;
     }
 
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
+    public PlatformType getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(PlatformType platform) {
+        this.platform = platform;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
-        msg.append(" id=").append(id).append(", ");
-        msg.append(" userId=").append(userId).append(", ");
-        msg.append(" suggestion=").append(suggestion).append(", ");
-        msg.append(" timeCreated=").append(timeCreated).append("] ");
+        msg.append(" id=").append(id);
+        msg.append(", userId=").append(userId);
+        msg.append(", userType=").append(userType);
+        msg.append(", platform=").append(platform);
+        msg.append(", version=").append(version);
+        msg.append(", suggestion=").append(suggestion);
+        msg.append(", status").append(status);
+        msg.append(", timeCreated=").append(timeCreated);
+        msg.append("] ");
         return msg.toString();
     }
 }

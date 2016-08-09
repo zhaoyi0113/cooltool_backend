@@ -342,6 +342,7 @@ public class UserService {
             modifyDenyUserIdsCache(entity);
         }
         UserBean bean = beanConverter.convert(entity);
+        bean.setProfilePhotoUrl(userStorage.getFileURL(bean.getProfilePhoto()));
         logger.info("after updating user is {}", bean);
         return bean;
     }
@@ -409,6 +410,7 @@ public class UserService {
             user = repository.save(user);
         }
         UserBean userBean = beanConverter.convert(user);
+        userBean.setProfilePhotoUrl(userStorage.getFileURL(userBean.getProfilePhoto()));
         return userBean;
     }
 
@@ -441,6 +443,7 @@ public class UserService {
             user = repository.save(user);
         }
         UserBean userBean = beanConverter.convert(user);
+        userBean.setProfilePhotoUrl(userStorage.getFileURL(userBean.getProfilePhoto()));
         return userBean;
     }
 
@@ -467,6 +470,7 @@ public class UserService {
         if (changed) {
             user = repository.save(user);
             UserBean userBean = beanConverter.convert(user);
+            userBean.setProfilePhotoUrl(userStorage.getFileURL(userBean.getProfilePhoto()));
             return userBean;
         }
         throw new BadRequestException(ErrorCode.DATA_ERROR);

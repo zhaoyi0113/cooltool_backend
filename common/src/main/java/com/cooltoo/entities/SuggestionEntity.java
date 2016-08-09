@@ -1,6 +1,8 @@
-package com.cooltoo.backend.entities;
+package com.cooltoo.entities;
 
+import com.cooltoo.constants.PlatformType;
 import com.cooltoo.constants.ReadingStatus;
+import com.cooltoo.constants.UserType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,6 +18,10 @@ public class SuggestionEntity {
     private String suggestion;
     private Date   timeCreated;
     private ReadingStatus status;
+    private UserType userType;
+    private String userName;
+    private PlatformType platform;
+    private String version;
 
     @Id
     @GeneratedValue
@@ -65,14 +71,56 @@ public class SuggestionEntity {
         this.status = status;
     }
 
+    @Column(name = "user_type")
+    @Enumerated
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
+    @Column(name = "user_name")
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @Column(name = "platform")
+    @Enumerated
+    public PlatformType getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(PlatformType platform) {
+        this.platform = platform;
+    }
+
+    @Column(name = "version")
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
-        msg.append(" id=").append(id).append(", ");
-        msg.append(" userId=").append(userId).append(", ");
-        msg.append(" suggestion=").append(suggestion).append(", ");
-        msg.append(" status").append(status).append(", ");
-        msg.append(" timeCreated=").append(timeCreated).append("] ");
+        msg.append(" id=").append(id);
+        msg.append(", userId=").append(userId);
+        msg.append(", userType=").append(userType);
+        msg.append(", platform=").append(platform);
+        msg.append(", version=").append(version);
+        msg.append(", suggestion=").append(suggestion);
+        msg.append(", status").append(status);
+        msg.append(", timeCreated=").append(timeCreated);
+        msg.append("] ");
         return msg.toString();
     }
 }

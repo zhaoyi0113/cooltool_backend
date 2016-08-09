@@ -68,10 +68,11 @@ public class UserAddressAPI {
                                @FormParam("province_id") @DefaultValue("-1") int provinceId,
                                @FormParam("city_id") @DefaultValue("-1") int cityId,
                                @FormParam("address") @DefaultValue("") String address,
+                               @FormParam("is_default") @DefaultValue("") String isDefault,
                                @FormParam("grade") @DefaultValue("-1") int grade
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserAddressBean userAddress = userAddressService.createAddress(userId, provinceId, cityId, grade, address);
+        UserAddressBean userAddress = userAddressService.createAddress(userId, provinceId, cityId, grade, address, isDefault);
         return Response.ok(userAddress).build();
     }
 

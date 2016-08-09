@@ -40,6 +40,7 @@ public class UserServiceOrderAPI {
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
 
     @Path("/category/top")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getServiceCategory(@Context HttpServletRequest request) {
@@ -50,6 +51,7 @@ public class UserServiceOrderAPI {
     }
 
     @Path("/category/sub_category")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getSubServiceCategory(@Context HttpServletRequest request,
@@ -62,6 +64,7 @@ public class UserServiceOrderAPI {
     }
 
     @Path("/category/item")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getServiceItemByCategoryId(@Context HttpServletRequest request,
