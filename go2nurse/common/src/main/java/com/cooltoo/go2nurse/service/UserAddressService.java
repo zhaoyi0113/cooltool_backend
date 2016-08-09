@@ -204,7 +204,7 @@ public class UserAddressService {
         }
         grade = grade<0 ? 0 : grade;
         YesNoEnum defaultAddress = YesNoEnum.parseString(isDefault);
-        defaultAddress = null==defaultAddress ? YesNoEnum.NO : YesNoEnum.YES;
+        defaultAddress = null==defaultAddress ? YesNoEnum.NO : defaultAddress;
 
         UserAddressEntity entity = new UserAddressEntity();
         entity.setUserId(userId);
@@ -217,6 +217,11 @@ public class UserAddressService {
         entity.setStatus(CommonStatus.ENABLED);
 
         entity = repository.save(entity);
+
+        if (YesNoEnum.YES.equals(defaultAddress)) {
+            setDefault(entity.getUserId(), entity.getId(), entity.getIsDefault());
+        }
+
         UserAddressBean bean = beanConverter.convert(entity);
         fillOtherProperties(bean);
         return bean;
