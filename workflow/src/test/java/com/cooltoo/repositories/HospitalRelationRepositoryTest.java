@@ -1,7 +1,7 @@
 package com.cooltoo.repositories;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
+import com.cooltoo.repository.NurseHospitalRelationRepository;
 import com.cooltoo.entities.HospitalEntity;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;

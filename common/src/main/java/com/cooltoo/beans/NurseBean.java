@@ -18,6 +18,7 @@ public class NurseBean {
     public static final String FRIENDS_COUNT = "friend_count";
     public static final String SPEAK_COUNT = "speak_count";
     public static final String ABILITY_COUNT = "skill_count";
+    public static final String INFO_EXTENSION = "info_extension";
 
     public static String getSkillNomination() {
         return SKILL_NOMINATION;

@@ -1,6 +1,6 @@
-package com.cooltoo.backend.repository;
+package com.cooltoo.repository;
 
-import com.cooltoo.backend.entities.NurseHospitalRelationEntity;
+import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.entities.HospitalEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

@@ -1,12 +1,12 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.converter.NurseHospitalRelationBeanConverter;
-import com.cooltoo.backend.converter.NurseHospitalRelationEntityConverter;
-import com.cooltoo.backend.entities.NurseHospitalRelationEntity;
-import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
+import com.cooltoo.converter.NurseHospitalRelationBeanConverter;
+import com.cooltoo.converter.NurseHospitalRelationEntityConverter;
+import com.cooltoo.entities.NurseHospitalRelationEntity;
+import com.cooltoo.repository.NurseHospitalRelationRepository;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.backend.beans.NurseHospitalRelationBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;

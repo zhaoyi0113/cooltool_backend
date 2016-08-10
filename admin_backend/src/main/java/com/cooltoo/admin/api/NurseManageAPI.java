@@ -1,20 +1,30 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
-import com.cooltoo.beans.NurseBean;
-import com.cooltoo.beans.NurseRelationshipBean;
+import com.cooltoo.backend.services.NurseHospitalRelationService;
 import com.cooltoo.backend.services.NurseRelationshipService;
 import com.cooltoo.backend.services.NurseService;
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseRelationshipBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.converter.NurseBeanConverter;
+import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.services.CommonNurseService;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -25,6 +35,9 @@ public class NurseManageAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseManageAPI.class);
 
+    @Autowired private NurseHospitalRelationService hospitalRelationService;
+    @Autowired private CommonNurseService commonNurseService;
+    @Autowired private NurseBeanConverter nurseBeanConverter;
     @Autowired private NurseService nurseService;
     @Autowired private NurseRelationshipService nurseRelationshipService;
 
@@ -97,6 +110,94 @@ public class NurseManageAPI {
         List<NurseBean> nurses = nurseService.updateAuthority(nurseIds, authority);
         logger.info("user {} update nurse {} 's authority property to {}, count={}", userId, nurseIds, authority, nurses.size());
         return Response.ok(nurses).build();
+    }
+
+    //==================================================================
+    //                           创建编辑
+    //==================================================================
+    @Path("/create_nurse")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response createNurse(@Context HttpServletRequest request,
+                                @FormParam("name") @DefaultValue("") String name,
+                                @FormParam("age") @DefaultValue("0") int age,
+                                @FormParam("gender") @DefaultValue("SECRET") String strGender,
+                                @FormParam("mobile") @DefaultValue("") String mobile,
+                                @FormParam("password") @DefaultValue("") String password,
+                                @FormParam("identification") @DefaultValue("") String identification,
+                                @FormParam("real_name") @DefaultValue("") String realName,
+                                @FormParam("short_name") @DefaultValue("") String shortNote,
+                                @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                @FormParam("department_id") @DefaultValue("0") int departmentId,
+                                @FormParam("can_answer_nursing_question") @DefaultValue("YES") String strCanAnswerNursingQuestion
+    ) {
+        GenderType gender = GenderType.parseString(strGender);
+        NurseEntity nurse = commonNurseService.registerNurse(name, age, gender, mobile, password, identification, realName, shortNote);
+        if (hospitalId>0 && departmentId>0) {
+            hospitalRelationService.newOne(nurse.getId(), hospitalId, departmentId);
+        }
+        return Response.ok(nurse.getId()).build();
+    }
+
+    @Path("/edit_nurse")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editNurseBasicInfo(@Context HttpServletRequest request,
+                                       @FormParam("nurse_id") @DefaultValue("0") long nurseId,
+                                       @FormParam("name") @DefaultValue("") String name,
+                                       @FormParam("age") @DefaultValue("-1") int age,
+                                       @FormParam("gender") @DefaultValue("") String strGender,
+                                       @FormParam("mobile") @DefaultValue("") String mobile,
+                                       @FormParam("password") @DefaultValue("") String password,
+                                       @FormParam("identification") @DefaultValue("") String identification,
+                                       @FormParam("real_name") @DefaultValue("") String realName,
+                                       @FormParam("short_name") @DefaultValue("") String shortNote,
+                                       @FormParam("authority") @DefaultValue("") String strAuthority,
+                                       @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                       @FormParam("department_id") @DefaultValue("0") int departmentId,
+                                       @FormParam("can_answer_nursing_question") @DefaultValue("") String strCanAnswerNursingQuestion
+    ) {
+        GenderType gender = GenderType.parseString(strGender);
+        UserAuthority authority = UserAuthority.parseString(strAuthority);
+        commonNurseService.updateBasicInfo(nurseId, name, age, gender, mobile, password, identification, realName, shortNote, authority);
+        if (hospitalId>0 && departmentId>0) {
+            hospitalRelationService.newOne(nurseId, hospitalId, departmentId);
+        }
+        NurseBean nurseBean = nurseService.getNurse(nurseId);
+        return Response.ok(nurseBean).build();
+    }
+
+
+    @Path("/edit_nurse/add_head_photo")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editNurseHeadPhoto(@Context HttpServletRequest request,
+                                       @FormDataParam("nurse_id") @DefaultValue("0") long nurseId,
+                                       @FormDataParam("image_name") String imageName,
+                                       @FormDataParam("image") InputStream image,
+                                       @FormDataParam("image") FormDataContentDisposition disposition
+    ) {
+        String path = nurseService.updateHeadPhoto(nurseId, imageName, image);
+        logger.info("upload successfully");
+        return Response.ok(path).build();
+    }
+
+    @Path("/edit_nurse/add_background_image")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editNurseBackgroundImage(@Context HttpServletRequest request,
+                                             @FormDataParam("nurse_id") @DefaultValue("0") long nurseId,
+                                             @FormDataParam("image_name") String imageName,
+                                             @FormDataParam("image") InputStream image,
+                                             @FormDataParam("image") FormDataContentDisposition disposition
+    ) {
+        String path = nurseService.updateBackgroundImage(nurseId, imageName, image);
+        logger.info("return background path "+path);
+        return Response.ok(path).build();
     }
 
     //============================================================================================

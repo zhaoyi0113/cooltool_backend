@@ -144,6 +144,7 @@ public class NurseEntity {
         msg.append("integral=").append(integral).append(" , ");
         msg.append("realName=").append(realName).append(" , ");
         msg.append("identification=").append(identification).append(" , ");
+        msg.append("authority=").append(authority).append(" , ");
         msg.append("shortNote=").append(shortNote);
         msg.append(" ]");
         return msg.toString();

@@ -4,7 +4,7 @@ import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.HospitalService;
 import com.cooltoo.backend.services.NurseHospitalRelationService;
 import com.cooltoo.beans.HospitalBean;
-import com.cooltoo.backend.beans.NurseHospitalRelationBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 

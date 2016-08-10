@@ -1,26 +1,27 @@
-package com.cooltoo.backend.beans;
+package com.cooltoo.entities;
 
-import com.cooltoo.beans.HospitalBean;
-import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by lg380357 on 2016/3/5.
  */
-public class NurseHospitalRelationBean {
+@Entity
+@Table(name = "nursego_nurse_hospital_relation")
+public class NurseHospitalRelationEntity {
 
     private long id;
     private long nurseId;
     private int hospitalId;
     private int departmentId;
-    private HospitalBean hospital;
-    private HospitalDepartmentBean parentDepart;
-    private HospitalDepartmentBean department;
     private Date time;
     private CommonStatus status;
 
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
     public long getId() {
         return id;
     }
@@ -29,6 +30,7 @@ public class NurseHospitalRelationBean {
         this.id = id;
     }
 
+    @Column(name = "nurse_id")
     public long getNurseId() {
         return nurseId;
     }
@@ -37,6 +39,7 @@ public class NurseHospitalRelationBean {
         this.nurseId = nurseId;
     }
 
+    @Column(name = "hospital_id")
     public int getHospitalId() {
         return hospitalId;
     }
@@ -45,6 +48,7 @@ public class NurseHospitalRelationBean {
         this.hospitalId = hospitalId;
     }
 
+    @Column(name = "department_id")
     public int getDepartmentId() {
         return departmentId;
     }
@@ -53,30 +57,7 @@ public class NurseHospitalRelationBean {
         this.departmentId = departmentId;
     }
 
-    public HospitalBean getHospital() {
-        return this.hospital;
-    }
-
-    public void setHospital(HospitalBean hospital) {
-        this.hospital = hospital;
-    }
-
-    public HospitalDepartmentBean getDepartment() {
-        return this.department;
-    }
-
-    public void setDepartment(HospitalDepartmentBean department) {
-        this.department = department;
-    }
-
-    public HospitalDepartmentBean getParentDepart() {
-        return this.parentDepart;
-    }
-
-    public void setParentDepart(HospitalDepartmentBean parentDepart) {
-        this.parentDepart = parentDepart;
-    }
-
+    @Column(name = "time_created")
     public Date getTime() {
         return time;
     }
@@ -85,6 +66,8 @@ public class NurseHospitalRelationBean {
         this.time = time;
     }
 
+    @Column(name = "status")
+    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }
