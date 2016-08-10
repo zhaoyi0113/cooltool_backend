@@ -1,6 +1,5 @@
 package com.cooltoo.backend.api;
 
-import com.cooltoo.backend.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakTopicBean;
@@ -18,7 +17,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
 /**

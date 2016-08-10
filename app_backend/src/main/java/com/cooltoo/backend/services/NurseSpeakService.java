@@ -5,6 +5,7 @@ import com.cooltoo.backend.converter.NurseSpeakConverter;
 import com.cooltoo.backend.converter.social_ability.SpeakAbilityTypeConverter;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.OfficialConfigBean;
 import com.cooltoo.beans.SensitiveWordBean;
 import com.cooltoo.beans.SpecificSocialAbility;

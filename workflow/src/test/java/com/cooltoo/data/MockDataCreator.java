@@ -1,9 +1,9 @@
 package com.cooltoo.data;
 
 import com.cooltoo.Application;
-import com.cooltoo.backend.entities.NurseEntity;
+import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.backend.entities.TokenAccessEntity;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.backend.repository.TokenAccessRepository;
 import com.cooltoo.backend.services.NurseFriendsService;
 import com.cooltoo.backend.services.NurseService;

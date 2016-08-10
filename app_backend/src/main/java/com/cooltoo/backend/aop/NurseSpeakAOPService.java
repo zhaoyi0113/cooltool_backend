@@ -1,6 +1,6 @@
 package com.cooltoo.backend.aop;
 
-import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakCommentBean;
 import com.cooltoo.backend.beans.NurseSpeakThumbsUpBean;

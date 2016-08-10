@@ -2,10 +2,6 @@ package com.cooltoo.backend.converter;
 
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
-import com.cooltoo.backend.entities.NurseEntity;
-import com.cooltoo.backend.repository.NurseRepository;
-import com.cooltoo.util.VerifyUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
 package com.cooltoo.backend.api;
 
-import com.cooltoo.backend.beans.NurseRelationshipBean;
+import com.cooltoo.beans.NurseRelationshipBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseRelationshipService;
 import com.cooltoo.constants.CommonStatus;

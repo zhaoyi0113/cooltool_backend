@@ -3,7 +3,7 @@ package com.cooltoo.backend.services;
 import com.cooltoo.backend.beans.NurseSpeakTopicRelationBean;
 import com.cooltoo.backend.converter.NurseSpeakTopicRelationBeanConverter;
 import com.cooltoo.backend.entities.NurseSpeakTopicRelationEntity;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
 import com.cooltoo.backend.repository.NurseSpeakTopicRelationRepository;
 import com.cooltoo.backend.repository.NurseSpeakTopicRepository;

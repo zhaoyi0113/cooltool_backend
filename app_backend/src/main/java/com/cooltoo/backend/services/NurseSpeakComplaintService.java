@@ -1,6 +1,6 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseSpeakBean;
 import com.cooltoo.backend.beans.NurseSpeakComplaintBean;
 import com.cooltoo.backend.converter.NurseSpeakComplaintBeanConverter;

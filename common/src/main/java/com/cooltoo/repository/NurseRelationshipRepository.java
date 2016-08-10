@@ -1,6 +1,6 @@
-package com.cooltoo.backend.repository;
+package com.cooltoo.repository;
 
-import com.cooltoo.backend.entities.NurseRelationshipEntity;
+import com.cooltoo.entities.NurseRelationshipEntity;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.RelationshipType;
 import org.springframework.data.domain.Page;

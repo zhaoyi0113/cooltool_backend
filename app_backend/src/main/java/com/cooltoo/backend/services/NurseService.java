@@ -1,15 +1,15 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.beans.SocialAbilitiesBean;
-import com.cooltoo.backend.converter.NurseBeanConverter;
-import com.cooltoo.backend.converter.NurseEntityConverter;
+import com.cooltoo.converter.NurseBeanConverter;
+import com.cooltoo.converter.NurseEntityConverter;
 import com.cooltoo.backend.repository.NurseHospitalRelationRepository;
 import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.leancloud.LeanCloudService;
-import com.cooltoo.backend.entities.NurseEntity;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.backend.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;

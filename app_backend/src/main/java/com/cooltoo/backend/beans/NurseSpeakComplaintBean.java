@@ -1,5 +1,6 @@
 package com.cooltoo.backend.beans;
 
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.ReadingStatus;
 import java.util.Date;
 

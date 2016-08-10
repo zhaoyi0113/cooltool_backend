@@ -1,6 +1,6 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseFriendsBean;
 import com.cooltoo.backend.converter.NurseFriendBeanConverter;
 import com.cooltoo.backend.entities.NurseFriendsEntity;

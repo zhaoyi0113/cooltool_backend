@@ -8,8 +8,8 @@ import com.cooltoo.backend.converter.social_ability.ThumbsUpAbilityTypeConverter
 import com.cooltoo.backend.entities.NurseIntegrationEntity;
 import com.cooltoo.backend.repository.NurseIntegrationRepository;
 import com.cooltoo.backend.repository.NurseSpeakCommentRepository;
-import com.cooltoo.backend.repository.NurseSpeakRepository;
 import com.cooltoo.backend.repository.NurseSpeakThumbsUpRepository;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.SocialAbilityType;

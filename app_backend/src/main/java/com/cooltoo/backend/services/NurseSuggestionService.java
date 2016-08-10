@@ -1,7 +1,7 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.entities.NurseEntity;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.beans.SuggestionBean;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;

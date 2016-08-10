@@ -1,7 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;

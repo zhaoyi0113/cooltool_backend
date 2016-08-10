@@ -1,7 +1,7 @@
 package com.cooltoo.backend.filter;
 
-import com.cooltoo.backend.entities.NurseEntity;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.HeaderKeys;
 import com.cooltoo.backend.entities.TokenAccessEntity;

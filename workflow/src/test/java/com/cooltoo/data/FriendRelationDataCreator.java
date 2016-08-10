@@ -1,8 +1,8 @@
 package com.cooltoo.data;
 
 import com.cooltoo.Application;
-import com.cooltoo.backend.entities.NurseEntity;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.backend.services.NurseFriendsService;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import org.junit.Ignore;

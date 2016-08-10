@@ -1,7 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.NurseRelationshipBean;
+import com.cooltoo.beans.NurseRelationshipBean;
 import com.cooltoo.backend.services.NurseRelationshipService;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.RelationshipType;

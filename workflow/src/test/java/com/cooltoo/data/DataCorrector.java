@@ -3,7 +3,7 @@ package com.cooltoo.data;
 import com.cooltoo.Application;
 import com.cooltoo.backend.entities.NurseFriendsEntity;
 import com.cooltoo.backend.repository.NurseFriendsRepository;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.repository.NurseRepository;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import org.junit.Ignore;
 import org.junit.Test;

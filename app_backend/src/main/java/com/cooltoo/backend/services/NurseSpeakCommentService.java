@@ -2,10 +2,10 @@ package com.cooltoo.backend.services;
 
 import com.cooltoo.backend.beans.NurseSpeakCommentBean;
 import com.cooltoo.backend.converter.NurseSpeakCommentBeanConverter;
-import com.cooltoo.backend.entities.NurseEntity;
+import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.backend.entities.NurseSpeakCommentEntity;
 import com.cooltoo.backend.entities.NurseSpeakEntity;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseSpeakCommentRepository;
 import com.cooltoo.backend.repository.NurseSpeakRepository;
 import com.cooltoo.constants.CommonStatus;

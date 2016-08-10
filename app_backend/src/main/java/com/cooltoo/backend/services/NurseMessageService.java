@@ -1,15 +1,17 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseMessageBean;
-import com.cooltoo.backend.converter.NurseBeanConverter;
+import com.cooltoo.converter.NurseBeanConverter;
 import com.cooltoo.backend.converter.NurseMessageBeanConverter;
 import com.cooltoo.backend.converter.social_ability.SpeakAbilityTypeConverter;
 import com.cooltoo.backend.entities.*;
 import com.cooltoo.backend.repository.*;
 import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.constants.*;
+import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;

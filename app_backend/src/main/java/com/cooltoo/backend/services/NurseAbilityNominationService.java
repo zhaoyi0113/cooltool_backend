@@ -3,7 +3,7 @@ package com.cooltoo.backend.services;
 import com.cooltoo.backend.beans.NurseAbilityNominationBean;
 import com.cooltoo.backend.converter.NurseAbilityNominationBeanConverter;
 import com.cooltoo.backend.entities.NurseAbilityNominationEntity;
-import com.cooltoo.backend.repository.NurseRepository;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.backend.repository.NurseAbilityNominationRepository;
 import com.cooltoo.constants.SocialAbilityType;
 import com.cooltoo.exception.BadRequestException;

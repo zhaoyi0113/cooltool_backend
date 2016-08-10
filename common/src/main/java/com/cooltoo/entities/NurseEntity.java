@@ -1,8 +1,7 @@
-package com.cooltoo.backend.entities;
+package com.cooltoo.entities;
 
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;
-import springfox.petstore.repository.UserRepository;
 
 import javax.persistence.*;
 
