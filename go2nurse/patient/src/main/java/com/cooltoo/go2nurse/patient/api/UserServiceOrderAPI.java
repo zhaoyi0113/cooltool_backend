@@ -131,7 +131,7 @@ public class UserServiceOrderAPI {
             if(body != null) {
                 Event event = Event.GSON.fromJson(body, Event.class);
                 Charge charge = (Charge) event.getData().getObject();
-                orderService.orderChargeWebhooks(event.getId(), charge.getId(), body);
+                orderService.orderChargeWebhooks(charge.getId(), event.getId(), body);
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
