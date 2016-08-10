@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.util.NetworkUtil;
 import com.google.common.io.CharStreams;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
@@ -110,7 +111,9 @@ public class UserServiceOrderAPI {
                                 @FormParam("channel") @DefaultValue("") String channel
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        String remoteIP = request.getRemoteAddr();
+        String remoteIP;
+        try { remoteIP = NetworkUtil.getIpAddress(request); }
+        catch (IOException ex) { remoteIP = "127.0.0.1"; }
         Charge charge = orderService.payForService(userId, orderId, channel, remoteIP);
         return Response.ok(charge).build();
     }

@@ -204,7 +204,7 @@ public class ServiceOrderService {
 
         ServiceOrderBean order = beanConverter.convert(entity);
         String orderNo = orderPingPPService.getOrderNo();
-        Charge charge = pingPPService.createCharge(orderNo, channel, order.getPaymentAmountCent(), clientIP,
+        Charge charge = pingPPService.createCharge(orderNo, channel, order.getTotalConsumptionCent(), clientIP,
                 order.getServiceItem().getName(), order.getServiceItem().getDescription(), order.getLeaveAMessage());
         if (null==charge) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
