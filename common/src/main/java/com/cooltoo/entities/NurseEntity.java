@@ -4,6 +4,8 @@ import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by yzzhao on 3/1/16.
@@ -26,6 +28,7 @@ public class NurseEntity {
     private String identification;
     private String shortNote;
     private UserAuthority authority;
+    private List<NurseExtensionEntity> extensions = new ArrayList<>();
 
     @Id
     @GeneratedValue
@@ -128,6 +131,17 @@ public class NurseEntity {
 
     public void setAuthority(UserAuthority authority) {
         this.authority = authority;
+    }
+
+    // 映射一对多的关联关系
+    @JoinColumn(name="nurse_id", insertable=false, updatable=false)// cooltoo_nurse_info_extension 关联 cooltoo_nurse 表的字段
+    @OneToMany
+    public List<NurseExtensionEntity> getExtensions() {
+        return extensions;
+    }
+
+    public void setExtensions(List<NurseExtensionEntity> extensions) {
+        this.extensions = extensions;
     }
 
     public String toString() {

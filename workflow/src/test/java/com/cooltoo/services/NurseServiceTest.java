@@ -52,13 +52,13 @@ public class NurseServiceTest extends AbstractCooltooTest {
         bean.setPassword("password");
         long id = service.registerNurse(bean);
         Assert.assertTrue(id>0);
-        List<NurseBean> all = service.getAllByAuthorityAndFuzzyName("", "", 0, 100);
+        List<NurseBean> all = service.getAllByAuthorityAndFuzzyName("", "", null, 0, 100);
         Assert.assertTrue(all.size()>0);
     }
 
     @Test
     public void testGetAll(){
-        List<NurseBean> all = service.getAllByAuthorityAndFuzzyName("", "", 0, 100);
+        List<NurseBean> all = service.getAllByAuthorityAndFuzzyName("", "", null, 0, 100);
         Assert.assertEquals(17, all.size());
     }
 
@@ -175,37 +175,37 @@ public class NurseServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testCountNurse() {
-        long count = service.countByAuthorityAndFuzzyName("", "");
+        long count = service.countByAuthorityAndFuzzyName("", "", null);
         Assert.assertEquals(17, count);
 
-        count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "");
+        count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "", null);
         Assert.assertEquals(12, count);
-        count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "");
+        count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "", null);
         Assert.assertEquals(5, count);
 
-        count = service.countByAuthorityAndFuzzyName("", "护士1");
+        count = service.countByAuthorityAndFuzzyName("", "护士1", null);
         Assert.assertEquals(9, count);
-        count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "护士1");
+        count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "护士1", null);
         Assert.assertEquals(4, count);
-        count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "护士1");
+        count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "护士1", null);
         Assert.assertEquals(5, count);
     }
 
     @Test
     public void testGetNurseByAuthority() {
-        List<NurseBean> count = service.getAllByAuthorityAndFuzzyName("", "", 0, 30);
+        List<NurseBean> count = service.getAllByAuthorityAndFuzzyName("", "", null, 0, 30);
         Assert.assertEquals(17, count.size());
 
-        count = service.getAllByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "", 0, 30);
+        count = service.getAllByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "", null, 0, 30);
         Assert.assertEquals(12, count.size());
-        count = service.getAllByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "", 0, 30);
+        count = service.getAllByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "", null, 0, 30);
         Assert.assertEquals(5, count.size());
 
-        count = service.getAllByAuthorityAndFuzzyName("", "name1", 0, 30);
+        count = service.getAllByAuthorityAndFuzzyName("", "name1", null, 0, 30);
         Assert.assertEquals(9, count.size());
-        count = service.getAllByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "name1", 0, 30);
+        count = service.getAllByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "name1", null, 0, 30);
         Assert.assertEquals(4, count.size());
-        count = service.getAllByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "name1", 0, 30);
+        count = service.getAllByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "name1", null, 0, 30);
         Assert.assertEquals(5, count.size());
     }
 

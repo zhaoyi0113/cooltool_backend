@@ -1,5 +1,6 @@
 package com.cooltoo.repository;
 
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.constants.UserAuthority;
 import org.springframework.data.domain.Page;
@@ -35,12 +36,14 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     //==================================================================
     //              for administrator user
     //==================================================================
-    @Query("FROM NurseEntity n" +
+    @Query("SELECT n FROM NurseEntity n LEFT JOIN n.extensions ne" +
             " WHERE (n.authority=?1  OR ?1 IS NULL)" +
-            " AND   (n.name LIKE %?2 OR ?2 IS NULL)")
-    Page<NurseEntity> findByAuthority(UserAuthority authority, String fuzzyName, Pageable page);
-    @Query("SELECT count(n.id) FROM NurseEntity n" +
+            " AND   (n.name LIKE %?2 OR ?2 IS NULL)" +
+            " AND   (ne.answerNursingQuestion=?3 OR ?3 IS NULL)")
+    Page<NurseEntity> findByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion, Pageable page);
+    @Query("SELECT count(n.id) FROM NurseEntity n LEFT JOIN n.extensions ne" +
             " WHERE (n.authority=?1  OR ?1 IS NULL)" +
-            " AND   (n.name LIKE %?2 OR ?2 IS NULL)")
-    long countByAuthority(UserAuthority authority, String fuzzyName);
+            " AND   (n.name LIKE %?2 OR ?2 IS NULL)" +
+            " AND   (ne.answerNursingQuestion=?3 OR ?3 IS NULL)")
+    long countByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion);
 }

@@ -1,20 +1,23 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.beans.NurseBean;
 import com.cooltoo.backend.beans.NurseQualificationBean;
 import com.cooltoo.backend.beans.SocialAbilitiesBean;
-import com.cooltoo.converter.NurseBeanConverter;
-import com.cooltoo.converter.NurseEntityConverter;
-import com.cooltoo.repository.NurseHospitalRelationRepository;
-import com.cooltoo.entities.HospitalEntity;
-import com.cooltoo.leancloud.LeanCloudService;
-import com.cooltoo.entities.NurseEntity;
-import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.converter.NurseBeanConverter;
+import com.cooltoo.converter.NurseEntityConverter;
+import com.cooltoo.entities.HospitalEntity;
+import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.leancloud.LeanCloudService;
+import com.cooltoo.repository.NurseHospitalRelationRepository;
+import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.services.NurseExtensionService;
 import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -67,6 +70,8 @@ public class NurseService {
     private NurseQualificationService qualificationService;
     @Autowired
     private NurseHospitalRelationService hospitalRelationService;
+    @Autowired
+    private NurseExtensionService nurseExtensionService;
 
 
     //==================================================================
@@ -213,6 +218,11 @@ public class NurseService {
         if (null!=qualifications && !qualifications.isEmpty()) {
             nurse.setProperty(NurseBean.QUALIFICATION, qualifications.get(0));
         }
+        // get nurse's extension
+        NurseExtensionBean extensionInfo = nurseExtensionService.getExtensionByNurseId(userId);
+        if (null!=extensionInfo) {
+            nurse.setProperty(NurseBean.INFO_EXTENSION, extensionInfo);
+        }
         return nurse;
     }
 
@@ -262,9 +272,10 @@ public class NurseService {
     //             get used by administrator
     //==============================================================
 
-    public long countByAuthorityAndFuzzyName(String strAuthority, String fuzzyName) {
+    public long countByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion) {
         logger.info("get nurse count by authority={} fuzzyName={}", strAuthority, fuzzyName);
         UserAuthority authority = UserAuthority.parseString(strAuthority);
+        YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
         if (VerifyUtil.isStringEmpty(fuzzyName)) {
             fuzzyName = null;
         }
@@ -272,17 +283,17 @@ public class NurseService {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
         long count;
-        if (null==authority && null==fuzzyName) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion) {
             count = repository.count();
         }
         else {
-            count = repository.countByAuthority(authority, fuzzyName);
+            count = repository.countByAuthority(authority, fuzzyName, canAnswerNursingQuestion);
         }
         logger.info("count is {}", count);
         return count;
     }
 
-    public List<NurseBean> getAllByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, int pageIndex, int number) {
+    public List<NurseBean> getAllByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion, int pageIndex, int number) {
         logger.info("get nurse by authority={} fuzzyName={} at page {} with number {}",
                 strAuthority, fuzzyName, pageIndex, number);
         PageRequest page = new PageRequest(pageIndex, number, Sort.Direction.DESC, "id");
@@ -290,17 +301,18 @@ public class NurseService {
 
         // get nuser by authority
         UserAuthority authority = UserAuthority.parseString(strAuthority);
+        YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
         if (VerifyUtil.isStringEmpty(fuzzyName)) {
             fuzzyName = null;
         }
         else {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
-        if (null==authority && null==fuzzyName) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion) {
             resultSet = repository.findAll(page);
         }
         else {
-            resultSet = repository.findByAuthority(authority, fuzzyName, page);
+            resultSet = repository.findByAuthority(authority, fuzzyName, canAnswerNursingQuestion, page);
         }
 
         // parse to bean
@@ -359,15 +371,20 @@ public class NurseService {
         }
 
         try {
+            Map<Long, NurseExtensionBean>        extensionInfo = nurseExtensionService.getExtensionByNurseIds(userIds);
             Map<Long, NurseHospitalRelationBean> hospitals  = hospitalRelationService.getRelationMapByNurseIds(userIds);
             Map<Long, Long>                      speakCount = speakService.countByUserIds(userIds);
             for (NurseBean bean : nurses) {
+                NurseExtensionBean extension = extensionInfo.get(bean.getId());
                 NurseHospitalRelationBean hospital = hospitals.get(bean.getId());
                 Long speakNum = speakCount.get(bean.getId());
                 speakNum = null == speakNum ? 0L : speakNum;
                 bean.setProperty(NurseBean.SPEAK_COUNT, speakNum);
                 if (null != hospital) {
                     bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospital);
+                }
+                if (null!=extension) {
+                    bean.setProperty(NurseBean.INFO_EXTENSION, extension);
                 }
             }
         }

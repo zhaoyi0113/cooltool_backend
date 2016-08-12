@@ -211,13 +211,16 @@ public class UserHospitalizedAPI {
             });
             Collections.sort(beans, new Comparator<UserHospitalizedCoursesBean>() {
                 @Override public int compare(UserHospitalizedCoursesBean o1, UserHospitalizedCoursesBean o2) {
+                    if (null!=o1 && o1.getId()<0 && null!=o2 && o2.getId()<0) {
+                        return (int)(o1.getId() - o2.getId());
+                    }
                     if (o1==null || o1.getId()<0) {
                         return 1;
                     }
                     if (o2==null || o2.getId()<0) {
                         return -1;
                     }
-                    return (int)(o1.getId() - o2.getId());
+                    return 0;
                 }
             });
         }

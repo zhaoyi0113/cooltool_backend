@@ -166,7 +166,7 @@ public class CourseCategoryService {
         courseCategoryAllSortedByReadStatus.setIntroduction(category_all);
         // all course without any category property
         CourseCategoryBean others = new CourseCategoryBean();
-        others.setId(0);
+        others.setId(-2);
         others.setName(category_others);
         others.setIntroduction(category_others);
 

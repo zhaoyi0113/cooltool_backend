@@ -2,22 +2,21 @@ package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.backend.services.NurseHospitalRelationService;
+import com.cooltoo.backend.services.NurseQualificationService;
 import com.cooltoo.backend.services.NurseRelationshipService;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseRelationshipBean;
-import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.constants.GenderType;
-import com.cooltoo.constants.UserAuthority;
-import com.cooltoo.converter.NurseBeanConverter;
+import com.cooltoo.constants.*;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.services.CommonNurseService;
+import com.cooltoo.services.NurseExtensionService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -37,9 +36,10 @@ public class NurseManageAPI {
 
     @Autowired private NurseHospitalRelationService hospitalRelationService;
     @Autowired private CommonNurseService commonNurseService;
-    @Autowired private NurseBeanConverter nurseBeanConverter;
     @Autowired private NurseService nurseService;
     @Autowired private NurseRelationshipService nurseRelationshipService;
+    @Autowired private NurseQualificationService nurseQualificationService;
+    @Autowired private NurseExtensionService nurseExtensionService;
 
     @Path("/{nurse_id}")
     @GET
@@ -71,11 +71,12 @@ public class NurseManageAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response countNurseByAuthorityAndName(@Context HttpServletRequest request,
                                                  @QueryParam("authority") @DefaultValue("") String authority,
-                                                 @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName
+                                                 @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
+                                                 @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get nurse record count by authority {} fuzzyName={}", userId, authority, fuzzyName);
-        long count = nurseService.countByAuthorityAndFuzzyName(authority, fuzzyName);
+        long count = nurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion);
         logger.info("count={}", count);
         return Response.ok(count).build();
     }
@@ -86,13 +87,14 @@ public class NurseManageAPI {
     public Response getNurseByAuthorityAndName(@Context HttpServletRequest request,
                                                @QueryParam("authority") @DefaultValue("") String strAuthority,
                                                @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
+                                               @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
                                                @QueryParam("index")  @DefaultValue("0")  int index,
                                                @QueryParam("number") @DefaultValue("10") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get nurse record count by authority {} fuzzyName{} at page {} with {} record/page",
                 userId, strAuthority, fuzzyName, index, number);
-        List<NurseBean> nurses = nurseService.getAllByAuthorityAndFuzzyName(strAuthority, fuzzyName, index, number);
+        List<NurseBean> nurses = nurseService.getAllByAuthorityAndFuzzyName(strAuthority, fuzzyName, canAnswerNursingQuestion, index, number);
         logger.info("count={}", userId, strAuthority, fuzzyName, index, number, nurses.size());
         return Response.ok(nurses).build();
     }
@@ -132,12 +134,8 @@ public class NurseManageAPI {
                                 @FormParam("department_id") @DefaultValue("0") int departmentId,
                                 @FormParam("can_answer_nursing_question") @DefaultValue("YES") String strCanAnswerNursingQuestion
     ) {
-        GenderType gender = GenderType.parseString(strGender);
-        NurseEntity nurse = commonNurseService.registerNurse(name, age, gender, mobile, password, identification, realName, shortNote);
-        if (hospitalId>0 && departmentId>0) {
-            hospitalRelationService.newOne(nurse.getId(), hospitalId, departmentId);
-        }
-        return Response.ok(nurse.getId()).build();
+        long nurseId = createNurse(name, age, strGender, mobile, password, identification, realName, shortNote, strCanAnswerNursingQuestion, hospitalId, departmentId);
+        return Response.ok(nurseId).build();
     }
 
     @Path("/edit_nurse")
@@ -159,13 +157,7 @@ public class NurseManageAPI {
                                        @FormParam("department_id") @DefaultValue("0") int departmentId,
                                        @FormParam("can_answer_nursing_question") @DefaultValue("") String strCanAnswerNursingQuestion
     ) {
-        GenderType gender = GenderType.parseString(strGender);
-        UserAuthority authority = UserAuthority.parseString(strAuthority);
-        commonNurseService.updateBasicInfo(nurseId, name, age, gender, mobile, password, identification, realName, shortNote, authority);
-        if (hospitalId>0 && departmentId>0) {
-            hospitalRelationService.newOne(nurseId, hospitalId, departmentId);
-        }
-        NurseBean nurseBean = nurseService.getNurse(nurseId);
+        NurseBean nurseBean = editNurse(nurseId, name, age, strGender, mobile, password, identification, realName, shortNote, strAuthority, strCanAnswerNursingQuestion, hospitalId, departmentId);
         return Response.ok(nurseBean).build();
     }
 
@@ -270,5 +262,41 @@ public class NurseManageAPI {
         String strStatus = null==commonStatus ? "" : commonStatus.name();
         NurseRelationshipBean relationship = nurseRelationshipService.updateRelationStatus(relationId, strStatus);
         return Response.ok(relationship).build();
+    }
+
+    @Transactional
+    private long createNurse(String name, int age, String strGender,
+                             String mobile, String password, String identification,
+                             String realName, String shortNote, String strCanAnswerNursingQuestion,
+                             int hospitalId, int departmentId
+    ) {
+        GenderType gender = GenderType.parseString(strGender);
+        YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
+        NurseEntity nurse = commonNurseService.registerNurse(name, age, gender, mobile, password, identification, realName, shortNote);
+        if (hospitalId>0 || departmentId>0) {
+            hospitalRelationService.newOne(nurse.getId(), hospitalId, departmentId);
+            nurseQualificationService.createQualificationByAdmin(nurse.getId());
+            if (YesNoEnum.YES.equals(canAnswerNursingQuestion)) {
+                nurseExtensionService.setExtension(nurse.getId(), canAnswerNursingQuestion);
+            }
+        }
+        return nurse.getId();
+    }
+
+    @Transactional
+    private NurseBean editNurse(long nurseId, String name, int age, String strGender,
+                                String mobile, String password, String identification,
+                                String realName, String shortNote, String strAuthority, String strCanAnswerNursingQuestion,
+                                int hospitalId, int departmentId) {
+        GenderType gender = GenderType.parseString(strGender);
+        UserAuthority authority = UserAuthority.parseString(strAuthority);
+        YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
+        commonNurseService.updateBasicInfo(nurseId, name, age, gender, mobile, password, identification, realName, shortNote, authority);
+        if (hospitalId>0 || departmentId>0) {
+            hospitalRelationService.newOne(nurseId, hospitalId, departmentId);
+            nurseExtensionService.setExtension(nurseId, canAnswerNursingQuestion);
+        }
+        NurseBean nurseBean = nurseService.getNurse(nurseId);
+        return nurseBean;
     }
 }

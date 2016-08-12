@@ -4,6 +4,7 @@ import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
@@ -103,8 +104,10 @@ public class CommonNurseService {
     //==============================================================
     //             get used by administrator
     //==============================================================
-    public long countByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName) {
-        logger.info("get nurse count by authority={} fuzzyName={}", authority, fuzzyName);
+    public long countByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion) {
+        logger.info("get nurse count by authority={} fuzzyName={} canAnswerNursingQuestion",
+                authority, fuzzyName, canAnswerNursingQuestion);
+
         if (VerifyUtil.isStringEmpty(fuzzyName)) {
             fuzzyName = null;
         }
@@ -112,17 +115,17 @@ public class CommonNurseService {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
         long count;
-        if (null==authority && null==fuzzyName) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion) {
             count = nurseRepository.count();
         }
         else {
-            count = nurseRepository.countByAuthority(authority, fuzzyName);
+            count = nurseRepository.countByAuthority(authority, fuzzyName, canAnswerNursingQuestion);
         }
         logger.info("count is {}", count);
         return count;
     }
 
-    public Iterable<NurseEntity> getByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, int pageIndex, int number) {
+    public Iterable<NurseEntity> getByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, int pageIndex, int number) {
         logger.info("get nurse by authority={} fuzzyName={} at page {} with number {}", authority, fuzzyName, pageIndex, number);
         PageRequest page = new PageRequest(pageIndex, number, sort);
         Page<NurseEntity> resultSet = null;
@@ -133,11 +136,11 @@ public class CommonNurseService {
         else {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
-        if (null==authority && null==fuzzyName) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion) {
             resultSet = nurseRepository.findAll(page);
         }
         else {
-            resultSet = nurseRepository.findByAuthority(authority, fuzzyName, page);
+            resultSet = nurseRepository.findByAuthority(authority, fuzzyName, canAnswerNursingQuestion, page);
         }
         return resultSet;
     }

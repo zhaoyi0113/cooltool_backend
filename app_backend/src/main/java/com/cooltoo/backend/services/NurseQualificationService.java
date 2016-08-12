@@ -90,6 +90,31 @@ public class NurseQualificationService {
         return qualificationPath;
     }
 
+    //=============================================
+    //       add qualification BY administrator
+    //=============================================
+    @Transactional
+    public NurseQualificationBean createQualificationByAdmin(long nurseId) {
+
+        List<NurseQualificationEntity> qualifications = repository.findNurseQualificationByUserId(nurseId, sort);
+        NurseQualificationEntity qualification ;
+        // check nurse qualification record
+        if (null==qualifications || qualifications.isEmpty()) {
+            qualification = new NurseQualificationEntity();
+            qualification.setUserId(nurseId);
+            qualification.setName("");
+        }
+        else {
+            qualification = qualifications.get(0);
+        }
+        qualification.setStatus(VetStatus.COMPLETED);
+        qualification.setStatusDesc("管理员创建");
+        qualification.setTimeCreated(new Date());
+        qualification.setTimeProcessed(new Date());
+        qualification = repository.save(qualification);
+        return beanConverter.convert(qualification);
+    }
+
     //=======================================================
     //     delete qualification file
     //=======================================================
