@@ -57,6 +57,7 @@ public class PingServiceOrderTestAPI {
         logger.info("service order "+order);
         Charge charge = orderService.payForService(userId, order.getId(), channel, ip);
 //        Charge charge = pingPPService.createCharge(orderNo, channel, amount, ip, subject, body, description);
+        logger.info("create charge object "+charge);
         return Response.ok(charge).build();
     }
 

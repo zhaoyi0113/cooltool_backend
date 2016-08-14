@@ -209,6 +209,7 @@ public class ServiceOrderService {
         if (null==charge) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
+            logger.info("create charge object failed ");
             return charge;
         }
 
