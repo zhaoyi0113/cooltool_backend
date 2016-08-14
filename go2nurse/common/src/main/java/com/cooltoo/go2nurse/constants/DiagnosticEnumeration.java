@@ -12,8 +12,9 @@ public enum DiagnosticEnumeration {
     HOSPITALIZED_DATE(1),      // 入院
     PHYSICAL_EXAMINATION(2),   // 检查
     OPERATION(3),                  // 手术
-    DISCHARGED_FROM_THE_HOSPITAL(5),    // 出院
-    AFTER_OPERATION(4)   // 手术后
+    DISCHARGED_FROM_THE_HOSPITAL(6),    // 出院
+    AFTER_OPERATION(4),   // 手术后
+    RECOVERY(5) // 康复
     ;
 
     private int order = 0;
@@ -41,6 +42,9 @@ public enum DiagnosticEnumeration {
         else if (AFTER_OPERATION.name().equalsIgnoreCase(type)) {
             diagnostic = AFTER_OPERATION;
         }
+        else if (RECOVERY.name().equalsIgnoreCase(type)) {
+            diagnostic = RECOVERY;
+        }
         return diagnostic;
     }
 
@@ -64,6 +68,9 @@ public enum DiagnosticEnumeration {
         else if (AFTER_OPERATION.ordinal() == type) {
             diagnostic = AFTER_OPERATION;
         }
+        else if (RECOVERY.ordinal() == type) {
+            diagnostic = RECOVERY;
+        }
         return diagnostic;
     }
 
@@ -78,6 +85,7 @@ public enum DiagnosticEnumeration {
         diagnostics.add(PHYSICAL_EXAMINATION);
         diagnostics.add(OPERATION);
         diagnostics.add(AFTER_OPERATION);
+        diagnostics.add(RECOVERY);
         diagnostics.add(DISCHARGED_FROM_THE_HOSPITAL);
         return diagnostics;
     }
