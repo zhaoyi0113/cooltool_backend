@@ -146,7 +146,7 @@ public class DoctorService {
 
         Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
         Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalIds);
-        List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefix());
+        List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefixForNurseGo());
         for (DoctorBean item : items) {
             String imageUrl = imageIdToUrl.get(item.getImageId());
             if (!VerifyUtil.isStringEmpty(imageUrl)) {

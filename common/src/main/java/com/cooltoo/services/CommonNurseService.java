@@ -1,11 +1,8 @@
 package com.cooltoo.services;
 
-import com.cooltoo.beans.NurseBean;
-import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -22,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -125,8 +121,9 @@ public class CommonNurseService {
         return count;
     }
 
-    public Iterable<NurseEntity> getByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, int pageIndex, int number) {
-        logger.info("get nurse by authority={} fuzzyName={} at page {} with number {}", authority, fuzzyName, pageIndex, number);
+    public Iterable<NurseEntity> getNurseByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, int pageIndex, int number) {
+        logger.info("get nurse by authority={} fuzzyName={} canAnswerNursingQuestion={} at page {} with number {}",
+                authority, fuzzyName, canAnswerNursingQuestion, pageIndex, number);
         PageRequest page = new PageRequest(pageIndex, number, sort);
         Page<NurseEntity> resultSet = null;
 
@@ -228,4 +225,50 @@ public class CommonNurseService {
         }
         return nurse;
     }
+
+    @Transactional
+    public List<NurseEntity> updateAuthority(String strNurseIds, UserAuthority authority) {
+        logger.info("update nurse {} 's authority={}", strNurseIds, authority);
+        // check parameters
+        if (null==authority) {
+            logger.error("authority is not valid");
+            return new ArrayList<>();
+        }
+        if (!VerifyUtil.isIds(strNurseIds)) {
+            logger.error("nurse ids is not valid");
+            return new ArrayList<>();
+        }
+
+        // get ids
+        List<Long> nurseIds = VerifyUtil.parseLongIds(strNurseIds);
+
+        // get nurses
+        List<NurseEntity> nurses = nurseRepository.findByIdIn(nurseIds);
+        if (null==nurses) {
+            return new ArrayList<>();
+        }
+        for (NurseEntity nurse : nurses) {
+            nurse.setAuthority(authority);
+        }
+        nurses = nurseRepository.save(nurses);
+        logger.info("update count is {}", nurses.size());
+        return nurses;
+    }
+
+
+    //========================================================================
+    //                        deleting
+    //========================================================================
+    @Transactional
+    public NurseEntity deleteNurse(long nurseId) {
+        logger.info("delete nurse by nurseId={}", nurseId);
+        NurseEntity nurse = nurseRepository.findOne(nurseId);
+        if (null==nurse) {
+            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
+        }
+        nurseRepository.delete(nurseId);
+        logger.info("delete nurse={}", nurse);
+        return nurse;
+    }
+
 }

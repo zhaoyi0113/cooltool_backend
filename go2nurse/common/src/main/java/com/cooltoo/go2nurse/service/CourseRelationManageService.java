@@ -79,7 +79,7 @@ public class CourseRelationManageService {
         logger.info("get department by course id={} and status={}", courseId, strStatus);
         List<Long> courseIds = Arrays.asList(new Long[]{courseId});
         List<Integer> departmentIds = departmentRelation.getDepartmentByCourseId(courseIds, strStatus);
-        List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefix());
+        List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefixForNurseGo());
         logger.info("department is {}", departments);
         return departments;
     }

@@ -21,8 +21,27 @@ public class Go2NurseUtility {
     @Value("${go2nurse.nginx.prefix}")
     private String httpPrefix;
 
+    @Value("${go2nurse.nginx.prefix.for.nursego}")
+    private String httpPrefixForNurseGo;
+    @Value("${storage.user.path}")
+    private String nursegoUserPath;
+    @Value("${storage.official.path}")
+    private String nursegoOfficialPath;
+
     public String getHttpPrefix() {
         return httpPrefix;
+    }
+
+    public String getHttpPrefixForNurseGo() {
+        return httpPrefixForNurseGo;
+    }
+
+    public String getHttpPrefixUserPathForNurseGo() {
+        return httpPrefixForNurseGo+nursegoUserPath;
+    }
+
+    public String getHttpPrefixOfficialPathForNurseGo() {
+        return httpPrefixForNurseGo+nursegoOfficialPath;
     }
 
     public <T> T parseJsonList(String content, Class clazz) {

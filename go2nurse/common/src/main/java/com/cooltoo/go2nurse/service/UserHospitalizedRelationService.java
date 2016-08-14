@@ -147,7 +147,7 @@ public class UserHospitalizedRelationService {
             }
         }
         List<HospitalBean> hospitals = hospitalService.getHospitalByIds(hospitalIds);
-        List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefix());
+        List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefixForNurseGo());
         for (UserHospitalizedRelationBean bean : beans) {
             int hospitalId = bean.getHospitalId();
             for (HospitalBean hospital : hospitals) {

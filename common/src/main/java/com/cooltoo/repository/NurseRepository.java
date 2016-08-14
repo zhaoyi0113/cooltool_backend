@@ -37,13 +37,13 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     //              for administrator user
     //==================================================================
     @Query("SELECT n FROM NurseEntity n LEFT JOIN n.extensions ne" +
-            " WHERE (n.authority=?1  OR ?1 IS NULL)" +
-            " AND   (n.name LIKE %?2 OR ?2 IS NULL)" +
-            " AND   (ne.answerNursingQuestion=?3 OR ?3 IS NULL)")
+            " WHERE (?1 IS NULL OR n.authority=?1)" +
+            " AND   (?2 IS NULL OR n.name LIKE %?2)" +
+            " AND   (?3 IS NULL OR ne.answerNursingQuestion=?3)")
     Page<NurseEntity> findByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion, Pageable page);
     @Query("SELECT count(n.id) FROM NurseEntity n LEFT JOIN n.extensions ne" +
-            " WHERE (n.authority=?1  OR ?1 IS NULL)" +
-            " AND   (n.name LIKE %?2 OR ?2 IS NULL)" +
-            " AND   (ne.answerNursingQuestion=?3 OR ?3 IS NULL)")
+            " WHERE (?1 IS NULL OR n.authority=?1)" +
+            " AND   (?2 IS NULL OR n.name LIKE %?2)" +
+            " AND   (?3 IS NULL OR ne.answerNursingQuestion=?3)")
     long countByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion);
 }
