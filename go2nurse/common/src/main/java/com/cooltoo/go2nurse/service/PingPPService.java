@@ -53,7 +53,7 @@ public class PingPPService {
         chargeMap.put("subject", subject);
         // 商品的描述信息，该参数最长为 128 个 Unicode 字符，
         // yeepay_wap 对于该参数长度限制为 100 个 Unicode 字符。
-        chargeMap.put("body", body);
+        chargeMap.put("body", body.isEmpty()?null:body);
         // 订单附加说明，最多 255 个 Unicode 字符。
         chargeMap.put("description", description);
 
