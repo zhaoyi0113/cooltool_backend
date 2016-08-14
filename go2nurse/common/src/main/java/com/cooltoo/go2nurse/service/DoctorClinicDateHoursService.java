@@ -79,6 +79,14 @@ public class DoctorClinicDateHoursService {
         return beans;
     }
 
+    public DoctorClinicHoursBean getClinicHourById(long clinicHourId) {
+        logger.info("get clinic hours by id={}", clinicHourId);
+        DoctorClinicHoursEntity hour = hoursRepository.findOne(clinicHourId);
+        DoctorClinicHoursBean bean = hoursBeanConverter.convert(hour);
+        logger.info("result is {}", bean);
+        return bean;
+    }
+
     public long countClinicDateByDoctorId(long doctorId, List<CommonStatus> statuses) {
         long count = dateRepository.countDoctorByConditions(doctorId, statuses, null, null);
         logger.info("count clinic dates by doctorId={} status={}, size is {}", doctorId, statuses, count);

@@ -23,6 +23,7 @@ public class ServiceItemBeanConverter implements Converter<ServiceItemEntity, Se
         bean.setClazz(source.getClazz());
         bean.setDescription(source.getDescription());
         bean.setImageId(source.getImageId());
+        bean.setDetailImageId(source.getDetailImageId());
         bean.setServicePriceCent(source.getServicePriceCent());
         bean.setServiceTimeDuration(source.getServiceTimeDuration());
         bean.setServiceTimeUnit(source.getServiceTimeUnit());

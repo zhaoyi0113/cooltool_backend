@@ -1,18 +1,15 @@
-package com.cooltoo.go2nurse.entities;
+package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 
-import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Time;
 
 /**
  * Created by hp on 2016/8/8.
  */
-@Entity
-@Table(name="go2nurse_doctor_appointment")
-public class DoctorAppointmentEntity {
+public class DoctorAppointmentBean {
 
     private long id;
     private Date time;
@@ -34,100 +31,78 @@ public class DoctorAppointmentEntity {
     private String patientJson;
     private OrderStatus orderStatus;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
     public long getId() {
         return id;
     }
 
-    @Column(name = "time_created")
     public Date getTime() {
         return time;
     }
 
-    @Column(name = "status")
-    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }
 
-    @Column(name = "order_no")
     public String getOrderNo() {
         return orderNo;
     }
 
-    @Column(name = "hospital_id")
     public int getHospitalId() {
         return hospitalId;
     }
 
-    @Column(name = "hospital")
     public String getHospitalJson() {
         return hospitalJson;
     }
 
-    @Column(name = "department_id")
     public int getDepartmentId() {
         return departmentId;
     }
 
-    @Column(name = "department")
     public String getDepartmentJson() {
         return departmentJson;
     }
 
-    @Column(name = "doctor_id")
     public long getDoctorId() {
         return doctorId;
     }
 
-    @Column(name = "doctor")
     public String getDoctorJson() {
         return doctorJson;
     }
 
-    @Column(name = "clinic_date_id")
     public long getClinicDateId() {
         return clinicDateId;
     }
 
-    @Column(name = "clinic_date")
     public Date getClinicDate() {
         return clinicDate;
     }
 
-    @Column(name = "clinic_hours_id")
     public long getClinicHoursId() {
         return clinicHoursId;
     }
 
-    @Column(name = "clinic_hours_start")
     public Time getClinicHoursStart() {
         return clinicHoursStart;
     }
 
-    @Column(name = "clinic_hours_end")
     public Time getClinicHoursEnd() {
         return clinicHoursEnd;
     }
 
-    @Column(name = "user_id")
     public long getUserId() {
         return userId;
     }
 
-    @Column(name = "patient_id")
     public long getPatientId() {
         return patientId;
     }
 
-    @Column(name = "patient")
     public String getPatientJson() {
         return patientJson;
     }
 
-    @Column(name = "order_status")
     public OrderStatus getOrderStatus() {
         return orderStatus;
     }

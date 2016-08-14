@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.util.VerifyUtil;
 import com.pingplusplus.Pingpp;
 import com.pingplusplus.exception.PingppException;
 import com.pingplusplus.model.Charge;
@@ -30,6 +31,14 @@ public class PingPPService {
     }
 
     public Charge createCharge(String orderNo, String channel, int amount, String ip, String subject, String body, String description) {
+        logger.info("create charge orderNo={} channel={} amount={} ip={} subject={} body={} desc={}",
+                orderNo, channel, amount, ip, subject, body, description);
+        if (VerifyUtil.isStringEmpty(body)) {
+            body = "no_body";
+        }
+        if (VerifyUtil.isStringEmpty(description)) {
+            description="无";
+        }
         Charge charge = null;
         Pingpp.apiKey = pingPPAPIKey;
         Pingpp.privateKey = pingPPRSAPrivateKey;

@@ -27,6 +27,8 @@ public class ServiceItemBean {
     private String description;
     private long imageId;
     private String imageUrl;
+    private long detailImageId;
+    private String detailImageUrl;
     private String servicePrice;
     private int servicePriceCent;
     private int serviceTimeDuration;
@@ -174,6 +176,22 @@ public class ServiceItemBean {
         this.grade = grade;
     }
 
+    public long getDetailImageId() {
+        return detailImageId;
+    }
+
+    public void setDetailImageId(long detailImageId) {
+        this.detailImageId = detailImageId;
+    }
+
+    public String getDetailImageUrl() {
+        return detailImageUrl;
+    }
+
+    public void setDetailImageUrl(String detailImageUrl) {
+        this.detailImageUrl = detailImageUrl;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -190,6 +208,7 @@ public class ServiceItemBean {
         msg.append(", clazz=").append(clazz);
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
+        msg.append(", detailImageId=").append(detailImageId);
         msg.append(", servicePrice=").append(servicePrice);
         msg.append(", servicePriceCent=").append(servicePriceCent);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);

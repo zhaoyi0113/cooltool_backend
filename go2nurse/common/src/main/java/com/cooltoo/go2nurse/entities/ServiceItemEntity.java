@@ -25,6 +25,7 @@ public class ServiceItemEntity {
     private ServiceClass clazz;
     private String description;
     private long imageId;
+    private long detailImageId;
     private int servicePriceCent;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
@@ -83,6 +84,11 @@ public class ServiceItemEntity {
     @Column(name = "image_id")
     public long getImageId() {
         return imageId;
+    }
+
+    @Column(name = "detail_image_id")
+    public long getDetailImageId() {
+        return detailImageId;
     }
 
     @Column(name = "service_price_cent")
@@ -145,6 +151,10 @@ public class ServiceItemEntity {
         this.imageId = imageId;
     }
 
+    public void setDetailImageId(long detailImageId) {
+        this.detailImageId = detailImageId;
+    }
+
     public void setServicePriceCent(int servicePriceCent) {
         this.servicePriceCent = servicePriceCent;
     }
@@ -175,6 +185,7 @@ public class ServiceItemEntity {
         msg.append(", clazz=").append(clazz);
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
+        msg.append(", detailImageId=").append(detailImageId);
         msg.append(", servicePriceCent=").append(servicePriceCent);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);

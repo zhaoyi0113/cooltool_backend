@@ -425,6 +425,9 @@ public class ServiceVendorCategoryAndItemService {
             if (!imagesId.contains(item.getImageId())) {
                 imagesId.add(item.getImageId());
             }
+            if (!imagesId.contains(item.getDetailImageId())) {
+                imagesId.add(item.getDetailImageId());
+            }
             if (ServiceVendorType.COMPANY.equals(item.getVendorType()) && !companyId.contains(item.getVendorId())) {
                 companyId.add(item.getVendorId());
             }
@@ -440,6 +443,10 @@ public class ServiceVendorCategoryAndItemService {
             String imageUrl = imageIdToUrl.get(item.getImageId());
             if (!VerifyUtil.isStringEmpty(imageUrl)) {
                 item.setImageUrl(imageUrl);
+            }
+            imageUrl = imageIdToUrl.get(item.getDetailImageId());
+            if (!VerifyUtil.isStringEmpty(imageUrl)) {
+                item.setDetailImageUrl(imageUrl);
             }
             if (ServiceVendorType.COMPANY.equals(item.getVendorType())) {
                 ServiceVendorBean vendor = vendorIdToBean.get(item.getVendorId());
@@ -832,6 +839,34 @@ public class ServiceVendorCategoryAndItemService {
 
         ServiceItemBean bean = itemBeanConverter.convert(entity);
         bean.setImageUrl(imageUrl);
+        logger.info("service item updated is {}", bean);
+        return bean;
+    }
+
+    @Transactional
+    public ServiceItemBean updateItemDetailImage(long itemId, String detailImageName, InputStream detailImage) {
+        logger.info("update service item={} by detailImageName={} detailImage={}",
+                itemId, detailImageName, null!=detailImage);
+
+        ServiceItemEntity entity = itemRep.findOne(itemId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        String imageUrl = "";
+        if (null!=detailImage) {
+            if (VerifyUtil.isStringEmpty(detailImageName)) {
+                detailImageName = "item_detail_image_" + System.nanoTime();
+            }
+            long imageId = userFileStorage.addFile(
+                    0/*entity.getImageId();  can not delete the image, because the service order service_item json use it*/
+                    , detailImageName, detailImage);
+            imageUrl = userFileStorage.getFileURL(imageId);
+            entity.setDetailImageId(imageId);
+        }
+
+        ServiceItemBean bean = itemBeanConverter.convert(entity);
+        bean.setDetailImageUrl(imageUrl);
         logger.info("service item updated is {}", bean);
         return bean;
     }

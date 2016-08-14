@@ -368,4 +368,18 @@ public class ServiceCategoryAndItemManageAPI {
         return Response.ok(serviceItem).build();
     }
 
+    @Path("/item/edit_detail_image")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response editServiceItemDetailImage(@Context HttpServletRequest request,
+                                               @FormDataParam("item_id") @DefaultValue("0") long itemId,
+                                               @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                               @FormDataParam("image") InputStream image,
+                                               @FormDataParam("image")FormDataContentDisposition disposition
+    ) {
+        ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItemDetailImage(itemId, imageName, image);
+        return Response.ok(serviceItem).build();
+    }
+
 }
