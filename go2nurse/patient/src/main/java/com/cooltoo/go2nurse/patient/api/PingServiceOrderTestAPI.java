@@ -43,7 +43,8 @@ public class PingServiceOrderTestAPI {
                                 @FormParam("channel") @DefaultValue("wx") String channel,
                                 @FormParam("patientId") long patientId,
                                 @FormParam("addressId") long addressId,
-                                @FormParam("serviceItemId") long serviceItemId) {
+                                @FormParam("serviceItemId") long serviceItemId,
+                                @FormParam("startTime") String startTime) {
         logger.info("get channel " + channel);
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         int amount = 100;
@@ -52,7 +53,7 @@ public class PingServiceOrderTestAPI {
         String subject = "test order";
         String body = "order description";
         String description = "order extra descritpion";
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, "2016-01-01", 1, "");
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, 1, "");
         logger.info("service order "+order);
         Charge charge = orderService.payForService(userId, order.getId(), channel, ip);
 //        Charge charge = pingPPService.createCharge(orderNo, channel, amount, ip, subject, body, description);
