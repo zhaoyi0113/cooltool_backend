@@ -28,6 +28,7 @@ public class UserBean {
     private String uniqueId;
     private String address;
     private UserHospitalizedStatus hasDecide;
+    private int channel;
 
     public long getId() {
         return id;
@@ -149,6 +150,14 @@ public class UserBean {
         this.hasDecide = hasDecide;
     }
 
+    public int getChannel() {
+        return channel;
+    }
+
+    public void setChannel(int channel) {
+        this.channel = channel;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -167,6 +176,7 @@ public class UserBean {
         msg.append(", hasDecide=").append(hasDecide);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
+        msg.append(", channel=").append(channel);
         msg.append("]");
         return msg.toString();
     }
