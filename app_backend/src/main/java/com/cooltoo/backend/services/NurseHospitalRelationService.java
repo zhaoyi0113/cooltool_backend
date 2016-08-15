@@ -1,7 +1,6 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.converter.NurseHospitalRelationBeanConverter;
-import com.cooltoo.converter.NurseHospitalRelationEntityConverter;
 import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.repository.NurseHospitalRelationRepository;
 import com.cooltoo.beans.HospitalBean;
@@ -32,7 +31,6 @@ public class NurseHospitalRelationService {
     @Autowired private HospitalService                    hospitalService;
     @Autowired private HospitalDepartmentService          departmentService;
     @Autowired private NurseHospitalRelationBeanConverter beanConverter;
-    @Autowired private NurseHospitalRelationEntityConverter entityConverter;
 
     //====================================================================
     //             get

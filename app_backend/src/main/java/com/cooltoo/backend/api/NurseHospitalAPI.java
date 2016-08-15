@@ -13,7 +13,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,11 +54,8 @@ public class NurseHospitalAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response searchHospital(@DefaultValue("") @QueryParam("name") String  name) {
-        List<HospitalBean> hospitals = hospitalService.searchHospital(true, true, name, -1, -1, -1, "", 1, -1, 0, 0);
-        logger.info("get hospital size is {}", hospitals.size());
-        if (null == hospitals) {
-            Response.ok(new ArrayList<>()).build();
-        }
+        long count = hospitalService.countHospitalByConditions(true, name, null, null, null, null, 1, null);
+        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, name, null, null, null, null, 1, null, 0, (int)count);
         return Response.ok(hospitals).build();
     }
 

@@ -6,6 +6,8 @@ import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.repository.HospitalRepository;
+import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.file.OfficialFileStorageService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -17,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -31,127 +32,55 @@ public class HospitalDepartmentService {
 
     private static final Logger logger = LoggerFactory.getLogger(HospitalDepartmentService.class.getName());
 
-    @Autowired
-    private HospitalDepartmentRepository repository;
-    @Autowired
-    private HospitalDepartmentRelationService relationService;
-    @Autowired
-    private NurseHospitalRelationService nurseRelationService;
+    @Autowired private CommonDepartmentService commonDepartmentService;
+    @Autowired private HospitalRepository hospitalRepository;
+    @Autowired private HospitalDepartmentRepository repository;
+    @Autowired private NurseHospitalRelationService nurseRelationService;
     @Autowired
     @Qualifier("OfficialFileStorageService")
     private OfficialFileStorageService officialStorage;
-    @Autowired
-    private HospitalDepartmentBeanConverter beanConverter;
+    @Autowired private HospitalDepartmentBeanConverter beanConverter;
 
     //=======================================================
     //        get department
     //=======================================================
-    public List<HospitalDepartmentBean> getAll() {
-        Sort sort = new Sort(Sort.Direction.ASC, "id");
-        Iterable<HospitalDepartmentEntity> departments  = repository.findAll(sort);
-        List<HospitalDepartmentBean>       departmentsB = new ArrayList<HospitalDepartmentBean>();
-        HospitalDepartmentBean             bean         = null;
-        List<Integer>                      topLevelIds  = new ArrayList<Integer>();
-        for (HospitalDepartmentEntity department : departments) {
-            bean = beanConverter.convert(department);
-            departmentsB.add(bean);
-            if (bean.getParentId()<=0) {
-                topLevelIds.add(bean.getId());
-            }
-        }
-        for (HospitalDepartmentBean department : departmentsB) {
-            department.setParentValid(topLevelIds.contains(department.getParentId()));
-        }
-        addImageUrl(departmentsB);
-        return departmentsB;
-    }
-
     public List<HospitalDepartmentBean> getDepartmentByUniqueId(String uniqueId) {
-        List<HospitalDepartmentBean> all = getAll();
-        List<HospitalDepartmentBean> departments = new ArrayList<>();
-        for (int i=0, count=all.size(); i<count; i++) {
-            HospitalDepartmentBean bean = all.get(i);
-            if (bean.getUniqueId().equals(uniqueId)) {
-                departments.add(bean);
-            }
-        }
+        List<HospitalDepartmentBean> departments = commonDepartmentService.getDepartmentByUniqueId(uniqueId, "");
         return departments;
     }
 
     public HospitalDepartmentBean getOneById(Integer id) {
-        HospitalDepartmentBean   bean       = null;
-        HospitalDepartmentEntity department = repository.findOne(id);
-        if (null == department) {
-            throw new BadRequestException(ErrorCode.HOSPITAL_DEPARTMENT_NOT_EXIST);
-        }
-        bean = beanConverter.convert(department);
-        department = repository.findOne(bean.getParentId());
-        bean.setParentValid(null!=department);
-        return addImageUrl(bean);
+        HospitalDepartmentBean bean = commonDepartmentService.getById(id, "");
+        return bean;
+    }
+
+    public List<HospitalDepartmentBean> getByHospitalId(Integer hospitalId) {
+        List<HospitalDepartmentBean> beans = commonDepartmentService.getByHospitalId(hospitalId, "");
+        return beans;
     }
 
     public List<HospitalDepartmentBean> getDepartmentsByIds(List<Integer> ids) {
-        List<HospitalDepartmentBean> all = getAll();
-        for (int i=0, count=all.size(); i<count; i++) {
-            HospitalDepartmentBean bean = all.get(i);
-            if (!ids.contains(bean.getId())) {
-                all.remove(i);
-                i --;
-                count --;
-            }
-        }
-        return all;
+        List<HospitalDepartmentBean> departments = commonDepartmentService.getByIds(ids, "");
+        return departments;
     }
 
-    public List<HospitalDepartmentBean> getAllTopLevelDepartment() {
-        List<HospitalDepartmentBean>               allDepartments = getAll();
-        List<HospitalDepartmentBean>               allTopLevels   = new ArrayList<HospitalDepartmentBean>();
-        List<HospitalDepartmentBean>               subDepartment  = null;
-        Map<Integer, List<HospitalDepartmentBean>> id2SubDepart   = new Hashtable<Integer, List<HospitalDepartmentBean>>();
-
-        for(HospitalDepartmentBean department : allDepartments) {
-            if (department.getParentId() <= 0) {
-                allTopLevels.add(department);
-                subDepartment = new ArrayList<HospitalDepartmentBean>();
-                id2SubDepart.put(department.getId(), subDepartment);
-            }
-        }
-
-        for(HospitalDepartmentBean department : allDepartments) {
-            if (department.getParentId()<=0) {
-                continue;
-            }
-            int parentId = department.getParentId();
-            subDepartment = id2SubDepart.get(parentId);
-            if (null==subDepartment) {
-                continue;
-            }
-            subDepartment.add(department);
-        }
-
-        for (HospitalDepartmentBean department : allTopLevels) {
-            int topLevelId = department.getId();
-            subDepartment  = id2SubDepart.get(topLevelId);
-            department.setSubDepartment(subDepartment);
-        }
-
+    public List<HospitalDepartmentBean> getAllTopLevelDepartment(int hospitalId) {
+        List<HospitalDepartmentBean> allTopLevels = commonDepartmentService.getTopLevel(hospitalId, false, 0, "");
         return allTopLevels;
     }
 
-    public List<HospitalDepartmentBean> getSecondLevelDepartment(int parentId) {
-        List<HospitalDepartmentBean> allDepartments = getAll();
-        List<HospitalDepartmentBean> secondLevels   = new ArrayList<HospitalDepartmentBean>();
-        for(HospitalDepartmentBean department : allDepartments) {
-            if (department.getParentId() == parentId) {
-                secondLevels.add(department);
-            }
-        }
-        return secondLevels;
+    public List<HospitalDepartmentBean> getSecondLevelDepartment(int hospitalId, int parentId) {
+        List<HospitalDepartmentBean> beans = commonDepartmentService.getByParentId(hospitalId, parentId, false, 0, "");
+        return beans;
     }
 
-    public List<HospitalDepartmentBean> getAllTopLevelDepartmentEnable() {
-        List<HospitalDepartmentBean> topLevelDepartments = getAllTopLevelDepartment();
-        List<HospitalDepartmentBean> allTopLevelEnable   = new ArrayList<HospitalDepartmentBean>();
+    //==================================================
+    //                    for nurse
+    //==================================================
+
+    public List<HospitalDepartmentBean> getAllTopLevelDepartmentEnable(int hospitalId) {
+        List<HospitalDepartmentBean> topLevelDepartments = getAllTopLevelDepartment(hospitalId);
+        List<HospitalDepartmentBean> allTopLevelEnable   = new ArrayList<>();
         for(HospitalDepartmentBean department : topLevelDepartments) {
             if (department.getEnable() > 0) {
                 allTopLevelEnable.add(department);
@@ -160,9 +89,9 @@ public class HospitalDepartmentService {
         return allTopLevelEnable;
     }
 
-    public List<HospitalDepartmentBean> getSecondLevelDepartmentEnable(int parentId) {
-        List<HospitalDepartmentBean> allSecondLevelDepartment = getSecondLevelDepartment(parentId);
-        List<HospitalDepartmentBean> allSecondLevenEnable     = new ArrayList<HospitalDepartmentBean>();
+    public List<HospitalDepartmentBean> getSecondLevelDepartmentEnable(int hospitalId, int parentId) {
+        List<HospitalDepartmentBean> allSecondLevelDepartment = getSecondLevelDepartment(hospitalId, parentId);
+        List<HospitalDepartmentBean> allSecondLevenEnable     = new ArrayList<>();
         for(HospitalDepartmentBean department : allSecondLevelDepartment) {
             if (department.getEnable() > 0) {
                 allSecondLevenEnable.add(department);
@@ -171,11 +100,12 @@ public class HospitalDepartmentService {
         return allSecondLevenEnable;
     }
 
+
     private HospitalDepartmentBean addImageUrl(HospitalDepartmentBean department) {
         if (null==department) {
             return department;
         }
-        List<HospitalDepartmentBean> departmentsB = new ArrayList<HospitalDepartmentBean>();
+        List<HospitalDepartmentBean> departmentsB = new ArrayList<>();
         departmentsB.add(department);
         addImageUrl(departmentsB);
         return departmentsB.get(0);
@@ -186,7 +116,7 @@ public class HospitalDepartmentService {
             return departments;
         }
 
-        List<Long> imageIds = new ArrayList<Long>();
+        List<Long> imageIds = new ArrayList<>();
         for (HospitalDepartmentBean department : departments) {
             imageIds.add(department.getImageId());
             imageIds.add(department.getDisableImageId());
@@ -221,7 +151,6 @@ public class HospitalDepartmentService {
 
         List<Integer> ids = new ArrayList<>();
         ids.add(departmentId);
-        relationService.deleteByDepartmentIds(ids);
         nurseRelationService.deleteByDepartmentIds(ids);
 
         return beanConverter.convert(entity);
@@ -254,7 +183,6 @@ public class HospitalDepartmentService {
         }
 
         repository.delete(departments);
-        relationService.deleteByDepartmentIds(departmentIds);
         nurseRelationService.deleteByDepartmentIds(departmentIds);
 
         List<HospitalDepartmentBean> retValue = new ArrayList<>();
@@ -275,6 +203,7 @@ public class HospitalDepartmentService {
         }
         HospitalDepartmentEntity entity = repository.findOne(bean.getId());
 
+        // name
         String value = bean.getName();
         if (!VerifyUtil.isStringEmpty(value)) {
             if (!entity.getName().equals(bean.getName())) {
@@ -285,6 +214,7 @@ public class HospitalDepartmentService {
                 entity.setName(bean.getName());
             }
         }
+        // parentId
         if (bean.getParentId()>0 && bean.getParentId()!=bean.getId()) {
             HospitalDepartmentEntity parent = repository.findOne(bean.getParentId());
             if (null!=parent) {
@@ -296,6 +226,7 @@ public class HospitalDepartmentService {
             }
         }
 
+        // image
         String imageUrl = null;
         if(null!=image) {
             long fileId = officialStorage.addFile(entity.getImageId(),entity.getName(), image);
@@ -304,6 +235,8 @@ public class HospitalDepartmentService {
                 imageUrl = officialStorage.getFilePath(fileId);
             }
         }
+
+        // disableImage
         String disableImageUrl = null;
         if (null!=disableImage) {
             long fileId = officialStorage.addFile(entity.getDisableImageId(), entity.getName()+"_disable", disableImage);
@@ -312,11 +245,15 @@ public class HospitalDepartmentService {
                 disableImageUrl = officialStorage.getFilePath(fileId);
             }
         }
+
+        // enable
         int enable = bean.getEnable();
         enable = enable<0 ? enable : (enable>1 ? 1 : enable);
         if (enable>=0) {
             entity.setEnable(enable);
         }
+
+        // description
         if (!VerifyUtil.isStringEmpty(bean.getDescription())) {
             entity.setDescription(bean.getDescription());
         }
@@ -345,7 +282,11 @@ public class HospitalDepartmentService {
     //        create department
     //=======================================================
     @Transactional
-    public Integer createHospitalDepartment(String name, String description, int enable, int parentId, InputStream image, InputStream disableImage) {
+    public Integer createHospitalDepartment(int hospitalId, String name, String description, int enable, int parentId, InputStream image, InputStream disableImage) {
+        if (!hospitalRepository.exists(hospitalId)) {
+            logger.error("hospital is not exist");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("new department name is empty!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -357,6 +298,7 @@ public class HospitalDepartmentService {
         }
 
         HospitalDepartmentEntity entity = new HospitalDepartmentEntity();
+        entity.setHospitalId(hospitalId);
         entity.setName(name);
 
         String uniqueId = null;

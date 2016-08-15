@@ -49,43 +49,44 @@ public class CoursesCreator {
 
     @Test
     public void createCourses(){
-        List<Long> coursesId = new ArrayList<>();
-        for(int i=0; i<2100;i++) {
-            String name = getRandomString(10);
-            String introduction = getRandomString(140);
-            String enrollUrl = "http://" + getRandomString(30);
-            CourseBean course = courseService.createCourse(name, introduction, enrollUrl, "", 0);
-            coursesId.add(course.getId());
-        }
-        List<HospitalBean> hospitals = hospitalService.searchHospital(true, false, null, -1, -1, -1, null, 1, 1, 0, 0);
-        List<HospitalDepartmentBean> departments = departmentService.getAll("");
-        List<DiagnosticEnumeration> diagnosticsEnum = DiagnosticEnumeration.getAllDiagnostic();
-
-        int departmentCount = departments.size();
-        int diagnosticCount = diagnosticsEnum.size() - 1;
-        int courseInEveryDiagnostic = 5;
-        int hospitalCount = coursesId.size()/(courseInEveryDiagnostic*diagnosticCount*departmentCount);
-
-        int coursesInEveryHospital = courseInEveryDiagnostic*diagnosticCount*departmentCount;
-        int coursesInEveryDepartment = courseInEveryDiagnostic*diagnosticCount;
-        for (int i=0, count=coursesId.size(); i<count; i++) {
-            Long courseId = coursesId.get(i);
-            int hospitalIndex = i/coursesInEveryHospital;
-            int departmentIndex = i/coursesInEveryDepartment;
-            int diagnosticIndex = i%courseInEveryDiagnostic;
-            if (hospitalIndex<hospitalCount) {
-                HospitalBean hospital = hospitals.get(hospitalIndex);
-                courseRelationService.addCourseToHospital(courseId, hospital.getId());
-                HospitalDepartmentBean department = departments.get(departmentIndex);
-                courseRelationService.addCourseToDepartment(courseId, department.getId());
-                DiagnosticEnumeration diagnosticEnum = diagnosticsEnum.get(diagnosticIndex + 1);
-                DiagnosticEnumerationBean diagnostic = diagnosticBeanConverter.convert(diagnosticEnum);
-                courseRelationService.addCourseToDiagnostic(courseId, diagnostic.getId());
-            }
-            else {
-                courseRelationService.addCourseToHospital(courseId, -1);
-            }
-        }
+//        List<Long> coursesId = new ArrayList<>();
+//        for(int i=0; i<2100;i++) {
+//            String name = getRandomString(10);
+//            String introduction = getRandomString(140);
+//            String enrollUrl = "http://" + getRandomString(30);
+//            CourseBean course = courseService.createCourse(name, introduction, enrollUrl, "", 0);
+//            coursesId.add(course.getId());
+//        }
+//        long hospitalCount = hospitalService.countHospitalByConditions(false, null, null, null, null, null, 1, 1);
+//        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(false, null, null, null, null, null, 1, 1, 0, (int)hospitalCount);
+//        List<HospitalDepartmentBean> departments = departmentService.getAll("");
+//        List<DiagnosticEnumeration> diagnosticsEnum = DiagnosticEnumeration.getAllDiagnostic();
+//
+//        int departmentCount = departments.size();
+//        int diagnosticCount = diagnosticsEnum.size() - 1;
+//        int courseInEveryDiagnostic = 5;
+//        int hospitalCount = coursesId.size()/(courseInEveryDiagnostic*diagnosticCount*departmentCount);
+//
+//        int coursesInEveryHospital = courseInEveryDiagnostic*diagnosticCount*departmentCount;
+//        int coursesInEveryDepartment = courseInEveryDiagnostic*diagnosticCount;
+//        for (int i=0, count=coursesId.size(); i<count; i++) {
+//            Long courseId = coursesId.get(i);
+//            int hospitalIndex = i/coursesInEveryHospital;
+//            int departmentIndex = i/coursesInEveryDepartment;
+//            int diagnosticIndex = i%courseInEveryDiagnostic;
+//            if (hospitalIndex<hospitalCount) {
+//                HospitalBean hospital = hospitals.get(hospitalIndex);
+//                courseRelationService.addCourseToHospital(courseId, hospital.getId());
+//                HospitalDepartmentBean department = departments.get(departmentIndex);
+//                courseRelationService.addCourseToDepartment(courseId, department.getId());
+//                DiagnosticEnumeration diagnosticEnum = diagnosticsEnum.get(diagnosticIndex + 1);
+//                DiagnosticEnumerationBean diagnostic = diagnosticBeanConverter.convert(diagnosticEnum);
+//                courseRelationService.addCourseToDiagnostic(courseId, diagnostic.getId());
+//            }
+//            else {
+//                courseRelationService.addCourseToHospital(courseId, -1);
+//            }
+//        }
     }
 
     public static String getRandomString(int length) { //length表示生成字符串的长度

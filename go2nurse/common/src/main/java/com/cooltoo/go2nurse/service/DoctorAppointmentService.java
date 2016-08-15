@@ -25,4 +25,10 @@ public class DoctorAppointmentService {
     //=========================================================================
     //                    adding
     //=========================================================================
+//    @Transactional
+//    public DoctorAppointmentBean appointDoctor(long userId, long patientId, long clinicHoursId) {
+//        DoctorClinicHoursBean clinicHoursBean = clinicDateHoursService.getClinicHourById(clinicHoursId);
+//
+//    }
+
 }

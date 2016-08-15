@@ -51,12 +51,6 @@ public class HospitalServiceTest extends AbstractCooltooTest {
     }
 
     @Test
-    public void testGetAll() {
-        List<HospitalBean> all = service.getAll();
-        Assert.assertEquals(5, all.size());
-    }
-
-    @Test
     public void testGetOne() {
         HospitalBean one = service.getOneById(33);
         Assert.assertEquals(33, one.getId());
@@ -97,13 +91,13 @@ public class HospitalServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testSearch() {
-        List<HospitalBean> hospitals = service.searchHospital(false, true, null, -1, -1, -1, null, -1, 1, 0, 5);
+        List<HospitalBean> hospitals = service.searchHospitalByConditions(true, null, null, null, null, null, null, 1, 0, 5);
         Assert.assertEquals(3, hospitals.size());
         Assert.assertEquals(11, hospitals.get(0).getId());
         Assert.assertEquals(22, hospitals.get(1).getId());
         Assert.assertEquals(33, hospitals.get(2).getId());
 
-        hospitals = service.searchHospital(false, true, null, -1, -1, -1, null, -1, 0, 0, 5);
+        hospitals = service.searchHospitalByConditions(true, null, null, null, null, null, null, 0, 0, 5);
         Assert.assertEquals(2, hospitals.size());
         Assert.assertEquals(44, hospitals.get(0).getId());
         Assert.assertEquals(55, hospitals.get(1).getId());

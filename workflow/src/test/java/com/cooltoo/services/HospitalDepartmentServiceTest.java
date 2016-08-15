@@ -21,6 +21,7 @@ import java.util.List;
  */
 @Transactional
 @DatabaseSetups({
+        @DatabaseSetup("classpath:/com/cooltoo/services/hospital_data.xml"),
         @DatabaseSetup("classpath:/com/cooltoo/services/hospital_department_data.xml")
 })
 public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
@@ -32,17 +33,11 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testNew1() {
-        int id = service.createHospitalDepartment("name111", "department111", -1, -1, null, null);
+        int id = service.createHospitalDepartment(11, "name111", "department111", -1, -1, null, null);
         Assert.assertTrue(id>0);
         List<HospitalDepartmentBean> all = service.getDepartmentsByIds(Arrays.asList(new Integer[]{id}));
         Assert.assertEquals(1, all.size());
         Assert.assertNotNull(all.get(0).getUniqueId());
-    }
-
-    @Test
-    public void testGetAll() {
-        List< HospitalDepartmentBean> all = service.getAll();
-        Assert.assertEquals(5, all.size());
     }
 
     @Test

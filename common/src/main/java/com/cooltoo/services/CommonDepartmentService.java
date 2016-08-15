@@ -36,33 +36,11 @@ public class CommonDepartmentService {
     //=======================================================
     //        get department
     //=======================================================
-    public List<HospitalDepartmentBean> getAll(String nginxPrefix) {
-        Sort sort = new Sort(Sort.Direction.ASC, "id");
-        Iterable<HospitalDepartmentEntity> resultSet  = repository.findAll(sort);
-        List<HospitalDepartmentBean> beans = entitiesToBeans(resultSet);
-        List<Integer> topLevelIds  = new ArrayList<>();
-        for (HospitalDepartmentBean bean : beans) {
-            if (bean.getParentId()<=0) {
-                topLevelIds.add(bean.getId());
-            }
-        }
-        for (HospitalDepartmentBean bean : beans) {
-            bean.setParentValid(topLevelIds.contains(bean.getParentId()));
-        }
-        fillOtherProperties(beans, nginxPrefix);
-        return beans;
-    }
-
     public List<HospitalDepartmentBean> getDepartmentByUniqueId(String uniqueId, String nginxPrefix) {
-        List<HospitalDepartmentBean> all = getAll(nginxPrefix);
-        List<HospitalDepartmentBean> departments = new ArrayList<>();
-        for (int i=0, count=all.size(); i<count; i++) {
-            HospitalDepartmentBean bean = all.get(i);
-            if (bean.getUniqueId().equals(uniqueId)) {
-                departments.add(bean);
-            }
-        }
-        return departments;
+        List<HospitalDepartmentEntity> entities = repository.findByUniqueId(uniqueId);
+        List<HospitalDepartmentBean> departments = entitiesToBeans(entities);
+        fillOtherProperties(departments, nginxPrefix);
+       return departments;
     }
 
     public HospitalDepartmentBean getById(Integer id, String nginxPrefix) {
@@ -79,21 +57,28 @@ public class CommonDepartmentService {
     }
 
     public List<HospitalDepartmentBean> getByIds(List<Integer> ids, String nginxPrefix) {
-        List<HospitalDepartmentBean> retVal = new ArrayList<>();
         if (VerifyUtil.isListEmpty(ids)) {
-            return retVal;
+            return new ArrayList<>();
         }
-        List<HospitalDepartmentBean> beans = getAll(nginxPrefix);
-        for (HospitalDepartmentBean bean : beans) {
-            if (ids.contains(bean.getId())) {
-                retVal.add(bean);
-            }
-        }
-        return retVal;
+        List<HospitalDepartmentEntity> entities = repository.findByIdIn(ids, sort);
+        List<HospitalDepartmentBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans, nginxPrefix);
+        return beans;
     }
 
-    public List<HospitalDepartmentBean> getTopLevel(boolean checkEnable, int enable, String nginxPrefix) {
-        List<HospitalDepartmentBean> allDepartments = getAll(nginxPrefix);
+    public List<HospitalDepartmentBean> getByHospitalId(Integer hospitalId, String nginxPrefix) {
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        List<HospitalDepartmentEntity> entities = repository.findByHospitalId(hospitalId, sort);
+        List<HospitalDepartmentBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans, nginxPrefix);
+        return beans;
+    }
+
+    public List<HospitalDepartmentBean> getTopLevel(int hospitalId, boolean checkEnable, int enable, String nginxPrefix) {
+        List<HospitalDepartmentEntity> entities = repository.findByHospitalId(hospitalId, sort);
+        List<HospitalDepartmentBean> allDepartments = entitiesToBeans(entities);
+        fillOtherProperties(allDepartments, nginxPrefix);
+
         List<HospitalDepartmentBean> allTopLevels = new ArrayList<>();
         List<HospitalDepartmentBean> subDepartment;
         Map<Integer, List<HospitalDepartmentBean>> id2SubDepart = new Hashtable<>();
@@ -103,7 +88,7 @@ public class CommonDepartmentService {
                 continue;
             }
             if (department.getParentId() <= 0) {
-                subDepartment = new ArrayList<HospitalDepartmentBean>();
+                subDepartment = new ArrayList<>();
                 allTopLevels.add(department);
                 department.setSubDepartment(subDepartment);
                 id2SubDepart.put(department.getId(), subDepartment);
@@ -124,16 +109,17 @@ public class CommonDepartmentService {
         return allTopLevels;
     }
 
-    public List<HospitalDepartmentBean> getByParentId(int parentId, boolean checkEnable, int enable, String nginxPrefix) {
-        List<HospitalDepartmentBean> allDepartments = getAll(nginxPrefix);
+    public List<HospitalDepartmentBean> getByParentId(int hospitalId, int parentId, boolean checkEnable, int enable, String nginxPrefix) {
+        List<HospitalDepartmentEntity> entities = repository.findByHospitalIdAndParentId(hospitalId, parentId, sort);
+        List<HospitalDepartmentBean> allDepartments = entitiesToBeans(entities);
+        fillOtherProperties(allDepartments, nginxPrefix);
+
         List<HospitalDepartmentBean> secondLevels = new ArrayList<>();
         for(HospitalDepartmentBean department : allDepartments) {
             if (checkEnable && department.getEnable()!=enable) {
                 continue;
             }
-            if (department.getParentId() == parentId) {
-                secondLevels.add(department);
-            }
+            secondLevels.add(department);
         }
         return secondLevels;
     }

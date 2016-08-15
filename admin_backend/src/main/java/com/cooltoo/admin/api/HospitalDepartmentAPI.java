@@ -10,6 +10,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class HospitalDepartmentAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getAll() {
-        List<HospitalDepartmentBean> all = service.getAll();
+        List<HospitalDepartmentBean> all = new ArrayList<>();
         return Response.ok(all).build();
     }
 
@@ -50,18 +51,20 @@ public class HospitalDepartmentAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getTopLevelDepartment() {
-        List<HospitalDepartmentBean> topLevels = service.getAllTopLevelDepartment();
+    public Response getTopLevelDepartment(@DefaultValue("0") @QueryParam("hospital_id") int hospitalId) {
+        List<HospitalDepartmentBean> topLevels = service.getAllTopLevelDepartment(hospitalId);
         logger.info("get all top level hospital " + topLevels);
         return Response.ok(topLevels).build();
     }
 
-    @Path("/second_level/{parent_id}")
+    @Path("/second_level")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getSecondLevelDepartment(@PathParam("parent_id") int parentId) {
-        List<HospitalDepartmentBean> topLevels = service.getSecondLevelDepartment(parentId);
+    public Response getSecondLevelDepartment(@DefaultValue("0") @QueryParam("hospital_id") int hospitalId,
+                                             @DefaultValue("0") @QueryParam("parent_id") int parentId
+    ) {
+        List<HospitalDepartmentBean> topLevels = service.getSecondLevelDepartment(hospitalId, parentId);
         logger.info("get second level hospital " + topLevels);
         return Response.ok(topLevels).build();
     }
@@ -125,11 +128,13 @@ public class HospitalDepartmentAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response newOne(@DefaultValue("")   @FormParam("name")        String name,
+    public Response newOne(@DefaultValue("0") @FormParam("hospital_id") int hospitalId,
+                           @DefaultValue("")   @FormParam("name") String name,
                            @DefaultValue("")   @FormParam("description") String description,
-                           @DefaultValue("-1") @FormParam("enable")      int enable,
-                           @DefaultValue("-1") @FormParam("parent_id")   int parentId) {
-        int id = service.createHospitalDepartment(name, description, enable, parentId, null, null);
+                           @DefaultValue("-1") @FormParam("enable") int enable,
+                           @DefaultValue("-1") @FormParam("parent_id") int parentId
+    ) {
+        int id = service.createHospitalDepartment(hospitalId, name, description, enable, parentId, null, null);
         logger.info("new hospital department id is " + id);
         return Response.ok(id).build();
     }

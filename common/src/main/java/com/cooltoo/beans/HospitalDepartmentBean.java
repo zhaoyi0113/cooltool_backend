@@ -1,5 +1,6 @@
 package com.cooltoo.beans;
 
+import javax.persistence.Column;
 import java.util.List;
 
 /**
@@ -8,6 +9,7 @@ import java.util.List;
 public class HospitalDepartmentBean {
 
     private int id;
+    private int hospitalId;
     private String name;
     private String description;
     private int enable;
@@ -26,6 +28,14 @@ public class HospitalDepartmentBean {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(int hospitalId) {
+        this.hospitalId = hospitalId;
     }
 
     public String getName() {
@@ -120,6 +130,7 @@ public class HospitalDepartmentBean {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", hospitalId=").append(hospitalId);
         msg.append(", name=").append(name);
         msg.append(", description=").append(description);
         msg.append(", enable=").append(enable);

@@ -34,8 +34,7 @@ public class CommonHospitalService {
 
     @Autowired private HospitalRepository repository;
     @Autowired private HospitalBeanConverter beanConverter;
-    @Autowired
-    private RegionService regionService;
+    @Autowired private RegionService regionService;
 
     //=======================================================
     //        get
@@ -52,17 +51,6 @@ public class CommonHospitalService {
         List<HospitalBean> hospitalBeans = entities2Beans(hospitals);
         fillOtherProperties(hospitalBeans);
         return hospitalBeans;
-    }
-
-    public List<HospitalBean> getAll() {
-        Iterable<HospitalEntity> iterable = repository.findAll();
-        List<HospitalBean> all = new ArrayList<>();
-        for (HospitalEntity entity : iterable) {
-            HospitalBean bean = beanConverter.convert(entity);
-            all.add(bean);
-        }
-        fillOtherProperties(all);
-        return all;
     }
 
     public long getHospitalSize() {
@@ -99,11 +87,7 @@ public class CommonHospitalService {
             return new ArrayList<>();
         }
         List<HospitalEntity> resultSet = repository.findByIdIn(hospitalIds);
-        List<HospitalBean>   hospitals = new ArrayList<>();
-        for (HospitalEntity result : resultSet) {
-            HospitalBean bean = beanConverter.convert(result);
-            hospitals.add(bean);
-        }
+        List<HospitalBean> hospitals = entities2Beans(resultSet);
         fillOtherProperties(hospitals);
         return hospitals;
     }
@@ -115,94 +99,62 @@ public class CommonHospitalService {
         return hospitalsInProvince;
     }
 
-    public List<HospitalBean> searchHospital(boolean isCount, boolean isAnd, String name,
-                                             int province, int city, int district, String address,
-                                             int status, int supportGo2nurse,
-                                             int index, int number) {
-        List<HospitalBean> allHospitals     = getAll();
-        List<HospitalBean> allHospitalMatch = new ArrayList<HospitalBean>();
-
-        boolean matchName     = !VerifyUtil.isStringEmpty(name);
-        boolean matchAddress  = !VerifyUtil.isStringEmpty(address);
-        boolean matchProvince = (province>0);
-        boolean matchCity     = (city    >0);
-        boolean matchDistrict = (district>0);
-        boolean matchRegion   = (matchProvince || matchCity || matchDistrict);
-        boolean matchStatus   = (1==status || 0==status);
-        boolean matchSupport  = (1==supportGo2nurse || 0==supportGo2nurse);
-        boolean condition1    = true;
-        boolean condition2    = true;
-        boolean condition3    = true;
-        boolean condition4    = true;
-        boolean condition5    = true;
-        if (null==allHospitals || allHospitals.isEmpty()) {
-            return allHospitals;
+    public long countHospitalByConditions(boolean isAnd, String name, Integer province, Integer city, Integer district, String address, Integer enable, Integer supportGo2nurse) {
+        logger.info("count by isAnd={} name={} province={} city={} district={} address={} enable={} supportGo2nurse={}",
+                isAnd, name, province, city, district, address, enable, supportGo2nurse);
+        long count = 0;
+        name = VerifyUtil.isStringEmpty(name) ? null : VerifyUtil.reconstructSQLContentLike(name.trim());
+        address = VerifyUtil.isStringEmpty(address) ? null : VerifyUtil.reconstructSQLContentLike(address.trim());
+        if (isAnd) {
+            count = repository.countByConditionsAND(name, province, city, district, address, enable, supportGo2nurse);
         }
-        for (HospitalBean hospital : allHospitals) {
-            condition1 = (!matchName)    || (matchName && !VerifyUtil.isStringEmpty(hospital.getName()) && hospital.getName().contains(name));
-            condition1 = (condition1     || (!matchName) || (matchName && !VerifyUtil.isStringEmpty( hospital.getAliasName()) && hospital.getAliasName().contains(name)));
-            condition2 = (!matchAddress) || (matchAddress && !VerifyUtil.isStringEmpty( hospital.getAddress()) && hospital.getAddress().contains(address));
-            condition4 = (!matchStatus)  || (matchStatus && hospital.getEnable()==status);
-            condition5 = (!matchSupport) || (matchSupport && hospital.getSupportGo2nurse()==supportGo2nurse);
-            if (matchRegion) {
-                if (!matchProvince) { province = hospital.getProvince(); }
-                if (!matchCity    ) { city     = hospital.getCity();     }
-                if (!matchDistrict) { district = hospital.getDistrict(); }
-
-                condition3 = ((hospital.getProvince() == province)
-                           && (hospital.getCity()     == city)
-                           && (hospital.getDistrict() == district));
-            }
-            else {
-                condition3 = true;
-            }
-
-            if (( isAnd && (condition1 && condition2 && condition3 && condition4 && condition5))
-             || (!isAnd && (condition1 || condition2 || condition3 || condition4 || condition5))) {
-                allHospitalMatch.add(hospital);
-            }
+        else {
+            count = repository.countByConditionsOR(name, province, city, district, address, enable, supportGo2nurse);
         }
+        logger.info("count is {}", count);
+        return count;
+    }
 
-        if (isCount) {
-            return allHospitalMatch;
-        }
+    public List<HospitalBean> searchHospitalByConditions(boolean isAnd, String name,
+                                                         Integer province, Integer city, Integer district, String address,
+                                                         Integer enable, Integer supportGo2nurse,
+                                                         Integer index, Integer number
+    ) {
+        logger.info("search by isAnd={} name={} province={} city={} district={} address={} enable={} supportGo2nurse={} index={} number={}",
+                isAnd, name, province, city, district, address, enable, supportGo2nurse, index, number);
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
+        PageRequest page = new PageRequest(index, number, sort);
 
-        List<HospitalBean> hospitals  = new ArrayList<>();
-        int iIndex   = Math.abs(index);
-        int iNumber  = Math.abs(number);
-        int startIdx = iIndex*iNumber;
-        int endIdx   = startIdx + number;
-        if (startIdx<0) {
-            startIdx = 0;
-        }
-        else if (startIdx>=allHospitalMatch.size()) {
-            return hospitals;
-        }
+        name = VerifyUtil.isStringEmpty(name) ? null : VerifyUtil.reconstructSQLContentLike(name.trim());
+        address = VerifyUtil.isStringEmpty(address) ? null : VerifyUtil.reconstructSQLContentLike(address.trim());
 
-        for (int i=startIdx, count=allHospitalMatch.size(); i<endIdx && i<count; i++) {
-            HospitalBean tmp = allHospitalMatch.get(i);
-            hospitals.add(tmp);
+        Page<HospitalEntity> entities;
+        if (isAnd) {
+            entities = repository.findByConditionsAND(name, province, city, district, address, enable, supportGo2nurse, page);
         }
-
-        return hospitals;
+        else {
+            entities = repository.findByConditionsOR(name, province, city, district, address, enable, supportGo2nurse, page);
+        }
+        List<HospitalBean> beans = entities2Beans(entities);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
     }
 
     public List<HospitalBean> getAllHospitalEnable() {
-        List<HospitalBean> allHospitals      = getAll();
-        List<HospitalBean> allHospitalEnable = new ArrayList<HospitalBean>();
-        for (HospitalBean hospital : allHospitals) {
-            if (hospital.getEnable()>0) {
-                allHospitalEnable.add(hospital);
-            }
-        }
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
+        List<HospitalEntity> entities = repository.findByEnable(1, sort);
+        List<HospitalBean> allHospitalEnable = entities2Beans(entities);
         return allHospitalEnable;
     }
 
     public List<HospitalBean> getAllHospitalEnableSupportGo2nurse() {
-        List<HospitalBean> allHospitals      = getAll();
-        List<HospitalBean> allHospitalEnable = new ArrayList<HospitalBean>();
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
+        List<HospitalEntity> entities = repository.findBySupportGo2nurse(1, sort);
+        List<HospitalBean> allHospitals = entities2Beans(entities);
+        List<HospitalBean> allHospitalEnable = new ArrayList<>();
         for (HospitalBean hospital : allHospitals) {
-            if (hospital.getEnable()>0 && hospital.getSupportGo2nurse()>0) {
+            if (hospital.getEnable()>0) {
                 allHospitalEnable.add(hospital);
             }
         }
@@ -215,17 +167,17 @@ public class CommonHospitalService {
             return null;
         }
         HospitalBean bean = beanConverter.convert(entity);
-        List<HospitalBean> one = new ArrayList<HospitalBean>();
+        List<HospitalBean> one = new ArrayList<>();
         one.add(bean);
         fillOtherProperties(one);
         return one.get(0);
     }
 
-    private List<HospitalBean> entities2Beans(Iterable<HospitalEntity> entities) {
+    public List<HospitalBean> entities2Beans(Iterable<HospitalEntity> entities) {
         if (null==entities) {
             return new ArrayList<>();
         }
-        List<HospitalBean> beans = new ArrayList<HospitalBean>();
+        List<HospitalBean> beans = new ArrayList<>();
         for (HospitalEntity entity : entities) {
             HospitalBean bean = beanConverter.convert(entity);
             beans.add(bean);
@@ -234,12 +186,12 @@ public class CommonHospitalService {
         return beans;
     }
 
-    private List<HospitalBean> fillOtherProperties(List<HospitalBean> hospitals) {
+    public List<HospitalBean> fillOtherProperties(List<HospitalBean> hospitals) {
         if (null==hospitals || hospitals.isEmpty()) {
             return hospitals;
         }
 
-        List<Integer> regionIds = new ArrayList<Integer>();
+        List<Integer> regionIds = new ArrayList<>();
         for (HospitalBean hospital : hospitals) {
             regionIds.add(hospital.getProvince());
             regionIds.add(hospital.getCity());

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataset>
-    <cooltoo_hospital_department id="11" name="name1" description="description 1" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="111111" />
-    <cooltoo_hospital_department id="22" name="name2" description="description 2" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="222222" />
-    <cooltoo_hospital_department id="33" name="name3" description="description 3" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="333333" />
-    <cooltoo_hospital_department id="44" name="name4" description="description 4" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="444444" />
-    <cooltoo_hospital_department id="55" name="name5" description="description 5" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="555555" />
+    <cooltoo_hospital_department id="11" hospital_id="11" name="name1" description="description 1" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="111111" />
+    <cooltoo_hospital_department id="22" hospital_id="22" name="name2" description="description 2" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="222222" />
+    <cooltoo_hospital_department id="33" hospital_id="33" name="name3" description="description 3" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="333333" />
+    <cooltoo_hospital_department id="44" hospital_id="44" name="name4" description="description 4" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="444444" />
+    <cooltoo_hospital_department id="55" hospital_id="55" name="name5" description="description 5" enable="1" parent_id="-1" image_id="-1" disable_image_id="-1" unique_id="555555" />
 </dataset>

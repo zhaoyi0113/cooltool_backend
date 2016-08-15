@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Table(name = "cooltoo_hospital_department")
 public class HospitalDepartmentEntity {
     private int id;
+    private int hospitalId;
     private String name;
     private String description;
     private int enable;
@@ -26,6 +27,15 @@ public class HospitalDepartmentEntity {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Column(name = "hospital_id")
+    public int getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(int hospitalId) {
+        this.hospitalId = hospitalId;
     }
 
     @Column(name = "name")

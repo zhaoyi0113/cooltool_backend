@@ -14,6 +14,7 @@ public class HospitalDepartmentBeanConverter implements Converter<HospitalDepart
     public HospitalDepartmentBean convert(HospitalDepartmentEntity source) {
         HospitalDepartmentBean bean = new HospitalDepartmentBean();
         bean.setId(source.getId());
+        bean.setHospitalId(source.getHospitalId());
         bean.setName(source.getName());
         bean.setDescription(source.getDescription());
         bean.setEnable(source.getEnable());
