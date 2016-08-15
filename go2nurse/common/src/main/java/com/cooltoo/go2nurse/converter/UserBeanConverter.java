@@ -27,6 +27,7 @@ public class UserBeanConverter implements Converter<UserEntity, UserBean> {
         bean.setUniqueId(source.getUniqueId());
         bean.setAddress(source.getAddress());
         bean.setHasDecide(source.getHasDecide());
+        bean.setChannel(source.getChannel().ordinal());
         return bean;
     }
 }

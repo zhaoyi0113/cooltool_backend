@@ -1,9 +1,6 @@
 package com.cooltoo.go2nurse.entities;
 
-import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.GenderType;
-import com.cooltoo.constants.UserAuthority;
-import com.cooltoo.constants.UserType;
+import com.cooltoo.constants.*;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 
 import javax.persistence.*;
@@ -30,6 +27,7 @@ public class UserEntity {
     private String uniqueId;
     private String address;
     private UserHospitalizedStatus hasDecide;
+    private AppChannel channel;
 
     @Id
     @GeneratedValue
@@ -161,6 +159,16 @@ public class UserEntity {
 
     public void setHasDecide(UserHospitalizedStatus hasDecide) {
         this.hasDecide = hasDecide;
+    }
+
+    @Column(name = "channel")
+    @Enumerated
+    public AppChannel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(AppChannel channel) {
+        this.channel = channel;
     }
 
     public String toString() {
