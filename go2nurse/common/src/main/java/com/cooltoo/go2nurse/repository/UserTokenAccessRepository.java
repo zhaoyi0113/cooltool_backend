@@ -13,5 +13,6 @@ public interface UserTokenAccessRepository extends JpaRepository<UserTokenAccess
 
     List<UserTokenAccessEntity> findTokenAccessByUserIdAndUserType(long userId, UserType userType);
     List<UserTokenAccessEntity> findTokenAccessByToken(String token);
+    List<UserTokenAccessEntity> findByUserId(long userId);
 
 }

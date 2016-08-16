@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.converter;
 
 import com.cooltoo.constants.AppChannel;
+import com.cooltoo.constants.CommonStatus;
 
 import javax.persistence.*;
 
@@ -16,6 +17,9 @@ public class UserOpenAppEntity {
     private String unionid;
     private String data;
     private AppChannel channel;
+    private long userId;
+    private CommonStatus status;
+    private long createdAt;
 
     @Id
     @Column(name = "id")
@@ -63,4 +67,32 @@ public class UserOpenAppEntity {
     public void setChannel(AppChannel channel) {
         this.channel = channel;
     }
+
+    @Column(name = "user_id")
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    @Column(name = "status")
+    public CommonStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CommonStatus status) {
+        this.status = status;
+    }
+
+    @Column(name = "created_at")
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
 }
+

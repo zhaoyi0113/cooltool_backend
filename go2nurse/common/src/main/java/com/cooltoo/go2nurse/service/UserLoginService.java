@@ -7,6 +7,7 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.entities.UserEntity;
 import com.cooltoo.go2nurse.entities.UserTokenAccessEntity;
+import com.cooltoo.go2nurse.repository.UserOpenAppRepository;
 import com.cooltoo.go2nurse.repository.UserRepository;
 import com.cooltoo.go2nurse.repository.UserTokenAccessRepository;
 import com.cooltoo.util.AccessTokenGenerator;
@@ -27,22 +28,27 @@ public class UserLoginService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserLoginService.class);
 
-    @Autowired private UserTokenAccessRepository tokenAccessRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private AccessTokenGenerator tokenGenerator;
+    @Autowired
+    private UserTokenAccessRepository tokenAccessRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private AccessTokenGenerator tokenGenerator;
+    @Autowired
+    private UserOpenAppRepository openAppRepository;
 
     @Transactional
-    public UserTokenAccessEntity login(String mobile, String password){
+    public UserTokenAccessEntity login(String mobile, String password) {
         logger.info("login by mobile={} password={}", mobile, password);
         List<UserEntity> users = userRepository.findByMobile(mobile);
-        if(users == null || users.isEmpty()){
+        if (users == null || users.isEmpty()) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
         UserEntity userEntity = users.get(0);
-        if(userEntity.getPassword()!=null && !userEntity.getPassword().equals(password)){
+        if (userEntity.getPassword() != null && !userEntity.getPassword().equals(password)) {
             throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
         }
-        if(UserAuthority.DENY_ALL.equals(userEntity.getAuthority())) {
+        if (UserAuthority.DENY_ALL.equals(userEntity.getAuthority())) {
             throw new BadRequestException(ErrorCode.USER_AUTHORITY_DENY_ALL);
         }
         UserTokenAccessEntity entity = new UserTokenAccessEntity();
@@ -56,10 +62,10 @@ public class UserLoginService {
     }
 
     @Transactional
-    public void logout(long userId){
+    public void logout(long userId) {
         logger.info("logout userId={}", userId);
         List<UserTokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByUserIdAndUserType(userId, UserType.NORMAL_USER);
-        if(tokenEntities.isEmpty()){
+        if (tokenEntities.isEmpty()) {
             throw new BadRequestException(ErrorCode.NOT_LOGIN);
         }
         tokenEntities.get(0).setStatus(CommonStatus.DISABLED);

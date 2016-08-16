@@ -5,7 +5,6 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
-import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
 import com.cooltoo.go2nurse.constants.ProcessStatus;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
@@ -47,9 +46,12 @@ public class UserAPI {
                              @FormParam("birthday") @DefaultValue("") String birthday,
                              @FormParam("mobile") @DefaultValue("") String mobile,
                              @FormParam("password") @DefaultValue("") String password,
-                             @FormParam("sms_code") @DefaultValue("") String smsCode
+                             @FormParam("sms_code") @DefaultValue("") String smsCode,
+                            @FormParam("channel")  String channel,
+                            @FormParam("channelid") String channelid
+
     ) {
-        UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode);
+        UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode, channel, channelid);
         PatientBean patientBean = patientService.create(name, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES);
         userPatientRelationService.addPatientToUser(patientBean.getId(), userBean.getId());
         return Response.ok(userBean).build();
