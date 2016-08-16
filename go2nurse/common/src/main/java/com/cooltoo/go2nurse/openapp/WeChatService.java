@@ -168,7 +168,6 @@ public class WeChatService {
         return null;
     }
 
-
     public String getSha1String(String decript) {
         return signString(decript, "SHA-1");
     }
