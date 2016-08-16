@@ -29,8 +29,8 @@ public class HospitalDepartmentAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
-    public Response getAll() {
-        List<HospitalDepartmentBean> all = new ArrayList<>();
+    public Response getAll(@DefaultValue("0") @QueryParam("hospital_id") int hospitalId) {
+        List<HospitalDepartmentBean> all = service.getByHospitalId(hospitalId);
         return Response.ok(all).build();
     }
 

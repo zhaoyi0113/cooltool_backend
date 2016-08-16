@@ -23,8 +23,6 @@ import java.util.*;
 @Service("CommonDepartmentService")
 public class CommonDepartmentService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommonDepartmentService.class.getName());
-
     private static final Sort sort = new Sort(Sort.Direction.ASC, "id");
 
     @Autowired private HospitalDepartmentRepository repository;
@@ -67,7 +65,6 @@ public class CommonDepartmentService {
     }
 
     public List<HospitalDepartmentBean> getByHospitalId(Integer hospitalId, String nginxPrefix) {
-        Sort sort = new Sort(Sort.Direction.DESC, "id");
         List<HospitalDepartmentEntity> entities = repository.findByHospitalId(hospitalId, sort);
         List<HospitalDepartmentBean> beans = entitiesToBeans(entities);
         fillOtherProperties(beans, nginxPrefix);
