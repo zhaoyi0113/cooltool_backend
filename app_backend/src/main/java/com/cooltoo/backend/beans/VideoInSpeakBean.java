@@ -2,6 +2,7 @@ package com.cooltoo.backend.beans;
 
 import com.cooltoo.constants.CCVideoStatus;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.VideoPlatform;
 
 import java.util.Date;
 
@@ -20,6 +21,7 @@ public class VideoInSpeakBean {
     private CCVideoStatus videoStatus;
     private Date time;
     private CommonStatus status;
+    private VideoPlatform platform;
 
     public long getId() {
         return id;
@@ -101,6 +103,14 @@ public class VideoInSpeakBean {
         this.backgroundUrl = backgroundUrl;
     }
 
+    public VideoPlatform getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(VideoPlatform platform) {
+        this.platform = platform;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -112,6 +122,7 @@ public class VideoInSpeakBean {
         msg.append(", background=").append(background);
         msg.append(", backgroundUrl=").append(backgroundUrl);
         msg.append(", videoStatus=").append(videoStatus);
+        msg.append(", platform=").append(platform);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append("]");

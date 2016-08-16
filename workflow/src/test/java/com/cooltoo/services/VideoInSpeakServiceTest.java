@@ -4,6 +4,7 @@ import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.backend.beans.VideoInSpeakBean;
 import com.cooltoo.backend.services.VideoInSpeakService;
 import com.cooltoo.constants.CCVideoStatus;
+import com.cooltoo.constants.VideoPlatform;
 import com.cooltoo.services.file.UserFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
@@ -108,7 +109,7 @@ public class VideoInSpeakServiceTest extends AbstractCooltooTest{
         InputStream background = new ByteArrayInputStream(backgroundName.getBytes());
         String snapshotName = "snapshot_name";
         InputStream snapshot = new ByteArrayInputStream(snapshotName.getBytes());
-        VideoInSpeakBean  bean = service.addVideo(speakId, videoId, backgroundName, background, snapshotName, snapshot);
+        VideoInSpeakBean  bean = service.addVideo(speakId, VideoPlatform.CC.name(), videoId, backgroundName, background, snapshotName, snapshot);
         Assert.assertNotNull(bean);
         Assert.assertNotNull(bean.getBackgroundUrl());
         Assert.assertTrue(bean.getBackground()>0);
@@ -135,7 +136,7 @@ public class VideoInSpeakServiceTest extends AbstractCooltooTest{
         Assert.assertEquals(speakId, videos.get(0).getSpeakId());
         Assert.assertNotEquals(status, videos.get(0).getVideoStatus());
 
-        videos = service.updateVideoStatus(videoId, status.name());
+        videos = service.updateVideoStatus(videoId, VideoPlatform.CC, status.name());
         Assert.assertEquals(1, videos.size());
         Assert.assertEquals(speakId, videos.get(0).getSpeakId());
         Assert.assertEquals(status, videos.get(0).getVideoStatus());

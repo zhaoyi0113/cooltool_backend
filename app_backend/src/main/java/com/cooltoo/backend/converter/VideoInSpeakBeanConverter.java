@@ -22,6 +22,7 @@ public class VideoInSpeakBeanConverter implements Converter<VideoInSpeakEntity, 
         bean.setSnapshot(source.getSnapshot());
         bean.setBackground(source.getBackground());
         bean.setVideoStatus(source.getVideoStatus());
+        bean.setPlatform(source.getPlatform());
         return bean;
     }
 }

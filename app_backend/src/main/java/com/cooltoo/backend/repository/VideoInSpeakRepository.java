@@ -1,6 +1,7 @@
 package com.cooltoo.backend.repository;
 
 import com.cooltoo.backend.entities.VideoInSpeakEntity;
+import com.cooltoo.constants.VideoPlatform;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 
@@ -12,6 +13,6 @@ import java.util.List;
 public interface VideoInSpeakRepository extends CrudRepository<VideoInSpeakEntity, Long> {
     List<VideoInSpeakEntity> findBySpeakIdIn(List<Long> speakIds);
     List<VideoInSpeakEntity> findBySpeakIdIn(List<Long> speakIds, Sort sort);
-    List<VideoInSpeakEntity> findByVideoId(String videoId);
+    List<VideoInSpeakEntity> findByVideoIdAndPlatform(String videoId, VideoPlatform platform);
     long countBySpeakId(Long speakId);
 }

@@ -6,6 +6,7 @@ import com.cooltoo.backend.entities.VideoInSpeakEntity;
 import com.cooltoo.backend.repository.VideoInSpeakRepository;
 import com.cooltoo.constants.CCVideoStatus;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.VideoPlatform;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.file.UserFileStorageService;
@@ -13,6 +14,7 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +39,20 @@ public class VideoInSpeakService {
     @Autowired private VideoInSpeakBeanConverter beanConverter;
     @Autowired private UserFileStorageService userStorage;
 
+    @Value("${nursego.qiniu.access.key}")
+    private String qiniuAccessKey;
+    @Value("${nursego.qiniu.secret.key}")
+    private String qiniuSecretKey;
+
     //================================================================
     //            get
     //================================================================
+    public Map<String, String> getQiNiuAuthority() {
+        Map<String, String> authority = new HashMap<>();
+        authority.put("access_key", qiniuAccessKey);
+        authority.put("secret_key", qiniuSecretKey);
+        return authority;
+    }
 
     public long countVideoInSpeak(long speakId) {
         logger.info("get video count in speak {}", speakId);
@@ -179,14 +192,14 @@ public class VideoInSpeakService {
     //          update
     //====================================================
     @Transactional
-    public List<VideoInSpeakBean> updateVideoStatus(String videoId, String strStatus) {
+    public List<VideoInSpeakBean> updateVideoStatus(String videoId, VideoPlatform platform, String strStatus) {
         logger.info("update video status by videoId={} to status={}", videoId, strStatus);
         CCVideoStatus status = CCVideoStatus.parseString(strStatus);
         if (null==status) {
             logger.error("status is invalid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        List<VideoInSpeakEntity> entities = repository.findByVideoId(videoId);
+        List<VideoInSpeakEntity> entities = repository.findByVideoIdAndPlatform(videoId, platform);
         if (!VerifyUtil.isListEmpty(entities)) {
             for (VideoInSpeakEntity entity : entities) {
                 entity.setVideoStatus(status);
@@ -202,12 +215,16 @@ public class VideoInSpeakService {
     //          add
     //====================================================
     @Transactional
-    public VideoInSpeakBean addVideo(long speakId, String videoId,
+    public VideoInSpeakBean addVideo(long speakId, String strPlatform, String videoId,
                                       String backgroundName , InputStream background,
                                       String snapshotName, InputStream snapshot) {
-        logger.info("add video={} and backgroundImage={}->{} snapshotImage={}->{} to speak {}",
-                videoId, backgroundName, null!=background, snapshotName, null!=snapshot, speakId);
-
+        logger.info("add platform={} video={} and backgroundImage={}->{} snapshotImage={}->{} to speak {}",
+                strPlatform, videoId, backgroundName, null!=background, snapshotName, null!=snapshot, speakId);
+        VideoPlatform platform = VideoPlatform.parseString(strPlatform);
+        if (null==platform) {
+            logger.error("platform is null");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
         if (VerifyUtil.isStringEmpty(videoId)) {
             logger.error("video is null");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -243,6 +260,7 @@ public class VideoInSpeakService {
             entity.setSnapshot(snapshotId);
         }
 
+        entity.setPlatform(platform);
         entity.setVideoStatus(CCVideoStatus.OTHER);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);

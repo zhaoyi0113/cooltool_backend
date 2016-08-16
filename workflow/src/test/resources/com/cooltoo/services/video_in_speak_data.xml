@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dataset>
-    <nursego_video_in_speak id="1"  speak_id="1"  video_id="111" snapshot="1"  background="1"  video_status="0" status="1" time_created="2016-01-01" />
-    <nursego_video_in_speak id="2"  speak_id="2"  video_id="222" snapshot="2"  background="2"  video_status="0" status="1" time_created="2016-01-01" />
-    <nursego_video_in_speak id="3"  speak_id="3"  video_id="333" snapshot="3"  background="3"  video_status="1" status="1" time_created="2016-01-01" />
-    <nursego_video_in_speak id="4"  speak_id="4"  video_id="444" snapshot="4"  background="4"  video_status="1" status="1" time_created="2016-01-01" />
-    <nursego_video_in_speak id="5"  speak_id="5"  video_id="555" snapshot="5"  background="5"  video_status="1" status="1" time_created="2016-01-01" />
-    <nursego_video_in_speak id="6"  speak_id="6"  video_id="666" snapshot="6"  background="6"  video_status="1" status="1" time_created="2016-01-01" />
-    <nursego_video_in_speak id="7"  speak_id="7"  video_id="777" snapshot="7"  background="7"  video_status="1" status="1" time_created="2016-01-01" />
-    <nursego_video_in_speak id="8"  speak_id="8"  video_id="888" snapshot="8"  background="8"  video_status="1" status="1" time_created="2016-01-01" />
-    <nursego_video_in_speak id="9"  speak_id="8"  video_id="999" snapshot="9"  background="9"  video_status="1" status="1" time_created="2016-01-01" />
+    <nursego_video_in_speak id="1"  speak_id="1" video_platform="0" video_id="111" snapshot="1"  background="1"  video_status="0" status="1" time_created="2016-01-01" />
+    <nursego_video_in_speak id="2"  speak_id="2" video_platform="0" video_id="222" snapshot="2"  background="2"  video_status="0" status="1" time_created="2016-01-01" />
+    <nursego_video_in_speak id="3"  speak_id="3" video_platform="0" video_id="333" snapshot="3"  background="3"  video_status="1" status="1" time_created="2016-01-01" />
+    <nursego_video_in_speak id="4"  speak_id="4" video_platform="0" video_id="444" snapshot="4"  background="4"  video_status="1" status="1" time_created="2016-01-01" />
+    <nursego_video_in_speak id="5"  speak_id="5" video_platform="0" video_id="555" snapshot="5"  background="5"  video_status="1" status="1" time_created="2016-01-01" />
+    <nursego_video_in_speak id="6"  speak_id="6" video_platform="0" video_id="666" snapshot="6"  background="6"  video_status="1" status="1" time_created="2016-01-01" />
+    <nursego_video_in_speak id="7"  speak_id="7" video_platform="0" video_id="777" snapshot="7"  background="7"  video_status="1" status="1" time_created="2016-01-01" />
+    <nursego_video_in_speak id="8"  speak_id="8" video_platform="0" video_id="888" snapshot="8"  background="8"  video_status="1" status="1" time_created="2016-01-01" />
+    <nursego_video_in_speak id="9"  speak_id="8" video_platform="0" video_id="999" snapshot="9"  background="9"  video_status="1" status="1" time_created="2016-01-01" />
 </dataset>

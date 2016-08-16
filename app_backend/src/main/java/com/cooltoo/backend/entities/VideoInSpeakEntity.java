@@ -2,6 +2,7 @@ package com.cooltoo.backend.entities;
 
 import com.cooltoo.constants.CCVideoStatus;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.VideoPlatform;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -21,6 +22,7 @@ public class VideoInSpeakEntity {
     private CCVideoStatus videoStatus;
     private Date time;
     private CommonStatus status;
+    private VideoPlatform platform;
 
     @Id
     @GeneratedValue
@@ -66,6 +68,12 @@ public class VideoInSpeakEntity {
         return status;
     }
 
+    @Column(name = "video_platform")
+    @Enumerated
+    public VideoPlatform getPlatform() {
+        return platform;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -98,6 +106,10 @@ public class VideoInSpeakEntity {
         this.status = status;
     }
 
+    public void setPlatform(VideoPlatform platform) {
+        this.platform = platform;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -107,6 +119,7 @@ public class VideoInSpeakEntity {
         msg.append(", snapshot=").append(snapshot);
         msg.append(", background=").append(background);
         msg.append(", videoStatus=").append(videoStatus);
+        msg.append(", platform=").append(platform);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append("]");

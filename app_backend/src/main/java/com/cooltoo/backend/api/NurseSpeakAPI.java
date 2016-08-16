@@ -7,6 +7,8 @@ import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.backend.services.VideoInSpeakService;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.SpeakType;
+import com.cooltoo.constants.VideoPlatform;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -18,9 +20,13 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yzzhao on 3/15/16.
@@ -110,20 +116,54 @@ public class NurseSpeakAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response shortVideoCallback(@Context HttpServletRequest request,
-                                       @QueryParam("videoid") @DefaultValue("") String videoCode,
+                                       @QueryParam("videoid") @DefaultValue("") String videoCodeId,
                                        @QueryParam("status") @DefaultValue("") String status,
                                        @QueryParam("duration") @DefaultValue("0") long durationSecond,
                                        @QueryParam("image") @DefaultValue("") String frontCoverUrl
     ) {
-        logger.info("short video call back videoCode={} status={} durationSecond={} frontCoverUrl={}",
-                videoCode, status, durationSecond, frontCoverUrl);
-        List<VideoInSpeakBean> videosUpdated = videoInSpeakService.updateVideoStatus(videoCode, status);
+        logger.info("short video call back videoCodeId={} status={} durationSecond={} frontCoverUrl={}",
+                videoCodeId, status, durationSecond, frontCoverUrl);
+        List<VideoInSpeakBean> videosUpdated = videoInSpeakService.updateVideoStatus(videoCodeId, VideoPlatform.CC, status);
         if (!VerifyUtil.isListEmpty(videosUpdated)) {
             return Response.ok(VerifyUtil.CC_VIDEO_CALLBACK_MESSAGE).build();
         }
         else {
             return Response.ok().build();
         }
+    }
+
+    @Path("/short_video/authority/7niu")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireNurseLogin = true)
+    public Response shortVideoQiNiuAuthority(@Context HttpServletRequest request) {
+        return Response.ok(videoInSpeakService.getQiNiuAuthority()).build();
+    }
+
+    @Path("/short_video/7niu_callback")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response shortVideoQiNiuCallback(@Context HttpServletRequest request) {
+        //接收七牛回调过来的内容
+        try {
+            String authorization = request.getHeader("Authorization");
+            logger.info("Authorization={}", authorization);
+            String line = "";
+            BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            logger.info("callback={}", sb.toString());//打印回调内容
+        }
+        catch (Exception ex) {
+            throw new com.cooltoo.exception.BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        //设置返回给七牛的json格式的数据
+        Map<String, String> retOK = new HashMap<>();
+        retOK.put("response", "success");
+        return Response.ok(retOK).build();
     }
 
 
@@ -173,6 +213,7 @@ public class NurseSpeakAPI {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @LoginAuthentication(requireNurseLogin = true)
     public Response addShortVideo(@Context HttpServletRequest request,
+                                  @FormDataParam("platform") @DefaultValue("") String platform,
                                   @FormDataParam("content") @DefaultValue("") String content,
                                   @FormDataParam("video_code") @DefaultValue("") String videoCode,
                                   @FormDataParam("background_image_name") @DefaultValue("") String backgroundImageName,
@@ -184,7 +225,7 @@ public class NurseSpeakAPI {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.addShortVideo(userId, content);
         if (null!=nurseSpeak) {
-            VideoInSpeakBean video = videoInSpeakService.addVideo(nurseSpeak.getId(), videoCode,
+            VideoInSpeakBean video = videoInSpeakService.addVideo(nurseSpeak.getId(), platform, videoCode,
                     backgroundImageName, backgroundImage,
                     snapshotImageName, snapshotImage);
             List<VideoInSpeakBean> videosInSpeak = new ArrayList<>();
