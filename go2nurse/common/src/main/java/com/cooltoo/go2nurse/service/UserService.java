@@ -133,11 +133,13 @@ public class UserService {
                     } else {
                         //already existed such user, link with channel user
                         UserEntity currentUser = currentUsers.get(0);
-                        UserBean userBean = updatePassword(currentUser.getId(), currentUser.getPassword(), password);
+                        currentUser.setPassword(password);
+                        repository.save(currentUser);
+//                        UserBean userBean = updatePassword(currentUser.getId(), currentUser.getPassword(), password);
                         loginService.login(mobile, password);
                         wechatusers.get(0).setUserId(currentUser.getId());
                         openAppRepository.save(wechatusers.get(0));
-                        return userBean;
+                        return beanConverter.convert(currentUser);
                     }
                 }
         }
