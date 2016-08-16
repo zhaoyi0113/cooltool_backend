@@ -229,7 +229,7 @@ public class HospitalDepartmentService {
         // image
         String imageUrl = null;
         if(null!=image) {
-            long fileId = officialStorage.addFile(entity.getImageId(),entity.getName(), image);
+            long fileId = officialStorage.addFile(/*entity.getImageId()*/ 0, entity.getName(), image);
             if (fileId>0) {
                 entity.setImageId(fileId);
                 imageUrl = officialStorage.getFilePath(fileId);
@@ -239,7 +239,7 @@ public class HospitalDepartmentService {
         // disableImage
         String disableImageUrl = null;
         if (null!=disableImage) {
-            long fileId = officialStorage.addFile(entity.getDisableImageId(), entity.getName()+"_disable", disableImage);
+            long fileId = officialStorage.addFile(/*entity.getDisableImageId()*/ 0, entity.getName()+"_disable", disableImage);
             if (fileId>0) {
                 entity.setDisableImageId(fileId);
                 disableImageUrl = officialStorage.getFilePath(fileId);
