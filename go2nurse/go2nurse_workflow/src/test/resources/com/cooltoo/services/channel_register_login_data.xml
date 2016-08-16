@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <go2nurse_user id="1"  name="用户 name1"  birthday="1970-04-04 14:44:44" gender="1" mobile="1231432143"  password="aa01" profile_photo_id="1" authority="1" type="1" unique_id="111111" status="1" time_created="2016-04-01 14:44:44" />
+    <go2nurse_user id="2"  name="用户 name2"  birthday="1971-04-04 14:44:44" gender="2" mobile="14321134"    password="aa02" profile_photo_id="1" authority="1" type="1" unique_id="222222" status="1" time_created="2016-04-02 14:44:44" />
+    <go2nurse_user id="3"  name="用户 name3"  birthday="1972-04-04 14:44:44" gender="1" mobile="13523212122" password="aa03" profile_photo_id="1" authority="1" type="1" unique_id="333333" status="1" time_created="2016-04-03 14:44:44" />
+    <go2nurse_user id="4"  name="用户 name4"  birthday="1973-04-04 14:44:44" gender="2" mobile="13811663451" password="aa04" profile_photo_id="1" authority="1" type="1" unique_id="444444" status="1" time_created="2016-04-04 14:44:44" />
+    <go2nurse_user id="5"  name="用户 name5"  birthday="1974-04-04 14:44:44" gender="1" mobile="18527727387" password="aa05" profile_photo_id="1" authority="1" type="1" unique_id="555555" status="1" time_created="2016-04-05 14:44:44" />
+    <go2nurse_user id="6"  name="用户 name6"  birthday="1975-04-04 14:44:44" gender="2" mobile="16811663451" password="aa06" profile_photo_id="1" authority="1" type="1" unique_id="666666" status="1" time_created="2016-04-06 14:44:44" />
+
+    <go2nurse_user_openapp_desc id="1" unionid="1" channel="2"/>
+</dataset>

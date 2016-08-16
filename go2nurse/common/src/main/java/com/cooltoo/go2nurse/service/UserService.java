@@ -1,15 +1,14 @@
 package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.GenderType;
-import com.cooltoo.constants.UserAuthority;
-import com.cooltoo.constants.UserType;
+import com.cooltoo.constants.*;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.converter.UserBeanConverter;
+import com.cooltoo.go2nurse.converter.UserOpenAppEntity;
 import com.cooltoo.go2nurse.entities.UserEntity;
+import com.cooltoo.go2nurse.repository.UserOpenAppRepository;
 import com.cooltoo.go2nurse.repository.UserRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.leancloud.LeanCloudService;
@@ -48,7 +47,8 @@ public class UserService {
     @Autowired private UserBeanConverter beanConverter;
     @Autowired private UserGo2NurseFileStorageService userStorage;
     @Autowired private LeanCloudService leanCloudService;
-
+    @Autowired private UserOpenAppRepository openAppRepository;
+    @Autowired private UserLoginService loginService;
 
     //==================================================================
     //         add
@@ -103,6 +103,45 @@ public class UserService {
 
         logger.info("add user={}", entity);
         return beanConverter.convert(entity);
+    }
+    public UserBean registerUser(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String channel, String channelid) {
+        if (repository.findByMobile(mobile).isEmpty() && channel==null) {
+            //first time register
+            return registerUser(name,gender,strBirthday,mobile,password,smsCode);
+        }
+        //check channel register
+        if(channel != null){
+            return registerWithChannel(name, gender, strBirthday, mobile, password, smsCode, channel,channelid);
+        }
+        throw new BadRequestException(ErrorCode.DATA_ERROR);
+    }
+
+    @Transactional
+    private UserBean registerWithChannel(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String channel, String channelid) {
+        AppChannel appChannel = AppChannel.valueOf(channel);
+        switch (appChannel) {
+            case WECHAT:
+                List<UserOpenAppEntity> wechatusers = openAppRepository.findByUnionid(channelid);
+                if (!wechatusers.isEmpty()) {
+                    List<UserEntity> currentUsers = repository.findByMobile(mobile);
+                    if (currentUsers.isEmpty()) {
+                        UserBean userBean = registerUser(name, gender, strBirthday, mobile, password, smsCode);
+                        wechatusers.get(0).setUserId(userBean.getId());
+                        openAppRepository.save(wechatusers.get(0));
+                        loginService.login(mobile, password);
+                        return userBean;
+                    } else {
+                        //already existed such user, link with channel user
+                        UserEntity currentUser = currentUsers.get(0);
+                        UserBean userBean = updatePassword(currentUser.getId(), currentUser.getPassword(), password);
+                        loginService.login(mobile, password);
+                        wechatusers.get(0).setUserId(currentUser.getId());
+                        openAppRepository.save(wechatusers.get(0));
+                        return userBean;
+                    }
+                }
+        }
+        throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
 
     //==================================================================
