@@ -94,7 +94,7 @@ public class WeChatService {
                 List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
                 if (!userTokens.isEmpty()) {
                     try {
-                        return new URI(serverHost + ":" + serverPort + "/?token=" + userTokens.get(0).getToken());
+                        return new URI("http://" + serverHost + ":" + serverPort + "/?token=" + userTokens.get(0).getToken());
                     } catch (URISyntaxException e) {
                         logger.error(e.getMessage(), e);
                     }
