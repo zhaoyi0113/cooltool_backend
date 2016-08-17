@@ -139,10 +139,11 @@ public class NurseSpeakAPI {
                                                   @QueryParam("key") @DefaultValue("") String key,
                                                   @QueryParam("bucket_name") @DefaultValue("") String bucketName
     ) {
+        bucketName = "cooltoo" + (!VerifyUtil.isStringEmpty(bucketName) ? ("/"+bucketName) : "");
         String token = videoInSpeakService.getQiNiuAuthorityToken(key, bucketName);
         Map<String, String> map = new HashMap<>();
         map.put("token", token);
-        map.put("bucketName", "cooltoo");
+        map.put("bucketName", bucketName);
         return Response.ok(map).build();
     }
 

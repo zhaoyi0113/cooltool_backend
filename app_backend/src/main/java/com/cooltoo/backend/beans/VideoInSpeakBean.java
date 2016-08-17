@@ -14,6 +14,7 @@ public class VideoInSpeakBean {
     private long id;
     private long speakId;
     private String videoId;
+    private String videoUrl;
     private long snapshot;
     private String snapshotUrl;
     private long background;
@@ -111,12 +112,21 @@ public class VideoInSpeakBean {
         this.platform = platform;
     }
 
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", speakId=").append(speakId);
         msg.append(", videoId=").append(videoId);
+        msg.append(", videoUrl=").append(videoUrl);
         msg.append(", snapshot=").append(snapshot);
         msg.append(", snapshotUrl=").append(snapshotUrl);
         msg.append(", background=").append(background);
