@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.qiniu.util.Auth;
+import com.qiniu.util.StringMap;
 
 import java.io.InputStream;
 import java.util.*;
@@ -47,11 +49,22 @@ public class VideoInSpeakService {
     //================================================================
     //            get
     //================================================================
-    public Map<String, String> getQiNiuAuthority() {
-        Map<String, String> authority = new HashMap<>();
-        authority.put("access_key", qiniuAccessKey);
-        authority.put("secret_key", qiniuSecretKey);
-        return authority;
+    public String getQiNiuAuthorityToken(String key, String bucketName) {
+        logger.info("get 7niu token by key={} bucketName={}", key, bucketName);
+        if (VerifyUtil.isStringEmpty(key)) {
+            logger.error("key is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (VerifyUtil.isStringEmpty(bucketName)) {
+            logger.error("bucketName is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        Auth auth = Auth.create(qiniuAccessKey, qiniuSecretKey);
+        StringMap map = new StringMap();
+        map.put("callbackUrl","http://www.nurse-go.cn:8080/nursego/nurse/speak/short_video/7niu_callback");
+        map.put("callbackBody", "filename=$(fname)&filesize=$(fsize)");
+        String token = auth.uploadToken(bucketName,key,3600,map);
+        return token;
     }
 
     public long countVideoInSpeak(long speakId) {

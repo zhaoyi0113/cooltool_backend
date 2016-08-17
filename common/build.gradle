@@ -51,4 +51,5 @@ dependencies {
 
     compile("com.notnoop.apns:apns:1.0.0.Beta6")
     compile 'com.google.guava:guava:19.0'
+    compile 'com.qiniu:qiniu-java-sdk:7.1.2'
 }

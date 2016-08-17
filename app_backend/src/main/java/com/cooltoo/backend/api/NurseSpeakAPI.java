@@ -25,10 +25,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by yzzhao on 3/15/16.
@@ -134,12 +131,19 @@ public class NurseSpeakAPI {
         }
     }
 
-    @Path("/short_video/authority/7niu")
+    @Path("/short_video/authority/7niu/token")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
-    public Response shortVideoQiNiuAuthority(@Context HttpServletRequest request) {
-        return Response.ok(videoInSpeakService.getQiNiuAuthority()).build();
+    public Response shortVideoQiNiuAuthorityToken(@Context HttpServletRequest request,
+                                                  @QueryParam("key") @DefaultValue("") String key,
+                                                  @QueryParam("bucket_name") @DefaultValue("") String bucketName
+    ) {
+        String token = videoInSpeakService.getQiNiuAuthorityToken(key, bucketName);
+        Map<String, String> map = new HashMap<>();
+        map.put("token", token);
+        map.put("bucketName", "cooltoo");
+        return Response.ok(map).build();
     }
 
     @Path("/short_video/7niu_callback")
@@ -148,14 +152,31 @@ public class NurseSpeakAPI {
     public Response shortVideoQiNiuCallback(@Context HttpServletRequest request) {
         //接收七牛回调过来的内容
         try {
-            String authorization = request.getHeader("Authorization");
-            logger.info("Authorization={}", authorization);
+            Enumeration<String> attributes = request.getAttributeNames();
+            Enumeration<String> headers = request.getHeaderNames();
+            Enumeration<String> parameters = request.getParameterNames();
+            while (attributes.hasMoreElements()) {
+                String key = attributes.nextElement();
+                Object obj = request.getAttribute(key);
+                logger.info("attribute: {}====={}", key, obj);
+            }
+            while (headers.hasMoreElements()) {
+                String key = headers.nextElement();
+                String obj = request.getHeader(key);
+                logger.info("headers: {}====={}", key, obj);
+            }
+
+            while (parameters.hasMoreElements()) {
+                String key = parameters.nextElement();
+                String[] obj = request.getParameterValues(key);
+                logger.info("parameters: {}====={}", key, Arrays.asList(obj));
+            }
+
             String line = "";
             ServletInputStream inputStream = request.getInputStream();
-            Reader reader = new InputStreamReader(inputStream);
-            BufferedReader reader2 = new BufferedReader(reader);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder sb = new StringBuilder();
-            while ((line = reader2.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }
             logger.info("callback={}", sb.toString());//打印回调内容
