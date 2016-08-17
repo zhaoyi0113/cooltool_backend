@@ -127,6 +127,7 @@ public class WeChatService {
     }
 
     public Map<String, String> getJSApiSignature(String url) {
+        logger.info("request js api signature from "+url);
         String noncestr = System.currentTimeMillis() + "";
         String jsApiTicket = tokenScheduler.getJsApiTicket();
         String timestamp = System.currentTimeMillis() + "";
@@ -139,6 +140,7 @@ public class WeChatService {
         signaturemap.put("timestamp", timestamp);
         signaturemap.put("signature", signature);
         signaturemap.put("appid", srvAppId);
+        logger.info("generate js api ticket");
         return signaturemap;
     }
 
