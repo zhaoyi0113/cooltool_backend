@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -149,9 +151,11 @@ public class NurseSpeakAPI {
             String authorization = request.getHeader("Authorization");
             logger.info("Authorization={}", authorization);
             String line = "";
-            BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
+            ServletInputStream inputStream = request.getInputStream();
+            Reader reader = new InputStreamReader(inputStream);
+            BufferedReader reader2 = new BufferedReader(reader);
             StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
+            while ((line = reader2.readLine()) != null) {
                 sb.append(line);
             }
             logger.info("callback={}", sb.toString());//打印回调内容
