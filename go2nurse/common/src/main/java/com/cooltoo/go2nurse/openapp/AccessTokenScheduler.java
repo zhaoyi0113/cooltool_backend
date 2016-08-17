@@ -1,11 +1,15 @@
 package com.cooltoo.go2nurse.openapp;
 
+import com.cooltoo.go2nurse.util.HttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.logging.Logger;
+import java.util.Map;
 
 /**
  * Created by yzzhao on 1/10/16.
@@ -13,9 +17,14 @@ import java.util.logging.Logger;
 @Component
 public class AccessTokenScheduler {
 
-    private static final Logger logger = Logger.getLogger(AccessTokenScheduler.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AccessTokenScheduler.class);
+    @Value("${wechat_go2nurse_appid}")
+    private String srvAppId;
 
-//    private Map<WeChatAccessState, String> accessTokens = new HashMap<>();
+    @Value("${wechat_go2nurse_appsecret}")
+    private String srvAppSecret;
+
+    private String accessToken;
 
     private String jsApiTicket;
 
@@ -23,7 +32,7 @@ public class AccessTokenScheduler {
     private WeChatService weChatService;
 
     @PostConstruct
-    public void postConstruct(){
+    public void postConstruct() {
         getAccessTokenScheduler();
     }
 
@@ -38,35 +47,29 @@ public class AccessTokenScheduler {
         thread.start();
     }
 
-    private void requestAccessToken(){
+    private void requestAccessToken() {
         logger.info("access token scheduler");
-//        String accessToken = weChatService.requestAccessToken(WeChatAccessState.WECHAT_SERVICE.name());
-//        accessTokens.put(WeChatAccessState.WECHAT_SERVICE, accessToken);
-//        accessToken = weChatService.requestAccessToken(WeChatAccessState.WEB.name());
-//        accessTokens.put(WeChatAccessState.WEB, accessToken);
-//        accessToken = weChatService.requestAccessToken(WeChatAccessState.WECHAT_SUBSCRIBER.name());
-//        accessTokens.put(WeChatAccessState.WECHAT_SUBSCRIBER, accessToken);
-//        jsApiTicket = weChatService.getJSApiTicket(accessTokens.get(WeChatAccessState.WECHAT_SERVICE));
-//        logger.info("get access token "+accessTokens);
+        String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + srvAppId + "&secret=" + srvAppSecret;
+        Map map = HttpUtils.getHttpRequest(url, Map.class);
+        if (map != null && map.containsKey("access_token")) {
+            accessToken = (String) map.get("access_token");
+            logger.info("refresh access token " + accessToken);
+            requestJSAPITicket();
+        } else {
+            logger.error("can't get token access");
+        }
     }
 
-//    public String getAccessToken(String state) {
-//        try {
-//            WeChatAccessState accessState = WeChatAccessState.valueOf(state);
-//            return getAccessToken(accessState);
-//        } catch (IllegalArgumentException e) {
-//            logger.log(Level.SEVERE, e.getMessage(), e);
-//        }
-//
-//        return null;
-//    }
-//
-//    public String getJsApiTicket() {
-//        return jsApiTicket;
-//    }
-//
-//    public String getAccessToken(WeChatAccessState state){
-//        return accessTokens.get(state);
-//    }
+    private void requestJSAPITicket() {
+        String url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi";
+        Map map = HttpUtils.getHttpRequest(url, Map.class);
+        if (map != null && map.containsKey("ticket")) {
+            jsApiTicket = (String) map.get("ticket");
+            logger.info("refresh js api ticket " + jsApiTicket);
+        } else {
+            logger.error("can't get js api ticket");
+        }
+    }
+
 
 }

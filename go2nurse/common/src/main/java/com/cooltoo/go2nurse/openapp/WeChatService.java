@@ -6,13 +6,8 @@ import com.cooltoo.go2nurse.converter.UserOpenAppEntity;
 import com.cooltoo.go2nurse.entities.UserTokenAccessEntity;
 import com.cooltoo.go2nurse.repository.UserOpenAppRepository;
 import com.cooltoo.go2nurse.repository.UserTokenAccessRepository;
+import com.cooltoo.go2nurse.util.HttpUtils;
 import com.google.gson.Gson;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,18 +85,18 @@ public class WeChatService {
             logger.info("login user openid=" + userInfo.getOpenid() + " unionid=" + unionid);
             List<UserOpenAppEntity> users = openAppRepository.findByUnionid(unionid);
             if (!users.isEmpty() && users.get(0).getUserId() != 0) {
-
+                //user unionid already exists, check whether it has login token
                 List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
                 if (!userTokens.isEmpty()) {
                     try {
+                        //if found login token, redirect to token url
                         return new URI("http://" + serverHost + ":" + serverPort + "/?token=" + userTokens.get(0).getToken());
                     } catch (URISyntaxException e) {
                         logger.error(e.getMessage(), e);
                     }
-                } else {
-
                 }
             } else {
+                //user union id doesn't exist, add the union id to database
                 UserOpenAppEntity entity = new UserOpenAppEntity();
                 entity.setChannel(AppChannel.WECHAT);
                 Gson gson = new Gson();
@@ -111,7 +106,6 @@ public class WeChatService {
                 entity.setUnionid(userInfo.getUnionid());
                 entity.setCreatedAt(System.currentTimeMillis());
                 openAppRepository.save(entity);
-
             }
         }
         try {
@@ -127,20 +121,9 @@ public class WeChatService {
     }
 
     public Map getWebLoginAccessToken(String code) {
-        try {
-            HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/sns/oauth2/access_token?appid=" +
-                    srvAppId + "&secret=" + srvAppSecret + "&code=" + code + "&&grant_type=authorization_code");
-            HttpClient httpClient = HttpClients.createDefault();
-            HttpResponse response = httpClient.execute(httpGet);
-            HttpEntity entity = response.getEntity();
-            String body = EntityUtils.toString(entity, "UTF-8").trim();
-            logger.info("get web login response " + body);
-            Gson gson = new Gson();
-            return gson.fromJson(body, Map.class);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-        return null;
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" +
+                srvAppId + "&secret=" + srvAppSecret + "&code=" + code + "&&grant_type=authorization_code";
+        return HttpUtils.getRequest(url);
     }
 
     public WeChatUserInfo getUserInfo(Map<String, String> webToken) {
@@ -149,19 +132,12 @@ public class WeChatService {
             return null;
         }
         try {
-            HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/sns/userinfo?access_token="
+            String url = "https://api.weixin.qq.com/sns/userinfo?access_token="
                     + webToken.get("access_token") +
-                    "&openid=" + webToken.get("openid") + "&lang=zh_CN");
-            HttpClient httpClient = HttpClients.createDefault();
-            HttpResponse response = httpClient.execute(httpGet);
-            HttpEntity entity = response.getEntity();
-            String body = EntityUtils.toString(entity, "UTF-8").trim();
-            logger.info("get web user info response " + body);
-            Gson gson = new Gson();
-            WeChatUserInfo gsonData = gson.fromJson(body, WeChatUserInfo.class);
-            logger.info("get wechat user info " + gsonData.getUnionid());
-
-            return gsonData;
+                    "&openid=" + webToken.get("openid") + "&lang=zh_CN";
+            WeChatUserInfo userInfo = HttpUtils.getHttpRequest(url, WeChatUserInfo.class);
+            logger.info("get wechat user info " + userInfo.getUnionid());
+            return userInfo;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
