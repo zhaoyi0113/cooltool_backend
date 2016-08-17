@@ -11,6 +11,7 @@ import java.util.List;
  * Created by zhaolisong on 16/4/14.
  */
 public interface VideoInSpeakRepository extends CrudRepository<VideoInSpeakEntity, Long> {
+    List<VideoInSpeakEntity> findByPlatformAndVideoId(VideoPlatform platform, String videoId);
     List<VideoInSpeakEntity> findBySpeakIdIn(List<Long> speakIds);
     List<VideoInSpeakEntity> findBySpeakIdIn(List<Long> speakIds, Sort sort);
     List<VideoInSpeakEntity> findByVideoIdAndPlatform(String videoId, VideoPlatform platform);

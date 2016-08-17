@@ -45,10 +45,26 @@ public class VideoInSpeakService {
     private String qiniuAccessKey;
     @Value("${nursego.qiniu.secret.key}")
     private String qiniuSecretKey;
+    @Value("${nursego.qiniu.video.domain}")
+    private String qiniuDomain;
+    @Value("${nursego.qiniu.video.callback.url}")
+    private String qiniuCallbackUrl;
+    @Value("${nursego.qiniu.video.callback.body}")
+    private String qiniuCallbackBody;
+
+
+    private static Auth QiNiuAuth = null;
 
     //================================================================
     //            get
     //================================================================
+    private Auth getQiNiuAuth() {
+        if (null==QiNiuAuth) {
+            QiNiuAuth = Auth.create(qiniuAccessKey, qiniuSecretKey);
+        }
+        return QiNiuAuth;
+    }
+
     public String getQiNiuAuthorityToken(String key, String bucketName) {
         logger.info("get 7niu token by key={} bucketName={}", key, bucketName);
         if (VerifyUtil.isStringEmpty(key)) {
@@ -59,10 +75,10 @@ public class VideoInSpeakService {
             logger.error("bucketName is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        Auth auth = Auth.create(qiniuAccessKey, qiniuSecretKey);
+        Auth auth = getQiNiuAuth();
         StringMap map = new StringMap();
-        map.put("callbackUrl","http://www.nurse-go.cn:8080/nursego/nurse/speak/short_video/7niu_callback");
-        map.put("callbackBody", "filename=$(fname)&filesize=$(fsize)");
+        map.put("callbackUrl",qiniuCallbackUrl);
+        map.put("callbackBody", qiniuCallbackBody);
         String token = auth.uploadToken(bucketName,key,3600,map);
         return token;
     }
@@ -75,7 +91,7 @@ public class VideoInSpeakService {
     }
 
     public List<VideoInSpeakBean> getVideoInSpeak(Long speakId) {
-        List<Long> speakIds = new ArrayList<Long>();
+        List<Long> speakIds = new ArrayList<>();
         speakIds.add(speakId);
         Map<Long, List<VideoInSpeakBean>> videoInSpeak = getVideoInSpeak(speakIds);
         return videoInSpeak.get(speakId);
@@ -129,6 +145,7 @@ public class VideoInSpeakService {
         if (VerifyUtil.isListEmpty(videoInSpeak)) {
             return;
         }
+        fillVideoUrl(videoInSpeak);
 
         List<Long> imageIds = new ArrayList<>();
         for (VideoInSpeakBean tmp : videoInSpeak) {
@@ -151,6 +168,23 @@ public class VideoInSpeakService {
                 imagePath = imageId2Path.get(tmp.getSnapshot());
                 tmp.setSnapshotUrl(imagePath);
             }
+        }
+    }
+
+    private void fillVideoUrl(List<VideoInSpeakBean> videoInSpeak) {
+        Calendar calender = Calendar.getInstance();
+        calender.add(Calendar.HOUR_OF_DAY, 1);
+        long second = calender.getTimeInMillis()/1000;
+        Auth auth = getQiNiuAuth();
+
+        for (VideoInSpeakBean tmp : videoInSpeak) {
+            if (VerifyUtil.isStringEmpty(tmp.getVideoId())) {
+                continue;
+            }
+            String videoUrl = qiniuDomain+tmp.getVideoId()+"?e="+second;
+            String videoToken = auth.sign(videoUrl);
+            videoUrl = videoUrl+"&token="+videoToken;
+            tmp.setVideoUrl(videoUrl);
         }
     }
 
@@ -224,6 +258,69 @@ public class VideoInSpeakService {
         return new ArrayList<>();
     }
 
+    @Transactional
+    public VideoInSpeakBean updateVideo(String strPlatform, String videoId,
+                                        String backgroundName , InputStream background,
+                                        String snapshotName, InputStream snapshot,
+                                        long speakId, String strStatus) {
+        logger.info("add platform={} video={} and backgroundImage={}->{} snapshotImage={}->{} to speak {} and status={}",
+                strPlatform, videoId, backgroundName, null!=background, snapshotName, null!=snapshot, speakId, strStatus);
+        VideoPlatform platform = VideoPlatform.parseString(strPlatform);
+        if (null==platform) {
+            logger.error("platform is null");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (VerifyUtil.isStringEmpty(videoId)) {
+            logger.error("video is null");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        CCVideoStatus status = CCVideoStatus.parseString(strStatus);
+
+        List<VideoInSpeakEntity> entities = repository.findByVideoIdAndPlatform(videoId, platform);
+        if (VerifyUtil.isListEmpty(entities)) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (entities.size()>1) {
+            logger.warn("there is more than one records, just update the 1st one");
+        }
+
+        boolean changed = false;
+        VideoInSpeakEntity entity = entities.get(0);
+        if (speakId>0) {
+            entity.setSpeakId(speakId);
+            changed = true;
+        }
+        if (null!=status) {
+            entity.setVideoStatus(CCVideoStatus.OTHER);
+            changed = true;
+        }
+
+        long backgroundId = uploadImage(backgroundName, background);
+        String backgroundUrl = "";
+        if (backgroundId>0) {
+            entity.setBackground(backgroundId);
+            backgroundUrl = userStorage.getFilePath(backgroundId);
+            changed = true;
+        }
+
+        long snapshotId = uploadImage(snapshotName, snapshot);
+        String snapshotUrl = "";
+        if (snapshotId>0) {
+            entity.setSnapshot(snapshotId);
+            snapshotUrl = userStorage.getFilePath(snapshotId);
+            changed = true;
+        }
+
+        if (changed) {
+            entity = repository.save(entity);
+        }
+
+        VideoInSpeakBean bean = beanConverter.convert(entity);
+        bean.setBackgroundUrl(backgroundUrl);
+        bean.setSnapshotUrl(snapshotUrl);
+        return bean;
+    }
+
     //====================================================
     //          add
     //====================================================
@@ -243,34 +340,22 @@ public class VideoInSpeakService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        long backgroundId = 0;
+        long backgroundId = uploadImage(backgroundName, background);
         String backgroundUrl = "";
-        if (null!=background) {
-            if (VerifyUtil.isStringEmpty(backgroundName)) {
-                backgroundName = "video_speak_back_" + System.nanoTime();
-            }
-            backgroundId   = userStorage.addFile(-1, backgroundName, background);
-            backgroundUrl = userStorage.getFilePath(backgroundId);
-        }
 
-        long snapshotId = 0;
+        long snapshotId = uploadImage(snapshotName, snapshot);
         String snapshotUrl = "";
-        if (null!=snapshot) {
-            if (VerifyUtil.isStringEmpty(snapshotName)) {
-                snapshotName = "video_speak_snap_" + System.nanoTime();
-            }
-            snapshotId = userStorage.addFile(-1, snapshotName, snapshot);
-            snapshotUrl = userStorage.getFilePath(snapshotId);
-        }
 
         VideoInSpeakEntity entity = new VideoInSpeakEntity();
         entity.setSpeakId(speakId);
         entity.setVideoId(videoId);
         if (backgroundId>0) {
             entity.setBackground(backgroundId);
+            backgroundUrl = userStorage.getFilePath(backgroundId);
         }
         if (snapshotId>0) {
             entity.setSnapshot(snapshotId);
+            snapshotUrl = userStorage.getFilePath(snapshotId);
         }
 
         entity.setPlatform(platform);
@@ -284,6 +369,17 @@ public class VideoInSpeakService {
         bean.setBackgroundUrl(backgroundUrl);
         bean.setSnapshotUrl(snapshotUrl);
         return bean;
+    }
+
+    private long uploadImage(String imageName, InputStream image) {
+        long imageId = 0;
+        if (null!=image) {
+            if (VerifyUtil.isStringEmpty(imageName)) {
+                imageName = "video_speak_" + System.nanoTime();
+            }
+            imageId = userStorage.addFile(-1, imageName, image);
+        }
+        return imageId;
     }
 
     //=====================================================================================

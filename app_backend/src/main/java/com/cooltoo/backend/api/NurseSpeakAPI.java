@@ -5,6 +5,7 @@ import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseSpeakComplaintService;
 import com.cooltoo.backend.services.NurseSpeakService;
 import com.cooltoo.backend.services.VideoInSpeakService;
+import com.cooltoo.constants.CCVideoStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.constants.VideoPlatform;
@@ -152,39 +153,8 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response shortVideoQiNiuCallback(@Context HttpServletRequest request) {
         //接收七牛回调过来的内容
-        try {
-            Enumeration<String> attributes = request.getAttributeNames();
-            Enumeration<String> headers = request.getHeaderNames();
-            Enumeration<String> parameters = request.getParameterNames();
-            while (attributes.hasMoreElements()) {
-                String key = attributes.nextElement();
-                Object obj = request.getAttribute(key);
-                logger.info("attribute: {}====={}", key, obj);
-            }
-            while (headers.hasMoreElements()) {
-                String key = headers.nextElement();
-                String obj = request.getHeader(key);
-                logger.info("headers: {}====={}", key, obj);
-            }
-
-            while (parameters.hasMoreElements()) {
-                String key = parameters.nextElement();
-                String[] obj = request.getParameterValues(key);
-                logger.info("parameters: {}====={}", key, Arrays.asList(obj));
-            }
-
-            String line = "";
-            ServletInputStream inputStream = request.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            logger.info("callback={}", sb.toString());//打印回调内容
-        }
-        catch (Exception ex) {
-            throw new com.cooltoo.exception.BadRequestException(ErrorCode.DATA_ERROR);
-        }
+        String videoId = request.getParameter("filename");
+        videoInSpeakService.addVideo(0, VideoPlatform.QiNiu.name(), videoId, null, null, null, null);
 
         //设置返回给七牛的json格式的数据
         Map<String, String> retOK = new HashMap<>();
@@ -251,9 +221,19 @@ public class NurseSpeakAPI {
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.addShortVideo(userId, content);
         if (null!=nurseSpeak) {
-            VideoInSpeakBean video = videoInSpeakService.addVideo(nurseSpeak.getId(), platform, videoCode,
-                    backgroundImageName, backgroundImage,
-                    snapshotImageName, snapshotImage);
+            VideoInSpeakBean video = null;
+            if (VideoPlatform.QiNiu.name().equalsIgnoreCase(platform)) {
+                video = videoInSpeakService.updateVideo(platform, videoCode,
+                        backgroundImageName, backgroundImage,
+                        snapshotImageName, snapshotImage,
+                        nurseSpeak.getId(), CCVideoStatus.OK.name());
+            }
+            if (null==video) {
+                video = videoInSpeakService.addVideo(nurseSpeak.getId(), platform, videoCode,
+                        backgroundImageName, backgroundImage,
+                        snapshotImageName, snapshotImage);
+            }
+
             List<VideoInSpeakBean> videosInSpeak = new ArrayList<>();
             videosInSpeak.add(video);
             nurseSpeak.setVideos(videosInSpeak);
