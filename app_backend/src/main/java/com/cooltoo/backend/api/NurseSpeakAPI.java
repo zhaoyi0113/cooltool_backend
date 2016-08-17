@@ -153,6 +153,12 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response shortVideoQiNiuCallback(@Context HttpServletRequest request) {
         //接收七牛回调过来的内容
+        String contentType = request.getHeader("content-type");
+        String authorith = request.getHeader("authorization");
+        String callbackBody = request.getParameter("filename");
+        callbackBody = "filename="+callbackBody;
+        boolean isValid = videoInSpeakService.isValidQiNiuCallback(authorith, contentType, callbackBody);
+
         String videoId = request.getParameter("filename");
         videoInSpeakService.addVideo(0, VideoPlatform.QiNiu.name(), videoId, null, null, null, null);
 

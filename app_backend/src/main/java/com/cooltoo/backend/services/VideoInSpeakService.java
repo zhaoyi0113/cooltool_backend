@@ -65,6 +65,14 @@ public class VideoInSpeakService {
         return QiNiuAuth;
     }
 
+    public boolean isValidQiNiuCallback(String authority, String contentType, String callbackBody) {
+        Auth auth = getQiNiuAuth();
+        boolean valid = auth.isValidCallback(authority, qiniuCallbackUrl, callbackBody, contentType);
+        logger.info("Is valid 7-Niu callback by original_authority={} contentType={} callbackBody={} callbackUrl={}? {}",
+                authority, contentType, callbackBody, qiniuCallbackUrl, valid);
+        return valid;
+    }
+
     public String getQiNiuAuthorityToken(String key, String bucketName) {
         logger.info("get 7niu token by key={} bucketName={}", key, bucketName);
         if (VerifyUtil.isStringEmpty(key)) {
