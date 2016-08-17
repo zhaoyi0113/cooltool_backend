@@ -5,10 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -44,7 +41,15 @@ public class OpenAppAPI {
             @QueryParam("state") String state) {
         logger.info(" login code=" + code + ", state= " + state);
         URI uri = weChatService.login(code, state);
-        logger.info("redirect to "+uri);
+        logger.info("redirect to " + uri);
         return Response.seeOther(uri).build();
     }
+
+    @GET
+    @Path("/wechat/jsapiticket/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getJSApiTicket(@QueryParam("url") String url) {
+        return Response.ok(weChatService.getJSApiSignature(url)).build();
+    }
+
 }

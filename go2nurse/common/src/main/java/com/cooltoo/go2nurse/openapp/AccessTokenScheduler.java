@@ -71,5 +71,19 @@ public class AccessTokenScheduler {
         }
     }
 
+    public String getJsApiTicket() {
+        return jsApiTicket;
+    }
 
+    public void setJsApiTicket(String jsApiTicket) {
+        this.jsApiTicket = jsApiTicket;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
 }

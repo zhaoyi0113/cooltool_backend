@@ -13,12 +13,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +28,7 @@ import java.util.Map;
  * Created by yzzhao on 8/14/16.
  */
 @Service("WeChatService")
+@Transactional
 public class WeChatService {
 
     private static final Logger logger = LoggerFactory.getLogger(WeChatService.class);
@@ -50,6 +53,9 @@ public class WeChatService {
 
     @Autowired
     private UserTokenAccessRepository tokenAccessRepository;
+
+    @Autowired
+    private AccessTokenScheduler tokenScheduler;
 
     public boolean validateEntryConnection(String signature, String timeStamp, String nonce) {
         logger.info("validate connection " + signature + ", " + timeStamp + ", " + nonce + ", " + token);
@@ -120,13 +126,29 @@ public class WeChatService {
         return null;
     }
 
-    public Map getWebLoginAccessToken(String code) {
+    public Map<String, String> getJSApiSignature(String url) {
+        String noncestr = System.currentTimeMillis() + "";
+        String jsApiTicket = tokenScheduler.getJsApiTicket();
+        String timestamp = System.currentTimeMillis() + "";
+        StringBuffer str = new StringBuffer();
+        str.append("jsapi_ticket=").append(jsApiTicket).append("&noncestr=").append(noncestr).append("&timestamp=").append(timestamp).append("&url=").append(url);
+        String signature = getSha1String(str.toString());
+        Map<String, String> signaturemap = new Hashtable<>();
+        signaturemap.put("noncestr", noncestr);
+        signaturemap.put("jsapiticket", jsApiTicket);
+        signaturemap.put("timestamp", timestamp);
+        signaturemap.put("signature", signature);
+        signaturemap.put("appid", srvAppId);
+        return signaturemap;
+    }
+
+    private Map getWebLoginAccessToken(String code) {
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" +
                 srvAppId + "&secret=" + srvAppSecret + "&code=" + code + "&&grant_type=authorization_code";
         return HttpUtils.getRequest(url);
     }
 
-    public WeChatUserInfo getUserInfo(Map<String, String> webToken) {
+    private WeChatUserInfo getUserInfo(Map<String, String> webToken) {
         if (webToken == null || !webToken.containsKey("openid")
                 || !webToken.containsKey("access_token")) {
             return null;
@@ -144,11 +166,11 @@ public class WeChatService {
         return null;
     }
 
-    public String getSha1String(String decript) {
+    private String getSha1String(String decript) {
         return signString(decript, "SHA-1");
     }
 
-    public String getMD5String(String descript) {
+    private String getMD5String(String descript) {
         return signString(descript, "MD5");
     }
 
