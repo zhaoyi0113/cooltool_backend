@@ -96,7 +96,7 @@ public class WeChatService {
                 if (!userTokens.isEmpty()) {
                     try {
                         //if found login token, redirect to token url
-                        return new URI("http://" + serverHost + ":" + serverPort + "/?token=" + userTokens.get(0).getToken());
+                        return new URI("http://" + serverHost + ":" + serverPort + "/go2nurse/?token=" + userTokens.get(0).getToken());
                     } catch (URISyntaxException e) {
                         logger.error(e.getMessage(), e);
                     }
@@ -115,7 +115,7 @@ public class WeChatService {
             }
         }
         try {
-            String urlStr = "http://" + serverHost + ":" + serverPort + "/#/register";
+            String urlStr = "http://" + serverHost + ":" + serverPort + "/go2nurse/#/register";
             if (unionid != null) {
                 urlStr += "/" + AppChannel.WECHAT + "/" + unionid;
             }
