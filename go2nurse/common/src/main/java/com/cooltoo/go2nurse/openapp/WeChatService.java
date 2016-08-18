@@ -42,9 +42,6 @@ public class WeChatService {
     @Value("${wechat_go2nurse_appsecret}")
     private String srvAppSecret;
 
-    @Value("${go2nurse.web.port}")
-    private String serverPort;
-
     @Value("${server.host}")
     private String serverHost;
 
@@ -96,7 +93,7 @@ public class WeChatService {
                 if (!userTokens.isEmpty()) {
                     try {
                         //if found login token, redirect to token url
-                        return new URI("http://" + serverHost + ":" + serverPort + "/?token=" + userTokens.get(0).getToken());
+                        return new URI("http://" + serverHost + "/go2nurse/?token=" + userTokens.get(0).getToken());
                     } catch (URISyntaxException e) {
                         logger.error(e.getMessage(), e);
                     }
@@ -115,7 +112,7 @@ public class WeChatService {
             }
         }
         try {
-            String urlStr = "http://" + serverHost + ":" + serverPort + "/#/register";
+            String urlStr = "http://" + serverHost + "/go2nurse/#/register";
             if (unionid != null) {
                 urlStr += "/" + AppChannel.WECHAT + "/" + unionid;
             }
@@ -127,6 +124,7 @@ public class WeChatService {
     }
 
     public Map<String, String> getJSApiSignature(String url) {
+        logger.info("request js api signature from "+url);
         String noncestr = System.currentTimeMillis() + "";
         String jsApiTicket = tokenScheduler.getJsApiTicket();
         String timestamp = System.currentTimeMillis() + "";
@@ -139,6 +137,7 @@ public class WeChatService {
         signaturemap.put("timestamp", timestamp);
         signaturemap.put("signature", signature);
         signaturemap.put("appid", srvAppId);
+        logger.info("generate js api ticket");
         return signaturemap;
     }
 
