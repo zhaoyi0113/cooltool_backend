@@ -122,7 +122,7 @@ public class UserService {
         AppChannel appChannel = AppChannel.valueOf(channel);
         switch (appChannel) {
             case WECHAT:
-                List<UserOpenAppEntity> wechatusers = openAppRepository.findByUnionidAndStatus(channelid, CommonStatus.ENABLED);
+                List<UserOpenAppEntity> wechatusers = openAppRepository.findByUnionid(channelid);
                 if (!wechatusers.isEmpty()) {
                     List<UserEntity> currentUsers = repository.findByMobile(mobile);
                     if (currentUsers.isEmpty()) {
@@ -136,10 +136,14 @@ public class UserService {
                         //already existed such user, link with channel user
                         UserEntity currentUser = currentUsers.get(0);
                         currentUser.setPassword(password);
+                        currentUser.setName(name);
+                        currentUser.setStatus(CommonStatus.ENABLED);
+                        currentUser.setBirthday(new Date(NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS)));
                         repository.save(currentUser);
 //                        UserBean userBean = updatePassword(currentUser.getId(), currentUser.getPassword(), password);
                         loginService.login(mobile, password);
                         wechatusers.get(0).setUserId(currentUser.getId());
+                        wechatusers.get(0).setStatus(CommonStatus.ENABLED);
                         openAppRepository.save(wechatusers.get(0));
                         return beanConverter.convert(currentUser);
                     }

@@ -86,4 +86,17 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         List<UserOpenAppEntity> openUsers = openAppRepository.findByUnionidAndStatus("1", CommonStatus.ENABLED);
         Assert.assertEquals(2, openUsers.get(0).getUserId());
     }
+
+    @Test
+    public void test_register_with_disabled_channel_user(){
+        UserBean userBean = userService.registerUser("bbb", 0, "", "13523212122", "aaa", "aaa", AppChannel.WECHAT.name(), "2");
+        Assert.assertEquals("bbb", userBean.getName());
+        Assert.assertEquals("aaa", userBean.getPassword());
+        List<UserOpenAppEntity> openUsers = openAppRepository.findByUnionidAndStatus("2", CommonStatus.ENABLED);
+        Assert.assertFalse(openUsers.isEmpty());
+        Assert.assertEquals(userBean.getId(), openUsers.get(0).getUserId());
+
+    }
+
+
 }

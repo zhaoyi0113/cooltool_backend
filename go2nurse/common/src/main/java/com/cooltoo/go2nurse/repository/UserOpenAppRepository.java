@@ -12,4 +12,5 @@ import java.util.List;
 public interface UserOpenAppRepository extends JpaRepository<UserOpenAppEntity, Long>{
 
     List<UserOpenAppEntity> findByUnionidAndStatus(String unionId, CommonStatus status);
+    List<UserOpenAppEntity> findByUnionid(String unionId);
 }
