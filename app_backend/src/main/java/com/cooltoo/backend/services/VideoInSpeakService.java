@@ -185,7 +185,7 @@ public class VideoInSpeakService {
 
     private void fillVideoUrl(List<VideoInSpeakBean> videoInSpeak) {
         Calendar calender = Calendar.getInstance();
-        calender.add(Calendar.HOUR_OF_DAY, 1);
+        calender.add(Calendar.DAY_OF_MONTH, 1);
         long second = calender.getTimeInMillis()/1000;
         Auth auth = getQiNiuAuth();
 
