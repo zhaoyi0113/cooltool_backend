@@ -9,23 +9,18 @@ import com.cooltoo.constants.CCVideoStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.SpeakType;
 import com.cooltoo.constants.VideoPlatform;
-import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.*;
 
 /**
@@ -154,17 +149,18 @@ public class NurseSpeakAPI {
     public Response shortVideoQiNiuCallback(@Context HttpServletRequest request) {
         //接收七牛回调过来的内容
         String contentType = request.getHeader("content-type");
-        String authorith = request.getHeader("authorization");
-        String callbackBody = request.getParameter("filename");
-        callbackBody = "filename="+callbackBody;
-        boolean isValid = videoInSpeakService.isValidQiNiuCallback(authorith, contentType, callbackBody);
-
-        String videoId = request.getParameter("filename");
-        videoInSpeakService.addVideo(0, VideoPlatform.QiNiu.name(), videoId, null, null, null, null);
-
+        String authority = request.getHeader("authorization");
+        String fileName = request.getParameter("filename");
+        String hash = request.getParameter("hash");
+        String key = request.getParameter("key");
+        String callbackBody = "filename="+fileName+"&key="+key+"&hash="+hash;
+        boolean isValid = videoInSpeakService.isValidQiNiuCallback(authority, contentType, callbackBody);
+        if (isValid) {
+            videoInSpeakService.addVideo(0, VideoPlatform.QiNiu.name(), key, null, null, null, null);
+        }
         //设置返回给七牛的json格式的数据
         Map<String, String> retOK = new HashMap<>();
-        retOK.put("response", "success");
+        retOK.put("response", isValid ? "success" : "error");
         return Response.ok(retOK).build();
     }
 
