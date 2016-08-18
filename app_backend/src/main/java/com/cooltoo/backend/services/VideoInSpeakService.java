@@ -303,7 +303,7 @@ public class VideoInSpeakService {
             changed = true;
         }
         if (null!=status) {
-            entity.setVideoStatus(CCVideoStatus.OTHER);
+            entity.setVideoStatus(status);
             changed = true;
         }
 
