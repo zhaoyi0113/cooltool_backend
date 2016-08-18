@@ -157,6 +157,7 @@ public class NurseSpeakAPI {
         boolean isValid = videoInSpeakService.isValidQiNiuCallback(authority, contentType, callbackBody);
         if (isValid) {
             videoInSpeakService.addVideo(0, VideoPlatform.QiNiu.name(), key, null, null, null, null);
+            videoInSpeakService.updateVideoStatus(key, VideoPlatform.QiNiu, CCVideoStatus.OK.name());
         }
         //设置返回给七牛的json格式的数据
         Map<String, String> retOK = new HashMap<>();
