@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
@@ -116,17 +117,18 @@ public class UserService {
         throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     private UserBean registerWithChannel(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String channel, String channelid) {
         AppChannel appChannel = AppChannel.valueOf(channel);
         switch (appChannel) {
             case WECHAT:
-                List<UserOpenAppEntity> wechatusers = openAppRepository.findByUnionid(channelid);
+                List<UserOpenAppEntity> wechatusers = openAppRepository.findByUnionidAndStatus(channelid, CommonStatus.ENABLED);
                 if (!wechatusers.isEmpty()) {
                     List<UserEntity> currentUsers = repository.findByMobile(mobile);
                     if (currentUsers.isEmpty()) {
                         UserBean userBean = registerUser(name, gender, strBirthday, mobile, password, smsCode);
                         wechatusers.get(0).setUserId(userBean.getId());
+                        wechatusers.get(0).setStatus(CommonStatus.ENABLED);
                         openAppRepository.save(wechatusers.get(0));
                         loginService.login(mobile, password);
                         return userBean;

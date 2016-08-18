@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.openapp;
 
 import com.cooltoo.constants.AppChannel;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.WeChatUserInfo;
 import com.cooltoo.go2nurse.converter.UserOpenAppEntity;
 import com.cooltoo.go2nurse.entities.UserTokenAccessEntity;
@@ -86,7 +87,7 @@ public class WeChatService {
         if (userInfo != null) {
             unionid = userInfo.getUnionid();
             logger.info("login user openid=" + userInfo.getOpenid() + " unionid=" + unionid);
-            List<UserOpenAppEntity> users = openAppRepository.findByUnionid(unionid);
+            List<UserOpenAppEntity> users = openAppRepository.findByUnionidAndStatus(unionid, CommonStatus.ENABLED);
             if (!users.isEmpty() && users.get(0).getUserId() != 0) {
                 //user unionid already exists, check whether it has login token
                 List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
@@ -107,6 +108,7 @@ public class WeChatService {
                 entity.setData(jsonData);
                 entity.setOpenid(userInfo.getOpenid());
                 entity.setUnionid(userInfo.getUnionid());
+                entity.setStatus(CommonStatus.ENABLED);
                 entity.setCreatedAt(System.currentTimeMillis());
                 openAppRepository.save(entity);
             }
