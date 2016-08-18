@@ -275,7 +275,7 @@ public class VideoInSpeakService {
                                         String backgroundName , InputStream background,
                                         String snapshotName, InputStream snapshot,
                                         long speakId, String strStatus) {
-        logger.info("add platform={} video={} and backgroundImage={}->{} snapshotImage={}->{} to speak {} and status={}",
+        logger.info("update platform={} video={} and backgroundImage={}->{} snapshotImage={}->{} to speak {} and status={}",
                 strPlatform, videoId, backgroundName, null!=background, snapshotName, null!=snapshot, speakId, strStatus);
         VideoPlatform platform = VideoPlatform.parseString(strPlatform);
         if (null==platform) {

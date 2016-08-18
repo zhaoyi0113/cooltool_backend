@@ -220,7 +220,8 @@ public class NurseSpeakAPI {
                                   @FormDataParam("snapshot_image_name") @DefaultValue("") String snapshotImageName,
                                   @FormDataParam("snapshot_image") InputStream snapshotImage
     ) {
-        logger.info("add short video content={} video_code={}", content, videoCode);
+        logger.info("add short video content={} video_code={} platform={} background_image={} snapshot={}",
+                content, videoCode, platform, null!=backgroundImage, null!=snapshotImage);
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseSpeakBean nurseSpeak = speakService.addShortVideo(userId, content);
         if (null!=nurseSpeak) {
