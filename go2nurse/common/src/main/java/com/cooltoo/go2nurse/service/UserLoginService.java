@@ -5,6 +5,7 @@ import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.converter.UserOpenAppEntity;
 import com.cooltoo.go2nurse.entities.UserEntity;
 import com.cooltoo.go2nurse.entities.UserTokenAccessEntity;
 import com.cooltoo.go2nurse.repository.UserOpenAppRepository;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
@@ -60,6 +62,27 @@ public class UserLoginService {
         entity.setToken(token);
         return tokenAccessRepository.save(entity);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserTokenAccessEntity login(String mobile, String password, String channel, String channelid){
+        if(channel != null && channelid != null){
+            List<UserOpenAppEntity> channelUsers = openAppRepository.findByUnionidAndStatus(channelid, CommonStatus.ENABLED);
+            if(channelUsers.isEmpty()){
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+            UserOpenAppEntity channelUser = channelUsers.get(0);
+            UserTokenAccessEntity userEntity = login(mobile, password);
+            if(channelUser.getUserId() != userEntity.getUserId()){
+                //update existed user mapping
+                channelUser.setUserId(userEntity.getUserId());
+                openAppRepository.save(channelUser);
+            }
+            return userEntity;
+        } else {
+            return login(mobile, password);
+        }
+    }
+
 
     @Transactional
     public void logout(long userId) {

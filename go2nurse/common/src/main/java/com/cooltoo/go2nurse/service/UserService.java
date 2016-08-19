@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
@@ -116,7 +117,7 @@ public class UserService {
         throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     private UserBean registerWithChannel(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String channel, String channelid) {
         AppChannel appChannel = AppChannel.valueOf(channel);
         switch (appChannel) {
@@ -127,6 +128,7 @@ public class UserService {
                     if (currentUsers.isEmpty()) {
                         UserBean userBean = registerUser(name, gender, strBirthday, mobile, password, smsCode);
                         wechatusers.get(0).setUserId(userBean.getId());
+                        wechatusers.get(0).setStatus(CommonStatus.ENABLED);
                         openAppRepository.save(wechatusers.get(0));
                         loginService.login(mobile, password);
                         return userBean;
@@ -134,10 +136,14 @@ public class UserService {
                         //already existed such user, link with channel user
                         UserEntity currentUser = currentUsers.get(0);
                         currentUser.setPassword(password);
+                        currentUser.setName(name);
+                        currentUser.setStatus(CommonStatus.ENABLED);
+                        currentUser.setBirthday(new Date(NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS)));
                         repository.save(currentUser);
 //                        UserBean userBean = updatePassword(currentUser.getId(), currentUser.getPassword(), password);
                         loginService.login(mobile, password);
                         wechatusers.get(0).setUserId(currentUser.getId());
+                        wechatusers.get(0).setStatus(CommonStatus.ENABLED);
                         openAppRepository.save(wechatusers.get(0));
                         return beanConverter.convert(currentUser);
                     }

@@ -7,5 +7,6 @@
     <go2nurse_user id="5"  name="用户 name5"  birthday="1974-04-04 14:44:44" gender="1" mobile="18527727387" password="aa05" profile_photo_id="1" authority="1" type="1" unique_id="555555" status="1" time_created="2016-04-05 14:44:44" />
     <go2nurse_user id="6"  name="用户 name6"  birthday="1975-04-04 14:44:44" gender="2" mobile="16811663451" password="aa06" profile_photo_id="1" authority="1" type="1" unique_id="666666" status="1" time_created="2016-04-06 14:44:44" />
 
-    <go2nurse_user_openapp_desc id="1" unionid="1" channel="2"/>
+    <go2nurse_user_openapp_desc id="1" unionid="1" channel="2" status="1" user_id="0"/>
+    <go2nurse_user_openapp_desc id="2" unionid="2" channel="2" status="0" user_id="3"/>
 </dataset>
