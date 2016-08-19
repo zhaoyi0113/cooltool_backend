@@ -1,26 +1,33 @@
 package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by hp on 2016/8/8.
  */
 public class DoctorAppointmentBean {
 
+    public static final String FLAG = "FLAG";
+
     private long id;
     private Date time;
     private CommonStatus status;
     private String orderNo;
     private int hospitalId;
-    private String hospitalJson;
+    private HospitalBean hospital;
     private int departmentId;
-    private String departmentJson;
+    private HospitalDepartmentBean department;
     private long doctorId;
-    private String doctorJson;
+    private DoctorBean doctor;
     private long clinicDateId;
     private Date clinicDate;
     private long clinicHoursId;
@@ -28,8 +35,9 @@ public class DoctorAppointmentBean {
     private Time clinicHoursEnd;
     private long userId;
     private long patientId;
-    private String patientJson;
+    private PatientBean patient;
     private OrderStatus orderStatus;
+    private Map<String, Object> properties = new HashMap<>();
 
     public long getId() {
         return id;
@@ -51,24 +59,24 @@ public class DoctorAppointmentBean {
         return hospitalId;
     }
 
-    public String getHospitalJson() {
-        return hospitalJson;
+    public HospitalBean getHospital() {
+        return hospital;
     }
 
     public int getDepartmentId() {
         return departmentId;
     }
 
-    public String getDepartmentJson() {
-        return departmentJson;
+    public HospitalDepartmentBean getDepartment() {
+        return department;
     }
 
     public long getDoctorId() {
         return doctorId;
     }
 
-    public String getDoctorJson() {
-        return doctorJson;
+    public DoctorBean getDoctor() {
+        return doctor;
     }
 
     public long getClinicDateId() {
@@ -99,8 +107,8 @@ public class DoctorAppointmentBean {
         return patientId;
     }
 
-    public String getPatientJson() {
-        return patientJson;
+    public PatientBean getPatient() {
+        return patient;
     }
 
     public OrderStatus getOrderStatus() {
@@ -127,24 +135,24 @@ public class DoctorAppointmentBean {
         this.hospitalId = hospitalId;
     }
 
-    public void setHospitalJson(String hospitalJson) {
-        this.hospitalJson = hospitalJson;
+    public void setHospital(HospitalBean hospital) {
+        this.hospital = hospital;
     }
 
     public void setDepartmentId(int departmentId) {
         this.departmentId = departmentId;
     }
 
-    public void setDepartmentJson(String departmentJson) {
-        this.departmentJson = departmentJson;
+    public void setDepartment(HospitalDepartmentBean department) {
+        this.department = department;
     }
 
     public void setDoctorId(long doctorId) {
         this.doctorId = doctorId;
     }
 
-    public void setDoctorJson(String doctorJson) {
-        this.doctorJson = doctorJson;
+    public void setDoctor(DoctorBean doctor) {
+        this.doctor = doctor;
     }
 
     public void setClinicDateId(long clinicDateId) {
@@ -175,12 +183,28 @@ public class DoctorAppointmentBean {
         this.patientId = patientId;
     }
 
-    public void setPatientJson(String patientJson) {
-        this.patientJson = patientJson;
+    public void setPatient(PatientBean patient) {
+        this.patient = patient;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public Object getProperty(String key){
+        return this.properties.get(key);
+    }
+
+    public void setProperty(String key, Object value){
+        this.properties.put(key, value);
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
     }
 
     public String toString() {

@@ -56,6 +56,16 @@ public class DoctorClinicDateHoursService {
     //==============================================================
     //                      getting
     //==============================================================
+    public DoctorClinicDateBean getClinicDateById(long clinicDateId) {
+        logger.info("get clinic date by id={}", clinicDateId);
+        DoctorClinicDateEntity date = dateRepository.findOne(clinicDateId);
+        if (null!=date) {
+            DoctorClinicDateBean bean = dateBeanConverter.convert(date);
+            logger.info("result is {}", bean);
+            return bean;
+        }
+        throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+    }
 
     public List<DoctorClinicDateBean> getClinicDateWithHours(long doctorId, int flag, List<CommonStatus> statuses) {
         logger.info("get clinic dates by doctorId={} flag={} status={}", doctorId, flag, statuses);
@@ -82,9 +92,12 @@ public class DoctorClinicDateHoursService {
     public DoctorClinicHoursBean getClinicHourById(long clinicHourId) {
         logger.info("get clinic hours by id={}", clinicHourId);
         DoctorClinicHoursEntity hour = hoursRepository.findOne(clinicHourId);
-        DoctorClinicHoursBean bean = hoursBeanConverter.convert(hour);
-        logger.info("result is {}", bean);
-        return bean;
+        if (null!=hour) {
+            DoctorClinicHoursBean bean = hoursBeanConverter.convert(hour);
+            logger.info("result is {}", bean);
+            return bean;
+        }
+        throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
     }
 
     public long countClinicDateByDoctorId(long doctorId, List<CommonStatus> statuses) {

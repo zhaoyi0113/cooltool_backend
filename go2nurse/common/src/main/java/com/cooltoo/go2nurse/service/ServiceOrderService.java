@@ -113,6 +113,7 @@ public class ServiceOrderService {
         List<ServiceOrderBean> beans = new ArrayList<>();
         for (ServiceOrderEntity entity : entities) {
             ServiceOrderBean bean = beanConverter.convert(entity);
+            bean.setProperty(ServiceOrderBean.FLAG, "order");
             beans.add(bean);
         }
         return beans;

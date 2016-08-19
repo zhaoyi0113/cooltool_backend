@@ -1,7 +1,13 @@
 package com.cooltoo.go2nurse.converter;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
+import com.cooltoo.go2nurse.beans.DoctorBean;
+import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.entities.DoctorAppointmentEntity;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +16,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DoctorAppointmentBeanConverter implements Converter<DoctorAppointmentEntity, DoctorAppointmentBean> {
+
+    @Autowired private Go2NurseUtility utility;
+
     @Override
     public DoctorAppointmentBean convert(DoctorAppointmentEntity source) {
         DoctorAppointmentBean bean = new DoctorAppointmentBean();
@@ -18,15 +27,27 @@ public class DoctorAppointmentBeanConverter implements Converter<DoctorAppointme
         bean.setStatus(source.getStatus());
         bean.setUserId(source.getUserId());
         bean.setPatientId(source.getPatientId());
-        bean.setPatientJson(source.getPatientJson());
+        if (null!=source.getPatientJson()) {
+            PatientBean patient = utility.parseJsonBean(source.getPatientJson(), PatientBean.class);
+            bean.setPatient(patient);
+        }
         bean.setOrderNo(source.getOrderNo());
         bean.setOrderStatus(source.getOrderStatus());
         bean.setHospitalId(source.getHospitalId());
-        bean.setHospitalJson(source.getHospitalJson());
+        if (null!=source.getHospitalJson()) {
+            HospitalBean hospital = utility.parseJsonBean(source.getHospitalJson(), HospitalBean.class);
+            bean.setHospital(hospital);
+        }
         bean.setDepartmentId(source.getDepartmentId());
-        bean.setDepartmentJson(source.getDepartmentJson());
+        if (null!=source.getDepartmentJson()) {
+            HospitalDepartmentBean department = utility.parseJsonBean(source.getDepartmentJson(), HospitalDepartmentBean.class);
+            bean.setDepartment(department);
+        }
         bean.setDoctorId(source.getDoctorId());
-        bean.setDoctorJson(source.getDoctorJson());
+        if (null!=source.getDepartmentJson()) {
+            DoctorBean doctor = utility.parseJsonBean(source.getDoctorJson(), DoctorBean.class);
+            bean.setDoctor(doctor);
+        }
         bean.setClinicDateId(source.getClinicDateId());
         bean.setClinicDate(source.getClinicDate());
         bean.setClinicHoursId(source.getClinicHoursId());

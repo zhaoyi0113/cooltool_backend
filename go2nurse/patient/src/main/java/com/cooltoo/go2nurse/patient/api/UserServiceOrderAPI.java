@@ -1,5 +1,7 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
+import com.cooltoo.go2nurse.service.DoctorAppointmentService;
 import com.cooltoo.util.NetworkUtil;
 import com.google.common.io.CharStreams;
 import com.cooltoo.constants.CommonStatus;
@@ -26,8 +28,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hp on 2016/7/15.
@@ -37,6 +38,7 @@ public class UserServiceOrderAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceOrderAPI.class);
 
+    @Autowired private DoctorAppointmentService doctorAppointmentService;
     @Autowired private ServiceOrderService orderService;
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
 
@@ -83,7 +85,9 @@ public class UserServiceOrderAPI {
     public Response getUserOrder(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<ServiceOrderBean> userOrders = orderService.getOrderByUserId(userId);
-        return Response.ok(userOrders).build();
+        List<DoctorAppointmentBean> doctorAppointments = doctorAppointmentService.getDoctorAppointment(userId, "CANCELLED,TO_SERVICE,COMPLETED");
+        List<Object> retVal = sortOrderAndAppointment(userOrders, doctorAppointments);
+        return Response.ok(retVal).build();
     }
 
     @POST
@@ -158,4 +162,31 @@ public class UserServiceOrderAPI {
         return Response.ok(order).build();
     }
 
+    private List<Object> sortOrderAndAppointment(List<ServiceOrderBean> orders, List<DoctorAppointmentBean> appointments) {
+        List<Object> retVal = new ArrayList<>();
+        for (ServiceOrderBean order : orders) {
+            retVal.add(order);
+        }
+        for (DoctorAppointmentBean appointment : appointments) {
+            retVal.add(appointment);
+        }
+        Collections.sort(retVal, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                if (null==o1 && null==o2) {
+                    return 0;
+                }
+                if (null==o1) {
+                    return 1;
+                }
+                if (null==o2) {
+                    return -1;
+                }
+                Date date1 = (o1 instanceof ServiceOrderBean) ? ((ServiceOrderBean)o1).getTime() : ((DoctorAppointmentBean)o1).getTime();
+                Date date2 = (o2 instanceof ServiceOrderBean) ? ((ServiceOrderBean)o2).getTime() : ((DoctorAppointmentBean)o2).getTime();
+                return (int)(date2.getTime()-date1.getTime());
+            }
+        });
+        return retVal;
+    }
 }

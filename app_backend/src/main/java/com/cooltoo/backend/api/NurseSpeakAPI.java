@@ -14,6 +14,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -132,10 +133,9 @@ public class NurseSpeakAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireNurseLogin = true)
     public Response shortVideoQiNiuAuthorityToken(@Context HttpServletRequest request,
-                                                  @QueryParam("key") @DefaultValue("") String key,
-                                                  @QueryParam("bucket_name") @DefaultValue("") String bucketName
+                                                  @QueryParam("key") @DefaultValue("") String key
     ) {
-        bucketName = "cooltoo" + (!VerifyUtil.isStringEmpty(bucketName) ? ("/"+bucketName) : "");
+        String bucketName = videoInSpeakService.getBucketName();
         String token = videoInSpeakService.getQiNiuAuthorityToken(key, bucketName);
         Map<String, String> map = new HashMap<>();
         map.put("token", token);

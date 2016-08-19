@@ -8,11 +8,15 @@ import com.cooltoo.go2nurse.constants.TimeUnit;
 import com.cooltoo.util.VerifyUtil;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/7/13.
  */
 public class ServiceOrderBean {
+
+    public static final String FLAG = "FLAG";
 
     private long id;
     private Date time;
@@ -42,6 +46,7 @@ public class ServiceOrderBean {
     private String paymentAmount;
     private int paymentAmountCent;
     private String leaveAMessage;
+    private Map<String, Object> properties = new HashMap<>();
 
     public long getId() {
         return id;
@@ -259,6 +264,22 @@ public class ServiceOrderBean {
 
     public void setLeaveAMessage(String leaveAMessage) {
         this.leaveAMessage = leaveAMessage;
+    }
+
+    public Object getProperty(String key){
+        return this.properties.get(key);
+    }
+
+    public void setProperty(String key, Object value){
+        this.properties.put(key, value);
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
     }
 
     @Override

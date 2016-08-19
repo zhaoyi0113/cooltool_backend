@@ -51,6 +51,8 @@ public class VideoInSpeakService {
     private String qiniuCallbackUrl;
     @Value("${nursego.qiniu.video.callback.body}")
     private String qiniuCallbackBody;
+    @Value("${nursego.qiniu.video.bucket}")
+    private String bucketName;
 
 
     private static Auth QiNiuAuth = null;
@@ -58,6 +60,10 @@ public class VideoInSpeakService {
     //================================================================
     //            get
     //================================================================
+    public String getBucketName() {
+        return bucketName;
+    }
+
     private Auth getQiNiuAuth() {
         if (null==QiNiuAuth) {
             QiNiuAuth = Auth.create(qiniuAccessKey, qiniuSecretKey);

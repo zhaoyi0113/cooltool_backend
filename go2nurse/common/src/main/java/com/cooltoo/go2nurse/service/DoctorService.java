@@ -53,6 +53,23 @@ public class DoctorService {
     //=====================================================================
     //                   getting
     //=====================================================================
+    public DoctorBean getDoctorById(long doctorId) {
+        logger.info("get doctor by id={}", doctorId);
+        DoctorEntity doctor = repository.findOne(doctorId);
+        if (null!=doctor) {
+            DoctorBean bean = beanConverter.convert(doctor);
+
+            // fill other properties
+            List<DoctorBean> beans = new ArrayList<>();
+            beans.add(bean);
+            fillOtherProperties(beans);
+
+            logger.info("result is {}", bean);
+            return bean;
+        }
+        throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+    }
+
     public boolean existDoctor(long doctorId) {
         return repository.exists(doctorId);
     }

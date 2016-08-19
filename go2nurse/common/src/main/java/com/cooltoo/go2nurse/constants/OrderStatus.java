@@ -1,5 +1,7 @@
 package com.cooltoo.go2nurse.constants;
 
+import com.cooltoo.util.VerifyUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,5 +88,20 @@ public enum  OrderStatus {
         all.add(OrderStatus.CANCELLED);
         all.add(OrderStatus.CREATE_CHARGE_FAILED);
         return all;
+    }
+
+    public static List<OrderStatus> parseStrings(String statuses) {
+        List<OrderStatus> ret = new ArrayList<>();
+        if (VerifyUtil.isStringEmpty(statuses)) {
+            return ret;
+        }
+        String[] arrStatus = statuses.split(",");
+        for (String tmp : arrStatus) {
+            OrderStatus one = parseString(tmp);
+            if (null!=one) {
+                ret.add(one);
+            }
+        }
+        return ret;
     }
 }

@@ -1,10 +1,13 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.ReadingStatus;
+import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
 import com.cooltoo.go2nurse.beans.DoctorBean;
 import com.cooltoo.go2nurse.beans.DoctorClinicDateBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.service.DoctorAppointmentService;
 import com.cooltoo.go2nurse.service.DoctorClinicDateHoursService;
 import com.cooltoo.go2nurse.service.DoctorService;
 import com.cooltoo.util.VerifyUtil;
@@ -29,6 +32,7 @@ public class UserDoctorAPI {
 
     @Autowired private DoctorService doctorService;
     @Autowired private DoctorClinicDateHoursService clinicDateHoursService;
+    @Autowired private DoctorAppointmentService doctorAppointmentService;
 
     @Path("/count/by_hospital_department")
     @GET
@@ -58,5 +62,56 @@ public class UserDoctorAPI {
     ) {
         List<DoctorClinicDateBean> monthClinicDates = clinicDateHoursService.getClinicDateWithHours(doctorId, flag, CommonStatus.getAll());
         return Response.ok(monthClinicDates).build();
+    }
+
+    @Path("/appointment")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response appointOneDoctor(@Context HttpServletRequest request,
+                                     @FormParam("patient_id") @DefaultValue("0") long patientId,
+                                     @FormParam("clinic_hour_id") @DefaultValue("0") long clinicHourId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        DoctorAppointmentBean appointment = doctorAppointmentService.appointDoctor(userId, patientId, clinicHourId);
+        return Response.ok(appointment).build();
+    }
+
+    @Path("/appointment/cancel_and_new_one")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response cancelAppointment(@Context HttpServletRequest request,
+                                      @FormParam("appointment_id") @DefaultValue("0") long appointmentId,
+                                      @FormParam("patient_id") @DefaultValue("0") long patientId,
+                                      @FormParam("clinic_hour_id") @DefaultValue("0") long clinicHourId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        DoctorAppointmentBean appointment = doctorAppointmentService.cancelAndNewOneAppointment(appointmentId, userId, patientId, clinicHourId);
+        return Response.ok(appointment).build();
+    }
+
+    @Path("/appointment/cancel")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response cancelAppointment(@Context HttpServletRequest request,
+                                      @FormParam("appointment_id") @DefaultValue("0") long appointmentId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        DoctorAppointmentBean appointment = doctorAppointmentService.cancelAppointment(userId, 0, appointmentId);
+        return Response.ok(appointment).build();
+    }
+
+    @Path("/appointment/complete")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response completeAppointment(@Context HttpServletRequest request,
+                                        @FormParam("appointment_id") @DefaultValue("0") long appointmentId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        DoctorAppointmentBean appointment = doctorAppointmentService.completeAppointment(userId, 0, appointmentId);
+        return Response.ok(appointment).build();
     }
 }

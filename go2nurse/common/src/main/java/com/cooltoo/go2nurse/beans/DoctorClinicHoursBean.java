@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
 
+import java.sql.Time;
 import java.util.Date;
 
 /**
@@ -14,8 +15,8 @@ public class DoctorClinicHoursBean {
     private CommonStatus status;
     private long doctorId;
     private long clinicDateId;
-    private Date clinicHourStart;
-    private Date clinicHourEnd;
+    private Time clinicHourStart;
+    private Time clinicHourEnd;
     private int numberCount;
 
     public long getId() {
@@ -38,11 +39,11 @@ public class DoctorClinicHoursBean {
         return clinicDateId;
     }
 
-    public Date getClinicHourStart() {
+    public Time getClinicHourStart() {
         return clinicHourStart;
     }
 
-    public Date getClinicHourEnd() {
+    public Time getClinicHourEnd() {
         return clinicHourEnd;
     }
 
@@ -70,11 +71,11 @@ public class DoctorClinicHoursBean {
         this.clinicDateId = clinicDateId;
     }
 
-    public void setClinicHourStart(Date clinicHourStart) {
+    public void setClinicHourStart(Time clinicHourStart) {
         this.clinicHourStart = clinicHourStart;
     }
 
-    public void setClinicHourEnd(Date clinicHourEnd) {
+    public void setClinicHourEnd(Time clinicHourEnd) {
         this.clinicHourEnd = clinicHourEnd;
     }
 
