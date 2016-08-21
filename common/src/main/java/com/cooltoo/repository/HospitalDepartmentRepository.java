@@ -12,6 +12,7 @@ import java.util.List;
 public interface HospitalDepartmentRepository extends CrudRepository<HospitalDepartmentEntity, Integer> {
     List<HospitalDepartmentEntity> findByHospitalIdAndParentId(Integer hospitalId, Integer parentId, Sort sort);
     List<HospitalDepartmentEntity> findByHospitalId(Integer hospitalId, Sort sort);
+    long countByHospitalId(Integer hospitalId);
     List<HospitalDepartmentEntity> findByIdIn(List<Integer> ids, Sort sort);
     List<HospitalDepartmentEntity> findByName(String name);
     List<HospitalDepartmentEntity> findAll(Sort sort);
