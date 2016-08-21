@@ -18,6 +18,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +47,7 @@ public class DepartmentDuplicatedCreator {
                 new Sort.Order(Sort.Direction.ASC, "parentId"),
                 new Sort.Order(Sort.Direction.ASC, "id")
         );
-        List<HospitalDepartmentEntity> allDepartmentInTable = departmentRepository.findAll(sort);
+        List<HospitalDepartmentEntity> allDepartmentInTable = departmentRepository.findByHospitalId(0, sort);
         int newDepartmentId = 0;
         for (HospitalDepartmentEntity tmp : allDepartmentInTable) {
             if (tmp.getId()>newDepartmentId) {
@@ -86,6 +88,7 @@ public class DepartmentDuplicatedCreator {
                                                         (newDepartmentId<100000) ? ("0"+newDepartmentId) :
                                                                 (newDepartmentId<1000000) ? (""+newDepartmentId) : "000000";
         newEntity.setUniqueId(uniqueId);
+
         return newEntity;
     }
 }
