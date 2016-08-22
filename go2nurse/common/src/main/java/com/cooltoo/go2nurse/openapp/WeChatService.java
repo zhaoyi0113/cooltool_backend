@@ -95,8 +95,8 @@ public class WeChatService {
                     try {
                         //if found login token, redirect to token url
                         String url = "http://" + serverHost + "/go2nurse/?token=" + userTokens.get(0).getToken();
-                        if(state != null){
-                            url += "&redirect="+state;
+                        if (state != null) {
+                            url += "&redirect=" + state;
                         }
                         return new URI(url);
                     } catch (URISyntaxException e) {
@@ -122,6 +122,9 @@ public class WeChatService {
             if (unionid != null) {
                 urlStr += "/" + AppChannel.WECHAT + "/" + unionid;
             }
+            if (state != null) {
+                urlStr += "/" + state;
+            }
             return new URI(urlStr);
         } catch (URISyntaxException e) {
             logger.error(e.getMessage(), e);
@@ -130,7 +133,7 @@ public class WeChatService {
     }
 
     public Map<String, String> getJSApiSignature(String url) {
-        logger.info("request js api signature from "+url);
+        logger.info("request js api signature from " + url);
         String noncestr = System.currentTimeMillis() + "";
         String jsApiTicket = tokenScheduler.getJsApiTicket();
         String timestamp = System.currentTimeMillis() + "";
