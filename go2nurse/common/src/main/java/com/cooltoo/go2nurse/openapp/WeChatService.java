@@ -77,12 +77,12 @@ public class WeChatService {
     public URI login(String code, String state) {
         Map accessToken = getWebLoginAccessToken(code);
         WeChatUserInfo userInfo = getUserInfo(accessToken);
-        URI userTokens = loginWithWeChatUser(userInfo);
+        URI userTokens = loginWithWeChatUser(userInfo, state);
         if (userTokens != null) return userTokens;
         return null;
     }
 
-    public URI loginWithWeChatUser(WeChatUserInfo userInfo) {
+    public URI loginWithWeChatUser(WeChatUserInfo userInfo, String state) {
         String unionid = null;
         if (userInfo != null) {
             unionid = userInfo.getUnionid();
@@ -94,7 +94,11 @@ public class WeChatService {
                 if (!userTokens.isEmpty()) {
                     try {
                         //if found login token, redirect to token url
-                        return new URI("http://" + serverHost + "/go2nurse/?token=" + userTokens.get(0).getToken());
+                        String url = "http://" + serverHost + "/go2nurse/?token=" + userTokens.get(0).getToken();
+                        if(state != null){
+                            url += "&redirect="+state;
+                        }
+                        return new URI(url);
                     } catch (URISyntaxException e) {
                         logger.error(e.getMessage(), e);
                     }

@@ -56,11 +56,11 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         WeChatUserInfo userInfo = new WeChatUserInfo();
         String unionid = "100";
         userInfo.setUnionid(unionid);
-        URI uri = weChatService.loginWithWeChatUser(userInfo);
+        URI uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("register"));
         userService.registerUser("aa", 0, "aa", "aaa", "aaa", "aaa", AppChannel.WECHAT.name(), "100");
-        uri = weChatService.loginWithWeChatUser(userInfo);
+        uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.getSchemeSpecificPart().contains("token"));
     }
@@ -70,11 +70,11 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         WeChatUserInfo userInfo = new WeChatUserInfo();
         String unionid = "1";
         userInfo.setUnionid(unionid);
-        URI uri = weChatService.loginWithWeChatUser(userInfo);
+        URI uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertFalse(uri.toString().contains("token"));
         userService.registerUser("aa", 0, "aa", "1231432143", "aaa", "aaa", AppChannel.WECHAT.name(), unionid);
-        uri = weChatService.loginWithWeChatUser(userInfo);
+        uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("token"));
     }
