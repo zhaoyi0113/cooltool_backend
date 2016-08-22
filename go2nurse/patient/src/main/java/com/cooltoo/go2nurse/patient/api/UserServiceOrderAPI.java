@@ -102,7 +102,7 @@ public class UserServiceOrderAPI {
                                  @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage
                                  ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage, 0);
         return Response.ok(order).build();
     }
 
@@ -158,7 +158,7 @@ public class UserServiceOrderAPI {
         Long patientId = !VerifyUtil.isIds(strPatientId) ? null : VerifyUtil.parseLongIds(strPatientId).get(0);
         Long addressId = !VerifyUtil.isIds(strAddressId) ? null : VerifyUtil.parseLongIds(strAddressId).get(0);
         Integer count = !VerifyUtil.isIds(strCount) ? null : VerifyUtil.parseIntIds(strCount).get(0);
-        ServiceOrderBean order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveAMessage);
+        ServiceOrderBean order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveAMessage, 0);
         return Response.ok(order).build();
     }
 

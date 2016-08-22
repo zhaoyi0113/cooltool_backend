@@ -15,6 +15,8 @@ public class ServiceOrderChargePingPPBean {
     private Date time;
     private CommonStatus status;
     private long orderId;
+    private String orderNo;
+    private String channel;
     private AppType appType;
     private ChargeType chargeType;
     private String chargeId;
@@ -37,6 +39,14 @@ public class ServiceOrderChargePingPPBean {
 
     public long getOrderId() {
         return orderId;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public String getChannel() {
+        return channel;
     }
 
     public AppType getAppType() {
@@ -83,6 +93,14 @@ public class ServiceOrderChargePingPPBean {
         this.orderId = orderId;
     }
 
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
     public void setAppType(AppType appType) {
         this.appType = appType;
     }
@@ -119,6 +137,8 @@ public class ServiceOrderChargePingPPBean {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", orderId=").append(orderId);
+        msg.append(", orderNo=").append(orderNo);
+        msg.append(", channel=").append(channel);
         msg.append(", appType=").append(appType);
         msg.append(", pingPPType=").append(chargeType);
         msg.append(", chargeId=").append(chargeId);

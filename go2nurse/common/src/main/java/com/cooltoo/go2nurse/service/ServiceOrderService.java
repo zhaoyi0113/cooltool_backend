@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/7/13.
@@ -55,6 +56,19 @@ public class ServiceOrderService {
     //=====================================================================
     //                   getting
     //=====================================================================
+    private String getOrderNo() {
+        String orderNo = System.currentTimeMillis()+"";
+        for (int i = 10; i>0; i--) {
+            orderNo = NumberUtil.getUniqueString();
+            if (repository.countByOrderNo(orderNo)<=0) {
+                break;
+            }
+            else {
+                orderNo = null;
+            }
+        }
+        return orderNo;
+    }
 
     public long countAllOrder() {
         long count = repository.count();
@@ -67,6 +81,7 @@ public class ServiceOrderService {
         PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, sort);
         Page<ServiceOrderEntity> resultSet = repository.findAll(pageRequest);
         List<ServiceOrderBean> beans = entitiesToBeans(resultSet);
+        fillOtherProperties(beans);
         logger.info("service order count is {}", beans.size());
         return beans;
     }
@@ -94,6 +109,7 @@ public class ServiceOrderService {
         PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, sort);
         Page<ServiceOrderEntity> entities = repository.findByConditions(serviceItemId, userId, categoryId, topCategoryId, vendorType, vendorId, orderStatus, pageRequest);
         List<ServiceOrderBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
         return beans;
     }
@@ -102,6 +118,7 @@ public class ServiceOrderService {
         logger.info("get service order by userId={}", userId);
         List<ServiceOrderEntity> entities = repository.findByUserId(userId, sort);
         List<ServiceOrderBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
         logger.info("service order count is {}", beans.size());
         return beans;
     }
@@ -119,6 +136,26 @@ public class ServiceOrderService {
         return beans;
     }
 
+    private void fillOtherProperties(List<ServiceOrderBean> beans) {
+        if (VerifyUtil.isListEmpty(beans)) {
+            return;
+        }
+        List<Long> orderIds = new ArrayList<>();
+        for (ServiceOrderBean tmp : beans) {
+            orderIds.add(tmp.getId());
+        }
+        Map<Long, List<ServiceOrderChargePingPPBean>> orderId2Charge = orderPingPPService.getOrderPingPPResult(AppType.GO_2_NURSE, orderIds);
+        for (ServiceOrderBean tmp : beans) {
+            List<ServiceOrderChargePingPPBean> charges = orderId2Charge.get(tmp.getId());
+            if (null==charges) {
+                tmp.setPingPP(new ArrayList<>());
+            }
+            else {
+                tmp.setPingPP(charges);
+            }
+        }
+    }
+
     //=====================================================================
     //                   deleting
     //=====================================================================
@@ -128,9 +165,9 @@ public class ServiceOrderService {
     //=====================================================================
     @Transactional
     public ServiceOrderBean updateOrder(long orderId, Long patientId, Long addressId,
-                                        String strStartTime, Integer count, String leaveAMessage) {
-        logger.info("update service order={} by patientId={} addressId={} strStartTime={} count={} leaveAMessage={}",
-                orderId, patientId, addressId, strStartTime, count, leaveAMessage);
+                                        String strStartTime, Integer count, String leaveAMessage, int preferentialCent) {
+        logger.info("update service order={} by patientId={} addressId={} strStartTime={} count={} leaveAMessage={} preferentialCent={}",
+                orderId, patientId, addressId, strStartTime, count, leaveAMessage, preferentialCent);
 
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null==entity) {
@@ -178,6 +215,11 @@ public class ServiceOrderService {
             changed = true;
         }
 
+        if (preferentialCent>0 && preferentialCent!=entity.getPreferentialCent()) {
+            entity.setPreferentialCent(preferentialCent);
+            changed = true;
+        }
+
         if (changed) {
             entity = repository.save(entity);
         }
@@ -204,7 +246,7 @@ public class ServiceOrderService {
         }
 
         ServiceOrderBean order = beanConverter.convert(entity);
-        String orderNo = orderPingPPService.getOrderNo();
+        String orderNo = order.getOrderNo();
         Charge charge = pingPPService.createCharge(orderNo, channel, order.getTotalConsumptionCent(), clientIP,
                 order.getServiceItem().getName(), order.getServiceItem().getDescription(), order.getLeaveAMessage());
         if (null==charge) {
@@ -214,7 +256,7 @@ public class ServiceOrderService {
             return charge;
         }
 
-        orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, ChargeType.CHARGE, charge.getId(), charge.toString());
+        orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, ChargeType.CHARGE, charge);
 
         return charge;
     }
@@ -237,9 +279,9 @@ public class ServiceOrderService {
     //=====================================================================
     @Transactional
     public ServiceOrderBean addOrder(long serviceItemId, long userId, long patientId, long addressId,
-                                     String strStartTime, int count, String leaveAMessage) {
-        logger.info("add service order by serviceItemId={} userId={} patientId={} addressId={} strStartTime={} count={} leaveAMessage={}",
-                serviceItemId, userId, patientId, addressId, strStartTime, count, leaveAMessage);
+                                     String strStartTime, int count, String leaveAMessage, int preferentialCent) {
+        logger.info("add service order by serviceItemId={} userId={} patientId={} addressId={} strStartTime={} count={} leaveAMessage={} preferentialCent={}",
+                serviceItemId, userId, patientId, addressId, strStartTime, count, leaveAMessage, preferentialCent);
         if (!serviceCategoryItemService.existItem(serviceItemId)) {
             logger.error("service item not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -259,6 +301,11 @@ public class ServiceOrderService {
         }
         if (count<0) {
             logger.error("time duration not valid");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        String orderNo = getOrderNo();
+        if (VerifyUtil.isStringEmpty(orderNo)) {
+            logger.error("create orderNo failed!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
@@ -351,6 +398,8 @@ public class ServiceOrderService {
         entity.setServiceTimeDuration(serviceItem.getServiceTimeDuration()*count);
         entity.setServiceTimeUnit(serviceItem.getServiceTimeUnit());
         entity.setTotalConsumptionCent(serviceItem.getServicePriceCent()*count);
+        entity.setPreferentialCent(preferentialCent);
+        entity.setOrderNo(orderNo);
         entity.setLeaveAMessage(leaveAMessage);
 
         entity.setOrderStatus(OrderStatus.TO_PAY);

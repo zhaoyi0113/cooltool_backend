@@ -10,8 +10,8 @@ import com.cooltoo.go2nurse.constants.ChargeType;
 import com.cooltoo.go2nurse.converter.ServiceOrderChargePingPPBeanConverter;
 import com.cooltoo.go2nurse.entities.ServiceOrderChargePingPPEntity;
 import com.cooltoo.go2nurse.repository.ServiceOrderChargePingPPRepository;
-import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
+import com.pingplusplus.model.Charge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,26 +30,12 @@ public class ServiceOrderChargePingPPService {
     private static final Logger logger = LoggerFactory.getLogger(ServiceOrderChargePingPPService.class);
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "time"),
-            new Sort.Order(Sort.Direction.DESC, "id")
+            new Sort.Order(Sort.Direction.ASC, "time"),
+            new Sort.Order(Sort.Direction.ASC, "id")
     );
 
     @Autowired private ServiceOrderChargePingPPRepository repository;
     @Autowired private ServiceOrderChargePingPPBeanConverter beanConverter;
-
-    public String getOrderNo() {
-        String orderNo = System.currentTimeMillis()+"";
-        for (int i = 10; i>0; i--) {
-            orderNo = NumberUtil.getUniqueString();
-            if (repository.countByChargeId(orderNo)<=0) {
-                break;
-            }
-            else {
-                orderNo = null;
-            }
-        }
-        return orderNo;
-    }
 
     public List<ServiceOrderChargePingPPBean> getOrderPingPPResult(AppType appType, long orderId) {
         logger.info("get order ping++ information by appType={} orderId={}", appType, orderId);
@@ -134,27 +120,29 @@ public class ServiceOrderChargePingPPService {
     //                      adding
     //==============================================================================
     @Transactional
-    public ServiceOrderChargePingPPBean addOrderCharge(long orderId, AppType appType, ChargeType chargeType, String chargeId, String chargeJson) {
-        logger.info("create order charge by orderId={} appType={} pingPPType={} pingPPId={} pingPPJson={}",
-                orderId, appType, chargeType, chargeId, chargeJson);
+    public ServiceOrderChargePingPPBean addOrderCharge(long orderId, AppType appType, ChargeType chargeType, Charge charge) {
+        logger.info("create order charge by orderId={} appType={} pingPPType={} pingPPJson={}",
+                orderId, appType, chargeType, charge.toString());
         if (null==appType) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if (null== chargeType) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (VerifyUtil.isStringEmpty(chargeId)) {
+        if (null==charge) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (VerifyUtil.isStringEmpty(chargeJson)) {
+        if (VerifyUtil.isStringEmpty(charge.getId())) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         ServiceOrderChargePingPPEntity entity = new ServiceOrderChargePingPPEntity();
         entity.setOrderId(orderId);
+        entity.setOrderNo(charge.getOrderNo());
+        entity.setChannel(charge.getChannel());
         entity.setAppType(appType);
         entity.setChargeType(chargeType);
-        entity.setChargeId(chargeId);
-        entity.setChargeJson(chargeJson);
+        entity.setChargeId(charge.getId());
+        entity.setChargeJson(charge.toString());
         entity.setChargeStatus(ChargeStatus.CHARGE_CREATED);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);

@@ -9,6 +9,7 @@ import com.cooltoo.util.VerifyUtil;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,13 +40,18 @@ public class ServiceOrderBean {
     private Date serviceStartTime;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
+    private int itemCount;
     private String totalConsumption;
     private int totalConsumptionCent;
+    private String preferential;
+    private int preferentialCent;
+    private String orderNo;
     private OrderStatus orderStatus;
     private Date payTime;
     private String paymentAmount;
     private int paymentAmountCent;
     private String leaveAMessage;
+    private List<ServiceOrderChargePingPPBean> pingPP;
     private Map<String, Object> properties = new HashMap<>();
 
     public long getId() {
@@ -132,12 +138,28 @@ public class ServiceOrderBean {
         return serviceTimeUnit;
     }
 
+    public int getItemCount() {
+        return itemCount;
+    }
+
     public String getTotalConsumption() {
         return totalConsumption;
     }
 
     public int getTotalConsumptionCent() {
         return totalConsumptionCent;
+    }
+
+    public String getPreferential() {
+        return preferential;
+    }
+
+    public int getPreferentialCent() {
+        return preferentialCent;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
     }
 
     public OrderStatus getOrderStatus() {
@@ -244,9 +266,22 @@ public class ServiceOrderBean {
         this.serviceTimeUnit = serviceTimeUnit;
     }
 
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
+    }
+
     public void setTotalConsumptionCent(int totalConsumptionCent) {
         this.totalConsumptionCent = totalConsumptionCent;
         this.totalConsumption = VerifyUtil.parsePrice(totalConsumptionCent);
+    }
+
+    public void setPreferentialCent(int preferentialCent) {
+        this.preferentialCent = preferentialCent;
+        this.preferential = VerifyUtil.parsePrice(preferentialCent);
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
@@ -264,6 +299,14 @@ public class ServiceOrderBean {
 
     public void setLeaveAMessage(String leaveAMessage) {
         this.leaveAMessage = leaveAMessage;
+    }
+
+    public List<ServiceOrderChargePingPPBean> getPingPP() {
+        return pingPP;
+    }
+
+    public void setPingPP(List<ServiceOrderChargePingPPBean> pingPP) {
+        this.pingPP = pingPP;
     }
 
     public Object getProperty(String key){

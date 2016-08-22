@@ -37,6 +37,8 @@ public class ServiceOrderEntity {
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
     private int totalConsumptionCent;
+    private int preferentialCent;
+    private String orderNo;
     private OrderStatus orderStatus;
     private Date payTime;
     private int paymentAmountCent;
@@ -151,6 +153,16 @@ public class ServiceOrderEntity {
         return totalConsumptionCent;
     }
 
+    @Column(name = "preferential_cent")
+    public int getPreferentialCent() {
+        return preferentialCent;
+    }
+
+    @Column(name = "order_no")
+    public String getOrderNo() {
+        return orderNo;
+    }
+
     @Column(name = "order_status")
     @Enumerated
     public OrderStatus getOrderStatus() {
@@ -256,6 +268,14 @@ public class ServiceOrderEntity {
         this.totalConsumptionCent = totalConsumptionCent;
     }
 
+    public void setPreferentialCent(int preferentialCent) {
+        this.preferentialCent = preferentialCent;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
     public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }
@@ -287,6 +307,8 @@ public class ServiceOrderEntity {
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);
         msg.append(", totalConsumptionCent=").append(totalConsumptionCent);
+        msg.append(", preferentialCent=").append(preferentialCent);
+        msg.append(", orderNo=").append(orderNo);
         msg.append(", orderStatus=").append(orderStatus);
         msg.append(", payTime=").append(payTime);
         msg.append(", paymentAmountCent=").append(paymentAmountCent);

@@ -74,10 +74,21 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
         bean.setServiceTimeDuration(source.getServiceTimeDuration());
         bean.setServiceTimeUnit(source.getServiceTimeUnit());
         bean.setTotalConsumptionCent(source.getTotalConsumptionCent());
+        bean.setPreferentialCent(source.getPreferentialCent());
+        bean.setOrderNo(source.getOrderNo());
         bean.setOrderStatus(source.getOrderStatus());
         bean.setPayTime(source.getPayTime());
         bean.setPaymentAmountCent(source.getPaymentAmountCent());
         bean.setLeaveAMessage(source.getLeaveAMessage());
+
+        int itemCount = 0;
+        if (null!=bean.getServiceItem()) {
+            int itemPrice = bean.getServiceItem().getServicePriceCent();
+            if (itemPrice>0 && bean.getTotalConsumptionCent()>0) {
+                itemCount = bean.getTotalConsumptionCent()/itemPrice;
+            }
+        }
+        bean.setItemCount(itemCount);
 
         return bean;
     }

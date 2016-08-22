@@ -17,6 +17,8 @@ public class ServiceOrderChargePingPPBeanConverter implements Converter<ServiceO
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
         bean.setOrderId(source.getOrderId());
+        bean.setOrderNo(source.getOrderNo());
+        bean.setChannel(source.getChannel());
         bean.setAppType(source.getAppType());
         bean.setChargeType(source.getChargeType());
         bean.setChargeId(source.getChargeId());

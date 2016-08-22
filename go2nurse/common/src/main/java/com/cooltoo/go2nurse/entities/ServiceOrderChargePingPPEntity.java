@@ -18,6 +18,8 @@ public class ServiceOrderChargePingPPEntity {
     private Date time;
     private CommonStatus status;
     private long orderId;
+    private String orderNo;
+    private String channel;
     private AppType appType;
     private ChargeType chargeType;
     private String chargeId;
@@ -47,6 +49,16 @@ public class ServiceOrderChargePingPPEntity {
     @Column(name = "order_id")
     public long getOrderId() {
         return orderId;
+    }
+
+    @Column(name = "order_no")
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    @Column(name = "channel")
+    public String getChannel() {
+        return channel;
     }
 
     @Column(name = "app_type")
@@ -103,6 +115,14 @@ public class ServiceOrderChargePingPPEntity {
         this.orderId = orderId;
     }
 
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
     public void setAppType(AppType appType) {
         this.appType = appType;
     }
@@ -139,6 +159,8 @@ public class ServiceOrderChargePingPPEntity {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", orderId=").append(orderId);
+        msg.append(", orderNo=").append(orderNo);
+        msg.append(", channel=").append(channel);
         msg.append(", appType=").append(appType);
         msg.append(", pingPPType=").append(chargeType);
         msg.append(", chargeId=").append(chargeId);

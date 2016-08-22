@@ -15,8 +15,6 @@ public interface ServiceOrderChargePingPPRepository extends JpaRepository<Servic
 
     List<ServiceOrderChargePingPPEntity> findByAppTypeAndOrderId(AppType appType, long orderId, Sort sort);
     List<ServiceOrderChargePingPPEntity> findByAppTypeAndOrderIdIn(AppType appType, List<Long> orderIds, Sort sort);
-    ServiceOrderChargePingPPEntity findByAppTypeAndChargeTypeAndChargeId(AppType appType, ChargeType chargeType, String chargeId);
 
-    long countByChargeId(String chargeId);
     ServiceOrderChargePingPPEntity findByChargeId(String chargeId);
 }

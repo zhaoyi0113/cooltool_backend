@@ -18,6 +18,7 @@ import java.util.List;
 public interface ServiceOrderRepository extends JpaRepository<ServiceOrderEntity, Long> {
 
     List<ServiceOrderEntity> findByUserId(long userId, Sort sort);
+    long countByOrderNo(String orderNo);
 
     @Query("SELECT count(order1.id) FROM ServiceOrderEntity order1" +
             " WHERE (?1 IS NULL OR order1.serviceItemId=?1)" +
