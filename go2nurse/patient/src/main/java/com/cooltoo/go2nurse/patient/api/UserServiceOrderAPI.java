@@ -79,6 +79,17 @@ public class UserServiceOrderAPI {
         return Response.ok(serviceItems).build();
     }
 
+    @Path("/by_order_id")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUserOrderByOrderId(@Context HttpServletRequest request,
+                                          @QueryParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
+        return Response.ok(orders.get(0)).build();
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)

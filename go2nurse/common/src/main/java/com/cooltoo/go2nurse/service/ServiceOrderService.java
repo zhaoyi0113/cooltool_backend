@@ -114,6 +114,20 @@ public class ServiceOrderService {
         return beans;
     }
 
+    public List<ServiceOrderBean> getOrderByOrderId(long orderId) {
+        logger.info("get service order by orderId={}", orderId);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        List<ServiceOrderEntity> entities = new ArrayList<>();
+        entities.add(entity);
+        List<ServiceOrderBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
+        logger.info("service order count is {}", beans.size());
+        return beans;
+    }
+
     public List<ServiceOrderBean> getOrderByUserId(long userId) {
         logger.info("get service order by userId={}", userId);
         List<ServiceOrderEntity> entities = repository.findByUserId(userId, sort);

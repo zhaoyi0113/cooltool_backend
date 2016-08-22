@@ -116,4 +116,14 @@ public class ServiceOrderManageAPI {
         List<ServiceOrderBean> orders = orderService.getOrder(pageIndex, sizePerPage);
         return Response.ok(orders).build();
     }
+
+    @Path("/by_order_id")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserOrderByOrderId(@Context HttpServletRequest request,
+                                          @QueryParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
+        return Response.ok(orders.get(0)).build();
+    }
 }
