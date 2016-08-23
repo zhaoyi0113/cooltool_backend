@@ -22,8 +22,11 @@ public interface ServiceCategoryRepository extends JpaRepository<ServiceCategory
 
     List<ServiceCategoryEntity> findByIdIn(List<Long> ids);
 
+    @Query("SELECT category.id, category.parentId FROM ServiceCategoryEntity category WHERE category.id IN (?1)")
+    List<Object[]> findIdAndParentIdByIdIn(List<Long> ids);
+
     @Modifying
     @Query("UPDATE ServiceCategoryEntity category SET category.parentId=0" +
-            " WHERE category.parentId IN ?2 ")
+            " WHERE category.parentId IN (?1) ")
     int setPatentIdToNone(List<Long> parentIds);
 }

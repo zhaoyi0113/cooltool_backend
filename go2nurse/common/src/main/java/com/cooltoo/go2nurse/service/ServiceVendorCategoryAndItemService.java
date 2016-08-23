@@ -194,6 +194,22 @@ public class ServiceVendorCategoryAndItemService {
         return beans;
     }
 
+    private Map<Long, Long> getSubCategoryIdToTopCategoryId(List<Long> subCategoryId) {
+        Map<Long, Long> subToTop = new HashMap<>();
+        if (VerifyUtil.isListEmpty(subCategoryId)) {
+        }
+        else {
+            List<Object[]> subAndTop = categoryRep.findIdAndParentIdByIdIn(subCategoryId);
+            for (Object[] tmp : subAndTop) {
+                if (null != tmp[1]) {
+                    subToTop.put((Long)tmp[0], (Long)tmp[1]);
+                }
+            }
+        }
+        logger.info("get sub category id --> top category id, count is {}", subToTop.size());
+        return subToTop;
+    }
+
     public boolean existItem(long itemId) {
         return itemRep.exists(itemId);
     }
@@ -421,7 +437,11 @@ public class ServiceVendorCategoryAndItemService {
         List<Long> imagesId = new ArrayList<>();
         List<Long> companyId = new ArrayList<>();
         List<Integer> hospitalsId = new ArrayList<>();
+        List<Long> categoryIds = new ArrayList<>();
         for (ServiceItemBean item : items) {
+            if (!categoryIds.contains(item.getCategoryId())) {
+                categoryIds.add(item.getCategoryId());
+            }
             if (!imagesId.contains(item.getImageId())) {
                 imagesId.add(item.getImageId());
             }
@@ -439,6 +459,7 @@ public class ServiceVendorCategoryAndItemService {
         Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
         Map<Long, ServiceVendorBean> vendorIdToBean = getVendorIdToBeanMapByIds(companyId);
         Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalsId);
+        Map<Long, Long> subCategoryIdToTopId = getSubCategoryIdToTopCategoryId(categoryIds);
         for (ServiceItemBean item : items) {
             String imageUrl = imageIdToUrl.get(item.getImageId());
             if (!VerifyUtil.isStringEmpty(imageUrl)) {
@@ -447,6 +468,10 @@ public class ServiceVendorCategoryAndItemService {
             imageUrl = imageIdToUrl.get(item.getDetailImageId());
             if (!VerifyUtil.isStringEmpty(imageUrl)) {
                 item.setDetailImageUrl(imageUrl);
+            }
+            Long topCategoryId = subCategoryIdToTopId.get(item.getCategoryId());
+            if (null!= topCategoryId) {
+                item.setTopCategoryId(topCategoryId);
             }
             if (ServiceVendorType.COMPANY.equals(item.getVendorType())) {
                 ServiceVendorBean vendor = vendorIdToBean.get(item.getVendorId());
