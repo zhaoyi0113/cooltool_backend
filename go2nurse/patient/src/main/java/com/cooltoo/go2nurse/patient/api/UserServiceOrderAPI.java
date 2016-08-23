@@ -173,6 +173,18 @@ public class UserServiceOrderAPI {
         return Response.ok(order).build();
     }
 
+    @Path("/cancel")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response userCancelOrder(@Context HttpServletRequest request,
+                                  @FormParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        ServiceOrderBean order = orderService.cancelOrder(true, userId, orderId);
+        return Response.ok(order).build();
+    }
+
     private List<Object> sortOrderAndAppointment(List<ServiceOrderBean> orders, List<DoctorAppointmentBean> appointments) {
         List<Object> retVal = new ArrayList<>();
         for (ServiceOrderBean order : orders) {

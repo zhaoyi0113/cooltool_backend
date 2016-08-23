@@ -288,6 +288,25 @@ public class ServiceOrderService {
         return beanConverter.convert(order);
     }
 
+    @Transactional
+    public ServiceOrderBean cancelOrder(boolean checkUser, long userId, long orderId) {
+        logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (checkUser) {
+            if (entity.getUserId()!=userId) {
+                logger.error("order not belong to user");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
+        entity.setOrderStatus(OrderStatus.CANCELLED);
+        entity = repository.save(entity);
+        logger.info("order cancelled is {}", entity);
+        return beanConverter.convert(entity);
+    }
+
     //=====================================================================
     //                   adding
     //=====================================================================
