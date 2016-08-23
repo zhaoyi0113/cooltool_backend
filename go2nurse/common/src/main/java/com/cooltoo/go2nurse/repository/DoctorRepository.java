@@ -28,4 +28,9 @@ public interface DoctorRepository extends JpaRepository<DoctorEntity, Long> {
             " AND (?2 IS NULL OR doctor.departmentId=?2)" +
             " AND (doctor.status IN (?3))")
     Page<DoctorEntity> findByHospitalDepartmentStatusIn(Integer hospitalId, Integer departmentId, List<CommonStatus> status, Pageable page);
+    @Query("FROM DoctorEntity doctor" +
+            " WHERE (?1 IS NULL OR doctor.hospitalId=?1)" +
+            " AND (?2 IS NULL OR doctor.departmentId=?2)" +
+            " AND (doctor.status IN (?3))")
+    List<DoctorEntity> findByHospitalDepartmentStatusIn(Integer hospitalId, Integer departmentId, List<CommonStatus> status, Sort sort);
 }
