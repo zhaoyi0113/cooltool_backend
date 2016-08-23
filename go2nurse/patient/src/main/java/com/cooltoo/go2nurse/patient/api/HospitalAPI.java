@@ -23,11 +23,9 @@ public class HospitalAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public Response getHospital(@Context HttpServletRequest request,
-                                @QueryParam("index") @DefaultValue("0") int pageIndex,
-                                @QueryParam("number") @DefaultValue("10") int sizePerPage
-    ) {
-        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, null, null, null, null, null, 1, 1, pageIndex, sizePerPage);
+    public Response getHospital(@Context HttpServletRequest request) {
+        int count = (int)hospitalService.countHospitalByConditions(true, null, null, null, null, null, 1, 1);
+        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, null, null, null, null, null, 1, 1, 0, count);
         return Response.ok(hospitals).build();
     }
 }
