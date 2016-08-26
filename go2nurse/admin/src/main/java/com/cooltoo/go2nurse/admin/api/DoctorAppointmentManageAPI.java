@@ -23,6 +23,7 @@ public class DoctorAppointmentManageAPI {
     @Autowired
     private DoctorAppointmentService doctorAppointmentService;
 
+    @Path("/by_id")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAppointmentById(@Context HttpServletRequest request,

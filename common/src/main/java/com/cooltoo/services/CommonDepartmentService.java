@@ -34,6 +34,10 @@ public class CommonDepartmentService {
     //=======================================================
     //        get department
     //=======================================================
+    public boolean existsDepartment(Integer departmentId) {
+        return repository.exists(departmentId);
+    }
+
     public List<HospitalDepartmentBean> getDepartmentByUniqueId(String uniqueId, String nginxPrefix) {
         List<HospitalDepartmentEntity> entities = repository.findByUniqueId(uniqueId);
         List<HospitalDepartmentBean> departments = entitiesToBeans(entities);
