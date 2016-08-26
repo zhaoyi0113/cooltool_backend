@@ -96,7 +96,7 @@ public class WeChatService {
                         //if found login token, redirect to token url
                         String url = "http://" + serverHost + "/go2nurse/?token=" + userTokens.get(0).getToken();
                         if (state != null) {
-                            url += "&redirect=" + state;
+                            url += "?redirect=" + state;
                         }
                         return new URI(url);
                     } catch (URISyntaxException e) {
