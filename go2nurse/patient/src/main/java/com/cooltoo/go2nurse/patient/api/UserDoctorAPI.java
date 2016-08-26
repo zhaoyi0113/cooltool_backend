@@ -2,7 +2,6 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
 import com.cooltoo.go2nurse.beans.DoctorBean;
 import com.cooltoo.go2nurse.beans.DoctorClinicDateBean;
@@ -12,15 +11,12 @@ import com.cooltoo.go2nurse.service.DoctorClinicDateHoursService;
 import com.cooltoo.go2nurse.service.DoctorService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.data.jpa.repository.Query;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +58,18 @@ public class UserDoctorAPI {
     ) {
         List<DoctorClinicDateBean> monthClinicDates = clinicDateHoursService.getClinicDateWithHours(doctorId, flag, CommonStatus.getAll());
         return Response.ok(monthClinicDates).build();
+    }
+
+    @Path("/appointment")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getAppointmentById(@Context HttpServletRequest request,
+                                       @QueryParam("appointment_id") @DefaultValue("0") long appointmentId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<DoctorAppointmentBean> appointment = doctorAppointmentService.getDoctorAppointment(true, userId, appointmentId);
+        return Response.ok(appointment.get(0)).build();
     }
 
     @Path("/appointment")

@@ -52,6 +52,24 @@ public class DoctorAppointmentService {
     //============================================
     //          getting for user
     //============================================
+    public List<DoctorAppointmentBean> getDoctorAppointment(boolean checkUser, Long userId, Long appointmentId) {
+        logger.info("user={} get doctor appointment by appointmentId={}", userId, appointmentId);
+        DoctorAppointmentEntity entity = repository.findOne(appointmentId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (checkUser && userId!=entity.getUserId()) {
+            logger.error("this appointment not belong to user");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        List<DoctorAppointmentEntity> entities = new ArrayList<>();
+        entities.add(entity);
+        List<DoctorAppointmentBean> beans = entitiesToBeans(entities);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     public List<DoctorAppointmentBean> getDoctorAppointment(Long userId, String strOrderStatuses) {
         logger.info("user={} get doctor appointment by orderStatuses={}", userId, strOrderStatuses);
         List<OrderStatus> orderStatuses = OrderStatus.parseStrings(strOrderStatuses);

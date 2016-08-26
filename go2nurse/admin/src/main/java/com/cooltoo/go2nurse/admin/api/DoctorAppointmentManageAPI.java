@@ -23,6 +23,15 @@ public class DoctorAppointmentManageAPI {
     @Autowired
     private DoctorAppointmentService doctorAppointmentService;
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAppointmentById(@Context HttpServletRequest request,
+                                       @QueryParam("appointment_id") @DefaultValue("0") long appointmentId
+    ) {
+        List<DoctorAppointmentBean> appointment = doctorAppointmentService.getDoctorAppointment(false, 0L, appointmentId);
+        return Response.ok(appointment.get(0)).build();
+    }
+
     @Path("/count")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
