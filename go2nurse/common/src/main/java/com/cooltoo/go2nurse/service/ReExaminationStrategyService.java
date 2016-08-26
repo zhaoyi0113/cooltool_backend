@@ -15,6 +15,8 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,13 +45,29 @@ public class ReExaminationStrategyService {
     //                        getting
     //===========================================================================
     public long countByStatus(List<CommonStatus> statuses) {
-        logger.info("count re-examination strategy by statuses={}", statuses);
         long count = 0L;
         if (!VerifyUtil.isListEmpty(statuses)) {
             count = repository.countByStatusIn(statuses);
         }
         logger.info("count re-examination strategy by statuses={}, count is {}", statuses, count);
         return count;
+    }
+
+    public List<ReExaminationStrategyBean> getByStatus(List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+        logger.info("get re-examination strategy by statuses={}, at pageIndex={} sizePerPage={}", statuses, pageIndex, sizePerPage);
+        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<ReExaminationStrategyEntity> entities = repository.findByStatusIn(statuses, request);
+        List<ReExaminationStrategyBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
+    public List<ReExaminationStrategyBean> getByDepartmentId(Integer departmentId, CommonStatus status) {
+        logger.info("get re-examination strategy by departmentId={} status={}", departmentId, status);
+        List<ReExaminationStrategyEntity> entities = repository.findByDepartmentIdAndStatus(departmentId, status, sort);
+        List<ReExaminationStrategyBean> beans = entitiesToBeans(entities);
+        return beans;
     }
 
     private List<ReExaminationStrategyBean> entitiesToBeans(Iterable<ReExaminationStrategyEntity> entities) {

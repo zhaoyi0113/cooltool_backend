@@ -2,9 +2,9 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.util.VerifyUtil;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by hp on 2016/8/26.
@@ -16,6 +16,7 @@ public class ReExaminationStrategyBean {
     private int departmentId;
     private HospitalDepartmentBean department;
     private String reExaminationDay;
+    private List<Integer> intReExaminationDay;
     private boolean recycled;
 
     public long getId() {
@@ -36,6 +37,10 @@ public class ReExaminationStrategyBean {
 
     public String getReExaminationDay() {
         return reExaminationDay;
+    }
+
+    public List<Integer> getIntReExaminationDay() {
+        return intReExaminationDay;
     }
 
     public boolean getRecycled() {
@@ -60,6 +65,19 @@ public class ReExaminationStrategyBean {
 
     public void setReExaminationDay(String reExaminationDay) {
         this.reExaminationDay = reExaminationDay;
+        this.intReExaminationDay = VerifyUtil.parseIntIds(reExaminationDay);
+        Collections.sort(intReExaminationDay, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                if (null==o1) {
+                    return -1;
+                }
+                if (null==o2) {
+                    return 1;
+                }
+                return o1 - o2;
+            }
+        });
     }
 
     public void setRecycled(boolean recycled) {

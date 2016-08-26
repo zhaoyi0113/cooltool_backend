@@ -4,7 +4,9 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.beans.ReExaminationStrategyBean;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
+import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
 import com.cooltoo.go2nurse.beans.UserReExaminationDateBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.constants.ProcessStatus;
@@ -41,6 +43,8 @@ public class UserReExaminationDateService {
 
     @Autowired private UserRepository userRepository;
     @Autowired private UserDiagnosticPointRelationService userDiagnosticRelationService;
+    @Autowired private ReExaminationStrategyService reExaminationStrategyService;
+    @Autowired private UserHospitalizedRelationService userHospitalizedRelationService;
 
     //===============================================================
     //                           getting for user
@@ -203,7 +207,14 @@ public class UserReExaminationDateService {
 
         // get re_examination dates and group id
         long reExamDateGroupId = System.currentTimeMillis();
-        List<Date> reExamDates = getReExaminationDate(startDate, YesNoEnum.YES.equals(hasOperation));
+        List<UserHospitalizedRelationBean> hospitalizedRelations = userHospitalizedRelationService.getUserHospitalizedRelationByGroupId(userId, hospitalizedGroupId);
+        List<Date> reExamDates = null;
+        if (!VerifyUtil.isListEmpty(hospitalizedRelations)) {
+            reExamDates = getReExaminationDate(startDate, hospitalizedRelations.get(0).getDepartmentId(), YesNoEnum.YES.equals(hasOperation));
+        }
+        if (VerifyUtil.isListEmpty(reExamDates)) {
+            reExamDates = getReExaminationDate(startDate, YesNoEnum.YES.equals(hasOperation));
+        }
 
         // add re_examination dates
         List<UserReExaminationDateBean> reExaminationDateBeans = new ArrayList<>();
@@ -237,6 +248,27 @@ public class UserReExaminationDateService {
 
         calendar.add(Calendar.MONTH, 6);
         reExamDate.add(calendar.getTime());
+
+        return reExamDate;
+    }
+
+    private List<Date> getReExaminationDate(Date startDate, Integer departmentId, boolean hasOperation) {
+        List<ReExaminationStrategyBean> reExamStrategy = reExaminationStrategyService.getByDepartmentId(departmentId, CommonStatus.ENABLED);
+        ReExaminationStrategyBean tmp = reExamStrategy.get(0);
+
+        List<Date> reExamDate = new ArrayList<>();
+        if (null==startDate) {
+            return reExamDate;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+
+        List<Integer> deltaDays = tmp.getIntReExaminationDay();
+        for (Integer deltaDay : deltaDays) {
+            calendar.add(Calendar.DAY_OF_MONTH, deltaDay);
+            reExamDate.add(calendar.getTime());
+            calendar.add(Calendar.DAY_OF_MONTH, -deltaDay);
+        }
 
         return reExamDate;
     }
