@@ -4,10 +4,12 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.ReExaminationStrategyBean;
 import com.cooltoo.go2nurse.entities.ReExaminationStrategyEntity;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by hp on 2016/8/26.
  */
+@Component
 public class ReExaminationStrategyBeanConverter implements Converter<ReExaminationStrategyEntity, ReExaminationStrategyBean> {
     @Override
     public ReExaminationStrategyBean convert(ReExaminationStrategyEntity source) {

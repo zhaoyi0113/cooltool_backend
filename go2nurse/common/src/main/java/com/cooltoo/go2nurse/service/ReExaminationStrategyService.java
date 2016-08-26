@@ -9,6 +9,7 @@ import com.cooltoo.go2nurse.beans.ReExaminationStrategyBean;
 import com.cooltoo.go2nurse.converter.ReExaminationStrategyBeanConverter;
 import com.cooltoo.go2nurse.entities.ReExaminationStrategyEntity;
 import com.cooltoo.go2nurse.repository.ReExaminationStrategyRepository;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -18,9 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hp on 2016/8/26.
@@ -38,11 +37,20 @@ public class ReExaminationStrategyService {
     @Autowired private ReExaminationStrategyRepository repository;
     @Autowired private ReExaminationStrategyBeanConverter beanConverter;
     @Autowired private CommonDepartmentService departmentService;
+    @Autowired private Go2NurseUtility utility;
 
     //===========================================================================
     //                        getting
     //===========================================================================
-//    public
+    public long countByStatus(List<CommonStatus> statuses) {
+        logger.info("count re-examination strategy by statuses={}", statuses);
+        long count = 0L;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            count = repository.countByStatusIn(statuses);
+        }
+        logger.info("count re-examination strategy by statuses={}, count is {}", statuses, count);
+        return count;
+    }
 
     private List<ReExaminationStrategyBean> entitiesToBeans(Iterable<ReExaminationStrategyEntity> entities) {
         List<ReExaminationStrategyBean> beans = new ArrayList<>();
@@ -66,7 +74,15 @@ public class ReExaminationStrategyService {
             departmentIds.add(tmp.getDepartmentId());
         }
 
-//        Map<Integer, HospitalDepartmentBean> departmentIdToBean
+        List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefixForNurseGo());
+        Map<Integer, HospitalDepartmentBean> departmentIdToBean = new HashMap<>();
+        for (HospitalDepartmentBean tmp : departments) {
+            departmentIdToBean.put(tmp.getId(), tmp);
+        }
+        for (ReExaminationStrategyBean tmp : beans) {
+            HospitalDepartmentBean dep = departmentIdToBean.get(tmp.getDepartmentId());
+            tmp.setDepartment(dep);
+        }
     }
 
     //===========================================================================
