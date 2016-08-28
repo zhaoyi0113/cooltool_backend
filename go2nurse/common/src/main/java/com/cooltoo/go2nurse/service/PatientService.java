@@ -3,6 +3,8 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.go2nurse.beans.UserBean;
+import com.cooltoo.go2nurse.entities.UserEntity;
 import com.cooltoo.go2nurse.entities.UserPatientRelationEntity;
 import com.cooltoo.go2nurse.repository.PatientRepository;
 import com.cooltoo.go2nurse.beans.PatientBean;
@@ -118,6 +120,33 @@ public class PatientService {
         }
         for (PatientEntity entity :entities) {
             PatientBean bean = beanConverter.convert(entity);
+            beans.add(bean);
+        }
+        return beans;
+    }
+
+    public Map<Long, PatientBean> getPatientIdToBean(List<Long> patientIds) {
+        logger.info("get patient by patientIds={}", patientIds);
+        if (VerifyUtil.isListEmpty(patientIds)) {
+            return new HashMap<>();
+        }
+        List<PatientEntity> resultSet = repository.findAll(patientIds);
+        List<PatientBean> beans = entities2Beans(resultSet);
+        logger.info("count is {}", beans.size());
+        Map<Long, PatientBean> map = new HashMap<>();
+        for (PatientBean tmp : beans) {
+            map.put(tmp.getId(), tmp);
+        }
+        return map;
+    }
+
+    private List<PatientBean> entities2Beans(Iterable<PatientEntity> entities) {
+        if (null==entities) {
+            return new ArrayList<>();
+        }
+        List<PatientBean> beans = new ArrayList<>();
+        for (PatientEntity tmp : entities) {
+            PatientBean bean = beanConverter.convert(tmp);
             beans.add(bean);
         }
         return beans;

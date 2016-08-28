@@ -1,73 +1,75 @@
-package com.cooltoo.go2nurse.entities;
+package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.util.VerifyUtil;
 
-import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by hp on 2016/8/28.
  */
-@Entity
-@Table(name = "go2nurse_user_consultation")
-public class UserConsultationEntity {
+public class UserConsultationBean {
 
     private long id;
     private Date time;
     private CommonStatus status;
     private long categoryId;
+    private ConsultationCategoryBean category;
     private String diseaseDescription;
     private String clinicalHistory;
     private long userId;
+    private UserBean user;
     private long patientId;
+    private PatientBean patient;
     private long nurseId;
+    private NurseBean nurse;
+    private List<String> imagesUrl;
+    private List<UserConsultationTalkBean> talks;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
     public long getId() {
         return id;
     }
 
-    @Column(name = "time_created")
     public Date getTime() {
         return time;
     }
 
-    @Column(name = "status")
-    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }
 
-    @Column(name = "category_id")
     public long getCategoryId() {
         return categoryId;
     }
 
-    @Column(name = "disease_description")
     public String getDiseaseDescription() {
         return diseaseDescription;
     }
 
-    @Column(name = "clinical_history")
     public String getClinicalHistory() {
         return clinicalHistory;
     }
 
-    @Column(name = "user_id")
     public long getUserId() {
         return userId;
     }
 
-    @Column(name = "patient_id")
     public long getPatientId() {
         return patientId;
     }
 
-    @Column(name = "nurse_id")
-    public long getNurseId() {
-        return nurseId;
+    public ConsultationCategoryBean getCategory() {
+        return category;
+    }
+
+    public UserBean getUser() {
+        return user;
+    }
+
+    public PatientBean getPatient() {
+        return patient;
     }
 
     public void setId(long id) {
@@ -102,8 +104,48 @@ public class UserConsultationEntity {
         this.patientId = patientId;
     }
 
+    public void setCategory(ConsultationCategoryBean category) {
+        this.category = category;
+    }
+
+    public void setUser(UserBean user) {
+        this.user = user;
+    }
+
+    public void setPatient(PatientBean patient) {
+        this.patient = patient;
+    }
+
+    public List<String> getImagesUrl() {
+        return imagesUrl;
+    }
+
+    public void setImagesUrl(List<String> imagesUrl) {
+        this.imagesUrl = imagesUrl;
+    }
+
+    public List<UserConsultationTalkBean> getTalks() {
+        return talks;
+    }
+
+    public void setTalks(List<UserConsultationTalkBean> talks) {
+        this.talks = talks;
+    }
+
+    public long getNurseId() {
+        return nurseId;
+    }
+
     public void setNurseId(long nurseId) {
         this.nurseId = nurseId;
+    }
+
+    public NurseBean getNurse() {
+        return nurse;
+    }
+
+    public void setNurse(NurseBean nurse) {
+        this.nurse = nurse;
     }
 
     public String toString() {
@@ -116,6 +158,7 @@ public class UserConsultationEntity {
         msg.append(", nurseId=").append(nurseId);
         msg.append(", clinicalHistory=").append(clinicalHistory);
         msg.append(", diseaseDescription=").append(diseaseDescription);
+        msg.append(", imagesUrl=").append(VerifyUtil.isListEmpty(imagesUrl) ? 0 : imagesUrl.size());
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

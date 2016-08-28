@@ -25,10 +25,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lg380357 on 2016/3/2.
@@ -233,6 +230,22 @@ public class UserService {
         UserBean user = getUserWithoutOtherInfo(mobile);
         fillOtherProperties(user);
         return user;
+    }
+
+    public Map<Long, UserBean> getUserIdToBean(List<Long> userIds) {
+        logger.info("get user by userIds={}", userIds);
+        if (VerifyUtil.isListEmpty(userIds)) {
+            return new HashMap<>();
+        }
+        List<UserEntity> resultSet = repository.findAll(userIds);
+        List<UserBean> beans = entities2Beans(resultSet);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        Map<Long, UserBean> map = new HashMap<>();
+        for (UserBean tmp : beans) {
+            map.put(tmp.getId(), tmp);
+        }
+        return map;
     }
 
     private void fillOtherProperties(UserBean user) {

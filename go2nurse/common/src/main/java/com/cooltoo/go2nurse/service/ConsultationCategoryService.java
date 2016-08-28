@@ -41,6 +41,10 @@ public class ConsultationCategoryService {
     //=====================================================================
     //                   getting
     //=====================================================================
+    public boolean existCategory(long categoryId) {
+        return categoryRep.exists(categoryId);
+    }
+
     public long countCategoryByStatus(List<CommonStatus> statuses) {
         long count = 0;
         if (!VerifyUtil.isListEmpty(statuses)) {
@@ -95,6 +99,22 @@ public class ConsultationCategoryService {
         List<ConsultationCategoryBean> beans = entitiesToBeans(entities);
         fillOtherProperties(beans);
         return beans;
+    }
+
+    public Map<Long, ConsultationCategoryBean> getCategoryIdToBean(List<Long> userIds) {
+        logger.info("get user by userIds={}", userIds);
+        if (VerifyUtil.isListEmpty(userIds)) {
+            return new HashMap<>();
+        }
+        List<ConsultationCategoryEntity> resultSet = categoryRep.findAll(userIds);
+        List<ConsultationCategoryBean> beans = entitiesToBeans(resultSet);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        Map<Long, ConsultationCategoryBean> map = new HashMap<>();
+        for (ConsultationCategoryBean tmp : beans) {
+            map.put(tmp.getId(), tmp);
+        }
+        return map;
     }
 
     private List<ConsultationCategoryBean> entitiesToBeans(Iterable<ConsultationCategoryEntity> entities) {

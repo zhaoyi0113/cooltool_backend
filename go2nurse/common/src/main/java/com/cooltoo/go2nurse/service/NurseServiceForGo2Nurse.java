@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,10 @@ public class NurseServiceForGo2Nurse {
     //===================================================================
     //
     //===================================================================
+    public boolean existsNurse(long nurseId) {
+        return commonNurseService.existNurse(nurseId);
+    }
+
     public NurseBean getNurseById(long nurseId) {
         logger.info("get nurse by nurseId={}", nurseId);
         NurseEntity nurse = commonNurseService.getNurseById(nurseId);
@@ -53,6 +58,19 @@ public class NurseServiceForGo2Nurse {
         NurseExtensionBean extension = nurseExtensionService.getExtensionByNurseId(nurseId);
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
         return bean;
+    }
+
+    public Map<Long, NurseBean> getNurseIdToBean(List<Long> nurseIds) {
+        logger.info("get nurse by nurseId={}", nurseIds);
+        List<NurseEntity> nurses = commonNurseService.getNurseByIds(nurseIds);
+        List<NurseBean> beans = entitiesToBeans(nurses);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        Map<Long, NurseBean> nurseIdToBean = new HashMap<>();
+        for (NurseBean tmp : beans) {
+            nurseIdToBean.put(tmp.getId(), tmp);
+        }
+        return nurseIdToBean;
     }
 
     public List<NurseBean> getNurseByCanAnswerQuestion(String strCanAnswerQuestion, int pageIndex, int sizePerPage) {
@@ -80,6 +98,9 @@ public class NurseServiceForGo2Nurse {
     }
 
     private void fillOtherProperties(List<NurseBean> beans) {
+        if (VerifyUtil.isListEmpty(beans)) {
+            return;
+        }
         List<Long> imageIds = new ArrayList<>();
         List<Long> nurseIds = new ArrayList<>();
         for (NurseBean bean :beans) {

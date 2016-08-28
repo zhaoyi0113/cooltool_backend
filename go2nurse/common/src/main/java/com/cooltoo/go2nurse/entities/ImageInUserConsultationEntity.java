@@ -75,11 +75,4 @@ public class ImageInUserConsultationEntity {
     public void setImageId(long imageId) {
         this.imageId = imageId;
     }
-
-    public String toString() {
-        StringBuilder msg = new StringBuilder();
-        msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
-        msg.append("]");
-        return msg.toString();
-    }
 }

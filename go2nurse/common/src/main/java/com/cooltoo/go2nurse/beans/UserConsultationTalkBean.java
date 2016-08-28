@@ -1,62 +1,58 @@
-package com.cooltoo.go2nurse.entities;
+package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
+import com.cooltoo.util.VerifyUtil;
 
-import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by hp on 2016/8/28.
  */
-@Entity
-@Table(name = "go2nurse_user_consultation_talk")
-public class UserConsultationTalkEntity {
+public class UserConsultationTalkBean {
 
     private long id;
     private Date time;
     private CommonStatus status;
     private long consultationId;
     private long nurseId;
+    private NurseBean nurse;
     private ConsultationTalkStatus talkStatus;
     private String talkContent;
+    private List<String> imagesUrl;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
     public long getId() {
         return id;
     }
 
-    @Column(name = "time_created")
     public Date getTime() {
         return time;
     }
 
-    @Column(name = "status")
-    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }
 
-    @Column(name = "user_consultation_id")
     public long getConsultationId() {
         return consultationId;
     }
 
-    @Column(name = "nurse_id")
     public long getNurseId() {
         return nurseId;
     }
 
-    @Column(name = "talk_status")
     public ConsultationTalkStatus getTalkStatus() {
         return talkStatus;
     }
 
-    @Column(name = "talk_content")
     public String getTalkContent() {
         return talkContent;
+    }
+
+    public NurseBean getNurse() {
+        return nurse;
     }
 
     public void setId(long id) {
@@ -87,6 +83,18 @@ public class UserConsultationTalkEntity {
         this.talkContent = talkContent;
     }
 
+    public void setNurse(NurseBean nurse) {
+        this.nurse = nurse;
+    }
+
+    public List<String> getImagesUrl() {
+        return imagesUrl;
+    }
+
+    public void setImagesUrl(List<String> imagesUrl) {
+        this.imagesUrl = imagesUrl;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -95,6 +103,7 @@ public class UserConsultationTalkEntity {
         msg.append(", nurseId=").append(nurseId);
         msg.append(", talkStatus=").append(talkStatus);
         msg.append(", talkContent=").append(talkContent);
+        msg.append(", imagesUrl=").append(VerifyUtil.isListEmpty(imagesUrl) ? 0 : imagesUrl.size());
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

@@ -128,7 +128,7 @@ public class ImagesInSpeakService {
     //====================================================
     //          delete
     //====================================================
-
+    @Transactional
     public ImagesInSpeakBean deleteById(long imageInSpeakId) {
         logger.info("delete image in speak by id {}", imageInSpeakId);
         ImagesInSpeakEntity image = repository.findOne(imageInSpeakId);
