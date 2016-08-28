@@ -48,6 +48,16 @@ public class UserDoctorAPI {
         return Response.ok(doctors).build();
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getDoctorById(@Context HttpServletRequest request,
+                                  @QueryParam("doctor_id") @DefaultValue("0") long doctorId
+    ) {
+        DoctorBean doctor = doctorService.getDoctorById(doctorId);
+        return Response.ok(doctor).build();
+    }
+
     @Path("/clinic_date")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
