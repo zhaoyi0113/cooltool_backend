@@ -51,6 +51,28 @@ public class UserConsultationService {
     //             get ----  admin using
     //===============================================================
 
+    public long countUserConsultationByCondition(Long userId, Long patientId, Long nurseId, Long categoryId, String contentLike) {
+        contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
+        long count = repository.countByConditions(userId, patientId, nurseId, categoryId, contentLike);
+        logger.info("count consultation user={} patientId={} nurseId={} categoryId={} contentLike={}, count is {}",
+                userId, patientId, nurseId, categoryId, contentLike, count);
+        return count;
+    }
+
+    public List<UserConsultationBean> getUserConsultationByCondition(Long userId, Long patientId, Long nurseId, Long categoryId, String contentLike, int pageIndex, int sizePerPage) {
+        logger.info("get consultation user={} patientId={} nurseId={} categoryId={} contentLike={} at page={} sizePerPage={}",
+                userId, patientId, nurseId, categoryId, contentLike, pageIndex, sizePerPage);
+        List<UserConsultationBean> beans;
+        contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
+        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<UserConsultationEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, categoryId, contentLike, request);
+        beans = entitiesToBeansForConsultation(resultSet);
+        fillOtherPropertiesForConsultation(beans);
+
+        logger.warn("consultation count={}", beans.size());
+        return beans;
+    }
+
 
     //===============================================================
     //             get ----  nurse using

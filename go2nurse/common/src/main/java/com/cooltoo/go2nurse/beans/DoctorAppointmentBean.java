@@ -9,7 +9,6 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by hp on 2016/8/8.
@@ -29,7 +28,8 @@ public class DoctorAppointmentBean {
     private long doctorId;
     private DoctorBean doctor;
     private long clinicDateId;
-    private Date clinicDate;
+    private long clinicDate;
+    private String clinicDateString;
     private long clinicHoursId;
     private Time clinicHoursStart;
     private Time clinicHoursEnd;
@@ -83,8 +83,12 @@ public class DoctorAppointmentBean {
         return clinicDateId;
     }
 
-    public Date getClinicDate() {
+    public long getClinicDate() {
         return clinicDate;
+    }
+
+    public String getClinicDateString() {
+        return clinicDateString;
     }
 
     public long getClinicHoursId() {
@@ -160,7 +164,8 @@ public class DoctorAppointmentBean {
     }
 
     public void setClinicDate(Date clinicDate) {
-        this.clinicDate = clinicDate;
+        this.clinicDate = clinicDate.getTime();
+        this.clinicDateString = clinicDate.toString();
     }
 
     public void setClinicHoursId(long clinicHoursId) {
