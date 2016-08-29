@@ -205,9 +205,10 @@ public class UserServiceOrderAPI {
                 if (null==o2) {
                     return -1;
                 }
-                Date date1 = (o1 instanceof ServiceOrderBean) ? ((ServiceOrderBean)o1).getTime() : ((DoctorAppointmentBean)o1).getClinicDate();
-                Date date2 = (o2 instanceof ServiceOrderBean) ? ((ServiceOrderBean)o2).getTime() : ((DoctorAppointmentBean)o2).getClinicDate();
-                return (int)(date2.getTime()-date1.getTime());
+                Date date1 = (o1 instanceof ServiceOrderBean) ? ((ServiceOrderBean)o1).getTime() : ((DoctorAppointmentBean)o1).getTime();
+                Date date2 = (o2 instanceof ServiceOrderBean) ? ((ServiceOrderBean)o2).getTime() : ((DoctorAppointmentBean)o2).getTime();
+                long delta = (date2.getTime()-date1.getTime());
+                return delta==0 ? 0 : (delta>0 ? 1 : -1);
             }
         });
         return retVal;

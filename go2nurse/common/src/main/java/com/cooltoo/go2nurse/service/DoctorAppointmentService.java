@@ -320,7 +320,7 @@ public class DoctorAppointmentService {
 
         // 下单
         DoctorAppointmentEntity entity = new DoctorAppointmentEntity();
-        entity.setTime(new Date(System.currentTimeMillis()));
+        entity.setTime(new java.util.Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity.setOrderNo(NumberUtil.getUniqueString());
         entity.setHospitalId(doctorBean.getHospitalId());

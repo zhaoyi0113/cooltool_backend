@@ -119,7 +119,7 @@ public class DoctorAppointmentBean {
     }
 
     public void setTime(java.util.Date time) {
-        this.time = new java.util.Date(time.getTime());
+        this.time = time;
     }
 
     public void setStatus(CommonStatus status) {

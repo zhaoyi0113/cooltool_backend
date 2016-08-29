@@ -101,22 +101,26 @@ public class DoctorClinicDateManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response editClinicDate(@Context HttpServletRequest request,
                                    @FormParam("clinic_date_id") @DefaultValue("0") long doctorDateId,
-                                   @FormParam("clinic_date") @DefaultValue("") String strClinicDate
+                                   @FormParam("clinic_date") @DefaultValue("") String strClinicDate,
+                                   @FormParam("clinic_hours_id") @DefaultValue("0") long clinicHoursId,
+                                   @FormParam("clinic_time_start") @DefaultValue("") String clinicTimeStart,
+                                   @FormParam("clinic_time_end") @DefaultValue("") String clinicTimeEnd,
+                                   @FormParam("number") @DefaultValue("0") int number
     ) {
-        DoctorClinicDateBean bean = dateHoursService.updateClinicDate(doctorDateId, strClinicDate, null);
-        return Response.ok(bean).build();
+        dateHoursService.updateClinicDate(doctorDateId, strClinicDate, null);
+        dateHoursService.updateClinicHours(clinicHoursId, clinicTimeStart, clinicTimeEnd, number, null);
+        return Response.ok().build();
     }
 
-    @Path("/edit/hours")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response editClinicHours(@Context HttpServletRequest request,
-                                    @FormParam("clinic_hours_id") @DefaultValue("0") long clinicHoursId,
-                                    @FormParam("clinic_time_start") @DefaultValue("") String clinicTimeStart,
-                                    @FormParam("clinic_time_end") @DefaultValue("") String clinicTimeEnd,
-                                    @FormParam("number") @DefaultValue("0") int number
-    ) {
-        DoctorClinicHoursBean bean = dateHoursService.updateClinicHours(clinicHoursId, clinicTimeStart, clinicTimeEnd, number, null);
-        return Response.ok(bean).build();
-    }
+//    @Path("/edit/hours")
+//    @POST
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response editClinicHours(@Context HttpServletRequest request,
+//                                    @FormParam("clinic_hours_id") @DefaultValue("0") long clinicHoursId,
+//                                    @FormParam("clinic_time_start") @DefaultValue("") String clinicTimeStart,
+//                                    @FormParam("clinic_time_end") @DefaultValue("") String clinicTimeEnd,
+//                                    @FormParam("number") @DefaultValue("0") int number
+//    ) {
+//        return Response.ok(bean).build();
+//    }
 }

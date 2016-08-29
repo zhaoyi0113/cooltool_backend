@@ -13,7 +13,7 @@ import java.sql.Date;
 public class DoctorClinicDateEntity {
 
     private long id;
-    private Date time;
+    private java.util.Date time;
     private CommonStatus status;
     private long doctorId;
     private Date clinicDate;
@@ -26,7 +26,7 @@ public class DoctorClinicDateEntity {
     }
 
     @Column(name = "time_created")
-    public Date getTime() {
+    public java.util.Date getTime() {
         return time;
     }
 
@@ -49,7 +49,7 @@ public class DoctorClinicDateEntity {
         this.id = id;
     }
 
-    public void setTime(Date time) {
+    public void setTime(java.util.Date time) {
         this.time = time;
     }
 

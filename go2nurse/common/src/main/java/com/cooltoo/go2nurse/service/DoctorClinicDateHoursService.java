@@ -330,7 +330,7 @@ public class DoctorClinicDateHoursService {
         List<DoctorClinicDateEntity> existed = dateRepository.findByDoctorIdAndClinicDate(doctorId, clinicDate, clinicDateSort);
         if (VerifyUtil.isListEmpty(existed)) {
             // not exist, then create one
-            dateEntity.setTime(new Date(System.currentTimeMillis()));
+            dateEntity.setTime(new java.util.Date());
             dateEntity.setStatus(CommonStatus.ENABLED);
             dateEntity.setDoctorId(doctorId);
             dateEntity.setClinicDate(clinicDate);
