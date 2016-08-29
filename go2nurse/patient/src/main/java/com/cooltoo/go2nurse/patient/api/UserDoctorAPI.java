@@ -95,7 +95,7 @@ public class UserDoctorAPI {
         return Response.ok(appointment).build();
     }
 
-    @Path("/appointment/cancel_and_new_one")
+    @Path("/appointment/modify")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
@@ -105,7 +105,7 @@ public class UserDoctorAPI {
                                       @FormParam("clinic_hour_id") @DefaultValue("0") long clinicHourId
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        DoctorAppointmentBean appointment = doctorAppointmentService.cancelAndNewOneAppointment(appointmentId, userId, patientId, clinicHourId);
+        DoctorAppointmentBean appointment = doctorAppointmentService.modifyAppointment(appointmentId, userId, patientId, clinicHourId);
         return Response.ok(appointment).build();
     }
 

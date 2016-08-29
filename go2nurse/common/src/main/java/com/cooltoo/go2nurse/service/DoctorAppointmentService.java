@@ -34,7 +34,7 @@ public class DoctorAppointmentService {
     private static final Logger logger = LoggerFactory.getLogger(DoctorAppointmentService.class);
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "time"),
+            new Sort.Order(Sort.Direction.DESC, "clinicDate"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
     private static final long hour4PMToMidnightMilliSecond = 8 * 60 * 60 * 1000;
@@ -182,11 +182,73 @@ public class DoctorAppointmentService {
     }
 
     @Transactional
-    public DoctorAppointmentBean cancelAndNewOneAppointment(long appointmentId, long userId, long patientId, long newClinicHoursId) {
-        logger.info("user={} patient={} cancel appointment={} and new clinicHour={}",
+    public DoctorAppointmentBean modifyAppointment(long appointmentId, long userId, long patientId, long newClinicHoursId) {
+        logger.info("user={} patient={} modify appointment={} with new clinicHour={}",
                 userId, patientId, appointmentId, newClinicHoursId);
-        cancelAppointment(userId, 0, appointmentId);
-        return appointDoctor(userId, patientId, newClinicHoursId);
+
+        // get entity
+        DoctorAppointmentEntity entity = repository.findOne(appointmentId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        DoctorClinicHoursBean clinicHoursBean = clinicDateHoursService.getClinicHourById(newClinicHoursId);
+        DoctorClinicDateBean clinicDateBean = clinicDateHoursService.getClinicDateById(clinicHoursBean.getClinicDateId());
+        DoctorBean doctorBean = doctorService.getDoctorById(clinicHoursBean.getDoctorId());
+
+        // check time is valid
+        Calendar calendar = Calendar.getInstance();
+        long currentMilli = calendar.getTimeInMillis();
+        long clinicDateMilli = clinicDateBean.getClinicDate().getTime();
+        if (!isTimeValid(clinicDateMilli, currentMilli)) {
+            logger.error("cannot appoint at this clinic date");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        // check number is valid, and user not appoint
+        int number = clinicHoursBean.getNumberCount();
+        List<DoctorAppointmentEntity> entities = repository.findByClinicHoursId(newClinicHoursId, sort);
+        int isNumberOrUserValid = isNumberConsumedOrUserHasAppointed(entities, patientId, number);
+        if (isNumberOrUserValid==-1) {
+            logger.error("user has appointed");
+            throw new BadRequestException(ErrorCode.PATIENT_HAS_APPOINT_DOCTOR_TODAY);
+        }
+        if (isNumberOrUserValid==-2) {
+            logger.error("there is no more number to appointed");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        // check patient is valid
+        PatientBean patientBean = patientService.getOneById(patientId);
+        if (null==patientBean) {
+            logger.error("patient not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        // 下单
+        entity.setStatus(CommonStatus.ENABLED);
+        entity.setHospitalId(doctorBean.getHospitalId());
+        if (null!=doctorBean.getHospital()) {
+            entity.setHospitalJson(utility.toJsonString(doctorBean.getHospital()));
+        }
+        entity.setDepartmentId(doctorBean.getDepartmentId());
+        if (null!=doctorBean.getDepartment()) {
+            entity.setDepartmentJson(utility.toJsonString(doctorBean.getDepartment()));
+        }
+        entity.setDoctorId(doctorBean.getId());
+        entity.setDoctorJson(utility.toJsonString(doctorBean));
+        entity.setClinicDateId(clinicDateBean.getId());
+        entity.setClinicDate(clinicDateBean.getClinicDate());
+        entity.setClinicHoursId(newClinicHoursId);
+        entity.setClinicHoursStart(clinicHoursBean.getClinicHourStart());
+        entity.setClinicHoursEnd(clinicHoursBean.getClinicHourEnd());
+        entity.setUserId(userId);
+        entity.setPatientId(patientId);
+        entity.setPatientJson(utility.toJsonString(patientBean));
+        entity.setOrderStatus(OrderStatus.TO_SERVICE);
+        entity = repository.save(entity);
+
+        return beanConverter.convert(entity);
     }
 
     //=========================================================================
