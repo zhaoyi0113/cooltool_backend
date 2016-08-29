@@ -18,7 +18,7 @@ public class DoctorAppointmentBean {
     public static final String FLAG = "FLAG";
 
     private long id;
-    private Date time;
+    private long time;
     private CommonStatus status;
     private String orderNo;
     private int hospitalId;
@@ -28,8 +28,7 @@ public class DoctorAppointmentBean {
     private long doctorId;
     private DoctorBean doctor;
     private long clinicDateId;
-    private long clinicDate;
-    private String clinicDateString;
+    private Date clinicDate;
     private long clinicHoursId;
     private Time clinicHoursStart;
     private Time clinicHoursEnd;
@@ -43,7 +42,7 @@ public class DoctorAppointmentBean {
         return id;
     }
 
-    public Date getTime() {
+    public long getTime() {
         return time;
     }
 
@@ -83,12 +82,8 @@ public class DoctorAppointmentBean {
         return clinicDateId;
     }
 
-    public long getClinicDate() {
+    public Date getClinicDate() {
         return clinicDate;
-    }
-
-    public String getClinicDateString() {
-        return clinicDateString;
     }
 
     public long getClinicHoursId() {
@@ -124,7 +119,7 @@ public class DoctorAppointmentBean {
     }
 
     public void setTime(Date time) {
-        this.time = time;
+        this.time = time.getTime();
     }
 
     public void setStatus(CommonStatus status) {
@@ -164,8 +159,7 @@ public class DoctorAppointmentBean {
     }
 
     public void setClinicDate(Date clinicDate) {
-        this.clinicDate = clinicDate.getTime();
-        this.clinicDateString = clinicDate.toString();
+        this.clinicDate = clinicDate;
     }
 
     public void setClinicHoursId(long clinicHoursId) {
