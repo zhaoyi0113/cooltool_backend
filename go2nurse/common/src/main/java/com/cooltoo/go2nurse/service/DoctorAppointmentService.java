@@ -76,7 +76,7 @@ public class DoctorAppointmentService {
         if (VerifyUtil.isListEmpty(orderStatuses)) {
             return new ArrayList<>();
         }
-        List<DoctorAppointmentEntity> entities = repository.findByConditionsForUser(userId, orderStatuses);
+        List<DoctorAppointmentEntity> entities = repository.findByConditionsForUser(userId, orderStatuses, sort);
         List<DoctorAppointmentBean> beans = entitiesToBeans(entities);
         logger.info("count is {}", beans.size());
         return beans;

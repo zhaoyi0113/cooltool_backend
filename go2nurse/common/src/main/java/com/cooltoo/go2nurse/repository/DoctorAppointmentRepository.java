@@ -24,7 +24,7 @@ public interface DoctorAppointmentRepository extends JpaRepository<DoctorAppoint
     @Query("FROM DoctorAppointmentEntity da" +
             " WHERE (?1 IS NULL OR da.userId=?1)" +
             " AND (da.orderStatus IN (?2))")
-    List<DoctorAppointmentEntity> findByConditionsForUser(Long userId, List<OrderStatus> orderStatuses);
+    List<DoctorAppointmentEntity> findByConditionsForUser(Long userId, List<OrderStatus> orderStatuses, Sort sort);
 
     @Query("FROM DoctorAppointmentEntity da" +
             " WHERE (?1 IS NULL OR da.userId=?1)" +
