@@ -18,7 +18,7 @@ public class DoctorAppointmentBean {
     public static final String FLAG = "FLAG";
 
     private long id;
-    private long time;
+    private java.util.Date time;
     private CommonStatus status;
     private String orderNo;
     private int hospitalId;
@@ -42,7 +42,7 @@ public class DoctorAppointmentBean {
         return id;
     }
 
-    public long getTime() {
+    public java.util.Date getTime() {
         return time;
     }
 
@@ -118,8 +118,8 @@ public class DoctorAppointmentBean {
         this.id = id;
     }
 
-    public void setTime(Date time) {
-        this.time = time.getTime();
+    public void setTime(java.util.Date time) {
+        this.time = time;
     }
 
     public void setStatus(CommonStatus status) {

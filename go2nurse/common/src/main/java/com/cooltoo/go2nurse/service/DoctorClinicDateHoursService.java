@@ -151,7 +151,7 @@ public class DoctorClinicDateHoursService {
         return beans;
     }
 
-    private void fillDateOtherProperties(List<DoctorClinicDateBean> dates) {
+    private void fillDateOtherProperties(List<DoctorClinicDateBean> dates/*, boolean fillNumberUsed*/) {
         if (VerifyUtil.isListEmpty(dates)) {
             return;
         }
@@ -164,6 +164,11 @@ public class DoctorClinicDateHoursService {
         }
 
         List<DoctorClinicHoursBean> hours = getClinicHoursByDateIds(dateIds);
+//        Map<Long, Long> clinicHourNumberUsed = null;
+//        if (fillNumberUsed) {
+//
+//        }
+
         for (DoctorClinicDateBean tmp : dates) {
             long dateId = tmp.getId();
             for (DoctorClinicHoursBean tmpH : hours) {

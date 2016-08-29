@@ -24,6 +24,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/8/14.
@@ -96,6 +97,10 @@ public class DoctorAppointmentService {
         return beans;
     }
 
+//    public Map<Long, Long> getClinicHourNumberUsed(List<Long> clinicDateIds) {
+//        logger.info("get clinic hour number used by clinicDateId={}", clinicDateIds);
+//        repository
+//    }
 
     //============================================
     //          getting for administrator

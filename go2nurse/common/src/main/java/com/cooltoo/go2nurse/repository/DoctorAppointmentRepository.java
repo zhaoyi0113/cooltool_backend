@@ -21,6 +21,11 @@ public interface DoctorAppointmentRepository extends JpaRepository<DoctorAppoint
     //============================================
     //          for user
     //============================================
+//    @Query("SELECT da.clinicHoursId, count(da.id) FROM DoctorAppointmentEntity da" +
+//            " WHERE (da.clinicDateId IN (?1))" +
+//            " AND (da.orderStatus IN (?2))")
+//    List<Object[]> findByConditionsForUser(List<Long> clinicDateIds, List<OrderStatus> orderStatuses, Sort sort);
+
     @Query("FROM DoctorAppointmentEntity da" +
             " WHERE (?1 IS NULL OR da.userId=?1)" +
             " AND (da.orderStatus IN (?2))")
