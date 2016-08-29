@@ -93,8 +93,8 @@ public class ServiceOrderChargePingPPService {
         logger.info("order charge webhooks event callback chargeId={} webhooksEventId={} webhooksEventJson={}",
                 chargeId, webhooksEventId, webhooksEventJson);
 
-        ServiceOrderChargePingPPEntity entity = repository.findByChargeId(chargeId);
-        if (null==entity) {
+        List<ServiceOrderChargePingPPEntity> entities = repository.findByChargeId(chargeId);
+        if (VerifyUtil.isListEmpty(entities)) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (VerifyUtil.isStringEmpty(webhooksEventId)) {
@@ -103,6 +103,18 @@ public class ServiceOrderChargePingPPService {
         }
         if (VerifyUtil.isStringEmpty(webhooksEventJson)) {
             logger.error("webhooks event json is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        ServiceOrderChargePingPPEntity entity = null;
+        for (ServiceOrderChargePingPPEntity tmp : entities) {
+            if (!CommonStatus.ENABLED.equals(tmp.getStatus())) {
+                continue;
+            }
+            entity = tmp;
+        }
+        if (null==entity) {
+            logger.error("no charge is valid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
@@ -135,7 +147,21 @@ public class ServiceOrderChargePingPPService {
         if (VerifyUtil.isStringEmpty(charge.getId())) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        ServiceOrderChargePingPPEntity entity = new ServiceOrderChargePingPPEntity();
+
+        ServiceOrderChargePingPPEntity entity = null;
+        List<ServiceOrderChargePingPPEntity> entities = repository.findByChargeId(charge.getId());
+        if (VerifyUtil.isListEmpty(entities)) {
+            entity = new ServiceOrderChargePingPPEntity();
+        }
+        else {
+            entity = entities.get(0);
+            entities.remove(0);
+
+            for (ServiceOrderChargePingPPEntity tmp : entities) {
+                tmp.setStatus(CommonStatus.DISABLED);
+            }
+            repository.save(entities);
+        }
         entity.setOrderId(orderId);
         entity.setOrderNo(charge.getOrderNo());
         entity.setChannel(charge.getChannel());
@@ -149,7 +175,7 @@ public class ServiceOrderChargePingPPService {
         entity = repository.save(entity);
 
         ServiceOrderChargePingPPBean bean = beanConverter.convert(entity);
-        logger.info("new ping++ is {}", bean);
+        logger.info("ping++ is {}", bean);
         return bean;
     }
 }
