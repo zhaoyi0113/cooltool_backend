@@ -18,6 +18,7 @@ public class DoctorClinicHoursBean {
     private Time clinicHourStart;
     private Time clinicHourEnd;
     private int numberCount;
+    private long numberUsed;
 
     public long getId() {
         return id;
@@ -49,6 +50,10 @@ public class DoctorClinicHoursBean {
 
     public int getNumberCount() {
         return numberCount;
+    }
+
+    public long getNumberUsed() {
+        return numberUsed;
     }
 
     public void setId(long id) {
@@ -83,6 +88,10 @@ public class DoctorClinicHoursBean {
         this.numberCount = numberCount;
     }
 
+    public void setNumberUsed(long numberUsed) {
+        this.numberUsed = numberUsed;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -95,6 +104,7 @@ public class DoctorClinicHoursBean {
         msg.append(", clinicHourStart=").append(clinicHourStart);
         msg.append(", clinicHourEnd=").append(clinicHourEnd);
         msg.append(", numberCount=").append(numberCount);
+        msg.append(", numberUsed=").append(numberUsed);
         msg.append("]");
         return msg.toString();
     }

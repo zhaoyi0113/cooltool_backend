@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/8/14.
@@ -97,10 +94,34 @@ public class DoctorAppointmentService {
         return beans;
     }
 
-//    public Map<Long, Long> getClinicHourNumberUsed(List<Long> clinicDateIds) {
-//        logger.info("get clinic hour number used by clinicDateId={}", clinicDateIds);
-//        repository
-//    }
+    public Map<Long, Long> getClinicHourNumberUsed(List<Long> clinicDateIds) {
+        logger.info("get clinic hour number used by clinicDateId={}", clinicDateIds);
+        Map<Long, Long> clinicHourIdToNumberUsed = new HashMap<>();
+        if (VerifyUtil.isListEmpty(clinicDateIds)) {
+            return clinicHourIdToNumberUsed;
+        }
+
+        List<OrderStatus> statuses = new ArrayList<>();
+        statuses.add(OrderStatus.TO_SERVICE);
+        statuses.add(OrderStatus.COMPLETED);
+
+        List<Object> hourIds = repository.findHourIdByConditionsForUser(clinicDateIds, statuses);
+        for (Object tmp : hourIds) {
+            if (!(tmp instanceof Long)) {
+                continue;
+            }
+            Long hourId = (Long) tmp;
+            Long numberUserd = clinicHourIdToNumberUsed.get(hourId);
+            if (null==numberUserd) {
+                clinicHourIdToNumberUsed.put(hourId, 1L);
+            }
+            else {
+                numberUserd ++;
+                clinicHourIdToNumberUsed.put(hourId, numberUserd);
+            }
+        }
+        return clinicHourIdToNumberUsed;
+    }
 
     //============================================
     //          getting for administrator

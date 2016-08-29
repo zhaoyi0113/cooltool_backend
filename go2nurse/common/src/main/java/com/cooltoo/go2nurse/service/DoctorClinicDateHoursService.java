@@ -25,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hp on 2016/8/4.
@@ -52,6 +50,7 @@ public class DoctorClinicDateHoursService {
     @Autowired private DoctorClinicHoursBeanConverter hoursBeanConverter;
 
     @Autowired private DoctorService doctorService;
+    @Autowired private DoctorAppointmentService appointmentService;
 
     //==============================================================
     //                      getting
@@ -84,7 +83,7 @@ public class DoctorClinicDateHoursService {
         logger.info("dateStart={} dateEnd={}", dateStart, dateEnd);
         List<DoctorClinicDateEntity> entities = dateRepository.findDoctorByConditions(doctorId, statuses, dateStart, dateEnd, clinicDateSort);
         List<DoctorClinicDateBean> beans = dateEntitiesToBeans(entities);
-        fillDateOtherProperties(beans);
+        fillDateOtherProperties(beans, true);
         logger.info("count is {}", beans.size());
         return beans;
     }
@@ -111,7 +110,7 @@ public class DoctorClinicDateHoursService {
         Pageable page = new PageRequest(pageIndex, sizePerPage, clinicDateSort);
         Page<DoctorClinicDateEntity> entities = dateRepository.findDoctorByConditions(doctorId, statuses, null, null, page);
         List<DoctorClinicDateBean> beans = dateEntitiesToBeans(entities);
-        fillDateOtherProperties(beans);
+        fillDateOtherProperties(beans, false);
         logger.info("count is {}", beans.size());
         return beans;
     }
@@ -151,7 +150,7 @@ public class DoctorClinicDateHoursService {
         return beans;
     }
 
-    private void fillDateOtherProperties(List<DoctorClinicDateBean> dates/*, boolean fillNumberUsed*/) {
+    private void fillDateOtherProperties(List<DoctorClinicDateBean> dates, boolean fillNumberUsed) {
         if (VerifyUtil.isListEmpty(dates)) {
             return;
         }
@@ -164,10 +163,14 @@ public class DoctorClinicDateHoursService {
         }
 
         List<DoctorClinicHoursBean> hours = getClinicHoursByDateIds(dateIds);
-//        Map<Long, Long> clinicHourNumberUsed = null;
-//        if (fillNumberUsed) {
-//
-//        }
+        Map<Long, Long> clinicHourNumberUsed = null;
+        if (fillNumberUsed) {
+            clinicHourNumberUsed = appointmentService.getClinicHourNumberUsed(dateIds);
+            for (DoctorClinicHoursBean tmpH : hours) {
+                Long numberUsed = clinicHourNumberUsed.get(tmpH.getId());
+                tmpH.setNumberUsed((numberUsed instanceof Long) ? numberUsed : 0L);
+            }
+        }
 
         for (DoctorClinicDateBean tmp : dates) {
             long dateId = tmp.getId();
