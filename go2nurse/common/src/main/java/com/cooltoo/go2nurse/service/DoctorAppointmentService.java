@@ -213,10 +213,10 @@ public class DoctorAppointmentService {
         // check number is valid, and user not appoint
         int number = clinicHoursBean.getNumberCount();
         List<DoctorAppointmentEntity> entities = repository.findByClinicHoursId(clinicHoursId, sort);
-        int isNumberOrUserValid = isNumberConsumedOrUserHasAppointed(entities, userId, number);
+        int isNumberOrUserValid = isNumberConsumedOrUserHasAppointed(entities, patientId, number);
         if (isNumberOrUserValid==-1) {
             logger.error("user has appointed");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.PATIENT_HAS_APPOINT_DOCTOR_TODAY);
         }
         if (isNumberOrUserValid==-2) {
             logger.error("there is no more number to appointed");
@@ -281,7 +281,7 @@ public class DoctorAppointmentService {
         return !((clinicDate-currentDate)<=hour4PMToMidnightMilliSecond);
     }
 
-    private int isNumberConsumedOrUserHasAppointed(List<DoctorAppointmentEntity> appointments, long userId, int clinicNumber) {
+    private int isNumberConsumedOrUserHasAppointed(List<DoctorAppointmentEntity> appointments, long patientId, int clinicNumber) {
         if (VerifyUtil.isListEmpty(appointments)) {
             return 0;
         }
@@ -293,7 +293,7 @@ public class DoctorAppointmentService {
             if (!OrderStatus.TO_SERVICE.equals(status) && !OrderStatus.COMPLETED.equals(status)) {
                 continue;
             }
-            if (tmp.getUserId()==userId) {
+            if (tmp.getPatientId()==patientId) {
                 userHasAppointed = true;
                 break;
             }
