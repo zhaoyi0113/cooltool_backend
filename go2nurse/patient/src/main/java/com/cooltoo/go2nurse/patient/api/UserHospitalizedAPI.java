@@ -213,7 +213,12 @@ public class UserHospitalizedAPI {
                 @Override public int compare(UserHospitalizedCoursesBean o1, UserHospitalizedCoursesBean o2) {
                     if (null!=o1 && null!=o2) {
                         long delta = (o1.getId() - o2.getId());
-                        return delta>0 ? 1 : (delta<0 ? -1 : 0);
+                        if (o1.getId()<0 && o2.getId()<0) {
+                            return delta>0 ? 1 : (delta<0 ? -1 : 0);
+                        }
+                        else {
+                            return delta > 0 ? -1 : (delta < 0 ? 1 : 0);
+                        }
                     }
                     if (o1==null || o1.getId()<0) {
                         return 1;
