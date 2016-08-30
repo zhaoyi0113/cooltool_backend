@@ -20,6 +20,7 @@ public class ReExaminationStrategyBeanConverter implements Converter<ReExaminati
         bean.setDepartmentId(source.getDepartmentId());
         bean.setReExaminationDay(source.getReExaminationDay());
         bean.setRecycled(YesNoEnum.YES.equals(source.getRecycled()) ? true : false);
+        bean.setOperation(YesNoEnum.YES.equals(source.getIsOperation()) ? true : false);
         return bean;
     }
 }

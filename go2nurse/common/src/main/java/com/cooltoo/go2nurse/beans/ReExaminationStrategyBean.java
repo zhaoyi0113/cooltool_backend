@@ -18,6 +18,7 @@ public class ReExaminationStrategyBean {
     private String reExaminationDay;
     private List<Integer> intReExaminationDay;
     private boolean recycled;
+    private boolean isOperation;
 
     public long getId() {
         return id;
@@ -41,6 +42,23 @@ public class ReExaminationStrategyBean {
 
     public List<Integer> getIntReExaminationDay() {
         return intReExaminationDay;
+    }
+
+    public List<Date> getDateReExaminationDay(Date fromDate) {
+        List<Date> reExamDate = new ArrayList<>();
+        if (null==fromDate) {
+            return reExamDate;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(fromDate);
+
+        List<Integer> deltaDays = null==intReExaminationDay ? new ArrayList<>() : intReExaminationDay;
+        for (Integer deltaDay : deltaDays) {
+            calendar.add(Calendar.DAY_OF_MONTH, deltaDay);
+            reExamDate.add(calendar.getTime());
+            calendar.add(Calendar.DAY_OF_MONTH, -deltaDay);
+        }
+        return reExamDate;
     }
 
     public boolean getRecycled() {
@@ -92,6 +110,14 @@ public class ReExaminationStrategyBean {
         this.department = department;
     }
 
+    public boolean isOperation() {
+        return isOperation;
+    }
+
+    public void setOperation(boolean operation) {
+        isOperation = operation;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -100,6 +126,7 @@ public class ReExaminationStrategyBean {
         msg.append(", departmentId=").append(departmentId);
         msg.append(", reExaminationDay=").append(reExaminationDay);
         msg.append(", recycled=").append(recycled);
+        msg.append(", isOperation=").append(isOperation);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

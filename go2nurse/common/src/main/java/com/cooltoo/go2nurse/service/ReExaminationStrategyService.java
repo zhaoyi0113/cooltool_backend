@@ -32,8 +32,8 @@ public class ReExaminationStrategyService {
     private static final Logger logger = LoggerFactory.getLogger(ReExaminationStrategyService.class);
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "time"),
-            new Sort.Order(Sort.Direction.DESC, "id")
+            new Sort.Order(Sort.Direction.ASC, "time"),
+            new Sort.Order(Sort.Direction.ASC, "id")
     );
 
     @Autowired private ReExaminationStrategyRepository repository;
@@ -107,8 +107,9 @@ public class ReExaminationStrategyService {
     //                        updating
     //===========================================================================
     @Transactional
-    public ReExaminationStrategyBean updateReExaminationStrategyForDepartment(long strategyId, Boolean isRecycled, String strategyDay, String status) {
-        logger.info("update re-examination strategy={} 's day={}, isRecycled={}", strategyId, strategyDay, isRecycled);
+    public ReExaminationStrategyBean updateReExaminationStrategyForDepartment(long strategyId, Boolean isRecycled, Boolean isOperation, String strategyDay, String status) {
+        logger.info("update re-examination strategy={} 's day={}, isRecycled={} isOperation={} status={}",
+                strategyId, strategyDay, isRecycled, isOperation, status);
         ReExaminationStrategyEntity entity = repository.findOne(strategyId);
 
         boolean changed = false;
@@ -119,6 +120,11 @@ public class ReExaminationStrategyService {
 
         if (null!=isRecycled) {
             entity.setRecycled(isRecycled ? YesNoEnum.YES : YesNoEnum.NO);
+            changed = true;
+        }
+
+        if (null!=isOperation) {
+            entity.setIsOperation(isOperation ? YesNoEnum.YES : YesNoEnum.NO);
             changed = true;
         }
 
@@ -139,8 +145,8 @@ public class ReExaminationStrategyService {
     //                        adding
     //===========================================================================
     @Transactional
-    public ReExaminationStrategyBean addReExaminationStrategyForDepartment(int departmentId, boolean isRecycled, String strategyDay) {
-        logger.info("add re-examination strategy day={} for department={}, isRecycled={}", strategyDay, departmentId, isRecycled);
+    public ReExaminationStrategyBean addReExaminationStrategyForDepartment(int departmentId, boolean isRecycled, boolean isOperation, String strategyDay) {
+        logger.info("add re-examination strategy day={} for department={}, isRecycled={} isOperation={}", strategyDay, departmentId, isRecycled, isOperation);
         if (VerifyUtil.isStringEmpty(strategyDay) || !VerifyUtil.isIds(strategyDay)) {
             logger.error("re-examination strategy day format is error");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -157,6 +163,7 @@ public class ReExaminationStrategyService {
             entity = new ReExaminationStrategyEntity();
             entity.setDepartmentId(departmentId);
             entity.setRecycled(isRecycled ? YesNoEnum.YES : YesNoEnum.NO);
+            entity.setIsOperation(isOperation ? YesNoEnum.YES : YesNoEnum.NO);
             entity.setReExaminationDay(strategyDay);
             entity.setTime(new Date());
             entity.setStatus(CommonStatus.ENABLED);
@@ -166,6 +173,7 @@ public class ReExaminationStrategyService {
             entities.remove(0);
 
             entity.setRecycled(isRecycled ? YesNoEnum.YES : YesNoEnum.NO);
+            entity.setIsOperation(isOperation ? YesNoEnum.YES : YesNoEnum.NO);
             entity.setReExaminationDay(strategyDay);
             entity.setTime(new Date());
             entity.setStatus(CommonStatus.ENABLED);

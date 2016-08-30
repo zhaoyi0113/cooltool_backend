@@ -210,10 +210,10 @@ public class UserReExaminationDateService {
         List<UserHospitalizedRelationBean> hospitalizedRelations = userHospitalizedRelationService.getUserHospitalizedRelationByGroupId(userId, hospitalizedGroupId);
         List<Date> reExamDates = null;
         if (!VerifyUtil.isListEmpty(hospitalizedRelations)) {
-            reExamDates = getReExaminationDate(startDate, hospitalizedRelations.get(0).getDepartmentId(), YesNoEnum.YES.equals(hasOperation));
+            reExamDates = getSpecificReExaminationDate(startDate, hospitalizedRelations.get(0).getDepartmentId(), YesNoEnum.YES.equals(hasOperation));
         }
         if (VerifyUtil.isListEmpty(reExamDates)) {
-            reExamDates = getReExaminationDate(startDate, YesNoEnum.YES.equals(hasOperation));
+            reExamDates = getDefaultReExaminationDate(startDate, YesNoEnum.YES.equals(hasOperation));
         }
 
         // add re_examination dates
@@ -230,7 +230,7 @@ public class UserReExaminationDateService {
     }
 
 
-    private List<Date> getReExaminationDate(Date startDate, boolean hasOperation) {
+    private List<Date> getDefaultReExaminationDate(Date startDate, boolean hasOperation) {
         List<Date> reExamDate = new ArrayList<>();
         if (null==startDate) {
             return reExamDate;
@@ -252,25 +252,24 @@ public class UserReExaminationDateService {
         return reExamDate;
     }
 
-    private List<Date> getReExaminationDate(Date startDate, Integer departmentId, boolean hasOperation) {
+    private List<Date> getSpecificReExaminationDate(Date startDate, Integer departmentId, boolean hasOperation) {
         List<ReExaminationStrategyBean> reExamStrategy = reExaminationStrategyService.getByDepartmentId(departmentId, CommonStatus.ENABLED);
-        ReExaminationStrategyBean tmp = reExamStrategy.get(0);
 
-        List<Date> reExamDate = new ArrayList<>();
-        if (null==startDate) {
-            return reExamDate;
+        List<Date> emptyReExamDate = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(reExamStrategy)) {
+            return emptyReExamDate;
         }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startDate);
-
-        List<Integer> deltaDays = tmp.getIntReExaminationDay();
-        for (Integer deltaDay : deltaDays) {
-            calendar.add(Calendar.DAY_OF_MONTH, deltaDay);
-            reExamDate.add(calendar.getTime());
-            calendar.add(Calendar.DAY_OF_MONTH, -deltaDay);
+        for (ReExaminationStrategyBean tmp : reExamStrategy) {
+            if (hasOperation) {
+                if (tmp.isOperation()) {
+                    return tmp.getDateReExaminationDay(startDate);
+                }
+            }
+            else {
+                return tmp.getDateReExaminationDay(startDate);
+            }
         }
-
-        return reExamDate;
+        return emptyReExamDate;
     }
 
     //===============================================================

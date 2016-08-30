@@ -18,6 +18,7 @@ public class ReExaminationStrategyEntity {
     private int departmentId;
     private String reExaminationDay;
     private YesNoEnum recycled;
+    private YesNoEnum isOperation;
 
     @Id
     @GeneratedValue
@@ -48,8 +49,15 @@ public class ReExaminationStrategyEntity {
     }
 
     @Column(name = "recycled")
+    @Enumerated
     public YesNoEnum getRecycled() {
         return recycled;
+    }
+
+    @Column(name = "is_operation")
+    @Enumerated
+    public YesNoEnum getIsOperation() {
+        return isOperation;
     }
 
     public void setId(long id) {
@@ -76,6 +84,10 @@ public class ReExaminationStrategyEntity {
         this.recycled = recycled;
     }
 
+    public void setIsOperation(YesNoEnum isOperation) {
+        this.isOperation = isOperation;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -84,6 +96,7 @@ public class ReExaminationStrategyEntity {
         msg.append(", departmentId=").append(departmentId);
         msg.append(", reExaminationDay=").append(reExaminationDay);
         msg.append(", recycled=").append(recycled);
+        msg.append(", isOperation=").append(isOperation);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

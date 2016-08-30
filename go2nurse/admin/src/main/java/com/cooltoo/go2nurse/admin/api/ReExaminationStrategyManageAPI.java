@@ -49,9 +49,10 @@ public class ReExaminationStrategyManageAPI {
     public Response addReExamination(@Context HttpServletRequest request,
                                      @FormParam("department_id") @DefaultValue("0") int departmentId,
                                      @FormParam("is_recycled") @DefaultValue("false") boolean isRecycled,
+                                     @FormParam("is_operation") @DefaultValue("false") boolean isOperation,
                                      @FormParam("strategy_day") @DefaultValue("") String strategyDay
     ) {
-        strategyService.addReExaminationStrategyForDepartment(departmentId, isRecycled, strategyDay);
+        strategyService.addReExaminationStrategyForDepartment(departmentId, isRecycled, isOperation, strategyDay);
         return Response.ok().build();
     }
 
@@ -61,11 +62,13 @@ public class ReExaminationStrategyManageAPI {
     public Response editReExamination(@Context HttpServletRequest request,
                                       @FormParam("re_examination_id") @DefaultValue("0") int reExaminationId,
                                       @FormParam("is_recycled") @DefaultValue("") String strIsRecycled,
+                                      @FormParam("is_operation") @DefaultValue("") String strIsOperation,
                                       @FormParam("strategy_day") @DefaultValue("") String strategyDay,
                                       @FormParam("status") @DefaultValue("") String status
     ) {
         Boolean isRecycled = VerifyUtil.isStringEmpty(strIsRecycled) ? null : Boolean.valueOf(strIsRecycled);
-        strategyService.updateReExaminationStrategyForDepartment(reExaminationId, isRecycled, strategyDay, status);
+        Boolean isOperation = VerifyUtil.isStringEmpty(strIsOperation) ? null : Boolean.valueOf(strIsOperation);
+        strategyService.updateReExaminationStrategyForDepartment(reExaminationId, isRecycled, isOperation, strategyDay, status);
         return Response.ok().build();
     }
 }
