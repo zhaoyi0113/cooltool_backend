@@ -225,7 +225,7 @@ public class DoctorAppointmentService {
         // check time is valid
         if (!isTimeValid(clinicDateBean.getClinicDate())) {
             logger.error("cannot appoint at this clinic date");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.CLINIC_DATE_NOT_ALLOWED);
         }
 
         // check number is valid, and user not appoint
@@ -289,7 +289,7 @@ public class DoctorAppointmentService {
         // check time is valid
         if (!isTimeValid(clinicDateBean.getClinicDate())) {
             logger.error("cannot appoint at this clinic date");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.CLINIC_DATE_NOT_ALLOWED);
         }
 
         // check number is valid, and user not appoint
