@@ -68,18 +68,21 @@ public class DoctorClinicDateHoursService {
 
     public List<DoctorClinicDateBean> getClinicDateWithHours(long doctorId, int flag, List<CommonStatus> statuses) {
         logger.info("get clinic dates by doctorId={} flag={} status={}", doctorId, flag, statuses);
-        Calendar calendarStart = Calendar.getInstance();
-        Calendar calendarEnd = Calendar.getInstance();
-        calendarStart.set(
-                calendarStart.get(Calendar.YEAR),
-                calendarStart.get(Calendar.MONTH)+flag,
+        Calendar calendarCurrent = Calendar.getInstance();
+        calendarCurrent.setTimeInMillis(calendarCurrent.getTimeInMillis()/1000*1000);
+        // start date
+        calendarCurrent.set(
+                calendarCurrent.get(Calendar.YEAR),
+                calendarCurrent.get(Calendar.MONTH)+flag,
                 1,0,0,0);
-        calendarEnd.set(
-                calendarEnd.get(Calendar.YEAR),
-                calendarEnd.get(Calendar.MONTH)+1+flag,
+        Date dateStart = new Date(calendarCurrent.getTimeInMillis());
+        // end date
+        calendarCurrent.set(
+                calendarCurrent.get(Calendar.YEAR),
+                calendarCurrent.get(Calendar.MONTH)+1+flag,
                 1,0,0,0);
-        Date dateStart = new Date(calendarStart.getTimeInMillis());
-        Date dateEnd = new Date(calendarEnd.getTimeInMillis());
+        calendarCurrent.add(Calendar.DAY_OF_MONTH, -1);
+        Date dateEnd = new Date(calendarCurrent.getTimeInMillis());
         logger.info("dateStart={} dateEnd={}", dateStart, dateEnd);
         List<DoctorClinicDateEntity> entities = dateRepository.findDoctorByConditions(doctorId, statuses, dateStart, dateEnd, clinicDateSort);
         List<DoctorClinicDateBean> beans = dateEntitiesToBeans(entities);
