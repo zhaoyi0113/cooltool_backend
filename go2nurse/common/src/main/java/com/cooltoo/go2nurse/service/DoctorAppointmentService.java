@@ -223,10 +223,7 @@ public class DoctorAppointmentService {
         DoctorBean doctorBean = doctorService.getDoctorById(clinicHoursBean.getDoctorId());
 
         // check time is valid
-        Calendar calendar = Calendar.getInstance();
-        long currentMilli = calendar.getTimeInMillis();
-        long clinicDateMilli = clinicDateBean.getClinicDate().getTime();
-        if (!isTimeValid(clinicDateMilli, currentMilli)) {
+        if (!isTimeValid(clinicDateBean.getClinicDate())) {
             logger.error("cannot appoint at this clinic date");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -282,18 +279,15 @@ public class DoctorAppointmentService {
     //=========================================================================
     @Transactional
     public DoctorAppointmentBean appointDoctor(long userId, long patientId, long clinicHoursId) {
-        Calendar calendar = Calendar.getInstance();
         logger.info("userId={} appoint doctor for patientId={} at clinicHoursId={} at time={}",
-                userId, patientId, clinicHoursId, calendar.getTime());
+                userId, patientId, clinicHoursId, new java.util.Date());
 
         DoctorClinicHoursBean clinicHoursBean = clinicDateHoursService.getClinicHourById(clinicHoursId);
         DoctorClinicDateBean clinicDateBean = clinicDateHoursService.getClinicDateById(clinicHoursBean.getClinicDateId());
         DoctorBean doctorBean = doctorService.getDoctorById(clinicHoursBean.getDoctorId());
 
         // check time is valid
-        long currentMilli = calendar.getTimeInMillis();
-        long clinicDateMilli = clinicDateBean.getClinicDate().getTime();
-        if (!isTimeValid(clinicDateMilli, currentMilli)) {
+        if (!isTimeValid(clinicDateBean.getClinicDate())) {
             logger.error("cannot appoint at this clinic date");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -365,8 +359,22 @@ public class DoctorAppointmentService {
         return beanConverter.convert(entity);
     }
 
-    private boolean isTimeValid(long clinicDate, long currentDate) {
-        return !((clinicDate-currentDate)<=hour4PMToMidnightMilliSecond);
+    private boolean isTimeValid(Date clinicDate) {
+        Calendar calendarCurrent = Calendar.getInstance();
+        Calendar calendarClinic = Calendar.getInstance();
+        calendarClinic.setTime(clinicDate);
+        if (calendarClinic.after(calendarCurrent)) {
+            boolean notToday = ((calendarClinic.get(Calendar.DAY_OF_MONTH)>calendarCurrent.get(Calendar.DAY_OF_MONTH)
+                    && (calendarClinic.get(Calendar.MONTH)>=calendarCurrent.get(Calendar.MONTH))
+                    && (calendarClinic.get(Calendar.YEAR)>=calendarCurrent.get(Calendar.YEAR))));
+            if (notToday) {
+                return true;
+            }
+            else if ((calendarCurrent.get(Calendar.HOUR_OF_DAY)<16)){
+                return true;
+            }
+        }
+        return false;
     }
 
     private int isNumberConsumedOrUserHasAppointed(List<DoctorAppointmentEntity> appointments, long patientId, int clinicNumber) {
