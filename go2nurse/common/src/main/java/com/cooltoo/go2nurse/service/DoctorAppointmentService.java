@@ -364,9 +364,9 @@ public class DoctorAppointmentService {
         Calendar calendarClinic = Calendar.getInstance();
         calendarClinic.setTime(clinicDate);
         if (calendarClinic.after(calendarCurrent)) {
-            boolean notToday = ((calendarClinic.get(Calendar.DAY_OF_MONTH)>calendarCurrent.get(Calendar.DAY_OF_MONTH)
-                    && (calendarClinic.get(Calendar.MONTH)>=calendarCurrent.get(Calendar.MONTH))
-                    && (calendarClinic.get(Calendar.YEAR)>=calendarCurrent.get(Calendar.YEAR))));
+            boolean notToday = ((calendarClinic.get(Calendar.YEAR)>calendarCurrent.get(Calendar.YEAR)))
+                    || (calendarClinic.get(Calendar.MONTH)>calendarCurrent.get(Calendar.MONTH))
+                    || (calendarClinic.get(Calendar.DAY_OF_MONTH)>calendarCurrent.get(Calendar.DAY_OF_MONTH));
             if (notToday) {
                 return true;
             }

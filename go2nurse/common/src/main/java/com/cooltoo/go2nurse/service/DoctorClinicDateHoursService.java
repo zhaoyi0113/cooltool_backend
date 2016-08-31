@@ -79,7 +79,7 @@ public class DoctorClinicDateHoursService {
         // end date
         calendarCurrent.set(
                 calendarCurrent.get(Calendar.YEAR),
-                calendarCurrent.get(Calendar.MONTH)+1+flag,
+                calendarCurrent.get(Calendar.MONTH)+1,
                 1,0,0,0);
         calendarCurrent.add(Calendar.DAY_OF_MONTH, -1);
         Date dateEnd = new Date(calendarCurrent.getTimeInMillis());
