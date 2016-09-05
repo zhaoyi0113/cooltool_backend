@@ -495,7 +495,7 @@ public class UserCourseRelationService {
     public UserCourseRelationBean updateUserCourseRelation(long courseId, long userId, String strReadingStatus) {
         logger.info("user={} update courseId={} with readingStatus={} and status={}", userId, courseId, strReadingStatus);
         ReadingStatus readingStatus = ReadingStatus.parseString(strReadingStatus);
-        if (null!=readingStatus) {
+        if (null==readingStatus) {
             logger.error("status is not valid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
