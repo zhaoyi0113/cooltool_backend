@@ -133,6 +133,9 @@ public class UserCourseRelationService {
             Set<DiagnosticEnumeration> keys = coursesInDepartment.keySet();
             for (DiagnosticEnumeration key : keys) {
                 List<CourseBean> courses = coursesInDepartment.get(key);
+                for (CourseBean course : courses) {// set reading status
+                    course.setReading(readCourseIds.contains(course.getId()) ? ReadingStatus.READ : ReadingStatus.UNREAD);
+                }
                 List<CourseBean> finalCourses = returnVal.get(key);
                 if (null == finalCourses) {
                     returnVal.put(key, courses);
@@ -141,7 +144,6 @@ public class UserCourseRelationService {
                 for (CourseBean course : courses) {
                     if (!finalCourses.contains(course)) {
                         finalCourses.add(course);
-                        course.setReading(readCourseIds.contains(course.getId()) ? ReadingStatus.READ : ReadingStatus.UNREAD);
                     }
                 }
             }
@@ -149,6 +151,10 @@ public class UserCourseRelationService {
             // get course of extension nursing of hospital
             List<CourseBean> coursesOfExtensionNursing =
                     courseRelationManageService.getEnabledCoursesByHospitalIdAndDiagnosticId(hospitalized.getHospitalId(), DiagnosticEnumeration.EXTENSION_NURSING.ordinal());
+            for (CourseBean course : coursesOfExtensionNursing) {// set reading status
+                course.setReading(readCourseIds.contains(course.getId()) ? ReadingStatus.READ : ReadingStatus.UNREAD);
+            }
+
             List<CourseBean> finalCourses = returnVal.get(DiagnosticEnumeration.EXTENSION_NURSING);
             if (null==finalCourses) {
                 returnVal.put(DiagnosticEnumeration.EXTENSION_NURSING, coursesOfExtensionNursing);
@@ -158,7 +164,6 @@ public class UserCourseRelationService {
                 for (CourseBean course : coursesOfExtensionNursing) {
                     if (!finalCourses.contains(course)) {
                         finalCourses.add(course);
-                        course.setReading(readCourseIds.contains(course.getId()) ? ReadingStatus.READ : ReadingStatus.UNREAD);
                     }
                 }
             }
