@@ -11,8 +11,10 @@ public class AdvertisementBean {
     private Date time;
     private CommonStatus status;
     private long frontCover;
+    private String frontCoverUrl;
     private String detailsUrl;
     private int order;
+    private String description;
 
     public long getId() {
         return id;
@@ -46,6 +48,14 @@ public class AdvertisementBean {
         this.frontCover = frontCover;
     }
 
+    public String getFrontCoverUrl() {
+        return frontCoverUrl;
+    }
+
+    public void setFrontCoverUrl(String frontCoverUrl) {
+        this.frontCoverUrl = frontCoverUrl;
+    }
+
     public String getDetailsUrl() {
         return detailsUrl;
     }
@@ -62,6 +72,14 @@ public class AdvertisementBean {
         this.order = order;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -71,7 +89,8 @@ public class AdvertisementBean {
         msg.append(", status=").append(status);
         msg.append(", grade=").append(order);
         msg.append(", frontCover=").append(frontCover);
-        msg.append(", detailsUrl").append(detailsUrl);
+        msg.append(", detailsUrl=").append(detailsUrl);
+        msg.append(", description=").append(description);
         msg.append("]");
         return msg.toString();
     }

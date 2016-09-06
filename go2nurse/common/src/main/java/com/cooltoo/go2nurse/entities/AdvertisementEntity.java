@@ -18,7 +18,8 @@ public class AdvertisementEntity {
     private CommonStatus status;
     private long frontCover;
     private String detailsUrl;
-    private int order;
+    private int orderIndex;
+    private String description;
 
     @Id
     @GeneratedValue
@@ -59,7 +60,7 @@ public class AdvertisementEntity {
         this.frontCover = frontCover;
     }
 
-    @Column(name = "enroll_url")
+    @Column(name = "details_url")
     public String getDetailsUrl() {
         return detailsUrl;
     }
@@ -68,13 +69,22 @@ public class AdvertisementEntity {
         this.detailsUrl = detailsUrl;
     }
 
-    @Column(name = "order")
-    public int getOrder() {
-        return order;
+    @Column(name = "order_index")
+    public int getOrderIndex() {
+        return orderIndex;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    public void setOrderIndex(int orderIndex) {
+        this.orderIndex = orderIndex;
+    }
+
+    @Column(name = "description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -84,9 +94,10 @@ public class AdvertisementEntity {
         msg.append("id=").append(id);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
-        msg.append(", grade=").append(order);
+        msg.append(", orderIndex=").append(orderIndex);
         msg.append(", frontCover=").append(frontCover);
         msg.append(", detailsUrl").append(detailsUrl);
+        msg.append(", description=").append(description);
         msg.append("]");
         return msg.toString();
     }

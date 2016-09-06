@@ -18,7 +18,8 @@ public class AdvertisementBeanConverter implements Converter<AdvertisementEntity
         bean.setStatus(source.getStatus());
         bean.setFrontCover(source.getFrontCover());
         bean.setDetailsUrl(source.getDetailsUrl());
-        bean.setOrder(source.getOrder());
+        bean.setOrder(source.getOrderIndex());
+        bean.setDescription(source.getDescription());
         return bean;
     }
 }
