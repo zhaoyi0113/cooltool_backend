@@ -21,4 +21,5 @@ public class AdvertisementService {
 
     @Autowired private UserGo2NurseFileStorageService userFileStorage;
 
+
 }
