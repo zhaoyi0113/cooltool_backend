@@ -74,8 +74,8 @@ public class UserCourseRelationService {
         }
 
         List<Long> readCourseIds = getRelationCourseId(userId, "read", CommonStatus.ENABLED.name());
-        if (VerifyUtil.isListEmpty(readCourseIds)) {
-            return;
+        if (VerifyUtil.isListEmpty(readCourseIds) && null==readCourseIds) {
+            readCourseIds = new ArrayList<>();
         }
 
         Set<CourseCategoryBean> keys = categoryToCourses.keySet();
