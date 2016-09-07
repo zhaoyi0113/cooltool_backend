@@ -33,11 +33,16 @@ public class UserHospitalizedAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(UserHospitalizedAPI.class);
 
-    @Autowired private UserService userService;
-    @Autowired private CourseRelationManageService courseManageService;
-    @Autowired private UserCourseRelationService userCourseService;
-    @Autowired private UserHospitalizedRelationService relationService;
-    @Autowired private UserDiagnosticPointRelationService diagnosticRelationService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private CourseRelationManageService courseManageService;
+    @Autowired
+    private UserCourseRelationService userCourseService;
+    @Autowired
+    private UserHospitalizedRelationService relationService;
+    @Autowired
+    private UserDiagnosticPointRelationService diagnosticRelationService;
 
     @Path("/get")
     @GET
@@ -45,7 +50,7 @@ public class UserHospitalizedAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response getRelation(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        long currentDiagnosticGroupId =diagnosticRelationService.getUserCurrentGroupId(userId);
+        long currentDiagnosticGroupId = diagnosticRelationService.getUserCurrentGroupId(userId);
         List<UserHospitalizedRelationBean> relations = relationService.getUserHospitalizedRelationByGroupId(userId, currentDiagnosticGroupId);
         return Response.ok(relations).build();
     }
@@ -58,7 +63,7 @@ public class UserHospitalizedAPI {
                                           @FormParam("hospital_department_unique_id") @DefaultValue("") String hospitalAndDepartmentUniqueId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        if (VerifyUtil.isStringEmpty(hospitalAndDepartmentUniqueId) || hospitalAndDepartmentUniqueId.length()!=12) {
+        if (VerifyUtil.isStringEmpty(hospitalAndDepartmentUniqueId) || hospitalAndDepartmentUniqueId.length() != 12) {
             logger.error("hospital department unique ids={} is invalid", hospitalAndDepartmentUniqueId);
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -119,8 +124,8 @@ public class UserHospitalizedAPI {
                                            @PathParam("hospital_department_unique_id") @DefaultValue("0") String hospitalDepartmentUniqueId
     ) {
         List<String> uniqueIds = NumberUtil.parseRandomIdentity(hospitalDepartmentUniqueId);
-        String hospitalUniqueId = uniqueIds.size()>=1 ? uniqueIds.get(0) : "";
-        String departmentUniqueId = uniqueIds.size()>=2 ? uniqueIds.get(1) : "";
+        String hospitalUniqueId = uniqueIds.size() >= 1 ? uniqueIds.get(0) : "";
+        String departmentUniqueId = uniqueIds.size() >= 2 ? uniqueIds.get(1) : "";
         Map<DiagnosticEnumeration, List<CourseBean>> courses = courseManageService.getDiagnosticToCoursesMapInDepartment(hospitalUniqueId, departmentUniqueId);
         return Response.ok(courses).build();
     }
@@ -129,7 +134,7 @@ public class UserHospitalizedAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public  Response getUserHospitalizedCourses(@Context HttpServletRequest request) {
+    public Response getUserHospitalizedCourses(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserBean user = userService.getUser(userId);
         boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
@@ -144,7 +149,7 @@ public class UserHospitalizedAPI {
             List<DiagnosticEnumeration> keys = DiagnosticEnumeration.getAllDiagnostic();
             for (DiagnosticEnumeration tmp : keys) {
                 List<CourseBean> value = courses.get(tmp);
-                if (null==value) {
+                if (null == value) {
                     value = new ArrayList<>();
                 }
                 UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
@@ -156,8 +161,7 @@ public class UserHospitalizedAPI {
                 bean.setCourses(value);
                 if (DiagnosticEnumeration.EXTENSION_NURSING.equals(tmp)) {
                     extensionNursingBean = bean;
-                }
-                else {
+                } else {
                     beans.add(bean);
                 }
                 if (!hasCourses) {
@@ -191,7 +195,7 @@ public class UserHospitalizedAPI {
         }
         logger.info("has_courses={}, extension_nursing_courses={}",
                 hasCourses,
-                null==extensionNursingBean ? 0 : extensionNursingBean.getCourses().size());
+                null == extensionNursingBean ? 0 : extensionNursingBean.getCourses().size());
         if (!hasCourses) {
             Map<CourseCategoryBean, List<CourseBean>> courses
                     = userCourseService.getAllPublicExtensionNursingCourses(userId);
@@ -209,39 +213,107 @@ public class UserHospitalizedAPI {
                 bean.setCourses(value);
                 beans.add(bean);
             });
-            Collections.sort(beans, new Comparator<UserHospitalizedCoursesBean>() {
-                @Override public int compare(UserHospitalizedCoursesBean o1, UserHospitalizedCoursesBean o2) {
-                    if (null!=o1 && null!=o2) {
-                        long delta = (o1.getId() - o2.getId());
-                        if (o1.getId()<0 && o2.getId()<0) {
-                            return delta>0 ? 1 : (delta<0 ? -1 : 0);
-                        }
-                        else {
-                            return delta > 0 ? -1 : (delta < 0 ? 1 : 0);
-                        }
-                    }
-                    if (o1==null || o1.getId()<0) {
-                        return 1;
-                    }
-                    if (o2==null || o2.getId()<0) {
-                        return -1;
-                    }
-                    return 0;
-                }
-            });
+            sortCourseArrays(beans);
         }
         return Response.ok(beans).build();
+    }
+
+    private void sortCourseArrays(List<UserHospitalizedCoursesBean> beans) {
+        Collections.sort(beans, new Comparator<UserHospitalizedCoursesBean>() {
+            @Override
+            public int compare(UserHospitalizedCoursesBean o1, UserHospitalizedCoursesBean o2) {
+                if (null != o1 && null != o2) {
+                    long delta = (o1.getId() - o2.getId());
+                    if (o1.getId() < 0 && o2.getId() < 0) {
+                        return delta > 0 ? 1 : (delta < 0 ? -1 : 0);
+                    } else {
+                        return delta > 0 ? -1 : (delta < 0 ? 1 : 0);
+                    }
+                }
+                if (o1 == null || o1.getId() < 0) {
+                    return 1;
+                }
+                if (o2 == null || o2.getId() < 0) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
     }
 
     @Path("/is_select_department")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public Response isSelectDepartment(@Context HttpServletRequest request){
+    public Response isSelectDepartment(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
         Map<String, Boolean> ret = new HashMap<>();
         ret.put("select_department", userHasSelectedCourses);
         return Response.ok(ret).build();
+    }
+
+    @GET
+    @Path("/diagnostic/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUserDiagnosticCourses(@Context HttpServletRequest request,
+                                             @PathParam("id") int diagnosticId) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        UserBean user = userService.getUser(userId);
+        boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
+        UserHospitalizedCoursesBean bean = null;
+        if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
+            Map<DiagnosticEnumeration, List<CourseBean>> courses
+                    = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
+            List<DiagnosticEnumeration> keys = DiagnosticEnumeration.getAllDiagnostic();
+            for (DiagnosticEnumeration tmp : keys) {
+                if (tmp.ordinal() == diagnosticId) {
+                    List<CourseBean> value = courses.get(tmp);
+                    if (null == value) {
+                        value = new ArrayList<>();
+                    }
+                    bean = new UserHospitalizedCoursesBean();
+                    bean.setId(tmp.ordinal());
+                    bean.setType(tmp.name());
+                    bean.setName(tmp.name());
+                    bean.setDescription("");
+                    bean.setImageUrl("");
+                    bean.setCourses(value);
+                }
+            }
+        }
+        if(bean == null){
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        return Response.ok(bean).build();
+    }
+
+    @GET
+    @Path("/category/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUserCategoryCourses(@Context HttpServletRequest request,
+                                             @PathParam("id") int categoryId) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
+        Map<CourseCategoryBean, List<CourseBean>> courses
+                = userCourseService.getAllPublicExtensionNursingCourses(userId);
+        courses.forEach((key, value) -> {
+            if(key.getId() == categoryId){
+                String name = key.getName();
+                if (CourseCategoryService.category_all.equals(key.getName())) {
+                    name = DiagnosticEnumeration.EXTENSION_NURSING.name();
+                }
+                bean.setId(key.getId());
+                bean.setType(name);
+                bean.setName(name);
+                bean.setDescription(key.getIntroduction());
+                bean.setImageUrl(key.getImageUrl());
+                bean.setCourses(value);
+            }
+
+        });
+        return Response.ok(bean).build();
     }
 }
