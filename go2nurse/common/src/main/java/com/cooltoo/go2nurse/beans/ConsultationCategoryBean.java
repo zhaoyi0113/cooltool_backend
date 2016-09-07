@@ -15,7 +15,7 @@ public class ConsultationCategoryBean {
     private String description;
     private long imageId;
     private String imageUrl;
-    private int grade;
+    private long order;
 
     public long getId() {
         return id;
@@ -45,8 +45,8 @@ public class ConsultationCategoryBean {
         return imageUrl;
     }
 
-    public int getGrade() {
-        return grade;
+    public long getOrder() {
+        return order;
     }
 
     public void setId(long id) {
@@ -77,8 +77,8 @@ public class ConsultationCategoryBean {
         this.imageUrl = imageUrl;
     }
 
-    public void setGrade(int grade) {
-        this.grade = grade;
+    public void setOrder(long order) {
+        this.order = order;
     }
 
     public String toString() {
@@ -90,7 +90,7 @@ public class ConsultationCategoryBean {
         msg.append(", name=").append(name);
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
-        msg.append(", grade=").append(grade);
+        msg.append(", order=").append(order);
         msg.append("]");
         return msg.toString();
     }

@@ -72,10 +72,9 @@ public class ConsultationCategoryManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addServiceCategory(@Context HttpServletRequest request,
                                        @FormParam("name") @DefaultValue("") String name,
-                                       @FormParam("description") @DefaultValue("") String description,
-                                       @FormParam("grade") @DefaultValue("0") int grade
+                                       @FormParam("description") @DefaultValue("") String description
     ) {
-        ConsultationCategoryBean category = categoryService.addCategory(name, description, grade);
+        ConsultationCategoryBean category = categoryService.addCategory(name, description);
         return Response.ok(category).build();
     }
 
@@ -90,10 +89,9 @@ public class ConsultationCategoryManageAPI {
                                         @FormParam("category_id") @DefaultValue("0") long categoryId,
                                         @FormParam("name") @DefaultValue("") String name,
                                         @FormParam("description") @DefaultValue("") String description,
-                                        @FormParam("grade") @DefaultValue("0") int grade,
                                         @FormParam("status") @DefaultValue("") String status
     ) {
-        ConsultationCategoryBean category = categoryService.updateCategory(categoryId, name, description, grade, status);
+        ConsultationCategoryBean category = categoryService.updateCategory(categoryId, name, description, status);
         return Response.ok(category).build();
     }
 
@@ -109,5 +107,18 @@ public class ConsultationCategoryManageAPI {
     ) {
         ConsultationCategoryBean category = categoryService.updateCategoryImage(categoryId, imageName, image);
         return Response.ok(category).build();
+    }
+
+    @Path("/category/order")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response changeTwoCategoryOrder(@Context HttpServletRequest request,
+                                           @FormParam("first_ad_id") long _1stId,
+                                           @FormParam("first_ad_order") long _1stOrder,
+                                           @FormParam("second_ad_id") long _2ndId,
+                                           @FormParam("second_ad_order") long _2ndOrder
+    ) {
+        categoryService.changeTwoCategoryOrder(_1stId, _1stOrder, _2ndId, _2ndOrder);
+        return Response.ok().build();
     }
 }

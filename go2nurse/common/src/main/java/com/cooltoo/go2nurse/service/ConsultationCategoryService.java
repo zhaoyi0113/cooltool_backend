@@ -30,8 +30,8 @@ public class ConsultationCategoryService {
     private static final Logger logger = LoggerFactory.getLogger(ConsultationCategoryService.class);
 
     private static final Sort categorySort = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "grade"),
-            new Sort.Order(Sort.Direction.DESC, "id")
+            new Sort.Order(Sort.Direction.ASC, "orderIndex"),
+            new Sort.Order(Sort.Direction.ASC, "id")
     );
 
     @Autowired private ConsultationCategoryRepository categoryRep;
@@ -184,9 +184,28 @@ public class ConsultationCategoryService {
     //                   updating
     //=====================================================================
     @Transactional
-    public ConsultationCategoryBean updateCategory(long categoryId, String name, String description, int grade, String strStatus) {
-        logger.info("update consultation category={} by name={} description={} grade={} status={}",
-                categoryId, name, description, grade, strStatus);
+    public void changeTwoCategoryOrder(long firstAdId, long firstAdOrder,
+                                       long secondAdId, long secondAdOrder
+    ) {
+        logger.info("change two consultation category order 1stId={}, 1stOrder={}, 2ndId={}, 2ndOrder={}",
+                firstAdId, firstAdOrder, secondAdId, secondAdOrder);
+        ConsultationCategoryEntity _1st = categoryRep.findOne(firstAdId);
+        ConsultationCategoryEntity _2nd = categoryRep.findOne(secondAdId);
+        if (null==_1st || null==_2nd) {
+            logger.error("the consultation category is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        _1st.setOrderIndex(secondAdOrder);
+        _2nd.setOrderIndex(firstAdOrder);
+        categoryRep.save(_1st);
+        categoryRep.save(_2nd);
+        return;
+    }
+
+    @Transactional
+    public ConsultationCategoryBean updateCategory(long categoryId, String name, String description, String strStatus) {
+        logger.info("update consultation category={} by name={} description={} status={}",
+                categoryId, name, description, strStatus);
 
         ConsultationCategoryEntity entity = categoryRep.findOne(categoryId);
         if (null==entity) {
@@ -200,10 +219,6 @@ public class ConsultationCategoryService {
         }
         if (!VerifyUtil.isStringEmpty(description)) {
             entity.setDescription(description);
-            changed = true;
-        }
-        if (grade>=0 && grade!=entity.getGrade()) {
-            entity.setGrade(grade);
             changed = true;
         }
         CommonStatus status = CommonStatus.parseString(strStatus);
@@ -253,9 +268,8 @@ public class ConsultationCategoryService {
     //=====================================================================
 
     @Transactional
-    public ConsultationCategoryBean addCategory(String name, String description, int grade) {
-        logger.info("add consultation category by name={} description={} grade={}",
-                name, description, grade);
+    public ConsultationCategoryBean addCategory(String name, String description) {
+        logger.info("add consultation category by name={} description={}", name, description);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -266,9 +280,10 @@ public class ConsultationCategoryService {
             entity.setDescription(description);
         }
         entity.setName(name);
-        entity.setGrade(grade<0 ? 0 : grade);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
+        entity = categoryRep.save(entity);
+        entity.setOrderIndex(entity.getId());
         entity = categoryRep.save(entity);
         ConsultationCategoryBean bean = categoryBeanConverter.convert(entity);
         logger.info("consultation category added is {}", bean);

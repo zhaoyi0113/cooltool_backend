@@ -18,7 +18,7 @@ public class ConsultationCategoryEntity {
     private String name;
     private String description;
     private long imageId;
-    private int grade;
+    private long orderIndex;
 
     @Id
     @GeneratedValue
@@ -53,9 +53,9 @@ public class ConsultationCategoryEntity {
         return imageId;
     }
 
-    @Column(name = "grade")
-    public int getGrade() {
-        return grade;
+    @Column(name = "order_index")
+    public long getOrderIndex() {
+        return orderIndex;
     }
 
     public void setId(long id) {
@@ -82,8 +82,8 @@ public class ConsultationCategoryEntity {
         this.imageId = imageId;
     }
 
-    public void setGrade(int grade) {
-        this.grade = grade;
+    public void setOrderIndex(long orderIndex) {
+        this.orderIndex = orderIndex;
     }
 
     public String toString() {
@@ -95,7 +95,7 @@ public class ConsultationCategoryEntity {
         msg.append(", name=").append(name);
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
-        msg.append(", grade=").append(grade);
+        msg.append(", orderIndex=").append(orderIndex);
         msg.append("]");
         return msg.toString();
     }
