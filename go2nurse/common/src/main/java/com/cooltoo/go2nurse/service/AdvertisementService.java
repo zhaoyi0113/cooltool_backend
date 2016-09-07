@@ -165,25 +165,15 @@ public class AdvertisementService {
     //===========================================================
 
     @Transactional
-    public long createAdvertisement(String frontCoverName, InputStream frontCover, String description, String detailsUrl, String strType) {
-        logger.info("create an advertisement by frontCoverName={} frontCover={} description={}, detailsUrl={} strType={}",
-                frontCoverName, frontCover!=null, description, detailsUrl);
-        if (null==frontCover) {
-            logger.error("the frontCover is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+    public long createAdvertisement(String description, String detailsUrl, String strType) {
+        logger.info("create an advertisement by description={}, detailsUrl={} strType={}", description, detailsUrl, strType);
         AdvertisementType type = AdvertisementType.parseString(strType);
         if (null==type) {
             logger.error("the type is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         AdvertisementEntity entity = new AdvertisementEntity();
-        long frontCoverId = userFileStorage.addFile(-1, frontCoverName, frontCover);
-        if (frontCoverId<0) {
-            logger.error("add frontCover is failed");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        entity.setFrontCover(frontCoverId);
+        entity.setFrontCover(0L);
         entity.setType(type);
         if (!VerifyUtil.isStringEmpty(description)) {
             entity.setDescription(description.trim());
