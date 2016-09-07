@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.ActivityStatus;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.constants.AdvertisementType;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -18,8 +19,9 @@ public class AdvertisementEntity {
     private CommonStatus status;
     private long frontCover;
     private String detailsUrl;
-    private int orderIndex;
+    private long orderIndex;
     private String description;
+    private AdvertisementType type;
 
     @Id
     @GeneratedValue
@@ -70,11 +72,11 @@ public class AdvertisementEntity {
     }
 
     @Column(name = "order_index")
-    public int getOrderIndex() {
+    public long getOrderIndex() {
         return orderIndex;
     }
 
-    public void setOrderIndex(int orderIndex) {
+    public void setOrderIndex(long orderIndex) {
         this.orderIndex = orderIndex;
     }
 
@@ -87,6 +89,15 @@ public class AdvertisementEntity {
         this.description = description;
     }
 
+    @Column(name = "advertisement_type")
+    public AdvertisementType getType() {
+        return type;
+    }
+
+    public void setType(AdvertisementType type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -95,6 +106,7 @@ public class AdvertisementEntity {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", orderIndex=").append(orderIndex);
+        msg.append(", type=").append(type);
         msg.append(", frontCover=").append(frontCover);
         msg.append(", detailsUrl").append(detailsUrl);
         msg.append(", description=").append(description);

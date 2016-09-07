@@ -1,6 +1,8 @@
 package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.constants.AdvertisementType;
+
 import java.util.Date;
 
 /**
@@ -13,8 +15,9 @@ public class AdvertisementBean {
     private long frontCover;
     private String frontCoverUrl;
     private String detailsUrl;
-    private int order;
+    private long order;
     private String description;
+    private AdvertisementType type;
 
     public long getId() {
         return id;
@@ -64,11 +67,11 @@ public class AdvertisementBean {
         this.detailsUrl = detailsUrl;
     }
 
-    public int getOrder() {
+    public long getOrder() {
         return order;
     }
 
-    public void setOrder(int order) {
+    public void setOrder(long order) {
         this.order = order;
     }
 
@@ -80,6 +83,14 @@ public class AdvertisementBean {
         this.description = description;
     }
 
+    public AdvertisementType getType() {
+        return type;
+    }
+
+    public void setType(AdvertisementType type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -87,9 +98,10 @@ public class AdvertisementBean {
         msg.append("id=").append(id);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
-        msg.append(", grade=").append(order);
+        msg.append(", order=").append(order);
+        msg.append(", type=").append(type);
         msg.append(", frontCover=").append(frontCover);
-        msg.append(", detailsUrl=").append(detailsUrl);
+        msg.append(", detailsUrl").append(detailsUrl);
         msg.append(", description=").append(description);
         msg.append("]");
         return msg.toString();

@@ -20,6 +20,7 @@ public class AdvertisementBeanConverter implements Converter<AdvertisementEntity
         bean.setDetailsUrl(source.getDetailsUrl());
         bean.setOrder(source.getOrderIndex());
         bean.setDescription(source.getDescription());
+        bean.setType(source.getType());
         return bean;
     }
 }

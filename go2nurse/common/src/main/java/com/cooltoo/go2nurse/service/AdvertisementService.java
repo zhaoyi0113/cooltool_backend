@@ -4,6 +4,7 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.AdvertisementBean;
+import com.cooltoo.go2nurse.constants.AdvertisementType;
 import com.cooltoo.go2nurse.converter.AdvertisementBeanConverter;
 import com.cooltoo.go2nurse.entities.AdvertisementEntity;
 import com.cooltoo.go2nurse.repository.AdvertisementRepository;
@@ -48,16 +49,11 @@ public class AdvertisementService {
     //                    get
     //===========================================================
 
-    public long countAdvertisementByStatus(String strStatus) {
-        logger.info("count all advertisement by status={}", strStatus);
+    public long countAdvertisementByStatus(String strStatus, String strType) {
+        logger.info("count all advertisement by status={} and type={}", strStatus, strType);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        long count = 0;
-        if ("ALL".equalsIgnoreCase(strStatus)) {
-            count = repository.count();
-        }
-        else if (null != status) {
-            count = repository.countByStatus(status);
-        }
+        AdvertisementType type = AdvertisementType.parseString(strType);
+        long count = repository.countByStatusAndType(status, type);
         logger.info("count all advertisement, size={}", count);
         return count;
     }
@@ -77,11 +73,11 @@ public class AdvertisementService {
         return activities;
     }
 
-    public List<AdvertisementBean> getAdvertisementByStatus(String strStatus) {
-        logger.info("get advertisement by status {}", strStatus);
+    public List<AdvertisementBean> getAdvertisementByStatusAndType(String strStatus, String strType) {
+        logger.info("get advertisement by status={} type={}", strStatus, strType);
 
         // get nuser by authority
-        List<AdvertisementEntity> resultSet = (List<AdvertisementEntity>) getAdvertisementByStatus(strStatus, sort);
+        List<AdvertisementEntity> resultSet = (List<AdvertisementEntity>) getAdvertisementByStatusAndType(strStatus, strType, sort);
 
         // parse to bean
         List<AdvertisementBean> beans = entities2Beans(resultSet);
@@ -90,12 +86,12 @@ public class AdvertisementService {
         return beans;
     }
 
-    public List<AdvertisementBean> getAdvertisementByStatus(String strStatus, int pageIndex, int number) {
-        logger.info("get advertisement by status {} at page {} with number {}", strStatus, pageIndex, number);
+    public List<AdvertisementBean> getAdvertisementByStatusAndType(String strStatus, String strType, int pageIndex, int number) {
+        logger.info("get advertisement by status={} type={} at page={} with number={}", strStatus, strType, pageIndex, number);
 
         // get nuser by authority
-        PageRequest          page          = new PageRequest(pageIndex, number, sort);
-        Page<AdvertisementEntity> resultSetPage = (Page<AdvertisementEntity>) getAdvertisementByStatus(strStatus, page);
+        PageRequest page = new PageRequest(pageIndex, number, sort);
+        Page<AdvertisementEntity> resultSetPage = (Page<AdvertisementEntity>) getAdvertisementByStatusAndType(strStatus, strType, page);
         // parse to bean
         List<AdvertisementBean> beans = entities2Beans(resultSetPage);
         fillOtherProperties(beans);
@@ -103,9 +99,10 @@ public class AdvertisementService {
         return beans;
     }
 
-    private Iterable<AdvertisementEntity> getAdvertisementByStatus(String strStatus, Object sortOrPage) {
+    private Iterable<AdvertisementEntity> getAdvertisementByStatusAndType(String strStatus, String strType, Object sortOrPage) {
         Iterable<AdvertisementEntity> advertisements = null;
         CommonStatus status = CommonStatus.parseString(strStatus);
+        AdvertisementType type = AdvertisementType.parseString(strType);
         if ("ALL".equalsIgnoreCase(strStatus)) {
             if (sortOrPage instanceof PageRequest) {
                 advertisements = repository.findAll((Pageable) sortOrPage);
@@ -116,10 +113,10 @@ public class AdvertisementService {
         }
         else if (null != status) {
             if (sortOrPage instanceof PageRequest) {
-                advertisements = repository.findByStatus(status, (Pageable) sortOrPage);
+                advertisements = repository.findByStatusAndType(status, type, (Pageable) sortOrPage);
             }
             else if (sortOrPage instanceof Sort) {
-                advertisements = repository.findByStatus(status, (Sort) sortOrPage);
+                advertisements = repository.findByStatusAndType(status, type, (Sort) sortOrPage);
             }
         }
         return advertisements;
@@ -168,11 +165,16 @@ public class AdvertisementService {
     //===========================================================
 
     @Transactional
-    public long createAdvertisement(String frontCoverName, InputStream frontCover, String description, String detailsUrl) {
-        logger.info("create an advertisement by frontCoverName={} frontCover={} description={}, detailsUrl={}",
+    public long createAdvertisement(String frontCoverName, InputStream frontCover, String description, String detailsUrl, String strType) {
+        logger.info("create an advertisement by frontCoverName={} frontCover={} description={}, detailsUrl={} strType={}",
                 frontCoverName, frontCover!=null, description, detailsUrl);
         if (null==frontCover) {
             logger.error("the frontCover is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        AdvertisementType type = AdvertisementType.parseString(strType);
+        if (null==type) {
+            logger.error("the type is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         AdvertisementEntity entity = new AdvertisementEntity();
@@ -182,6 +184,7 @@ public class AdvertisementService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         entity.setFrontCover(frontCoverId);
+        entity.setType(type);
         if (!VerifyUtil.isStringEmpty(description)) {
             entity.setDescription(description.trim());
         }
@@ -204,11 +207,11 @@ public class AdvertisementService {
 
     @Transactional
     public AdvertisementBean updateAdvertisement(long advertisementId, String description,
-                                                String detailsUrl, String strStatus,
+                                                 String detailsUrl, String strStatus, String strType,
                                                  String frontCoverName, InputStream frontCover
     ) {
-        logger.info("update advertisement {} by description={}, imageName={} image={}, enrollUrl={}",
-                advertisementId, description, frontCoverName, frontCover!=null, detailsUrl);
+        logger.info("update advertisement={} by description={}, imageName={} image={}, detailsUrl={}, strStatus={}, strType={}",
+                advertisementId, description, frontCoverName, frontCover!=null, detailsUrl, strStatus, strType);
 
         AdvertisementEntity entity = repository.findOne(advertisementId);
         if (null==entity) {
@@ -218,7 +221,7 @@ public class AdvertisementService {
 
         boolean changed = false;
 
-        if (!VerifyUtil.isStringEmpty(description)) {
+        if (!VerifyUtil.isStringEmpty(description) && !description.trim().equals(entity.getDescription())) {
             entity.setDescription(description.trim());
             changed = true;
         }
@@ -234,13 +237,18 @@ public class AdvertisementService {
             entity.setFrontCover(imageId);
             changed = true;
         }
-        if (!VerifyUtil.isStringEmpty(detailsUrl)) {
+        if (!VerifyUtil.isStringEmpty(detailsUrl) && !detailsUrl.equals(entity.getDetailsUrl())) {
             entity.setDetailsUrl(detailsUrl);
             changed = true;
         }
         CommonStatus status = CommonStatus.parseString(strStatus);
         if (null!=status && !status.equals(entity.getStatus())) {
             entity.setStatus(status);
+            changed = true;
+        }
+        AdvertisementType type = AdvertisementType.parseString(strType);
+        if (null!=type && !type.equals(entity.getType())) {
+            entity.setType(type);
             changed = true;
         }
 
@@ -252,6 +260,25 @@ public class AdvertisementService {
         AdvertisementBean bean = beanConverter.convert(entity);
         bean.setFrontCoverUrl(imageUrl);
         return bean;
+    }
+
+    @Transactional
+    public void changeTwoAdvertisementOrder(long firstAdId, long firstAdOrder,
+                                            long secondAdId, long secondAdOrder
+    ) {
+        logger.info("change two advertisement order 1stId={}, 1stOrder={}, 2ndId={}, 2ndOrder={}",
+                firstAdId, firstAdOrder, secondAdId, secondAdOrder);
+        AdvertisementEntity _1st = repository.findOne(firstAdId);
+        AdvertisementEntity _2nd = repository.findOne(secondAdId);
+        if (null==_1st || null==_2nd) {
+            logger.error("the advertisement is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        _1st.setOrderIndex(secondAdOrder);
+        _2nd.setOrderIndex(firstAdOrder);
+        repository.save(_1st);
+        repository.save(_2nd);
+        return;
     }
 
     //=============================================================
