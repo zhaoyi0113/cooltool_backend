@@ -371,6 +371,17 @@ public class UserConsultationService {
     //           adding
     //=======================================
     public long addTalk(long consultationId, long nurseId, ConsultationTalkStatus talkStatus, String talkContent) {
+        logger.info("add consultation talk, consultationId={} nurseId={} talkStatus={} talkContent={}.",
+                consultationId, nurseId, talkStatus, talkContent);
+        UserConsultationEntity consultation = repository.findOne(consultationId);
+        if (null==consultation) {
+            logger.error("consultation is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (0!=consultation.getNurseId() && nurseId!=consultation.getNurseId()) {
+            logger.error("consultation not belong this nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
         long talkId = talkService.addConsultationTalk(consultationId, nurseId, talkStatus, talkContent);
         return talkId;
     }
