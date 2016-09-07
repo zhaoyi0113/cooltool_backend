@@ -244,6 +244,41 @@ public class UserCourseRelationService {
         return returnValue;
     }
 
+    // 历史课程
+    public List<CourseBean> getUserAllCoursesRead(long userId, int pageIndex, int sizePerPage) {
+        logger.info("get courses read by userId={} at pageIndex={} size={}", userId, pageIndex, sizePerPage);
+
+        // get user read courses
+        List<ReadingStatus> read = new ArrayList<>();
+        read.add(ReadingStatus.READ);
+        List<Long> readCourseIds = repository.findCourseIdByUserIdAndReadStatusAndStatus(userId, read, CommonStatus.ENABLED, sort);
+        List<Long> readCoursePageIds = new ArrayList<>();
+        int startIndex = pageIndex*sizePerPage;
+        int endIndex = startIndex + sizePerPage;
+        for (int i=startIndex; i<readCourseIds.size(); i++) {
+            if (i<endIndex) {
+                readCoursePageIds.add(readCourseIds.get(i));
+                continue;
+            }
+            else {
+                break;
+            }
+        }
+        List<CourseBean> readCourses = courseService.getCourseByIds(readCoursePageIds);
+
+        List<CourseBean> returnValue = new ArrayList<>();
+        for (Long courseId : readCoursePageIds) {
+            for (CourseBean course : readCourses) {
+                if (course.getId() == courseId) {
+                    returnValue.add(course);
+                    break;
+                }
+            }
+        }
+        logger.info("courses count is {}", returnValue.size());
+        return returnValue;
+    }
+
     //===================================================
     //               get for admin user
     //===================================================

@@ -42,7 +42,6 @@ public class UserConsultationAPI {
         return Response.ok(consultations).build();
     }
 
-    @Path("/with_talks")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
@@ -97,7 +96,7 @@ public class UserConsultationAPI {
     }
 
     @Path("/edit")
-    @POST
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response editConsultation(@Context HttpServletRequest request,

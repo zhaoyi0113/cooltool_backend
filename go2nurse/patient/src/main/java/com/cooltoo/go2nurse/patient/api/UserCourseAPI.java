@@ -50,6 +50,18 @@ public class UserCourseAPI {
         return Response.ok(coursesUserRead).build();
     }
 
+    @Path("/read")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUserReadCourse(@Context HttpServletRequest request,
+                                      @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                      @QueryParam("number") @DefaultValue("10") int sizePerPage) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<CourseBean> coursesUserRead = userCourseRelation.getUserAllCoursesRead(userId, pageIndex, sizePerPage);
+        return Response.ok(coursesUserRead).build();
+    }
+
     @Path("/add_courses")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
