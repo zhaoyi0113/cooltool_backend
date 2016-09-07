@@ -63,12 +63,11 @@ public class AdvertisementManageAPI {
 
 
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createAdvertisement(@Context HttpServletRequest request,
-                                        @FormDataParam("description") String description,
-                                        @FormDataParam("details_url") String detailsUrl,
-                                        @FormDataParam("type") String type
+                                        @FormParam("description") String description,
+                                        @FormParam("details_url") String detailsUrl,
+                                        @FormParam("type") String type
 
     ) {
         long advertisementId = advertisementService.createAdvertisement(description, detailsUrl, type);
