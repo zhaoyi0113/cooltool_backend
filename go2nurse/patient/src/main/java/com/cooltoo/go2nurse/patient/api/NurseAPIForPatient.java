@@ -31,7 +31,7 @@ public class NurseAPIForPatient {
         return Response.ok(nurse).build();
     }
 
-
+    // can_answer_nursing_question ===> yes/no/none
     @Path("/by_condition")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
