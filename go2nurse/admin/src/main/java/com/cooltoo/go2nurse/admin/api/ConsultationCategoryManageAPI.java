@@ -113,10 +113,10 @@ public class ConsultationCategoryManageAPI {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response changeTwoCategoryOrder(@Context HttpServletRequest request,
-                                           @FormParam("first_ad_id") long _1stId,
-                                           @FormParam("first_ad_order") long _1stOrder,
-                                           @FormParam("second_ad_id") long _2ndId,
-                                           @FormParam("second_ad_order") long _2ndOrder
+                                           @FormParam("first_id") long _1stId,
+                                           @FormParam("first_order") long _1stOrder,
+                                           @FormParam("second_id") long _2ndId,
+                                           @FormParam("second_order") long _2ndOrder
     ) {
         categoryService.changeTwoCategoryOrder(_1stId, _1stOrder, _2ndId, _2ndOrder);
         return Response.ok().build();

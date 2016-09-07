@@ -239,10 +239,11 @@ public class UserConsultationService {
             entity.setCategoryId(categoryId);
             changed = true;
         }
-        if (null!=nurseId && nurseId!=entity.getNurseId()) {
-            entity.setNurseId(nurseId);
-            changed = true;
-        }
+//        // can not change nurseId
+//        if (null!=nurseId && nurseId!=entity.getNurseId()) {
+//            entity.setNurseId(nurseId);
+//            changed = true;
+//        }
         if (changed) {
             entity = repository.save(entity);
         }
@@ -281,6 +282,7 @@ public class UserConsultationService {
 
         UserConsultationEntity entity = new UserConsultationEntity();
         entity.setCategoryId(categoryId<0 ? 0 : categoryId);
+        entity.setNurseId(nurseId<0 ? 0 : nurseId);
         entity.setUserId(userId);
         entity.setPatientId(patientId);
         entity.setDiseaseDescription(diseaseDescription.trim());
