@@ -1,9 +1,12 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.go2nurse.beans.ConsultationCategoryBean;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.service.ConsultationCategoryService;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -26,8 +29,26 @@ import java.util.Map;
 public class UserConsultationAPI {
 
     @Autowired private UserConsultationService userConsultationService;
+    @Autowired private ConsultationCategoryService categoryService;
 
 
+    //=================================================================================================================
+    //                                           consultation category service
+    //=================================================================================================================
+    @Path("/category")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getServiceCategory(@Context HttpServletRequest request) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.ENABLED);
+        List<ConsultationCategoryBean> topCategories = categoryService.getCategoryByStatus(statuses);
+        return Response.ok(topCategories).build();
+    }
+
+    //=================================================================================================================
+    //                                           consultation service
+    //=================================================================================================================
     @Path("/query")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
