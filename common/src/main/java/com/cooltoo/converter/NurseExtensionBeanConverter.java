@@ -17,6 +17,8 @@ public class NurseExtensionBeanConverter implements Converter<NurseExtensionEnti
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
         bean.setNurseId(source.getNurseId());
+        bean.setGoodAt(source.getGoodAt());
+        bean.setJobTitle(source.getJobTitle());
         bean.setAnswerNursingQuestion(source.getAnswerNursingQuestion());
         return bean;
     }

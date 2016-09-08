@@ -2,12 +2,12 @@ package com.cooltoo.services;
 
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.NurseJobTitle;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.converter.NurseExtensionBeanConverter;
 import com.cooltoo.entities.NurseExtensionEntity;
 import com.cooltoo.repository.NurseExtensionRepository;
 import com.cooltoo.util.VerifyUtil;
-import org.omg.IOP.ENCODING_CDR_ENCAPS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,11 +73,17 @@ public class NurseExtensionService {
     //                  setting
     //================================================================================
     @Transactional
-    public NurseExtensionBean setExtension(long nurseId, YesNoEnum answerNursingQuestion) {
-        logger.info("set nurse extension. nurseId={} answerNursingQuestion={}", nurseId, answerNursingQuestion);
+    public NurseExtensionBean setExtension(long nurseId, YesNoEnum answerNursingQuestion, String beGoodAt, String jobTitle) {
+        logger.info("set nurse extension. nurseId={} answerNursingQuestion={} beGoodAt={} jobTitle={}",
+                nurseId, answerNursingQuestion, beGoodAt, jobTitle);
         if (null==answerNursingQuestion) {
             logger.warn("answerNursingQuestion is empty");
-            return null;
+        }
+        if (VerifyUtil.isStringEmpty(beGoodAt)) {
+            logger.warn("beGoodAt is empty");
+        }
+        if (VerifyUtil.isStringEmpty(jobTitle)) {
+            logger.warn("jobTitle is empty");
         }
 
         NurseExtensionEntity entity;
@@ -89,11 +95,29 @@ public class NurseExtensionService {
             entity.setTime(new Date());
             entity.setStatus(CommonStatus.ENABLED);
             entity.setNurseId(nurseId);
-            entity.setAnswerNursingQuestion(answerNursingQuestion);
+            if (null!=answerNursingQuestion) {
+                entity.setAnswerNursingQuestion(answerNursingQuestion);
+            }
+            if (!VerifyUtil.isStringEmpty(beGoodAt)) {
+                entity.setGoodAt(beGoodAt.trim());
+            }
+            NurseJobTitle njt = NurseJobTitle.parseString(jobTitle);
+            if (null!=njt) {
+                entity.setJobTitle(njt);
+            }
         }
         else {
             entity = entities.get(0);
-            entity.setAnswerNursingQuestion(answerNursingQuestion);
+            if (null!=answerNursingQuestion) {
+                entity.setAnswerNursingQuestion(answerNursingQuestion);
+            }
+            if (!VerifyUtil.isStringEmpty(beGoodAt)) {
+                entity.setGoodAt(beGoodAt.trim());
+            }
+            NurseJobTitle njt = NurseJobTitle.parseString(jobTitle);
+            if (null!=njt) {
+                entity.setJobTitle(njt);
+            }
             extensionCount = entities.size();
         }
         entity = repository.save(entity);

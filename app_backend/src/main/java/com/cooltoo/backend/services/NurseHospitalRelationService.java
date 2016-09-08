@@ -112,10 +112,10 @@ public class NurseHospitalRelationService {
         List<Integer> hospitalIds   = new ArrayList<>();
         List<Integer> departmentIds = new ArrayList<>();
         for (NurseHospitalRelationBean bean : relationBeans) {
-            if (bean.getHospitalId()>0) {
+            if (bean.getHospitalId()>0 && !hospitalIds.contains(bean.getHospitalId())) {
                 hospitalIds.add(bean.getHospitalId());
             }
-            if (bean.getDepartmentId()>0) {
+            if (bean.getDepartmentId()>0 && !departmentIds.contains(bean.getDepartmentId())) {
                 departmentIds.add(bean.getDepartmentId());
             }
         }

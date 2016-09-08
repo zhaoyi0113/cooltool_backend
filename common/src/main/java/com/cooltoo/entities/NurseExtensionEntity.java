@@ -1,6 +1,7 @@
 package com.cooltoo.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.NurseJobTitle;
 import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.*;
@@ -19,6 +20,8 @@ public class NurseExtensionEntity {
     private long nurseId;
     private NurseEntity nurse;
     private YesNoEnum answerNursingQuestion;
+    private String goodAt;
+    private NurseJobTitle jobTitle;
 
     @Id
     @GeneratedValue
@@ -69,6 +72,25 @@ public class NurseExtensionEntity {
         this.answerNursingQuestion = answerNursingQuestion;
     }
 
+    @Column(name = "good_at")
+    public String getGoodAt() {
+        return goodAt;
+    }
+
+    public void setGoodAt(String goodAt) {
+        this.goodAt = goodAt;
+    }
+
+    @Column(name = "job_title")
+    @Enumerated
+    public NurseJobTitle getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(NurseJobTitle jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
     // 映射多对一的关联关系
     @JoinColumn(name="nurse_id", insertable=false, updatable=false)// cooltoo_nurse_info_extension 关联 cooltoo_nurse 表的字段
     @ManyToOne()
@@ -85,6 +107,8 @@ public class NurseExtensionEntity {
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", nurseId=").append(nurseId);
+        msg.append(", goodAt=").append(goodAt);
+        msg.append(", jobTitle=").append(jobTitle);
         msg.append(", answerNursingQuestion=").append(answerNursingQuestion);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);

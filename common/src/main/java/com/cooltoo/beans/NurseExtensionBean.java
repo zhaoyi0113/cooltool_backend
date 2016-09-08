@@ -1,6 +1,7 @@
 package com.cooltoo.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.NurseJobTitle;
 import com.cooltoo.constants.YesNoEnum;
 
 import java.util.Date;
@@ -15,6 +16,8 @@ public class NurseExtensionBean {
     private CommonStatus status;
     private long nurseId;
     private YesNoEnum answerNursingQuestion;
+    private String goodAt;
+    private NurseJobTitle jobTitle;
 
     public long getId() {
         return id;
@@ -56,11 +59,29 @@ public class NurseExtensionBean {
         this.answerNursingQuestion = answerNursingQuestion;
     }
 
+    public String getGoodAt() {
+        return goodAt;
+    }
+
+    public void setGoodAt(String goodAt) {
+        this.goodAt = goodAt;
+    }
+
+    public NurseJobTitle getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(NurseJobTitle jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", nurseId=").append(nurseId);
+        msg.append(", goodAt=").append(goodAt);
+        msg.append(", jobTitle=").append(jobTitle);
         msg.append(", answerNursingQuestion=").append(answerNursingQuestion);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);

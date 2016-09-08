@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.converter.NurseBeanConverter;
@@ -9,6 +10,7 @@ import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.services.CommonNurseService;
 import com.cooltoo.services.NurseExtensionService;
 import com.cooltoo.services.file.UserFileStorageService;
@@ -31,6 +33,7 @@ public class NurseServiceForGo2Nurse {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseServiceForGo2Nurse.class);
 
+    @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
     @Autowired private NurseExtensionService nurseExtensionService;
     @Autowired private CommonNurseService commonNurseService;
     @Autowired private NurseBeanConverter nurseBeanConverter;
@@ -56,7 +59,9 @@ public class NurseServiceForGo2Nurse {
         bean.setProfilePhotoUrl(utility.getHttpPrefixForNurseGo()+profilePath);
         bean.setBackgroundImageUrl(utility.getHttpPrefixForNurseGo()+backgroundPath);
         NurseExtensionBean extension = nurseExtensionService.getExtensionByNurseId(nurseId);
+        NurseHospitalRelationBean hospitalDepartment = nurseHospitalRelationService.getRelationByNurseId(nurseId, utility.getHttpPrefixForNurseGo());
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
+        bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospitalDepartment);
         return bean;
     }
 
@@ -121,10 +126,13 @@ public class NurseServiceForGo2Nurse {
 
         Map<Long, String> imageId2Path = nursegoFileStorage.getFilePath(imageIds);
         Map<Long, NurseExtensionBean> nurseId2Extension = nurseExtensionService.getExtensionByNurseIds(nurseIds);
+        Map<Long, NurseHospitalRelationBean> nurseId2Hospital = nurseHospitalRelationService.getRelationMapByNurseIds(nurseIds, utility.getHttpPrefixForNurseGo());
         for (NurseBean bean : beans) {
             long nurseId = bean.getId();
             NurseExtensionBean extension = nurseId2Extension.get(nurseId);
+            NurseHospitalRelationBean hospital = nurseId2Hospital.get(nurseId);
             bean.setProperty(NurseBean.INFO_EXTENSION, extension);
+            bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospital);
 
             long imageId = bean.getProfilePhotoId();
             String imgPath = imageId2Path.get(imageId);
