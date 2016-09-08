@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <go2nurse_service_vendor id="30" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 30" description="服务供应商简介 30" logo_id="0"/>
+    <go2nurse_service_vendor id="31" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 31" description="服务供应商简介 31" logo_id="0"/>
+    <go2nurse_service_vendor id="32" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 32" description="服务供应商简介 32" logo_id="0"/>
+    <go2nurse_service_vendor id="33" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 33" description="服务供应商简介 33" logo_id="0"/>
+    <go2nurse_service_vendor id="34" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 34" description="服务供应商简介 34" logo_id="0"/>
+    <go2nurse_service_vendor id="35" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 35" description="服务供应商简介 35" logo_id="0"/>
+    <go2nurse_service_vendor id="36" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 36" description="服务供应商简介 36" logo_id="0"/>
+    <go2nurse_service_vendor id="37" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 37" description="服务供应商简介 37" logo_id="0"/>
+    <go2nurse_service_vendor id="38" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 38" description="服务供应商简介 38" logo_id="0"/>
+    <go2nurse_service_vendor id="39" time_created="2016-08-01 14:51:24" status="1" name="服务供应商 39" description="服务供应商简介 39" logo_id="0"/>
+    <go2nurse_service_vendor id="40" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 40" description="服务供应商简介 40" logo_id="0"/>
+    <go2nurse_service_vendor id="41" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 41" description="服务供应商简介 41" logo_id="0"/>
+    <go2nurse_service_vendor id="42" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 42" description="服务供应商简介 42" logo_id="0"/>
+    <go2nurse_service_vendor id="43" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 43" description="服务供应商简介 43" logo_id="0"/>
+    <go2nurse_service_vendor id="44" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 44" description="服务供应商简介 44" logo_id="0"/>
+    <go2nurse_service_vendor id="45" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 45" description="服务供应商简介 45" logo_id="0"/>
+    <go2nurse_service_vendor id="46" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 46" description="服务供应商简介 46" logo_id="0"/>
+    <go2nurse_service_vendor id="47" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 47" description="服务供应商简介 47" logo_id="0"/>
+    <go2nurse_service_vendor id="48" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 48" description="服务供应商简介 48" logo_id="0"/>
+    <go2nurse_service_vendor id="49" time_created="2016-08-01 14:51:24" status="0" name="服务供应商 49" description="服务供应商简介 49" logo_id="0"/>
+    <go2nurse_service_vendor id="50" time_created="2016-08-01 14:51:24" status="2" name="服务供应商 50" description="服务供应商简介 50" logo_id="0"/>
+</dataset>

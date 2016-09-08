@@ -377,7 +377,7 @@ public class ServiceVendorCategoryAndItemService {
 
     public List<ServiceItemBean> getItemByIdIn(List<Long> itemIds) {
         logger.info("get service item by ids");
-        List<ServiceItemEntity> entities = itemRep.findByIdIn(itemIds);
+        List<ServiceItemEntity> entities = itemRep.findByIdIn(itemIds, itemSort);
         List<ServiceItemBean> beans = serviceItemEntitiesToBeans(entities);
         fillItemOtherProperties(beans);
         logger.info("count is {}", beans.size());
@@ -617,7 +617,7 @@ public class ServiceVendorCategoryAndItemService {
         if (VerifyUtil.isListEmpty(itemIds)) {
             return itemIds;
         }
-        List<ServiceItemEntity> entities = itemRep.findByIdIn(itemIds);
+        List<ServiceItemEntity> entities = itemRep.findByIdIn(itemIds, itemSort);
         if (VerifyUtil.isListEmpty(entities)) {
             return itemIds;
         }

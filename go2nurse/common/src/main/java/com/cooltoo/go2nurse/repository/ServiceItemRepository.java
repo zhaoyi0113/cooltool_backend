@@ -27,16 +27,16 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
     List<ServiceItemEntity> findByVendorIdAndStatusIn(Long vendorId, List<CommonStatus> statuses, Sort sort);
     Page<ServiceItemEntity> findByVendorIdAndStatusIn(Long vendorId, List<CommonStatus> statuses, Pageable sort);
 
-    List<ServiceItemEntity> findByIdIn(List<Long> ids);
+    List<ServiceItemEntity> findByIdIn(List<Long> ids, Sort sort);
 
     @Modifying
     @Query("UPDATE ServiceItemEntity item SET item.categoryId=0" +
-            " WHERE item.categoryId IN ?2 ")
+            " WHERE item.categoryId IN ?1 ")
     int setCategoryIdToNone(List<Long> categoryId);
 
     @Modifying
     @Query("UPDATE ServiceItemEntity item SET item.vendorId=0, item.vendorType=0" +
-            " WHERE item.vendorId IN ?2 ")
+            " WHERE item.vendorId IN ?1 ")
     int setVendorIdToNone(List<Long> vendorId);
 
 
