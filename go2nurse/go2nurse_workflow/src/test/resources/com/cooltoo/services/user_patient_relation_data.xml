@@ -9,4 +9,7 @@
     <go2nurse_user_patient_relation id="16" time_created="2016-04-07 14:44:44" status="1" user_id="3" patient_id="7" />
     <go2nurse_user_patient_relation id="17" time_created="2016-04-08 14:44:44" status="1" user_id="4" patient_id="8" />
     <go2nurse_user_patient_relation id="18" time_created="2016-04-09 14:44:44" status="0" user_id="5" patient_id="9" />
+    <go2nurse_user_patient_relation id="19" time_created="2016-04-09 14:44:44" status="0" user_id="463" patient_id="367" />
+    <go2nurse_user_patient_relation id="20" time_created="2016-04-09 14:44:44" status="0" user_id="592" patient_id="365" />
+    <go2nurse_user_patient_relation id="21" time_created="2016-04-09 14:44:44" status="0" user_id="452" patient_id="284" />
 </dataset>

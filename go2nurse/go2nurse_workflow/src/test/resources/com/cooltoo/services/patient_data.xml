@@ -17,4 +17,7 @@
     <go2nurse_patient id="15" name="病人15" birthday="1984-04-04 14:44:44" gender="0" mobile="13815151515" identity_card="015151515" status="1" time_created="2016-04-15 14:44:44" />
     <go2nurse_patient id="16" name="病人16" birthday="1985-04-04 14:44:44" gender="0" mobile="15816161616" identity_card="016161616" status="0" time_created="2016-04-16 14:44:44" />
     <go2nurse_patient id="17" name="病人17" birthday="1986-04-04 14:44:44" gender="1" mobile="16317171717" identity_card="017171717" status="2" time_created="2016-04-17 14:44:44" />
+    <go2nurse_patient id="367" name="病人367" birthday="1986-04-04 14:44:44" gender="1" mobile="16317367367" identity_card="017367367" status="2" time_created="2016-04-17 14:44:44" />
+    <go2nurse_patient id="365" name="病人365" birthday="1986-04-04 14:44:44" gender="1" mobile="16317365365" identity_card="017365365" status="2" time_created="2016-04-17 14:44:44" />
+    <go2nurse_patient id="284" name="病人284" birthday="1986-04-04 14:44:44" gender="1" mobile="16317284284" identity_card="017284284" status="2" time_created="2016-04-17 14:44:44" />
 </dataset>

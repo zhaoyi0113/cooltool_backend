@@ -223,7 +223,7 @@ public class AdvertisementService {
                 frontCoverName = "frontCover"+System.currentTimeMillis();
             }
             imageId = userFileStorage.addFile(entity.getFrontCover(), frontCoverName, frontCover);
-            imageUrl = userFileStorage.getFilePath(imageId);
+            imageUrl = userFileStorage.getFileURL(imageId);
             entity.setFrontCover(imageId);
             changed = true;
         }

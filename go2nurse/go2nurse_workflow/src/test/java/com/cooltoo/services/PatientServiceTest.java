@@ -98,7 +98,7 @@ public class PatientServiceTest extends AbstractCooltooTest {
         String status = CommonStatus.ENABLED.name();
 
         long count = service.countAll(null, -1, null, null, null);
-        Assert.assertEquals(17, count);
+        Assert.assertEquals(20, count);
 
         count = service.countAll(name, -1, null, null, null);
         Assert.assertEquals(9, count);

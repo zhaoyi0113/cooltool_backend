@@ -148,16 +148,16 @@ public class UserServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetAll(){
         List<UserBean> all = service.getAllByAuthorityAndFuzzyName("", "", 0, 100);
-        Assert.assertEquals(17, all.size());
+        Assert.assertEquals(20, all.size());
     }
 
     @Test
     public void testCountUser() {
         long count = service.countByAuthorityAndFuzzyName("", "");
-        Assert.assertEquals(17, count);
+        Assert.assertEquals(20, count);
 
         count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "");
-        Assert.assertEquals(12, count);
+        Assert.assertEquals(15, count);
         count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "");
         Assert.assertEquals(5, count);
 
@@ -189,10 +189,10 @@ public class UserServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetUserByAuthority() {
         List<UserBean> count = service.getAllByAuthorityAndFuzzyName("", "", 0, 30);
-        Assert.assertEquals(17, count.size());
+        Assert.assertEquals(20, count.size());
 
         count = service.getAllByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "", 0, 30);
-        Assert.assertEquals(12, count.size());
+        Assert.assertEquals(15, count.size());
         count = service.getAllByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "", 0, 30);
         Assert.assertEquals(5, count.size());
 
