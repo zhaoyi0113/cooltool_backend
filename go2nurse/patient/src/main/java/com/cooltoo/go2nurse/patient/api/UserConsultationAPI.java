@@ -19,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -98,7 +99,9 @@ public class UserConsultationAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long consultationId = userConsultationService.addConsultation(categoryId, nurseId, userId, patientId, diseaseDescription, clinicalHistory);
-        return Response.ok(consultationId).build();
+        Map<String, Long> retValue = new HashMap<>();
+        retValue.put("id", consultationId);
+        return Response.ok(retValue).build();
     }
 
     @Path("/add_image")

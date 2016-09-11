@@ -1,6 +1,7 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
+import com.cooltoo.backend.filter.LoginAuthentication;
 import com.cooltoo.backend.services.NurseHospitalRelationService;
 import com.cooltoo.backend.services.NurseQualificationService;
 import com.cooltoo.backend.services.NurseRelationshipService;
@@ -117,6 +118,15 @@ public class NurseManageAPI {
     //==================================================================
     //                           创建编辑
     //==================================================================
+
+    @Path("/job_title")
+    @GET
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response getNurseJobTitle(@Context HttpServletRequest request) {
+        List<NurseJobTitle> all = NurseJobTitle.getAll();
+        return Response.ok(all).build();
+    }
+
     @Path("/create_nurse")
     @POST
     @Produces(MediaType.APPLICATION_JSON)

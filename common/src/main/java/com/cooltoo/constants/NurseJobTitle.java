@@ -1,5 +1,8 @@
 package com.cooltoo.constants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum NurseJobTitle {
     NOT_SETTING("未设置"),
     NURSING_EXPERT("护理专家")
@@ -31,5 +34,12 @@ public enum NurseJobTitle {
             retVal = NOT_SETTING;
         }
         return retVal;
+    }
+
+    public static List<NurseJobTitle> getAll() {
+        List<NurseJobTitle> all = new ArrayList<>();
+        all.add(NOT_SETTING);
+        all.add(NURSING_EXPERT);
+        return all;
     }
 }
