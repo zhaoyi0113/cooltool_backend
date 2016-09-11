@@ -201,8 +201,6 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
 
         clientIp = "127.0.0.1";
         charge = (Object)orderService.payForService(userId, orderId, channel, clientIp);
-        Assert.assertNotNull(charge);
-
     }
 
     @Test
