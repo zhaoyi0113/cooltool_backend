@@ -66,7 +66,7 @@ public class Go2NurseUtility {
             return mapper.readValue(content, clazz);
         }
         catch (Exception ex) {
-            logger.error("parse the json list error, json={}, class={}", content, clazz);
+            logger.error("parse the json list error, json={}, class={} throwable={}", content, clazz, ex);
             return null;
         }
     }

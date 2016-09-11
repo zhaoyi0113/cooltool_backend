@@ -12,4 +12,5 @@
     <go2nurse_user_patient_relation id="19" time_created="2016-04-09 14:44:44" status="0" user_id="463" patient_id="367" />
     <go2nurse_user_patient_relation id="20" time_created="2016-04-09 14:44:44" status="0" user_id="592" patient_id="365" />
     <go2nurse_user_patient_relation id="21" time_created="2016-04-09 14:44:44" status="0" user_id="452" patient_id="284" />
+    <go2nurse_user_patient_relation id="22" time_created="2016-04-09 14:44:44" status="0" user_id="463" patient_id="17" />
 </dataset>

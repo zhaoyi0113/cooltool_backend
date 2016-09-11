@@ -3,8 +3,8 @@ package com.cooltoo.services;
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
-import com.cooltoo.go2nurse.service.ServiceOrderChargePingPPService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
+import com.cooltoo.util.NumberUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -26,7 +26,8 @@ import java.util.List;
         @DatabaseSetup("classpath:/com/cooltoo/services/service_order_charge_pingpp_data.xml"),
         @DatabaseSetup("classpath:/com/cooltoo/services/user_data.xml"),
         @DatabaseSetup("classpath:/com/cooltoo/services/patient_data.xml"),
-        @DatabaseSetup("classpath:/com/cooltoo/services/user_patient_relation_data.xml")
+        @DatabaseSetup("classpath:/com/cooltoo/services/user_patient_relation_data.xml"),
+        @DatabaseSetup("classpath:/com/cooltoo/services/user_address_data.xml")
 })
 public class ServiceOrderServiceTest extends AbstractCooltooTest {
 
@@ -123,18 +124,148 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
 
     @Test
     public void updateOrder() {
+    /*
+    TO_PAY(0, "TO_PAY"), // 等待支付
+    TO_DISPATCH(1, "TO_DISPATCH"), // 等待接单
+    TO_SERVICE(2, "TO_SERVICE"), // 等待服务
+    IN_PROCESS(3, "IN_PROCESS"), // 服务中
+    COMPLETED(4, "COMPLETED"),  // 服务完成
+        <go2nurse_service_order id="276"     order_status="1"
+        <go2nurse_service_order id="278"     order_status="1"
+        <go2nurse_service_order id="279"     order_status="5"
+        <go2nurse_service_order id="280"     order_status="4"
+        <go2nurse_service_order id="282"     order_status="2"
+    */
+        long orderId = 276;
+        long patientId = 17;
+        long addressId = 16;
+        String startTime ="2016-09-21 12:00:00";
+        long lStartTime = NumberUtil.getTime(startTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        int count = 15;
+        String leaveMessage = "message test";
+        int preferentialCent = 1000;
+        ServiceOrderBean order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+        Assert.assertEquals(orderId, order.getId());
+        Assert.assertEquals(patientId, order.getPatientId());
+        Assert.assertEquals(addressId, order.getAddressId());
+        Assert.assertEquals(lStartTime, order.getServiceStartTime().getTime());
+        Assert.assertEquals(count, order.getItemCount());
+        Assert.assertEquals(leaveMessage, order.getLeaveAMessage());
+        Assert.assertEquals(preferentialCent, order.getPreferentialCent());
+
+        orderId = 279;
+        Throwable th = null;
+        try {
+            order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
+
+        orderId = 280;
+        th = null;
+        try {
+            order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
+
+        orderId = 282;
+        th = null;
+        try {
+            order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
 
     }
 
     @Test
     public void payForService() {
+        long orderId = 276;
+        long userId = 1;
+        String channel = "";
+        String clientIp = "";
+        Throwable th = null;
+        try {
+            orderService.payForService(userId, orderId, channel, clientIp);
+        } catch (Exception ex) { th=ex; }
+        Assert.assertNotNull(th);
+
+        userId = 463;
+        th = null;
+        try {
+            orderService.payForService(userId, orderId, channel, clientIp);
+        } catch (Exception ex) { th=ex; }
+        Assert.assertNotNull(th);
+
+        channel = "wx";
+        Object charge = (Object)orderService.payForService(userId, orderId, channel, clientIp);
+        Assert.assertNull(charge);
+
+        clientIp = "127.0.0.1";
+        charge = (Object)orderService.payForService(userId, orderId, channel, clientIp);
+        Assert.assertNotNull(charge);
+
     }
 
     @Test
     public void cancelOrder() {
+        long orderId = 276;
+        long userId = 1;
+        ServiceOrderBean order = null;
+        Throwable th = null;
+        try {
+            order = orderService.cancelOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
+
+        userId = 463;
+        th = null;
+        try {
+            order = orderService.cancelOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNull(th);
+        Assert.assertEquals(orderId, order.getId());
+        Assert.assertEquals(OrderStatus.CANCELLED, order.getOrderStatus());
+
+        orderId = 279;
+        th = null;
+        try {
+            order = orderService.cancelOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
+
+        orderId = 280;
+        th = null;
+        try {
+            order = orderService.cancelOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
+
+        orderId = 282;
+        th = null;
+        try {
+            order = orderService.cancelOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
     }
 
     @Test
     public void addOrder() {
+        long itemId = 11;
+        long userId = 463;
+        long patientId = 17;
+        long addressId = 16;
+        String startTime ="2016-09-21 12:00:00";
+        long lStartTime = NumberUtil.getTime(startTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        int count = 15;
+        String leaveMessage = "message test";
+        int preferentialCent = 1000;
+        ServiceOrderBean order = orderService.addOrder(itemId, userId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+        Assert.assertTrue(order.getId()>0);
+        Assert.assertEquals(userId, order.getUserId());
+        Assert.assertEquals(patientId, order.getPatientId());
+        Assert.assertEquals(addressId, order.getAddressId());
+        Assert.assertEquals(lStartTime, order.getServiceStartTime().getTime());
+        Assert.assertEquals(count, order.getItemCount());
+        Assert.assertEquals(leaveMessage, order.getLeaveAMessage());
+        Assert.assertEquals(preferentialCent, order.getPreferentialCent());
     }
 }
