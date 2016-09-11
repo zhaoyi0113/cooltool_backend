@@ -48,6 +48,14 @@ public class UserConsultationTalkService {
         return repository.exists(talkId);
     }
 
+    public UserConsultationTalkBean getTalkWithoutInfoById(long talkId) {
+        UserConsultationTalkEntity talk = repository.findOne(talkId);
+        if (null==talk) {
+            return null;
+        }
+        return beanConverter.convert(talk);
+    }
+
     public List<UserConsultationTalkBean> getTalkByConsultationId(long consultationId) {
         logger.info("get consultation talk by consultationId={}.", consultationId);
         List<Long> consultationIds = new ArrayList<>();

@@ -6,7 +6,8 @@ package com.cooltoo.go2nurse.constants;
 public enum ConsultationTalkStatus {
     NONE,
     USER_SPEAK,
-    NURSE_SPEAK;
+    NURSE_SPEAK,
+    ADMIN_SPEAK;
 
     public static ConsultationTalkStatus parseString(String type) {
         ConsultationTalkStatus ret = null;
@@ -18,6 +19,9 @@ public enum ConsultationTalkStatus {
         }
         else if (NURSE_SPEAK.name().equalsIgnoreCase(type)) {
             ret = NURSE_SPEAK;
+        }
+        else if (ADMIN_SPEAK.name().equalsIgnoreCase(type)) {
+            ret = ADMIN_SPEAK;
         }
         return ret;
     }
@@ -32,6 +36,9 @@ public enum ConsultationTalkStatus {
         }
         else if (NURSE_SPEAK.ordinal() == type) {
             ret = NURSE_SPEAK;
+        }
+        else if (ADMIN_SPEAK.ordinal() == type) {
+            ret = ADMIN_SPEAK;
         }
         return ret;
     }

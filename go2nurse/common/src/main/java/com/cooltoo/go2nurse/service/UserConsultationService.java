@@ -9,7 +9,6 @@ import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.converter.UserConsultationBeanConverter;
 import com.cooltoo.go2nurse.entities.UserConsultationEntity;
 import com.cooltoo.go2nurse.repository.UserConsultationRepository;
-import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -392,8 +391,13 @@ public class UserConsultationService {
             logger.error("consultation is not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (!talkService.existTalk(talkId)) {
+        UserConsultationTalkBean talk = talkService.getTalkWithoutInfoById(talkId);
+        if (null==talk) {
             logger.error("talk is not exist");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (talk.getConsultationId() != consultationId) {
+            logger.error("talk is not belong to consultation");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
