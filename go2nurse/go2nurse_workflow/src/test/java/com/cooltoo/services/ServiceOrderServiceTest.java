@@ -72,18 +72,58 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
 
     @Test
     public void getOrderByConditions() {
+        long userId = 452;
+        long categoryId = 204;
+        long topCategoryId = 200;
+        OrderStatus orderStatus = OrderStatus.CANCELLED;
+        List<ServiceOrderBean> beans = orderService.getOrderByConditions(null, userId, null, null, null, null, null, 0, 10);
+        Assert.assertEquals(4, beans.size());
+        Assert.assertEquals(283, beans.get(0).getId());
+        Assert.assertEquals(282, beans.get(1).getId());
+        Assert.assertEquals(280, beans.get(2).getId());
+        Assert.assertEquals(279, beans.get(3).getId());
+
+        beans = orderService.getOrderByConditions(null, null, categoryId, null, null, null, null, 0, 10);
+        Assert.assertEquals(3, beans.size());
+        Assert.assertEquals(278, beans.get(0).getId());
+        Assert.assertEquals(277, beans.get(1).getId());
+        Assert.assertEquals(276, beans.get(2).getId());
+
+        beans = orderService.getOrderByConditions(null, null, null, topCategoryId, null, null, null, 0, 10);
+        Assert.assertEquals(6, beans.size());
+        Assert.assertEquals(283, beans.get(0).getId());
+        Assert.assertEquals(280, beans.get(1).getId());
+        Assert.assertEquals(279, beans.get(2).getId());
+        Assert.assertEquals(278, beans.get(3).getId());
+        Assert.assertEquals(277, beans.get(4).getId());
+        Assert.assertEquals(276, beans.get(5).getId());
+
+        beans = orderService.getOrderByConditions(null, null, null, null, null, null, orderStatus, 0, 10);
+        Assert.assertEquals(0, beans.size());
     }
 
     @Test
     public void getOrderByOrderId() {
+        long orderId = 283;
+        List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
+        Assert.assertEquals(1, orders.size());
+        Assert.assertEquals(283, orders.get(0).getId());
     }
 
     @Test
     public void getOrderByUserId() {
+        long userId = 452;
+        List<ServiceOrderBean> beans = orderService.getOrderByUserId(userId);
+        Assert.assertEquals(4, beans.size());
+        Assert.assertEquals(283, beans.get(0).getId());
+        Assert.assertEquals(282, beans.get(1).getId());
+        Assert.assertEquals(280, beans.get(2).getId());
+        Assert.assertEquals(279, beans.get(3).getId());
     }
 
     @Test
     public void updateOrder() {
+
     }
 
     @Test

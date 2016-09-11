@@ -111,7 +111,7 @@ public class UserService {
         if(channel != null){
             return registerWithChannel(name, gender, strBirthday, mobile, password, smsCode, channel,channelid);
         }
-        throw new BadRequestException(ErrorCode.DATA_ERROR);
+        throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
