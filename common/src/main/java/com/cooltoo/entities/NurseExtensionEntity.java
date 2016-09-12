@@ -81,7 +81,6 @@ public class NurseExtensionEntity {
     }
 
     @Column(name = "job_title")
-    @Enumerated
     public String getJobTitle() {
         return jobTitle;
     }
