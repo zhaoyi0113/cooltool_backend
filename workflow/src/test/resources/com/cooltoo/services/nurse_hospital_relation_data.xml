@@ -7,7 +7,7 @@
     <nursego_nurse_hospital_relation id="55" nurse_id="55" hospital_id="55" department_id="55" />
     <cooltoo_nurse id="11"  name="nurse1" age="11" gender="1" mobile="1231432143" />
     <cooltoo_nurse id="22" name="nurse2" age="22" gender="2" mobile="14321134" />
-    <cooltoo_nurse id="33"  name="nurse3" age="33" gender="3" mobile="135232121222" />
+    <cooltoo_nurse id="33"  name="nurse3" age="33" gender="0" mobile="135232121222" />
     <cooltoo_nurse id="44"  name="nurse4" age="44" gender="2" mobile="13811663451" />
     <cooltoo_nurse id="55"  name="nurse5" age="55" gender="1" mobile="18527727387" />
     <cooltoo_hospital id="11" name="hospital1" province="2" city="3" />

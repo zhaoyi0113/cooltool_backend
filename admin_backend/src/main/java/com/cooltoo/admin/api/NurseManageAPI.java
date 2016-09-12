@@ -12,6 +12,7 @@ import com.cooltoo.constants.*;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.services.CommonNurseService;
 import com.cooltoo.services.NurseExtensionService;
+import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -73,11 +74,15 @@ public class NurseManageAPI {
     public Response countNurseByAuthorityAndName(@Context HttpServletRequest request,
                                                  @QueryParam("authority") @DefaultValue("") String authority,
                                                  @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
-                                                 @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion
+                                                 @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
+                                                 @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
+                                                 @QueryParam("department_id") @DefaultValue("") String strDepartmentId
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get nurse record count by authority {} fuzzyName={}", userId, authority, fuzzyName);
-        long count = nurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion);
+        Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
+        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
+        long count = nurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId);
         logger.info("count={}", count);
         return Response.ok(count).build();
     }
@@ -89,13 +94,17 @@ public class NurseManageAPI {
                                                @QueryParam("authority") @DefaultValue("") String strAuthority,
                                                @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
                                                @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
+                                               @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
+                                               @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
                                                @QueryParam("index")  @DefaultValue("0")  int index,
                                                @QueryParam("number") @DefaultValue("10") int number
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get nurse record count by authority {} fuzzyName{} at page {} with {} record/page",
                 userId, strAuthority, fuzzyName, index, number);
-        List<NurseBean> nurses = nurseService.getAllByAuthorityAndFuzzyName(strAuthority, fuzzyName, canAnswerNursingQuestion, index, number);
+        Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
+        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
+        List<NurseBean> nurses = nurseService.getAllByAuthorityAndFuzzyName(strAuthority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, index, number);
         logger.info("count={}", userId, strAuthority, fuzzyName, index, number, nurses.size());
         return Response.ok(nurses).build();
     }

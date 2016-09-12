@@ -13,6 +13,7 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,8 @@ import java.util.*;
 public class NurseHospitalRelationService {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseHospitalRelationService.class.getName());
+
+    private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
     @Autowired private NurseHospitalRelationRepository    repository;
     @Autowired private NurseService                       nurseService;
@@ -58,7 +61,7 @@ public class NurseHospitalRelationService {
     public NurseHospitalRelationBean getRelationByNurseId(Long nurseId) {
         logger.info("get one nurse-hospital-department relationship information by nurseId={}", nurseId);
 
-        List<NurseHospitalRelationEntity> resultSert = repository.findByNurseId(nurseId);
+        List<NurseHospitalRelationEntity> resultSert = repository.findByNurseId(nurseId, sort);
         if (null==resultSert || resultSert.isEmpty()) {
             return null;
         }
@@ -165,15 +168,14 @@ public class NurseHospitalRelationService {
     //====================================================================
     //     toggle set nurse hospital and department
     //====================================================================
-
     @Transactional
     public Long newOne(NurseHospitalRelationBean bean) {
         logger.info("set nurse-hospital-department relationship information by bean={}", bean);
-        HospitalBean                hospital     = null;
-        HospitalDepartmentBean      department   = null;
-        HospitalDepartmentBean      parentDepart = null;
-        NurseHospitalRelationEntity relation     = null;
-        List<NurseHospitalRelationEntity> relations = repository.findByNurseId(bean.getNurseId());
+        // is nurse exist
+        nurseService.getNurseWithoutOtherInfo(bean.getNurseId());
+
+        NurseHospitalRelationEntity relation;
+        List<NurseHospitalRelationEntity> relations = repository.findByNurseId(bean.getNurseId(), sort);
         if (!relations.isEmpty()) {
             // exist relationship
             relation = relations.get(0);
@@ -181,11 +183,8 @@ public class NurseHospitalRelationService {
         else {
             // new relationship
             relation = new NurseHospitalRelationEntity();
-            relation.setTime(new Date());
+            relation.setNurseId(bean.getNurseId());
         }
-        // nurse exist
-        nurseService.getNurseWithoutOtherInfo(bean.getNurseId());
-        relation.setNurseId(bean.getNurseId());
         // hospital exist
         if (bean.getHospitalId()>0) {
             hospitalService.getOneById(bean.getHospitalId());
@@ -198,12 +197,23 @@ public class NurseHospitalRelationService {
             departmentService.getOneById(bean.getDepartmentId());
             if (relation.getDepartmentId()!=bean.getDepartmentId()) {
                 relation.setDepartmentId(bean.getDepartmentId());
-                relation.setTime(new Date());
             }
         }
-
+        relation.setTime(new Date());
         relation.setStatus(CommonStatus.ENABLED);
         relation = repository.save(relation);
+
+        // delete others
+        relations = repository.findByNurseId(bean.getNurseId(), sort);
+        for (int i = 0; i < relations.size(); i ++) {
+            NurseHospitalRelationEntity temp = relations.get(i);
+            if (temp.getId() == relation.getId()) {
+                relations.remove(i);
+                break;
+            }
+        }
+        repository.delete(relations);
+
         return relation.getId();
     }
 

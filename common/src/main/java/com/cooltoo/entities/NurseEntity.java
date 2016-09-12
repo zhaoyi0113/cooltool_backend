@@ -29,6 +29,7 @@ public class NurseEntity {
     private String shortNote;
     private UserAuthority authority;
     private List<NurseExtensionEntity> extensions = new ArrayList<>();
+    private List<NurseHospitalRelationEntity> hospitalRelation = new ArrayList<>();
 
     @Id
     @GeneratedValue
@@ -142,6 +143,17 @@ public class NurseEntity {
 
     public void setExtensions(List<NurseExtensionEntity> extensions) {
         this.extensions = extensions;
+    }
+
+    // 映射一对多的关联关系
+    @JoinColumn(name="nurse_id", insertable=false, updatable=false)// nursego_nurse_hospital_relation 关联 cooltoo_nurse 表的字段
+    @OneToMany
+    public List<NurseHospitalRelationEntity> getHospitalRelation() {
+        return hospitalRelation;
+    }
+
+    public void setHospitalRelation(List<NurseHospitalRelationEntity> hospitalRelation) {
+        this.hospitalRelation = hospitalRelation;
     }
 
     public String toString() {

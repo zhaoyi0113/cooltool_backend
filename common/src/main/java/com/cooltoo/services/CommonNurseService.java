@@ -100,9 +100,9 @@ public class CommonNurseService {
     //==============================================================
     //             get used by administrator
     //==============================================================
-    public long countByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion) {
-        logger.info("get nurse count by authority={} fuzzyName={} canAnswerNursingQuestion",
-                authority, fuzzyName, canAnswerNursingQuestion);
+    public long countByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, Integer hospitalId, Integer departmentId) {
+        logger.info("get nurse count by authority={} fuzzyName={} canAnswerNursingQuestion={} hospital={} department={}",
+                authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId);
 
         if (VerifyUtil.isStringEmpty(fuzzyName)) {
             fuzzyName = null;
@@ -115,15 +115,15 @@ public class CommonNurseService {
             count = nurseRepository.count();
         }
         else {
-            count = nurseRepository.countByAuthority(authority, fuzzyName, canAnswerNursingQuestion);
+            count = nurseRepository.countByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId);
         }
         logger.info("count is {}", count);
         return count;
     }
 
-    public Iterable<NurseEntity> getNurseByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, int pageIndex, int number) {
-        logger.info("get nurse by authority={} fuzzyName={} canAnswerNursingQuestion={} at page {} with number {}",
-                authority, fuzzyName, canAnswerNursingQuestion, pageIndex, number);
+    public Iterable<NurseEntity> getNurseByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, Integer hospitalId, Integer departmentId, int pageIndex, int number) {
+        logger.info("get nurse by authority={} fuzzyName={} canAnswerNursingQuestion={} hospital={} department={} at page {} with number {}",
+                authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, pageIndex, number);
         PageRequest page = new PageRequest(pageIndex, number, sort);
         Page<NurseEntity> resultSet = null;
 
@@ -137,7 +137,7 @@ public class CommonNurseService {
             resultSet = nurseRepository.findAll(page);
         }
         else {
-            resultSet = nurseRepository.findByAuthority(authority, fuzzyName, canAnswerNursingQuestion, page);
+            resultSet = nurseRepository.findByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, page);
         }
         return resultSet;
     }

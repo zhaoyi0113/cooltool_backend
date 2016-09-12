@@ -13,6 +13,7 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,8 @@ public class CommonNurseHospitalRelationService {
 
     private static final Logger logger = LoggerFactory.getLogger(CommonNurseHospitalRelationService.class.getName());
 
+    private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
+
     @Autowired private NurseHospitalRelationRepository repository;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
@@ -37,16 +40,16 @@ public class CommonNurseHospitalRelationService {
     public NurseHospitalRelationBean getRelationByNurseId(Long nurseId, String nginxPrefix) {
         logger.info("get one nurse hospital department information by nurseId={}", nurseId);
 
-        List<NurseHospitalRelationEntity> resultSert = repository.findByNurseId(nurseId);
-        if (null==resultSert || resultSert.isEmpty()) {
+        List<NurseHospitalRelationEntity> resultSet = repository.findByNurseId(nurseId, sort);
+        if (null==resultSet || resultSet.isEmpty()) {
             return null;
         }
-        if (resultSert.size()>1) {
+        if (resultSet.size()>1) {
             return null;
         }
 
         List<NurseHospitalRelationBean> relations = new ArrayList<>();
-        for (NurseHospitalRelationEntity result : resultSert) {
+        for (NurseHospitalRelationEntity result : resultSet) {
             NurseHospitalRelationBean bean = beanConverter.convert(result);
             relations.add(bean);
         }

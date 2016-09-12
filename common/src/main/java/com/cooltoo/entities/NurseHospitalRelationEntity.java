@@ -14,6 +14,7 @@ public class NurseHospitalRelationEntity {
 
     private long id;
     private long nurseId;
+    private NurseEntity nurse;
     private int hospitalId;
     private int departmentId;
     private Date time;
@@ -74,6 +75,17 @@ public class NurseHospitalRelationEntity {
 
     public void setStatus(CommonStatus status) {
         this.status = status;
+    }
+
+    // 映射多对一的关联关系
+    @JoinColumn(name="nurse_id", insertable=false, updatable=false)// nursego_nurse_hospital_relation 关联 cooltoo_nurse 表的字段
+    @ManyToOne()
+    public NurseEntity getNurse() {
+        return nurse;
+    }
+
+    public void setNurse(NurseEntity nurse) {
+        this.nurse = nurse;
     }
 
     public String toString() {
