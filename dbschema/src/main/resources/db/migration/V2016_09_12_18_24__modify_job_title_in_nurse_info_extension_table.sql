@@ -1,0 +1,1 @@
+ALTER TABLE `cooltoo_nurse_info_extension` CHANGE COLUMN `job_title` `job_title` VARCHAR(500) NULL DEFAULT '';

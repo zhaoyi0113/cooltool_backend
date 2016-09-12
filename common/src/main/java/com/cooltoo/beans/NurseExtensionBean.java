@@ -1,7 +1,6 @@
 package com.cooltoo.beans;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.NurseJobTitle;
 import com.cooltoo.constants.YesNoEnum;
 
 import java.util.Date;
@@ -17,7 +16,7 @@ public class NurseExtensionBean {
     private long nurseId;
     private YesNoEnum answerNursingQuestion;
     private String goodAt;
-    private NurseJobTitle jobTitle;
+    private String jobTitle;
 
     public long getId() {
         return id;
@@ -67,11 +66,11 @@ public class NurseExtensionBean {
         this.goodAt = goodAt;
     }
 
-    public NurseJobTitle getJobTitle() {
+    public String getJobTitle() {
         return jobTitle;
     }
 
-    public void setJobTitle(NurseJobTitle jobTitle) {
+    public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
     }
 

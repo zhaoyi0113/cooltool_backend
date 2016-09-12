@@ -1,7 +1,6 @@
 package com.cooltoo.entities;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.NurseJobTitle;
 import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.*;
@@ -21,7 +20,7 @@ public class NurseExtensionEntity {
     private NurseEntity nurse;
     private YesNoEnum answerNursingQuestion;
     private String goodAt;
-    private NurseJobTitle jobTitle;
+    private String jobTitle;
 
     @Id
     @GeneratedValue
@@ -83,11 +82,11 @@ public class NurseExtensionEntity {
 
     @Column(name = "job_title")
     @Enumerated
-    public NurseJobTitle getJobTitle() {
+    public String getJobTitle() {
         return jobTitle;
     }
 
-    public void setJobTitle(NurseJobTitle jobTitle) {
+    public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
     }
 

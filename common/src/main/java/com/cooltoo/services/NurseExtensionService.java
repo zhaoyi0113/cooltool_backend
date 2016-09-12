@@ -2,7 +2,6 @@ package com.cooltoo.services;
 
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.NurseJobTitle;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.converter.NurseExtensionBeanConverter;
 import com.cooltoo.entities.NurseExtensionEntity;
@@ -101,9 +100,8 @@ public class NurseExtensionService {
             if (!VerifyUtil.isStringEmpty(beGoodAt)) {
                 entity.setGoodAt(beGoodAt.trim());
             }
-            NurseJobTitle njt = NurseJobTitle.parseString(jobTitle);
-            if (null!=njt) {
-                entity.setJobTitle(njt);
+            if (!VerifyUtil.isStringEmpty(jobTitle)) {
+                entity.setJobTitle(jobTitle);
             }
         }
         else {
@@ -114,9 +112,8 @@ public class NurseExtensionService {
             if (!VerifyUtil.isStringEmpty(beGoodAt)) {
                 entity.setGoodAt(beGoodAt.trim());
             }
-            NurseJobTitle njt = NurseJobTitle.parseString(jobTitle);
-            if (null!=njt) {
-                entity.setJobTitle(njt);
+            if (!VerifyUtil.isStringEmpty(jobTitle)) {
+                entity.setJobTitle(jobTitle);
             }
             extensionCount = entities.size();
         }
