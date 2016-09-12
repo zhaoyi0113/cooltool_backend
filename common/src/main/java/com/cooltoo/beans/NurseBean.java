@@ -204,6 +204,7 @@ public class NurseBean {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", authority=").append(authority);
         msg.append(", name=").append(name);
         msg.append(", gender=").append(gender);
         msg.append(", age=").append(age);

@@ -31,7 +31,10 @@ import java.util.List;
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/work_file_type_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/file_storage_data.xml"),
         @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_qualification_data.xml"),
-        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_qualification_file_data.xml")
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_qualification_file_data.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_hospital_relation_data_2.xml"),
+        @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_info_extension_data.xml")
+
 })
 public class NurseServiceTest extends AbstractCooltooTest {
 
@@ -197,6 +200,7 @@ public class NurseServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(17, count.size());
 
         count = service.getAllByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "", null, null, null, 0, 30);
+        logger.info("count={}, beans={}", count.size(), count);
         Assert.assertEquals(12, count.size());
         count = service.getAllByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "", null, null, null, 0, 30);
         Assert.assertEquals(5, count.size());

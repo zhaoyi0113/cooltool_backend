@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <nursego_nurse_hospital_relation id="1" nurse_id="1" hospital_id="11" department_id="11" />
+    <nursego_nurse_hospital_relation id="2" nurse_id="2" hospital_id="22" department_id="22" />
+    <nursego_nurse_hospital_relation id="3" nurse_id="3" hospital_id="33" department_id="33" />
+    <nursego_nurse_hospital_relation id="4" nurse_id="4" hospital_id="44" department_id="44" />
+    <nursego_nurse_hospital_relation id="5" nurse_id="5" hospital_id="55" department_id="55" />
+</dataset>
