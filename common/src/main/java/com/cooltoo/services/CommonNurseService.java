@@ -111,7 +111,7 @@ public class CommonNurseService {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
         long count;
-        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId) {
             count = nurseRepository.count();
         }
         else {
@@ -133,7 +133,7 @@ public class CommonNurseService {
         else {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
-        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId) {
             resultSet = nurseRepository.findAll(page);
         }
         else {
