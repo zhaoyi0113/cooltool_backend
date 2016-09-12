@@ -26,12 +26,13 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     List<Long> findByAuthorityAndIdIn(UserAuthority authority, List<Long> ids);
 
     @Query("SELECT count(n.id) FROM NurseEntity n WHERE n.name like %?1")
-    long      countByFuzzyName(String fuzzyName);
+    long countByFuzzyName(String fuzzyName);
     @Query("SELECT n.id FROM NurseEntity n WHERE n.name like %?1")
     List<Long> findIdsByFuzzyName(String fuzzyName, Pageable page);
 
     List<NurseEntity> findByName(String name);
     List<NurseEntity> findByIdIn(List<Long> ids);
+
 
     //==================================================================
     //              for administrator user
@@ -50,4 +51,14 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
             " AND   (?4 IS NULL OR nhr.hospitalId=?4)" +
             " AND   (?5 IS NULL OR nhr.departmentId=?5)")
     long countByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion, Integer hospitalId, Integer departmentId);
+
+
+    //==================================================================
+    //              for administrator user
+    //==================================================================
+    @Query("SELECT n FROM NurseEntity n LEFT JOIN n.extensions ne LEFT JOIN n.hospitalRelation nhr" +
+            " WHERE (n.authority=?1)" +
+            " AND   (?2 IS NULL OR ne.answerNursingQuestion=?2)" +
+            " AND   ((?3 IS NULL OR n.name LIKE %?3) OR (nhr.hospitalId IN (?4)) OR (nhr.departmentId IN (?5)))")
+    Page<NurseEntity> findByQueryString(UserAuthority authority, YesNoEnum answerNursingQuestion, String fuzzyName, List<Integer> hospitalId, List<Integer> departmentId, Pageable page);
 }

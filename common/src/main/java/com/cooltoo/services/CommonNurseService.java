@@ -3,9 +3,13 @@ package com.cooltoo.services;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.entities.HospitalDepartmentEntity;
+import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.repository.HospitalDepartmentRepository;
+import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -32,6 +36,8 @@ public class CommonNurseService {
     private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
     @Autowired private NurseRepository nurseRepository;
+    @Autowired private HospitalRepository hospitalRepository;
+    @Autowired private HospitalDepartmentRepository departmentRepository;
 
     //========================================================================
     //                        getting
@@ -139,6 +145,39 @@ public class CommonNurseService {
         else {
             resultSet = nurseRepository.findByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, page);
         }
+        return resultSet;
+    }
+
+    public Iterable<NurseEntity> getNurseByQueryString(UserAuthority authority, YesNoEnum canAnswerNursingQuestion, String fuzzyName, String hospitalName, String departmentName, int pageIndex, int number) {
+        logger.info("get nurse by authority={} canAnswerNursingQuestion={} fuzzyName={} hospitalName={} departmentName={} at page {} with number {}",
+                authority, canAnswerNursingQuestion, fuzzyName, hospitalName, departmentName, pageIndex, number);
+        PageRequest page = new PageRequest(pageIndex, number, sort);
+        Page<NurseEntity> resultSet = null;
+
+        fuzzyName = (VerifyUtil.isStringEmpty(fuzzyName)) ? null : VerifyUtil.reconstructSQLContentLike(fuzzyName);
+        hospitalName = (VerifyUtil.isStringEmpty(hospitalName)) ? null : VerifyUtil.reconstructSQLContentLike(hospitalName);
+        departmentName = (VerifyUtil.isStringEmpty(departmentName)) ? null : VerifyUtil.reconstructSQLContentLike(departmentName);
+
+        // get hospital Ids
+        List<HospitalEntity> hospitals = hospitalRepository.findByNameLike(hospitalName, 1);
+        List<Integer> hospitalIds = new ArrayList<>();
+        for (HospitalEntity tmp : hospitals) {
+            hospitalIds.add(tmp.getId());
+        }
+        hospitalIds.add(Integer.MIN_VALUE);
+        hospitals.clear();
+
+        // get hospital Ids
+        List<HospitalDepartmentEntity> departments = departmentRepository.findByNameLike(departmentName);
+        List<Integer> departmentIds = new ArrayList<>();
+        for (HospitalDepartmentEntity tmp : departments) {
+            departmentIds.add(tmp.getId());
+        }
+        departmentIds.add(Integer.MIN_VALUE);
+        departments.clear();
+
+        resultSet = nurseRepository.findByQueryString(authority, canAnswerNursingQuestion, fuzzyName, hospitalIds, departmentIds, page);
+
         return resultSet;
     }
 

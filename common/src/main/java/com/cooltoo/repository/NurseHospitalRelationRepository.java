@@ -15,8 +15,9 @@ import java.util.List;
 public interface NurseHospitalRelationRepository extends CrudRepository<NurseHospitalRelationEntity, Long> {
     List<NurseHospitalRelationEntity> findByNurseId(Long userId, Sort sort);
     List<NurseHospitalRelationEntity> findByNurseIdIn(List<Long> userIds);
-    List<NurseHospitalRelationEntity> findByHospitalIdIn(List<Integer> departmentIds);
+    List<NurseHospitalRelationEntity> findByHospitalIdIn(List<Integer> hospitalIds);
     List<NurseHospitalRelationEntity> findByDepartmentIdIn(List<Integer> departmentIds);
+    List<NurseHospitalRelationEntity> findByHospitalIdInOrDepartmentIdIn(List<Integer> hospitalIds, List<Integer> departmentIds);
     @Query("select hospital from HospitalEntity hospital, NurseHospitalRelationEntity relation where relation.nurseId = :userId and relation.hospitalId = hospital.id")
     List<HospitalEntity> getNurseHospitals(@Param("userId") long userId);
     void deleteByDepartmentIdIn(List<Integer> departIds);

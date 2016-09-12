@@ -2,6 +2,7 @@ package com.cooltoo.repository;
 
 import com.cooltoo.entities.HospitalDepartmentEntity;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -18,4 +19,9 @@ public interface HospitalDepartmentRepository extends CrudRepository<HospitalDep
     List<HospitalDepartmentEntity> findAll(Sort sort);
     List<HospitalDepartmentEntity> findByUniqueId(String uniqueId);
     long countByUniqueId(String uniqueId);
+
+    @Query("FROM HospitalDepartmentEntity hd" +
+            " WHERE (?1 IS NOT NULL AND hd.name LIKE %?1)" +
+            " AND   (hd.enable=1)")
+    List<HospitalDepartmentEntity> findByNameLike(String nameLike);
 }

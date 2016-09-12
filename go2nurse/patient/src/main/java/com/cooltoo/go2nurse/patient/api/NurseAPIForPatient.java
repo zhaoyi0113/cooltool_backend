@@ -51,4 +51,22 @@ public class NurseAPIForPatient {
         List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByCanAnswerQuestion(name, canAnswerNursingQuestion, hospitalId, departmentId, index, number);
         return Response.ok(nurses).build();
     }
+
+
+    // can_answer_nursing_question ===> yes/no/none
+    @Path("/query_string")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getNurseById(@Context HttpServletRequest request,
+                                 @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
+                                 @QueryParam("query") @DefaultValue("") String query,
+                                 @QueryParam("index")  @DefaultValue("0")  int index,
+                                 @QueryParam("number") @DefaultValue("10") int number
+
+    ) {
+        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByQueryString(canAnswerNursingQuestion, query, index, number);
+        return Response.ok(nurses).build();
+    }
+
 }
