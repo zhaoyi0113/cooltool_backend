@@ -130,6 +130,7 @@ public class NurseManageAPI {
 
     @Path("/job_title")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getNurseJobTitle(@Context HttpServletRequest request) {
         List<NurseJobTitle> all = NurseJobTitle.getAll();
