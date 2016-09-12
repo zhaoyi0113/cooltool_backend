@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,12 +38,17 @@ public class NurseAPIForPatient {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getNurseById(@Context HttpServletRequest request,
+                                 @QueryParam("name") @DefaultValue("") String name,
                                  @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
+                                 @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
+                                 @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
                                  @QueryParam("index")  @DefaultValue("0")  int index,
                                  @QueryParam("number") @DefaultValue("10") int number
 
     ) {
-        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByCanAnswerQuestion(canAnswerNursingQuestion, index, number);
+        Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
+        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
+        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByCanAnswerQuestion(name, canAnswerNursingQuestion, hospitalId, departmentId, index, number);
         return Response.ok(nurses).build();
     }
 }
