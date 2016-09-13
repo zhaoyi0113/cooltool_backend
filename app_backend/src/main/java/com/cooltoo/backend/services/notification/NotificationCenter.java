@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -72,6 +73,18 @@ public class NotificationCenter {
             logger.warn("the user " + userId + " doesn't have any registered device.");
             return;
         }
+        ApnsService apnsService = createAPNSService(bodyText);
+        String payload = createPayload(bodyText, customFields, actionCode, type);
+        if(payload != null) {
+            publishToDevice(apnsService, payload, tokens);
+        }
+    }
+
+    public void publishToDevice(String deviceToken, String bodyText, Map<String, String> customFields, String actionCode, NotificationType type) {
+        List<NurseDeviceTokensBean> tokens = new ArrayList<>();
+        NurseDeviceTokensBean bean = new NurseDeviceTokensBean();
+        bean.setDeviceToken(deviceToken);
+        tokens.add(bean);
         ApnsService apnsService = createAPNSService(bodyText);
         String payload = createPayload(bodyText, customFields, actionCode, type);
         if(payload != null) {
