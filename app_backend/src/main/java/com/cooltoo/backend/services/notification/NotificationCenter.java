@@ -9,6 +9,7 @@ import com.notnoop.apns.PayloadBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,8 +23,6 @@ import java.util.concurrent.Executors;
 @Component
 public class NotificationCenter {
 
-    private static final String P12_CER_FILE = "/CertificatesPushNotification.p12";
-
     private static final String P12_PASSWORD = "!Yqt0529*";
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationCenter.class);
@@ -34,6 +33,9 @@ public class NotificationCenter {
 
     @Autowired
     private NurseDeviceTokensService deviceTokensService;
+
+    @Value("${apple_push_notification_certificates}")
+    private String P12_CER_FILE;
 
     public void publishToAllDevices(String bodyText, Map<String, String> customFields, String actionCode, NotificationType type) {
         List<NurseDeviceTokensBean> deviceTokens = deviceTokensService.getAllActiveDeviceTokens();
