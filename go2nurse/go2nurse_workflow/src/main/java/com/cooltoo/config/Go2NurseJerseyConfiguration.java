@@ -70,6 +70,7 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
         register(UserConsultationManageAPI.class);
         register(AdvertisementAPI.class);
         register(AdvertisementManageAPI.class);
+        register(UserDeviceTokensAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 
