@@ -170,8 +170,23 @@ public class UserConsultationService {
         Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
         Map<Long, ConsultationCategoryBean> categoryIdToBean = categoryService.getCategoryIdToBean(categoryIds);
         Map<Long, List<String>> consultationIdToImagesUrl = imageService.getConsultationIdToImagesUrl(consultationIds);
-        Map<Long, UserConsultationTalkBean> consultationIdToTalkBean = talkService.getOneTalkByConsultationIds(consultationIds);
 
+        // fill talk's nurse information
+        nurseIds.clear();
+        Map<Long, UserConsultationTalkBean> consultationIdToTalkBean = talkService.getOneTalkByConsultationIds(consultationIds);
+        Collection<UserConsultationTalkBean> consultationTalks = consultationIdToTalkBean.values();
+        for (UserConsultationTalkBean tmp : consultationTalks) {
+            if (!nurseIds.contains(tmp.getNurseId())) {
+                nurseIds.add(tmp.getNurseId());
+            }
+        }
+        Map<Long, NurseBean> talkNurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
+        for (UserConsultationTalkBean tmp : consultationTalks) {
+            NurseBean nurse = talkNurseIdToBean.get(tmp.getNurseId());
+            tmp.setNurse(nurse);
+        }
+
+        // fill properties
         for (UserConsultationBean tmp : beans) {
             UserBean user = userIdToBean.get(tmp.getUserId());
             tmp.setUser(user);

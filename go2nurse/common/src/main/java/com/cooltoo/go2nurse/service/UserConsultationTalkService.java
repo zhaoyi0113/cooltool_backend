@@ -77,7 +77,10 @@ public class UserConsultationTalkService {
             if (consultationIdToTalk.containsKey(talk.getConsultationId())) {
                 continue;
             }
-            consultationIdToTalk.put(talk.getConsultationId(), talk);
+            ConsultationTalkStatus talkStatus = talk.getTalkStatus();
+            if (ConsultationTalkStatus.NURSE_SPEAK.equals(talkStatus) && ConsultationTalkStatus.USER_SPEAK.equals(talkStatus)) {
+                consultationIdToTalk.put(talk.getConsultationId(), talk);
+            }
         }
         logger.info("count is {}", consultationIdToTalk.size());
         return consultationIdToTalk;
