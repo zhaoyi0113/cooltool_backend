@@ -28,6 +28,7 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
     private NurseDeviceTokensRepository repository;
 
     @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
     public void testRegisterAnonymousDeviceToken() {
         String token = String.valueOf(System.currentTimeMillis());
         long id = deviceTokensService.registerAnonymousDeviceToken(token);
@@ -117,6 +118,7 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
     }
 
     @Test
+    @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
     public void testInactiveNoneExistedToken(){
         deviceTokensService.inactiveUserDeviceToken(3, "aaa");
     }
