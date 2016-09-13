@@ -96,6 +96,7 @@ public class NotificationCenter {
     }
 
     private ApnsService createAPNSService(String bodyText) {
+        logger.debug("P12_CER_FILE========================" + P12_CER_FILE);
         return APNS.newService().withCert(getClass().
                 getResourceAsStream(P12_CER_FILE), P12_PASSWORD).
                 withSandboxDestination().build();
