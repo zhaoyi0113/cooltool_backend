@@ -2,6 +2,8 @@ package com.cooltoo.go2nurse.openapp;
 
 import com.cooltoo.constants.AppChannel;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.WeChatUserInfo;
 import com.cooltoo.go2nurse.converter.UserOpenAppEntity;
 import com.cooltoo.go2nurse.entities.UserTokenAccessEntity;
@@ -148,6 +150,14 @@ public class WeChatService {
         signaturemap.put("appid", srvAppId);
         logger.info("generate js api ticket");
         return signaturemap;
+    }
+
+    public String getOpenIdByUserId(long userId){
+        UserOpenAppEntity userEntity = openAppRepository.findFirstByUserId(userId);
+        if(userEntity != null){
+            return userEntity.getOpenid();
+        }
+        throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
     }
 
     private Map getWebLoginAccessToken(String code) {

@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.go2nurse.constants.AppType;
 import com.cooltoo.go2nurse.constants.ChargeType;
+import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.pingplusplus.model.Charge;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
@@ -25,10 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/7/13.
@@ -52,6 +50,7 @@ public class ServiceOrderService {
     @Autowired private Go2NurseUtility go2NurseUtility;
     @Autowired private ServiceOrderChargePingPPService orderPingPPService;
     @Autowired private PingPPService pingPPService;
+    @Autowired private WeChatService weChatService;
 
     //=====================================================================
     //                   getting
@@ -261,8 +260,13 @@ public class ServiceOrderService {
 
         ServiceOrderBean order = beanConverter.convert(entity);
         String orderNo = order.getOrderNo();
+        Map extra = new HashMap<>();
+        if(channel.equals("wx_pub")){
+            String openId = weChatService.getOpenIdByUserId(userId);
+            extra.put("open_id", openId);
+        }
         Charge charge = pingPPService.createCharge(orderNo, channel, order.getTotalConsumptionCent(), clientIP,
-                order.getServiceItem().getName(), order.getServiceItem().getDescription(), order.getLeaveAMessage());
+                order.getServiceItem().getName(), order.getServiceItem().getDescription(), order.getLeaveAMessage(), extra);
         if (null==charge) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
