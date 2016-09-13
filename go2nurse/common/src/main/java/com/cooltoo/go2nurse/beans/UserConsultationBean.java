@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.util.VerifyUtil;
 
 import java.util.Date;
@@ -27,6 +28,7 @@ public class UserConsultationBean {
     private NurseBean nurse;
     private List<String> imagesUrl;
     private List<UserConsultationTalkBean> talks;
+    private YesNoEnum completed;
 
     public long getId() {
         return id;
@@ -146,6 +148,14 @@ public class UserConsultationBean {
 
     public void setNurse(NurseBean nurse) {
         this.nurse = nurse;
+    }
+
+    public YesNoEnum getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(YesNoEnum completed) {
+        this.completed = completed;
     }
 
     public String toString() {

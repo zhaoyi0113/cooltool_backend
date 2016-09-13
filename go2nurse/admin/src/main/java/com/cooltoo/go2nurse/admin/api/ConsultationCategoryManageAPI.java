@@ -109,6 +109,20 @@ public class ConsultationCategoryManageAPI {
         return Response.ok(category).build();
     }
 
+    @Path("/category/edit_icon")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response editServiceCategoryIcon(@Context HttpServletRequest request,
+                                             @FormDataParam("category_id") @DefaultValue("0") long categoryId,
+                                             @FormDataParam("icon_name") @DefaultValue("") String iconName,
+                                             @FormDataParam("icon") InputStream icon,
+                                             @FormDataParam("icon")FormDataContentDisposition disposition
+    ) {
+        ConsultationCategoryBean category = categoryService.updateCategoryImage(categoryId, iconName, icon);
+        return Response.ok(category).build();
+    }
+
     @Path("/category/order")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)

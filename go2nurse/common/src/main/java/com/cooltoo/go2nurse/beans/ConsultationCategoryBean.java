@@ -15,6 +15,8 @@ public class ConsultationCategoryBean {
     private String description;
     private long imageId;
     private String imageUrl;
+    private long iconId;
+    private String iconUrl;
     private long order;
 
     public long getId() {
@@ -43,6 +45,14 @@ public class ConsultationCategoryBean {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public long getIconId() {
+        return iconId;
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
     }
 
     public long getOrder() {
@@ -75,6 +85,14 @@ public class ConsultationCategoryBean {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public void setIconId(long iconId) {
+        this.iconId = iconId;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
     public void setOrder(long order) {

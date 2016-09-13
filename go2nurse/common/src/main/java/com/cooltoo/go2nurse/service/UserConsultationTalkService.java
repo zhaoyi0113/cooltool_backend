@@ -18,9 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hp on 2016/8/28.
@@ -64,6 +62,25 @@ public class UserConsultationTalkService {
         List<UserConsultationTalkBean> retValue = entitiesToBeans(comments);
         logger.info("count is {}", retValue.size());
         return retValue;
+    }
+
+    public Map<Long, UserConsultationTalkBean> getOneTalkByConsultationIds(List<Long> consultationIds) {
+        logger.info("get consultationId-->one talk by consultationIds={}.",
+                VerifyUtil.isListEmpty(consultationIds) ? 0 : consultationIds.size());
+        if (VerifyUtil.isListEmpty(consultationIds)) {
+            return new HashMap<>();
+        }
+        List<UserConsultationTalkEntity> comments = repository.findByStatusNotAndConsultationIdIn(CommonStatus.DELETED, consultationIds, sort);
+        List<UserConsultationTalkBean> retValue = entitiesToBeans(comments);
+        Map<Long, UserConsultationTalkBean> consultationIdToTalk = new HashMap<>();
+        for (UserConsultationTalkBean talk : retValue) {
+            if (consultationIdToTalk.containsKey(talk.getConsultationId())) {
+                continue;
+            }
+            consultationIdToTalk.put(talk.getConsultationId(), talk);
+        }
+        logger.info("count is {}", consultationIdToTalk.size());
+        return consultationIdToTalk;
     }
 
     private List<UserConsultationTalkBean> entitiesToBeans(Iterable<UserConsultationTalkEntity> entities) {

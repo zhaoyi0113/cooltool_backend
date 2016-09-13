@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
@@ -169,6 +170,7 @@ public class UserConsultationService {
         Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
         Map<Long, ConsultationCategoryBean> categoryIdToBean = categoryService.getCategoryIdToBean(categoryIds);
         Map<Long, List<String>> consultationIdToImagesUrl = imageService.getConsultationIdToImagesUrl(consultationIds);
+        Map<Long, UserConsultationTalkBean> consultationIdToTalkBean = talkService.getOneTalkByConsultationIds(consultationIds);
 
         for (UserConsultationBean tmp : beans) {
             UserBean user = userIdToBean.get(tmp.getUserId());
@@ -181,6 +183,11 @@ public class UserConsultationService {
             tmp.setCategory(category);
             List<String> imagesUrl = consultationIdToImagesUrl.get(tmp.getId());
             tmp.setImagesUrl(imagesUrl);
+
+            UserConsultationTalkBean talk = consultationIdToTalkBean.get(tmp.getId());
+            List<UserConsultationTalkBean> talkList = new ArrayList<>();
+            talkList.add(talk);
+            tmp.setTalks(talkList);
         }
     }
 
@@ -220,7 +227,7 @@ public class UserConsultationService {
         return retValue;
     }
 
-    public CommonStatus updateConsultationStatus(Long consultationId, Long categoryId, Long nurseId, CommonStatus status) {
+    public CommonStatus updateConsultationStatus(Long consultationId, Long categoryId, Long nurseId, CommonStatus status, YesNoEnum completed) {
         logger.info("update consultation={} with categoryId={} nurseId={} status={}",
                 consultationId, categoryId, nurseId, status);
         UserConsultationEntity entity = repository.findOne(consultationId);
@@ -232,6 +239,10 @@ public class UserConsultationService {
         boolean changed = false;
         if (null!=status && status!=entity.getStatus()) {
             entity.setStatus(status);
+            changed = true;
+        }
+        if (null!=completed && completed!=entity.getCompleted()) {
+            entity.setCompleted(completed);
             changed = true;
         }
         if (null!=categoryId && categoryId!=entity.getCategoryId()) {
@@ -286,6 +297,7 @@ public class UserConsultationService {
         entity.setPatientId(patientId);
         entity.setDiseaseDescription(diseaseDescription.trim());
         entity.setClinicalHistory(clinicalHistory);
+        entity.setCompleted(YesNoEnum.NO);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = repository.save(entity);
@@ -381,15 +393,25 @@ public class UserConsultationService {
             logger.error("consultation not belong this nurse");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+        if (YesNoEnum.YES.equals(consultation.getCompleted())) {
+            logger.error("consultation has completed");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
         long talkId = talkService.addConsultationTalk(consultationId, nurseId, talkStatus, talkContent);
         return talkId;
     }
 
     public Map<String, String> addTalkImage(long userId, long consultationId, long talkId, String imageName, InputStream image) {
         logger.info("user={} add image to consultation={} talkId={} name={} image={}", userId, consultationId, talkId, imageName, (null!=image));
-        if (!repository.exists(consultationId)) {
+
+        UserConsultationEntity consultation = repository.findOne(consultationId);
+        if (null==consultation) {
             logger.error("consultation is not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (YesNoEnum.YES.equals(consultation.getCompleted())) {
+            logger.error("consultation has completed");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         UserConsultationTalkBean talk = talkService.getTalkWithoutInfoById(talkId);
         if (null==talk) {

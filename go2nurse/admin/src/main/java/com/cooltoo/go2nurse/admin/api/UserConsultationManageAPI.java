@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.service.UserConsultationService;
@@ -78,10 +79,12 @@ public class UserConsultationManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response editConsultation(@Context HttpServletRequest request,
                                      @FormParam("consultation_id") @DefaultValue("0") long consultationId,
-                                     @FormParam("status") @DefaultValue("") String strStatus
+                                     @FormParam("status") @DefaultValue("") String strStatus,
+                                     @FormParam("completed") @DefaultValue("") String strCompleted /* YES , NO */
     ) {
         CommonStatus status = CommonStatus.parseString(strStatus);
-        userConsultationService.updateConsultationStatus(null, null, null, status);
+        YesNoEnum completed = YesNoEnum.parseString(strCompleted);
+        userConsultationService.updateConsultationStatus(null, null, null, status, completed);
         return Response.ok().build();
     }
 

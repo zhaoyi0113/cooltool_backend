@@ -135,20 +135,27 @@ public class ConsultationCategoryService {
         }
 
         List<Long> imagesId = new ArrayList<>();
+        List<Long> iconsId = new ArrayList<>();
         for (ConsultationCategoryBean item : items) {
-            if (imagesId.contains(item.getImageId())) {
-                continue;
+            if (!imagesId.contains(item.getImageId())) {
+                imagesId.add(item.getImageId());
             }
-            imagesId.add(item.getImageId());
+            if (!iconsId.contains(item.getIconId())) {
+                iconsId.add(item.getIconId());
+            }
         }
 
         Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
+        Map<Long, String> iconIdToUrl = userFileStorage.getFileUrl(iconsId);
         for (ConsultationCategoryBean item : items) {
             String imageUrl = imageIdToUrl.get(item.getImageId());
-            if (VerifyUtil.isStringEmpty(imageUrl)) {
-                continue;
+            if (!VerifyUtil.isStringEmpty(imageUrl)) {
+                item.setImageUrl(imageUrl);
             }
-            item.setImageUrl(imageUrl);
+            String iconUrl = iconIdToUrl.get(item.getIconId());
+            if (!VerifyUtil.isStringEmpty(iconUrl)) {
+                item.setIconUrl(iconUrl);
+            }
         }
     }
 
@@ -259,6 +266,32 @@ public class ConsultationCategoryService {
 
         ConsultationCategoryBean bean = categoryBeanConverter.convert(entity);
         bean.setImageUrl(imageUrl);
+        logger.info("consultation category updated is {}", bean);
+        return bean;
+    }
+
+    @Transactional
+    public ConsultationCategoryBean updateCategoryIcon(long categoryId, String iconName, InputStream icon) {
+        logger.info("update consultation category={} by iconName={} icon={}",
+                categoryId, iconName, null!=icon);
+
+        ConsultationCategoryEntity entity = categoryRep.findOne(categoryId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        String iconUrl = "";
+        if (null!=icon) {
+            if (VerifyUtil.isStringEmpty(iconName)) {
+                iconName = "consultation_category_icon_" + System.nanoTime();
+            }
+            long iconId = userFileStorage.addFile(entity.getIconId(), iconName, icon);
+            iconUrl = userFileStorage.getFileURL(iconId);
+            entity.setIconId(iconId);
+        }
+
+        ConsultationCategoryBean bean = categoryBeanConverter.convert(entity);
+        bean.setIconUrl(iconUrl);
         logger.info("consultation category updated is {}", bean);
         return bean;
     }

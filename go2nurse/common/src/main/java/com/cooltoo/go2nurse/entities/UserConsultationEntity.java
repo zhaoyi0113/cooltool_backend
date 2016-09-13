@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -21,6 +22,7 @@ public class UserConsultationEntity {
     private long userId;
     private long patientId;
     private long nurseId;
+    private YesNoEnum completed;
 
     @Id
     @GeneratedValue
@@ -70,6 +72,12 @@ public class UserConsultationEntity {
         return nurseId;
     }
 
+    @Column(name = "completed")
+    @Enumerated
+    public YesNoEnum getCompleted() {
+        return completed;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -104,6 +112,10 @@ public class UserConsultationEntity {
 
     public void setNurseId(long nurseId) {
         this.nurseId = nurseId;
+    }
+
+    public void setCompleted(YesNoEnum completed) {
+        this.completed = completed;
     }
 
     public String toString() {

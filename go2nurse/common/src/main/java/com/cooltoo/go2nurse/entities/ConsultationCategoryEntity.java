@@ -18,6 +18,7 @@ public class ConsultationCategoryEntity {
     private String name;
     private String description;
     private long imageId;
+    private long iconId;
     private long orderIndex;
 
     @Id
@@ -53,6 +54,11 @@ public class ConsultationCategoryEntity {
         return imageId;
     }
 
+    @Column(name = "icon_id")
+    public long getIconId() {
+        return iconId;
+    }
+
     @Column(name = "order_index")
     public long getOrderIndex() {
         return orderIndex;
@@ -80,6 +86,10 @@ public class ConsultationCategoryEntity {
 
     public void setImageId(long imageId) {
         this.imageId = imageId;
+    }
+
+    public void setIconId(long iconId) {
+        this.iconId = iconId;
     }
 
     public void setOrderIndex(long orderIndex) {
