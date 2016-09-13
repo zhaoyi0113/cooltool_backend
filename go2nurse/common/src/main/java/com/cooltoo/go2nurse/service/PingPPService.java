@@ -30,7 +30,7 @@ public class PingPPService {
     public PingPPService() {
     }
 
-    public Charge createCharge(String orderNo, String channel, int amount, String ip, String subject, String body, String description) {
+    public Charge createCharge(String orderNo, String channel, int amount, String ip, String subject, String body, String description, Map extra) {
         logger.info("create charge orderNo={} channel={} amount={} ip={} subject={} body={} desc={}",
                 orderNo, channel, amount, ip, subject, body, description);
         if (VerifyUtil.isStringEmpty(body)) {
@@ -66,8 +66,6 @@ public class PingPPService {
         // 订单附加说明，最多 255 个 Unicode 字符。
         chargeMap.put("description", description);
 
-        Map<String, Object> extra = new HashMap<>();
-//        extra.put("open_id", "USER_OPENID");
         chargeMap.put("extra", extra);
         try {
             //发起交易请求

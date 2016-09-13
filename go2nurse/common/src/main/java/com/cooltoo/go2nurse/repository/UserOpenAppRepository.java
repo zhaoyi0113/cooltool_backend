@@ -13,4 +13,5 @@ public interface UserOpenAppRepository extends JpaRepository<UserOpenAppEntity, 
 
     List<UserOpenAppEntity> findByUnionidAndStatus(String unionId, CommonStatus status);
     List<UserOpenAppEntity> findByUnionid(String unionId);
+    UserOpenAppEntity findFirstByUserId(long userId);
 }
