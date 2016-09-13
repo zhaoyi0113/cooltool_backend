@@ -87,7 +87,7 @@ public class NotificationCenter {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    logger.debug("push to device " + payload + "," + token.getDeviceToken());
+                    logger.info("push to device " + payload + "," + token.getDeviceToken());
                     apnsService.push(token.getDeviceToken(), payload);
                 }
             });
