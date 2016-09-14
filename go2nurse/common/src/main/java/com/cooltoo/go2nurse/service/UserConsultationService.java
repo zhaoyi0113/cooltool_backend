@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.DeviceType;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -10,6 +11,7 @@ import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.converter.UserConsultationBeanConverter;
 import com.cooltoo.go2nurse.entities.UserConsultationEntity;
 import com.cooltoo.go2nurse.repository.UserConsultationRepository;
+import com.cooltoo.go2nurse.service.notification.*;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.*;
 
@@ -46,6 +49,7 @@ public class UserConsultationService {
     @Autowired private ConsultationCategoryService categoryService;
     @Autowired private NurseServiceForGo2Nurse nurseService;
 
+    @Autowired private Notifier notifier;
 
     //===============================================================
     //             get ----  admin using
@@ -413,6 +417,15 @@ public class UserConsultationService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         long talkId = talkService.addConsultationTalk(consultationId, nurseId, talkStatus, talkContent);
+        if (!ConsultationTalkStatus.USER_SPEAK.equals(talkStatus)) {
+            MessageBean message = new MessageBean();
+            message.setAlertBody("你有一条回复");
+            message.setType(MessageType.CONSULTATION_TALK.name());
+            message.setStatus(talkStatus.name());
+            message.setRelativeId(consultationId);
+            message.setDescription(talkContent);
+            notifier.notifyUserPatient(consultation.getUserId(), message);
+        }
         return talkId;
     }
 

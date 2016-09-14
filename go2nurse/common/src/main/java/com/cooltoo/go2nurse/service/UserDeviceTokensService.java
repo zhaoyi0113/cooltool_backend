@@ -50,6 +50,12 @@ public class UserDeviceTokensService {
         return beans;
     }
 
+    public List<UserDeviceTokensBean> getDeviceToken(DeviceType type, String token) {
+        List<UserDeviceTokensEntity> deviceTokens = repository.findByDeviceTypeAndDeviceToken(type, token);
+        List<UserDeviceTokensBean> beans = entitiesToBeans(deviceTokens);
+        return beans;
+    }
+
     private List<UserDeviceTokensBean> entitiesToBeans(Iterable<UserDeviceTokensEntity> entities) {
         if (null==entities) {
             return new ArrayList<>();
@@ -119,5 +125,17 @@ public class UserDeviceTokensService {
 
         UserDeviceTokensEntity saved = repository.save(entity);
         return saved.getId();
+    }
+
+    private List<UserDeviceTokensBean> entitiesToBeans(List<UserDeviceTokensEntity> entities) {
+        if (null==entities) {
+            return new ArrayList<>();
+        }
+        List<UserDeviceTokensBean> ret = new ArrayList<>();
+        for (UserDeviceTokensEntity tmp : entities) {
+            UserDeviceTokensBean bean = beanConverter.convert(tmp);
+            ret.add(bean);
+        }
+        return ret;
     }
 }

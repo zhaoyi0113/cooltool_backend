@@ -3,6 +3,9 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.go2nurse.constants.AppType;
 import com.cooltoo.go2nurse.constants.ChargeType;
 import com.cooltoo.go2nurse.openapp.WeChatService;
+import com.cooltoo.go2nurse.service.notification.MessageBean;
+import com.cooltoo.go2nurse.service.notification.MessageType;
+import com.cooltoo.go2nurse.service.notification.Notifier;
 import com.pingplusplus.model.Charge;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
@@ -51,6 +54,8 @@ public class ServiceOrderService {
     @Autowired private ServiceOrderChargePingPPService orderPingPPService;
     @Autowired private PingPPService pingPPService;
     @Autowired private WeChatService weChatService;
+
+    @Autowired private Notifier notifier;
 
     //=====================================================================
     //                   getting
@@ -271,6 +276,15 @@ public class ServiceOrderService {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
             logger.info("create charge object failed ");
+
+            MessageBean message = new MessageBean();
+            message.setAlertBody("订单状态有更新");
+            message.setType(MessageType.ORDER.name());
+            message.setStatus(entity.getOrderStatus().name());
+            message.setRelativeId(entity.getId());
+            message.setDescription("Ping++ make charge failed!");
+            notifier.notifyUserPatient(entity.getUserId(), message);
+
             return charge;
         }
 
@@ -287,8 +301,18 @@ public class ServiceOrderService {
         long orderId = charge.getOrderId();
         ServiceOrderEntity order = repository.findOne(orderId);
         order.setOrderStatus(OrderStatus.TO_DISPATCH);
+
         order = repository.save(order);
         logger.info("order charged is {}", order);
+
+        MessageBean message = new MessageBean();
+        message.setAlertBody("订单状态有更新");
+        message.setType(MessageType.ORDER.name());
+        message.setStatus(order.getOrderStatus().name());
+        message.setRelativeId(order.getId());
+        message.setDescription("waiting for dispatch order!");
+        notifier.notifyUserPatient(order.getUserId(), message);
+
         return beanConverter.convert(order);
     }
 
@@ -308,6 +332,15 @@ public class ServiceOrderService {
         entity.setOrderStatus(OrderStatus.CANCELLED);
         entity = repository.save(entity);
         logger.info("order cancelled is {}", entity);
+
+        MessageBean message = new MessageBean();
+        message.setAlertBody("订单状态有更新");
+        message.setType(MessageType.ORDER.name());
+        message.setStatus(entity.getOrderStatus().name());
+        message.setRelativeId(entity.getId());
+        message.setDescription("order cancelled!");
+        notifier.notifyUserPatient(entity.getUserId(), message);
+
         return beanConverter.convert(entity);
     }
 
