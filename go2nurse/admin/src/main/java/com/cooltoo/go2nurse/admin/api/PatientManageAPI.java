@@ -36,10 +36,20 @@ public class PatientManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPatientsByUserId(@Context HttpServletRequest request,
                                         @QueryParam("user_id") @DefaultValue("0") long userId,
+                                        @QueryParam("patient_name") @DefaultValue("") String patientName,
                                         @QueryParam("status") @DefaultValue("ALL") String strStatus
     ) {
+        patientName = VerifyUtil.isStringEmpty(patientName) ? null : patientName.trim();
         List<Long> patientsId = userPatientRelationService.getPatientByUser(userId, "ALL");
         List<PatientBean> patients  = patientService.getAllByStatusAndIds(patientsId, CommonStatus.parseString(strStatus));
+        for (int i=0; i<patients.size(); i++) {
+            PatientBean tmp = patients.get(i);
+            if (null!=tmp.getName() && tmp.getName().contains(patientName)) {
+                continue;
+            }
+            patients.remove(i);
+            i--;
+        }
         return Response.ok(patients).build();
     }
 
