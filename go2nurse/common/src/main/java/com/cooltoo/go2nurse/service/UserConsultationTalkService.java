@@ -70,15 +70,15 @@ public class UserConsultationTalkService {
         if (VerifyUtil.isListEmpty(consultationIds)) {
             return new HashMap<>();
         }
-        List<UserConsultationTalkEntity> comments = repository.findByStatusNotAndConsultationIdIn(CommonStatus.DELETED, consultationIds, sort);
-        List<UserConsultationTalkBean> retValue = entitiesToBeans(comments);
+        List<UserConsultationTalkEntity> talks = repository.findByStatusNotAndConsultationIdIn(CommonStatus.DELETED, consultationIds, sort);
+        List<UserConsultationTalkBean> retValue = entitiesToBeans(talks);
         Map<Long, UserConsultationTalkBean> consultationIdToTalk = new HashMap<>();
         for (UserConsultationTalkBean talk : retValue) {
             if (consultationIdToTalk.containsKey(talk.getConsultationId())) {
                 continue;
             }
             ConsultationTalkStatus talkStatus = talk.getTalkStatus();
-            if (ConsultationTalkStatus.NURSE_SPEAK.equals(talkStatus) && ConsultationTalkStatus.USER_SPEAK.equals(talkStatus)) {
+            if (ConsultationTalkStatus.NURSE_SPEAK.equals(talkStatus) || ConsultationTalkStatus.ADMIN_SPEAK.equals(talkStatus)) {
                 consultationIdToTalk.put(talk.getConsultationId(), talk);
             }
         }
