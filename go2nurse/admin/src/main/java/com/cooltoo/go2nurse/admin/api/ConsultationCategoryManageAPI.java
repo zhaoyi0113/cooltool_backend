@@ -119,7 +119,7 @@ public class ConsultationCategoryManageAPI {
                                              @FormDataParam("icon") InputStream icon,
                                              @FormDataParam("icon")FormDataContentDisposition disposition
     ) {
-        ConsultationCategoryBean category = categoryService.updateCategoryImage(categoryId, iconName, icon);
+        ConsultationCategoryBean category = categoryService.updateCategoryIcon(categoryId, iconName, icon);
         return Response.ok(category).build();
     }
 
