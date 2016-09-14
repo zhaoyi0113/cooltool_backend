@@ -70,6 +70,7 @@ public class PingPPService {
             GsonBuilder builder = new GsonBuilder();
             String json = builder.create().toJson(extra);
             chargeMap.put("extra", json);
+            logger.info("charge extra "+json);
         }else{
             chargeMap.put("extra", extra);
         }
@@ -79,7 +80,7 @@ public class PingPPService {
             // 传到客户端请先转成字符串 .toString(), 调该方法，会自动转成正确的 JSON 字符串
             logger.info("create charge is {}", charge);
         } catch (PingppException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return null;
         }
         return charge;
