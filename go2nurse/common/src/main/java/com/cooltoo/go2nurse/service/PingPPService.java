@@ -66,14 +66,7 @@ public class PingPPService {
         chargeMap.put("body", body);
         // 订单附加说明，最多 255 个 Unicode 字符。
         chargeMap.put("description", description);
-        if(extra != null){
-            GsonBuilder builder = new GsonBuilder();
-            String json = builder.create().toJson(extra);
-            chargeMap.put("extra", json);
-            logger.info("charge extra "+json);
-        }else{
-            chargeMap.put("extra", extra);
-        }
+        chargeMap.put("extra", extra);
         try {
             //发起交易请求
             charge = Charge.create(chargeMap);
