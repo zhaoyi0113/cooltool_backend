@@ -12,6 +12,8 @@ import com.cooltoo.go2nurse.service.ConsultationCategoryService;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +32,8 @@ import java.util.Map;
  */
 @Path("/user/consultation")
 public class UserConsultationAPI {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserConsultationAPI.class);
 
     @Autowired private UserConsultationService userConsultationService;
     @Autowired private ConsultationCategoryService categoryService;
@@ -129,6 +133,7 @@ public class UserConsultationAPI {
                                          @FormParam("consultation_id") @DefaultValue("0") long consultationId,
                                          @FormParam("media_id") @DefaultValue("") String mediaId
     ) {
+        logger.info("download image from wx with the media id "+mediaId+" consultant id "+consultationId);
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         InputStream inputStream = weChatService.downloadImageFromWX(mediaId);
         Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, consultationId, "", inputStream);
