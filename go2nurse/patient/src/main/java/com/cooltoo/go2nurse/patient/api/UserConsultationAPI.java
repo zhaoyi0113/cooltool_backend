@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.beans.ConsultationCategoryBean;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.service.ConsultationCategoryService;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.util.VerifyUtil;
@@ -32,7 +33,7 @@ public class UserConsultationAPI {
 
     @Autowired private UserConsultationService userConsultationService;
     @Autowired private ConsultationCategoryService categoryService;
-
+    @Autowired private WeChatService weChatService;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -117,6 +118,20 @@ public class UserConsultationAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, consultationId, imageName, image);
+        return Response.ok(imageIdToUrl).build();
+    }
+
+    @Path("/add_image/wx")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response addConsultationImageFromWX(@Context HttpServletRequest request,
+                                         @FormParam("consultation_id") @DefaultValue("0") long consultationId,
+                                         @FormParam("media_id") @DefaultValue("") String mediaId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        InputStream inputStream = weChatService.downloadImageFromWX(mediaId);
+        Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, consultationId, "", inputStream);
         return Response.ok(imageIdToUrl).build();
     }
 

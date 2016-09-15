@@ -10,6 +10,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,10 +23,7 @@ public final class HttpUtils {
 
     public static Map<String, String> getRequest(String url){
         try {
-            HttpGet httpGet = new HttpGet(url);
-            HttpClient httpClient = HttpClients.createDefault();
-            HttpResponse response = httpClient.execute(httpGet);
-            HttpEntity entity = response.getEntity();
+            HttpEntity entity = getHttpResponseEntity(url);
             String body = EntityUtils.toString(entity, "UTF-8").trim();
             Gson gson = new Gson();
             Map map = gson.fromJson(body, Map.class);
@@ -38,10 +36,7 @@ public final class HttpUtils {
 
     public static <T> T getHttpRequest(String url, Class<T> returnType){
         try {
-            HttpGet httpGet = new HttpGet(url);
-            HttpClient httpClient = HttpClients.createDefault();
-            HttpResponse response = httpClient.execute(httpGet);
-            HttpEntity entity = response.getEntity();
+            HttpEntity entity = getHttpResponseEntity(url);
             String body = EntityUtils.toString(entity, "UTF-8").trim();
             logger.info("get http response "+body);
             Gson gson = new Gson();
@@ -51,5 +46,12 @@ public final class HttpUtils {
             logger.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    public static HttpEntity getHttpResponseEntity(String url) throws IOException {
+        HttpGet httpGet = new HttpGet(url);
+        HttpClient httpClient = HttpClients.createDefault();
+        HttpResponse response = httpClient.execute(httpGet);
+        return response.getEntity();
     }
 }

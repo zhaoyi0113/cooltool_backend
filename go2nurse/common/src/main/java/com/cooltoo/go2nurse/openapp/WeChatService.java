@@ -11,6 +11,7 @@ import com.cooltoo.go2nurse.repository.UserOpenAppRepository;
 import com.cooltoo.go2nurse.repository.UserTokenAccessRepository;
 import com.cooltoo.go2nurse.util.HttpUtils;
 import com.google.gson.Gson;
+import org.apache.http.HttpEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
@@ -150,6 +153,18 @@ public class WeChatService {
         signaturemap.put("appid", srvAppId);
         logger.info("generate js api ticket");
         return signaturemap;
+    }
+
+    public InputStream downloadImageFromWX(String mediaId){
+        String accessToken = tokenScheduler.getAccessToken();
+        String url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token="+accessToken+"&media_id="+mediaId;
+        try {
+            HttpEntity entity = HttpUtils.getHttpResponseEntity(url);
+            return entity.getContent();
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     public String getOpenIdByUserId(long userId){
