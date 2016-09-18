@@ -115,6 +115,18 @@ public class UserConsultationManageAPI {
         return Response.ok(talkId).build();
     }
 
+    @Path("/talk")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateConsultationTalk(@Context HttpServletRequest request,
+                                        @FormParam("talk_id") @DefaultValue("0") long talkId,
+                                        @FormParam("is_best") @DefaultValue("") String isBest/* yes, no */
+    ) {
+        YesNoEnum best = YesNoEnum.parseString(isBest);
+        talkId = userConsultationService.updateTalk(talkId, best);
+        return Response.ok(talkId).build();
+    }
+
     @Path("/talk/add_image")
     @POST
     @Produces(MediaType.APPLICATION_JSON)

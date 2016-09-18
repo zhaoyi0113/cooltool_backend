@@ -429,6 +429,12 @@ public class UserConsultationService {
         return talkId;
     }
 
+    public long updateTalk(long talkId, YesNoEnum isBest) {
+        logger.info("update consultation talkId={} isBest={}.", talkId, isBest);
+        talkService.updateConsultationTalk(talkId, isBest);
+        return talkId;
+    }
+
     public Map<String, String> addTalkImage(long userId, long consultationId, long talkId, String imageName, InputStream image) {
         logger.info("user={} add image to consultation={} talkId={} name={} image={}", userId, consultationId, talkId, imageName, (null!=image));
 

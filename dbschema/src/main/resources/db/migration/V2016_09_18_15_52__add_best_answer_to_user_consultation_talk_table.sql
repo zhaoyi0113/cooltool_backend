@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_user_consultation_talk` ADD COLUMN `best` INT(11) NULL DEFAULT 0;

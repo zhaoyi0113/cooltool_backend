@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.converter;
 
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserConsultationTalkBean;
 import com.cooltoo.go2nurse.entities.UserConsultationTalkEntity;
 import org.springframework.core.convert.converter.Converter;
@@ -20,6 +21,7 @@ public class UserConsultationTalkBeanConverter implements Converter<UserConsulta
         bean.setNurseId(source.getNurseId());
         bean.setTalkStatus(source.getTalkStatus());
         bean.setTalkContent(source.getTalkContent());
+        bean.setIsBest(YesNoEnum.YES.equals(source.getIsBest()));
         return bean;
     }
 }

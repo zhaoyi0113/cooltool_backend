@@ -21,6 +21,7 @@ public class UserConsultationTalkBean {
     private NurseBean nurse;
     private ConsultationTalkStatus talkStatus;
     private String talkContent;
+    private boolean isBest;
     private List<String> imagesUrl;
 
     public long getId() {
@@ -95,6 +96,14 @@ public class UserConsultationTalkBean {
         this.imagesUrl = imagesUrl;
     }
 
+    public boolean isBest() {
+        return isBest;
+    }
+
+    public void setIsBest(boolean isBest) {
+        this.isBest = isBest;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -103,6 +112,7 @@ public class UserConsultationTalkBean {
         msg.append(", nurseId=").append(nurseId);
         msg.append(", talkStatus=").append(talkStatus);
         msg.append(", talkContent=").append(talkContent);
+        msg.append(", isBest=").append(isBest);
         msg.append(", imagesUrl=").append(VerifyUtil.isListEmpty(imagesUrl) ? 0 : imagesUrl.size());
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);

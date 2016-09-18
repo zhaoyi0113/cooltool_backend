@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.UserConsultationTalkBean;
@@ -149,10 +150,34 @@ public class UserConsultationTalkService {
         entity.setNurseId(nurseId);
         entity.setTalkStatus(talkStatus);
         entity.setTalkContent(talkContent.trim());
+        entity.setIsBest(YesNoEnum.NO);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity = repository.save(entity);
 
         return entity.getId();
+    }
+
+    //==================================================================
+    //                           updating
+    //==================================================================
+    @Transactional
+    public long updateConsultationTalk(long talkId, YesNoEnum isBest) {
+        logger.info("update consultation talkId={} isBest={}.", talkId, isBest);
+        UserConsultationTalkEntity talkEntity = repository.findOne(talkId);
+        if (null==talkEntity) {
+            logger.error("talk not exists");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        boolean changed = false;
+        if (null!=isBest && !isBest.equals(talkEntity.getIsBest())) {
+            talkEntity.setIsBest(isBest);
+            changed = true;
+        }
+        if (changed) {
+            repository.save(talkEntity);
+        }
+
+        return talkId;
     }
 }
