@@ -187,7 +187,9 @@ public class UserConsultationAPI {
     ) {
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.parseString(strTalkStatus);
         long talkId = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
-        return Response.ok(talkId).build();
+        Map<String, Long> returnValue = new HashMap<>();
+        returnValue.put("id", talkId);
+        return Response.ok(returnValue).build();
     }
 
     @Path("/talk/add_image")
