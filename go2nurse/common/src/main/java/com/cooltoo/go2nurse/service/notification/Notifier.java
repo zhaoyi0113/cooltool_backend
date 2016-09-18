@@ -36,8 +36,8 @@ public class Notifier {
             if (!VerifyUtil.isListEmpty(androidTokens)) {
                 leanCloudNotifier.publishToDevices(androidTokens, null, message);
             }
-            if (!VerifyUtil.isListEmpty(androidTokens)) {
-                appleNotifier.publishToDevices(androidTokens, message, AppleNotifier.AppleNotificationType.ALERT);
+            if (!VerifyUtil.isListEmpty(iosTokens)) {
+                appleNotifier.publishToDevices(iosTokens, message, AppleNotifier.AppleNotificationType.ALERT);
             }
         }
     }

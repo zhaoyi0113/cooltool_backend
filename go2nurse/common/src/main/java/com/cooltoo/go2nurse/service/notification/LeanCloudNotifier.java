@@ -1,8 +1,6 @@
 package com.cooltoo.go2nurse.service.notification;
 
 import com.cooltoo.constants.DeviceType;
-import com.cooltoo.go2nurse.beans.UserDeviceTokensBean;
-import com.cooltoo.go2nurse.service.UserDeviceTokensService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

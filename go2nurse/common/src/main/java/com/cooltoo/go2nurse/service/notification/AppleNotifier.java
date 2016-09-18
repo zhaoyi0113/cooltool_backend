@@ -1,9 +1,6 @@
 package com.cooltoo.go2nurse.service.notification;
 
-import com.cooltoo.constants.DeviceType;
 import com.cooltoo.features.AppFeatures;
-import com.cooltoo.go2nurse.beans.UserDeviceTokensBean;
-import com.cooltoo.go2nurse.service.UserDeviceTokensService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
