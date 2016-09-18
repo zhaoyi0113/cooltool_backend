@@ -188,7 +188,7 @@ public class UserConsultationAPI {
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.parseString(strTalkStatus);
         long talkId = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
         Map<String, Long> returnValue = new HashMap<>();
-        returnValue.put("id", talkId);
+        returnValue.put("talk_id", talkId);
         return Response.ok(returnValue).build();
     }
 
