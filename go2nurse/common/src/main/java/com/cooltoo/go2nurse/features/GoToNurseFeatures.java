@@ -10,8 +10,10 @@ import org.togglz.core.context.FeatureContext;
 public enum GoToNurseFeatures implements Feature{
 
     @Label("SMS Code Verification")
-    SMS_CODE;
+    SMS_CODE,
 
+    @Label("Send APNS")
+    APNS;
 
     public boolean isActive(){
         return FeatureContext.getFeatureManager().isActive(this);

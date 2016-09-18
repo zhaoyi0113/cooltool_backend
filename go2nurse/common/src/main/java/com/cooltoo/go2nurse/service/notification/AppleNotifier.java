@@ -1,6 +1,6 @@
 package com.cooltoo.go2nurse.service.notification;
 
-import com.cooltoo.features.AppFeatures;
+import com.cooltoo.go2nurse.features.GoToNurseFeatures;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
@@ -55,7 +55,7 @@ public class AppleNotifier {
     }
 
     private void publishToDevice(final ApnsService apnsService, final String payload, List<String> deviceTokens) {
-        if(!AppFeatures.APNS.isActive()){
+        if(!GoToNurseFeatures.APNS.isActive()){
             return;
         }
         for (final String token : deviceTokens) {
