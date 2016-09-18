@@ -76,7 +76,15 @@ public class UserConsultationTalkService {
         Map<Long, UserConsultationTalkBean> consultationIdToTalk = new HashMap<>();
         for (UserConsultationTalkBean talk : retValue) {
             if (consultationIdToTalk.containsKey(talk.getConsultationId())) {
-                continue;
+                if (!talk.isBest()) {
+                    continue;
+                }
+                else {
+                    UserConsultationTalkBean tmpTalk = consultationIdToTalk.get(talk.getConsultationId());
+                    if (tmpTalk.isBest()) {
+                        continue;
+                    }
+                }
             }
             ConsultationTalkStatus talkStatus = talk.getTalkStatus();
             if (ConsultationTalkStatus.NURSE_SPEAK.equals(talkStatus) || ConsultationTalkStatus.ADMIN_SPEAK.equals(talkStatus)) {
@@ -168,6 +176,11 @@ public class UserConsultationTalkService {
         if (null==talkEntity) {
             logger.error("talk not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (ConsultationTalkStatus.USER_SPEAK.equals(talkEntity.getTalkStatus())
+         || ConsultationTalkStatus.NONE.equals(talkEntity.getTalkStatus())) {
+            logger.error("user talk can not set isBest");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         boolean changed = false;
         if (null!=isBest && !isBest.equals(talkEntity.getIsBest())) {
