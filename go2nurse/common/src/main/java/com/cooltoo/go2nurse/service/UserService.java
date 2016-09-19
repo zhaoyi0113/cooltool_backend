@@ -64,9 +64,6 @@ public class UserService {
             throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
         }
         GenderType genderType = GenderType.parseInt(gender);
-        if (null==genderType) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
 
         String uniqueId = null;
         for (int i = 10; i>0; i--) {
@@ -83,13 +80,13 @@ public class UserService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        Date birthday = new Date(NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS));
+        long birthdayMilliSecond = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         UserHospitalizedStatus hasDecide = UserHospitalizedStatus.parseString(strHasDecide);
 
         UserEntity entity = new UserEntity();
         entity.setName(name);
-        entity.setGender(genderType);
-        entity.setBirthday(birthday);
+        entity.setGender(null==genderType ? GenderType.SECRET : genderType );
+        entity.setBirthday(birthdayMilliSecond<0 ? null : new Date(birthdayMilliSecond));
         entity.setMobile(mobile);
         entity.setPassword(password);
         entity.setAuthority(UserAuthority.AGREE_ALL);
@@ -137,7 +134,8 @@ public class UserService {
                         currentUser.setPassword(password);
                         currentUser.setName(name);
                         currentUser.setStatus(CommonStatus.ENABLED);
-                        currentUser.setBirthday(new Date(NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS)));
+                        long birthdayMilliSecond = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+                        currentUser.setBirthday(birthdayMilliSecond<0 ? null : new Date(birthdayMilliSecond));
                         if (null!=hasDecide && !hasDecide.equals(currentUser.getHasDecide())) {
                             currentUser.setHasDecide(hasDecide);
                         }
