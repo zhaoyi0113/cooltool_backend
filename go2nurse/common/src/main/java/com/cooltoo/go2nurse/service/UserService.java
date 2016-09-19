@@ -86,7 +86,7 @@ public class UserService {
         UserEntity entity = new UserEntity();
         entity.setName(name);
         entity.setGender(null==genderType ? GenderType.SECRET : genderType );
-        entity.setBirthday(birthdayMilliSecond<0 ? null : new Date(birthdayMilliSecond));
+        entity.setBirthday(birthdayMilliSecond<0 ? new Date(0) : new Date(birthdayMilliSecond));
         entity.setMobile(mobile);
         entity.setPassword(password);
         entity.setAuthority(UserAuthority.AGREE_ALL);
@@ -135,7 +135,7 @@ public class UserService {
                         currentUser.setName(name);
                         currentUser.setStatus(CommonStatus.ENABLED);
                         long birthdayMilliSecond = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-                        currentUser.setBirthday(birthdayMilliSecond<0 ? null : new Date(birthdayMilliSecond));
+                        currentUser.setBirthday(birthdayMilliSecond<0 ? new Date(0)  : new Date(birthdayMilliSecond));
                         if (null!=hasDecide && !hasDecide.equals(currentUser.getHasDecide())) {
                             currentUser.setHasDecide(hasDecide);
                         }

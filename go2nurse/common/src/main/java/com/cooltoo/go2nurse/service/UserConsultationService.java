@@ -216,7 +216,9 @@ public class UserConsultationService {
 
             UserConsultationTalkBean talk = consultationIdToTalkBean.get(tmp.getId());
             List<UserConsultationTalkBean> talkList = new ArrayList<>();
-            talkList.add(talk);
+            if (null!=talk) {
+                talkList.add(talk);
+            }
             tmp.setTalks(talkList);
         }
     }
