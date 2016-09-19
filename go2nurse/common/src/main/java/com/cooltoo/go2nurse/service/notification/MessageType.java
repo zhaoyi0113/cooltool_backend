@@ -5,6 +5,7 @@ package com.cooltoo.go2nurse.service.notification;
  */
 public enum  MessageType {
     ORDER,
-    CONSULTATION_TALK
+    CONSULTATION_TALK,
+    APPOINTMENT
     ;
 }

@@ -8,6 +8,9 @@ import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.converter.DoctorAppointmentBeanConverter;
 import com.cooltoo.go2nurse.entities.DoctorAppointmentEntity;
 import com.cooltoo.go2nurse.repository.DoctorAppointmentRepository;
+import com.cooltoo.go2nurse.service.notification.MessageBean;
+import com.cooltoo.go2nurse.service.notification.MessageType;
+import com.cooltoo.go2nurse.service.notification.Notifier;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -43,6 +46,8 @@ public class DoctorAppointmentService {
     @Autowired private DoctorClinicDateHoursService clinicDateHoursService;
     @Autowired private DoctorService doctorService;
     @Autowired private PatientService patientService;
+
+    @Autowired private Notifier notifier;
 
     //=========================================================================
     //                    getting
@@ -183,6 +188,15 @@ public class DoctorAppointmentService {
         }
         entity.setOrderStatus(OrderStatus.COMPLETED);
         entity = repository.save(entity);
+
+        MessageBean message = new MessageBean();
+        message.setAlertBody("预约状态有更新");
+        message.setType(MessageType.APPOINTMENT.name());
+        message.setStatus(entity.getOrderStatus().name());
+        message.setRelativeId(entity.getId());
+        message.setDescription("appointment completed!");
+        notifier.notifyUserPatient(entity.getUserId(), message);
+
         return beanConverter.convert(entity);
     }
 
@@ -204,6 +218,15 @@ public class DoctorAppointmentService {
         }
         entity.setOrderStatus(OrderStatus.CANCELLED);
         entity = repository.save(entity);
+
+        MessageBean message = new MessageBean();
+        message.setAlertBody("预约状态有更新");
+        message.setType(MessageType.APPOINTMENT.name());
+        message.setStatus(entity.getOrderStatus().name());
+        message.setRelativeId(entity.getId());
+        message.setDescription("appointment cancelled!");
+        notifier.notifyUserPatient(entity.getUserId(), message);
+
         return beanConverter.convert(entity);
     }
 
