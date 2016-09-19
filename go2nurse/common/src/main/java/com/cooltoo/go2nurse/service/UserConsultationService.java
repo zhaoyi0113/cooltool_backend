@@ -100,6 +100,17 @@ public class UserConsultationService {
         return beans;
     }
 
+    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, int pageIndex, int sizePerPage) {
+        logger.info("user={} get consultation nurseId={} at page={} sizePerPage={}", userId, nurseId, pageIndex, sizePerPage);
+        List<UserConsultationBean> beans;
+        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<UserConsultationEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, CommonStatus.DELETED, nurseId, request);
+        beans = entitiesToBeansForConsultation(resultSet);
+        fillOtherPropertiesForConsultation(beans);
+        logger.warn("speak count={}", beans.size());
+        return beans;
+    }
+
     public UserConsultationBean getUserConsultation(long consultationId) {
         logger.info("get consultationId={}", consultationId);
         UserConsultationEntity resultSet = repository.findOne(consultationId);

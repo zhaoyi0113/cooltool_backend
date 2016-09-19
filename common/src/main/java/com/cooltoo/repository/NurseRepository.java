@@ -33,6 +33,13 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     List<NurseEntity> findByName(String name);
     List<NurseEntity> findByIdIn(List<Long> ids);
 
+    // query nurse by realName or hospitalId or departmentId
+    @Query("SELECT n FROM NurseEntity n LEFT JOIN n.extensions ne LEFT JOIN n.hospitalRelation nhr" +
+            " WHERE (n.authority=?1)" +
+            " AND   (?2 IS NULL OR ne.answerNursingQuestion=?2)" +
+            " AND   ((?3 IS NULL OR n.realName LIKE %?3) OR (nhr.hospitalId IN (?4)) OR (nhr.departmentId IN (?5)))")
+    Page<NurseEntity> findByQueryString(UserAuthority authority, YesNoEnum answerNursingQuestion, String fuzzyName, List<Integer> hospitalId, List<Integer> departmentId, Pageable page);
+
 
     //==================================================================
     //              for administrator user
@@ -52,13 +59,4 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
             " AND   (?5 IS NULL OR nhr.departmentId=?5)")
     long countByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion, Integer hospitalId, Integer departmentId);
 
-
-    //==================================================================
-    //              for administrator user
-    //==================================================================
-    @Query("SELECT n FROM NurseEntity n LEFT JOIN n.extensions ne LEFT JOIN n.hospitalRelation nhr" +
-            " WHERE (n.authority=?1)" +
-            " AND   (?2 IS NULL OR ne.answerNursingQuestion=?2)" +
-            " AND   ((?3 IS NULL OR n.name LIKE %?3) OR (nhr.hospitalId IN (?4)) OR (nhr.departmentId IN (?5)))")
-    Page<NurseEntity> findByQueryString(UserAuthority authority, YesNoEnum answerNursingQuestion, String fuzzyName, List<Integer> hospitalId, List<Integer> departmentId, Pageable page);
 }

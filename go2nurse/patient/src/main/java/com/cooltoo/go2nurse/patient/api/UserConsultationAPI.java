@@ -70,6 +70,20 @@ public class UserConsultationAPI {
         return Response.ok(consultations).build();
     }
 
+    @Path("/query/by_nurse_id")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getConsultation(@Context HttpServletRequest request,
+                                    @PathParam("nurse_id") @DefaultValue("0") long nurseId,
+                                    @PathParam("index")  @DefaultValue("0")  int pageIndex,
+                                    @PathParam("number") @DefaultValue("10") int sizePerPage
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, pageIndex, sizePerPage);
+        return Response.ok(consultations).build();
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
