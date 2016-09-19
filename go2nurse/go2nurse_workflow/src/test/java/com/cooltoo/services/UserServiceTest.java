@@ -45,11 +45,13 @@ public class UserServiceTest extends AbstractCooltooTest {
         String mobile = "15811663430";
         String password = "password";
         String smsCode = "aaaa";
-        UserBean userBean = service.registerUser(name, gender, "", mobile, password, smsCode);
+        String hasDecide = "NONE";
+        UserBean userBean = service.registerUser(name, gender, "", mobile, password, smsCode, hasDecide);
         Assert.assertTrue(userBean.getId()>0);
         UserBean all = service.getUser(userBean.getId());
         Assert.assertEquals(name, all.getName());
         Assert.assertNotNull(all.getUniqueId());
+        Assert.assertEquals(hasDecide, userBean.getHasDecide().name());
     }
 
     @Test

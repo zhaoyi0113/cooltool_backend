@@ -50,7 +50,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
     @Test
     public void test_register_from_existed_wechat_user() {
-        UserBean newUser = userService.registerUser("", 0, "", "aaa", "aaa", "aaa", AppChannel.WECHAT.name(), "1");
+        UserBean newUser = userService.registerUser("", 0, "", "aaa", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "1");
         List<UserOpenAppEntity> channelUsers = openAppRepository.findByUnionidAndStatus("1", CommonStatus.ENABLED);
         Assert.assertNotNull(newUser);
         Assert.assertFalse(channelUsers.isEmpty());
@@ -65,7 +65,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         URI uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("register"));
-        userService.registerUser("aa", 0, "aa", "aaa", "aaa", "aaa", AppChannel.WECHAT.name(), "100");
+        userService.registerUser("aa", 0, "aa", "aaa", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "100");
         uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.getSchemeSpecificPart().contains("token"));
@@ -79,7 +79,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         URI uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertFalse(uri.toString().contains("token"));
-        userService.registerUser("aa", 0, "aa", "1231432143", "aaa", "aaa", AppChannel.WECHAT.name(), unionid);
+        userService.registerUser("aa", 0, "aa", "1231432143", "aaa", "aaa", "none", AppChannel.WECHAT.name(), unionid);
         uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("token"));
@@ -95,7 +95,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
     @Test
     public void test_register_with_disabled_channel_user() {
-        UserBean userBean = userService.registerUser("bbb", 0, "", "13523212122", "aaa", "aaa", AppChannel.WECHAT.name(), "2");
+        UserBean userBean = userService.registerUser("bbb", 0, "", "13523212122", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "2");
         Assert.assertEquals("bbb", userBean.getName());
         Assert.assertEquals("aaa", userBean.getPassword());
         List<UserOpenAppEntity> openUsers = openAppRepository.findByUnionidAndStatus("2", CommonStatus.ENABLED);

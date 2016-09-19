@@ -41,19 +41,21 @@ public class UserAPI {
     @Path("/register")
     @Produces(MediaType.APPLICATION_JSON)
     public Response newUser(@Context HttpServletRequest request,
-                             @FormParam("name") @DefaultValue("") String name,
-                             @FormParam("gender") @DefaultValue("2") int gender,
-                             @FormParam("birthday") @DefaultValue("") String birthday,
-                             @FormParam("mobile") @DefaultValue("") String mobile,
-                             @FormParam("password") @DefaultValue("") String password,
-                             @FormParam("sms_code") @DefaultValue("") String smsCode,
+                            @FormParam("name") @DefaultValue("") String name,
+                            @FormParam("gender") @DefaultValue("2") int gender,
+                            @FormParam("birthday") @DefaultValue("") String birthday,
+                            @FormParam("mobile") @DefaultValue("") String mobile,
+                            @FormParam("password") @DefaultValue("") String password,
+                            @FormParam("sms_code") @DefaultValue("") String smsCode,
                             @FormParam("channel")  String channel,
-                            @FormParam("channelid") String channelid
+                            @FormParam("channelid") String channelid,
+                            @FormParam("has_decide") String hasDecide
 
     ) {
-        UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode, channel, channelid);
-        PatientBean patientBean = patientService.create(name, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES);
-        userPatientRelationService.addPatientToUser(patientBean.getId(), userBean.getId());
+        UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode, hasDecide, channel, channelid);
+        // do not created default patient
+        // PatientBean patientBean = patientService.create(name, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES);
+        // userPatientRelationService.addPatientToUser(patientBean.getId(), userBean.getId());
         return Response.ok(userBean).build();
     }
 

@@ -52,9 +52,9 @@ public class UserService {
     //         add
     //==================================================================
     @Transactional
-    public UserBean registerUser(String name, int gender, String strBirthday, String mobile, String password, String smsCode) {
-        logger.info("register new user with name={} gender={} birthday={} mobile={} password={} smsCode={}",
-                name, gender, strBirthday, mobile, password, smsCode);
+    public UserBean registerUser(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String strHasDecide) {
+        logger.info("register new user with name={} gender={} birthday={} mobile={} password={} smsCode={} hasDecide={}",
+                name, gender, strBirthday, mobile, password, smsCode, strHasDecide);
         leanCloudService.verifySmsCode(smsCode, mobile);
 
         if (VerifyUtil.isStringEmpty(password)){
@@ -84,6 +84,7 @@ public class UserService {
         }
 
         Date birthday = new Date(NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS));
+        UserHospitalizedStatus hasDecide = UserHospitalizedStatus.parseString(strHasDecide);
 
         UserEntity entity = new UserEntity();
         entity.setName(name);
@@ -96,26 +97,26 @@ public class UserService {
         entity.setUniqueId(uniqueId);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
-        entity.setHasDecide(UserHospitalizedStatus.NONE);
+        entity.setHasDecide(null==hasDecide ? UserHospitalizedStatus.NONE : hasDecide);
         entity = repository.save(entity);
 
         logger.info("add user={}", entity);
         return beanConverter.convert(entity);
     }
-    public UserBean registerUser(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String channel, String channelid) {
+    public UserBean registerUser(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String hasDecide, String channel, String channelid) {
         if (repository.findByMobile(mobile).isEmpty() && channel==null) {
             //first time register
-            return registerUser(name,gender,strBirthday,mobile,password,smsCode);
+            return registerUser(name,gender,strBirthday,mobile,password,smsCode,hasDecide);
         }
         //check channel register
         if(channel != null){
-            return registerWithChannel(name, gender, strBirthday, mobile, password, smsCode, channel,channelid);
+            return registerWithChannel(name, gender, strBirthday, mobile, password, smsCode, hasDecide, channel,channelid);
         }
         throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    private UserBean registerWithChannel(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String channel, String channelid) {
+    private UserBean registerWithChannel(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String strHasDecide, String channel, String channelid) {
         AppChannel appChannel = AppChannel.valueOf(channel);
         switch (appChannel) {
             case WECHAT:
@@ -123,7 +124,7 @@ public class UserService {
                 if (!wechatusers.isEmpty()) {
                     List<UserEntity> currentUsers = repository.findByMobile(mobile);
                     if (currentUsers.isEmpty()) {
-                        UserBean userBean = registerUser(name, gender, strBirthday, mobile, password, smsCode);
+                        UserBean userBean = registerUser(name, gender, strBirthday, mobile, password, smsCode, strHasDecide);
                         wechatusers.get(0).setUserId(userBean.getId());
                         wechatusers.get(0).setStatus(CommonStatus.ENABLED);
                         openAppRepository.save(wechatusers.get(0));
@@ -131,11 +132,15 @@ public class UserService {
                         return userBean;
                     } else {
                         //already existed such user, link with channel user
+                        UserHospitalizedStatus hasDecide = UserHospitalizedStatus.parseString(strHasDecide);
                         UserEntity currentUser = currentUsers.get(0);
                         currentUser.setPassword(password);
                         currentUser.setName(name);
                         currentUser.setStatus(CommonStatus.ENABLED);
                         currentUser.setBirthday(new Date(NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS)));
+                        if (null!=hasDecide && !hasDecide.equals(currentUser.getHasDecide())) {
+                            currentUser.setHasDecide(hasDecide);
+                        }
                         repository.save(currentUser);
 //                        UserBean userBean = updatePassword(currentUser.getId(), currentUser.getPassword(), password);
                         loginService.login(mobile, password);
