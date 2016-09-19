@@ -120,9 +120,9 @@ public class UserConsultationManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateConsultationTalk(@Context HttpServletRequest request,
                                         @FormParam("talk_id") @DefaultValue("0") long talkId,
-                                        @FormParam("is_best") @DefaultValue("") String isBest/* yes, no */
+                                        @FormParam("is_best") boolean isBest/* true, false */
     ) {
-        YesNoEnum best = YesNoEnum.parseString(isBest);
+        YesNoEnum best = isBest ? YesNoEnum.YES : YesNoEnum.NO;
         talkId = userConsultationService.updateTalk(talkId, best);
         return Response.ok(talkId).build();
     }
