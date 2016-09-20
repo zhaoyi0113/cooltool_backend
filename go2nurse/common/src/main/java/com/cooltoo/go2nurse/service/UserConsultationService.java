@@ -2,7 +2,7 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.DeviceType;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -22,7 +22,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.*;
 
@@ -71,7 +70,7 @@ public class UserConsultationService {
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
         Page<UserConsultationEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, categoryId, contentLike, request);
         beans = entitiesToBeansForConsultation(resultSet);
-        fillOtherPropertiesForConsultation(beans);
+        fillOtherPropertiesForConsultation(beans, ConsultationTalkStatus.ADMIN_SPEAK);
 
         logger.warn("consultation count={}", beans.size());
         return beans;
@@ -79,7 +78,7 @@ public class UserConsultationService {
 
 
     //===============================================================
-    //             get ----  nurse using
+    //             get ----  patient using
     //===============================================================
 
     public List<UserConsultationBean> getUserConsultation(Long userId, String contentLike, int pageIndex, int sizePerPage) {
@@ -94,7 +93,7 @@ public class UserConsultationService {
             PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
             Page<UserConsultationEntity> resultSet = repository.findByUserIdAndStatusNotAndContentLike(userId, CommonStatus.DELETED, contentLike, request);
             beans = entitiesToBeansForConsultation(resultSet);
-            fillOtherPropertiesForConsultation(beans);
+            fillOtherPropertiesForConsultation(beans, ConsultationTalkStatus.USER_SPEAK);
         }
         logger.warn("speak count={}", beans.size());
         return beans;
@@ -106,7 +105,7 @@ public class UserConsultationService {
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
         Page<UserConsultationEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, CommonStatus.DELETED, nurseId, request);
         beans = entitiesToBeansForConsultation(resultSet);
-        fillOtherPropertiesForConsultation(beans);
+        fillOtherPropertiesForConsultation(beans, ConsultationTalkStatus.USER_SPEAK);
         logger.warn("speak count={}", beans.size());
         return beans;
     }
@@ -122,7 +121,7 @@ public class UserConsultationService {
         entities.add(resultSet);
 
         List<UserConsultationBean> userConsultation = entitiesToBeansForConsultation(entities);
-        fillOtherPropertiesForConsultation(userConsultation);
+        fillOtherPropertiesForConsultation(userConsultation, ConsultationTalkStatus.USER_SPEAK);
         return userConsultation.get(0);
     }
 
@@ -152,7 +151,7 @@ public class UserConsultationService {
         return beans;
     }
 
-    private void fillOtherPropertiesForConsultation(List<UserConsultationBean> beans) {
+    private void fillOtherPropertiesForConsultation(List<UserConsultationBean> beans, ConsultationTalkStatus talkStatusNotMatch) {
         if (VerifyUtil.isListEmpty(beans)) {
             return;
         }
@@ -185,10 +184,11 @@ public class UserConsultationService {
         Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
         Map<Long, ConsultationCategoryBean> categoryIdToBean = categoryService.getCategoryIdToBean(categoryIds);
         Map<Long, List<String>> consultationIdToImagesUrl = imageService.getConsultationIdToImagesUrl(consultationIds);
+        Map<Long, Long> consultationIdToUnreadTalkSize = talkService.getUnreadTalkSizeByConsultationIds(consultationIds, talkStatusNotMatch);
 
         // fill talk's nurse information
         nurseIds.clear();
-        Map<Long, UserConsultationTalkBean> consultationIdToTalkBean = talkService.getOneTalkByConsultationIds(consultationIds);
+        Map<Long, UserConsultationTalkBean> consultationIdToTalkBean = talkService.getBestTalkByConsultationIds(consultationIds);
         Collection<UserConsultationTalkBean> consultationTalks = consultationIdToTalkBean.values();
         for (UserConsultationTalkBean tmp : consultationTalks) {
             if (!nurseIds.contains(tmp.getNurseId())) {
@@ -220,6 +220,9 @@ public class UserConsultationService {
                 talkList.add(talk);
             }
             tmp.setTalks(talkList);
+
+            Long unreadTalkSize = consultationIdToUnreadTalkSize.get(tmp.getId());
+            tmp.setHasUnreadTalk(null==unreadTalkSize ? false : (unreadTalkSize>0));
         }
     }
 
@@ -399,8 +402,6 @@ public class UserConsultationService {
         }
     }
 
-
-
     //=======================================
     //           deleting
     //=======================================
@@ -442,10 +443,20 @@ public class UserConsultationService {
         return talkId;
     }
 
+    //=======================================
+    //           updating
+    //=======================================
     public long updateTalk(long talkId, YesNoEnum isBest) {
         logger.info("update consultation talkId={} isBest={}.", talkId, isBest);
         talkService.updateConsultationTalk(talkId, isBest);
         return talkId;
+    }
+
+    public long updateConsultationUnreadTalkStatusToRead(long consultationId, ConsultationTalkStatus talkStatusNotMatch) {
+        logger.info("update consultation(Id={}) talkStatusNotMatch={} talks' readingStatus={}.",
+                consultationId, talkStatusNotMatch, ReadingStatus.READ);
+        talkService.updateConsultationUnreadTalkStatusToRead(consultationId, talkStatusNotMatch);
+        return consultationId;
     }
 
     public Map<String, String> addTalkImage(long userId, long consultationId, long talkId, String imageName, InputStream image) {

@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -65,7 +66,7 @@ public class UserConsultationTalkService {
         return retValue;
     }
 
-    public Map<Long, UserConsultationTalkBean> getOneTalkByConsultationIds(List<Long> consultationIds) {
+    public Map<Long, UserConsultationTalkBean> getBestTalkByConsultationIds(List<Long> consultationIds) {
         logger.info("get consultationId-->one talk by consultationIds={}.",
                 VerifyUtil.isListEmpty(consultationIds) ? 0 : consultationIds.size());
         if (VerifyUtil.isListEmpty(consultationIds)) {
@@ -93,6 +94,30 @@ public class UserConsultationTalkService {
         }
         logger.info("count is {}", consultationIdToTalk.size());
         return consultationIdToTalk;
+    }
+
+    public Map<Long, Long> getUnreadTalkSizeByConsultationIds(List<Long> consultationIds, ConsultationTalkStatus talkStatusNotMatch) {
+        logger.info("get consultationId-->one talk by consultationIds={}.",
+                VerifyUtil.isListEmpty(consultationIds) ? 0 : consultationIds.size());
+        if (VerifyUtil.isListEmpty(consultationIds)) {
+            return new HashMap<>();
+        }
+        List<UserConsultationTalkEntity> talks = repository.findByStatusNotAndReadingStatusAndConsultationIdIn(CommonStatus.DELETED, ReadingStatus.UNREAD, consultationIds, sort);
+        Map<Long, Long> consultationIdToUnreadTalkSize = new HashMap<>();
+        for (UserConsultationTalkEntity talk : talks) {
+            if (talkStatusNotMatch.equals(talk.getTalkStatus())) {
+                continue;
+            }
+            if (consultationIdToUnreadTalkSize.containsKey(talk.getConsultationId())) {
+                Long tmpTalkSize = consultationIdToUnreadTalkSize.get(talk.getConsultationId());
+                consultationIdToUnreadTalkSize.put(talk.getConsultationId(), tmpTalkSize++);
+            }
+            else {
+                consultationIdToUnreadTalkSize.put(talk.getConsultationId(), 1L);
+            }
+        }
+        logger.info("count is {}", consultationIdToUnreadTalkSize.size());
+        return consultationIdToUnreadTalkSize;
     }
 
     private List<UserConsultationTalkBean> entitiesToBeans(Iterable<UserConsultationTalkEntity> entities) {
@@ -159,6 +184,7 @@ public class UserConsultationTalkService {
         entity.setTalkStatus(talkStatus);
         entity.setTalkContent(talkContent.trim());
         entity.setIsBest(YesNoEnum.NO);
+        entity.setReadingStatus(ReadingStatus.UNREAD);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity = repository.save(entity);
@@ -178,7 +204,7 @@ public class UserConsultationTalkService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (ConsultationTalkStatus.USER_SPEAK.equals(talkEntity.getTalkStatus())
-         || ConsultationTalkStatus.NONE.equals(talkEntity.getTalkStatus())) {
+                || ConsultationTalkStatus.NONE.equals(talkEntity.getTalkStatus())) {
             logger.error("user talk can not set isBest");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -192,5 +218,30 @@ public class UserConsultationTalkService {
         }
 
         return talkId;
+    }
+
+    @Transactional
+    public long updateConsultationUnreadTalkStatusToRead(long consultationId, ConsultationTalkStatus talkStatusNotMatch) {
+        logger.info("update consultation(Id={}) talkStatusNotMatch={} talks' readingStatus={}.",
+                consultationId, talkStatusNotMatch, ReadingStatus.READ);
+        List<UserConsultationTalkEntity> unreadTalks = repository.findByReadingStatusAndTalkStatusNotAndConsultationId(ReadingStatus.UNREAD, talkStatusNotMatch, consultationId);
+        if (VerifyUtil.isListEmpty(unreadTalks)) {
+            logger.error("talks not exists");
+            return consultationId;
+        }
+        boolean changed = false;
+        if (null != talkStatusNotMatch) {
+            for (UserConsultationTalkEntity talkEntity : unreadTalks) {
+                if (!talkStatusNotMatch.equals(talkEntity.getTalkStatus())) {
+                    talkEntity.setReadingStatus(ReadingStatus.READ);
+                    changed = true;
+                }
+            }
+        }
+        if (changed) {
+            repository.save(unreadTalks);
+        }
+
+        return consultationId;
     }
 }

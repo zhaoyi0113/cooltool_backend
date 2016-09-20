@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 
@@ -22,6 +23,7 @@ public class UserConsultationTalkEntity {
     private ConsultationTalkStatus talkStatus;
     private String talkContent;
     private YesNoEnum isBest;
+    private ReadingStatus readingStatus;
 
     @Id
     @GeneratedValue
@@ -67,6 +69,12 @@ public class UserConsultationTalkEntity {
         return isBest;
     }
 
+    @Column(name = "reading_status")
+    @Enumerated
+    public ReadingStatus getReadingStatus() {
+        return readingStatus;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -99,6 +107,10 @@ public class UserConsultationTalkEntity {
         this.isBest = isBest;
     }
 
+    public void setReadingStatus(ReadingStatus readingStatus) {
+        this.readingStatus = readingStatus;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -108,6 +120,7 @@ public class UserConsultationTalkEntity {
         msg.append(", talkStatus=").append(talkStatus);
         msg.append(", talkContent=").append(talkContent);
         msg.append(", isBest=").append(isBest);
+        msg.append(", readingStatus=").append(readingStatus);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

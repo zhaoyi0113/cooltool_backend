@@ -22,6 +22,7 @@ public class UserConsultationTalkBeanConverter implements Converter<UserConsulta
         bean.setTalkStatus(source.getTalkStatus());
         bean.setTalkContent(source.getTalkContent());
         bean.setIsBest(YesNoEnum.YES.equals(source.getIsBest()));
+        bean.setReadingStatus(source.getReadingStatus());
         return bean;
     }
 }

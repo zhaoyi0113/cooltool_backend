@@ -29,6 +29,7 @@ public class UserConsultationBean {
     private List<String> imagesUrl;
     private List<UserConsultationTalkBean> talks;
     private YesNoEnum completed;
+    private boolean hasUnreadTalk;
 
     public long getId() {
         return id;
@@ -158,6 +159,14 @@ public class UserConsultationBean {
         this.completed = completed;
     }
 
+    public boolean isHasUnreadTalk() {
+        return hasUnreadTalk;
+    }
+
+    public void setHasUnreadTalk(boolean hasUnreadTalk) {
+        this.hasUnreadTalk = hasUnreadTalk;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -166,6 +175,8 @@ public class UserConsultationBean {
         msg.append(", userId=").append(userId);
         msg.append(", patientId=").append(patientId);
         msg.append(", nurseId=").append(nurseId);
+        msg.append(", completed=").append(completed);
+        msg.append(", hasUnreadTalk=").append(hasUnreadTalk);
         msg.append(", clinicalHistory=").append(clinicalHistory);
         msg.append(", diseaseDescription=").append(diseaseDescription);
         msg.append(", imagesUrl=").append(VerifyUtil.isListEmpty(imagesUrl) ? 0 : imagesUrl.size());

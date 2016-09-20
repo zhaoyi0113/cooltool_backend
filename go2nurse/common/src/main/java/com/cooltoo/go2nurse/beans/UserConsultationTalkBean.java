@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.util.VerifyUtil;
 
@@ -22,6 +23,7 @@ public class UserConsultationTalkBean {
     private ConsultationTalkStatus talkStatus;
     private String talkContent;
     private boolean isBest;
+    private ReadingStatus readingStatus;
     private List<String> imagesUrl;
 
     public long getId() {
@@ -104,6 +106,14 @@ public class UserConsultationTalkBean {
         this.isBest = isBest;
     }
 
+    public ReadingStatus getReadingStatus() {
+        return readingStatus;
+    }
+
+    public void setReadingStatus(ReadingStatus readingStatus) {
+        this.readingStatus = readingStatus;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -113,6 +123,7 @@ public class UserConsultationTalkBean {
         msg.append(", talkStatus=").append(talkStatus);
         msg.append(", talkContent=").append(talkContent);
         msg.append(", isBest=").append(isBest);
+        msg.append(", readingStatus=").append(readingStatus);
         msg.append(", imagesUrl=").append(VerifyUtil.isListEmpty(imagesUrl) ? 0 : imagesUrl.size());
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);

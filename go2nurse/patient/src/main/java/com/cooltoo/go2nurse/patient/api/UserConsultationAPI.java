@@ -221,4 +221,18 @@ public class UserConsultationAPI {
         Map<String, String> imageIdToUrl = userConsultationService.addTalkImage(userId, consultationId, talkId, imageName, image);
         return Response.ok(imageIdToUrl).build();
     }
+
+    @Path("/talk/reading_status")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response addConsultationTalkImage(@Context HttpServletRequest request,
+                                             @FormParam("consultation_id") @DefaultValue("0") long consultationId
+    ) {
+        consultationId = userConsultationService.updateConsultationUnreadTalkStatusToRead(consultationId, ConsultationTalkStatus.USER_SPEAK);
+
+        Map<String, Long> retValue = new HashMap<>();
+        retValue.put("consultation_id", consultationId);
+        return Response.ok(retValue).build();
+    }
 }
