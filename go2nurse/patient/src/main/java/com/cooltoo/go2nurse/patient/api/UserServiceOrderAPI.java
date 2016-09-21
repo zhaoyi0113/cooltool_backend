@@ -130,6 +130,7 @@ public class UserServiceOrderAPI {
         try { remoteIP = NetworkUtil.getIpAddress(request); }
         catch (IOException ex) { remoteIP = "127.0.0.1"; }
         Charge charge = orderService.payForService(userId, orderId, channel, remoteIP);
+        logger.debug("pay success with charge "+charge);
         return Response.ok(charge).build();
     }
 
