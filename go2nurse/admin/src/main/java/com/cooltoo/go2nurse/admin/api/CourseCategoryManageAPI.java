@@ -51,6 +51,17 @@ public class CourseCategoryManageAPI {
         return Response.ok(categories).build();
     }
 
+    @Path("/{category_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCategoryById(@Context HttpServletRequest request,
+                                          @PathParam("category_id") @DefaultValue("0") long categoryId
+    ) {
+        logger.info("get category by category id");
+        CourseCategoryBean category = categoryService.getCategoryById(categoryId);
+        return Response.ok(category).build();
+    }
+
     // status ==> all/enabled/disabled/deleted
     @Path("/status/count/{status}")
     @GET

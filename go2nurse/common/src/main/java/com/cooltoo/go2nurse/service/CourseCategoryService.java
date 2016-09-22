@@ -238,6 +238,17 @@ public class CourseCategoryService {
         return exists;
     }
 
+    public CourseCategoryBean getCategoryById(long categoryId) {
+        logger.info("get course category by categoryId={}", categoryId);
+        CourseCategoryEntity category = repository.findOne(categoryId);
+        if (null==category) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        List<CourseCategoryBean> beans = entitiesToBeans(Arrays.asList(new CourseCategoryEntity[]{category}));
+        fillOtherProperties(beans);
+        return beans.get(0);
+    }
+
     public long countByStatus(String strStatus) {
         logger.info("count course category by statues={}", strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
