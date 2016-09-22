@@ -450,7 +450,7 @@ public class UserConsultationService {
             logger.error("consultation is not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (0!=consultation.getNurseId() && nurseId!=consultation.getNurseId()) {
+        if (nurseId>0 && 0!=consultation.getNurseId() && nurseId!=consultation.getNurseId()) {
             logger.error("consultation not belong this nurse");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
