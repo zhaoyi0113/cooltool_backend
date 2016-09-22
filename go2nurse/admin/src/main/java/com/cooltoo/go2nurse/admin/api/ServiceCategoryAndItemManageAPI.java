@@ -56,6 +56,16 @@ public class ServiceCategoryAndItemManageAPI {
         return Response.ok(vendorCount).build();
     }
 
+    @Path("/vendor/{vendor_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getVendor(@Context HttpServletRequest request,
+                              @PathParam("vendor_id") @DefaultValue("0") long vendorId
+    ) {
+        ServiceVendorBean serviceVendor = vendorCategoryAndItemService.getVendorById(vendorId);
+        return Response.ok(serviceVendor).build();
+    }
+
     @Path("/vendor")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -68,6 +78,24 @@ public class ServiceCategoryAndItemManageAPI {
 
         List<ServiceVendorBean> serviceVendor = vendorCategoryAndItemService.getVendor(statuses, pageIndex, sizePerPage);
         return Response.ok(serviceVendor).build();
+    }
+
+    @Path("/category/{category_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response countTopServiceCategory(@Context HttpServletRequest request,
+                                            @PathParam("category_id") @DefaultValue("0") long categoryId
+    ) {
+        List<ServiceCategoryBean> categories = vendorCategoryAndItemService.getCategoryAndParentById(categoryId);
+        if (VerifyUtil.isListEmpty(categories)) {
+            return Response.ok(categories).build();
+        }
+        else {
+            if (categories.size()>1) {
+                categories.remove(1);
+            }
+            return Response.ok(categories).build();
+        }
     }
 
     @Path("/category/top/count")

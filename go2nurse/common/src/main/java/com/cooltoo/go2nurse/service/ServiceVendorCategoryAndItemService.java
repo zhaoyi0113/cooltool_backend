@@ -69,6 +69,19 @@ public class ServiceVendorCategoryAndItemService {
     //=====================================================================
     //                   getting
     //=====================================================================
+
+    public ServiceVendorBean getVendorById(long vendorId) {
+        logger.info("get service vendor by vendorId={}", vendorId);
+        ServiceVendorEntity vendor = vendorRep.findOne(vendorId);
+        if (null==vendor) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        List<ServiceVendorBean> beans = serviceVendorEntitiesToBeans(Arrays.asList(new ServiceVendorEntity[]{vendor}));
+        fillVendorOtherProperties(beans);
+        logger.info("count is ={}", beans.size());
+        return beans.get(0);
+    }
+
     public long countVendor(List<CommonStatus> statuses) {
         long count = 0;
         if (!VerifyUtil.isListEmpty(statuses)) {
@@ -191,6 +204,9 @@ public class ServiceVendorCategoryAndItemService {
 
         List<ServiceCategoryBean> beans = serviceCategoryEntitiesToBeans(entities);
         fillCategoryOtherProperties(beans);
+        if (beans.size()>1) {
+            beans.get(0).setParent(beans.get(1));
+        }
         return beans;
     }
 
