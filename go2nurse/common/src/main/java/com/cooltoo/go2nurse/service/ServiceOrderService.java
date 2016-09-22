@@ -262,6 +262,10 @@ public class ServiceOrderService {
             logger.warn("channel is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+        if (!OrderStatus.TO_PAY.equals(entity.getOrderStatus())) {
+            logger.error("order status={}, not to_pay", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
 
         ServiceOrderBean order = beanConverter.convert(entity);
         String orderNo = order.getOrderNo();
@@ -300,6 +304,13 @@ public class ServiceOrderService {
         ServiceOrderChargePingPPBean charge = orderPingPPService.orderChargePingPpWebhooks(chargeId, webhooksEventId, webhooksEventJson);
         long orderId = charge.getOrderId();
         ServiceOrderEntity order = repository.findOne(orderId);
+        if (null==order) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (!OrderStatus.TO_PAY.equals(order.getOrderStatus())) {
+            logger.error("order status={}, not to_pay", order.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
         order.setOrderStatus(OrderStatus.TO_DISPATCH);
 
         order = repository.save(order);
@@ -472,7 +483,12 @@ public class ServiceOrderService {
         entity.setOrderNo(orderNo);
         entity.setLeaveAMessage(leaveAMessage);
 
-        entity.setOrderStatus(OrderStatus.TO_PAY);
+        if (entity.getTotalConsumptionCent() - entity.getPreferentialCent() > 0) {
+            entity.setOrderStatus(OrderStatus.TO_PAY);
+        }
+        else {
+            entity.setOrderStatus(OrderStatus.TO_DISPATCH);
+        }
         entity.setPayTime(new Date(0));
         entity.setPaymentAmountCent(0);
 
