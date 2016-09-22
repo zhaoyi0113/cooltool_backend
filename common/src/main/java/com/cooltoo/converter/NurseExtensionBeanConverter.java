@@ -1,6 +1,7 @@
 package com.cooltoo.converter;
 
 import com.cooltoo.beans.NurseExtensionBean;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.entities.NurseExtensionEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ public class NurseExtensionBeanConverter implements Converter<NurseExtensionEnti
         bean.setGoodAt(source.getGoodAt());
         bean.setJobTitle(source.getJobTitle());
         bean.setAnswerNursingQuestion(source.getAnswerNursingQuestion());
+        bean.setIsExport(YesNoEnum.YES.equals(source.getIsExport()) ? YesNoEnum.YES : YesNoEnum.NO);
         return bean;
     }
 }

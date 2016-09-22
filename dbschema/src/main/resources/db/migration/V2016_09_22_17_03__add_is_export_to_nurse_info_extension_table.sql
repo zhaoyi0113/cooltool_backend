@@ -1,0 +1,1 @@
+ALTER TABLE `cooltoo_nurse_info_extension` ADD COLUMN `is_expert` INT(11) NULL DEFAULT 0 AFTER `job_title`;
