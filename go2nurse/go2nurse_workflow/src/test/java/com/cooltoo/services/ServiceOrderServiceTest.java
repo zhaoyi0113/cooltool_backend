@@ -199,7 +199,7 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         Object charge = (Object)orderService.payForService(userId, orderId, channel, clientIp);
         Assert.assertNull(charge);
 
-        orderId = 277;
+        orderId = 278;
         clientIp = "127.0.0.1";
         charge = (Object)orderService.payForService(userId, orderId, channel, clientIp);
     }
