@@ -198,7 +198,7 @@ public class ServiceVendorCategoryAndItemService {
         entities.add(entity);
 
         ServiceCategoryEntity parentEntity = categoryRep.findOne(entity.getParentId());
-        if(null!=entity) {
+        if(null!=parentEntity) {
             entities.add(parentEntity);
         }
 
