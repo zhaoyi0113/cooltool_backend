@@ -84,8 +84,8 @@ public class UserConsultationManageAPI {
     ) {
         CommonStatus status = CommonStatus.parseString(strStatus);
         YesNoEnum completed = YesNoEnum.parseString(strCompleted);
-        userConsultationService.updateConsultationStatus(null, null, null, status, completed);
-        return Response.ok().build();
+        UserConsultationBean bean = userConsultationService.updateConsultationStatus(null, null, null, status, completed);
+        return Response.ok(bean).build();
     }
 
 

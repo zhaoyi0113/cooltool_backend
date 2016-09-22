@@ -226,6 +226,32 @@ public class UserConsultationService {
         }
     }
 
+    private void fillOtherPropertiesForSingleConsultation(UserConsultationBean consultation) {
+        if (null==consultation) {
+            return;
+        }
+
+        Long userId = consultation.getUserId();
+        Long patientId = consultation.getPatientId();
+        Long nurseId = consultation.getNurseId();
+        Long categoryId = consultation.getCategoryId();
+        Long consultationId = consultation.getId();
+
+        UserBean user = userService.getUser(userId);
+        PatientBean patient = patientService.getOneById(patientId);
+        NurseBean nurse = nurseService.getNurseById(nurseId);
+        ConsultationCategoryBean category = categoryService.getCategoryById(categoryId);
+        Map<Long, List<String>> consultationIdToImagesUrl = imageService.getConsultationIdToImagesUrl(Arrays.asList(new Long[]{consultationId}));
+
+        // fill properties
+        consultation.setUser(user);
+        consultation.setPatient(patient);
+        consultation.setNurse(nurse);
+        consultation.setCategory(category);
+        List<String> imagesUrl = consultationIdToImagesUrl.get(consultation.getId());
+        consultation.setImagesUrl(imagesUrl);
+    }
+
 
     //===============================================================
     //             update
@@ -262,7 +288,7 @@ public class UserConsultationService {
         return retValue;
     }
 
-    public CommonStatus updateConsultationStatus(Long consultationId, Long categoryId, Long nurseId, CommonStatus status, YesNoEnum completed) {
+    public UserConsultationBean updateConsultationStatus(Long consultationId, Long categoryId, Long nurseId, CommonStatus status, YesNoEnum completed) {
         logger.info("update consultation={} with categoryId={} nurseId={} status={}",
                 consultationId, categoryId, nurseId, status);
         UserConsultationEntity entity = repository.findOne(consultationId);
@@ -292,7 +318,9 @@ public class UserConsultationService {
         if (changed) {
             entity = repository.save(entity);
         }
-        return entity.getStatus();
+        UserConsultationBean bean = beanConverter.convert(entity);
+        fillOtherPropertiesForSingleConsultation(bean);
+        return bean;
     }
 
 

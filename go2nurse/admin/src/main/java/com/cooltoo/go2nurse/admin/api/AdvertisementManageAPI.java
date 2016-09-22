@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.go2nurse.beans.AdvertisementBean;
 import com.cooltoo.go2nurse.service.AdvertisementService;
+import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,17 @@ import java.util.List;
 public class AdvertisementManageAPI {
 
     @Autowired private AdvertisementService advertisementService;
+
+    @Path("/{advertisement_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response countAdvertisement(@Context HttpServletRequest request,
+                                       @PathParam("advertisement_id") @DefaultValue("0") Long advertisementId
+    ) {
+        List<AdvertisementBean> activities = advertisementService.getAdvertisementByIds(advertisementId+"");
+        AdvertisementBean one = VerifyUtil.isListEmpty(activities) ? null: activities.get(0);
+        return Response.ok(one).build();
+    }
 
     // status ==> all/enabled/disabled/deleted
     // type ==> consultation/appointment

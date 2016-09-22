@@ -161,14 +161,14 @@ public class UserConsultationAPI {
     public Response editConsultation(@Context HttpServletRequest request,
                                      @FormParam("consultation_id") @DefaultValue("0") long consultationId,
                                      @FormParam("category_id") @DefaultValue("") String strCategoryId,
-                                     @FormParam("nurse_id") @DefaultValue("") String strNurseId,
+                                     @FormParam("nurse_id") @DefaultValue("") String strNurseId, /* not used */
                                      @FormParam("completed") @DefaultValue("") String strCompleted/* YES , NO */
     ) {
         Long categoryId = VerifyUtil.isIds(strCategoryId) ? VerifyUtil.parseLongIds(strCategoryId).get(0) : null;
         Long nurseId = VerifyUtil.isIds(strNurseId) ? VerifyUtil.parseLongIds(strNurseId).get(0) : null;
         YesNoEnum completed = YesNoEnum.parseString(strCompleted);
-        userConsultationService.updateConsultationStatus(consultationId, categoryId, nurseId, null, completed);
-        return Response.ok().build();
+        UserConsultationBean bean = userConsultationService.updateConsultationStatus(consultationId, categoryId, nurseId, null, completed);
+        return Response.ok(bean).build();
     }
 
 

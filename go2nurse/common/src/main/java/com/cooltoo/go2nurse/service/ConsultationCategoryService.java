@@ -87,18 +87,18 @@ public class ConsultationCategoryService {
         return beans;
     }
 
-    public List<ConsultationCategoryBean> getCategoryAndParentById(long categoryId) {
+    public ConsultationCategoryBean getCategoryById(long categoryId) {
         logger.info("get consultation category by categoryId={}", categoryId);
         List<ConsultationCategoryEntity> entities = new ArrayList<>();
         ConsultationCategoryEntity entity = categoryRep.findOne(categoryId);
         if(null==entity) {
-            return new ArrayList<>();
+            return null;
         }
         entities.add(entity);
 
         List<ConsultationCategoryBean> beans = entitiesToBeans(entities);
         fillOtherProperties(beans);
-        return beans;
+        return beans.get(0);
     }
 
     public Map<Long, ConsultationCategoryBean> getCategoryIdToBean(List<Long> userIds) {

@@ -39,6 +39,16 @@ public class ConsultationCategoryManageAPI {
         return statuses;
     }
 
+    @Path("/category/{category_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCategoryById(@Context HttpServletRequest request,
+                                    @PathParam("category_id") @DefaultValue("0") long categoryId
+    ) {
+        ConsultationCategoryBean categories = categoryService.getCategoryById(categoryId);
+        return Response.ok(categories).build();
+    }
+
     @Path("/category/count")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

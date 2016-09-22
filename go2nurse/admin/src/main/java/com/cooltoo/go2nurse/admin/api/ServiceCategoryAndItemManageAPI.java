@@ -125,6 +125,16 @@ public class ServiceCategoryAndItemManageAPI {
         return Response.ok(serviceCategories).build();
     }
 
+    @Path("/item")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response countOrderByConditions(@Context HttpServletRequest request,
+                                           @QueryParam("item_id") @DefaultValue("0") long itemId
+    ) {
+        ServiceItemBean item = vendorCategoryAndItemService.getItemById(itemId);
+        return Response.ok(item).build();
+    }
+
     @Path("/item/count_by_vendor")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

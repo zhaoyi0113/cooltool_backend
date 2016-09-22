@@ -83,6 +83,16 @@ public class UserManageAPI {
         return Response.ok(bean).build();
     }
 
+    @Path("/user")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserById(@Context HttpServletRequest request,
+                                @QueryParam("user_id") @DefaultValue("0") long userId
+    ) {
+        UserBean user = userService.getUser(userId);
+        return Response.ok(user).build();
+    }
+
     @Path("/count")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
