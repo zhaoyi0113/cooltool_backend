@@ -122,7 +122,8 @@ public class UserDiagnosticPointAPI {
                                                           @FormParam("physical_examination_date") @DefaultValue("") String examinationDate,
                                                           @FormParam("operation_date") @DefaultValue("") String operationDate,
                                                           @FormParam("rehabilitation_date") @DefaultValue("") String rehabilitationDate,
-                                                          @FormParam("discharged_from_hospital_date") @DefaultValue("") String dischargedDate
+                                                          @FormParam("discharged_from_hospital_date") @DefaultValue("") String dischargedDate,
+                                                          @FormParam("has_operation") @DefaultValue("") String strHasOperation /* true, false */
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long currentGroupId = relationService.getUserCurrentGroupId(userId);
@@ -130,6 +131,11 @@ public class UserDiagnosticPointAPI {
         List<DiagnosticEnumeration> diagnosticPoints = new ArrayList<>();
         List<Date> pointTimes = new ArrayList<>();
         parseTime(hospitalizedDate, examinationDate, operationDate, rehabilitationDate, dischargedDate, diagnosticPoints, pointTimes);
+
+        Boolean hasOperation = VerifyUtil.isStringEmpty(strHasOperation) ? null : Boolean.valueOf(strHasOperation);
+        if (null!=hasOperation) {
+            relationService.updateHasOperationFlagByUserAndGroup(userId, currentGroupId, hasOperation);
+        }
 
         List<UserDiagnosticPointRelationBean> relation = relationService.updateUserDiagnosticPointTime(currentGroupId, userId, diagnosticPoints, pointTimes);
         return Response.ok(relation).build();
@@ -181,7 +187,7 @@ public class UserDiagnosticPointAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response userCancelDiagnostic(@Context HttpServletRequest request,
-                                         @FormParam("has_operation") @DefaultValue("") String strHasOperation
+                                         @FormParam("has_operation") @DefaultValue("") String strHasOperation /* true, false */
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long groupId = relationService.getUserCurrentGroupId(userId);
