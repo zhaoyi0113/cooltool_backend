@@ -18,6 +18,7 @@ public class ConsultationCategoryBean {
     private long iconId;
     private String iconUrl;
     private long order;
+    private String keyword;
 
     public long getId() {
         return id;
@@ -57,6 +58,10 @@ public class ConsultationCategoryBean {
 
     public long getOrder() {
         return order;
+    }
+
+    public String getKeyword() {
+        return keyword;
     }
 
     public void setId(long id) {
@@ -99,6 +104,10 @@ public class ConsultationCategoryBean {
         this.order = order;
     }
 
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -109,6 +118,7 @@ public class ConsultationCategoryBean {
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
         msg.append(", order=").append(order);
+        msg.append(", keyword=").append(keyword);
         msg.append("]");
         return msg.toString();
     }

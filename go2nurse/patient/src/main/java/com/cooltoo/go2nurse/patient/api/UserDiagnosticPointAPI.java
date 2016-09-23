@@ -113,6 +113,20 @@ public class UserDiagnosticPointAPI {
         return Response.ok(relation).build();
     }
 
+    @Path("/edit/did_have_operation")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response updateRelationByHasOperationFlag(@Context HttpServletRequest request,
+                                                     @FormParam("has_operation") @DefaultValue("") String strHasOperation /* true, false */
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long currentGroupId = relationService.getUserCurrentGroupId(userId);
+
+        List<UserDiagnosticPointRelationBean> relation = relationService.updateHasOp(currentGroupId, userId, null, null);
+        return Response.ok(relation).build();
+    }
+
     @Path("/edit/current_diagnostic_point_times")
     @POST
     @Produces(MediaType.APPLICATION_JSON)

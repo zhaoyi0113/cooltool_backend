@@ -82,9 +82,10 @@ public class ConsultationCategoryManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addServiceCategory(@Context HttpServletRequest request,
                                        @FormParam("name") @DefaultValue("") String name,
-                                       @FormParam("description") @DefaultValue("") String description
+                                       @FormParam("description") @DefaultValue("") String description,
+                                       @FormParam("keyword") @DefaultValue("") String keyword
     ) {
-        ConsultationCategoryBean category = categoryService.addCategory(name, description);
+        ConsultationCategoryBean category = categoryService.addCategory(name, description, keyword);
         return Response.ok(category).build();
     }
 
@@ -99,9 +100,10 @@ public class ConsultationCategoryManageAPI {
                                         @FormParam("category_id") @DefaultValue("0") long categoryId,
                                         @FormParam("name") @DefaultValue("") String name,
                                         @FormParam("description") @DefaultValue("") String description,
+                                        @FormParam("keyword") @DefaultValue("") String keyword,
                                         @FormParam("status") @DefaultValue("") String status
     ) {
-        ConsultationCategoryBean category = categoryService.updateCategory(categoryId, name, description, status);
+        ConsultationCategoryBean category = categoryService.updateCategory(categoryId, name, description, status, keyword);
         return Response.ok(category).build();
     }
 

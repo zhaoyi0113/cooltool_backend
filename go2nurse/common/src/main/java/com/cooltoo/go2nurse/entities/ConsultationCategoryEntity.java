@@ -20,6 +20,7 @@ public class ConsultationCategoryEntity {
     private long imageId;
     private long iconId;
     private long orderIndex;
+    private String keyword;
 
     @Id
     @GeneratedValue
@@ -64,6 +65,11 @@ public class ConsultationCategoryEntity {
         return orderIndex;
     }
 
+    @Column(name = "keyword")
+    public String getKeyword() {
+        return keyword;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -96,6 +102,10 @@ public class ConsultationCategoryEntity {
         this.orderIndex = orderIndex;
     }
 
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -106,6 +116,7 @@ public class ConsultationCategoryEntity {
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
         msg.append(", orderIndex=").append(orderIndex);
+        msg.append(", keyword=").append(keyword);
         msg.append("]");
         return msg.toString();
     }

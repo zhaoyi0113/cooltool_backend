@@ -401,6 +401,15 @@ public class UserConsultationService {
     //=======================================
     //           getting
     //=======================================
+    public UserConsultationTalkBean getTalkById(Long talkId) {
+        UserConsultationTalkBean talkBean = talkService.getTalkWithoutInfoById(talkId);
+        if (null!=talkBean) {
+            List<UserConsultationTalkBean> talkBeans = Arrays.asList(new UserConsultationTalkBean[]{talkBean});
+            fillOtherPropertiesForTalk(talkBean.getConsultationId(), talkBeans);
+        }
+        return talkBean;
+    }
+
     private List<UserConsultationTalkBean> getTalkByConsultationId(Long consultationId) {
         List<UserConsultationTalkBean> talksBean = talkService.getTalkByConsultationId(consultationId);
         fillOtherPropertiesForTalk(consultationId, talksBean);

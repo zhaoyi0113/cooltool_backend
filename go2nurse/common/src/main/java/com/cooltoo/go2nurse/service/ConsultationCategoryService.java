@@ -210,7 +210,7 @@ public class ConsultationCategoryService {
     }
 
     @Transactional
-    public ConsultationCategoryBean updateCategory(long categoryId, String name, String description, String strStatus) {
+    public ConsultationCategoryBean updateCategory(long categoryId, String name, String description, String strStatus, String keyword) {
         logger.info("update consultation category={} by name={} description={} status={}",
                 categoryId, name, description, strStatus);
 
@@ -226,6 +226,10 @@ public class ConsultationCategoryService {
         }
         if (!VerifyUtil.isStringEmpty(description)) {
             entity.setDescription(description);
+            changed = true;
+        }
+        if (!VerifyUtil.isStringEmpty(keyword)) {
+            entity.setKeyword(keyword.trim());
             changed = true;
         }
         CommonStatus status = CommonStatus.parseString(strStatus);
@@ -301,7 +305,7 @@ public class ConsultationCategoryService {
     //=====================================================================
 
     @Transactional
-    public ConsultationCategoryBean addCategory(String name, String description) {
+    public ConsultationCategoryBean addCategory(String name, String description, String keyword) {
         logger.info("add consultation category by name={} description={}", name, description);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
@@ -311,6 +315,9 @@ public class ConsultationCategoryService {
         ConsultationCategoryEntity entity = new ConsultationCategoryEntity();
         if (!VerifyUtil.isStringEmpty(description)) {
             entity.setDescription(description);
+        }
+        if (!VerifyUtil.isStringEmpty(keyword)) {
+            entity.setKeyword(keyword.trim());
         }
         entity.setName(name);
         entity.setStatus(CommonStatus.ENABLED);

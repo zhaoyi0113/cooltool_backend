@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.admin.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
+import com.cooltoo.go2nurse.beans.UserConsultationTalkBean;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.util.VerifyUtil;
@@ -92,6 +93,16 @@ public class UserConsultationManageAPI {
     //=================================================================================================================
     //                                           talk service
     //=================================================================================================================
+    @Path("/talk")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getConsultationTalk(@Context HttpServletRequest request,
+                                        @FormParam("talk_id") @DefaultValue("0") long talkId
+    ) {
+        UserConsultationTalkBean talkBean = userConsultationService.getTalkById(talkId);
+        return Response.ok(talkBean).build();
+    }
+
     @Path("/talk")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)

@@ -21,6 +21,7 @@ public class ConsultationCategoryBeanConverter implements Converter<Consultation
         bean.setImageId(source.getImageId());
         bean.setIconId(source.getIconId());
         bean.setOrder(source.getOrderIndex());
+        bean.setKeyword(source.getKeyword());
         return bean;
     }
 }
