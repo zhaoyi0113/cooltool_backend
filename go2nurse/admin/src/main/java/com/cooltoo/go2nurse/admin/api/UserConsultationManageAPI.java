@@ -97,7 +97,7 @@ public class UserConsultationManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConsultationTalk(@Context HttpServletRequest request,
-                                        @FormParam("talk_id") @DefaultValue("0") long talkId
+                                        @QueryParam("talk_id") @DefaultValue("0") long talkId
     ) {
         UserConsultationTalkBean talkBean = userConsultationService.getTalkById(talkId);
         return Response.ok(talkBean).build();
