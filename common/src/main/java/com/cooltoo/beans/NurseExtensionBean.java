@@ -17,7 +17,7 @@ public class NurseExtensionBean {
     private YesNoEnum answerNursingQuestion;
     private String goodAt;
     private String jobTitle;
-    private YesNoEnum isExport;
+    private YesNoEnum isExpert;
 
     public long getId() {
         return id;
@@ -75,12 +75,12 @@ public class NurseExtensionBean {
         this.jobTitle = jobTitle;
     }
 
-    public YesNoEnum getIsExport() {
-        return isExport;
+    public YesNoEnum getIsExpert() {
+        return isExpert;
     }
 
-    public void setIsExport(YesNoEnum isExport) {
-        this.isExport = isExport;
+    public void setIsExpert(YesNoEnum isExpert) {
+        this.isExpert = isExpert;
     }
 
     public String toString() {
@@ -90,7 +90,7 @@ public class NurseExtensionBean {
         msg.append(", nurseId=").append(nurseId);
         msg.append(", goodAt=").append(goodAt);
         msg.append(", jobTitle=").append(jobTitle);
-        msg.append(", isExport=").append(isExport);
+        msg.append(", isExpert=").append(isExpert);
         msg.append(", answerNursingQuestion=").append(answerNursingQuestion);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);

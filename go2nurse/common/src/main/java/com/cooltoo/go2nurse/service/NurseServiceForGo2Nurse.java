@@ -41,7 +41,7 @@ public class NurseServiceForGo2Nurse {
     @Autowired private Go2NurseUtility utility;
 
     //===================================================================
-    //
+    //                     getting
     //===================================================================
     public boolean existsNurse(long nurseId) {
         return commonNurseService.existNurse(nurseId);

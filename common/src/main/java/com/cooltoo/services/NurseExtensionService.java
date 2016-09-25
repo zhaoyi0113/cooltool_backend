@@ -72,7 +72,7 @@ public class NurseExtensionService {
     //                  setting
     //================================================================================
     @Transactional
-    public NurseExtensionBean setExtension(long nurseId, YesNoEnum answerNursingQuestion, String beGoodAt, String jobTitle, YesNoEnum isExport) {
+    public NurseExtensionBean setExtension(long nurseId, YesNoEnum answerNursingQuestion, String beGoodAt, String jobTitle, YesNoEnum isExpert) {
         logger.info("set nurse extension. nurseId={} answerNursingQuestion={} beGoodAt={} jobTitle={}",
                 nurseId, answerNursingQuestion, beGoodAt, jobTitle);
         if (null==answerNursingQuestion) {
@@ -103,8 +103,8 @@ public class NurseExtensionService {
             if (!VerifyUtil.isStringEmpty(jobTitle)) {
                 entity.setJobTitle(jobTitle);
             }
-            if (null!=isExport) {
-                entity.setIsExport(isExport);
+            if (null!=isExpert) {
+                entity.setIsExpert(isExpert);
             }
         }
         else {
@@ -118,8 +118,8 @@ public class NurseExtensionService {
             if (!VerifyUtil.isStringEmpty(jobTitle)) {
                 entity.setJobTitle(jobTitle);
             }
-            if (null!=isExport) {
-                entity.setIsExport(isExport);
+            if (null!=isExpert) {
+                entity.setIsExpert(isExpert);
             }
             extensionCount = entities.size();
         }

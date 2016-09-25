@@ -21,7 +21,7 @@ public class NurseExtensionBeanConverter implements Converter<NurseExtensionEnti
         bean.setGoodAt(source.getGoodAt());
         bean.setJobTitle(source.getJobTitle());
         bean.setAnswerNursingQuestion(source.getAnswerNursingQuestion());
-        bean.setIsExport(YesNoEnum.YES.equals(source.getIsExport()) ? YesNoEnum.YES : YesNoEnum.NO);
+        bean.setIsExpert(YesNoEnum.YES.equals(source.getIsExpert()) ? YesNoEnum.YES : YesNoEnum.NO);
         return bean;
     }
 }

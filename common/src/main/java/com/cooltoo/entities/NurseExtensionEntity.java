@@ -21,7 +21,7 @@ public class NurseExtensionEntity {
     private YesNoEnum answerNursingQuestion;
     private String goodAt;
     private String jobTitle;
-    private YesNoEnum isExport;
+    private YesNoEnum isExpert;
 
     @Id
     @GeneratedValue
@@ -92,12 +92,12 @@ public class NurseExtensionEntity {
 
     @Column(name = "is_expert")
     @Enumerated
-    public YesNoEnum getIsExport() {
-        return isExport;
+    public YesNoEnum getIsExpert() {
+        return isExpert;
     }
 
-    public void setIsExport(YesNoEnum isExport) {
-        this.isExport = isExport;
+    public void setIsExpert(YesNoEnum isExpert) {
+        this.isExpert = isExpert;
     }
 
     // 映射多对一的关联关系
