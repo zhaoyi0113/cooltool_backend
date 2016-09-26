@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
 import com.cooltoo.util.VerifyUtil;
@@ -42,13 +43,15 @@ public class NurseAPIForPatient {
                                  @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
                                  @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
                                  @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
+                                 @QueryParam("register_from") @DefaultValue("") String strRegisterFrom,
                                  @QueryParam("index")  @DefaultValue("0")  int index,
                                  @QueryParam("number") @DefaultValue("10") int number
 
     ) {
         Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
-        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByCanAnswerQuestion(name, canAnswerNursingQuestion, hospitalId, departmentId, index, number);
+        RegisterFrom registerFrom = RegisterFrom.parseString(strRegisterFrom);
+        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByCanAnswerQuestion(name, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, index, number);
         return Response.ok(nurses).build();
     }
 
