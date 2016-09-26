@@ -187,13 +187,26 @@ public class CommonNurseService {
     //========================================================================
     @Transactional
     public NurseEntity registerNurse(String name, int age, GenderType gender, String mobile, String password, String identification, String realName, String shortNote, RegisterFrom from) {
+        if (null==from) {
+            logger.info("register from is null");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (VerifyUtil.isStringEmpty(mobile)){
+            logger.info("mobile is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        mobile = mobile.trim();
+        if(!nurseRepository.findByMobile(mobile).isEmpty()){
+            throw new BadRequestException(ErrorCode.NURSE_ALREADY_EXISTED);
+        }
+
         gender = null==gender ? GenderType.SECRET : gender;
 
         NurseEntity entity = new NurseEntity();
         entity.setName(name);
         entity.setAge(age);
         entity.setGender(gender);
-        entity.setMobile(mobile);
+        entity.setMobile(mobile.trim());
         entity.setPassword(password);
         entity.setRealName(realName);
         entity.setIdentification(identification);
@@ -201,13 +214,6 @@ public class CommonNurseService {
         entity.setAuthority(UserAuthority.AGREE_ALL);
         entity.setRegisterFrom(from);
         logger.info("add new nurse={}", entity);
-        if (VerifyUtil.isStringEmpty(mobile)){
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        mobile = mobile.trim();
-        if(!nurseRepository.findByMobile(mobile).isEmpty()){
-            throw new BadRequestException(ErrorCode.NURSE_ALREADY_EXISTED);
-        }
         entity = nurseRepository.save(entity);
         return entity;
     }
