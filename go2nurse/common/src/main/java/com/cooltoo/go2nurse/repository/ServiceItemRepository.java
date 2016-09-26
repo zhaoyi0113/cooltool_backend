@@ -23,9 +23,9 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
     List<ServiceItemEntity> findByCategoryIdAndStatusIn(Long categoryId, List<CommonStatus> statuses, Sort sort);
     Page<ServiceItemEntity> findByCategoryIdAndStatusIn(Long categoryId, List<CommonStatus> statuses, Pageable sort);
 
-    long countByVendorIdAndStatusIn(Long vendorId, List<CommonStatus> statuses);
-    List<ServiceItemEntity> findByVendorIdAndStatusIn(Long vendorId, List<CommonStatus> statuses, Sort sort);
-    Page<ServiceItemEntity> findByVendorIdAndStatusIn(Long vendorId, List<CommonStatus> statuses, Pageable sort);
+    long countByVendorIdAndVendorTypeAndStatusIn(Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses);
+    List<ServiceItemEntity> findByVendorIdAndVendorTypeAndStatusIn(Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses, Sort sort);
+    Page<ServiceItemEntity> findByVendorIdAndVendorTypeAndStatusIn(Long vendorId, ServiceVendorType vendorType, List<CommonStatus> statuses, Pageable sort);
 
     List<ServiceItemEntity> findByIdIn(List<Long> ids, Sort sort);
 

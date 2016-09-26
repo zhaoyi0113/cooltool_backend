@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.DoctorAppointmentService;
 import com.cooltoo.util.NetworkUtil;
 import com.google.common.io.CharStreams;
@@ -76,6 +77,20 @@ public class UserServiceOrderAPI {
         List<CommonStatus> statuses = new ArrayList<>();
         statuses.add(CommonStatus.ENABLED);
         List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByCategoryId(categoryId, statuses);
+        return Response.ok(serviceItems).build();
+    }
+
+    @Path("/vendor/item")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getServiceItemByVendor(@Context HttpServletRequest request,
+                                           @QueryParam("vendor_id") @DefaultValue("0") int vendorId,
+                                           @QueryParam("vendor_type") @DefaultValue("0") String vendorType /* company, hospital*/
+    ) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.ENABLED);
+        List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByVendorId(vendorId, vendorType, statuses);
         return Response.ok(serviceItems).build();
     }
 

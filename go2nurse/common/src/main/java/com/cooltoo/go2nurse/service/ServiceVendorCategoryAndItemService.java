@@ -273,20 +273,22 @@ public class ServiceVendorCategoryAndItemService {
         return beans;
     }
 
-    public long countItemByVendorId(long vendorId, List<CommonStatus> statuses) {
+    public long countItemByVendorId(long vendorId, String strVendorType, List<CommonStatus> statuses) {
         long count = 0;
-        if (!VerifyUtil.isListEmpty(statuses)) {
-            count = itemRep.countByVendorIdAndStatusIn(vendorId, statuses);
+        ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
+        if (null!=vendorType && !VerifyUtil.isListEmpty(statuses)) {
+            count = itemRep.countByVendorIdAndVendorTypeAndStatusIn(vendorId, vendorType, statuses);
         }
         logger.info("count service item by vendorId={} status={}, size is {}", vendorId, statuses, count);
         return count;
     }
 
-    public List<ServiceItemBean> getItemByVendorId(long vendorId, List<CommonStatus> statuses) {
+    public List<ServiceItemBean> getItemByVendorId(long vendorId, String strVendorType, List<CommonStatus> statuses) {
         logger.info("get service item by vendorId={} status={}", vendorId, statuses);
         List<ServiceItemBean> beans;
-        if (!VerifyUtil.isListEmpty(statuses)) {
-            List<ServiceItemEntity> entities = itemRep.findByVendorIdAndStatusIn(vendorId, statuses, itemSort);
+        ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
+        if (null!=vendorType && !VerifyUtil.isListEmpty(statuses)) {
+            List<ServiceItemEntity> entities = itemRep.findByVendorIdAndVendorTypeAndStatusIn(vendorId, vendorType, statuses, itemSort);
             beans = serviceItemEntitiesToBeans(entities);
             fillItemOtherProperties(beans);
         }
@@ -298,12 +300,13 @@ public class ServiceVendorCategoryAndItemService {
         return beans;
     }
 
-    public List<ServiceItemBean> getItemByVendorId(long vendorId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+    public List<ServiceItemBean> getItemByVendorId(long vendorId, String strVendorType, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
         logger.info("get service item by vendorId={} status={}, at page={} size={}", vendorId, pageIndex, sizePerPage);
         List<ServiceItemBean> beans;
-        if (!VerifyUtil.isListEmpty(statuses)) {
+        ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
+        if (null!=vendorType && !VerifyUtil.isListEmpty(statuses)) {
             PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, itemSort);
-            Page<ServiceItemEntity> entities = itemRep.findByVendorIdAndStatusIn(vendorId, statuses, pageRequest);
+            Page<ServiceItemEntity> entities = itemRep.findByVendorIdAndVendorTypeAndStatusIn(vendorId, vendorType, statuses, pageRequest);
             beans = serviceItemEntitiesToBeans(entities);
             fillItemOtherProperties(beans);
         }
