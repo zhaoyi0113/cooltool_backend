@@ -204,6 +204,10 @@ public class NurseBean {
         this.registerFromApplication = null==registerFrom ? null : registerFrom.getApplication();
     }
 
+    public String getRegisterFromApplication() {
+        return registerFromApplication;
+    }
+
     public List<NurseRelationshipBean> getRelationshipToRequester() {
         return relationshipToRequester;
     }
