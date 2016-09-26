@@ -76,7 +76,7 @@ public class NurseManageAPI {
                                                  @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
                                                  @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
                                                  @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
-                                                 @FormParam("register_from") @DefaultValue("") String strRegisterFrom /* COOLTOO, GO2NURSE */
+                                                 @QueryParam("register_from") @DefaultValue("") String strRegisterFrom /* COOLTOO, GO2NURSE */
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get nurse record count by authority {} fuzzyName={}", userId, authority, fuzzyName);
@@ -97,7 +97,7 @@ public class NurseManageAPI {
                                                @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
                                                @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
                                                @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
-                                               @FormParam("register_from") @DefaultValue("") String strRegisterFrom, /* COOLTOO, GO2NURSE */
+                                               @QueryParam("register_from") @DefaultValue("") String strRegisterFrom, /* COOLTOO, GO2NURSE */
                                                @QueryParam("index")  @DefaultValue("0")  int index,
                                                @QueryParam("number") @DefaultValue("10") int number
     ) {
