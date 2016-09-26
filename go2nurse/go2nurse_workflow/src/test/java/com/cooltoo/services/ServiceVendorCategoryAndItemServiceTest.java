@@ -142,16 +142,18 @@ public class ServiceVendorCategoryAndItemServiceTest extends AbstractCooltooTest
     @Test
     public void countItemByVendorId() {
         long vendorId = 30;
+        String vendorType = "company";
         List<CommonStatus> statuses = CommonStatus.getAll();
-        long items = vendorCategoryAndItemService.countItemByVendorId(vendorId, statuses);
+        long items = vendorCategoryAndItemService.countItemByVendorId(vendorId, vendorType, statuses);
         Assert.assertEquals(4, items);
     }
 
     @Test
     public void getItemByVendorId() {
         long vendorId = 30;
+        String vendorType = "company";
         List<CommonStatus> statuses = CommonStatus.getAll();
-        List<ServiceItemBean> items = vendorCategoryAndItemService.getItemByVendorId(vendorId, statuses);
+        List<ServiceItemBean> items = vendorCategoryAndItemService.getItemByVendorId(vendorId, vendorType, statuses);
         Assert.assertEquals(4, items.size());
         for (ServiceItemBean tmp : items) {
             Assert.assertEquals(vendorId, tmp.getVendorId());
