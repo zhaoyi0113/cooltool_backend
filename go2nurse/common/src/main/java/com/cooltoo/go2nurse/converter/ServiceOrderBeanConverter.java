@@ -89,6 +89,7 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
             }
         }
         bean.setItemCount(itemCount);
+        bean.setScore(source.getScore());
 
         return bean;
     }

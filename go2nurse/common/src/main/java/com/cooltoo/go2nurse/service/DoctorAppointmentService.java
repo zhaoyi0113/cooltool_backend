@@ -171,6 +171,30 @@ public class DoctorAppointmentService {
     //                    updating
     //=========================================================================
     @Transactional
+    public DoctorAppointmentBean scoreAppointment(long userId, long doctorId, long appointmentId, float score) {
+        logger.info("user={} doctor={} appointment={} score={}!", userId, doctorId, appointmentId, score);
+        DoctorAppointmentEntity entity = repository.findOne(appointmentId);
+        if (null==entity) {
+            logger.error("appointment is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (userId>0 && userId!=entity.getUserId()) {
+            logger.error("not user's appointment");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (doctorId>0 && doctorId!=entity.getDoctorId()) {
+            logger.error("not doctor's appointment");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        score = score<0 ? 0 : score;
+
+        entity.setScore(score);
+        entity = repository.save(entity);
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
     public DoctorAppointmentBean completeAppointment(long userId, long doctorId, long appointmentId) {
         logger.info("user={} doctor={} appointment={} completed!", userId, doctorId, appointmentId);
         DoctorAppointmentEntity entity = repository.findOne(appointmentId);

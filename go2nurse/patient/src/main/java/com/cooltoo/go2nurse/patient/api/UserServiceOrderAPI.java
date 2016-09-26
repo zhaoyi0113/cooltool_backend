@@ -186,6 +186,19 @@ public class UserServiceOrderAPI {
         return Response.ok(order).build();
     }
 
+    @Path("/score")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response userScoreOrder(@Context HttpServletRequest request,
+                                   @FormParam("order_id") @DefaultValue("0") long orderId,
+                                   @FormParam("score") @DefaultValue("0") float score
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        ServiceOrderBean order = orderService.scoreOrder(true, userId, orderId, score);
+        return Response.ok(order).build();
+    }
+
     private List<Object> sortOrderAndAppointment(List<ServiceOrderBean> orders, List<DoctorAppointmentBean> appointments) {
         List<Object> retVal = new ArrayList<>();
         for (ServiceOrderBean order : orders) {

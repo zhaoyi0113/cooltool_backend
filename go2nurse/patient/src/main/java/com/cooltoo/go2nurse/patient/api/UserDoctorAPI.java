@@ -132,4 +132,17 @@ public class UserDoctorAPI {
         DoctorAppointmentBean appointment = doctorAppointmentService.completeAppointment(userId, 0, appointmentId);
         return Response.ok(appointment).build();
     }
+
+    @Path("/appointment/score")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response scoreAppointment(@Context HttpServletRequest request,
+                                     @FormParam("appointment_id") @DefaultValue("0") long appointmentId,
+                                     @FormParam("score") @DefaultValue("0") float score
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        DoctorAppointmentBean appointment = doctorAppointmentService.scoreAppointment(userId, 0, appointmentId, score);
+        return Response.ok(appointment).build();
+    }
 }

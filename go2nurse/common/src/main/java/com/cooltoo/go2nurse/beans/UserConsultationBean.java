@@ -29,6 +29,7 @@ public class UserConsultationBean {
     private List<String> imagesUrl;
     private List<UserConsultationTalkBean> talks;
     private YesNoEnum completed;
+    private float score;
     private boolean hasUnreadTalk;
 
     public long getId() {
@@ -75,6 +76,10 @@ public class UserConsultationBean {
         return patient;
     }
 
+    public float getScore() {
+        return score;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -117,6 +122,10 @@ public class UserConsultationBean {
 
     public void setPatient(PatientBean patient) {
         this.patient = patient;
+    }
+
+    public void setScore(float score) {
+        this.score = score;
     }
 
     public List<String> getImagesUrl() {
@@ -180,6 +189,7 @@ public class UserConsultationBean {
         msg.append(", clinicalHistory=").append(clinicalHistory);
         msg.append(", diseaseDescription=").append(diseaseDescription);
         msg.append(", imagesUrl=").append(VerifyUtil.isListEmpty(imagesUrl) ? 0 : imagesUrl.size());
+        msg.append(", score=").append(score);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

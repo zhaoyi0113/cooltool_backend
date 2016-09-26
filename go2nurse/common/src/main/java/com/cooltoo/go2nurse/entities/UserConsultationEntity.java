@@ -23,6 +23,7 @@ public class UserConsultationEntity {
     private long patientId;
     private long nurseId;
     private YesNoEnum completed;
+    private float score;
 
     @Id
     @GeneratedValue
@@ -78,6 +79,11 @@ public class UserConsultationEntity {
         return completed;
     }
 
+    @Column(name = "score")
+    public float getScore() {
+        return score;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -118,6 +124,10 @@ public class UserConsultationEntity {
         this.completed = completed;
     }
 
+    public void setScore(float score) {
+        this.score = score;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -128,6 +138,8 @@ public class UserConsultationEntity {
         msg.append(", nurseId=").append(nurseId);
         msg.append(", clinicalHistory=").append(clinicalHistory);
         msg.append(", diseaseDescription=").append(diseaseDescription);
+        msg.append(", completed=").append(completed);
+        msg.append(", score=").append(score);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

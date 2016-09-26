@@ -36,6 +36,7 @@ public class DoctorAppointmentBean {
     private long patientId;
     private PatientBean patient;
     private OrderStatus orderStatus;
+    private float score;
     private Map<String, Object> properties = new HashMap<>();
 
     public long getId() {
@@ -114,6 +115,10 @@ public class DoctorAppointmentBean {
         return orderStatus;
     }
 
+    public float getScore() {
+        return score;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -190,6 +195,10 @@ public class DoctorAppointmentBean {
         this.orderStatus = orderStatus;
     }
 
+    public void setScore(float score) {
+        this.score = score;
+    }
+
     public Object getProperty(String key){
         return this.properties.get(key);
     }
@@ -212,6 +221,7 @@ public class DoctorAppointmentBean {
         msg.append("id=").append(id);
         msg.append(", orderNo=").append(orderNo);
         msg.append(", orderStatus=").append(orderStatus);
+        msg.append(", score=").append(score);
         msg.append(", userId=").append(userId);
         msg.append(", patientId=").append(patientId);
         msg.append(", hospitalId=").append(hospitalId);

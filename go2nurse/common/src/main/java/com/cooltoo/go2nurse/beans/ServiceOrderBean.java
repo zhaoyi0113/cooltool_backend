@@ -51,6 +51,7 @@ public class ServiceOrderBean {
     private String paymentAmount;
     private int paymentAmountCent;
     private String leaveAMessage;
+    private float score;
     private List<ServiceOrderChargePingPPBean> pingPP;
     private Map<String, Object> properties = new HashMap<>();
 
@@ -182,6 +183,10 @@ public class ServiceOrderBean {
         return leaveAMessage;
     }
 
+    public float getScore() {
+        return score;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -301,6 +306,10 @@ public class ServiceOrderBean {
         this.leaveAMessage = leaveAMessage;
     }
 
+    public void setScore(float score) {
+        this.score = score;
+    }
+
     public List<ServiceOrderChargePingPPBean> getPingPP() {
         return pingPP;
     }
@@ -343,6 +352,7 @@ public class ServiceOrderBean {
         msg.append(", orderStatus=").append(orderStatus);
         msg.append(", payTime=").append(payTime);
         msg.append(", paymentAmount=").append(paymentAmount);
+        msg.append(", score=").append(score);
         msg.append("]");
         return msg.toString();
     }

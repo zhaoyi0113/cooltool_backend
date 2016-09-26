@@ -288,13 +288,19 @@ public class UserConsultationService {
         return retValue;
     }
 
-    public UserConsultationBean updateConsultationStatus(Long consultationId, Long categoryId, Long nurseId, CommonStatus status, YesNoEnum completed) {
-        logger.info("update consultation={} with categoryId={} nurseId={} status={}",
-                consultationId, categoryId, nurseId, status);
+    @Transactional
+    public UserConsultationBean updateConsultationStatus(Long userId, Long consultationId, Long categoryId, Long nurseId, CommonStatus status, YesNoEnum completed) {
+        logger.info("update consultation={} with categoryId={} nurseId={} status={} userId={}",
+                consultationId, categoryId, nurseId, status, userId);
         UserConsultationEntity entity = repository.findOne(consultationId);
         if (null==entity) {
             logger.error("consultation is not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        if (null!=userId && userId>0 && entity.getUserId()!=userId) {
+            logger.info("consultation not belong to user");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
         boolean changed = false;
@@ -318,6 +324,31 @@ public class UserConsultationService {
         if (changed) {
             entity = repository.save(entity);
         }
+        UserConsultationBean bean = beanConverter.convert(entity);
+        fillOtherPropertiesForSingleConsultation(bean);
+        return bean;
+    }
+
+    @Transactional
+    public UserConsultationBean scoreConsultation(Long userId, Long consultationId, float score) {
+        logger.info("score consultation={} with score={} userId={}",
+                consultationId, score, userId);
+        UserConsultationEntity entity = repository.findOne(consultationId);
+        if (null==entity) {
+            logger.error("consultation is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        if (null!=userId && userId>0 && entity.getUserId()!=userId) {
+            logger.info("consultation not belong to user");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        score = score<0 ? 0 : score;
+
+        entity.setScore(score);
+        entity = repository.save(entity);
+
         UserConsultationBean bean = beanConverter.convert(entity);
         fillOtherPropertiesForSingleConsultation(bean);
         return bean;
@@ -368,6 +399,7 @@ public class UserConsultationService {
         return entity.getId();
     }
 
+    @Transactional
     public Map<String, String> addConsultationImage(long userId, long consultationId, String imageName, InputStream image) {
         logger.info("user={} add image to consultation={} name={} image={}", userId, consultationId, imageName, (null!=image));
 
@@ -442,7 +474,7 @@ public class UserConsultationService {
     //=======================================
     //           deleting
     //=======================================
-
+    @Transactional
     public List<Long> deleteTalk(List<Long> talkIds) {
         List<Long> comments = talkService.deleteByIds(talkIds);
         return comments;
@@ -451,6 +483,7 @@ public class UserConsultationService {
     //=======================================
     //           adding
     //=======================================
+    @Transactional
     public long addTalk(long consultationId, long nurseId, ConsultationTalkStatus talkStatus, String talkContent) {
         logger.info("add consultation talk, consultationId={} nurseId={} talkStatus={} talkContent={}.",
                 consultationId, nurseId, talkStatus, talkContent);
@@ -483,12 +516,14 @@ public class UserConsultationService {
     //=======================================
     //           updating
     //=======================================
+    @Transactional
     public long updateTalk(long talkId, YesNoEnum isBest) {
         logger.info("update consultation talkId={} isBest={}.", talkId, isBest);
         talkService.updateConsultationTalk(talkId, isBest);
         return talkId;
     }
 
+    @Transactional
     public long updateConsultationUnreadTalkStatusToRead(long consultationId, ConsultationTalkStatus talkStatusNotMatch) {
         logger.info("update consultation(Id={}) talkStatusNotMatch={} talks' readingStatus={}.",
                 consultationId, talkStatusNotMatch, ReadingStatus.READ);
@@ -496,6 +531,7 @@ public class UserConsultationService {
         return consultationId;
     }
 
+    @Transactional
     public Map<String, String> addTalkImage(long userId, long consultationId, long talkId, String imageName, InputStream image) {
         logger.info("user={} add image to consultation={} talkId={} name={} image={}", userId, consultationId, talkId, imageName, (null!=image));
 

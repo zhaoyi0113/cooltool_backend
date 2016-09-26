@@ -53,6 +53,7 @@ public class DoctorAppointmentBeanConverter implements Converter<DoctorAppointme
         bean.setClinicHoursId(source.getClinicHoursId());
         bean.setClinicHoursStart(source.getClinicHoursStart());
         bean.setClinicHoursEnd(source.getClinicHoursEnd());
+        bean.setScore(source.getScore());
         return bean;
     }
 }

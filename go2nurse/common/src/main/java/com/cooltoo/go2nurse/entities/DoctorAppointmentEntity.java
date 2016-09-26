@@ -33,6 +33,7 @@ public class DoctorAppointmentEntity {
     private long patientId;
     private String patientJson;
     private OrderStatus orderStatus;
+    private float score;
 
     @Id
     @GeneratedValue
@@ -132,6 +133,11 @@ public class DoctorAppointmentEntity {
         return orderStatus;
     }
 
+    @Column(name = "order_status")
+    public float getScore() {
+        return score;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -208,12 +214,17 @@ public class DoctorAppointmentEntity {
         this.orderStatus = orderStatus;
     }
 
+    public void setScore(float score) {
+        this.score = score;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", orderNo=").append(orderNo);
         msg.append(", orderStatus=").append(orderStatus);
+        msg.append(", score=").append(score);
         msg.append(", userId=").append(userId);
         msg.append(", patientId=").append(patientId);
         msg.append(", hospitalId=").append(hospitalId);

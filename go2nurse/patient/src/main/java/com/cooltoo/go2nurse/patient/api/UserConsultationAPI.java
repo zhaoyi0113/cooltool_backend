@@ -164,10 +164,24 @@ public class UserConsultationAPI {
                                      @FormParam("nurse_id") @DefaultValue("") String strNurseId, /* not used */
                                      @FormParam("completed") @DefaultValue("") String strCompleted/* YES , NO */
     ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Long categoryId = VerifyUtil.isIds(strCategoryId) ? VerifyUtil.parseLongIds(strCategoryId).get(0) : null;
         Long nurseId = VerifyUtil.isIds(strNurseId) ? VerifyUtil.parseLongIds(strNurseId).get(0) : null;
         YesNoEnum completed = YesNoEnum.parseString(strCompleted);
-        UserConsultationBean bean = userConsultationService.updateConsultationStatus(consultationId, categoryId, nurseId, null, completed);
+        UserConsultationBean bean = userConsultationService.updateConsultationStatus(userId, consultationId, categoryId, nurseId, null, completed);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/score")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response scoreConsultation(@Context HttpServletRequest request,
+                                      @FormParam("consultation_id") @DefaultValue("0") long consultationId,
+                                      @FormParam("score") @DefaultValue("0") float score
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        UserConsultationBean bean = userConsultationService.scoreConsultation(userId, consultationId, score);
         return Response.ok(bean).build();
     }
 

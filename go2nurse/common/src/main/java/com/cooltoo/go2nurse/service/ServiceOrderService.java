@@ -355,6 +355,28 @@ public class ServiceOrderService {
         return beanConverter.convert(entity);
     }
 
+    @Transactional
+    public ServiceOrderBean scoreOrder(boolean checkUser, long userId, long orderId, float score) {
+        logger.info("score order={} by user={} checkFlag={} score={}", orderId, userId, checkUser, score);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (checkUser) {
+            if (entity.getUserId()!=userId) {
+                logger.error("order not belong to user");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
+
+        score = score<0 ? 0 : score;
+
+        entity.setScore(score);
+        entity = repository.save(entity);
+        logger.info("order scored is {}", entity);
+        return beanConverter.convert(entity);
+    }
+
     //=====================================================================
     //                   adding
     //=====================================================================

@@ -43,6 +43,7 @@ public class ServiceOrderEntity {
     private Date payTime;
     private int paymentAmountCent;
     private String leaveAMessage;
+    private float score;
 
     @Id
     @GeneratedValue
@@ -184,6 +185,11 @@ public class ServiceOrderEntity {
         return leaveAMessage;
     }
 
+    @Column(name = "score")
+    public float getScore() {
+        return score;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -292,6 +298,10 @@ public class ServiceOrderEntity {
         this.leaveAMessage = leaveAMessage;
     }
 
+    public void setScore(float score) {
+        this.score = score;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -312,6 +322,8 @@ public class ServiceOrderEntity {
         msg.append(", orderStatus=").append(orderStatus);
         msg.append(", payTime=").append(payTime);
         msg.append(", paymentAmountCent=").append(paymentAmountCent);
+        msg.append(", leaveAMessage=").append(leaveAMessage);
+        msg.append(", score=").append(score);
         msg.append("]");
         return msg.toString();
     }
