@@ -51,6 +51,11 @@ public class UserDiagnosticPointAPI {
         List<UserDiagnosticPointRelationBean> relations = relationService.getUserCurrentDiagnosticRelation(userId);
         List<UserDiagnosticPointRelationBean> returnValue = new ArrayList<>();
         for (int i=relations.size()-1; i>=0; i--) {
+            UserDiagnosticPointRelationBean relation = relations.get(i);
+            if (!YesNoEnum.YES.equals(relation.getHasOperation())
+              && DiagnosticEnumeration.OPERATION.equals(relation.getDiagnostic())) {
+                continue;
+            }
             returnValue.add(relations.get(i));
         }
         return Response.ok(returnValue).build();
