@@ -133,7 +133,7 @@ public class DoctorAppointmentEntity {
         return orderStatus;
     }
 
-    @Column(name = "order_status")
+    @Column(name = "score")
     public float getScore() {
         return score;
     }
