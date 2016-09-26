@@ -56,7 +56,6 @@ dependencies {
     compile project(':go2nurse:common')
     compile project(':go2nurse:patient')
     compile project(':go2nurse:admin')
-    compile project(':go2nurse:nurse')
 }
 
 ext {
