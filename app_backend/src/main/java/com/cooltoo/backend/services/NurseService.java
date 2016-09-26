@@ -6,6 +6,7 @@ import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.converter.NurseBeanConverter;
@@ -94,9 +95,10 @@ public class NurseService {
             throw new BadRequestException(ErrorCode.NURSE_ALREADY_EXISTED);
         }
         entity.setAuthority(UserAuthority.AGREE_ALL);
+        entity.setRegisterFrom(RegisterFrom.COOLTOO);
         entity = commonNurseService.registerNurse(entity.getName(), entity.getAge(), entity.getGender(),
                 entity.getMobile(), entity.getPassword(),
-                entity.getIdentification(), entity.getRealName(), entity.getShortNote());
+                entity.getIdentification(), entity.getRealName(), entity.getShortNote(), entity.getRegisterFrom());
         return entity.getId();
     }
 
@@ -239,19 +241,19 @@ public class NurseService {
     //             get used by administrator
     //==============================================================
 
-    public long countByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion, Integer hospitalId, Integer departmentId) {
+    public long countByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
         UserAuthority authority = UserAuthority.parseString(strAuthority);
         YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
-        long count = commonNurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId);
+        long count = commonNurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom);
         logger.info("count is {}", count);
         return count;
     }
 
-    public List<NurseBean> getAllByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion, Integer hospitalId, Integer departmentId, int pageIndex, int number) {
+    public List<NurseBean> getAllByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, int pageIndex, int number) {
         // get nurse by authority
         UserAuthority authority = UserAuthority.parseString(strAuthority);
         YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
-        Iterable<NurseEntity> resultSet = commonNurseService.getNurseByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, pageIndex, number);
+        Iterable<NurseEntity> resultSet = commonNurseService.getNurseByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, pageIndex, number);
         // parse to bean
         List<NurseBean> beanList = entities2Beans(resultSet);
         fillOtherProperties(beanList);

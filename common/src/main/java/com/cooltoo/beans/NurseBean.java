@@ -1,6 +1,7 @@
 package com.cooltoo.beans;
 
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.UserAuthority;
 
 import java.util.HashMap;
@@ -38,6 +39,8 @@ public class NurseBean {
     private String identification;
     private String shortNote;
     private UserAuthority authority;
+    private RegisterFrom registerFrom;
+    private String registerFromApplication;
     private String password;
     private long profilePhotoId;
     private String profilePhotoUrl;
@@ -192,6 +195,15 @@ public class NurseBean {
         this.authority = authority;
     }
 
+    public RegisterFrom getRegisterFrom() {
+        return registerFrom;
+    }
+
+    public void setRegisterFrom(RegisterFrom registerFrom) {
+        this.registerFrom = registerFrom;
+        this.registerFromApplication = null==registerFrom ? null : registerFrom.getApplication();
+    }
+
     public List<NurseRelationshipBean> getRelationshipToRequester() {
         return relationshipToRequester;
     }
@@ -205,6 +217,7 @@ public class NurseBean {
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
         msg.append(", authority=").append(authority);
+        msg.append(", registerFrom=").append(registerFrom);
         msg.append(", name=").append(name);
         msg.append(", gender=").append(gender);
         msg.append(", age=").append(age);

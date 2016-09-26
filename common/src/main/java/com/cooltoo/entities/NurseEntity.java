@@ -1,6 +1,7 @@
 package com.cooltoo.entities;
 
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.UserAuthority;
 
 import javax.persistence.*;
@@ -28,6 +29,7 @@ public class NurseEntity {
     private String identification;
     private String shortNote;
     private UserAuthority authority;
+    private RegisterFrom registerFrom;
     private List<NurseExtensionEntity> extensions = new ArrayList<>();
     private List<NurseHospitalRelationEntity> hospitalRelation = new ArrayList<>();
 
@@ -81,12 +83,17 @@ public class NurseEntity {
 
     @Column(name = "password")
     public String getPassword() { return password; }
+
     public void setPassword(String password) { this.password = password; }
+
     @Column(name = "profile_photo_id")
     public long getProfilePhotoId() { return profilePhotoId; }
+
     public void setProfilePhotoId(long profilePhotoId) { this.profilePhotoId = profilePhotoId; }
+
     @Column(name = "background_image_id")
     public long getBackgroundImageId() { return backgroundImageId; }
+
     public void setBackgroundImageId(long backgroundImageId) {this.backgroundImageId = backgroundImageId;}
 
     @Column(name = "integral")
@@ -134,6 +141,16 @@ public class NurseEntity {
         this.authority = authority;
     }
 
+    @Column(name = "register_from")
+    @Enumerated
+    public RegisterFrom getRegisterFrom() {
+        return registerFrom;
+    }
+
+    public void setRegisterFrom(RegisterFrom registerFrom) {
+        this.registerFrom = registerFrom;
+    }
+
     // 映射一对多的关联关系
     @JoinColumn(name="nurse_id", insertable=false, updatable=false)// cooltoo_nurse_info_extension 关联 cooltoo_nurse 表的字段
     @OneToMany
@@ -159,19 +176,20 @@ public class NurseEntity {
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" ,");
-        msg.append("name=").append(name).append(" ,");
-        msg.append("gender=").append(gender).append(" ,");
-        msg.append("mobile=").append(mobile).append(" ,");
-        msg.append("age=").append(age).append(" , ");
-        msg.append("password=").append(password).append(" , ");
-        msg.append("profilePhotoId=").append(profilePhotoId).append(" , ");
-        msg.append("backgroundImageId=").append(backgroundImageId).append(" , ");
-        msg.append("integral=").append(integral).append(" , ");
-        msg.append("realName=").append(realName).append(" , ");
-        msg.append("identification=").append(identification).append(" , ");
-        msg.append("authority=").append(authority).append(" , ");
-        msg.append("shortNote=").append(shortNote);
+        msg.append("id=").append(id);
+        msg.append(", name=").append(name);
+        msg.append(", gender=").append(gender);
+        msg.append(", mobile=").append(mobile);
+        msg.append(", age=").append(age);
+        msg.append(", password=").append(password);
+        msg.append(", profilePhotoId=").append(profilePhotoId);
+        msg.append(", backgroundImageId=").append(backgroundImageId);
+        msg.append(", integral=").append(integral);
+        msg.append(", realName=").append(realName);
+        msg.append(", identification=").append(identification);
+        msg.append(", authority=").append(authority);
+        msg.append(", registerFrom=").append(registerFrom);
+        msg.append(", shortNote=").append(shortNote);
         msg.append(" ]");
         return msg.toString();
     }

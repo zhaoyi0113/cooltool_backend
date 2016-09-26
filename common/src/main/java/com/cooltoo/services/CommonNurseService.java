@@ -1,6 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.entities.HospitalDepartmentEntity;
@@ -106,7 +107,7 @@ public class CommonNurseService {
     //==============================================================
     //             get used by administrator
     //==============================================================
-    public long countByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, Integer hospitalId, Integer departmentId) {
+    public long countByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
         logger.info("get nurse count by authority={} fuzzyName={} canAnswerNursingQuestion={} hospital={} department={}",
                 authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId);
 
@@ -117,17 +118,17 @@ public class CommonNurseService {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
         long count;
-        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId && null==registerFrom) {
             count = nurseRepository.count();
         }
         else {
-            count = nurseRepository.countByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId);
+            count = nurseRepository.countByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom);
         }
         logger.info("count is {}", count);
         return count;
     }
 
-    public Iterable<NurseEntity> getNurseByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, Integer hospitalId, Integer departmentId, int pageIndex, int number) {
+    public Iterable<NurseEntity> getNurseByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, int pageIndex, int number) {
         logger.info("get nurse by authority={} fuzzyName={} canAnswerNursingQuestion={} hospital={} department={} at page {} with number {}",
                 authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, pageIndex, number);
         PageRequest page = new PageRequest(pageIndex, number, sort);
@@ -139,11 +140,11 @@ public class CommonNurseService {
         else {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
-        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId && null==registerFrom) {
             resultSet = nurseRepository.findAll(page);
         }
         else {
-            resultSet = nurseRepository.findByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, page);
+            resultSet = nurseRepository.findByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, page);
         }
         return resultSet;
     }
@@ -185,7 +186,7 @@ public class CommonNurseService {
     //                        adding
     //========================================================================
     @Transactional
-    public NurseEntity registerNurse(String name, int age, GenderType gender, String mobile, String password, String identification, String realName, String shortNote) {
+    public NurseEntity registerNurse(String name, int age, GenderType gender, String mobile, String password, String identification, String realName, String shortNote, RegisterFrom from) {
         gender = null==gender ? GenderType.SECRET : gender;
 
         NurseEntity entity = new NurseEntity();
@@ -198,6 +199,7 @@ public class CommonNurseService {
         entity.setIdentification(identification);
         entity.setShortNote(shortNote);
         entity.setAuthority(UserAuthority.AGREE_ALL);
+        entity.setRegisterFrom(from);
         logger.info("add new nurse={}", entity);
         if (VerifyUtil.isStringEmpty(mobile)){
             throw new BadRequestException(ErrorCode.DATA_ERROR);

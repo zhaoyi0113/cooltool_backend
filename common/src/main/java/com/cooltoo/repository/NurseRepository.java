@@ -1,5 +1,6 @@
 package com.cooltoo.repository;
 
+import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.constants.UserAuthority;
@@ -49,14 +50,16 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
             " AND   (?2 IS NULL OR n.name LIKE %?2)" +
             " AND   (?3 IS NULL OR ne.answerNursingQuestion=?3)" +
             " AND   (?4 IS NULL OR nhr.hospitalId=?4)" +
-            " AND   (?5 IS NULL OR nhr.departmentId=?5)")
-    Page<NurseEntity> findByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion, Integer hospitalId, Integer departmentId, Pageable page);
+            " AND   (?5 IS NULL OR nhr.departmentId=?5)" +
+            " AND   (?6 IS NULL OR n.registerFrom=?6)")
+    Page<NurseEntity> findByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, Pageable page);
     @Query("SELECT count(n.id) FROM NurseEntity n LEFT JOIN n.extensions ne LEFT JOIN n.hospitalRelation nhr" +
             " WHERE (?1 IS NULL OR n.authority=?1)" +
             " AND   (?2 IS NULL OR n.name LIKE %?2)" +
             " AND   (?3 IS NULL OR ne.answerNursingQuestion=?3)" +
             " AND   (?4 IS NULL OR nhr.hospitalId=?4)" +
-            " AND   (?5 IS NULL OR nhr.departmentId=?5)")
-    long countByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion, Integer hospitalId, Integer departmentId);
+            " AND   (?5 IS NULL OR nhr.departmentId=?5)" +
+            " AND   (?6 IS NULL OR n.registerFrom=?6)")
+    long countByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom);
 
 }

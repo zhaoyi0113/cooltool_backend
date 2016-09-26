@@ -75,13 +75,15 @@ public class NurseManageAPI {
                                                  @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
                                                  @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
                                                  @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
-                                                 @QueryParam("department_id") @DefaultValue("") String strDepartmentId
+                                                 @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
+                                                 @FormParam("register_from") @DefaultValue("") String strRegisterFrom /* COOLTOO, GO2NURSE */
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         logger.info("user {} get nurse record count by authority {} fuzzyName={}", userId, authority, fuzzyName);
         Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
-        long count = nurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId);
+        RegisterFrom registerFrom = RegisterFrom.parseString(strRegisterFrom);
+        long count = nurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom);
         logger.info("count={}", count);
         return Response.ok(count).build();
     }
@@ -95,6 +97,7 @@ public class NurseManageAPI {
                                                @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
                                                @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
                                                @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
+                                               @FormParam("register_from") @DefaultValue("") String strRegisterFrom, /* COOLTOO, GO2NURSE */
                                                @QueryParam("index")  @DefaultValue("0")  int index,
                                                @QueryParam("number") @DefaultValue("10") int number
     ) {
@@ -103,7 +106,8 @@ public class NurseManageAPI {
                 userId, strAuthority, fuzzyName, index, number);
         Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
-        List<NurseBean> nurses = nurseService.getAllByAuthorityAndFuzzyName(strAuthority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, index, number);
+        RegisterFrom registerFrom = RegisterFrom.parseString(strRegisterFrom);
+        List<NurseBean> nurses = nurseService.getAllByAuthorityAndFuzzyName(strAuthority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, index, number);
         logger.info("count={}", userId, strAuthority, fuzzyName, index, number, nurses.size());
         return Response.ok(nurses).build();
     }
@@ -145,9 +149,10 @@ public class NurseManageAPI {
                                 @FormParam("can_answer_nursing_question") @DefaultValue("NO") String strCanAnswerNursingQuestion, /* YES, NO*/
                                 @FormParam("good_at") @DefaultValue("") String goodAt,
                                 @FormParam("job_title") @DefaultValue("") String jobTitle,
-                                @FormParam("is_expert") @DefaultValue("NO") String isExport /* YES, NO*/
+                                @FormParam("is_expert") @DefaultValue("NO") String isExport, /* YES, NO*/
+                                @FormParam("register_from") @DefaultValue("") String registerFrom /* COOLTOO, GO2NURSE */
     ) {
-        long nurseId = createNurse(name, age, strGender, mobile, password, identification, realName, shortNote,
+        long nurseId = createNurse(name, age, strGender, mobile, password, identification, realName, shortNote, registerFrom,
                 strCanAnswerNursingQuestion, goodAt, jobTitle, isExport,
                 hospitalId, departmentId);
         return Response.ok(nurseId).build();
@@ -287,14 +292,15 @@ public class NurseManageAPI {
     @Transactional
     private long createNurse(String name, int age, String strGender,
                              String mobile, String password, String identification,
-                             String realName, String shortNote,
+                             String realName, String shortNote, String strRegisterFrom,
                              String strCanAnswerNursingQuestion, String beGoodAt, String jobTitle, String isExpert,
                              int hospitalId, int departmentId
     ) {
         GenderType gender = GenderType.parseString(strGender);
         YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
         YesNoEnum expert = YesNoEnum.parseString(isExpert);
-        NurseEntity nurse = commonNurseService.registerNurse(name, age, gender, mobile, password, identification, realName, shortNote);
+        RegisterFrom registerFrom = RegisterFrom.parseString(strRegisterFrom);
+        NurseEntity nurse = commonNurseService.registerNurse(name, age, gender, mobile, password, identification, realName, shortNote, registerFrom);
         if (hospitalId>0 || departmentId>0) {
             hospitalRelationService.newOne(nurse.getId(), hospitalId, departmentId);
             nurseQualificationService.createQualificationByAdmin(nurse.getId());
