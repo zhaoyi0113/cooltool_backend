@@ -5,7 +5,8 @@ package com.cooltoo.constants;
  */
 public enum UserType {
     NURSE,
-    NORMAL_USER;
+    NORMAL_USER,
+    DOCTOR;
 
     public static UserType parseString(String user) {
         if (NURSE.name().equalsIgnoreCase(user)) {
@@ -13,6 +14,9 @@ public enum UserType {
         }
         else if (NORMAL_USER.name().equalsIgnoreCase(user)) {
             return NORMAL_USER;
+        }
+        else if (DOCTOR.name().equalsIgnoreCase(user)) {
+            return DOCTOR;
         }
         return null;
     }
@@ -22,6 +26,9 @@ public enum UserType {
         }
         else if (NORMAL_USER.ordinal()==user) {
             return NORMAL_USER;
+        }
+        else if (DOCTOR.ordinal()==user) {
+            return DOCTOR;
         }
         return null;
     }

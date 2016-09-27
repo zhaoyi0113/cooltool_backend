@@ -25,6 +25,7 @@ public class DoctorBean {
     private HospitalBean hospital;
     private int departmentId;
     private HospitalDepartmentBean department;
+    private float score;
 
     public long getId() {
         return id;
@@ -80,6 +81,10 @@ public class DoctorBean {
 
     public HospitalDepartmentBean getDepartment() {
         return department;
+    }
+
+    public float getScore() {
+        return score;
     }
 
     public void setId(long id) {
@@ -138,6 +143,10 @@ public class DoctorBean {
         this.department = department;
     }
 
+    public void setScore(float score) {
+        this.score = score;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -153,6 +162,7 @@ public class DoctorBean {
         msg.append(", imageUrl=").append(imageUrl);
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", departmentId=").append(departmentId);
+        msg.append(", score=").append(score);
         msg.append("]");
         return msg.toString();
     }

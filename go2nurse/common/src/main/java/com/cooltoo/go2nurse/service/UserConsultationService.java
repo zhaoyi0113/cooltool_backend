@@ -3,11 +3,13 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ReadingStatus;
+import com.cooltoo.constants.UserType;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
+import com.cooltoo.go2nurse.constants.ReasonType;
 import com.cooltoo.go2nurse.converter.UserConsultationBeanConverter;
 import com.cooltoo.go2nurse.entities.UserConsultationEntity;
 import com.cooltoo.go2nurse.repository.UserConsultationRepository;
@@ -49,6 +51,7 @@ public class UserConsultationService {
     @Autowired private NurseServiceForGo2Nurse nurseService;
 
     @Autowired private Notifier notifier;
+    @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
 
     //===============================================================
     //             get ----  admin using
@@ -330,7 +333,7 @@ public class UserConsultationService {
     }
 
     @Transactional
-    public UserConsultationBean scoreConsultation(Long userId, Long consultationId, float score) {
+    public UserConsultationBean scoreConsultation(Long userId, Long nurseId, Long consultationId, float score) {
         logger.info("score consultation={} with score={} userId={}",
                 consultationId, score, userId);
         UserConsultationEntity entity = repository.findOne(consultationId);
@@ -348,6 +351,10 @@ public class UserConsultationService {
 
         entity.setScore(score);
         entity = repository.save(entity);
+
+        if (nurseService.existsNurse(nurseId) && score>0) {
+            nurseDoctorScoreService.addScore(UserType.NURSE, nurseId, entity.getUserId(), ReasonType.CONSULTATION, consultationId, score, 1/*weight*/);
+        }
 
         UserConsultationBean bean = beanConverter.convert(entity);
         fillOtherPropertiesForSingleConsultation(bean);

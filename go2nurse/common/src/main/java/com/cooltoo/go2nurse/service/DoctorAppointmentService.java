@@ -1,10 +1,12 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.OrderStatus;
+import com.cooltoo.go2nurse.constants.ReasonType;
 import com.cooltoo.go2nurse.converter.DoctorAppointmentBeanConverter;
 import com.cooltoo.go2nurse.entities.DoctorAppointmentEntity;
 import com.cooltoo.go2nurse.repository.DoctorAppointmentRepository;
@@ -48,6 +50,7 @@ public class DoctorAppointmentService {
     @Autowired private PatientService patientService;
 
     @Autowired private Notifier notifier;
+    @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
 
     //=========================================================================
     //                    getting
@@ -191,6 +194,13 @@ public class DoctorAppointmentService {
 
         entity.setScore(score);
         entity = repository.save(entity);
+
+
+
+        if (doctorService.existDoctor(doctorId) && score>0) {
+            nurseDoctorScoreService.addScore(UserType.DOCTOR, doctorId, entity.getUserId(), ReasonType.APPOINTMENT, appointmentId, score, 1/*weight*/);
+        }
+
         return beanConverter.convert(entity);
     }
 

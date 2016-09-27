@@ -5,6 +5,7 @@ import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.constants.UserType;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.converter.NurseBeanConverter;
 import com.cooltoo.entities.NurseEntity;
@@ -40,6 +41,7 @@ public class NurseServiceForGo2Nurse {
     @Autowired private NurseBeanConverter nurseBeanConverter;
     @Autowired private UserFileStorageService nursegoFileStorage;
     @Autowired private Go2NurseUtility utility;
+    @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
 
     //===================================================================
     //                     getting
@@ -61,8 +63,10 @@ public class NurseServiceForGo2Nurse {
         bean.setBackgroundImageUrl(utility.getHttpPrefixForNurseGo()+backgroundPath);
         NurseExtensionBean extension = nurseExtensionService.getExtensionByNurseId(nurseId);
         NurseHospitalRelationBean hospitalDepartment = nurseHospitalRelationService.getRelationByNurseId(nurseId, utility.getHttpPrefixForNurseGo());
+        Float score = nurseDoctorScoreService.getScoreByReceiverTypeAndId(UserType.NURSE, nurseId);
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
         bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospitalDepartment);
+        bean.setProperty(NurseBean.SCORE, null==score ? 0F : score);
         return bean;
     }
 
@@ -138,12 +142,15 @@ public class NurseServiceForGo2Nurse {
         Map<Long, String> imageId2Path = nursegoFileStorage.getFilePath(imageIds);
         Map<Long, NurseExtensionBean> nurseId2Extension = nurseExtensionService.getExtensionByNurseIds(nurseIds);
         Map<Long, NurseHospitalRelationBean> nurseId2Hospital = nurseHospitalRelationService.getRelationMapByNurseIds(nurseIds, utility.getHttpPrefixForNurseGo());
+        Map<Long, Float> nurseId2Score = nurseDoctorScoreService.getScoreByReceiverTypeAndIds(UserType.NURSE, nurseIds);
         for (NurseBean bean : beans) {
             long nurseId = bean.getId();
             NurseExtensionBean extension = nurseId2Extension.get(nurseId);
             NurseHospitalRelationBean hospital = nurseId2Hospital.get(nurseId);
+            Float score = nurseId2Score.get(nurseId);
             bean.setProperty(NurseBean.INFO_EXTENSION, extension);
             bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospital);
+            bean.setProperty(NurseBean.SCORE, null==score ? 0F : score);
 
             long imageId = bean.getProfilePhotoId();
             String imgPath = imageId2Path.get(imageId);

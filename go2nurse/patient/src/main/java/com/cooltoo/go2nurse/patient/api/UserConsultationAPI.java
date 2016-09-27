@@ -178,10 +178,11 @@ public class UserConsultationAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response scoreConsultation(@Context HttpServletRequest request,
                                       @FormParam("consultation_id") @DefaultValue("0") long consultationId,
+                                      @FormParam("nurse_id") @DefaultValue("0") long nurseId,
                                       @FormParam("score") @DefaultValue("0") float score
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserConsultationBean bean = userConsultationService.scoreConsultation(userId, consultationId, score);
+        UserConsultationBean bean = userConsultationService.scoreConsultation(userId, nurseId, consultationId, score);
         return Response.ok(bean).build();
     }
 

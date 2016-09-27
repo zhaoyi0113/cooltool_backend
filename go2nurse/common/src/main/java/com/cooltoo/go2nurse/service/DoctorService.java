@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.UserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.DoctorBean;
@@ -44,6 +45,7 @@ public class DoctorService {
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
     @Autowired private Go2NurseUtility utility;
+    @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
 
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "grade"),
@@ -146,6 +148,7 @@ public class DoctorService {
             return;
         }
 
+        List<Long> doctorIds = new ArrayList<>();
         List<Long> imagesId = new ArrayList<>();
         List<Integer> hospitalIds = new ArrayList<>();
         List<Integer> departmentIds = new ArrayList<>();
@@ -159,11 +162,15 @@ public class DoctorService {
             if (!departmentIds.contains(item.getDepartmentId())) {
                 departmentIds.add(item.getDepartmentId());
             }
+            if (!doctorIds.contains(item.getId())) {
+                doctorIds.add(item.getId());
+            }
         }
 
         Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
         Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalIds);
         List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefixForNurseGo());
+        Map<Long, Float> doctorIdToScore = nurseDoctorScoreService.getScoreByReceiverTypeAndIds(UserType.DOCTOR, doctorIds);
         for (DoctorBean item : items) {
             String imageUrl = imageIdToUrl.get(item.getImageId());
             if (!VerifyUtil.isStringEmpty(imageUrl)) {
@@ -178,6 +185,8 @@ public class DoctorService {
                     item.setDepartment(tmp);
                 }
             }
+            Float score = doctorIdToScore.get(item.getId());
+            item.setScore(null==score ? 0F : score);
         }
     }
 
