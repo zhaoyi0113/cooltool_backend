@@ -316,4 +316,16 @@ public class UserHospitalizedAPI {
         });
         return Response.ok(bean).build();
     }
+
+    @GET
+    @Path("/hospital_and_category")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getCoursesByHospitalIdAndCategoryId(@Context HttpServletRequest request,
+                                                        @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                                        @QueryParam("category_id") @DefaultValue("0") long categoryId
+    ) {
+        List<CourseBean> courses = courseManageService.getCoursesByHospitalAndCategory(hospitalId, categoryId);
+        return Response.ok(courses).build();
+    }
 }

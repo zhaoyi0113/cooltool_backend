@@ -11,6 +11,7 @@ import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.converter.DiagnosticEnumerationBeanConverter;
+import com.cooltoo.go2nurse.repository.CourseCategoryRelationRepository;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.repository.HospitalRepository;
@@ -51,6 +52,7 @@ public class CourseRelationManageService {
     @Autowired private CourseHospitalRelationService hospitalRelation;
     @Autowired private CourseDepartmentRelationService departmentRelation;
     @Autowired private CourseDiagnosticRelationService diagnosticRelation;
+    @Autowired private CourseCategoryRelationRepository categoryRelation;
 
     //==============================================================================
     //                    getting
@@ -65,6 +67,31 @@ public class CourseRelationManageService {
 
     public boolean diagnosticExist(long diagnosticId) {
         return diagnostic.exitsDiagnostic(diagnosticId);
+    }
+
+    public List<CourseBean> getCoursesByHospitalAndCategory(int hospitalId, long categoryId) {
+        logger.info("get courses by hospitalId={} categoryId={}", hospitalId, categoryId);
+
+        List<Long> courseIdInHospital = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
+        List<Long> courseIdInCategory = categoryRelation.findCourseIdByStatusAndCategoryId(CommonStatus.ENABLED, categoryId);
+
+        List<Long> courseIdInHospitalAndCategory = new ArrayList<>();
+        for (Long courseId : courseIdInHospital) {
+            if (courseIdInCategory.contains(courseId)) {
+                courseIdInHospitalAndCategory.add(courseId);
+            }
+        }
+
+        List<CourseBean> courseInHospitalAndCategory;
+        if (VerifyUtil.isListEmpty(courseIdInHospitalAndCategory)) {
+            courseInHospitalAndCategory = new ArrayList<>();
+        }
+        else {
+            courseInHospitalAndCategory = course.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), courseIdInHospitalAndCategory);
+        }
+
+        logger.info("course size is {}", courseInHospitalAndCategory.size());
+        return courseInHospitalAndCategory;
     }
 
     public List<HospitalBean> getHospitalByCourseId(long courseId, String strStatus) {
