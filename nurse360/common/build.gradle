@@ -1,0 +1,12 @@
+apply plugin: 'java'
+
+group = 'com.cooltoo.nurse360'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(":common")
+}

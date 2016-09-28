@@ -236,13 +236,13 @@ public class UserConsultationService {
 
         Long userId = consultation.getUserId();
         Long patientId = consultation.getPatientId();
-        Long nurseId = consultation.getNurseId();
+        long nurseId = consultation.getNurseId();
         Long categoryId = consultation.getCategoryId();
         Long consultationId = consultation.getId();
 
         UserBean user = userService.getUser(userId);
         PatientBean patient = patientService.getOneById(patientId);
-        NurseBean nurse = nurseService.getNurseById(nurseId);
+        NurseBean nurse = nurseId<=0 ? null : nurseService.getNurseById(nurseId);
         ConsultationCategoryBean category = categoryService.getCategoryById(categoryId);
         Map<Long, List<String>> consultationIdToImagesUrl = imageService.getConsultationIdToImagesUrl(Arrays.asList(new Long[]{consultationId}));
 
