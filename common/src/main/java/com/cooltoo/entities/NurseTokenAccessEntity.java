@@ -1,4 +1,4 @@
-package com.cooltoo.backend.entities;
+package com.cooltoo.entities;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.UserType;
@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "nursego_token_access")
-public class TokenAccessEntity {
+public class NurseTokenAccessEntity {
     private long id;
 
     private long userId;

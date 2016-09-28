@@ -2,9 +2,9 @@ package com.cooltoo.data;
 
 import com.cooltoo.Application;
 import com.cooltoo.entities.NurseEntity;
-import com.cooltoo.backend.entities.TokenAccessEntity;
+import com.cooltoo.entities.NurseTokenAccessEntity;
 import com.cooltoo.repository.NurseRepository;
-import com.cooltoo.backend.repository.TokenAccessRepository;
+import com.cooltoo.repository.NurseTokenAccessRepository;
 import com.cooltoo.backend.services.NurseFriendsService;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.backend.services.NurseSpeakService;
@@ -68,7 +68,7 @@ public class MockDataCreator  {
     private NurseSpeakService nurseSpeakService;
 
     @Autowired
-    private TokenAccessRepository tokenRepository;
+    private NurseTokenAccessRepository tokenRepository;
 
     public static final String NURSE_NAME_PREFIX = "护士";
 
@@ -166,13 +166,13 @@ public class MockDataCreator  {
     }
 
     private void addNurseTonken(NurseEntity nurse) {
-        TokenAccessEntity entity = new TokenAccessEntity();
+        NurseTokenAccessEntity entity = new NurseTokenAccessEntity();
         entity.setUserId(nurse.getId());
         entity.setType(UserType.NURSE);
         entity.setTimeCreated(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity.setToken(nurse.getMobile()+System.nanoTime());
-        List<TokenAccessEntity> all = tokenRepository.findTokenAccessByToken(entity.getToken());
+        List<NurseTokenAccessEntity> all = tokenRepository.findTokenAccessByToken(entity.getToken());
         if (all.isEmpty()) {
             tokenRepository.save(entity);
         }

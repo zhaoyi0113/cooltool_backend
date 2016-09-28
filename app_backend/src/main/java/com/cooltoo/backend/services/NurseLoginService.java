@@ -1,12 +1,12 @@
 package com.cooltoo.backend.services;
 
 import com.cooltoo.repository.NurseRepository;
-import com.cooltoo.backend.repository.TokenAccessRepository;
+import com.cooltoo.repository.NurseTokenAccessRepository;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.entities.NurseEntity;
-import com.cooltoo.backend.entities.TokenAccessEntity;
+import com.cooltoo.entities.NurseTokenAccessEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.AccessTokenGenerator;
@@ -27,7 +27,7 @@ public class NurseLoginService {
     private static final Logger logger = LoggerFactory.getLogger(NurseLoginService.class.getName());
 
     @Autowired
-    private TokenAccessRepository tokenAccessRepository;
+    private NurseTokenAccessRepository tokenAccessRepository;
 
     @Autowired
     private NurseRepository nurseRepository;
@@ -36,7 +36,7 @@ public class NurseLoginService {
     private AccessTokenGenerator tokenGenerator;
 
     @Transactional
-    public TokenAccessEntity login(String mobile, String password){
+    public NurseTokenAccessEntity login(String mobile, String password){
         logger.info("login "+ mobile +", password:"+password);
         List<NurseEntity> nurses = nurseRepository.findByMobile(mobile);
         if(nurses == null || nurses.isEmpty()){
@@ -49,7 +49,7 @@ public class NurseLoginService {
         if(UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
             throw new BadRequestException(ErrorCode.USER_AUTHORITY_DENY_ALL);
         }
-        TokenAccessEntity entity = new TokenAccessEntity();
+        NurseTokenAccessEntity entity = new NurseTokenAccessEntity();
         entity.setUserId(nurseEntity.getId());
         entity.setType(UserType.NURSE);
         entity.setTimeCreated(Calendar.getInstance().getTime());
@@ -61,7 +61,7 @@ public class NurseLoginService {
 
     @Transactional
     public void logout(long userId){
-        List<TokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByUserId(userId);
+        List<NurseTokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByUserId(userId);
         if(tokenEntities.isEmpty()){
             throw new BadRequestException(ErrorCode.NOT_LOGIN);
         }
@@ -70,7 +70,7 @@ public class NurseLoginService {
     }
 
     public boolean isLogin(long userId){
-        List<TokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByUserId(userId);
+        List<NurseTokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByUserId(userId);
         if (tokenEntities.isEmpty()) {
             return false;
         }

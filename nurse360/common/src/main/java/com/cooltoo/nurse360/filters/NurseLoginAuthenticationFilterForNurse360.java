@@ -1,18 +1,19 @@
-package com.cooltoo.backend.filter;
+package com.cooltoo.nurse360.filters;
 
-import com.cooltoo.entities.NurseEntity;
-import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.HeaderKeys;
-import com.cooltoo.entities.NurseTokenAccessEntity;
 import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.entities.NurseTokenAccessEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.repository.NurseTokenAccessRepository;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
@@ -21,36 +22,29 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Created by yzzhao on 3/2/16.
+ * Created by hp on 6/13/16.
  */
 @Provider
-public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
+public class NurseLoginAuthenticationFilterForNurse360 implements ContainerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseLoginAuthenticationFilter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseLoginAuthenticationFilterForNurse360.class);
 
-    @Context
-    private HttpServletRequest servletRequest;
-    @Context
-    private ResourceInfo resourceInfo;
-    @Autowired
-    private NurseTokenAccessRepository tokenAccessRepository;
-    @Autowired
-    private NurseRepository nurseRepository;
+    @Context private ResourceInfo resourceInfo;
+    @Autowired private NurseTokenAccessRepository tokenAccessRepository;
+    @Autowired private NurseRepository nurseRepository;
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         LoginAuthentication login = resourceInfo.getResourceClass().getAnnotation(LoginAuthentication.class);
-        if (login == null) {
+        if (null==login) {
             login = resourceInfo.getResourceMethod().getAnnotation(LoginAuthentication.class);
             if(login == null){
                 return;
             }
         }
-        logger.info("access "+requestContext.getUriInfo().getAbsolutePath());
+        logger.info("access==>{}", requestContext.getUriInfo().getAbsolutePath());
         String invokePath = requestContext.getUriInfo().getAbsolutePath().getPath();
         boolean isLogoutLogin = false;
         if (invokePath.endsWith("logout") || invokePath.endsWith("login")) {
@@ -67,9 +61,9 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
             }
         }
         String token = tokens.get(0);
-        logger.info("get token " + token);
+        logger.info("get token={}", token);
         if (token != null) {
-            //read user id from token
+            //read nurse id from token
             List<NurseTokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByToken(token);
             if (tokenEntities.isEmpty()) {
                 if (login.requireNurseLogin()) {
@@ -79,16 +73,16 @@ public class NurseLoginAuthenticationFilter implements ContainerRequestFilter {
                     return;
                 }
             }
-            long userId = tokenEntities.get(0).getUserId();
-            logger.info("get user id "+userId);
-            NurseEntity nurseEntity = nurseRepository.findOne(userId);
+            long nurseId = tokenEntities.get(0).getUserId();
+            logger.info("get nurse id "+nurseId);
+            NurseEntity nurseEntity = nurseRepository.findOne(nurseId);
             if (null==nurseEntity) {
                 throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
             }
             if (!isLogoutLogin && UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
                 throw new BadRequestException(ErrorCode.USER_AUTHORITY_DENY_ALL);
             }
-            requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, userId);
+            requestContext.setProperty(ContextKeys.USER_LOGIN_USER_ID, nurseId);
         }
     }
 }
