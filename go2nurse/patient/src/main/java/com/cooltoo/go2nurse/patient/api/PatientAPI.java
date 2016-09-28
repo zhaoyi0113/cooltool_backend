@@ -86,7 +86,6 @@ public class PatientAPI {
         PatientBean patient = service.create(name, gender, date, identityCard, mobile, VerifyUtil.isListEmpty(usersPatient) ? YesNoEnum.YES : null);
         if (null!=patient && patient.getId()>0) {
             UserPatientRelationBean relation = userPatientRelation.addPatientToUser(patient.getId(), userId);
-            userPatientRelation.getPatientByUser(userId, CommonStatus.ENABLED.name());
             logger.info("user patient relation is {}", relation);
         }
         return Response.ok(patient).build();
