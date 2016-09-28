@@ -1,5 +1,7 @@
 package com.cooltoo.config;
 
+
+import com.cooltoo.nurse360.nurse.api.NurseAPIForNurse360;
 import io.swagger.annotations.Api;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -23,6 +25,7 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
 
     public Nurse360JerseyConfiguration() {
         register(MultiPartFeature.class);
+        register(NurseAPIForNurse360.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
     }

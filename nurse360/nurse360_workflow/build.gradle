@@ -50,6 +50,7 @@ dependencies {
 
     compile project(':common')
     compile project(':nurse360:common')
+    compile project(':nurse360:nurse')
 }
 
 ext {
