@@ -140,4 +140,57 @@ public class CommonNurseHospitalRelationService {
             }
         }
     }
+
+    //==============================================================
+    //                       adding
+    //==============================================================
+
+    @Transactional
+    public long setRelation(long nurseId, int hospitalId, int departmentId) {
+        logger.info("nurse={} set hospital={} department={}", nurseId, hospitalId, departmentId);
+
+        if (nurseId<=0) {
+            return 0L;
+        }
+
+        NurseHospitalRelationEntity relation;
+        List<NurseHospitalRelationEntity> relations = repository.findByNurseId(nurseId, sort);
+        if (!relations.isEmpty()) {
+            // exist relationship
+            relation = relations.get(0);
+        }
+        else {
+            // new relationship
+            relation = new NurseHospitalRelationEntity();
+            relation.setNurseId(nurseId);
+        }
+        // hospital exist
+        if (hospitalService.existHospital(hospitalId)) {
+            if (relation.getHospitalId()!=hospitalId) {
+                relation.setHospitalId(hospitalId);
+            }
+        }
+        // department exist
+        if (departmentService.existsDepartment(departmentId)) {
+            if (relation.getDepartmentId()!=departmentId) {
+                relation.setDepartmentId(departmentId);
+            }
+        }
+        relation.setTime(new Date());
+        relation.setStatus(CommonStatus.ENABLED);
+        relation = repository.save(relation);
+
+        // delete others
+        relations = repository.findByNurseId(nurseId, sort);
+        for (int i = 0; i < relations.size(); i ++) {
+            NurseHospitalRelationEntity temp = relations.get(i);
+            if (temp.getId() == relation.getId()) {
+                relations.remove(i);
+                break;
+            }
+        }
+        repository.delete(relations);
+
+        return relation.getId();
+    }
 }

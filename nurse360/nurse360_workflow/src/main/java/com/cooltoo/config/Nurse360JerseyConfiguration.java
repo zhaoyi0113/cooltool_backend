@@ -25,7 +25,5 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(MultiPartFeature.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
-
     }
-
 }

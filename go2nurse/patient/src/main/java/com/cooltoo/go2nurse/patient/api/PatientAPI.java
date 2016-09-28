@@ -81,9 +81,12 @@ public class PatientAPI {
         if (time > 0) {
             date = new Date(time);
         }
-        PatientBean patient = service.create(name, gender, date, identityCard, mobile, null);
+
+        List<Long> usersPatient = userPatientRelation.getPatientByUser(userId, CommonStatus.ENABLED.name());
+        PatientBean patient = service.create(name, gender, date, identityCard, mobile, VerifyUtil.isListEmpty(usersPatient) ? YesNoEnum.YES : null);
         if (null!=patient && patient.getId()>0) {
             UserPatientRelationBean relation = userPatientRelation.addPatientToUser(patient.getId(), userId);
+            userPatientRelation.getPatientByUser(userId, CommonStatus.ENABLED.name());
             logger.info("user patient relation is {}", relation);
         }
         return Response.ok(patient).build();

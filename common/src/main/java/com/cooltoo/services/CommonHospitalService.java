@@ -173,6 +173,10 @@ public class CommonHospitalService {
         return one.get(0);
     }
 
+    public boolean existHospital(Integer id) {
+        return repository.exists(id);
+    }
+
     public List<HospitalBean> entities2Beans(Iterable<HospitalEntity> entities) {
         if (null==entities) {
             return new ArrayList<>();
