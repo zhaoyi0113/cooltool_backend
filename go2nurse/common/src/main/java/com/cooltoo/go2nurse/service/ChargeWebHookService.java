@@ -5,6 +5,8 @@ import com.google.common.io.CharStreams;
 import com.google.gson.JsonSyntaxException;
 import com.pingplusplus.model.Charge;
 import com.pingplusplus.model.Event;
+import com.tencent.common.Configure;
+import com.tencent.common.Signature;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -12,6 +14,7 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletInputStream;
@@ -33,6 +36,9 @@ public class ChargeWebHookService {
 
     @Autowired private ServiceOrderService orderService;
     @Autowired private Go2NurseUtility utility;
+
+    @Value("${wechat_go2nurse_appsecret}")
+    private String srvAppSecret;
 
     public Object webHookBody(HttpServletRequest request) {
         logger.info("receive web hooks");
@@ -83,21 +89,34 @@ public class ChargeWebHookService {
     }
 
     private String weixinCharge(Document document) {
-        Map<String,String> map = new HashMap<>();
+        Map<String,Object> keyValue = new HashMap<>();
+        Map<String,Object> forSign = new HashMap<>();
         try {
             Element root = document.getRootElement();
             List<Element> elem = root.elements();
-            for (Element e : elem) { map.put(e.getName(), e.getText()); }
+            for (Element e : elem) {
+                keyValue.put(e.getName(), e.getText());
+                if (!e.getName().equalsIgnoreCase("sign")) {
+                    forSign.put(e.getName(), e.getText());
+                }
+            }
         }
         catch (Exception ex) {
             return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[notification message format error]]></return_msg></xml>";
         }
 
-        String returnCode = map.get("return_code");
-        if (returnCode.equalsIgnoreCase("success")) {
-            String outTradeNo = map.get("out_trade_no");
-            orderService.orderChargeWebhooks(outTradeNo, outTradeNo, utility.toJsonString(map));
-            //TODO -- wait for check the sign of WeiXin callback
+        Object returnCode = keyValue.get("return_code");
+        if (null!=returnCode && "success".equalsIgnoreCase(returnCode.toString())) {
+            //check the sign of WeiXin callback
+            Configure.setKey(srvAppSecret);
+            String originSign = keyValue.get("sign").toString();
+            String checkSign = Signature.getSign(forSign);
+            if (!checkSign.equalsIgnoreCase(originSign)) {
+                return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[checksum sign is wrong]]></return_msg></xml>";
+            }
+
+            String outTradeNo = keyValue.get("out_trade_no").toString();
+            orderService.orderChargeWebhooks(outTradeNo, outTradeNo, utility.toJsonString(keyValue));
             return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
         }
         else {
