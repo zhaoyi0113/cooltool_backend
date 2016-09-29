@@ -165,3 +165,6 @@ twins-manager-ui/
 workflow/file_repository/
 
 /workflow/envs/local/database.properties
+
+# Avoid ignoring WeiXin sdk jar file (.jar files are usually ignored)
+!wxpay-scanpay-java-sdk-1.0.jar
