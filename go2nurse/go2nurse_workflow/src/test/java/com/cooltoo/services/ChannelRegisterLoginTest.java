@@ -50,7 +50,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
     @Test
     public void test_register_from_existed_wechat_user() {
-        UserBean newUser = userService.registerUser("", 0, "", "aaa", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "1");
+        UserBean newUser = userService.registerUser("", 0, "", "aaa", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "1", null);
         List<UserOpenAppEntity> channelUsers = openAppRepository.findByUnionidAndStatus("1", CommonStatus.ENABLED);
         Assert.assertNotNull(newUser);
         Assert.assertFalse(channelUsers.isEmpty());
@@ -65,7 +65,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         URI uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("register"));
-        userService.registerUser("aa", 0, "aa", "aaa", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "100");
+        userService.registerUser("aa", 0, "aa", "aaa", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "100", "");
         uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.getSchemeSpecificPart().contains("token"));
@@ -79,7 +79,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         URI uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertFalse(uri.toString().contains("token"));
-        userService.registerUser("aa", 0, "aa", "1231432143", "aaa", "aaa", "none", AppChannel.WECHAT.name(), unionid);
+        userService.registerUser("aa", 0, "aa", "1231432143", "aaa", "aaa", "none", AppChannel.WECHAT.name(), unionid, null);
         uri = weChatService.loginWithWeChatUser(userInfo, null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("token"));
@@ -87,7 +87,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
     @Test
     public void test_login_with_different_channelid_and_user_info() {
-        UserTokenAccessEntity userEntity = loginService.login("14321134", "aa02", AppChannel.WECHAT.name(), "1");
+        UserTokenAccessEntity userEntity = loginService.login("14321134", "aa02", AppChannel.WECHAT.name(), "1", null);
         Assert.assertEquals(2, userEntity.getUserId());
         List<UserOpenAppEntity> openUsers = openAppRepository.findByUnionidAndStatus("1", CommonStatus.ENABLED);
         Assert.assertEquals(2, openUsers.get(0).getUserId());
@@ -95,7 +95,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
     @Test
     public void test_register_with_disabled_channel_user() {
-        UserBean userBean = userService.registerUser("bbb", 0, "", "13523212122", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "2");
+        UserBean userBean = userService.registerUser("bbb", 0, "", "13523212122", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "2", null);
         Assert.assertEquals("bbb", userBean.getName());
         Assert.assertEquals("aaa", userBean.getPassword());
         List<UserOpenAppEntity> openUsers = openAppRepository.findByUnionidAndStatus("2", CommonStatus.ENABLED);
@@ -108,7 +108,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
     public void test_login_with_disabled_channelid() {
         BadRequestException ex = null;
         try {
-            loginService.login("16811663451", "aa06", "wx", "2");
+            loginService.login("16811663451", "aa06", "wx", "2", "aaaa");
         } catch (BadRequestException e) {
             ex = e;
         }
@@ -117,11 +117,76 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
     @Test
     public void test_login_with_channelid_from_different_user() {
-        loginService.login("16811663451", "aa06", "wx", "3");
+        loginService.login("16811663451", "aa06", "wx", "3", "");
         List<UserOpenAppEntity> entities = openAppRepository.findByUnionid("3");
         Assert.assertEquals(1, entities.size());
         UserOpenAppEntity entity = entities.get(0);
         Assert.assertEquals(6, entity.getUserId());
+    }
+
+    @Test
+    public void test_login_with_openid() {
+        UserTokenAccessEntity userEntity = loginService.login("13523212122", "aa03", "wx", null, "1");
+        Assert.assertNotNull(userEntity);
+        userEntity = loginService.login("13523212122", "aa03", "wx", null, "2");
+        Assert.assertNotNull(userEntity);
+        userEntity = loginService.login("13523212122", "aa03", "wx", null, "2");
+        Assert.assertNotNull(userEntity);
+        userEntity = loginService.login("13523212122", "aa03", "wx", "5", "2");
+        Assert.assertNotNull(userEntity);
+    }
+
+    @Test
+    public void test_failed_login_with_openid() {
+        BadRequestException ex = null;
+        try {
+            UserTokenAccessEntity userEntity = loginService.login("13523212122", "aa03", "wx", null, "xxxxx");
+        } catch (BadRequestException e) {
+            ex = e;
+        }
+        Assert.assertNotNull(ex);
+    }
+
+    @Test
+    public void test_register_with_existed_account() {
+        BadRequestException ex = null;
+        try {
+            userService.registerUser("", 0, "", "1231432143", "aa01", "", "");
+        } catch (BadRequestException e) {
+            ex = e;
+        }
+        Assert.assertNotNull(ex);
+    }
+
+    @Test
+    public void test_register_new_user_with_openid() {
+        UserBean userBean = userService.registerUser("name", 0, null, "12345678", "123456", "", "YES", AppChannel.WECHAT.name(), "", "1");
+        Assert.assertNotNull(userBean);
+        List<UserEntity> user = userRepository.findByMobile("12345678");
+        Assert.assertTrue(user.size() > 0);
+        Assert.assertEquals("12345678", user.get(0).getMobile());
+
+
+    }
+
+    @Test
+    public void test_register_existed_user_with_openid() {
+        userService.registerUser("aaa", 0, null, "1231432143", "aa01", "", "NO", AppChannel.WECHAT.name(), "", "1");
+        userService.registerUser("aaa", 0, null, "1231432143", "aa01", "", "NO", AppChannel.WECHAT.name(), "", "2");
+        long id = userService.getUser("1231432143").getId();
+        List<UserOpenAppEntity> users = openAppRepository.findByUserId(id);
+        Assert.assertTrue(users.size() > 0);
+    }
+
+    @Test
+    public void test_register_duplicate_channelId() {
+        BadRequestException ex =  null;
+        try{
+            userService.registerUser("",0,null,"","","","",AppChannel.WECHAT.name(), "1","");
+        }catch(BadRequestException e){
+            ex = e;
+        }
+        Assert.assertNotNull(ex);
     }
 
 }

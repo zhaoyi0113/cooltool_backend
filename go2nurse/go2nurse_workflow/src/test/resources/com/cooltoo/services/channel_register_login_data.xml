@@ -10,4 +10,6 @@
     <go2nurse_user_openapp_desc id="1" unionid="1" channel="2" status="1" user_id="0"/>
     <go2nurse_user_openapp_desc id="2" unionid="2" channel="2" status="0" user_id="3"/>
     <go2nurse_user_openapp_desc id="3" unionid="3" channel="2" status="1" user_id="3"/>
+    <go2nurse_user_openapp_desc id="4" unionid="4" openid="1" channel="2" status="1" user_id="3"/>
+    <go2nurse_user_openapp_desc id="5" unionid="5" openid="2" channel="2" status="1" user_id="3"/>
 </dataset>

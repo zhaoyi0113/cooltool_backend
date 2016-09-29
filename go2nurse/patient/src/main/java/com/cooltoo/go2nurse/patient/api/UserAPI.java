@@ -49,10 +49,11 @@ public class UserAPI {
                             @FormParam("sms_code") @DefaultValue("") String smsCode,
                             @FormParam("channel")  String channel,
                             @FormParam("channelid") String channelid,
+                            @FormParam("openid") String openid,
                             @FormParam("has_decide") String hasDecide
 
     ) {
-        UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode, hasDecide, channel, channelid);
+        UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode, hasDecide, channel, channelid, openid);
         // do not created default patient
         // PatientBean patientBean = patientService.create(name, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES);
         // userPatientRelationService.addPatientToUser(patientBean.getId(), userBean.getId());

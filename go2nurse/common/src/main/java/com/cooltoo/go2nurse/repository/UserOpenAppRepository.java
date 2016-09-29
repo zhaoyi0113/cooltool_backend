@@ -12,6 +12,9 @@ import java.util.List;
 public interface UserOpenAppRepository extends JpaRepository<UserOpenAppEntity, Long>{
 
     List<UserOpenAppEntity> findByUnionidAndStatus(String unionId, CommonStatus status);
+    List<UserOpenAppEntity> findByOpenidAndStatus(String openId, CommonStatus status);
     List<UserOpenAppEntity> findByUnionid(String unionId);
+    List<UserOpenAppEntity> findByOpenid(String openId);
+    List<UserOpenAppEntity> findByUserId(long userId);
     UserOpenAppEntity findFirstByUserId(long userId);
 }

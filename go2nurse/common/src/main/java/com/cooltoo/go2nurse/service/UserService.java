@@ -41,12 +41,18 @@ public class UserService {
 
     private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
-    @Autowired private UserRepository repository;
-    @Autowired private UserBeanConverter beanConverter;
-    @Autowired private UserGo2NurseFileStorageService userStorage;
-    @Autowired private LeanCloudService leanCloudService;
-    @Autowired private UserOpenAppRepository openAppRepository;
-    @Autowired private UserLoginService loginService;
+    @Autowired
+    private UserRepository repository;
+    @Autowired
+    private UserBeanConverter beanConverter;
+    @Autowired
+    private UserGo2NurseFileStorageService userStorage;
+    @Autowired
+    private LeanCloudService leanCloudService;
+    @Autowired
+    private UserOpenAppRepository openAppRepository;
+    @Autowired
+    private UserLoginService loginService;
 
     //==================================================================
     //         add
@@ -57,21 +63,20 @@ public class UserService {
                 name, gender, strBirthday, mobile, password, smsCode, strHasDecide);
         leanCloudService.verifySmsCode(smsCode, mobile);
 
-        if (VerifyUtil.isStringEmpty(password)){
+        if (VerifyUtil.isStringEmpty(password)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if(!repository.findByMobile(mobile).isEmpty()){
+        if (!repository.findByMobile(mobile).isEmpty()) {
             throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
         }
         GenderType genderType = GenderType.parseInt(gender);
 
         String uniqueId = null;
-        for (int i = 10; i>0; i--) {
+        for (int i = 10; i > 0; i--) {
             uniqueId = NumberUtil.randomIdentity();
-            if (repository.countByUniqueId(uniqueId)<=0) {
+            if (repository.countByUniqueId(uniqueId) <= 0) {
                 break;
-            }
-            else {
+            } else {
                 uniqueId = null;
             }
         }
@@ -85,8 +90,8 @@ public class UserService {
 
         UserEntity entity = new UserEntity();
         entity.setName(name);
-        entity.setGender(null==genderType ? GenderType.SECRET : genderType );
-        entity.setBirthday(birthdayMilliSecond<0 ? new Date(0) : new Date(birthdayMilliSecond));
+        entity.setGender(null == genderType ? GenderType.SECRET : genderType);
+        entity.setBirthday(birthdayMilliSecond < 0 ? new Date(0) : new Date(birthdayMilliSecond));
         entity.setMobile(mobile);
         entity.setPassword(password);
         entity.setAuthority(UserAuthority.AGREE_ALL);
@@ -94,31 +99,38 @@ public class UserService {
         entity.setUniqueId(uniqueId);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
-        entity.setHasDecide(null==hasDecide ? UserHospitalizedStatus.NONE : hasDecide);
+        entity.setHasDecide(null == hasDecide ? UserHospitalizedStatus.NONE : hasDecide);
         entity = repository.save(entity);
 
         logger.info("add user={}", entity);
         return beanConverter.convert(entity);
     }
-    public UserBean registerUser(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String hasDecide, String channel, String channelid) {
-        if (repository.findByMobile(mobile).isEmpty() && channel==null) {
+
+    public UserBean registerUser(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String hasDecide, String channel, String channelid, String openid) {
+        if (repository.findByMobile(mobile).isEmpty() && channel == null) {
             //first time register
-            return registerUser(name,gender,strBirthday,mobile,password,smsCode,hasDecide);
+            return registerUser(name, gender, strBirthday, mobile, password, smsCode, hasDecide);
         }
         //check channel register
-        if(channel != null){
-            return registerWithChannel(name, gender, strBirthday, mobile, password, smsCode, hasDecide, channel,channelid);
+        if (channel != null) {
+            return registerWithChannel(name, gender, strBirthday, mobile, password, smsCode, hasDecide, channel, channelid, openid);
         }
         throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    private UserBean registerWithChannel(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String strHasDecide, String channel, String channelid) {
+    private UserBean registerWithChannel(String name, int gender, String strBirthday, String mobile, String password, String smsCode, String strHasDecide, String channel, String channelid, String openid) {
         AppChannel appChannel = AppChannel.valueOf(channel);
         switch (appChannel) {
             case WECHAT:
-                List<UserOpenAppEntity> wechatusers = openAppRepository.findByUnionid(channelid);
-                if (!wechatusers.isEmpty()) {
+                List<UserOpenAppEntity> wechatusers = null;
+                if (channelid != null) {
+                    wechatusers = openAppRepository.findByUnionid(channelid);
+                }
+                if((wechatusers == null || wechatusers.isEmpty()) && openid != null){
+                    wechatusers = openAppRepository.findByOpenid(openid);
+                }
+                if (wechatusers != null && !wechatusers.isEmpty()) {
                     List<UserEntity> currentUsers = repository.findByMobile(mobile);
                     if (currentUsers.isEmpty()) {
                         UserBean userBean = registerUser(name, gender, strBirthday, mobile, password, smsCode, strHasDecide);
@@ -135,8 +147,8 @@ public class UserService {
                         currentUser.setName(name);
                         currentUser.setStatus(CommonStatus.ENABLED);
                         long birthdayMilliSecond = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-                        currentUser.setBirthday(birthdayMilliSecond<0 ? new Date(0)  : new Date(birthdayMilliSecond));
-                        if (null!=hasDecide && !hasDecide.equals(currentUser.getHasDecide())) {
+                        currentUser.setBirthday(birthdayMilliSecond < 0 ? new Date(0) : new Date(birthdayMilliSecond));
+                        if (null != hasDecide && !hasDecide.equals(currentUser.getHasDecide())) {
                             currentUser.setHasDecide(hasDecide);
                         }
                         repository.save(currentUser);
@@ -191,7 +203,7 @@ public class UserService {
         logger.info("get user without other info by id={}", userId);
         UserEntity entity = repository.findOne(userId);
         logger.info("get user without other info is={}", entity);
-        if (null==entity) {
+        if (null == entity) {
             return null;
         }
         return beanConverter.convert(entity);
@@ -201,11 +213,11 @@ public class UserService {
         logger.info("get user without other info by mobile={}", mobile);
         UserEntity user = null;
         List<UserEntity> users = repository.findByMobile(mobile);
-        if (null!=users && !users.isEmpty() && users.size()==1) {
+        if (null != users && !users.isEmpty() && users.size() == 1) {
             user = users.get(0);
         }
         logger.error("get index=0, result is {}.", users);
-        if (null==user) {
+        if (null == user) {
             return null;
         }
         return beanConverter.convert(user);
@@ -266,15 +278,13 @@ public class UserService {
         UserAuthority authority = UserAuthority.parseString(strAuthority);
         if (VerifyUtil.isStringEmpty(fuzzyName)) {
             fuzzyName = null;
-        }
-        else {
+        } else {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
         long count;
-        if (null==authority && null==fuzzyName) {
+        if (null == authority && null == fuzzyName) {
             count = repository.count();
-        }
-        else {
+        } else {
             count = repository.countByAuthorityAndName(authority, fuzzyName);
         }
         logger.info("count is {}", count);
@@ -291,14 +301,12 @@ public class UserService {
         UserAuthority authority = UserAuthority.parseString(strAuthority);
         if (VerifyUtil.isStringEmpty(fuzzyName)) {
             fuzzyName = null;
-        }
-        else {
+        } else {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
-        if (null==authority && null==fuzzyName) {
+        if (null == authority && null == fuzzyName) {
             resultSet = repository.findAll(page);
-        }
-        else {
+        } else {
             resultSet = repository.findByAuthorityAndName(authority, fuzzyName, page);
         }
 
@@ -310,7 +318,7 @@ public class UserService {
     }
 
     private List<UserBean> entities2Beans(Iterable<UserEntity> entities) {
-        if (null==entities) {
+        if (null == entities) {
             return new ArrayList<>();
         }
         List<UserBean> beans = new ArrayList<>();
@@ -322,12 +330,12 @@ public class UserService {
     }
 
     private void fillOtherProperties(List<UserBean> users) {
-        if (null==users || users.isEmpty()) {
+        if (null == users || users.isEmpty()) {
             return;
         }
 
         List<Long> imageIds = new ArrayList<>();
-        for (UserBean bean :users) {
+        for (UserBean bean : users) {
             long imageId = bean.getProfilePhoto();
             if (!imageIds.contains(imageId)) {
                 imageIds.add(imageId);
@@ -336,7 +344,7 @@ public class UserService {
 
         Map<Long, String> imageId2Path = userStorage.getFileUrl(imageIds);
         for (UserBean bean : users) {
-            long   imageId = bean.getProfilePhoto();
+            long imageId = bean.getProfilePhoto();
             String imgPath = imageId2Path.get(imageId);
             if (!VerifyUtil.isStringEmpty(imgPath)) {
                 bean.setProfilePhotoUrl(imgPath);
@@ -352,7 +360,7 @@ public class UserService {
         logger.info("update user={} with name={} gender={} birthday={} authority={} address={} hasDecide={}",
                 userId, name, iGender, strBirthday, iAuthority, address, strHasDecide);
         UserEntity entity = repository.findOne(userId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
 
@@ -365,19 +373,19 @@ public class UserService {
 
         if (!VerifyUtil.isStringEmpty(strBirthday)) {
             long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-            if (time>0) {
+            if (time > 0) {
                 Date birthday = new Date(time);
                 entity.setBirthday(birthday);
                 changed = true;
             }
         }
         GenderType gender = GenderType.parseInt(iGender);
-        if(null!=gender) {
+        if (null != gender) {
             entity.setGender(gender);
             changed = true;
         }
         UserHospitalizedStatus hasDecide = UserHospitalizedStatus.parseString(strHasDecide);
-        if(null!=hasDecide) {
+        if (null != hasDecide) {
             entity.setHasDecide(hasDecide);
             changed = true;
         }
@@ -392,7 +400,7 @@ public class UserService {
 
         boolean authorityChanged = false;
         UserAuthority authority = UserAuthority.parseInt(iAuthority);
-        if (null!=authority) {
+        if (null != authority) {
             entity.setAuthority(authority);
             authorityChanged = true;
             changed = true;
@@ -411,16 +419,16 @@ public class UserService {
     }
 
     @Transactional
-    public UserBean updateProfilePhoto(long userId, String imageName, InputStream image){
+    public UserBean updateProfilePhoto(long userId, String imageName, InputStream image) {
         logger.info("update profile photo for user={}, imageName={}, image={}", userId, imageName, image);
         UserEntity entity = repository.findOne(userId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         long imageId = 0;
         String imageUrl = "";
         imageId = userStorage.addFile(entity.getProfilePhoto(), imageName, image);
-        if (imageId>0) {
+        if (imageId > 0) {
             entity.setProfilePhoto(imageId);
             imageUrl = userStorage.getFileURL(imageId);
             entity = repository.save(entity);
@@ -435,7 +443,7 @@ public class UserService {
         logger.info("verify by userId={} smsCode={} mobile={}", userId, smsCode, mobile);
         leanCloudService.verifySmsCode(smsCode, mobile);
         UserBean user = getUserWithoutOtherInfo(mobile);
-        if (null==user) {
+        if (null == user) {
             user = getUserWithoutOtherInfo(userId);
         }
         return user;
@@ -447,7 +455,7 @@ public class UserService {
                 userId, newMobile, newPassword);
 
         UserEntity user = repository.getOne(userId);
-        if (null==user) {
+        if (null == user) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
@@ -483,7 +491,7 @@ public class UserService {
                 userId, newMobile, smsCode);
 
         UserEntity user = repository.getOne(userId);
-        if (null==user) {
+        if (null == user) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
@@ -493,7 +501,7 @@ public class UserService {
             leanCloudService.verifySmsCode(smsCode.trim(), newMobile.trim());
             newMobile = newMobile.trim();
             List<UserEntity> userExist = repository.findByMobile(newMobile);
-            if(null!=userExist && !userExist.isEmpty()){
+            if (null != userExist && !userExist.isEmpty()) {
                 throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
             }
             if (!newMobile.equals(user.getMobile())) {
@@ -516,7 +524,7 @@ public class UserService {
                 userId, oldPassword, newPassword);
 
         UserEntity user = repository.getOne(userId);
-        if (null==user) {
+        if (null == user) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
@@ -540,7 +548,7 @@ public class UserService {
     }
 
     private void modifyDenyUserIdsCache(UserEntity user) {
-        if (null==user) {
+        if (null == user) {
             return;
         }
         long userId = user.getId();

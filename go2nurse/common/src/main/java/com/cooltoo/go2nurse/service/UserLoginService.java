@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -64,10 +65,17 @@ public class UserLoginService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public UserTokenAccessEntity login(String mobile, String password, String channel, String channelid){
-        if(channel != null && channelid != null){
-            List<UserOpenAppEntity> channelUsers = openAppRepository.findByUnionidAndStatus(channelid, CommonStatus.ENABLED);
-            if(channelUsers.isEmpty()){
+    public UserTokenAccessEntity login(String mobile, String password, String channel, String channelid, String openId){
+        if(channel != null && (channelid != null || openId != null)){
+            //user can login either by unionid or unionid
+            List<UserOpenAppEntity> channelUsers = null;
+            if(channelid != null){
+                channelUsers = openAppRepository.findByUnionidAndStatus(channelid, CommonStatus.ENABLED);
+            }
+            if((channelUsers==null || channelUsers.isEmpty()) && openId != null){
+                channelUsers = openAppRepository.findByOpenidAndStatus(openId, CommonStatus.ENABLED);
+            }
+            if(channelUsers == null || channelUsers.isEmpty()){
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
             UserOpenAppEntity channelUser = channelUsers.get(0);

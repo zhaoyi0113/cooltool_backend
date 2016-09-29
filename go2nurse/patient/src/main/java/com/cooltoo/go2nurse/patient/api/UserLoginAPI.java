@@ -32,9 +32,10 @@ public class UserLoginAPI {
                           @FormParam("mobile") String mobile,
                           @FormParam("password") String password,
                           @FormParam("channel") String channel,
-                          @FormParam("channelid")String channelId
+                          @FormParam("channelid")String channelId,
+                          @FormParam("openId") String openId
     ) {
-        UserTokenAccessEntity token = loginService.login(mobile, password, channel, channelId);
+        UserTokenAccessEntity token = loginService.login(mobile, password, channel, channelId, openId);
         logger.info("token:" + token.getToken());
         HttpSession session = request.getSession();
         session.setAttribute(ContextKeys.USER_LOGIN_USER_ID, token.getUserId());
