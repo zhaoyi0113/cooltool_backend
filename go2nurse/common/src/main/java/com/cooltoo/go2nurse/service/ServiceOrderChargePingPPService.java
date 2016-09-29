@@ -11,7 +11,6 @@ import com.cooltoo.go2nurse.converter.ServiceOrderChargePingPPBeanConverter;
 import com.cooltoo.go2nurse.entities.ServiceOrderChargePingPPEntity;
 import com.cooltoo.go2nurse.repository.ServiceOrderChargePingPPRepository;
 import com.cooltoo.util.VerifyUtil;
-import com.pingplusplus.model.Charge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,24 +131,31 @@ public class ServiceOrderChargePingPPService {
     //                      adding
     //==============================================================================
     @Transactional
-    public ServiceOrderChargePingPPBean addOrderCharge(long orderId, AppType appType, ChargeType chargeType, Charge charge) {
+    public ServiceOrderChargePingPPBean addOrderCharge(long orderId, AppType appType, String orderNo, String channel,
+                                                       ChargeType chargeType, String chargeId, String chargeJson) {
         logger.info("create order charge by orderId={} appType={} pingPPType={} pingPPJson={}",
-                orderId, appType, chargeType, charge.toString());
+                orderId, appType, chargeType, chargeJson);
         if (null==appType) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (VerifyUtil.isStringEmpty(orderNo)) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (VerifyUtil.isStringEmpty(channel)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if (null== chargeType) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (null==charge) {
+        if (VerifyUtil.isStringEmpty(chargeId)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (VerifyUtil.isStringEmpty(charge.getId())) {
+        if (VerifyUtil.isStringEmpty(chargeJson)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
         ServiceOrderChargePingPPEntity entity = null;
-        List<ServiceOrderChargePingPPEntity> entities = repository.findByChargeId(charge.getId());
+        List<ServiceOrderChargePingPPEntity> entities = repository.findByChargeId(chargeId);
         if (VerifyUtil.isListEmpty(entities)) {
             entity = new ServiceOrderChargePingPPEntity();
         }
@@ -163,12 +169,12 @@ public class ServiceOrderChargePingPPService {
             repository.save(entities);
         }
         entity.setOrderId(orderId);
-        entity.setOrderNo(charge.getOrderNo());
-        entity.setChannel(charge.getChannel());
+        entity.setOrderNo(orderNo);
+        entity.setChannel(channel);
         entity.setAppType(appType);
         entity.setChargeType(chargeType);
-        entity.setChargeId(charge.getId());
-        entity.setChargeJson(charge.toString());
+        entity.setChargeId(chargeId);
+        entity.setChargeJson(chargeJson);
         entity.setChargeStatus(ChargeStatus.CHARGE_CREATED);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);

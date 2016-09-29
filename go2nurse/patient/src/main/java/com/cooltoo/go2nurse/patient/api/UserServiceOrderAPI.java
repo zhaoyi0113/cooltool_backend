@@ -1,10 +1,9 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
-import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.go2nurse.service.ChargeWebHookService;
 import com.cooltoo.go2nurse.service.DoctorAppointmentService;
 import com.cooltoo.util.NetworkUtil;
-import com.google.common.io.CharStreams;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
@@ -15,21 +14,23 @@ import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.util.VerifyUtil;
 import com.pingplusplus.model.Charge;
-import com.pingplusplus.model.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.*;
+
+import com.google.common.io.CharStreams;
+import com.pingplusplus.model.Event;
+import javax.servlet.ServletInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.*;
 
 /**
  * Created by hp on 2016/7/15.
@@ -42,6 +43,7 @@ public class UserServiceOrderAPI {
     @Autowired private DoctorAppointmentService doctorAppointmentService;
     @Autowired private ServiceOrderService orderService;
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
+    @Autowired private ChargeWebHookService chargeWebHookService;
 
     @Path("/category/top")
     @GET
@@ -153,21 +155,30 @@ public class UserServiceOrderAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response pingPpWebhooks(@Context HttpServletRequest request) {
-        logger.info("receive web hooks");
-        try {
-            ServletInputStream inputStream = request.getInputStream();
-            Reader reader = new InputStreamReader(inputStream);
-            String body = CharStreams.toString(reader);
-            logger.info("receive body "+body);
-            if(body != null) {
-                Event event = Event.GSON.fromJson(body, Event.class);
-                Charge charge = (Charge) event.getData().getObject();
-                orderService.orderChargeWebhooks(charge.getId(), event.getId(), body);
-            }
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+//        logger.info("receive web hooks");
+//        try {
+//            ServletInputStream inputStream = request.getInputStream();
+//            Reader reader = new InputStreamReader(inputStream);
+//            String body = CharStreams.toString(reader);
+//            logger.info("receive body "+body);
+//            if(body != null) {
+//                Event event = Event.GSON.fromJson(body, Event.class);
+//                Charge charge = (Charge) event.getData().getObject();
+//                orderService.orderChargeWebhooks(charge.getId(), event.getId(), body);
+//            }
+//        } catch (IOException e) {
+//            logger.error(e.getMessage(), e);
+//        }
+//        return Response.ok().build();
+
+
+        String returnValue = (String)chargeWebHookService.webHookBody(request);
+        if (VerifyUtil.isStringEmpty(returnValue)) {
+            return Response.ok().build();
         }
-        return Response.ok().build();
+        else {
+            return Response.ok(returnValue).build();
+        }
     }
 
     @Path("/edit")

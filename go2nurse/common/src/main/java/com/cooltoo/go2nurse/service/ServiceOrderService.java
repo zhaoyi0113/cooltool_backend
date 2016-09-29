@@ -292,7 +292,7 @@ public class ServiceOrderService {
             return charge;
         }
 
-        orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, ChargeType.CHARGE, charge);
+        orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, channel, ChargeType.CHARGE, charge.getId(), charge.toString());
 
         return charge;
     }
@@ -305,6 +305,7 @@ public class ServiceOrderService {
         long orderId = charge.getOrderId();
         ServiceOrderEntity order = repository.findOne(orderId);
         if (null==order) {
+            logger.error("order not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (!OrderStatus.TO_PAY.equals(order.getOrderStatus())) {
