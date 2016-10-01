@@ -35,9 +35,12 @@ public class UserConsultationAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(UserConsultationAPI.class);
 
-    @Autowired private UserConsultationService userConsultationService;
-    @Autowired private ConsultationCategoryService categoryService;
-    @Autowired private WeChatService weChatService;
+    @Autowired
+    private UserConsultationService userConsultationService;
+    @Autowired
+    private ConsultationCategoryService categoryService;
+    @Autowired
+    private WeChatService weChatService;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -62,7 +65,7 @@ public class UserConsultationAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response getConsultation(@Context HttpServletRequest request,
                                     @QueryParam("content") @DefaultValue("") String content,
-                                    @QueryParam("index")  @DefaultValue("0")  int pageIndex,
+                                    @QueryParam("index") @DefaultValue("0") int pageIndex,
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
@@ -76,7 +79,7 @@ public class UserConsultationAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response getConsultation(@Context HttpServletRequest request,
                                     @QueryParam("nurse_id") @DefaultValue("0") long nurseId,
-                                    @QueryParam("index")  @DefaultValue("0")  int pageIndex,
+                                    @QueryParam("index") @DefaultValue("0") int pageIndex,
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
@@ -100,7 +103,7 @@ public class UserConsultationAPI {
     public Response deleteConsultation(@Context HttpServletRequest request,
                                        @FormParam("consultation_id") @DefaultValue("0") long consultationId
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<Long> allIds = new ArrayList<>();
         allIds.add(consultationId);
         allIds = userConsultationService.deleteConsultationByIds(userId, allIds);
@@ -117,7 +120,7 @@ public class UserConsultationAPI {
                                     @FormParam("disease_description") @DefaultValue("") String diseaseDescription,
                                     @FormParam("clinical_history") @DefaultValue("") String clinicalHistory
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long consultationId = userConsultationService.addConsultation(categoryId, nurseId, userId, patientId, diseaseDescription, clinicalHistory);
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", consultationId);
@@ -134,7 +137,7 @@ public class UserConsultationAPI {
                                          @FormDataParam("image_name") @DefaultValue("") String imageName,
                                          @FormDataParam("image") InputStream image
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, consultationId, imageName, image);
         return Response.ok(imageIdToUrl).build();
     }
@@ -144,11 +147,11 @@ public class UserConsultationAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addConsultationImageFromWX(@Context HttpServletRequest request,
-                                         @FormParam("consultation_id") @DefaultValue("0") long consultationId,
-                                         @FormParam("media_id") @DefaultValue("") String mediaId
+                                               @FormParam("consultation_id") @DefaultValue("0") long consultationId,
+                                               @FormParam("media_id") @DefaultValue("") String mediaId
     ) {
-        logger.info("download image from wx with the media id "+mediaId+" consultant id "+consultationId);
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        logger.info("download image from wx with the media id " + mediaId + " consultant id " + consultationId);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         InputStream inputStream = weChatService.downloadImageFromWX(mediaId);
         Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, consultationId, "", inputStream);
         return Response.ok(imageIdToUrl).build();
@@ -164,7 +167,7 @@ public class UserConsultationAPI {
                                      @FormParam("nurse_id") @DefaultValue("") String strNurseId, /* not used */
                                      @FormParam("completed") @DefaultValue("") String strCompleted/* YES , NO */
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Long categoryId = VerifyUtil.isIds(strCategoryId) ? VerifyUtil.parseLongIds(strCategoryId).get(0) : null;
         Long nurseId = VerifyUtil.isIds(strNurseId) ? VerifyUtil.parseLongIds(strNurseId).get(0) : null;
         YesNoEnum completed = YesNoEnum.parseString(strCompleted);
@@ -181,7 +184,7 @@ public class UserConsultationAPI {
                                       @FormParam("nurse_id") @DefaultValue("0") long nurseId,
                                       @FormParam("score") @DefaultValue("0") float score
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserConsultationBean bean = userConsultationService.scoreConsultation(userId, nurseId, consultationId, score);
         return Response.ok(bean).build();
     }
@@ -232,8 +235,24 @@ public class UserConsultationAPI {
                                              @FormDataParam("image_name") @DefaultValue("") String imageName,
                                              @FormDataParam("image") InputStream image
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Map<String, String> imageIdToUrl = userConsultationService.addTalkImage(userId, consultationId, talkId, imageName, image);
+        return Response.ok(imageIdToUrl).build();
+    }
+
+    @Path("/talk/add_image/wx")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response addConsultationTalkImageFromWX(@Context HttpServletRequest request,
+                                                   @FormParam("consultation_id") @DefaultValue("0") long consultationId,
+                                                   @FormDataParam("talk_id") @DefaultValue("0") long talkId,
+                                                   @FormParam("media_id") @DefaultValue("") String mediaId
+    ) {
+        logger.info("download image from wx with the media id " + mediaId + " consultant id " + consultationId);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        InputStream inputStream = weChatService.downloadImageFromWX(mediaId);
+        Map<String, String> imageIdToUrl = userConsultationService.addTalkImage(userId, consultationId, talkId, "", inputStream);
         return Response.ok(imageIdToUrl).build();
     }
 
