@@ -246,7 +246,7 @@ public class UserConsultationAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response addConsultationTalkImageFromWX(@Context HttpServletRequest request,
                                                    @FormParam("consultation_id") @DefaultValue("0") long consultationId,
-                                                   @FormDataParam("talk_id") @DefaultValue("0") long talkId,
+                                                   @FormParam("talk_id") @DefaultValue("0") long talkId,
                                                    @FormParam("media_id") @DefaultValue("") String mediaId
     ) {
         logger.info("download image from wx with the media id " + mediaId + " consultant id " + consultationId);
