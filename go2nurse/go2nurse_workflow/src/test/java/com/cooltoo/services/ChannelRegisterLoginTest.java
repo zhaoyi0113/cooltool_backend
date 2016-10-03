@@ -134,6 +134,12 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         Assert.assertNotNull(userEntity);
         userEntity = loginService.login("13523212122", "aa03", "wx", "5", "2");
         Assert.assertNotNull(userEntity);
+
+        WeChatUserInfo weChatUserInfo = new WeChatUserInfo();
+        weChatUserInfo.setOpenid("1");
+        URI uri = weChatService.loginWithWeChatUser(weChatUserInfo, null);
+        Assert.assertNotNull(uri);
+        Assert.assertTrue(uri.toString().contains("token"));
     }
 
     @Test
@@ -188,5 +194,6 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         }
         Assert.assertNotNull(ex);
     }
+
 
 }

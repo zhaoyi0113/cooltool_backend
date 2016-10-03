@@ -25,10 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by yzzhao on 8/14/16.
@@ -89,10 +86,18 @@ public class WeChatService {
 
     public URI loginWithWeChatUser(WeChatUserInfo userInfo, String state) {
         String unionid = null;
+        String openid = null;
         if (userInfo != null) {
             unionid = userInfo.getUnionid();
-            logger.info("login user openid=" + userInfo.getOpenid() + " unionid=" + unionid);
-            List<UserOpenAppEntity> users = openAppRepository.findByUnionidAndStatus(unionid, CommonStatus.ENABLED);
+            openid = userInfo.getOpenid();
+            logger.info("login user openid=" + userInfo.getOpenid() + " unionid=" + unionid+", openid="+openid);
+
+            List<UserOpenAppEntity> users = new ArrayList<>();
+            if(unionid != null){
+                users = openAppRepository.findByUnionidAndStatus(unionid, CommonStatus.ENABLED);
+            }else if(openid != null){
+                users = openAppRepository.findByOpenidAndStatus(openid, CommonStatus.ENABLED);
+            }
             if (!users.isEmpty() && users.get(0).getUserId() != 0) {
                 //user unionid already exists, check whether it has login token
                 List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
@@ -124,8 +129,8 @@ public class WeChatService {
         }
         try {
             String urlStr = "http://" + serverHost + "/go2nurse/#/register";
-            if (unionid != null) {
-                urlStr += "/" + AppChannel.WECHAT + "/" + unionid;
+            if (openid != null) {
+                urlStr += "/" + AppChannel.WECHAT + "/" + openid;
             }
             if (state != null) {
                 urlStr += "/" + state;
