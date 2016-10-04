@@ -81,9 +81,10 @@ public class WeChatService {
     }
 
     public URI login(String code, String state) {
-        Map accessToken = getWebLoginAccessToken(code, state);
+        String appid = state.split("_")[0];
+        Map accessToken = getWebLoginAccessToken(code, appid);
         WeChatUserInfo userInfo = getUserInfo(accessToken);
-        URI userTokens = loginWithWeChatUser(userInfo, state);
+        URI userTokens = loginWithWeChatUser(userInfo, state.split("_")[1]);
         if (userTokens != null) return userTokens;
         return null;
     }
