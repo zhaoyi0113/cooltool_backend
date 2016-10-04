@@ -214,4 +214,15 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         Assert.assertNotNull(appid);
         Assert.assertEquals("3", appid);
     }
+
+    @Test
+    public void test_wechat_login_duplicate_user(){
+        WeChatUserInfo userInfo = new WeChatUserInfo();
+        userInfo.setOpenid(System.currentTimeMillis()+"");
+        weChatService.loginWithWeChatUser(userInfo, "");
+        weChatService.loginWithWeChatUser(userInfo, "");
+        weChatService.loginWithWeChatUser(userInfo, "");
+        List<UserOpenAppEntity> userOpenEntties = openAppRepository.findByOpenid(userInfo.getOpenid());
+        Assert.assertEquals(1, userOpenEntties.size());
+    }
 }

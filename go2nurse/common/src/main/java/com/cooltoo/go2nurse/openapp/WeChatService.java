@@ -120,7 +120,7 @@ public class WeChatService {
                 }
             } else {
                 //user open id doesn't exist, add the open id to database
-                logger.info("user id doesn't exists in openapp table");
+                logger.info("save openid to database: "+userInfo.getOpenid());
                 UserOpenAppEntity entity = new UserOpenAppEntity();
                 entity.setChannel(AppChannel.WECHAT);
                 Gson gson = new Gson();
@@ -148,9 +148,9 @@ public class WeChatService {
         return null;
     }
 
-    public void saveTokenToUserWeChat(String openId, String token) {
+    public void saveTokenToUserWeChat(String appId, String token) {
         //save user token and openid
-        WeChatAccountEntity wechatAccount = weChatAccountRepository.findFirstByAppId(openId);
+        WeChatAccountEntity wechatAccount = weChatAccountRepository.findFirstByAppId(appId);
         if(wechatAccount!=null){
             if(weChatTokenAccessRepository.countByWechatAccountIdAndStatus(wechatAccount.getId(), CommonStatus.ENABLED)<=0) {
                 UserWeChatTokenAccessEntity weChatTokenAccessEntity = new UserWeChatTokenAccessEntity();
