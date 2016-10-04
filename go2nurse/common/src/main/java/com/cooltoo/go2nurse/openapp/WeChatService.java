@@ -96,7 +96,7 @@ public class WeChatService {
             logger.info("login user openid=" + userInfo.getOpenid() + ", openid="+openid);
 
             List<UserOpenAppEntity> users = new ArrayList<>();
-                users = openAppRepository.findByOpenidAndStatus(openid, CommonStatus.ENABLED);
+                users = openAppRepository.findByOpenidAndStatusOrderByCreatedAtDesc(openid, CommonStatus.ENABLED);
 
             if (!users.isEmpty() && users.get(0).getUserId() != 0) {
                 //user openid already exists, check whether it has login token

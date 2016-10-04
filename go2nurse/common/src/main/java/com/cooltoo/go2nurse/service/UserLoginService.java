@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -76,7 +75,7 @@ public class UserLoginService {
                 channelUsers = openAppRepository.findByUnionidAndStatus(channelid, CommonStatus.ENABLED);
             }
             if((channelUsers==null || channelUsers.isEmpty()) && openId != null){
-                channelUsers = openAppRepository.findByOpenidAndStatus(openId, CommonStatus.ENABLED);
+                channelUsers = openAppRepository.findByOpenidAndStatusOrderByCreatedAtDesc(openId, CommonStatus.ENABLED);
             }
             if(channelUsers == null || channelUsers.isEmpty()){
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
