@@ -93,31 +93,34 @@ public class WeChatService {
         String openid = null;
         if (userInfo != null) {
             openid = userInfo.getOpenid();
-            logger.info("login user openid=" + userInfo.getOpenid() + ", openid="+openid);
+            logger.info("login user openid=" + userInfo.getOpenid());
 
             List<UserOpenAppEntity> users = new ArrayList<>();
                 users = openAppRepository.findByOpenidAndStatusOrderByCreatedAtDesc(openid, CommonStatus.ENABLED);
+            if (!users.isEmpty()) {
+                //when user has open in wechat but has not registered, the user id will be 0
+                if(users.get(0).getUserId() != 0) {
+                    //user openid already exists, check whether it has login token
+                    List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
+                    if (!userTokens.isEmpty()) {
+                        try {
+                            String userToken = userTokens.get(0).getToken();
+                            saveTokenToUserWeChat(state, userToken);
+                            //if found login token, redirect to token url
+                            String url = "http://" + serverHost + "/go2nurse/?token=" + userToken;
+                            if (state != null) {
+                                url += "?redirect=" + state;
+                            }
 
-            if (!users.isEmpty() && users.get(0).getUserId() != 0) {
-                //user openid already exists, check whether it has login token
-                List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
-                if (!userTokens.isEmpty()) {
-                    try {
-                        String userToken = userTokens.get(0).getToken();
-                        saveTokenToUserWeChat(state, userToken);
-                        //if found login token, redirect to token url
-                        String url = "http://" + serverHost + "/go2nurse/?token=" + userToken;
-                        if (state != null) {
-                            url += "?redirect=" + state;
+                            return new URI(url);
+                        } catch (URISyntaxException e) {
+                            logger.error(e.getMessage(), e);
                         }
-
-                        return new URI(url);
-                    } catch (URISyntaxException e) {
-                        logger.error(e.getMessage(), e);
                     }
                 }
             } else {
                 //user open id doesn't exist, add the open id to database
+                logger.info("user id doesn't exists in openapp table");
                 UserOpenAppEntity entity = new UserOpenAppEntity();
                 entity.setChannel(AppChannel.WECHAT);
                 Gson gson = new Gson();
