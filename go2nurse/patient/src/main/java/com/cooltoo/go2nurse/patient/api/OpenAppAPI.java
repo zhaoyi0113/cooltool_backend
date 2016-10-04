@@ -1,11 +1,15 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -48,8 +52,10 @@ public class OpenAppAPI {
     @GET
     @Path("/wechat/jsapiticket/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getJSApiTicket(@QueryParam("url") String url) {
-        return Response.ok(weChatService.getJSApiSignature(url)).build();
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getJSApiTicket(@Context HttpServletRequest request, @QueryParam("url") String url) {
+        String token = (String)request.getAttribute(ContextKeys.USER_ACCESS_TOKEN);
+        return Response.ok(weChatService.getJSApiSignature(token, url)).build();
     }
 
 }

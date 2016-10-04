@@ -1,14 +1,18 @@
 package com.cooltoo.go2nurse.openapp;
 
+import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.entities.WeChatAccountEntity;
+import com.cooltoo.go2nurse.repository.WeChatAccountRepository;
 import com.cooltoo.go2nurse.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,18 +22,12 @@ import java.util.Map;
 public class AccessTokenScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenScheduler.class);
-    @Value("${wechat_go2nurse_appid}")
-    private String srvAppId;
 
-    @Value("${wechat_go2nurse_appsecret}")
-    private String srvAppSecret;
+    private Map<String, String> accessTokens = new HashMap<>();
 
-    private String accessToken;
+    private Map<String, String> jsApiTickets = new HashMap<>();
 
-    private String jsApiTicket;
-
-    @Autowired
-    private WeChatService weChatService;
+    @Autowired private WeChatAccountRepository weChatAccountRepository;
 
     @PostConstruct
     public void postConstruct() {
@@ -49,41 +47,40 @@ public class AccessTokenScheduler {
 
     private void requestAccessToken() {
         logger.info("access token scheduler");
-        String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + srvAppId + "&secret=" + srvAppSecret;
-        Map map = HttpUtils.getHttpRequest(url, Map.class);
-        if (map != null && map.containsKey("access_token")) {
-            accessToken = (String) map.get("access_token");
-            logger.info("refresh access token " + accessToken);
-            requestJSAPITicket();
-        } else {
-            logger.error("can't get token access");
+        List<WeChatAccountEntity> accounts = weChatAccountRepository.findByStatus(CommonStatus.ENABLED);
+        for(WeChatAccountEntity entity : accounts){
+            String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + entity.getAppId() + "&secret=" + entity.getAppSecret();
+            Map map = HttpUtils.getHttpRequest(url, Map.class);
+            if (map != null && map.containsKey("access_token")) {
+                String accessToken = (String) map.get("access_token");
+                logger.info("refresh access token " + accessToken);
+                accessTokens.put(entity.getAppId(), accessToken);
+                requestJSAPITicket(entity.getAppId(), accessToken);
+            } else {
+                logger.error("can't get token access");
+            }
         }
+
     }
 
-    private void requestJSAPITicket() {
+    private void requestJSAPITicket(String appId, String accessToken) {
         String url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi";
         Map map = HttpUtils.getHttpRequest(url, Map.class);
         if (map != null && map.containsKey("ticket")) {
-            jsApiTicket = (String) map.get("ticket");
+            String jsApiTicket = (String) map.get("ticket");
             logger.info("refresh js api ticket " + jsApiTicket);
+            jsApiTickets.put(appId, jsApiTicket);
         } else {
             logger.error("can't get js api ticket");
         }
     }
 
-    public String getJsApiTicket() {
-        return jsApiTicket;
+    public String getJsApiTicket(String appid) {
+        return jsApiTickets.get(appid);
     }
 
-    public void setJsApiTicket(String jsApiTicket) {
-        this.jsApiTicket = jsApiTicket;
+    public String getAccessToken(String appid) {
+        return accessTokens.get(appid);
     }
 
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
 }

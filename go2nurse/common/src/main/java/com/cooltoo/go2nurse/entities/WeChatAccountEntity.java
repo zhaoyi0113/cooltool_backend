@@ -12,7 +12,7 @@ import java.util.Date;
 @Table(name = "go2nurse_wechat_account")
 public class WeChatAccountEntity {
 
-    private long id;
+    private int id;
     private String appId;
     private String appSecret;
     private Date timeCreated;
@@ -20,11 +20,11 @@ public class WeChatAccountEntity {
 
     @GeneratedValue
     @Id
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

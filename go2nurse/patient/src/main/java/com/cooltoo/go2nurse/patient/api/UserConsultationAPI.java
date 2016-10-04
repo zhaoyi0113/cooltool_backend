@@ -152,7 +152,8 @@ public class UserConsultationAPI {
     ) {
         logger.info("download image from wx with the media id " + mediaId + " consultant id " + consultationId);
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        InputStream inputStream = weChatService.downloadImageFromWX(mediaId);
+        String accessToken = (String) request.getAttribute(ContextKeys.USER_ACCESS_TOKEN);
+        InputStream inputStream = weChatService.downloadImageFromWX(accessToken, mediaId);
         Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, consultationId, "", inputStream);
         return Response.ok(imageIdToUrl).build();
     }
@@ -251,7 +252,8 @@ public class UserConsultationAPI {
     ) {
         logger.info("download image from wx with the media id " + mediaId + " consultant id " + consultationId);
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        InputStream inputStream = weChatService.downloadImageFromWX(mediaId);
+        String userAccessToken = (String)request.getAttribute(ContextKeys.USER_ACCESS_TOKEN);
+        InputStream inputStream = weChatService.downloadImageFromWX(userAccessToken, mediaId);
         Map<String, String> imageIdToUrl = userConsultationService.addTalkImage(userId, consultationId, talkId, "", inputStream);
         return Response.ok(imageIdToUrl).build();
     }

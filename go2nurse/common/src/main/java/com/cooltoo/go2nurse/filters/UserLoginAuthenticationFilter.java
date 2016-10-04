@@ -62,6 +62,7 @@ public class UserLoginAuthenticationFilter implements ContainerRequestFilter {
         }
         String token = tokens.get(0);
         logger.info("get token={}", token);
+        requestContext.setProperty(ContextKeys.USER_ACCESS_TOKEN, token);
         if (token != null) {
             //read user id from token
             List<UserTokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByToken(token);

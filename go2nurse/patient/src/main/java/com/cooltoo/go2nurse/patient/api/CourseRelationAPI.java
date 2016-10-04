@@ -27,7 +27,6 @@ public class CourseRelationAPI {
     @Path("/conditions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
     public Response getCourse(@Context HttpServletRequest request,
                               @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
                               @QueryParam("department_id") @DefaultValue("0") int departmentId,

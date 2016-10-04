@@ -9,9 +9,11 @@ import com.cooltoo.go2nurse.beans.WeChatUserInfo;
 import com.cooltoo.go2nurse.converter.UserOpenAppEntity;
 import com.cooltoo.go2nurse.entities.UserEntity;
 import com.cooltoo.go2nurse.entities.UserTokenAccessEntity;
+import com.cooltoo.go2nurse.entities.UserWeChatTokenAccessEntity;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.repository.UserOpenAppRepository;
 import com.cooltoo.go2nurse.repository.UserRepository;
+import com.cooltoo.go2nurse.repository.UserWeChatTokenAccessRepository;
 import com.cooltoo.go2nurse.service.UserLoginService;
 import com.cooltoo.go2nurse.service.UserService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -47,6 +49,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired private UserWeChatTokenAccessRepository weChatTokenAccessRepository;
 
     @Test
     public void test_register_from_existed_wechat_user() {
@@ -195,5 +198,18 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         Assert.assertNotNull(ex);
     }
 
+    @Test
+    public void test_login_save_wechat_token(){
+        UserTokenAccessEntity entity = loginService.login("13523212122", "aa03", AppChannel.WECHAT.name(), null, "1");
+        UserWeChatTokenAccessEntity wechatToken = weChatTokenAccessRepository.findFirstByTokenAndStatus(entity.getToken(), CommonStatus.ENABLED);
+        Assert.assertNotNull(wechatToken);
 
+    }
+
+    @Test
+    public void test_find_appid_by_token(){
+        String appid = weChatTokenAccessRepository.findAppIdFromToken("token1", CommonStatus.ENABLED);
+        Assert.assertNotNull(appid);
+        Assert.assertEquals("3", appid);
+    }
 }

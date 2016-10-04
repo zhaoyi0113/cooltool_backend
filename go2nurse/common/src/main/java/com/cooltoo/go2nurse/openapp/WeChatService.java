@@ -7,8 +7,12 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.WeChatUserInfo;
 import com.cooltoo.go2nurse.converter.UserOpenAppEntity;
 import com.cooltoo.go2nurse.entities.UserTokenAccessEntity;
+import com.cooltoo.go2nurse.entities.UserWeChatTokenAccessEntity;
+import com.cooltoo.go2nurse.entities.WeChatAccountEntity;
 import com.cooltoo.go2nurse.repository.UserOpenAppRepository;
 import com.cooltoo.go2nurse.repository.UserTokenAccessRepository;
+import com.cooltoo.go2nurse.repository.UserWeChatTokenAccessRepository;
+import com.cooltoo.go2nurse.repository.WeChatAccountRepository;
 import com.cooltoo.go2nurse.util.HttpUtils;
 import com.google.gson.Gson;
 import org.apache.http.HttpEntity;
@@ -39,12 +43,6 @@ public class WeChatService {
     @Value("${wechat_token}")
     private String token;
 
-    @Value("${wechat_go2nurse_appid}")
-    private String srvAppId;
-
-    @Value("${wechat_go2nurse_appsecret}")
-    private String srvAppSecret;
-
     @Value("${server.host}")
     private String serverHost;
 
@@ -56,6 +54,12 @@ public class WeChatService {
 
     @Autowired
     private AccessTokenScheduler tokenScheduler;
+
+    @Autowired
+    private WeChatAccountRepository weChatAccountRepository;
+
+    @Autowired
+    private UserWeChatTokenAccessRepository weChatTokenAccessRepository;
 
     public boolean validateEntryConnection(String signature, String timeStamp, String nonce) {
         logger.info("validate connection " + signature + ", " + timeStamp + ", " + nonce + ", " + token);
@@ -77,7 +81,7 @@ public class WeChatService {
     }
 
     public URI login(String code, String state) {
-        Map accessToken = getWebLoginAccessToken(code);
+        Map accessToken = getWebLoginAccessToken(code, state);
         WeChatUserInfo userInfo = getUserInfo(accessToken);
         URI userTokens = loginWithWeChatUser(userInfo, state);
         if (userTokens != null) return userTokens;
@@ -99,22 +103,25 @@ public class WeChatService {
                 users = openAppRepository.findByOpenidAndStatus(openid, CommonStatus.ENABLED);
             }
             if (!users.isEmpty() && users.get(0).getUserId() != 0) {
-                //user unionid already exists, check whether it has login token
+                //user openid already exists, check whether it has login token
                 List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
                 if (!userTokens.isEmpty()) {
                     try {
+                        String userToken = userTokens.get(0).getToken();
+                        saveTokenToUserWeChat(state, userToken);
                         //if found login token, redirect to token url
-                        String url = "http://" + serverHost + "/go2nurse/?token=" + userTokens.get(0).getToken();
+                        String url = "http://" + serverHost + "/go2nurse/?token=" + userToken;
                         if (state != null) {
                             url += "?redirect=" + state;
                         }
+
                         return new URI(url);
                     } catch (URISyntaxException e) {
                         logger.error(e.getMessage(), e);
                     }
                 }
             } else {
-                //user union id doesn't exist, add the union id to database
+                //user open id doesn't exist, add the open id to database
                 UserOpenAppEntity entity = new UserOpenAppEntity();
                 entity.setChannel(AppChannel.WECHAT);
                 Gson gson = new Gson();
@@ -142,10 +149,29 @@ public class WeChatService {
         return null;
     }
 
-    public Map<String, String> getJSApiSignature(String url) {
+    public void saveTokenToUserWeChat(String openId, String token) {
+        //save user token and openid
+        WeChatAccountEntity wechatAccount = weChatAccountRepository.findFirstByAppId(openId);
+        if(wechatAccount!=null){
+            if(weChatTokenAccessRepository.countByWechatAccountIdAndStatus(wechatAccount.getId(), CommonStatus.ENABLED)<=0) {
+                UserWeChatTokenAccessEntity weChatTokenAccessEntity = new UserWeChatTokenAccessEntity();
+                weChatTokenAccessEntity.setStatus(CommonStatus.ENABLED);
+                weChatTokenAccessEntity.setTimeCreated(Calendar.getInstance().getTime());
+                weChatTokenAccessEntity.setToken(token);
+                weChatTokenAccessEntity.setWechatAccountId((int) wechatAccount.getId());
+                weChatTokenAccessRepository.save(weChatTokenAccessEntity);
+            }
+        }
+    }
+
+    public Map<String, String> getJSApiSignature(String userAccessToken, String url) {
         logger.info("request js api signature from " + url);
+        String appid = weChatTokenAccessRepository.findAppIdFromToken(userAccessToken, CommonStatus.ENABLED);
+        if(appid == null){
+            return new HashMap<>();
+        }
         String noncestr = System.currentTimeMillis() + "";
-        String jsApiTicket = tokenScheduler.getJsApiTicket();
+        String jsApiTicket = tokenScheduler.getJsApiTicket(appid);
         String timestamp = System.currentTimeMillis() + "";
         StringBuffer str = new StringBuffer();
         str.append("jsapi_ticket=").append(jsApiTicket).append("&noncestr=").append(noncestr).append("&timestamp=").append(timestamp).append("&url=").append(url);
@@ -155,13 +181,14 @@ public class WeChatService {
         signaturemap.put("jsapiticket", jsApiTicket);
         signaturemap.put("timestamp", timestamp);
         signaturemap.put("signature", signature);
-        signaturemap.put("appid", srvAppId);
+        signaturemap.put("appid", appid);
         logger.info("generate js api ticket");
         return signaturemap;
     }
 
-    public InputStream downloadImageFromWX(String mediaId){
-        String accessToken = tokenScheduler.getAccessToken();
+    public InputStream downloadImageFromWX(String userAccessToken, String mediaId){
+        String appid = weChatTokenAccessRepository.findAppIdFromToken(userAccessToken, CommonStatus.ENABLED);
+        String accessToken = tokenScheduler.getAccessToken(appid);
         String url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token="+accessToken+"&media_id="+mediaId;
         try {
             HttpEntity entity = HttpUtils.getHttpResponseEntity(url);
@@ -180,9 +207,13 @@ public class WeChatService {
         throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
     }
 
-    private Map getWebLoginAccessToken(String code) {
+    private Map getWebLoginAccessToken(String code, String appid) {
+        WeChatAccountEntity weChatAccount = weChatAccountRepository.findFirstByAppId(appid);
+        if(weChatAccount == null){
+            return null;
+        }
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" +
-                srvAppId + "&secret=" + srvAppSecret + "&code=" + code + "&&grant_type=authorization_code";
+                weChatAccount.getAppId() + "&secret=" + weChatAccount.getAppSecret() + "&code=" + code + "&&grant_type=authorization_code";
         return HttpUtils.getRequest(url);
     }
 
@@ -196,7 +227,7 @@ public class WeChatService {
                     + webToken.get("access_token") +
                     "&openid=" + webToken.get("openid") + "&lang=zh_CN";
             WeChatUserInfo userInfo = HttpUtils.getHttpRequest(url, WeChatUserInfo.class);
-            logger.info("get wechat user info " + userInfo.getUnionid());
+            logger.info("get wechat user info " + userInfo.getOpenid());
             return userInfo;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

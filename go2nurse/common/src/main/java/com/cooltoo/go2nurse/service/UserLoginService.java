@@ -8,6 +8,7 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.converter.UserOpenAppEntity;
 import com.cooltoo.go2nurse.entities.UserEntity;
 import com.cooltoo.go2nurse.entities.UserTokenAccessEntity;
+import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.repository.UserOpenAppRepository;
 import com.cooltoo.go2nurse.repository.UserRepository;
 import com.cooltoo.go2nurse.repository.UserTokenAccessRepository;
@@ -39,6 +40,8 @@ public class UserLoginService {
     private AccessTokenGenerator tokenGenerator;
     @Autowired
     private UserOpenAppRepository openAppRepository;
+    @Autowired
+    private WeChatService weChatService;
 
     @Transactional
     public UserTokenAccessEntity login(String mobile, String password) {
@@ -85,6 +88,8 @@ public class UserLoginService {
                 channelUser.setUserId(userEntity.getUserId());
                 openAppRepository.save(channelUser);
             }
+            //save token to wechat user access table
+            weChatService.saveTokenToUserWeChat(openId, userEntity.getToken());
             return userEntity;
         } else {
             return login(mobile, password);
