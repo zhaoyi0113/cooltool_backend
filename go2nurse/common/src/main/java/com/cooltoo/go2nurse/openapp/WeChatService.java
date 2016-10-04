@@ -89,19 +89,14 @@ public class WeChatService {
     }
 
     public URI loginWithWeChatUser(WeChatUserInfo userInfo, String state) {
-        String unionid = null;
         String openid = null;
         if (userInfo != null) {
-            unionid = userInfo.getUnionid();
             openid = userInfo.getOpenid();
-            logger.info("login user openid=" + userInfo.getOpenid() + " unionid=" + unionid+", openid="+openid);
+            logger.info("login user openid=" + userInfo.getOpenid() + ", openid="+openid);
 
             List<UserOpenAppEntity> users = new ArrayList<>();
-            if(unionid != null){
-                users = openAppRepository.findByUnionidAndStatus(unionid, CommonStatus.ENABLED);
-            }else if(openid != null){
                 users = openAppRepository.findByOpenidAndStatus(openid, CommonStatus.ENABLED);
-            }
+
             if (!users.isEmpty() && users.get(0).getUserId() != 0) {
                 //user openid already exists, check whether it has login token
                 List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
