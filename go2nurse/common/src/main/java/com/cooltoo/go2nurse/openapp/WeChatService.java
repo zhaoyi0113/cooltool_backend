@@ -84,12 +84,12 @@ public class WeChatService {
         String appid = state.split("_")[0];
         Map accessToken = getWebLoginAccessToken(code, appid);
         WeChatUserInfo userInfo = getUserInfo(accessToken);
-        URI userTokens = loginWithWeChatUser(userInfo, state.split("_")[1]);
+        URI userTokens = loginWithWeChatUser(userInfo, state.split("_")[1], appid);
         if (userTokens != null) return userTokens;
         return null;
     }
 
-    public URI loginWithWeChatUser(WeChatUserInfo userInfo, String state) {
+    public URI loginWithWeChatUser(WeChatUserInfo userInfo, String state, String appid) {
         String openid = null;
         if (userInfo != null) {
             openid = userInfo.getOpenid();
@@ -105,7 +105,7 @@ public class WeChatService {
                     if (!userTokens.isEmpty()) {
                         try {
                             String userToken = userTokens.get(0).getToken();
-                            saveTokenToUserWeChat(state, userToken);
+                            saveTokenToUserWeChat(appid, userToken);
                             //if found login token, redirect to token url
                             String url = "http://" + serverHost + "/go2nurse/?token=" + userToken;
                             if (state != null) {
@@ -129,6 +129,7 @@ public class WeChatService {
                 entity.setOpenid(userInfo.getOpenid());
                 entity.setUnionid(userInfo.getUnionid());
                 entity.setStatus(CommonStatus.ENABLED);
+                entity.setAppId(appid);
                 entity.setCreatedAt(System.currentTimeMillis());
                 openAppRepository.save(entity);
             }
@@ -150,6 +151,8 @@ public class WeChatService {
 
     public void saveTokenToUserWeChat(String appId, String token) {
         //save user token and openid
+        logger.info("save app id "+appId+" token "+token);
+
         WeChatAccountEntity wechatAccount = weChatAccountRepository.findFirstByAppId(appId);
         if(wechatAccount!=null){
             if(weChatTokenAccessRepository.countByTokenAndStatus(token, CommonStatus.ENABLED)<=0) {
@@ -157,9 +160,11 @@ public class WeChatService {
                 weChatTokenAccessEntity.setStatus(CommonStatus.ENABLED);
                 weChatTokenAccessEntity.setTimeCreated(Calendar.getInstance().getTime());
                 weChatTokenAccessEntity.setToken(token);
-                weChatTokenAccessEntity.setWechatAccountId((int) wechatAccount.getId());
+                weChatTokenAccessEntity.setWechatAccountId(wechatAccount.getId());
                 weChatTokenAccessRepository.save(weChatTokenAccessEntity);
             }
+        }else{
+            logger.warn("can't find appid "+appId);
         }
     }
 

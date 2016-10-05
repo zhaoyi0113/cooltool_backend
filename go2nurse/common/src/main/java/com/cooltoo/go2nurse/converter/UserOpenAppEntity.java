@@ -20,6 +20,7 @@ public class UserOpenAppEntity {
     private long userId;
     private CommonStatus status;
     private long createdAt;
+    private String appId;
 
     @Id
     @Column(name = "id")
@@ -93,6 +94,15 @@ public class UserOpenAppEntity {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Column(name = "appid")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 }
 

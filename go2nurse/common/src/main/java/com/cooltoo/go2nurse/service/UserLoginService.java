@@ -88,7 +88,7 @@ public class UserLoginService {
                 openAppRepository.save(channelUser);
             }
             //save token to wechat user access table
-            weChatService.saveTokenToUserWeChat(openId, userEntity.getToken());
+            weChatService.saveTokenToUserWeChat(channelUser.getAppId(), userEntity.getToken());
             return userEntity;
         } else {
             return login(mobile, password);

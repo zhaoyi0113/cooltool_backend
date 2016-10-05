@@ -66,11 +66,11 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         String unionid = "100";
         userInfo.setUnionid(unionid);
         userInfo.setOpenid("100");
-        URI uri = weChatService.loginWithWeChatUser(userInfo, null);
+        URI uri = weChatService.loginWithWeChatUser(userInfo, null,null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("register"));
         userService.registerUser("aa", 0, "aa", "aaa", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "100", "100");
-        uri = weChatService.loginWithWeChatUser(userInfo, null);
+        uri = weChatService.loginWithWeChatUser(userInfo, null,null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.getSchemeSpecificPart().contains("token"));
     }
@@ -81,11 +81,11 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         String unionid = "1";
         userInfo.setUserId(999);
         userInfo.setUnionid(unionid);
-        URI uri = weChatService.loginWithWeChatUser(userInfo, null);
+        URI uri = weChatService.loginWithWeChatUser(userInfo, null,null);
         Assert.assertNotNull(uri);
         Assert.assertFalse(uri.toString().contains("token"));
         userService.registerUser("aa", 0, "aa", "13523212122", "aaa", "aaa", "none", AppChannel.WECHAT.name(), unionid, "1");
-        uri = weChatService.loginWithWeChatUser(userInfo, null);
+        uri = weChatService.loginWithWeChatUser(userInfo, null,null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("token"));
     }
@@ -142,7 +142,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
         WeChatUserInfo weChatUserInfo = new WeChatUserInfo();
         weChatUserInfo.setOpenid("1");
-        URI uri = weChatService.loginWithWeChatUser(weChatUserInfo, null);
+        URI uri = weChatService.loginWithWeChatUser(weChatUserInfo, null,null);
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("token"));
     }
@@ -219,9 +219,9 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
     public void test_wechat_login_duplicate_user(){
         WeChatUserInfo userInfo = new WeChatUserInfo();
         userInfo.setOpenid(System.currentTimeMillis()+"");
-        weChatService.loginWithWeChatUser(userInfo, "");
-        weChatService.loginWithWeChatUser(userInfo, "");
-        weChatService.loginWithWeChatUser(userInfo, "");
+        weChatService.loginWithWeChatUser(userInfo, "",null);
+        weChatService.loginWithWeChatUser(userInfo, "",null);
+        weChatService.loginWithWeChatUser(userInfo, "",null);
         List<UserOpenAppEntity> userOpenEntties = openAppRepository.findByOpenid(userInfo.getOpenid());
         Assert.assertEquals(1, userOpenEntties.size());
     }
