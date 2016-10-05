@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface UserWeChatTokenAccessRepository extends CrudRepository<UserWeChatTokenAccessEntity, Long>{
 
-    Long countByWechatAccountIdAndStatus(int accountId, CommonStatus status);
+    Long countByTokenAndStatus(String token, CommonStatus status);
 
     UserWeChatTokenAccessEntity findFirstByTokenAndStatus(String token, CommonStatus status);
 

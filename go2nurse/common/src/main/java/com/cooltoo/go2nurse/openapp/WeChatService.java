@@ -152,7 +152,7 @@ public class WeChatService {
         //save user token and openid
         WeChatAccountEntity wechatAccount = weChatAccountRepository.findFirstByAppId(appId);
         if(wechatAccount!=null){
-            if(weChatTokenAccessRepository.countByWechatAccountIdAndStatus(wechatAccount.getId(), CommonStatus.ENABLED)<=0) {
+            if(weChatTokenAccessRepository.countByTokenAndStatus(token, CommonStatus.ENABLED)<=0) {
                 UserWeChatTokenAccessEntity weChatTokenAccessEntity = new UserWeChatTokenAccessEntity();
                 weChatTokenAccessEntity.setStatus(CommonStatus.ENABLED);
                 weChatTokenAccessEntity.setTimeCreated(Calendar.getInstance().getTime());
@@ -167,6 +167,7 @@ public class WeChatService {
         logger.info("request js api signature from " + url);
         String appid = weChatTokenAccessRepository.findAppIdFromToken(userAccessToken, CommonStatus.ENABLED);
         if(appid == null){
+            logger.warn("Can't find appid from database for the user token "+userAccessToken);
             return new HashMap<>();
         }
         String noncestr = System.currentTimeMillis() + "";
