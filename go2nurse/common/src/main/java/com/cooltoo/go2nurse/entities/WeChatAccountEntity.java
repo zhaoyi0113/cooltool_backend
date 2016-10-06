@@ -16,6 +16,7 @@ public class WeChatAccountEntity {
     private String appId;
     private String appSecret;
     private Date timeCreated;
+    private String mchId;
     private CommonStatus status;
 
     @GeneratedValue
@@ -53,6 +54,15 @@ public class WeChatAccountEntity {
 
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    @Column(name = "mch_id")
+    public String getMchId() {
+        return mchId;
+    }
+
+    public void setMchId(String mchId) {
+        this.mchId = mchId;
     }
 
     @Column(name = "status")
