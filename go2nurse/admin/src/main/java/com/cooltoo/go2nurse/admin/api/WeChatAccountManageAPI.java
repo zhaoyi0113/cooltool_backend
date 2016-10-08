@@ -20,6 +20,16 @@ public class WeChatAccountManageAPI {
     @Autowired
     private WeChatAccountService weChatAccountService;
 
+    @Path("/{account_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getWeChatAccountByAccountId(@Context HttpServletRequest request,
+                                                @PathParam("account_id") @DefaultValue("0") int accountId
+    ) {
+        WeChatAccountBean account = weChatAccountService.getWeChatAccountById(accountId);
+        return Response.ok(account).build();
+    }
+
     @Path("/count")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -44,7 +54,7 @@ public class WeChatAccountManageAPI {
     @Path("/{account_id}")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteClinicDateByClinicDateId(@Context HttpServletRequest request,
+    public Response deleteWeChatAccountByAccountId(@Context HttpServletRequest request,
                                                    @PathParam("account_id") @DefaultValue("0") int accountId
     ) {
         WeChatAccountBean account = weChatAccountService.deleteWeChatAccountById(accountId);

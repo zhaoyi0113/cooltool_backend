@@ -35,6 +35,15 @@ public class WeChatAccountService {
     //===============================================================
     //               getting
     //===============================================================
+    public WeChatAccountBean getWeChatAccountById(int accountId) {
+        logger.info("get WeChat Account by accountId={}", accountId);
+        WeChatAccountEntity entity = repository.findOne(accountId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        return beanConverter.convert(entity);
+    }
+
     public long countWeChatAccount(String status) {
         logger.info("count WeChat account by status={}", status);
         long result = 0;
