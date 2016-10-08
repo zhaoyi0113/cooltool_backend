@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_wechat_account` ADD COLUMN `name` VARCHAR(50) NULL;

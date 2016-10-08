@@ -1,16 +1,13 @@
-package com.cooltoo.go2nurse.entities;
+package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Created by zhaoyi0113 on 10/3/16.
+ * Created by zhls on 10/8/16.
  */
-@Entity
-@Table(name = "go2nurse_wechat_account")
-public class WeChatAccountEntity {
+public class WeChatAccountBean {
 
     private int id;
     private String appId;
@@ -20,8 +17,6 @@ public class WeChatAccountEntity {
     private CommonStatus status;
     private String name;
 
-    @GeneratedValue
-    @Id
     public int getId() {
         return id;
     }
@@ -30,7 +25,6 @@ public class WeChatAccountEntity {
         this.id = id;
     }
 
-    @Column(name = "appid")
     public String getAppId() {
         return appId;
     }
@@ -39,7 +33,6 @@ public class WeChatAccountEntity {
         this.appId = appId;
     }
 
-    @Column(name = "appsecret")
     public String getAppSecret() {
         return appSecret;
     }
@@ -48,7 +41,6 @@ public class WeChatAccountEntity {
         this.appSecret = appSecret;
     }
 
-    @Column(name = "time_created")
     public Date getTimeCreated() {
         return timeCreated;
     }
@@ -57,7 +49,6 @@ public class WeChatAccountEntity {
         this.timeCreated = timeCreated;
     }
 
-    @Column(name = "mch_id")
     public String getMchId() {
         return mchId;
     }
@@ -66,8 +57,6 @@ public class WeChatAccountEntity {
         this.mchId = mchId;
     }
 
-    @Column(name = "status")
-    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }
@@ -76,7 +65,6 @@ public class WeChatAccountEntity {
         this.status = status;
     }
 
-    @Column(name = "name")
     public String getName() {
         return name;
     }

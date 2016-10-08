@@ -28,7 +28,10 @@ public class OpenAppAPI {
     @Path("/wechat/entry")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response wechatEntry(@QueryParam("signature") String signature, @QueryParam("timestamp") String timestamp, @QueryParam("nonce") String nonce, @QueryParam("echostr") String echostr) {
+    public Response wechatEntry(@QueryParam("signature") String signature,
+                                @QueryParam("timestamp") String timestamp,
+                                @QueryParam("nonce") String nonce,
+                                @QueryParam("echostr") String echostr) {
         logger.info("wechat entry " + signature);
         boolean b = weChatService.validateEntryConnection(signature, timestamp, nonce);
         if (b) {
