@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
  */
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface LoginAuthentication {
+public @interface Nurse360LoginAuthentication {
     boolean requireNurseLogin() default false;
 }

@@ -8,6 +8,9 @@ import com.cooltoo.converter.NurseBeanConverter;
 import com.cooltoo.entities.NurseEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.beans.ServiceOrderBean;
+import com.cooltoo.go2nurse.constants.OrderStatus;
+import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.leancloud.LeanCloudService;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
@@ -41,7 +44,7 @@ public class NurseServiceForNurse360 {
     @Autowired private UserFileStorageService nursegoFileStorage;
     @Autowired private Nurse360Utility utility;
     @Autowired private LeanCloudService leanCloudService;
-
+    @Autowired private NurseOrderRelationServiceForNurse360 nurseOrderService;
 
     //===================================================================
     //                     getting
@@ -63,8 +66,10 @@ public class NurseServiceForNurse360 {
         bean.setBackgroundImageUrl(utility.getHttpPrefixForNurseGo()+backgroundPath);
         NurseExtensionBean extension = nurseExtensionService.getExtensionByNurseId(nurseId);
         NurseHospitalRelationBean hospitalDepartment = nurseHospitalRelationService.getRelationByNurseId(nurseId, utility.getHttpPrefixForNurseGo());
+        List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseIdAndOrderStatus(nurseId, CommonStatus.ENABLED.name(), OrderStatus.IN_PROCESS);
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
         bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospitalDepartment);
+        bean.setProperty(NurseBean.ORDER, orders);
         return bean;
     }
 

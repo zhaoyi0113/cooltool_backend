@@ -40,4 +40,6 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrderEntity
             " AND (?7 IS NULL OR order1.orderStatus=?7)")
     Page<ServiceOrderEntity> findByConditions(Long itemId, Long userId, Long categoryId, Long topCategoryId, ServiceVendorType vendorType, Long vendorId, OrderStatus orderStatus, Pageable page);
 
+    List<ServiceOrderEntity> findByIdInAndOrderStatus(List<Long> orderIds, OrderStatus orderStatus, Sort sort);
+    Page<ServiceOrderEntity> findByIdIn(List<Long> orderIds, Pageable page);
 }

@@ -9,4 +9,5 @@ repositories {
 
 dependencies {
     compile project(":common")
+    compile project(':go2nurse:common')
 }

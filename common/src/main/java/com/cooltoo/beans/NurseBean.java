@@ -21,6 +21,7 @@ public class NurseBean {
     public static final String ABILITY_COUNT = "skill_count";
     public static final String INFO_EXTENSION = "info_extension";
     public static final String SCORE = "score";
+    public static final String ORDER = "order";
 
     public static String getSkillNomination() {
         return SKILL_NOMINATION;

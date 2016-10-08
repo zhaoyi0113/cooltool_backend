@@ -1,10 +1,13 @@
 package com.cooltoo.config;
 
 
-import com.cooltoo.nurse360.filters.BadRequestExceptionMapper;
-import com.cooltoo.nurse360.filters.CORSResponseFilter;
+import com.cooltoo.nurse360.filters.Nurse360BadRequestExceptionMapper;
+import com.cooltoo.nurse360.filters.Nurse360CORSResponseFilter;
 import com.cooltoo.nurse360.filters.NurseLoginAuthenticationFilterForNurse360;
 import com.cooltoo.nurse360.nurse.api.NurseAPIForNurse360;
+import com.cooltoo.nurse360.nurse.api.NurseLoginAPI;
+import com.cooltoo.nurse360.nurse.api.NurseOrderAPI;
+import com.cooltoo.nurse360.nurse.api.NursePatientAPI;
 import io.swagger.annotations.Api;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -28,10 +31,13 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
 
     public Nurse360JerseyConfiguration() {
         register(MultiPartFeature.class);
-        register(BadRequestExceptionMapper.class);
-        register(CORSResponseFilter.class);
+        register(Nurse360BadRequestExceptionMapper.class);
+        register(Nurse360CORSResponseFilter.class);
         register(NurseLoginAuthenticationFilterForNurse360.class);
         register(NurseAPIForNurse360.class);
+        register(NurseLoginAPI.class);
+        register(NurseOrderAPI.class);
+        register(NursePatientAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
     }

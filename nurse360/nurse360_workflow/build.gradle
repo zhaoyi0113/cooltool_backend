@@ -49,6 +49,7 @@ dependencies {
     testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
 
     compile project(':common')
+    compile project(':go2nurse:common')
     compile project(':nurse360:common')
     compile project(':nurse360:nurse')
 }

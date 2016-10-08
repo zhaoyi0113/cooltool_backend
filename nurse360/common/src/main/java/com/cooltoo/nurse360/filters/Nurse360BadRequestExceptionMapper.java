@@ -13,9 +13,9 @@ import javax.ws.rs.ext.Provider;
  * Created by yzzhao on 1/21/16.
  */
 @Provider
-public class BadRequestExceptionMapper implements ExceptionMapper<BadRequestException> {
+public class Nurse360BadRequestExceptionMapper implements ExceptionMapper<BadRequestException> {
 
-    private static final Logger logger = LoggerFactory.getLogger(BadRequestExceptionMapper.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Nurse360BadRequestExceptionMapper.class.getName());
 
     @Override
     public Response toResponse(BadRequestException exception) {

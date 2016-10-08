@@ -1,5 +1,8 @@
 package com.cooltoo.nurse360.nurse.api;
 
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,5 +40,14 @@ public class NurseAPIForNurse360 {
         long nurseId = nurseServiceForNurse360.addNurse(realName, age, gender, mobile, password, smsCode);
         nurseServiceForNurse360.setHospitalDepartmentAndJobTitle(nurseId, hospitalId, departmentId, jobTitle);
         return Response.ok(nurseId).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getNurseInfomation(@Context HttpServletRequest request) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean nurse = nurseServiceForNurse360.getNurseById(nurseId);
+        return Response.ok(nurse).build();
     }
 }

@@ -37,9 +37,9 @@ public class NurseLoginAuthenticationFilterForNurse360 implements ContainerReque
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        LoginAuthentication login = resourceInfo.getResourceClass().getAnnotation(LoginAuthentication.class);
+        Nurse360LoginAuthentication login = resourceInfo.getResourceClass().getAnnotation(Nurse360LoginAuthentication.class);
         if (null==login) {
-            login = resourceInfo.getResourceMethod().getAnnotation(LoginAuthentication.class);
+            login = resourceInfo.getResourceMethod().getAnnotation(Nurse360LoginAuthentication.class);
             if(login == null){
                 return;
             }
@@ -82,7 +82,7 @@ public class NurseLoginAuthenticationFilterForNurse360 implements ContainerReque
             if (!isLogoutLogin && UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
                 throw new BadRequestException(ErrorCode.USER_AUTHORITY_DENY_ALL);
             }
-            requestContext.setProperty(ContextKeys.USER_LOGIN_USER_ID, nurseId);
+            requestContext.setProperty(ContextKeys.NURSE_LOGIN_USER_ID, nurseId);
         }
     }
 }

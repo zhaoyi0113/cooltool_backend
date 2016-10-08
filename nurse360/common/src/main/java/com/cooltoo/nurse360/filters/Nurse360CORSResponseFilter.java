@@ -11,7 +11,7 @@ import java.io.IOException;
  * Created by yzzhao on 1/5/16.
  */
 @Provider
-public class CORSResponseFilter implements ContainerResponseFilter {
+public class Nurse360CORSResponseFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
