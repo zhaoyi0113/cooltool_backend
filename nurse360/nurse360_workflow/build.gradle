@@ -52,6 +52,8 @@ dependencies {
     compile project(':go2nurse:common')
     compile project(':nurse360:common')
     compile project(':nurse360:nurse')
+    compile project(':nurse360:admin')
+    compile project(':nurse360:hospital')
 }
 
 ext {
