@@ -145,4 +145,22 @@ public class UserDoctorAPI {
         DoctorAppointmentBean appointment = doctorAppointmentService.scoreAppointment(userId, 0, appointmentId, score);
         return Response.ok(appointment).build();
     }
+
+    @Path("/list/{hospital_id}/{department_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getByHospitalDepartment(@Context HttpServletRequest request,
+                                            @PathParam("hospital_id") @DefaultValue("") String strHospitalId,
+                                            @PathParam("department_id") @DefaultValue("") String strDepartmentId
+    ) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.ENABLED);
+        statuses.add(CommonStatus.DISABLED);
+        Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
+        Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
+
+        int countDoctor = (int) doctorService.countDoctor(hospitalId, departmentId, statuses);
+        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, 0, countDoctor);
+        return Response.ok(doctors).build();
+    }
 }
