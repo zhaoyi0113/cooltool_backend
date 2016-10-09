@@ -1,5 +1,6 @@
-package com.cooltoo;
+package com.cooltoo.nurse360;
 
+import com.cooltoo.Application;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;

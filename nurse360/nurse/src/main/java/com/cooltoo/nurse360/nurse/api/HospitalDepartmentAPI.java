@@ -29,7 +29,6 @@ public class HospitalDepartmentAPI {
     @Path("/hospital")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getHospital(@Context HttpServletRequest request) {
         int count = (int)hospitalService.countHospitalByConditions(true, null, null, null, null, null, 1, 1);
         List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, null, null, null, null, null, 1, 1, 0, count);
@@ -39,7 +38,6 @@ public class HospitalDepartmentAPI {
     @Path("/department/{hospital_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getHospital(@Context HttpServletRequest request,
                                 @PathParam("hospital_id") @DefaultValue("0") int hospitalId
     ) {

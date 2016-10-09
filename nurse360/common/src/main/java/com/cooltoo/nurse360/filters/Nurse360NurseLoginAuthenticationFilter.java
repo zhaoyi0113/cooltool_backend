@@ -24,12 +24,12 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by hp on 6/13/16.
+ * Created by zhaolisong on 16/9/28.
  */
 @Provider
-public class NurseLoginAuthenticationFilterForNurse360 implements ContainerRequestFilter {
+public class Nurse360NurseLoginAuthenticationFilter implements ContainerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseLoginAuthenticationFilterForNurse360.class);
+    private static final Logger logger = LoggerFactory.getLogger(Nurse360NurseLoginAuthenticationFilter.class);
 
     @Context private ResourceInfo resourceInfo;
     @Autowired private NurseTokenAccessRepository tokenAccessRepository;

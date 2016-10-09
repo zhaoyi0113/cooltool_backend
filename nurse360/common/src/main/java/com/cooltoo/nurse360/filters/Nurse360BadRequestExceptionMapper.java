@@ -10,7 +10,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 /**
- * Created by yzzhao on 1/21/16.
+ * Created by zhaolisong on 16/9/28.
  */
 @Provider
 public class Nurse360BadRequestExceptionMapper implements ExceptionMapper<BadRequestException> {

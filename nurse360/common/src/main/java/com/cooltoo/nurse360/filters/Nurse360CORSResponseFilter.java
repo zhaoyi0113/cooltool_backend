@@ -8,7 +8,7 @@ import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
 /**
- * Created by yzzhao on 1/5/16.
+ * Created by zhaolisong on 16/9/28.
  */
 @Provider
 public class Nurse360CORSResponseFilter implements ContainerResponseFilter {

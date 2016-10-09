@@ -3,7 +3,7 @@ package com.cooltoo.config;
 
 import com.cooltoo.nurse360.filters.Nurse360BadRequestExceptionMapper;
 import com.cooltoo.nurse360.filters.Nurse360CORSResponseFilter;
-import com.cooltoo.nurse360.filters.NurseLoginAuthenticationFilterForNurse360;
+import com.cooltoo.nurse360.filters.Nurse360NurseLoginAuthenticationFilter;
 import com.cooltoo.nurse360.nurse.api.*;
 import io.swagger.annotations.Api;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -30,7 +30,7 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(MultiPartFeature.class);
         register(Nurse360BadRequestExceptionMapper.class);
         register(Nurse360CORSResponseFilter.class);
-        register(NurseLoginAuthenticationFilterForNurse360.class);
+        register(Nurse360NurseLoginAuthenticationFilter.class);
         register(HospitalDepartmentAPI.class);
         register(NurseAPIForNurse360.class);
         register(NurseLoginAPI.class);
