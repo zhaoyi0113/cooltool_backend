@@ -79,6 +79,15 @@ public class ServiceOrderService {
         return repository.exists(orderId);
     }
 
+    public List<ServiceOrderBean> getOrderByOrderNo(String orderNo) {
+        logger.info("get orders by orderNo={}", orderNo);
+        List<ServiceOrderEntity> resultSet = repository.findByOrderNo(orderNo);
+        List<ServiceOrderBean> beans = entitiesToBeans(resultSet);
+        fillOtherProperties(beans);
+        logger.info("service order count is {}", beans.size());
+        return beans;
+    }
+
     public long countAllOrder() {
         long count = repository.count();
         logger.info("count all service order is {}", count);

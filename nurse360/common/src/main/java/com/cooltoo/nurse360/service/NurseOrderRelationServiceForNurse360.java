@@ -41,6 +41,11 @@ public class NurseOrderRelationServiceForNurse360 {
     //============================================================================
     //                 get
     //============================================================================
+    public List<ServiceOrderBean> getOrderByOrderNo(String orderNo) {
+        List<ServiceOrderBean> beans = orderService.getOrderByOrderNo(orderNo);
+        return beans;
+    }
+
     public List<ServiceOrderBean> getOrderByNurseId(long nurseId, String strStatus, int pageIndex, int sizePerPage) {
         logger.info("get orders by nurseId={} with status={}", nurseId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);

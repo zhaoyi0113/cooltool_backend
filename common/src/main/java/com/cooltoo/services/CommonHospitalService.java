@@ -122,6 +122,9 @@ public class CommonHospitalService {
     ) {
         logger.info("search by isAnd={} name={} province={} city={} district={} address={} enable={} supportGo2nurse={} index={} number={}",
                 isAnd, name, province, city, district, address, enable, supportGo2nurse, index, number);
+        if (number==0) {
+            return new ArrayList<>();
+        }
         Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
         PageRequest page = new PageRequest(index, number, sort);
 
