@@ -26,6 +26,7 @@ public class DoctorBean {
     private int departmentId;
     private HospitalDepartmentBean department;
     private float score;
+    private String introduction;
 
     public long getId() {
         return id;
@@ -85,6 +86,10 @@ public class DoctorBean {
 
     public float getScore() {
         return score;
+    }
+
+    public String getIntroduction() {
+        return introduction;
     }
 
     public void setId(long id) {
@@ -147,6 +152,10 @@ public class DoctorBean {
         this.score = score;
     }
 
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -163,6 +172,7 @@ public class DoctorBean {
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", departmentId=").append(departmentId);
         msg.append(", score=").append(score);
+        msg.append(", introduction=").append(introduction);
         msg.append("]");
         return msg.toString();
     }

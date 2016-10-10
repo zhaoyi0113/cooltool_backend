@@ -224,9 +224,11 @@ public class DoctorService {
     @Transactional
     public DoctorBean updateDoctor(long doctorId,
                                    String name, String post, String jobTitle, String beGoodAt,
-                                   int hospitalId, int departmentId, String strStatus, int grade) {
-        logger.info("update doctor={} by name={} post={} jobTitle={} beGoodAt={} hospitalId={} departmentId={} status={} grade={}",
-                doctorId, name, post, jobTitle, beGoodAt, hospitalId, departmentId, strStatus, grade);
+                                   int hospitalId, int departmentId, String strStatus, int grade,
+                                   String introduction
+    ) {
+        logger.info("update doctor={} by name={} post={} jobTitle={} beGoodAt={} hospitalId={} departmentId={} status={} grade={} introduction={}",
+                doctorId, name, post, jobTitle, beGoodAt, hospitalId, departmentId, strStatus, grade, introduction);
         DoctorEntity entity = repository.findOne(doctorId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -250,6 +252,10 @@ public class DoctorService {
         }
         if (!VerifyUtil.isStringEmpty(beGoodAt)) {
             entity.setBeGoodAt(beGoodAt.trim());
+            changed = true;
+        }
+        if (!VerifyUtil.isStringEmpty(introduction)) {
+            entity.setIntroduction(introduction.trim());
             changed = true;
         }
         if (hospitalId>=0 && hospitalId!=entity.getHospitalId()) {
@@ -310,9 +316,9 @@ public class DoctorService {
     //=====================================================================
 
     @Transactional
-    public DoctorBean addDoctor(String name, String post, String jobTitle, String beGoodAt, int hospitalId, int departmentId, int grade) {
-        logger.info("add doctor by name={} post={} jobTitle={} beGoodAt={} hospitalId={} departmentId={} grade={}",
-                name, post, jobTitle, beGoodAt, hospitalId, departmentId, grade);
+    public DoctorBean addDoctor(String name, String post, String jobTitle, String beGoodAt, int hospitalId, int departmentId, int grade, String introduction) {
+        logger.info("add doctor by name={} post={} jobTitle={} beGoodAt={} hospitalId={} departmentId={} grade={} introduction={}",
+                name, post, jobTitle, beGoodAt, hospitalId, departmentId, grade, introduction);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -329,6 +335,9 @@ public class DoctorService {
         }
         if (!VerifyUtil.isStringEmpty(beGoodAt)) {
             entity.setBeGoodAt(beGoodAt.trim());
+        }
+        if (!VerifyUtil.isStringEmpty(introduction)) {
+            entity.setIntroduction(introduction);
         }
         entity.setHospitalId(hospitalId<0 ? 0 : hospitalId);
         entity.setDepartmentId(departmentId<0 ? 0 : departmentId);

@@ -57,7 +57,7 @@ public class Nurse360CourseEntity {
         return content;
     }
 
-    @Column(name = "front_corver")
+    @Column(name = "front_cover")
     public long getFrontCover() {
         return frontCover;
     }

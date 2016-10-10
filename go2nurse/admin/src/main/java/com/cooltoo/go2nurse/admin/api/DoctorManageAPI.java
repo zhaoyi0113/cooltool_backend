@@ -110,9 +110,10 @@ public class DoctorManageAPI {
                                      @FormParam("be_good_at") @DefaultValue("") String beGoodAt,
                                      @FormParam("grade") @DefaultValue("0") int grade,
                                      @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                     @FormParam("department_id") @DefaultValue("0") int departmentId
+                                     @FormParam("department_id") @DefaultValue("0") int departmentId,
+                                     @FormParam("introduction") String introduction
     ) {
-        DoctorBean doctor = doctorService.addDoctor(name, post, jobTitle, beGoodAt, hospitalId, departmentId, grade);
+        DoctorBean doctor = doctorService.addDoctor(name, post, jobTitle, beGoodAt, hospitalId, departmentId, grade, introduction);
         return Response.ok(doctor).build();
     }
 
@@ -132,9 +133,10 @@ public class DoctorManageAPI {
                                       @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
                                       @FormParam("department_id") @DefaultValue("-1") int departmentId,
                                       @FormParam("status") @DefaultValue("") String status,
-                                      @FormParam("grade") @DefaultValue("-1") int grade
+                                      @FormParam("grade") @DefaultValue("-1") int grade,
+                                      @FormParam("introduction") String introduction
     ) {
-        DoctorBean doctor = doctorService.updateDoctor(doctorId, name, post, jobTitle, beGoodAt, hospitalId, departmentId, status, grade);
+        DoctorBean doctor = doctorService.updateDoctor(doctorId, name, post, jobTitle, beGoodAt, hospitalId, departmentId, status, grade, introduction);
         return Response.ok(doctor).build();
     }
 
