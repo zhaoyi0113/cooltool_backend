@@ -215,6 +215,7 @@ public class WeChatService {
     private Map getWebLoginAccessToken(String code, String appid) {
         WeChatAccountEntity weChatAccount = weChatAccountRepository.findFirstByAppId(appid);
         if(weChatAccount == null){
+            logger.error("can't find appid "+appid);
             return null;
         }
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" +
