@@ -25,6 +25,11 @@ public interface Nurse360NotificationRepository extends JpaRepository<Nurse360No
             " AND (?2 IS NULL OR notification.departmentId=?2)" +
             " AND (?3 IS NULL OR notification.status=?3)")
     Page<Nurse360NotificationEntity> findByHospitalIdAndDepartmentIdAndStatus(Integer hospitalId, Integer departmentId, CommonStatus status, Pageable page);
+    @Query("FROM Nurse360NotificationEntity notification" +
+            " WHERE (?1 IS NULL OR notification.hospitalId=?1)" +
+            " AND (notification.departmentId IN (?2))" +
+            " AND (?3 IS NULL OR notification.status=?3)")
+    Page<Nurse360NotificationEntity> findByHospitalIdAndDepartmentIdInAndStatus(Integer hospitalId, List<Integer> departmentIds, CommonStatus status, Pageable page);
     long countByTitle(String title);
     List<Nurse360NotificationEntity> findByIdIn(List<Long> ids, Sort sort);
     List<Nurse360NotificationEntity> findByStatusAndIdIn(CommonStatus status, List<Long> ids, Sort sort);

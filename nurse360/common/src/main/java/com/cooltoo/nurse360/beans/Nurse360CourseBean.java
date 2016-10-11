@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.beans;
 
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.CourseStatus;
 
 import java.util.Date;
@@ -21,6 +22,7 @@ public class Nurse360CourseBean {
     private String uniqueId;
     private String keyword;
     private long categoryId;
+    private YesNoEnum hasRead;
 
     public long getId() {
         return id;
@@ -68,6 +70,10 @@ public class Nurse360CourseBean {
 
     public long getCategoryId() {
         return categoryId;
+    }
+
+    public YesNoEnum getHasRead() {
+        return hasRead;
     }
 
     public void setId(long id) {
@@ -118,6 +124,10 @@ public class Nurse360CourseBean {
         this.categoryId = categoryId;
     }
 
+    public void setHasRead(YesNoEnum hasRead) {
+        this.hasRead = hasRead;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -132,6 +142,7 @@ public class Nurse360CourseBean {
         msg.append(", uniqueId=").append(uniqueId);
         msg.append(", keyword=").append(keyword);
         msg.append(", categoryId=").append(categoryId);
+        msg.append(", hasRead=").append(hasRead);
         msg.append("]");
         return msg.toString();
     }

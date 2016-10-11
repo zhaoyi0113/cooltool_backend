@@ -19,6 +19,7 @@ public class Nurse360NotificationBean {
     private YesNoEnum significance;
     private int hospitalId;
     private int departmentId;
+    private YesNoEnum hasRead;
 
     public long getId() {
         return id;
@@ -54,6 +55,10 @@ public class Nurse360NotificationBean {
 
     public int getDepartmentId() {
         return departmentId;
+    }
+
+    public YesNoEnum getHasRead() {
+        return hasRead;
     }
 
     public void setId(long id) {
@@ -92,6 +97,10 @@ public class Nurse360NotificationBean {
         this.departmentId = departmentId;
     }
 
+    public void setHasRead(YesNoEnum hasRead) {
+        this.hasRead = hasRead;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -104,6 +113,7 @@ public class Nurse360NotificationBean {
         msg.append(", significance=").append(significance);
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", departmentId=").append(departmentId);
+        msg.append(", hasRead=").append(hasRead);
         msg.append("]");
         return msg.toString();
     }

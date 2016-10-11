@@ -76,6 +76,26 @@ public class NotificationServiceForNurse360 {
         return beans;
     }
 
+    public List<Nurse360NotificationBean> getNotificationByHospitalDepartmentStatus(Integer hospitalId, List<Integer> departmentIds, String strStatus, int pageIndex, int sizeOfPage) {
+        logger.info("get  notification by hospitalId={} departmentIds={} status={} at page={} size={}",
+                hospitalId, departmentIds, strStatus, pageIndex, sizeOfPage);
+        // get all notification
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        PageRequest page = new PageRequest(pageIndex, sizeOfPage, notificationSort);
+
+        if (VerifyUtil.isListEmpty(departmentIds)) {
+            if (null==departmentIds) {
+                departmentIds = new ArrayList<>();
+            }
+            departmentIds.add(0);
+        }
+
+        Page<Nurse360NotificationEntity> resultSet = repository.findByHospitalIdAndDepartmentIdInAndStatus(hospitalId, departmentIds, status, page);
+        List<Nurse360NotificationBean> beans = entitiesToBeans(resultSet, false);
+        fillOtherProperties(beans);
+        return beans;
+    }
+
     public List<Nurse360NotificationBean> getNotificationByStatusAndIds(String strStatus, List<Long> notificationIds) {
         logger.info("get  notification by status={} ids={}", strStatus, notificationIds);
         CommonStatus status = CommonStatus.parseString(strStatus);
@@ -228,7 +248,7 @@ public class NotificationServiceForNurse360 {
         }
 
         YesNoEnum significance = YesNoEnum.parseString(strSignificance);
-        entity.setSignificance(null==significance ? YesNoEnum.YES : YesNoEnum.NO);
+        entity.setSignificance(null==significance ? YesNoEnum.NO : significance);
         entity.setHospitalId(hospitalId);
         entity.setDepartmentId(departmentId);
         entity.setTime(new Date());

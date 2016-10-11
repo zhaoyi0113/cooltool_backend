@@ -26,10 +26,9 @@ public interface Nurse360CourseRepository extends JpaRepository<Nurse360CourseEn
             " WHERE (?1 IS NULL OR course.name LIKE %?1)" +
             " AND (?2 IS NULL OR course.status=?2)")
     Page<Nurse360CourseEntity> findByNameLikeAndStatus(String nameLike, CourseStatus status, Pageable page);
-    long countByName(String name);
     List<Nurse360CourseEntity> findByName(String name, Sort sort);
     List<Nurse360CourseEntity> findByIdIn(List<Long> ids, Sort sort);
-    List<Nurse360CourseEntity> findByIdIn(List<Long> ids, Page page);
+    List<Nurse360CourseEntity> findCourseByIdIn(List<Long> ids, Pageable page);
     List<Nurse360CourseEntity> findByStatusAndIdIn(CourseStatus status, List<Long> ids, Sort sort);
     @Query("SELECT course.id FROM Nurse360CourseEntity course" +
             " WHERE (?1 IS NULL OR course.status=?1)" +

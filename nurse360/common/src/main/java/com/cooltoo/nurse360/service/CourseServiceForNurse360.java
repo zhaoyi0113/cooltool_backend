@@ -157,7 +157,7 @@ public class CourseServiceForNurse360 {
             return new ArrayList<>();
         }
         PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
-        List<Nurse360CourseEntity> resultSet = repository.findByIdIn(courseIds, (Page)page);
+        List<Nurse360CourseEntity> resultSet = repository.findCourseByIdIn(courseIds, page);
         List<Nurse360CourseBean>   beans = entities2BeansWithoutContent(resultSet);
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());

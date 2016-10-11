@@ -15,7 +15,7 @@ public interface Nurse360CourseHospitalRelationRepository extends JpaRepository<
     @Query("SELECT DISTINCT relation.courseId FROM Nurse360CourseHospitalRelationEntity relation" +
             " WHERE relation.hospitalId=?1" +
             " AND relation.departmentId=?2" +
-            " AND (?2 IS NULL OR relation.status=?2)")
+            " AND (?3 IS NULL OR relation.status=?3)")
     List<Long> findByHospitalIdAndDepartmentIdAndStatus(Integer hospitalId, Integer departmentId, CommonStatus status);
 
     @Query("SELECT DISTINCT relation.courseId FROM Nurse360CourseHospitalRelationEntity relation" +

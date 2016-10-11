@@ -65,7 +65,7 @@ public class CourseHospitalRelationServiceForNurse360 {
     }
 
     public List<Long> getCourseInHospitalAndDepartment(Integer hospitalId, Integer departmentId, String strStatus) {
-        logger.info("count course in hospital={} department={} with status={}", hospitalId, departmentId, strStatus);
+        logger.info("get courseIds in hospital={} department={} with status={}", hospitalId, departmentId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Long> courseIds = new ArrayList<>();
         if (null==status && !"ALL".equalsIgnoreCase(strStatus)) {
