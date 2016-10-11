@@ -1,7 +1,7 @@
 package com.cooltoo.backend.services.notification;
 
-import com.cooltoo.backend.beans.NurseDeviceTokensBean;
-import com.cooltoo.backend.services.NurseDeviceTokensService;
+import com.cooltoo.beans.NurseDeviceTokensBean;
+import com.cooltoo.services.NurseDeviceTokensService;
 import com.cooltoo.features.AppFeatures;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;

@@ -98,13 +98,14 @@ public class CourseCategoryServiceForNurse360 {
         logger.info("get course category by status={} ids={}", strStatus, categoryIds);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Nurse360CourseCategoryEntity> resultSet = null;
-        if (null==status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                resultSet = repository.findByIdIn(categoryIds, categorySort);
+        if (!VerifyUtil.isListEmpty(categoryIds)) {
+            if (null == status) {
+                if ("ALL".equalsIgnoreCase(strStatus)) {
+                    resultSet = repository.findByIdIn(categoryIds, categorySort);
+                }
+            } else {
+                resultSet = repository.findByStatusAndIdIn(status, categoryIds, categorySort);
             }
-        }
-        else {
-            resultSet = repository.findByStatusAndIdIn(status, categoryIds, categorySort);
         }
         List<Nurse360CourseCategoryBean> beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);

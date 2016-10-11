@@ -29,6 +29,7 @@ public interface Nurse360CourseRepository extends JpaRepository<Nurse360CourseEn
     long countByName(String name);
     List<Nurse360CourseEntity> findByName(String name, Sort sort);
     List<Nurse360CourseEntity> findByIdIn(List<Long> ids, Sort sort);
+    List<Nurse360CourseEntity> findByIdIn(List<Long> ids, Page page);
     List<Nurse360CourseEntity> findByStatusAndIdIn(CourseStatus status, List<Long> ids, Sort sort);
     @Query("SELECT course.id FROM Nurse360CourseEntity course" +
             " WHERE (?1 IS NULL OR course.status=?1)" +

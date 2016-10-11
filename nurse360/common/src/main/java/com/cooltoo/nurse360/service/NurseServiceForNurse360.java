@@ -207,6 +207,6 @@ public class NurseServiceForNurse360 {
         logger.info("nurse={} set hospital={} department={} and jobTitle={}",
                 nurseId, hospitalId, departmentId, jobTitle);
         nurseHospitalRelationService.setRelation(nurseId, hospitalId, departmentId);
-        nurseExtensionService.setExtension(nurseId, null, null, jobTitle, null);
+        nurseExtensionService.setExtension(nurseId, null, null, jobTitle, null, null);
     }
 }

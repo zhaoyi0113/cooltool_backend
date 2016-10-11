@@ -42,11 +42,10 @@ public class CourseManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countCourse(@Context HttpServletRequest request,
-                                @QueryParam("title_like") @DefaultValue("") String titleLike,
                                 @PathParam("status") @DefaultValue("") String status
     ) {
         logger.info("get course count by status={}", status);
-        long count = courseService.countByNameLikeAndStatus(titleLike, status);
+        long count = courseService.countByNameLikeAndStatus(null, status);
         logger.info("count = {}", count);
         return Response.ok(count).build();
     }
@@ -56,13 +55,41 @@ public class CourseManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCourseByStatus(@Context HttpServletRequest request,
-                                      @QueryParam("title_like") @DefaultValue("") String titleLike,
                                       @PathParam("status") @DefaultValue("") String status,
                                       @PathParam("index")  @DefaultValue("0") int index,
                                       @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get course by status={} at page={}, {}/page", status, index, number);
-        List<Nurse360CourseBean> courses = courseService.getCourseByNameAndStatus(titleLike, status, index, number);
+        List<Nurse360CourseBean> courses = courseService.getCourseByNameAndStatus(null, status, index, number);
+        logger.info("count = {}", courses.size());
+        return Response.ok(courses).build();
+    }
+
+    @Path("/count/{hospital_id}/{department_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response countCourseByHospitalDepartment(@Context HttpServletRequest request,
+                                                    @PathParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                                    @PathParam("department_id") @DefaultValue("0") int departmentId
+    ) {
+        List<Long> courseIds = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
+        courseIds = courseService.getCourseIdByStatusAndIds("ALL", courseIds);
+        int count = VerifyUtil.isListEmpty(courseIds) ? 0 : courseIds.size();
+        logger.info("count = {}", count);
+        return Response.ok(count).build();
+    }
+
+    @Path("/{hospital_id}/{department_id}/{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCourseByHospitalDepartment(@Context HttpServletRequest request,
+                                                  @PathParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                                  @PathParam("department_id") @DefaultValue("0") int departmentId,
+                                                  @PathParam("index")  @DefaultValue("0") int index,
+                                                  @PathParam("number") @DefaultValue("10") int number
+    ) {
+        List<Long> courseIds = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
+        List<Nurse360CourseBean> courses = courseService.getCourseByIds(courseIds, index, number);
         logger.info("count = {}", courses.size());
         return Response.ok(courses).build();
     }

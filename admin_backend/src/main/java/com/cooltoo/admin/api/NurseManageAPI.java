@@ -149,11 +149,12 @@ public class NurseManageAPI {
                                 @FormParam("can_answer_nursing_question") @DefaultValue("NO") String strCanAnswerNursingQuestion, /* YES, NO*/
                                 @FormParam("good_at") @DefaultValue("") String goodAt,
                                 @FormParam("job_title") @DefaultValue("") String jobTitle,
-                                @FormParam("is_expert") @DefaultValue("NO") String isExport, /* YES, NO*/
-                                @FormParam("register_from") @DefaultValue("") String registerFrom /* COOLTOO, GO2NURSE */
+                                @FormParam("is_expert") @DefaultValue("NO") String isExpert, /* YES, NO*/
+                                @FormParam("register_from") @DefaultValue("") String registerFrom /* COOLTOO, GO2NURSE */,
+                                @FormParam("can_see_all_order") @DefaultValue("") String canSeeAllOrder /* YES, NO*/
     ) {
         long nurseId = createNurse(name, age, strGender, mobile, password, identification, realName, shortNote, registerFrom,
-                strCanAnswerNursingQuestion, goodAt, jobTitle, isExport,
+                strCanAnswerNursingQuestion, goodAt, jobTitle, isExpert, canSeeAllOrder,
                 hospitalId, departmentId);
         return Response.ok(nurseId).build();
     }
@@ -178,10 +179,11 @@ public class NurseManageAPI {
                                        @FormParam("can_answer_nursing_question") @DefaultValue("") String strCanAnswerNursingQuestion,
                                        @FormParam("good_at") @DefaultValue("") String goodAt,
                                        @FormParam("job_title") @DefaultValue("") String jobTitle,
-                                       @FormParam("is_expert") @DefaultValue("") String isExport /* YES, NO*/
+                                       @FormParam("is_expert") @DefaultValue("") String isExpert /* YES, NO*/,
+                                       @FormParam("can_see_all_order") @DefaultValue("") String canSeeAllOrder /* YES, NO*/
     ) {
         NurseBean nurseBean = editNurse(nurseId, name, age, strGender, mobile, password, identification, realName, shortNote, strAuthority,
-                strCanAnswerNursingQuestion, goodAt, jobTitle, isExport,
+                strCanAnswerNursingQuestion, goodAt, jobTitle, isExpert, canSeeAllOrder,
                 hospitalId, departmentId);
         return Response.ok(nurseBean).build();
     }
@@ -293,19 +295,20 @@ public class NurseManageAPI {
     private long createNurse(String name, int age, String strGender,
                              String mobile, String password, String identification,
                              String realName, String shortNote, String strRegisterFrom,
-                             String strCanAnswerNursingQuestion, String beGoodAt, String jobTitle, String isExpert,
+                             String strCanAnswerNursingQuestion, String beGoodAt, String jobTitle, String isExpert, String canSeeAllOrder,
                              int hospitalId, int departmentId
     ) {
         GenderType gender = GenderType.parseString(strGender);
         YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
         YesNoEnum expert = YesNoEnum.parseString(isExpert);
+        YesNoEnum seeAllOrder = YesNoEnum.parseString(canSeeAllOrder);
         RegisterFrom registerFrom = RegisterFrom.parseString(strRegisterFrom);
         NurseEntity nurse = commonNurseService.registerNurse(name, age, gender, mobile, password, identification, realName, shortNote, registerFrom);
         if (hospitalId>0 || departmentId>0) {
             hospitalRelationService.newOne(nurse.getId(), hospitalId, departmentId);
             nurseQualificationService.createQualificationByAdmin(nurse.getId());
             if (YesNoEnum.YES.equals(canAnswerNursingQuestion)) {
-                nurseExtensionService.setExtension(nurse.getId(), canAnswerNursingQuestion, beGoodAt, jobTitle, expert);
+                nurseExtensionService.setExtension(nurse.getId(), canAnswerNursingQuestion, beGoodAt, jobTitle, expert, seeAllOrder);
             }
         }
         return nurse.getId();
@@ -315,16 +318,17 @@ public class NurseManageAPI {
     private NurseBean editNurse(long nurseId, String name, int age, String strGender,
                                 String mobile, String password, String identification,
                                 String realName, String shortNote, String strAuthority,
-                                String strCanAnswerNursingQuestion, String beGoodAt, String jobTitle, String isExpert,
+                                String strCanAnswerNursingQuestion, String beGoodAt, String jobTitle, String isExpert, String canSeeAllOrder,
                                 int hospitalId, int departmentId) {
         GenderType gender = GenderType.parseString(strGender);
         UserAuthority authority = UserAuthority.parseString(strAuthority);
         YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
         YesNoEnum expert = YesNoEnum.parseString(isExpert);
+        YesNoEnum seeAllOrder = YesNoEnum.parseString(canSeeAllOrder);
         commonNurseService.updateBasicInfo(nurseId, name, age, gender, mobile, password, identification, realName, shortNote, authority);
         if (hospitalId>0 || departmentId>0) {
             hospitalRelationService.newOne(nurseId, hospitalId, departmentId);
-            nurseExtensionService.setExtension(nurseId, canAnswerNursingQuestion, beGoodAt, jobTitle, expert);
+            nurseExtensionService.setExtension(nurseId, canAnswerNursingQuestion, beGoodAt, jobTitle, expert, seeAllOrder);
         }
         NurseBean nurseBean = nurseService.getNurse(nurseId);
         return nurseBean;

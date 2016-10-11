@@ -1,9 +1,9 @@
-package com.cooltoo.backend.services;
+package com.cooltoo.services;
 
-import com.cooltoo.backend.beans.NurseDeviceTokensBean;
-import com.cooltoo.backend.converter.NurseDeviceTokensBeanConverter;
-import com.cooltoo.backend.entities.NurseDeviceTokensEntity;
-import com.cooltoo.backend.repository.NurseDeviceTokensRepository;
+import com.cooltoo.beans.NurseDeviceTokensBean;
+import com.cooltoo.converter.NurseDeviceTokensBeanConverter;
+import com.cooltoo.entities.NurseDeviceTokensEntity;
+import com.cooltoo.repository.NurseDeviceTokensRepository;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;

@@ -18,6 +18,7 @@ public class NurseExtensionBean {
     private String goodAt;
     private String jobTitle;
     private YesNoEnum isExpert;
+    private YesNoEnum canSeeAllOrder;
 
     public long getId() {
         return id;
@@ -83,6 +84,14 @@ public class NurseExtensionBean {
         this.isExpert = isExpert;
     }
 
+    public YesNoEnum getCanSeeAllOrder() {
+        return canSeeAllOrder;
+    }
+
+    public void setCanSeeAllOrder(YesNoEnum canSeeAllOrder) {
+        this.canSeeAllOrder = canSeeAllOrder;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -91,6 +100,7 @@ public class NurseExtensionBean {
         msg.append(", goodAt=").append(goodAt);
         msg.append(", jobTitle=").append(jobTitle);
         msg.append(", isExpert=").append(isExpert);
+        msg.append(", canSeeAllOrder=").append(canSeeAllOrder);
         msg.append(", answerNursingQuestion=").append(answerNursingQuestion);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);

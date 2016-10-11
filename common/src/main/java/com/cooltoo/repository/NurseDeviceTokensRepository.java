@@ -1,6 +1,6 @@
-package com.cooltoo.backend.repository;
+package com.cooltoo.repository;
 
-import com.cooltoo.backend.entities.NurseDeviceTokensEntity;
+import com.cooltoo.entities.NurseDeviceTokensEntity;
 import com.cooltoo.constants.CommonStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 

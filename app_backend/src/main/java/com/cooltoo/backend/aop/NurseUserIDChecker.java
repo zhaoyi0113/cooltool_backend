@@ -25,12 +25,12 @@ public class NurseUserIDChecker {
     @Autowired
     private NurseService nurseService;
 
-    @Before("execution(* com.cooltoo.backend.services.NurseDeviceTokensService.inactiveUserDeviceToken(..))")
+    @Before("execution(* com.cooltoo.services.NurseDeviceTokensService.inactiveUserDeviceToken(..))")
     public void inactiveUserDeviceToken(JoinPoint joinPoint) {
         checkUserExisted(joinPoint);
     }
 
-    @Before("execution(* com.cooltoo.backend.services.NurseDeviceTokensService.registerUserDeviceToken(..))")
+    @Before("execution(* com.cooltoo.services.NurseDeviceTokensService.registerUserDeviceToken(..))")
     public void registerUserDeviceToken(JoinPoint joinPoint) {
         checkUserExisted(joinPoint);
     }

@@ -1,6 +1,6 @@
-package com.cooltoo.backend.api;
+package com.cooltoo.nurse360.nurse.api;
 
-import com.cooltoo.backend.filter.LoginAuthentication;
+import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.services.NurseDeviceTokensService;
 import com.cooltoo.constants.ContextKeys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class NurseDeviceTokensAPI {
 
     @POST
     @Path("/user/{token}")
-    @LoginAuthentication(requireNurseLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response registerUserDeviceToken(@Context HttpServletRequest request,
                                             @PathParam("token") String token){
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
@@ -40,7 +40,7 @@ public class NurseDeviceTokensAPI {
 
     @POST
     @Path("/inactive/{token}")
-    @LoginAuthentication(requireNurseLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response inactiveUserDeviceToken(@Context HttpServletRequest request,
                                             @PathParam("token") String token){
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);

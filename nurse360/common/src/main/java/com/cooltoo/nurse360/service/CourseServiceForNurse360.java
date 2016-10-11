@@ -151,6 +151,19 @@ public class CourseServiceForNurse360 {
         return beans;
     }
 
+    public List<Nurse360CourseBean> getCourseByIds(List<Long> courseIds, int pageIndex, int sizePerPage) {
+        logger.info("get course by ids={}", courseIds);
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return new ArrayList<>();
+        }
+        PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
+        List<Nurse360CourseEntity> resultSet = repository.findByIdIn(courseIds, (Page)page);
+        List<Nurse360CourseBean>   beans = entities2BeansWithoutContent(resultSet);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     private List<Nurse360CourseBean> entities2BeansWithoutContent(Iterable<Nurse360CourseEntity> entities) {
         if (null==entities) {
             return new ArrayList<>();

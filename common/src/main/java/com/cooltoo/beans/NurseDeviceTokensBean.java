@@ -1,16 +1,13 @@
-package com.cooltoo.backend.entities;
+package com.cooltoo.beans;
 
 import com.cooltoo.constants.CommonStatus;
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Created by yzzhao on 4/28/16.
+ * Created by yzzhao on 4/29/16.
  */
-@Table(name = "nursego_nurse_device_tokens")
-@Entity
-public class NurseDeviceTokensEntity {
+public class NurseDeviceTokensBean {
 
     private long id;
 
@@ -22,9 +19,6 @@ public class NurseDeviceTokensEntity {
 
     private Date timeCreated;
 
-    @GeneratedValue
-    @Id
-    @Column(name = "id")
     public long getId() {
         return id;
     }
@@ -33,7 +27,6 @@ public class NurseDeviceTokensEntity {
         this.id = id;
     }
 
-    @Column(name = "user_id")
     public long getUserId() {
         return userId;
     }
@@ -42,7 +35,6 @@ public class NurseDeviceTokensEntity {
         this.userId = userId;
     }
 
-    @Column(name = "device_token")
     public String getDeviceToken() {
         return deviceToken;
     }
@@ -51,8 +43,6 @@ public class NurseDeviceTokensEntity {
         this.deviceToken = deviceToken;
     }
 
-    @Column(name = "status")
-    @Enumerated
     public CommonStatus getStatus() {
         return status;
     }
@@ -61,7 +51,6 @@ public class NurseDeviceTokensEntity {
         this.status = status;
     }
 
-    @Column(name = "time_created")
     public Date getTimeCreated() {
         return timeCreated;
     }

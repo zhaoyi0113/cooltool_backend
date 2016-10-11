@@ -1,10 +1,9 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.NurseDeviceTokensBean;
-import com.cooltoo.backend.entities.NurseDeviceTokensEntity;
-import com.cooltoo.backend.repository.NurseDeviceTokensRepository;
-import com.cooltoo.backend.services.NurseDeviceTokensService;
+import com.cooltoo.beans.NurseDeviceTokensBean;
+import com.cooltoo.entities.NurseDeviceTokensEntity;
+import com.cooltoo.repository.NurseDeviceTokensRepository;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.github.springtestdbunit.annotation.DatabaseSetup;

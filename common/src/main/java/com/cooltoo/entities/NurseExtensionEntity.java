@@ -22,6 +22,7 @@ public class NurseExtensionEntity {
     private String goodAt;
     private String jobTitle;
     private YesNoEnum isExpert;
+    private YesNoEnum seeAllOrder;
 
     @Id
     @GeneratedValue
@@ -98,6 +99,16 @@ public class NurseExtensionEntity {
 
     public void setIsExpert(YesNoEnum isExpert) {
         this.isExpert = isExpert;
+    }
+
+    @Column(name = "see_all_order")
+    @Enumerated
+    public YesNoEnum getSeeAllOrder() {
+        return seeAllOrder;
+    }
+
+    public void setSeeAllOrder(YesNoEnum seeAllOrder) {
+        this.seeAllOrder = seeAllOrder;
     }
 
     // 映射多对一的关联关系

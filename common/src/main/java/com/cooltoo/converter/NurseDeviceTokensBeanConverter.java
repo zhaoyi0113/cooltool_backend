@@ -1,7 +1,7 @@
-package com.cooltoo.backend.converter;
+package com.cooltoo.converter;
 
-import com.cooltoo.backend.beans.NurseDeviceTokensBean;
-import com.cooltoo.backend.entities.NurseDeviceTokensEntity;
+import com.cooltoo.beans.NurseDeviceTokensBean;
+import com.cooltoo.entities.NurseDeviceTokensEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
