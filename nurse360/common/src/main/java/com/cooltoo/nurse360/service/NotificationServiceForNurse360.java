@@ -252,7 +252,7 @@ public class NotificationServiceForNurse360 {
         entity.setHospitalId(hospitalId);
         entity.setDepartmentId(departmentId);
         entity.setTime(new Date());
-        entity.setStatus(CommonStatus.ENABLED);
+        entity.setStatus(CommonStatus.DISABLED);
         entity = repository.save(entity);
 
         Nurse360NotificationBean bean = beanConverter.convert(entity);

@@ -30,7 +30,7 @@ public class NurseExtensionAPI {
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getCourseOfNurse(@Context HttpServletRequest request,
                                      @PathParam("index") @DefaultValue("0") int pageIndex,
-                                     @PathParam("number") @DefaultValue("0") int sizePerPage
+                                     @PathParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<Nurse360CourseBean> courses = nurseExtensionService.getCourseByNurseId(nurseId, pageIndex, sizePerPage);
@@ -44,7 +44,7 @@ public class NurseExtensionAPI {
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getNotificationOfNurse(@Context HttpServletRequest request,
                                            @PathParam("index") @DefaultValue("0") int pageIndex,
-                                           @PathParam("number") @DefaultValue("0") int sizePerPage
+                                           @PathParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<Nurse360NotificationBean> notification = nurseExtensionService.getNotificationByNurseId(nurseId, pageIndex, sizePerPage);
