@@ -65,13 +65,14 @@ public class CourseManageAPI {
         return Response.ok(courses).build();
     }
 
-    @Path("/count/{hospital_id}/{department_id}")
+    @Path("/hospital_department/count/")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countCourseByHospitalDepartment(@Context HttpServletRequest request,
-                                                    @PathParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                                    @PathParam("department_id") @DefaultValue("0") int departmentId
+                                                    @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                                    @QueryParam("department_id") String strDepartmentId
     ) {
+        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         List<Long> courseIds = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
         courseIds = courseService.getCourseIdByStatusAndIds("ALL", courseIds);
         int count = VerifyUtil.isListEmpty(courseIds) ? 0 : courseIds.size();
@@ -79,15 +80,16 @@ public class CourseManageAPI {
         return Response.ok(count).build();
     }
 
-    @Path("/{hospital_id}/{department_id}/{index}/{number}")
+    @Path("/hospital_department")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCourseByHospitalDepartment(@Context HttpServletRequest request,
-                                                  @PathParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                                  @PathParam("department_id") @DefaultValue("0") int departmentId,
-                                                  @PathParam("index")  @DefaultValue("0") int index,
-                                                  @PathParam("number") @DefaultValue("10") int number
+                                                  @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                                  @QueryParam("department_id") String strDepartmentId,
+                                                  @QueryParam("index")  @DefaultValue("0") int index,
+                                                  @QueryParam("number") @DefaultValue("10") int number
     ) {
+        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         List<Long> courseIds = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
         List<Nurse360CourseBean> courses = courseService.getCourseByIds(courseIds, index, number);
         logger.info("count = {}", courses.size());
