@@ -27,6 +27,7 @@ public final class HttpUtils {
             String body = EntityUtils.toString(entity, "UTF-8").trim();
             Gson gson = new Gson();
             Map map = gson.fromJson(body, Map.class);
+            logger.info("get request from "+url+", "+map);
             return map;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -81,10 +81,10 @@ public class WeChatService {
     }
 
     public URI login(String code, String state) {
-        String appid = state.split("_")[0];
+        String appid = state.split("_",2)[0];
         Map accessToken = getWebLoginAccessToken(code, appid);
         WeChatUserInfo userInfo = getUserInfo(accessToken);
-        URI userTokens = loginWithWeChatUser(userInfo, state.split("_")[1], appid);
+        URI userTokens = loginWithWeChatUser(userInfo, state.split("_",2)[1], appid);
         if (userTokens != null) return userTokens;
         return null;
     }
@@ -215,6 +215,7 @@ public class WeChatService {
     private Map getWebLoginAccessToken(String code, String appid) {
         WeChatAccountEntity weChatAccount = weChatAccountRepository.findFirstByAppId(appid);
         if(weChatAccount == null){
+            logger.error("can't find appid "+appid);
             return null;
         }
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" +
