@@ -241,19 +241,21 @@ public class NurseService {
     //             get used by administrator
     //==============================================================
 
-    public long countByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
+    public long countByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion, String strCanSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
         UserAuthority authority = UserAuthority.parseString(strAuthority);
         YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
-        long count = commonNurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom);
+        YesNoEnum canSeeAllOrder = YesNoEnum.parseString(strCanSeeAllOrder);
+        long count = commonNurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, canSeeAllOrder, hospitalId, departmentId, registerFrom);
         logger.info("count is {}", count);
         return count;
     }
 
-    public List<NurseBean> getAllByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, int pageIndex, int number) {
+    public List<NurseBean> getAllByAuthorityAndFuzzyName(String strAuthority, String fuzzyName, String strCanAnswerNursingQuestion, String strCanSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, int pageIndex, int number) {
         // get nurse by authority
         UserAuthority authority = UserAuthority.parseString(strAuthority);
         YesNoEnum canAnswerNursingQuestion = YesNoEnum.parseString(strCanAnswerNursingQuestion);
-        Iterable<NurseEntity> resultSet = commonNurseService.getNurseByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, pageIndex, number);
+        YesNoEnum canSeeAllOrder = YesNoEnum.parseString(strCanSeeAllOrder);
+        Iterable<NurseEntity> resultSet = commonNurseService.getNurseByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, canSeeAllOrder, hospitalId, departmentId, registerFrom, pageIndex, number);
         // parse to bean
         List<NurseBean> beanList = entities2Beans(resultSet);
         fillOtherProperties(beanList);

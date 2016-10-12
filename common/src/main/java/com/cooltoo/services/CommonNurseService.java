@@ -107,7 +107,7 @@ public class CommonNurseService {
     //==============================================================
     //             get used by administrator
     //==============================================================
-    public long countByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
+    public long countByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, YesNoEnum canSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
         logger.info("get nurse count by authority={} fuzzyName={} canAnswerNursingQuestion={} hospital={} department={}",
                 authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId);
 
@@ -118,17 +118,17 @@ public class CommonNurseService {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
         long count;
-        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId && null==registerFrom) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId && null==registerFrom && null==canSeeAllOrder) {
             count = nurseRepository.count();
         }
         else {
-            count = nurseRepository.countByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom);
+            count = nurseRepository.countByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, canSeeAllOrder);
         }
         logger.info("count is {}", count);
         return count;
     }
 
-    public Iterable<NurseEntity> getNurseByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, int pageIndex, int number) {
+    public Iterable<NurseEntity> getNurseByAuthorityAndFuzzyName(UserAuthority authority, String fuzzyName, YesNoEnum canAnswerNursingQuestion, YesNoEnum canSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, int pageIndex, int number) {
         logger.info("get nurse by authority={} fuzzyName={} canAnswerNursingQuestion={} hospital={} department={} at page {} with number {}",
                 authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, pageIndex, number);
         PageRequest page = new PageRequest(pageIndex, number, sort);
@@ -140,11 +140,11 @@ public class CommonNurseService {
         else {
             fuzzyName = VerifyUtil.reconstructSQLContentLike(fuzzyName);
         }
-        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId && null==registerFrom) {
+        if (null==authority && null==fuzzyName && null==canAnswerNursingQuestion && null==hospitalId && null==departmentId && null==registerFrom && null==canSeeAllOrder) {
             resultSet = nurseRepository.findAll(page);
         }
         else {
-            resultSet = nurseRepository.findByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, page);
+            resultSet = nurseRepository.findByAuthority(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, canSeeAllOrder, page);
         }
         return resultSet;
     }

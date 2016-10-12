@@ -74,6 +74,7 @@ public class NurseManageAPI {
                                                  @QueryParam("authority") @DefaultValue("") String authority,
                                                  @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
                                                  @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
+                                                 @QueryParam("can_see_all_order") @DefaultValue("") String canSeeAllOrder, /* Yes, No */
                                                  @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
                                                  @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
                                                  @QueryParam("register_from") @DefaultValue("") String strRegisterFrom /* COOLTOO, GO2NURSE */
@@ -83,7 +84,7 @@ public class NurseManageAPI {
         Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         RegisterFrom registerFrom = RegisterFrom.parseString(strRegisterFrom);
-        long count = nurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom);
+        long count = nurseService.countByAuthorityAndFuzzyName(authority, fuzzyName, canAnswerNursingQuestion, canSeeAllOrder, hospitalId, departmentId, registerFrom);
         logger.info("count={}", count);
         return Response.ok(count).build();
     }
@@ -95,6 +96,7 @@ public class NurseManageAPI {
                                                @QueryParam("authority") @DefaultValue("") String strAuthority,
                                                @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
                                                @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
+                                               @QueryParam("can_see_all_order") @DefaultValue("") String canSeeAllOrder, /* Yes, No */
                                                @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
                                                @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
                                                @QueryParam("register_from") @DefaultValue("") String strRegisterFrom, /* COOLTOO, GO2NURSE */
@@ -107,7 +109,7 @@ public class NurseManageAPI {
         Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         RegisterFrom registerFrom = RegisterFrom.parseString(strRegisterFrom);
-        List<NurseBean> nurses = nurseService.getAllByAuthorityAndFuzzyName(strAuthority, fuzzyName, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, index, number);
+        List<NurseBean> nurses = nurseService.getAllByAuthorityAndFuzzyName(strAuthority, fuzzyName, canAnswerNursingQuestion, canSeeAllOrder, hospitalId, departmentId, registerFrom, index, number);
         logger.info("count={}", userId, strAuthority, fuzzyName, index, number, nurses.size());
         return Response.ok(nurses).build();
     }
