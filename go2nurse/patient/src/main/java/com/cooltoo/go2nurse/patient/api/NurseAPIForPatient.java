@@ -41,6 +41,7 @@ public class NurseAPIForPatient {
     public Response getNurseById(@Context HttpServletRequest request,
                                  @QueryParam("name") @DefaultValue("") String name,
                                  @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
+                                 @QueryParam("can_see_all_order") @DefaultValue("") String canSeeAllOrder,
                                  @QueryParam("hospital_id") @DefaultValue("") String strHospitalId,
                                  @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
                                  @QueryParam("register_from") @DefaultValue("") String strRegisterFrom,
@@ -51,7 +52,7 @@ public class NurseAPIForPatient {
         Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         RegisterFrom registerFrom = RegisterFrom.parseString(strRegisterFrom);
-        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByCanAnswerQuestion(name, canAnswerNursingQuestion, hospitalId, departmentId, registerFrom, index, number);
+        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByCanAnswerQuestion(name, canAnswerNursingQuestion, canSeeAllOrder, hospitalId, departmentId, registerFrom, index, number);
         return Response.ok(nurses).build();
     }
 
