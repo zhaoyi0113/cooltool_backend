@@ -15,4 +15,5 @@ public interface NurseOrderRelationRepository extends JpaRepository<NurseOrderRe
     List<NurseOrderRelationEntity> findByNurseIdAndStatus(long nurseId, CommonStatus status, Sort sort);
     List<NurseOrderRelationEntity> findByNurseIdAndOrderId(long nurseId, long orderId, Sort sort);
     List<NurseOrderRelationEntity> findByOrderId(long orderId, Sort sort);
+    List<NurseOrderRelationEntity> findByOrderIdInAndStatus(List<Long> orderIds, CommonStatus status);
 }

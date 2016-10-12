@@ -1,15 +1,21 @@
 package com.cooltoo.nurse360.service;
 
+import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.NurseOrderRelationBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.converter.NurseOrderRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
 import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
+import com.cooltoo.repository.NurseHospitalRelationRepository;
+import com.cooltoo.services.NurseExtensionService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 16/9/28.
@@ -30,10 +34,14 @@ public class NurseOrderRelationServiceForNurse360 {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseOrderRelationServiceForNurse360.class);
 
+    private static final Sort nurseHospitalRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
+
     public static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 
+    @Autowired private NurseExtensionService nurseExtensionService;
+    @Autowired private NurseHospitalRelationRepository nurseHospitalRelationRepository;
     @Autowired private NurseOrderRelationRepository repository;
     @Autowired private NurseOrderRelationBeanConverter beanConverter;
     @Autowired private ServiceOrderService orderService;
@@ -46,20 +54,54 @@ public class NurseOrderRelationServiceForNurse360 {
         return beans;
     }
 
-    public List<ServiceOrderBean> getOrderByNurseId(long nurseId, String strStatus, int pageIndex, int sizePerPage) {
+    public List<ServiceOrderBean> getAllOrder(long nurseId, String strStatus, int pageIndex, int sizePerPage) {
         logger.info("get orders by nurseId={} with status={}", nurseId, strStatus);
-        CommonStatus status = CommonStatus.parseString(strStatus);
-        List<NurseOrderRelationEntity> resultSet = repository.findByNurseIdAndStatus(nurseId, status, sort);
-        List<Long> orderIds = new ArrayList<>();
-        if (!VerifyUtil.isListEmpty(resultSet)) {
-            for (NurseOrderRelationEntity tmp : resultSet) {
-                if (orderIds.contains(tmp.getOrderId())) {
-                    continue;
-                }
-                orderIds.add(tmp.getOrderId());
-            }
+
+        List<ServiceOrderBean> orders = new ArrayList<>();
+
+        // get nurse extension information
+        NurseExtensionBean nurseExtensionInfo = nurseExtensionService.getExtensionByNurseId(nurseId);
+        boolean canSeeAllOrder = true;
+        if (null==nurseExtensionInfo || null==nurseExtensionInfo.getCanSeeAllOrder() || !YesNoEnum.YES.equals(nurseExtensionInfo.getCanSeeAllOrder())) {
+            canSeeAllOrder = false;
         }
-        List<ServiceOrderBean> orders = orderService.getOrderByIds(orderIds, pageIndex, sizePerPage);
+
+        // get nurse hospital department relation
+        List<NurseHospitalRelationEntity> nurseHospitalRelations = nurseHospitalRelationRepository.findByNurseId(nurseId, nurseHospitalRelationSort);
+        if (null==nurseHospitalRelations || nurseHospitalRelations.isEmpty() || nurseHospitalRelations.size()!=1) {
+            return orders;
+        }
+        NurseHospitalRelationEntity nurseHospitalRelation = nurseHospitalRelations.get(0);
+
+
+        // get orders
+        if (canSeeAllOrder) {
+            orders = orderService.getOrderByConditions(null, null, null, null, null, null, null, pageIndex, sizePerPage);
+        }
+        else {
+            orders = orderService.getOrderByConditions(null, null, null, null,
+                    new Long(nurseHospitalRelation.getHospitalId()), ServiceVendorType.HOSPITAL,
+                    null, pageIndex, sizePerPage);
+        }
+
+//        // order ids
+//        List<Long> orderIds = new ArrayList<>();
+//        for (ServiceOrderBean tmp : orders) {
+//            if (!orderIds.contains(tmp.getId())) {
+//                orderIds.add(tmp.getId());
+//            }
+//        }
+//
+//        // get order has been grabbed or not
+//        CommonStatus status = CommonStatus.parseString(strStatus);
+//        List<NurseOrderRelationEntity> resultSet = repository.findByOrderIdInAndStatus(orderIds, status);
+//        Map<Long, Long> orderIdToGrabberId = new HashMap<>();
+//        if (!VerifyUtil.isListEmpty(resultSet)) {
+//            for (NurseOrderRelationEntity tmp : resultSet) {
+//                orderIdToGrabberId.put(tmp.getOrderId(), tmp.getNurseId());
+//            }
+//        }
+
         logger.info("count is {}", orders.size());
         return orders;
     }
@@ -117,8 +159,8 @@ public class NurseOrderRelationServiceForNurse360 {
     //                 add
     //============================================================================
     @Transactional
-    public long grabOrder(long nurseId, long orderId) {
-        logger.info("add order={} to nurse={}", orderId, nurseId);
+    public long fetchOrder(long nurseId, long orderId) {
+        logger.info("nurse={} fetches order={}", orderId, nurseId);
         if (!orderService.existOrder(orderId)) {
             logger.info("order not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -147,9 +189,12 @@ public class NurseOrderRelationServiceForNurse360 {
         }
 
         if (nurseId!=entity.getNurseId()) {
-            logger.info("order has been grabbed");
+            logger.info("order has been fetched");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+
+        // update order status
+        orderService.nurseFetchOrder(orderId);
 
         NurseOrderRelationBean bean = beanConverter.convert(entity);
         logger.info("add relation={}", bean);

@@ -39,10 +39,11 @@ public class NotificationManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response countNotification(@Context HttpServletRequest request,
                                       @QueryParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                      @QueryParam("department_id") @DefaultValue("0") int departmentId,
-                                      @QueryParam("status") @DefaultValue("") String status
+                                      @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
+                                      @QueryParam("status") @DefaultValue("ALL") String status
     ) {
         logger.info("get notification count by status={}", status);
+        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         long count = notificationService.countByHospitalDepartmentStatus(hospitalId, departmentId, status);
         logger.info("count = {}", count);
         return Response.ok(count).build();
@@ -53,12 +54,13 @@ public class NotificationManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getNotificationByStatus(@Context HttpServletRequest request,
                                             @QueryParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                            @QueryParam("department_id") @DefaultValue("0") int departmentId,
-                                            @QueryParam("status") @DefaultValue("") String status,
+                                            @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
+                                            @QueryParam("status") @DefaultValue("ALL") String status,
                                             @QueryParam("index")  @DefaultValue("0") int index,
                                             @QueryParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get notification by status={} at page={}, {}/page", status, index, number);
+        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         List<Nurse360NotificationBean> categories = notificationService.getNotificationByHospitalDepartmentStatus(hospitalId, departmentId, status, index, number);
         logger.info("count = {}", categories.size());
         return Response.ok(categories).build();

@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Order;
 import java.util.*;
 
 /**
@@ -368,6 +369,32 @@ public class ServiceOrderService {
     }
 
     @Transactional
+    public ServiceOrderBean nurseFetchOrder(long orderId) {
+        logger.info("nurse fetch order={}", orderId);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (!OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, can not be fetched", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        entity.setOrderStatus(OrderStatus.TO_SERVICE);
+        entity = repository.save(entity);
+        logger.info("order fetched is {}", entity);
+
+        MessageBean message = new MessageBean();
+        message.setAlertBody("订单状态有更新");
+        message.setType(MessageType.ORDER.name());
+        message.setStatus(entity.getOrderStatus().name());
+        message.setRelativeId(entity.getId());
+        message.setDescription("order fetched!");
+        notifier.notifyUserPatient(entity.getUserId(), message);
+
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
     public ServiceOrderBean cancelOrder(boolean checkUser, long userId, long orderId) {
         logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
         ServiceOrderEntity entity = repository.findOne(orderId);
@@ -379,6 +406,11 @@ public class ServiceOrderService {
                 logger.error("order not belong to user");
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
+        }
+        if (OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
+          ||OrderStatus.COMPLETED.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, can not be cancelled", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         entity.setOrderStatus(OrderStatus.CANCELLED);
         entity = repository.save(entity);

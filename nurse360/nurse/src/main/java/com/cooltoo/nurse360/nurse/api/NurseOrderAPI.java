@@ -3,7 +3,6 @@ package com.cooltoo.nurse360.nurse.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
-import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NurseOrderRelationServiceForNurse360;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,17 @@ public class NurseOrderAPI {
                              @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseId(nurseId, CommonStatus.ENABLED.name(), pageIndex, sizePerPage);
+        List<ServiceOrderBean> orders = nurseOrderService.getAllOrder(nurseId, CommonStatus.ENABLED.name(), pageIndex, sizePerPage);
+        return Response.ok(orders).build();
+    }
+
+    @Path("/self")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getSelfOrder(@Context HttpServletRequest request) {
+        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseIdAndOrderStatus(nurseId, CommonStatus.ENABLED.name(), null);
         return Response.ok(orders).build();
     }
 
@@ -55,7 +64,7 @@ public class NurseOrderAPI {
                               @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        nurseOrderService.grabOrder(nurseId, orderId);
+        nurseOrderService.fetchOrder(nurseId, orderId);
         return Response.ok().build();
     }
 }
