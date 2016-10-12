@@ -395,6 +395,32 @@ public class ServiceOrderService {
     }
 
     @Transactional
+    public ServiceOrderBean nurseGiveUpOrder(long orderId) {
+        logger.info("nurse fetch order={}", orderId);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (!OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, can not be given_up", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        entity.setOrderStatus(OrderStatus.TO_DISPATCH);
+        entity = repository.save(entity);
+        logger.info("order fetched is {}", entity);
+
+        MessageBean message = new MessageBean();
+        message.setAlertBody("订单状态有更新");
+        message.setType(MessageType.ORDER.name());
+        message.setStatus(entity.getOrderStatus().name());
+        message.setRelativeId(entity.getId());
+        message.setDescription("order be given up!");
+        notifier.notifyUserPatient(entity.getUserId(), message);
+
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
     public ServiceOrderBean cancelOrder(boolean checkUser, long userId, long orderId) {
         logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
         ServiceOrderEntity entity = repository.findOne(orderId);
@@ -422,6 +448,38 @@ public class ServiceOrderService {
         message.setStatus(entity.getOrderStatus().name());
         message.setRelativeId(entity.getId());
         message.setDescription("order cancelled!");
+        notifier.notifyUserPatient(entity.getUserId(), message);
+
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
+    public ServiceOrderBean orderInProcess(boolean checkUser, long userId, long orderId) {
+        logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (checkUser) {
+            if (entity.getUserId()!=userId) {
+                logger.error("order not belong to user");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
+        if (!OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, can not be in_process", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        entity.setOrderStatus(OrderStatus.IN_PROCESS);
+        entity = repository.save(entity);
+        logger.info("order in_process is {}", entity);
+
+        MessageBean message = new MessageBean();
+        message.setAlertBody("订单状态有更新");
+        message.setType(MessageType.ORDER.name());
+        message.setStatus(entity.getOrderStatus().name());
+        message.setRelativeId(entity.getId());
+        message.setDescription("order is in_process!");
         notifier.notifyUserPatient(entity.getUserId(), message);
 
         return beanConverter.convert(entity);

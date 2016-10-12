@@ -56,8 +56,8 @@ public class NurseOrderAPI {
         return Response.ok(orders).build();
     }
 
-    @Path("/grab")
-    @POST
+    @Path("/fetch")
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response grabOrder(@Context HttpServletRequest request,
@@ -65,6 +65,18 @@ public class NurseOrderAPI {
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         nurseOrderService.fetchOrder(nurseId, orderId);
+        return Response.ok().build();
+    }
+
+    @Path("/cancel")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response cancelOrder(@Context HttpServletRequest request,
+                                @FormParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        nurseOrderService.giveUpOrder(nurseId, orderId);
         return Response.ok().build();
     }
 }

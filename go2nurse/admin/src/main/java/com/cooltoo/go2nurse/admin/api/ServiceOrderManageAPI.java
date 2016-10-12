@@ -131,10 +131,20 @@ public class ServiceOrderManageAPI {
     @Path("/cancel")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    public Response cancelAppointment(@Context HttpServletRequest request,
-                                      @FormParam("order_id") @DefaultValue("0") long orderId
+    public Response cancelOrder(@Context HttpServletRequest request,
+                                @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.cancelOrder(false, -1, orderId);
+        return Response.ok(order).build();
+    }
+
+    @Path("/in_process")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response orderInProcess(@Context HttpServletRequest request,
+                                   @FormParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        ServiceOrderBean order = orderService.orderInProcess(false, -1, orderId);
         return Response.ok(order).build();
     }
 }

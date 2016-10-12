@@ -201,4 +201,41 @@ public class NurseOrderRelationServiceForNurse360 {
         return bean.getNurseId();
     }
 
+    //============================================================================
+    //                 delete
+    //============================================================================
+    @Transactional
+    public long giveUpOrder(long nurseId, long orderId) {
+        logger.info("nurse={} give up order={}", nurseId, orderId);
+        if (!orderService.existOrder(orderId)) {
+            logger.info("order not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        List<NurseOrderRelationEntity> relations = repository.findByOrderId(orderId, sort);
+        boolean orderBelongToNurse = true;
+        if (VerifyUtil.isListEmpty(relations)) {
+            orderBelongToNurse = false;
+        }
+        else {
+            for (NurseOrderRelationEntity tmp : relations) {
+                if (tmp.getNurseId()!=nurseId) {
+                    orderBelongToNurse = false;
+                }
+            }
+        }
+        if (!orderBelongToNurse) {
+            logger.info("order not belong this nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        repository.delete(relations);
+
+        // update order status
+        orderService.nurseGiveUpOrder(orderId);
+
+        return nurseId;
+    }
+
 }
