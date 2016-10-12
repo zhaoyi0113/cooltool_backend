@@ -37,6 +37,18 @@ public class NurseExtensionAPI {
         return Response.ok(courses).build();
     }
 
+    @Path("/course/{course_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getCourseById(@Context HttpServletRequest request,
+                                  @PathParam("course_id") @DefaultValue("0") int courseId
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        Nurse360CourseBean course = nurseExtensionService.getCourseById(nurseId, courseId);
+        return Response.ok(course).build();
+    }
+
 
     @Path("/notification/{index}/{number}")
     @GET
@@ -50,6 +62,19 @@ public class NurseExtensionAPI {
         List<Nurse360NotificationBean> notification = nurseExtensionService.getNotificationByNurseId(nurseId, pageIndex, sizePerPage);
         return Response.ok(notification).build();
     }
+
+    @Path("/notification/{notification_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getNotificationById(@Context HttpServletRequest request,
+                                        @PathParam("notification_id") @DefaultValue("0") long notificationId
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        Nurse360NotificationBean notification = nurseExtensionService.getNotificationById(nurseId, notificationId);
+        return Response.ok(notification).build();
+    }
+
 
     @Path("/course")
     @POST

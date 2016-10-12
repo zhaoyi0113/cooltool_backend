@@ -12,6 +12,7 @@ import com.cooltoo.nurse360.entities.NurseCourseRelationEntity;
 import com.cooltoo.nurse360.entities.NurseNotificationRelationEntity;
 import com.cooltoo.nurse360.repository.NurseCourseRelationRepository;
 import com.cooltoo.nurse360.repository.NurseNotificationRelationRepository;
+import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.repository.NurseHospitalRelationRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ public class NurseExtensionServiceForNurse360 {
 
     private static final Sort nurseHospitalRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
+    @Autowired private Nurse360Utility utility;
     // nurse hospital, course, notification relation
     @Autowired private NurseHospitalRelationRepository nurseHospitalRelationRepository;
     @Autowired private NurseCourseRelationRepository nurseCourseRelationRepository;
@@ -52,6 +54,12 @@ public class NurseExtensionServiceForNurse360 {
     //***************
     //  get courses
     //***************
+    public Nurse360CourseBean getCourseById(long nurseId, long courseId) {
+        logger.info("nurse={} get course by courseId={}", nurseId, courseId);
+        Nurse360CourseBean course = courseService.getCourseById(courseId, utility.getHttpPrefix());
+        return course;
+    }
+
     public List<Nurse360CourseBean> getCourseByNurseId(long nurseId, int pageIndex, int number) {
         logger.info("get course by nurseId={}", nurseId);
         List<Nurse360CourseBean> courses = new ArrayList<>();
@@ -100,6 +108,12 @@ public class NurseExtensionServiceForNurse360 {
     //********************
     //  get notification
     //********************
+    public Nurse360NotificationBean getNotificationById(long nurseId, long notificationId) {
+        logger.info("nurse={} get notification by notificationId={}", nurseId, notificationId);
+        Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
+        return notification;
+    }
+
     public List<Nurse360NotificationBean> getNotificationByNurseId(long nurseId, int pageIndex, int number) {
         logger.info("get course by nurseId={}", nurseId);
         List<Nurse360NotificationBean> notifications = new ArrayList<>();
