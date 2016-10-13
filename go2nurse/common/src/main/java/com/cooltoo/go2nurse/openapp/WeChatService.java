@@ -101,7 +101,6 @@ public class WeChatService {
                 //when user has openid in wechat but has not registered, the user id will be 0
                 if(users.get(0).getUserId() != 0) {
                     //user openid already exists, check whether it has login token
-                    List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
                     WeChatAccountEntity weChatAccount = weChatAccountRepository.findFirstByAppId(appid);
                     if(weChatAccount != null) {
                         List<UserTokenAccessEntity> userTokenEntity = weChatTokenAccessRepository.getUserAccessTokenByAccountIdAndUserId(weChatAccount.getId(), users.get(0).getUserId());
