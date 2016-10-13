@@ -47,6 +47,7 @@ public class NurseExtensionServiceForNurse360 {
     @Autowired private CourseHospitalRelationServiceForNurse360 courseHospitalRelationService;
     // notification
     @Autowired private NotificationServiceForNurse360 notificationService;
+    @Autowired private NotificationHospitalRelationServiceForNurse360 notificationHospitalRelationService;
 
     //========================================================================
     //                getting
@@ -125,16 +126,25 @@ public class NurseExtensionServiceForNurse360 {
         }
         NurseHospitalRelationEntity nurseHospitalRelation = nurseHospitalRelations.get(0);
 
-        // get notification
-        List<Integer> departmentIds = new ArrayList<>();
-        departmentIds.add(0);
-        if (nurseHospitalRelation.getDepartmentId()>0) {
-            departmentIds.add(nurseHospitalRelation.getDepartmentId());
-        }
-        notifications = notificationService.getNotificationByHospitalDepartmentStatus(
-                nurseHospitalRelation.getHospitalId(), departmentIds, CommonStatus.ENABLED.name(),
-                pageIndex, number
+        // get notification id
+        List<Long> notificationIdInDepartment = notificationHospitalRelationService.getNotificationInHospitalAndDepartment(
+                nurseHospitalRelation.getHospitalId(), nurseHospitalRelation.getDepartmentId(), CommonStatus.ENABLED.name()
         );
+        List<Long> notificationIdInHospital = notificationHospitalRelationService.getNotificationInHospitalAndDepartment(
+                nurseHospitalRelation.getHospitalId(), 0, CommonStatus.ENABLED.name()
+        );
+        for (Long tmpId : notificationIdInHospital) {
+            if (null==notificationIdInDepartment) {
+                notificationIdInDepartment = new ArrayList<>();
+            }
+            if (notificationIdInDepartment.contains(tmpId)) {
+                continue;
+            }
+            notificationIdInDepartment.add(tmpId);
+        }
+
+        // get notification
+        notifications = notificationService.getNotificationByIds(notificationIdInDepartment, pageIndex, number);
 
         // notification that nurse has read
         List<Long> notificationReadId = nurseNotificationRelationRepository.findNotificationIdByNurseIdAndReadingStatus(nurseId, ReadingStatus.READ);

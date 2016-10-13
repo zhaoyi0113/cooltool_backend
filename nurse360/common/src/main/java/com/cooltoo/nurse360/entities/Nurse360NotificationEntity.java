@@ -20,8 +20,6 @@ public class Nurse360NotificationEntity {
     private String introduction;
     private String content;
     private YesNoEnum significance;
-    private int hospitalId;
-    private int departmentId;
 
     @Id
     @GeneratedValue
@@ -62,16 +60,6 @@ public class Nurse360NotificationEntity {
         return significance;
     }
 
-    @Column(name = "hospital_id")
-    public int getHospitalId() {
-        return hospitalId;
-    }
-
-    @Column(name = "department_id")
-    public int getDepartmentId() {
-        return departmentId;
-    }
-
     public void setId(long id) {
         this.id = id;
     }
@@ -100,14 +88,6 @@ public class Nurse360NotificationEntity {
         this.significance = significance;
     }
 
-    public void setHospitalId(int hospitalId) {
-        this.hospitalId = hospitalId;
-    }
-
-    public void setDepartmentId(int departmentId) {
-        this.departmentId = departmentId;
-    }
-
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -118,8 +98,6 @@ public class Nurse360NotificationEntity {
         msg.append(", introduction=").append(introduction);
         msg.append(", content=").append(content);
         msg.append(", significance=").append(significance);
-        msg.append(", hospitalId=").append(hospitalId);
-        msg.append(", departmentId=").append(departmentId);
         msg.append("]");
         return msg.toString();
     }

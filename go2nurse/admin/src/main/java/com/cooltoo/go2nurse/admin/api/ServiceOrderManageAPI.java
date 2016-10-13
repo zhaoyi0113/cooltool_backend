@@ -1,6 +1,5 @@
 package com.cooltoo.go2nurse.admin.api;
 
-import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
@@ -145,6 +144,16 @@ public class ServiceOrderManageAPI {
                                    @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.orderInProcess(false, -1, orderId);
+        return Response.ok(order).build();
+    }
+
+    @Path("/completed")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response orderCompleted(@Context HttpServletRequest request,
+                                   @FormParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        ServiceOrderBean order = orderService.completedOrder(false, -1, orderId);
         return Response.ok(order).build();
     }
 }

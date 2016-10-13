@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 /**
  * Created by hp on 2016/7/13.
  */
@@ -90,6 +92,12 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
         }
         bean.setItemCount(itemCount);
         bean.setScore(source.getScore());
+        if (null!=source.getCompletedTime()) {
+            bean.setCompletedTime(source.getCompletedTime());
+        }
+        else {
+            bean.setCompletedTime(new Date(0));
+        }
 
         return bean;
     }

@@ -55,7 +55,7 @@ public class CourseServiceForNurse360 {
         return exist;
     }
 
-    public long countByNameLikeAndStatus(String title, String strStatus) {
+    public long countByTitleLikeAndStatus(String title, String strStatus) {
         logger.info("count all course by status={}", strStatus);
         CourseStatus status = CourseStatus.parseString(strStatus);
         title = VerifyUtil.isStringEmpty(title) ? null : VerifyUtil.reconstructSQLContentLike(title.trim());
@@ -72,7 +72,7 @@ public class CourseServiceForNurse360 {
         return beans;
     }
 
-    public List<Nurse360CourseBean> getCourseByNameAndStatus(String title, String strStatus) {
+    public List<Nurse360CourseBean> getCourseByTitleAndStatus(String title, String strStatus) {
         logger.info("get all course by status={}", strStatus);
         CourseStatus status = CourseStatus.parseString(strStatus);
         title = VerifyUtil.isStringEmpty(title) ? null : VerifyUtil.reconstructSQLContentLike(title.trim());
@@ -84,7 +84,7 @@ public class CourseServiceForNurse360 {
         return beans;
     }
 
-    public List<Nurse360CourseBean> getCourseByNameAndStatus(String title, String strStatus, int pageIndex, int sizePerPage) {
+    public List<Nurse360CourseBean> getCourseByTitleAndStatus(String title, String strStatus, int pageIndex, int sizePerPage) {
         logger.info("get all course by status={} at page={} sizePerPage={}", strStatus, pageIndex, sizePerPage);
         CourseStatus status = CourseStatus.parseString(strStatus);
         title = VerifyUtil.isStringEmpty(title) ? null : VerifyUtil.reconstructSQLContentLike(title.trim());
@@ -107,7 +107,7 @@ public class CourseServiceForNurse360 {
         CourseStatus status = CourseStatus.parseString(strStatus);
         if (null==status) {
             if ("ALL".equalsIgnoreCase(strStatus)) {
-                resultSet = repository.findCourseIdByStatusAndIdIn(status, courseIds, sort);
+                resultSet = repository.findCourseIdByStatusAndIdIn(null, courseIds, sort);
             }
         }
         else {
@@ -133,18 +133,6 @@ public class CourseServiceForNurse360 {
         else {
             resultSet = repository.findByStatusAndIdIn(status, courseIds, sort);
         }
-        List<Nurse360CourseBean>   beans = entities2BeansWithoutContent(resultSet);
-        fillOtherProperties(beans);
-        logger.info("count is {}", beans.size());
-        return beans;
-    }
-
-    public List<Nurse360CourseBean> getCourseByIds(List<Long> courseIds) {
-        logger.info("get course by ids={}", courseIds);
-        if (VerifyUtil.isListEmpty(courseIds)) {
-            return new ArrayList<>();
-        }
-        List<Nurse360CourseEntity> resultSet = repository.findAll(courseIds);
         List<Nurse360CourseBean>   beans = entities2BeansWithoutContent(resultSet);
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());

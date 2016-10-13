@@ -28,7 +28,7 @@ public class NotificationServiceForNurse360 {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationServiceForNurse360.class);
 
-    private static final Sort notificationSort = new Sort(
+    private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.ASC, "id")
     );
 
@@ -45,6 +45,38 @@ public class NotificationServiceForNurse360 {
         return exists;
     }
 
+//    public long countByTitleLikeAndStatus(String titleLike, String strStatus) {
+//        logger.info("count all notification by titleLike={} status={}", titleLike, strStatus);
+//        CommonStatus status = CommonStatus.parseString(strStatus);
+//        titleLike = VerifyUtil.isStringEmpty(titleLike) ? null : VerifyUtil.reconstructSQLContentLike(titleLike.trim());
+//        long count = repository.countByTitleLikeAndStatus(titleLike, status);
+//        logger.info("count is {}", count);
+//        return count;
+//    }
+//
+//    public List<Nurse360NotificationBean> getByTitleLikeAndStatus(String titleLike, String strStatus) {
+//        logger.info("get all notification by titleLike={} status={}", titleLike, strStatus);
+//        CommonStatus status = CommonStatus.parseString(strStatus);
+//        titleLike = VerifyUtil.isStringEmpty(titleLike) ? null : VerifyUtil.reconstructSQLContentLike(titleLike.trim());
+//        List<Nurse360NotificationEntity> resultSet = repository.findByTitleLikeAndStatus(titleLike, status, sort);
+//        List<Nurse360NotificationBean> beans = entitiesToBeans(resultSet, false);
+//        fillOtherProperties(beans);
+//        logger.info("count is {}", beans.size());
+//        return beans;
+//    }
+//
+//    public List<Nurse360NotificationBean> getByTitleLikeAndStatus(String titleLike, String strStatus, int pageIndex, int sizePerPage) {
+//        logger.info("get all notification by titleLike={} status={} at page={} sizePerPage={}", titleLike, strStatus, pageIndex, sizePerPage);
+//        CommonStatus status = CommonStatus.parseString(strStatus);
+//        titleLike = VerifyUtil.isStringEmpty(titleLike) ? null : VerifyUtil.reconstructSQLContentLike(titleLike.trim());
+//        PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
+//        Page<Nurse360NotificationEntity> resultSet = repository.findByTitleLikeAndStatus(titleLike, status, page);
+//        List<Nurse360NotificationBean> beans = entitiesToBeans(resultSet, false);
+//        fillOtherProperties(beans);
+//        logger.info("count is {}", beans.size());
+//        return beans;
+//    }
+
     public Nurse360NotificationBean getNotificationById(long notificationId) {
         logger.info("get notification by notificationId={}", notificationId);
         Nurse360NotificationEntity notification = repository.findOne(notificationId);
@@ -56,62 +88,58 @@ public class NotificationServiceForNurse360 {
         return beans.get(0);
     }
 
-    public long countByHospitalDepartmentStatus(Integer hospitalId, Integer departmentId, String strStatus) {
-        logger.info("count notification by hospitalId={} departmentId={} statues={}", hospitalId, departmentId, strStatus);
-        CommonStatus status = CommonStatus.parseString(strStatus);
-        long count = repository.countByHospitalIdAndDepartmentIdAndStatus(hospitalId, departmentId, status);
-        logger.info("notification count is {}", count);
-        return count;
-    }
-
-    public List<Nurse360NotificationBean> getNotificationByHospitalDepartmentStatus(Integer hospitalId, Integer departmentId, String strStatus, int pageIndex, int sizeOfPage) {
-        logger.info("get  notification by hospitalId={} departmentId={} status={} at page={} size={}",
-                hospitalId, departmentId, strStatus, pageIndex, sizeOfPage);
-        // get all notification
-        CommonStatus status = CommonStatus.parseString(strStatus);
-        PageRequest page = new PageRequest(pageIndex, sizeOfPage, notificationSort);
-        Page<Nurse360NotificationEntity> resultSet = repository.findByHospitalIdAndDepartmentIdAndStatus(hospitalId, departmentId, status, page);
-        List<Nurse360NotificationBean> beans = entitiesToBeans(resultSet, false);
-        fillOtherProperties(beans);
-        return beans;
-    }
-
-    public List<Nurse360NotificationBean> getNotificationByHospitalDepartmentStatus(Integer hospitalId, List<Integer> departmentIds, String strStatus, int pageIndex, int sizeOfPage) {
-        logger.info("get  notification by hospitalId={} departmentIds={} status={} at page={} size={}",
-                hospitalId, departmentIds, strStatus, pageIndex, sizeOfPage);
-        // get all notification
-        CommonStatus status = CommonStatus.parseString(strStatus);
-        PageRequest page = new PageRequest(pageIndex, sizeOfPage, notificationSort);
-
-        if (VerifyUtil.isListEmpty(departmentIds)) {
-            if (null==departmentIds) {
-                departmentIds = new ArrayList<>();
-            }
-            departmentIds.add(0);
+    public List<Long> getNotificationIdByStatusAndIds(String strStatus, List<Long> notificationIds) {
+        logger.info("get notificationId by status={} ids={}", strStatus, notificationIds);
+        List<Long> resultSet = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(notificationIds)) {
+            return resultSet;
         }
 
-        Page<Nurse360NotificationEntity> resultSet = repository.findByHospitalIdAndDepartmentIdInAndStatus(hospitalId, departmentIds, status, page);
-        List<Nurse360NotificationBean> beans = entitiesToBeans(resultSet, false);
-        fillOtherProperties(beans);
-        return beans;
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        if (null==status) {
+            if ("ALL".equalsIgnoreCase(strStatus)) {
+                resultSet = repository.findNotificationIdByStatusAndIdIn(null, notificationIds, sort);
+            }
+        }
+        else {
+            resultSet = repository.findNotificationIdByStatusAndIdIn(status, notificationIds, sort);
+        }
+        logger.info("count is {}", resultSet.size());
+        return resultSet;
     }
 
     public List<Nurse360NotificationBean> getNotificationByStatusAndIds(String strStatus, List<Long> notificationIds) {
-        logger.info("get  notification by status={} ids={}", strStatus, notificationIds);
+        logger.info("get notification by status={} ids={}", strStatus, notificationIds);
+        if (VerifyUtil.isListEmpty(notificationIds)) {
+            return new ArrayList<>();
+        }
+
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Nurse360NotificationEntity> resultSet = null;
-        if (!VerifyUtil.isListEmpty(notificationIds)) {
-            if (null == status) {
-                if ("ALL".equalsIgnoreCase(strStatus)) {
-                    resultSet = repository.findByIdIn(notificationIds, notificationSort);
-                }
-            } else {
-                resultSet = repository.findByStatusAndIdIn(status, notificationIds, notificationSort);
+        if (null==status) {
+            if ("ALL".equalsIgnoreCase(strStatus)) {
+                resultSet = repository.findByIdIn(notificationIds, sort);
             }
         }
-        List<Nurse360NotificationBean> beans = entitiesToBeans(resultSet, true);
+        else {
+            resultSet = repository.findByStatusAndIdIn(status, notificationIds, sort);
+        }
+        List<Nurse360NotificationBean>   beans = entitiesToBeans(resultSet, false);
         fillOtherProperties(beans);
-        logger.info("get notification is {}", beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
+    public List<Nurse360NotificationBean> getNotificationByIds(List<Long> courseIds, int pageIndex, int sizePerPage) {
+        logger.info("get notification by ids={} at pageIndex={} sizePerPage={}", courseIds, pageIndex, sizePerPage);
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return new ArrayList<>();
+        }
+        PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
+        List<Nurse360NotificationEntity> resultSet = repository.findByIdIn(courseIds, page);
+        List<Nurse360NotificationBean>   beans = entitiesToBeans(resultSet, false);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
         return beans;
     }
 
@@ -156,12 +184,11 @@ public class NotificationServiceForNurse360 {
     @Transactional
     public Nurse360NotificationBean updateNotification(long notificationId,
                                                        String title, String introduction, String content,
-                                                       Integer hospitalId, Integer departmentId,
                                                        String strSignificance, String strStatus) {
         boolean    changed = false;
         String     imgUrl = "";
-        logger.info("update notification {} by title={} introduction={} content={} hospitalId={} departmentId={} significance={} status={}",
-                notificationId, title, introduction, content, hospitalId, departmentId, strSignificance, strStatus);
+        logger.info("update notification {} by title={} introduction={} content={} significance={} status={}",
+                notificationId, title, introduction, content, strSignificance, strStatus);
         Nurse360NotificationEntity entity = repository.findOne(notificationId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -203,16 +230,6 @@ public class NotificationServiceForNurse360 {
             changed = true;
         }
 
-        if (null!=hospitalId && hospitalId!=entity.getHospitalId()) {
-            entity.setHospitalId(hospitalId);
-            changed = true;
-        }
-
-        if (null!=departmentId && departmentId!=entity.getDepartmentId()) {
-            entity.setDepartmentId(departmentId);
-            changed = true;
-        }
-
         if (changed) {
             entity = repository.save(entity);
         }
@@ -226,9 +243,9 @@ public class NotificationServiceForNurse360 {
     //         add
     //=================================================================
     @Transactional
-    public Nurse360NotificationBean addNotification(String title, String introduction, Integer hospitalId, Integer departmentId, String strSignificance) {
-        logger.info("add notification : title={} introduction={} hospitalId={} departmentId={} significance={}",
-                title, introduction, hospitalId, departmentId, strSignificance);
+    public Nurse360NotificationBean addNotification(String title, String introduction, String strSignificance) {
+        logger.info("add notification : title={} introduction={} significance={}",
+                title, introduction, strSignificance);
         title = VerifyUtil.isStringEmpty(title) ? "" : title.trim();
         String imageUrl = null;
         if (VerifyUtil.isStringEmpty(title)) {
@@ -249,8 +266,6 @@ public class NotificationServiceForNurse360 {
 
         YesNoEnum significance = YesNoEnum.parseString(strSignificance);
         entity.setSignificance(null==significance ? YesNoEnum.NO : significance);
-        entity.setHospitalId(hospitalId);
-        entity.setDepartmentId(departmentId);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.DISABLED);
         entity = repository.save(entity);

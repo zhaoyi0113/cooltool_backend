@@ -35,10 +35,9 @@ public class NurseOrderRelationServiceForNurse360 {
     private static final Logger logger = LoggerFactory.getLogger(NurseOrderRelationServiceForNurse360.class);
 
     private static final Sort nurseHospitalRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
+    private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
-    public static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "id")
-    );
+    private static final List<OrderStatus> orderStatuses = Arrays.asList(new OrderStatus[]{OrderStatus.TO_DISPATCH, OrderStatus.TO_SERVICE});
 
     @Autowired private NurseExtensionService nurseExtensionService;
     @Autowired private NurseHospitalRelationRepository nurseHospitalRelationRepository;
@@ -73,15 +72,14 @@ public class NurseOrderRelationServiceForNurse360 {
         }
         NurseHospitalRelationEntity nurseHospitalRelation = nurseHospitalRelations.get(0);
 
-
         // get orders
         if (canSeeAllOrder) {
-            orders = orderService.getOrderByConditions(null, null, null, null, null, null, null, pageIndex, sizePerPage);
+            orders = orderService.getOrderByConditions(null, null, orderStatuses, pageIndex, sizePerPage);
         }
         else {
-            orders = orderService.getOrderByConditions(null, null, null, null,
+            orders = orderService.getOrderByConditions(
                     new Long(nurseHospitalRelation.getHospitalId()), ServiceVendorType.HOSPITAL,
-                    null, pageIndex, sizePerPage);
+                    orderStatuses, pageIndex, sizePerPage);
         }
 
 //        // order ids
@@ -92,7 +90,7 @@ public class NurseOrderRelationServiceForNurse360 {
 //            }
 //        }
 //
-//        // get order has been grabbed or not
+//        // get order has been fetchbed or not
 //        CommonStatus status = CommonStatus.parseString(strStatus);
 //        List<NurseOrderRelationEntity> resultSet = repository.findByOrderIdInAndStatus(orderIds, status);
 //        Map<Long, Long> orderIdToGrabberId = new HashMap<>();
@@ -155,6 +153,39 @@ public class NurseOrderRelationServiceForNurse360 {
         return bean;
     }
 
+    @Transactional
+    public long completedOrder(long nurseId, long orderId) {
+        logger.info("nurse={} complete order={}", nurseId, orderId);
+        if (!orderService.existOrder(orderId)) {
+            logger.info("order not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        List<NurseOrderRelationEntity> relations = repository.findByOrderId(orderId, sort);
+        boolean orderBelongToNurse = true;
+        if (VerifyUtil.isListEmpty(relations)) {
+            orderBelongToNurse = false;
+        }
+        else {
+            for (NurseOrderRelationEntity tmp : relations) {
+                if (tmp.getNurseId()!=nurseId) {
+                    orderBelongToNurse = false;
+                }
+            }
+        }
+        if (!orderBelongToNurse) {
+            logger.info("order not belong this nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        // complete order
+        ServiceOrderBean order = orderService.completedOrder(false, 0, orderId);
+
+        logger.info("complete order={}", order);
+        return orderId;
+    }
+
     //============================================================================
     //                 add
     //============================================================================
@@ -178,6 +209,7 @@ public class NurseOrderRelationServiceForNurse360 {
             entity.setOrderId(orderId);
             entity.setTime(new Date());
         }
+        entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         repository.save(entity);
 

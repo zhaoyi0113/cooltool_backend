@@ -52,6 +52,8 @@ public class ServiceOrderBean {
     private int paymentAmountCent;
     private String leaveAMessage;
     private float score;
+    private Date fetchTime;
+    private Date completedTime;
     private List<ServiceOrderChargePingPPBean> pingPP;
     private Map<String, Object> properties = new HashMap<>();
 
@@ -187,6 +189,14 @@ public class ServiceOrderBean {
         return score;
     }
 
+    public Date getCompletedTime() {
+        return completedTime;
+    }
+
+    public Date getFetchTime() {
+        return fetchTime;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -310,6 +320,14 @@ public class ServiceOrderBean {
         this.score = score;
     }
 
+    public void setCompletedTime(Date completedTime) {
+        this.completedTime = completedTime;
+    }
+
+    public void setFetchTime(Date fetchTime) {
+        this.fetchTime = fetchTime;
+    }
+
     public List<ServiceOrderChargePingPPBean> getPingPP() {
         return pingPP;
     }
@@ -353,6 +371,7 @@ public class ServiceOrderBean {
         msg.append(", payTime=").append(payTime);
         msg.append(", paymentAmount=").append(paymentAmount);
         msg.append(", score=").append(score);
+        msg.append(", completedTime=").append(completedTime);
         msg.append("]");
         return msg.toString();
     }

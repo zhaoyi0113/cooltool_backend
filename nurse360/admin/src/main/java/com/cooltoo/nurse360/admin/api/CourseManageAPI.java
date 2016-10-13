@@ -45,7 +45,7 @@ public class CourseManageAPI {
                                 @PathParam("status") @DefaultValue("") String status
     ) {
         logger.info("get course count by status={}", status);
-        long count = courseService.countByNameLikeAndStatus(null, status);
+        long count = courseService.countByTitleLikeAndStatus(null, status);
         logger.info("count = {}", count);
         return Response.ok(count).build();
     }
@@ -60,7 +60,7 @@ public class CourseManageAPI {
                                       @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get course by status={} at page={}, {}/page", status, index, number);
-        List<Nurse360CourseBean> courses = courseService.getCourseByNameAndStatus(null, status, index, number);
+        List<Nurse360CourseBean> courses = courseService.getCourseByTitleAndStatus(null, status, index, number);
         logger.info("count = {}", courses.size());
         return Response.ok(courses).build();
     }
@@ -104,7 +104,7 @@ public class CourseManageAPI {
     ) {
         logger.info("get course by ids={}", strCourseIds);
         List<Long> courseIds = VerifyUtil.parseLongIds(strCourseIds);
-        List<Nurse360CourseBean> courses = courseService.getCourseByIds(courseIds);
+        List<Nurse360CourseBean> courses = courseService.getCourseByStatusAndIds("ALL", courseIds);
         logger.info("count = {}", courses.size());
         return Response.ok(courses).build();
     }

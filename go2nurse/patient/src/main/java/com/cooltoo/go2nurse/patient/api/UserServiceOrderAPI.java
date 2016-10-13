@@ -205,10 +205,22 @@ public class UserServiceOrderAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response userCancelOrder(@Context HttpServletRequest request,
-                                  @FormParam("order_id") @DefaultValue("0") long orderId
+                                    @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.cancelOrder(true, userId, orderId);
+        return Response.ok(order).build();
+    }
+
+    @Path("/completed")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response userCompletedOrder(@Context HttpServletRequest request,
+                                       @FormParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        ServiceOrderBean order = orderService.completedOrder(true, userId, orderId);
         return Response.ok(order).build();
     }
 

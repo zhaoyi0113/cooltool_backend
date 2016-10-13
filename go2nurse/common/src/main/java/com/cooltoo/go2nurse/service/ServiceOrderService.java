@@ -2,7 +2,9 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.go2nurse.constants.AppType;
 import com.cooltoo.go2nurse.constants.ChargeType;
+import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
 import com.cooltoo.go2nurse.openapp.WeChatService;
+import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
 import com.cooltoo.go2nurse.service.notification.MessageBean;
 import com.cooltoo.go2nurse.service.notification.MessageType;
 import com.cooltoo.go2nurse.service.notification.Notifier;
@@ -29,7 +31,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.Order;
 import java.util.*;
 
 /**
@@ -57,6 +58,8 @@ public class ServiceOrderService {
     @Autowired private WeChatService weChatService;
 
     @Autowired private Notifier notifier;
+
+    @Autowired private NurseOrderRelationRepository nurseOrderRelationRepository;
 
     //=====================================================================
     //                   getting
@@ -158,6 +161,19 @@ public class ServiceOrderService {
         return beans;
     }
 
+    public List<ServiceOrderBean> getOrderByConditions(Long vendorId, ServiceVendorType vendorType, List<OrderStatus> orderStatus,
+                                                       int pageIndex, int sizePerPage
+    ) {
+        logger.info("get order by vendorType={} vendorId={} orderStatus={} pageIndex={} sizePerPage={}",
+                vendorType, vendorId, orderStatus, pageIndex, sizePerPage);
+        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<ServiceOrderEntity> entities = repository.findByConditions(vendorType, vendorId, orderStatus, pageRequest);
+        List<ServiceOrderBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     public List<ServiceOrderBean> getOrderByOrderId(long orderId) {
         logger.info("get service order by orderId={}", orderId);
         ServiceOrderEntity entity = repository.findOne(orderId);
@@ -202,6 +218,8 @@ public class ServiceOrderService {
         for (ServiceOrderBean tmp : beans) {
             orderIds.add(tmp.getId());
         }
+
+        // set pingpp charge
         Map<Long, List<ServiceOrderChargePingPPBean>> orderId2Charge = orderPingPPService.getOrderPingPPResult(AppType.GO_2_NURSE, orderIds);
         for (ServiceOrderBean tmp : beans) {
             List<ServiceOrderChargePingPPBean> charges = orderId2Charge.get(tmp.getId());
@@ -210,6 +228,27 @@ public class ServiceOrderService {
             }
             else {
                 tmp.setPingPP(charges);
+            }
+        }
+
+        // set fetch time
+        final Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        List<NurseOrderRelationEntity> nurseFetchTime = nurseOrderRelationRepository.findByOrderIdInAndStatus(orderIds, CommonStatus.ENABLED, sort);
+        Map<Long, Date> orderIdToFetchTime = new HashMap<>();
+        for (NurseOrderRelationEntity tmp : nurseFetchTime) {
+            if (orderIdToFetchTime.containsKey(tmp.getOrderId())) {
+                continue;
+            }
+            orderIdToFetchTime.put(tmp.getOrderId(), tmp.getTime());
+        }
+        Date _1970 = new Date(0); // 1970-01-00 08:00:00
+        for (ServiceOrderBean tmp : beans) {
+            Date fetchTime = orderIdToFetchTime.get(tmp.getId());
+            if (null==fetchTime) {
+                tmp.setFetchTime(_1970);
+            }
+            else {
+                tmp.setFetchTime(fetchTime);
             }
         }
     }
@@ -448,6 +487,39 @@ public class ServiceOrderService {
         message.setStatus(entity.getOrderStatus().name());
         message.setRelativeId(entity.getId());
         message.setDescription("order cancelled!");
+        notifier.notifyUserPatient(entity.getUserId(), message);
+
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
+    public ServiceOrderBean completedOrder(boolean checkUser, long userId, long orderId) {
+        logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (checkUser) {
+            if (entity.getUserId()!=userId) {
+                logger.error("order not belong to user");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
+        if (!OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, can not be completed", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        entity.setOrderStatus(OrderStatus.COMPLETED);
+        entity.setCompletedTime(new Date());
+        entity = repository.save(entity);
+        logger.info("order cancelled is {}", entity);
+
+        MessageBean message = new MessageBean();
+        message.setAlertBody("订单状态有更新");
+        message.setType(MessageType.ORDER.name());
+        message.setStatus(entity.getOrderStatus().name());
+        message.setRelativeId(entity.getId());
+        message.setDescription("order completed!");
         notifier.notifyUserPatient(entity.getUserId(), message);
 
         return beanConverter.convert(entity);
