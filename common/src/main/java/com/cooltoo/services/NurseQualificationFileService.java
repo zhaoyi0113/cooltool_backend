@@ -3,10 +3,12 @@ package com.cooltoo.services;
 import com.cooltoo.beans.NurseQualificationFileBean;
 import com.cooltoo.beans.WorkFileTypeBean;
 import com.cooltoo.converter.NurseQualificationFileBeanConverter;
+import com.cooltoo.entities.NurseQualificationEntity;
 import com.cooltoo.entities.NurseQualificationFileEntity;
 import com.cooltoo.repository.NurseQualificationFileRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.repository.NurseQualificationRepository;
 import com.cooltoo.services.file.SecretFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -30,15 +32,13 @@ public class NurseQualificationFileService {
 
     private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "workfileTypeId"),
                                               new Sort.Order(Sort.Direction.ASC, "timeCreated"));
-    @Autowired
-    private NurseQualificationFileRepository repository;
+    @Autowired private NurseQualificationFileRepository repository;
+    @Autowired private NurseQualificationFileBeanConverter beanConverter;
+    @Autowired private NurseQualificationRepository qualificationRepository;
+    @Autowired private WorkFileTypeService workfileTypeService;
     @Autowired
     @Qualifier("SecretFileStorageService")
     private SecretFileStorageService secretStorage;
-    @Autowired
-    private WorkFileTypeService workfileTypeService;
-    @Autowired
-    private NurseQualificationFileBeanConverter beanConverter;
 
     //=============================================================
     //       get qualification file
@@ -171,6 +171,10 @@ public class NurseQualificationFileService {
         return filePath;
     }
 
+
+    //=============================================================
+    //       update qualification file
+    //=============================================================
     @Transactional
     public NurseQualificationFileBean updateQualificationFile(long id, WorkFileTypeBean workFileType, String fileName, InputStream file, Date expiryTime, String nginxPrefix) {
         logger.info("update a qualification file parameters is expiryTime={} type={} fileName={} file={}", expiryTime, workFileType, fileName, file);
@@ -215,5 +219,19 @@ public class NurseQualificationFileService {
         NurseQualificationFileBean bean = beanConverter.convert(entity);
         bean.setWorkfileUrl(nginxPrefix+filePath);
         return bean;
+    }
+
+    @Transactional
+    public long changeQualificationId(long qualificationId, long newQualificationId) {
+        logger.info("change qualificationId={} to newOne={}", qualificationId, newQualificationId);
+        if (!qualificationRepository.exists(newQualificationId)) {
+            return newQualificationId;
+        }
+        Iterable<NurseQualificationFileEntity> allFileEntities = repository.findByQualificationId(qualificationId, sort);
+        for (NurseQualificationFileEntity tmp : allFileEntities) {
+            tmp.setQualificationId(newQualificationId);
+        }
+        repository.save(allFileEntities);
+        return newQualificationId;
     }
 }

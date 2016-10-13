@@ -86,6 +86,10 @@ public class NurseQualificationService {
             qualification = qualifications.get(0);
             qualifications.remove(0);
             if (!VerifyUtil.isListEmpty(qualifications)) {
+                // change to the new qualification id
+                for (NurseQualificationEntity tmp : qualifications) {
+                    qualificationFileService.changeQualificationId(tmp.getId(), qualification.getId());
+                }
                 repository.delete(qualifications);
             }
         }
