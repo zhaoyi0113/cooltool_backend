@@ -98,8 +98,13 @@ public class WeChatService {
 
             List<UserOpenAppEntity> users = openAppRepository.findByOpenidAndStatusOrderByCreatedAtDesc(openid, CommonStatus.ENABLED);
             if (!users.isEmpty()) {
+                UserOpenAppEntity userOpenAppEntity = users.get(0);
+                if(userOpenAppEntity.getAppId()==null){
+                    userOpenAppEntity.setAppId(appid);
+                    openAppRepository.save(userOpenAppEntity);
+                }
                 //when user has openid in wechat but has not registered, the user id will be 0
-                if(users.get(0).getUserId() != 0) {
+                if(userOpenAppEntity.getUserId() != 0) {
                     //user openid already exists, check whether it has login token
                     WeChatAccountEntity weChatAccount = weChatAccountRepository.findFirstByAppId(appid);
                     if(weChatAccount != null) {
