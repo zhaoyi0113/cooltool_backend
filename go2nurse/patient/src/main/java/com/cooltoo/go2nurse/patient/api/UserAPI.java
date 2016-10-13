@@ -5,6 +5,7 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
+import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.constants.ProcessStatus;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
@@ -21,6 +22,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,9 +57,20 @@ public class UserAPI {
 
     ) {
         UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode, hasDecide, channel, channelid, openid);
-        // do not created default patient
+
+        // //do not created default patient
         // PatientBean patientBean = patientService.create(name, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES);
         // userPatientRelationService.addPatientToUser(patientBean.getId(), userBean.getId());
+
+        // add HOSPITALIZED_DATE diagnostic point datetime when hasDecide is IN_HOSPITAL
+        if (UserHospitalizedStatus.IN_HOSPITAL.equals(userBean.getHasDecide())) {
+            List<DiagnosticEnumeration> diagnosticPoints = new ArrayList<>();
+            List<Date> pointTimes = new ArrayList<>();
+            diagnosticPoints.add(DiagnosticEnumeration.HOSPITALIZED_DATE);
+            pointTimes.add(new Date());
+            long groupId = System.currentTimeMillis();
+            diagnosticRelationService.addUserDiagnosticRelation(userBean.getId(), groupId, diagnosticPoints, pointTimes, false);
+        }
         return Response.ok(userBean).build();
     }
 

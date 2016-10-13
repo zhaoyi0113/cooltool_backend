@@ -1,6 +1,7 @@
 package com.cooltoo.nurse360.nurse.api;
 
 import com.cooltoo.beans.NurseQualificationBean;
+import com.cooltoo.beans.NurseQualificationFileBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
@@ -79,6 +80,20 @@ public class NurseQualificationAPIForNurse360 {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseQualificationBean> qualifications = service.deleteNurseQualificationByUserId(userId);
         logger.info("user {} delete qualifications is {}." , userId, qualifications);
+        return Response.ok().build();
+    }
+
+    @Path("/work_file")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response deleteQualificationFile(@Context HttpServletRequest request,
+                                            @FormParam("qualification_file_id") long fileId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        logger.info("user {} delete qualification file", userId);
+        NurseQualificationFileBean qualificationFile = service.deleteFileByFileId(fileId);
+        logger.info("user {} delete qualification file is {}." , userId, qualificationFile);
         return Response.ok().build();
     }
 }
