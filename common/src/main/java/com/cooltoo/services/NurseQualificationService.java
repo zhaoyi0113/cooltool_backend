@@ -127,6 +127,11 @@ public class NurseQualificationService {
     //=======================================================
     //     delete qualification file
     //=======================================================
+    @Transactional
+    public NurseQualificationFileBean deleteFileByFileId(long qualificationFileId) {
+        // delete qualification file record, and delete images and file_storage record
+        return qualificationFileService.deleteFileByFileId(qualificationFileId);
+    }
 
     @Transactional
     public NurseQualificationBean deleteNurseQualification(long qualificationId) {

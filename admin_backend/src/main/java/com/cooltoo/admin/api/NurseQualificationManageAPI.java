@@ -127,6 +127,17 @@ public class NurseQualificationManageAPI {
         return Response.ok(qualificationFile).build();
     }
 
+    @Path("/work_file")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response deleteNurseQualification(@Context HttpServletRequest request,
+                                             @FormParam("qualification_file_id") long fileId
+    ) {
+        NurseQualificationFileBean bean = qualificationService.deleteFileByFileId(fileId);
+        return Response.ok(bean).build();
+    }
+
 //    @DELETE
 //    @Produces(MediaType.APPLICATION_JSON)
 //    @AdminUserLoginAuthentication(requireUserLogin = true)

@@ -126,6 +126,24 @@ public class NurseQualificationFileService {
         return files;
     }
 
+    @Transactional
+    public NurseQualificationFileBean deleteFileByFileId(long fileId) {
+        NurseQualificationFileEntity fileEntity = repository.findOne(fileId);
+        if (null==fileEntity) {
+            logger.warn("file not exist");
+            return null;
+        }
+        List<Long> imageIds = new ArrayList<>();
+        imageIds.add(fileEntity.getWorkfileId());
+
+        repository.delete(fileEntity);
+        secretStorage.deleteFiles(imageIds);
+
+        NurseQualificationFileBean bean = beanConverter.convert(fileEntity);
+        logger.info("delete the qualification files ==== {}", bean);
+        return bean;
+    }
+
 
     //=============================================================
     //       add qualification file
