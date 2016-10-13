@@ -35,7 +35,7 @@ public class NurseQualificationService {
     private static final Logger logger = LoggerFactory.getLogger(NurseQualificationService.class.getName());
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.ASC,  "name"));
+            new Sort.Order(Sort.Direction.ASC,  "id"));
 
     @Autowired private NurseQualificationRepository repository;
     @Autowired private NurseQualificationBeanConverter beanConverter;
@@ -78,6 +78,18 @@ public class NurseQualificationService {
         qualification.setTimeCreated(new Date());
         qualification.setTimeProcessed(null);
         qualification = repository.save(qualification);
+
+
+        // check the qualification is single
+        qualifications = repository.findNurseQualificationByUserId(nurseId, sort);
+        if (qualifications.size()>1) {
+            qualification = qualifications.get(0);
+            qualifications.remove(0);
+            if (!VerifyUtil.isListEmpty(qualifications)) {
+                repository.delete(qualifications);
+            }
+        }
+
 
         String qualificationPath = qualificationFileService.addQualificationFile(qualification.getId(), workFileTypeB, fileName, file);
         return qualificationPath;

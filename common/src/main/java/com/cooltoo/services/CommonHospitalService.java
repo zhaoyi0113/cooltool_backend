@@ -1,7 +1,6 @@
 package com.cooltoo.services;
 
 import com.cooltoo.beans.HospitalBean;
-import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.RegionBean;
 import com.cooltoo.converter.HospitalBeanConverter;
 import com.cooltoo.converter.HospitalEntityConverter;
@@ -13,7 +12,6 @@ import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.target.HotSwappableTargetSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +31,9 @@ import java.util.Map;
 public class CommonHospitalService {
 
     private static final Logger logger = LoggerFactory.getLogger(CommonHospitalService.class.getName());
+
+
+    private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
 
     @Autowired private HospitalRepository repository;
     @Autowired private HospitalBeanConverter beanConverter;
@@ -64,7 +65,6 @@ public class CommonHospitalService {
     }
 
     public List<HospitalBean> getAllByPage(int index, int number) {
-        Sort        sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
         PageRequest page = new PageRequest(index, number, sort);
 
         Page<HospitalEntity> pageResult = repository.findAll(page);
@@ -129,7 +129,6 @@ public class CommonHospitalService {
         if (number==0) {
             return new ArrayList<>();
         }
-        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
         PageRequest page = new PageRequest(index, number, sort);
 
         name = VerifyUtil.isStringEmpty(name) ? null : VerifyUtil.reconstructSQLContentLike(name.trim());
@@ -149,14 +148,12 @@ public class CommonHospitalService {
     }
 
     public List<HospitalBean> getAllHospitalEnable() {
-        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
         List<HospitalEntity> entities = repository.findByEnable(1, sort);
         List<HospitalBean> allHospitalEnable = entities2Beans(entities);
         return allHospitalEnable;
     }
 
     public List<HospitalBean> getAllHospitalEnableSupportGo2nurse() {
-        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "name"));
         List<HospitalEntity> entities = repository.findBySupportGo2nurse(1, sort);
         List<HospitalBean> allHospitals = entities2Beans(entities);
         List<HospitalBean> allHospitalEnable = new ArrayList<>();
