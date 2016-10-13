@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.repository;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ReadingStatus;
+import com.cooltoo.go2nurse.entities.UserTokenAccessEntity;
 import com.cooltoo.go2nurse.entities.UserWeChatTokenAccessEntity;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +25,7 @@ public interface UserWeChatTokenAccessRepository extends CrudRepository<UserWeCh
             " AND (tokenAccess.status = ?2)" )
     String findAppIdFromToken(String token, CommonStatus status);
 
+    @Query(value = "SELECT userToken from UserWeChatTokenAccessEntity weChatToken, UserTokenAccessEntity userToken, WeChatAccountEntity weChatAccount "+
+            " where weChatToken.token = userToken.token and weChatToken.wechatAccountId = ?1  and userToken.userId = ?2")
+    List<UserTokenAccessEntity> getUserAccessTokenByAccountIdAndUserId(int accountId, long userId);
 }

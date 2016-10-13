@@ -138,6 +138,7 @@ public class UserService {
                         wechatusers.get(0).setStatus(CommonStatus.ENABLED);
                         openAppRepository.save(wechatusers.get(0));
                         loginService.login(mobile, password);
+                        loginService.login(mobile, password, channel, channelid, openid);
                         return userBean;
                     } else {
                         //already existed such user, link with channel user
@@ -152,8 +153,8 @@ public class UserService {
                             currentUser.setHasDecide(hasDecide);
                         }
                         repository.save(currentUser);
-//                        UserBean userBean = updatePassword(currentUser.getId(), currentUser.getPassword(), password);
                         loginService.login(mobile, password);
+                        loginService.login(mobile, password, channel, channelid, openid);
                         wechatusers.get(0).setUserId(currentUser.getId());
                         wechatusers.get(0).setStatus(CommonStatus.ENABLED);
                         openAppRepository.save(wechatusers.get(0));
