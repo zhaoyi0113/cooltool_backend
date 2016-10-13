@@ -175,6 +175,7 @@ public class WeChatService {
             logger.warn("Can't find appid from database for the user token "+userAccessToken);
             return new HashMap<>();
         }
+        logger.info("get appid from user token "+userAccessToken+" is "+appid);
         String noncestr = System.currentTimeMillis() + "";
         String jsApiTicket = tokenScheduler.getJsApiTicket(appid);
         String timestamp = System.currentTimeMillis() + "";
