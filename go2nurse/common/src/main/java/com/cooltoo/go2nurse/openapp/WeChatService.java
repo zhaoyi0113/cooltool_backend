@@ -144,7 +144,7 @@ public class WeChatService {
                 urlStr += "/" + AppChannel.WECHAT + "/" + openid;
             }
             if (state != null) {
-                urlStr += "/" + state;
+                urlStr += "/" +"?redirect=" + state;
             }
             return new URI(urlStr);
         } catch (URISyntaxException e) {
