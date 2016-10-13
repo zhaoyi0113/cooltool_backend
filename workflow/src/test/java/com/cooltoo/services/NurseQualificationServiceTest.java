@@ -1,8 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.NurseQualificationBean;
-import com.cooltoo.backend.services.NurseQualificationService;
+import com.cooltoo.beans.NurseQualificationBean;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.services.file.SecretFileStorageService;
@@ -44,7 +43,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
         boolean isOk;
         long nurseId = 3;
         isOk = true;
-        List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(nurseId);
+        List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(nurseId, "");
         for (NurseQualificationBean bean : qualifications) {
             if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
                 isOk = false;
@@ -55,7 +54,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
         nurseId = 2;
         isOk = true;
-        qualifications = qualService.getAllNurseQualifications(nurseId);
+        qualifications = qualService.getAllNurseQualifications(nurseId, "");
         for (NurseQualificationBean bean : qualifications) {
             if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
                 isOk = false;
@@ -66,7 +65,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
         nurseId = 1;
         isOk = true;
-        qualifications = qualService.getAllNurseQualifications(nurseId);
+        qualifications = qualService.getAllNurseQualifications(nurseId, "");
         for (NurseQualificationBean bean : qualifications) {
             if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
                 isOk = false;
@@ -84,7 +83,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
         NurseQualificationBean bean = null;
         String filePath = qualService.addWorkFile(4, name, WorkFileType.EMPLOYEES_CARD.name(), "aaa.png", byteInput);
-        bean = qualService.getAllNurseQualifications(4).get(0);
+        bean = qualService.getAllNurseQualifications(4, "").get(0);
         logger.info("add work file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
@@ -96,7 +95,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
         name = "Identi2";
         filePath = qualService.addWorkFile(4, name, WorkFileType.IDENTIFICATION.name(), "aaa.png", byteInput);
-        bean = qualService.getAllNurseQualifications(4).get(0);
+        bean = qualService.getAllNurseQualifications(4, "").get(0);
         logger.info("add identification file : " + bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(4, bean.getUserId());
@@ -110,7 +109,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testUpdateNurseQualification() {
-        List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(1);
+        List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(1, "");
         boolean isOk = true;
         for (NurseQualificationBean bean : qualifications) {
             if (!VetStatus.COMPLETED.equals(bean.getStatus())) {
@@ -126,7 +125,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
                 qualService.updateQualification(bean.getId(), bean.getName(), VetStatus.COMPLETED, null);
             }
         }
-        qualifications = qualService.getAllNurseQualifications(1);
+        qualifications = qualService.getAllNurseQualifications(1, "");
         isOk = true;
         for (NurseQualificationBean bean : qualifications) {
             logger.info(bean.toString());
@@ -141,7 +140,7 @@ public class NurseQualificationServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testDeleteNurseQualification() {
-        List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(1);
+        List<NurseQualificationBean> qualifications = qualService.getAllNurseQualifications(1, "");
         for (NurseQualificationBean bean : qualifications) {
             logger.info(bean.toString());
             qualService.deleteNurseQualification(bean.getId());

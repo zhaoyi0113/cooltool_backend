@@ -1,14 +1,14 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
-import com.cooltoo.backend.services.NurseHospitalRelationService;
-import com.cooltoo.backend.services.NurseQualificationService;
+import com.cooltoo.services.NurseQualificationService;
 import com.cooltoo.backend.services.NurseRelationshipService;
 import com.cooltoo.backend.services.NurseService;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseRelationshipBean;
 import com.cooltoo.constants.*;
 import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.services.CommonNurseService;
 import com.cooltoo.services.NurseExtensionService;
 import com.cooltoo.util.VerifyUtil;
@@ -35,7 +35,7 @@ public class NurseManageAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseManageAPI.class);
 
-    @Autowired private NurseHospitalRelationService hospitalRelationService;
+    @Autowired private CommonNurseHospitalRelationService hospitalRelationService;
     @Autowired private CommonNurseService commonNurseService;
     @Autowired private NurseService nurseService;
     @Autowired private NurseRelationshipService nurseRelationshipService;
@@ -307,7 +307,7 @@ public class NurseManageAPI {
         RegisterFrom registerFrom = RegisterFrom.parseString(strRegisterFrom);
         NurseEntity nurse = commonNurseService.registerNurse(name, age, gender, mobile, password, identification, realName, shortNote, registerFrom);
         if (hospitalId>0 || departmentId>0) {
-            hospitalRelationService.newOne(nurse.getId(), hospitalId, departmentId);
+            hospitalRelationService.setRelation(nurse.getId(), hospitalId, departmentId);
             nurseQualificationService.createQualificationByAdmin(nurse.getId());
             if (YesNoEnum.YES.equals(canAnswerNursingQuestion)) {
                 nurseExtensionService.setExtension(nurse.getId(), canAnswerNursingQuestion, beGoodAt, jobTitle, expert, seeAllOrder);
@@ -329,7 +329,7 @@ public class NurseManageAPI {
         YesNoEnum seeAllOrder = YesNoEnum.parseString(canSeeAllOrder);
         commonNurseService.updateBasicInfo(nurseId, name, age, gender, mobile, password, identification, realName, shortNote, authority);
         if (hospitalId>0 || departmentId>0) {
-            hospitalRelationService.newOne(nurseId, hospitalId, departmentId);
+            hospitalRelationService.setRelation(nurseId, hospitalId, departmentId);
             nurseExtensionService.setExtension(nurseId, canAnswerNursingQuestion, beGoodAt, jobTitle, expert, seeAllOrder);
         }
         NurseBean nurseBean = nurseService.getNurse(nurseId);

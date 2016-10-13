@@ -1,19 +1,18 @@
-package com.cooltoo.backend.services;
+package com.cooltoo.services;
 
-import com.cooltoo.backend.beans.NurseQualificationBean;
-import com.cooltoo.backend.beans.NurseQualificationFileBean;
+import com.cooltoo.beans.NurseQualificationBean;
+import com.cooltoo.beans.NurseQualificationFileBean;
 import com.cooltoo.beans.WorkFileTypeBean;
-import com.cooltoo.backend.converter.NurseQualificationBeanConverter;
+import com.cooltoo.converter.NurseQualificationBeanConverter;
 import com.cooltoo.entities.NurseEntity;
-import com.cooltoo.backend.entities.NurseQualificationEntity;
-import com.cooltoo.backend.repository.NurseQualificationRepository;
+import com.cooltoo.entities.NurseQualificationEntity;
+import com.cooltoo.repository.NurseQualificationRepository;
 import com.cooltoo.repository.NurseRepository;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.WorkFileTypeService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,18 +37,12 @@ public class NurseQualificationService {
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.ASC,  "name"));
 
-    @Autowired
-    private NurseQualificationRepository repository;
-    @Autowired
-    private NurseQualificationBeanConverter beanConverter;
-    @Autowired
-    private WorkFileTypeService workfileTypeService;
-    @Autowired
-    private NurseRepository nurseRepository;
-    @Autowired
-    private NurseHospitalRelationService hospitalRelationService;
-    @Autowired
-    private NurseQualificationFileService qualificationFileService;
+    @Autowired private NurseQualificationRepository repository;
+    @Autowired private NurseQualificationBeanConverter beanConverter;
+    @Autowired private WorkFileTypeService workfileTypeService;
+    @Autowired private NurseRepository nurseRepository;
+    @Autowired private CommonNurseHospitalRelationService hospitalRelationService;
+    @Autowired private NurseQualificationFileService qualificationFileService;
 
     //=======================================================
     //         add qualification file
@@ -136,16 +129,18 @@ public class NurseQualificationService {
     }
 
     @Transactional
-    public List<NurseQualificationBean> deleteNurseQualificationByUserId(long userId) {
-        List<NurseQualificationBean> qualificationsB = getAllNurseQualifications(userId);
-        if (qualificationsB.isEmpty()) {
-            return qualificationsB;
+    public List<NurseQualificationBean> deleteNurseQualificationByUserId(long nurseId) {
+        logger.info("nurse={} delete his qualifications", nurseId);
+        List<NurseQualificationBean> qualifications = getAllNurseQualifications(nurseId, "");
+        if (qualifications.isEmpty()) {
+            return qualifications;
         }
 
-        for (NurseQualificationBean qualification : qualificationsB) {
+        for (NurseQualificationBean qualification : qualifications) {
             deleteNurseQualification(qualification.getId());
         }
-        return qualificationsB;
+        logger.info("nurse qualifications={}.", qualifications);
+        return qualifications;
     }
 
     //=======================================================
@@ -165,7 +160,8 @@ public class NurseQualificationService {
         return resultSet;
     }
 
-    public List<NurseQualificationBean> getAllNurseQualifications(long nurseId) {
+    public List<NurseQualificationBean> getAllNurseQualifications(long nurseId, String nginxPrefix) {
+        logger.info("nurse={} get his qualifications with nginxPrefix={}.", nurseId, nginxPrefix);
         List<NurseQualificationEntity> resultSet = repository.findNurseQualificationByUserId(nurseId, sort);
         if (null==resultSet || resultSet.isEmpty()) {
             logger.info("The qualification record is empty!");
@@ -181,11 +177,12 @@ public class NurseQualificationService {
             qualifications.add(bean);
         }
 
-        fillOtherProperties(qualifications);
+        fillOtherProperties(qualifications, nginxPrefix);
+        logger.info("nurse qualifications={}.", qualifications);
         return qualifications;
     }
 
-    public List<NurseQualificationBean> getAllQualifications(String status, int pageIndex, int number) {
+    public List<NurseQualificationBean> getAllQualifications(String status, int pageIndex, int number, String nginxPrefix) {
         logger.info("get qualification by status {} at page {} numberOfPage {}", status, pageIndex, number);
         VetStatus   vetStatus   = VetStatus.parseString(status);
         PageRequest pageRequest = new PageRequest(pageIndex, number, Sort.Direction.DESC, "timeCreated");
@@ -206,11 +203,11 @@ public class NurseQualificationService {
             qualifications.add(bean);
         }
 
-        fillOtherProperties(qualifications);
+        fillOtherProperties(qualifications, nginxPrefix);
         return qualifications;
     }
 
-    private void fillOtherProperties(List<NurseQualificationBean> resultSet) {
+    private void fillOtherProperties(List<NurseQualificationBean> resultSet, String nginxPrefix) {
         if (null==resultSet || resultSet.isEmpty()) {
             return;
         }
@@ -224,16 +221,12 @@ public class NurseQualificationService {
         }
 
         List<NurseEntity>                           nurses          = nurseRepository.findByIdIn(userIds);
-        List<NurseHospitalRelationBean>             hospitals       = hospitalRelationService.getRelationByNurseIds(userIds);
         Map<Long, NurseEntity>                      userId2Bean     = new HashMap<>();
-        Map<Long, NurseHospitalRelationBean>        userId2Hospital = new HashMap<>();
-        Map<Long, List<NurseQualificationFileBean>> qulfId2QulfFile = qualificationFileService.getAllFileByQualificationId(qulfIds);
+        Map<Long, NurseHospitalRelationBean>        userId2Hospital = hospitalRelationService.getRelationMapByNurseIds(userIds, nginxPrefix);
+        Map<Long, List<NurseQualificationFileBean>> qulfId2QulfFile = qualificationFileService.getAllFileByQualificationId(qulfIds, nginxPrefix);
 
         for (NurseEntity tmp : nurses) {
             userId2Bean.put(tmp.getId(), tmp);
-        }
-        for (NurseHospitalRelationBean tmp : hospitals) {
-            userId2Hospital.put(tmp.getNurseId(), tmp);
         }
 
         for (NurseQualificationBean tmp : resultSet) {
@@ -315,9 +308,9 @@ public class NurseQualificationService {
     }
 
     @Transactional
-    public NurseQualificationFileBean updateQualificationFile(int qualificationFileId, String workfileType, String fileName, InputStream file, Date expiryTime) {
+    public NurseQualificationFileBean updateQualificationFile(int qualificationFileId, String workfileType, String fileName, InputStream file, Date expiryTime, String nginxPrefix) {
         WorkFileTypeBean workfileTypeB = getWorkFileTypeBean(workfileType);
-        NurseQualificationFileBean bean = qualificationFileService.updateQualificationFile(qualificationFileId, workfileTypeB, fileName, file, expiryTime);
+        NurseQualificationFileBean bean = qualificationFileService.updateQualificationFile(qualificationFileId, workfileTypeB, fileName, file, expiryTime, nginxPrefix);
         return bean;
     }
 }

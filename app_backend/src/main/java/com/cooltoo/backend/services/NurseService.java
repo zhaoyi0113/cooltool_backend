@@ -1,6 +1,6 @@
 package com.cooltoo.backend.services;
 
-import com.cooltoo.backend.beans.NurseQualificationBean;
+import com.cooltoo.beans.NurseQualificationBean;
 import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
@@ -18,8 +18,10 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.leancloud.LeanCloudService;
 import com.cooltoo.repository.NurseHospitalRelationRepository;
 import com.cooltoo.repository.NurseRepository;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.services.CommonNurseService;
 import com.cooltoo.services.NurseExtensionService;
+import com.cooltoo.services.NurseQualificationService;
 import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -58,7 +60,7 @@ public class NurseService {
     @Autowired private NurseSocialAbilitiesService abilitiesService;
     @Autowired private LeanCloudService leanCloudService;
     @Autowired private NurseQualificationService qualificationService;
-    @Autowired private NurseHospitalRelationService hospitalRelationService;
+    @Autowired private CommonNurseHospitalRelationService hospitalRelationService;
     @Autowired private NurseExtensionService nurseExtensionService;
 
 
@@ -192,7 +194,7 @@ public class NurseService {
             nurse.setHospital(nurseHospitals.get(0).getName());
         }
         try {
-            NurseHospitalRelationBean relation = hospitalRelationService.getRelationByNurseId(userId);
+            NurseHospitalRelationBean relation = hospitalRelationService.getRelationByNurseId(userId, "");
             if (null != relation) {
                 nurse.setProperty(NurseBean.HOSPITAL_DEPARTMENT, relation);
             }
@@ -206,7 +208,7 @@ public class NurseService {
         List<SocialAbilitiesBean> norminated = this.abilitiesService.getUserAllTypeAbilities(userId);
         nurse.setProperty(NurseBean.ABILITY_COUNT, null==norminated ? 0 : norminated.size());
         // get nurse's qualification
-        List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(userId);
+        List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(userId, "");
         if (null!=qualifications && !qualifications.isEmpty()) {
             nurse.setProperty(NurseBean.QUALIFICATION, qualifications.get(0));
         }
@@ -313,7 +315,7 @@ public class NurseService {
 
         try {
             Map<Long, NurseExtensionBean>        extensionInfo = nurseExtensionService.getExtensionByNurseIds(userIds);
-            Map<Long, NurseHospitalRelationBean> hospitals  = hospitalRelationService.getRelationMapByNurseIds(userIds);
+            Map<Long, NurseHospitalRelationBean> hospitals  = hospitalRelationService.getRelationMapByNurseIds(userIds, "");
             Map<Long, Long>                      speakCount = speakService.countByUserIds(userIds);
             for (NurseBean bean : nurses) {
                 NurseExtensionBean extension = extensionInfo.get(bean.getId());

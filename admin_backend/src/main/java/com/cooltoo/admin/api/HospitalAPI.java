@@ -1,8 +1,8 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
-import com.cooltoo.backend.services.HospitalService;
 import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,7 +23,7 @@ public class HospitalAPI {
     private static final Logger logger = LoggerFactory.getLogger(HospitalAPI.class.getName());
 
     @Autowired
-    private HospitalService service;
+    private CommonHospitalService service;
 
     @Path("/search/count")
     @POST

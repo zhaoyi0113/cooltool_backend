@@ -1,4 +1,4 @@
-package com.cooltoo.backend.entities;
+package com.cooltoo.entities;
 
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.constants.WorkFileType;

@@ -1,7 +1,6 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.services.HospitalService;
 import com.cooltoo.beans.HospitalBean;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
@@ -25,7 +24,7 @@ import java.util.List;
 public class HospitalServiceTest extends AbstractCooltooTest {
 
     @Autowired
-    private HospitalService service;
+    private CommonHospitalService service;
 
     @Test
     public void testNew1() {

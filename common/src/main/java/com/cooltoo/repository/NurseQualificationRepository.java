@@ -1,7 +1,6 @@
-package com.cooltoo.backend.repository;
+package com.cooltoo.repository;
 
-import com.cooltoo.backend.beans.NurseQualificationBean;
-import com.cooltoo.backend.entities.NurseQualificationEntity;
+import com.cooltoo.entities.NurseQualificationEntity;
 import com.cooltoo.constants.VetStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

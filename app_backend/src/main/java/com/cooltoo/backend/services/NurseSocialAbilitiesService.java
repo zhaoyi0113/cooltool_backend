@@ -11,6 +11,7 @@ import com.cooltoo.constants.*;
 import com.cooltoo.beans.SpecificSocialAbility;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class NurseSocialAbilitiesService {
     @Autowired private NurseSpeakThumbsUpService     thumbsUpService;
     @Autowired private NurseSpeakCommentService      commentService;
     @Autowired private SpeakTypeService              speakTypeService;
-    @Autowired private NurseHospitalRelationService  nurseHospitalService;
+    @Autowired private CommonNurseHospitalRelationService nurseHospitalService;
     @Autowired private BadgeService                  badgeService;
     @Autowired private NurseIntegrationService       integrationService;
 
@@ -78,7 +79,7 @@ public class NurseSocialAbilitiesService {
         Map<Integer, SkillBean>   skillId2Bean   = skillService.getAllEnableSkillId2BeanMap();
         List<NurseSkillBean>      nurseSkills    = nurseSkillService.getAllSkills(userId);
 
-        NurseHospitalRelationBean nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId);
+        NurseHospitalRelationBean nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId, "");
 
         // department social ability
         SocialAbilitiesBean departmentAbility = getUserDepartment(allIntegration, UserType.NURSE, userId);
@@ -120,7 +121,7 @@ public class NurseSocialAbilitiesService {
     }
 
     private SocialAbilitiesBean getUserDepartment(List<NurseIntegrationBean> allIntegration, UserType userType, long userId) {
-        NurseHospitalRelationBean nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId);
+        NurseHospitalRelationBean nurseHospDepart= nurseHospitalService.getRelationByNurseId(userId, "");
         if (null == nurseHospDepart) {
             return null;
         }

@@ -3,6 +3,7 @@ package com.cooltoo.nurse360.service;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.beans.NurseQualificationBean;
 import com.cooltoo.constants.*;
 import com.cooltoo.converter.NurseBeanConverter;
 import com.cooltoo.entities.NurseEntity;
@@ -15,6 +16,7 @@ import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.services.CommonNurseService;
 import com.cooltoo.services.NurseExtensionService;
+import com.cooltoo.services.NurseQualificationService;
 import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -44,6 +46,7 @@ public class NurseServiceForNurse360 {
     @Autowired private Nurse360Utility utility;
     @Autowired private LeanCloudService leanCloudService;
     @Autowired private NurseOrderRelationServiceForNurse360 nurseOrderService;
+    @Autowired private NurseQualificationService nurseQualificationService;
 
     //===================================================================
     //                     getting
@@ -66,9 +69,11 @@ public class NurseServiceForNurse360 {
         NurseExtensionBean extension = nurseExtensionService.getExtensionByNurseId(nurseId);
         NurseHospitalRelationBean hospitalDepartment = nurseHospitalRelationService.getRelationByNurseId(nurseId, utility.getHttpPrefixForNurseGo());
         List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseIdAndOrderStatus(nurseId, CommonStatus.ENABLED.name(), OrderStatus.IN_PROCESS);
+        List<NurseQualificationBean> qualification = nurseQualificationService.getAllNurseQualifications(nurseId, utility.getHttpPrefixForNurseGo());
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
         bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospitalDepartment);
         bean.setProperty(NurseBean.ORDER, orders);
+        bean.setProperty(NurseBean.QUALIFICATION, qualification);
         return bean;
     }
 

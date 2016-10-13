@@ -1,8 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.backend.beans.NurseQualificationFileBean;
-import com.cooltoo.backend.services.NurseQualificationFileService;
+import com.cooltoo.beans.NurseQualificationFileBean;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -33,11 +32,11 @@ public class NurseQualificationFileServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetAll() {
         List<NurseQualificationFileBean> all = null;
-        all = service.getAllFileByQualificationId(1);
+        all = service.getAllFileByQualificationId(1, "");
         Assert.assertEquals(5, all.size());
-        all = service.getAllFileByQualificationId(2);
+        all = service.getAllFileByQualificationId(2, "");
         Assert.assertEquals(1, all.size());
-        all = service.getAllFileByQualificationId(3);
+        all = service.getAllFileByQualificationId(3, "");
         Assert.assertEquals(3, all.size());
     }
 }

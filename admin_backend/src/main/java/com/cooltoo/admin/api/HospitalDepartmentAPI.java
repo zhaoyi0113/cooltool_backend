@@ -1,8 +1,8 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
-import com.cooltoo.backend.services.HospitalDepartmentService;
 import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.services.CommonDepartmentService;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -10,7 +10,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +23,13 @@ public class HospitalDepartmentAPI {
     private static final Logger logger = LoggerFactory.getLogger(HospitalDepartmentAPI.class.getName());
 
     @Autowired
-    private HospitalDepartmentService service;
+    private CommonDepartmentService service;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getAll(@DefaultValue("0") @QueryParam("hospital_id") int hospitalId) {
-        List<HospitalDepartmentBean> all = service.getByHospitalId(hospitalId);
+        List<HospitalDepartmentBean> all = service.getByHospitalId(hospitalId, "");
         return Response.ok(all).build();
     }
 
@@ -39,7 +38,7 @@ public class HospitalDepartmentAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getOneById(@DefaultValue("-1") @PathParam("id") int id) {
-        HospitalDepartmentBean bean = service.getOneById(id);
+        HospitalDepartmentBean bean = service.getById(id, "");
         logger.info("get hospital department is " + bean);
         if (null == bean) {
             Response.ok().build();
@@ -52,7 +51,7 @@ public class HospitalDepartmentAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response getTopLevelDepartment(@DefaultValue("0") @QueryParam("hospital_id") int hospitalId) {
-        List<HospitalDepartmentBean> topLevels = service.getAllTopLevelDepartment(hospitalId);
+        List<HospitalDepartmentBean> topLevels = service.getTopLevel(hospitalId, false, 0, "");
         logger.info("get all top level hospital " + topLevels);
         return Response.ok(topLevels).build();
     }
@@ -64,7 +63,7 @@ public class HospitalDepartmentAPI {
     public Response getSecondLevelDepartment(@DefaultValue("0") @QueryParam("hospital_id") int hospitalId,
                                              @DefaultValue("0") @QueryParam("parent_id") int parentId
     ) {
-        List<HospitalDepartmentBean> topLevels = service.getSecondLevelDepartment(hospitalId, parentId);
+        List<HospitalDepartmentBean> topLevels = service.getByParentId(hospitalId, parentId, false, 0, "");
         logger.info("get second level hospital " + topLevels);
         return Response.ok(topLevels).build();
     }
@@ -93,7 +92,7 @@ public class HospitalDepartmentAPI {
                            @DefaultValue("")   @FormParam("description") String description,
                            @DefaultValue("-1") @FormParam("enable")      int enable,
                            @DefaultValue("-1") @FormParam("parent_id")   int parentId) {
-        HospitalDepartmentBean one = service.update(id, name, description, enable, parentId, null, null);
+        HospitalDepartmentBean one = service.update(id, name, description, enable, parentId, null, null, "");
         logger.info("update hospital department is " + one);
         if (null==one) {
             return Response.ok().build();
@@ -108,7 +107,7 @@ public class HospitalDepartmentAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateImage(@FormDataParam("id")       int                        id,
                                 @FormDataParam("file")     InputStream                file) {
-        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, file, null);
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, file, null, "");
         logger.info("update hospital department is " + one);
         return Response.ok(one).build();
     }
@@ -120,7 +119,7 @@ public class HospitalDepartmentAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateDisableImage(@FormDataParam("id")       int                        id,
                                        @FormDataParam("file")     InputStream                file) {
-        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, file);
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, file, "");
         logger.info("update hospital department is " + one);
         return Response.ok(one).build();
     }

@@ -1,11 +1,11 @@
 package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.filter.LoginAuthentication;
-import com.cooltoo.backend.services.HospitalService;
-import com.cooltoo.backend.services.NurseHospitalRelationService;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.services.CommonHospitalService;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,9 +26,9 @@ public class NurseHospitalAPI {
     private static final Logger logger = LoggerFactory.getLogger(NurseHospitalAPI.class.getName());
 
     @Autowired
-    private HospitalService hospitalService;
+    private CommonHospitalService hospitalService;
     @Autowired
-    private NurseHospitalRelationService hospitalRelationService;
+    private CommonNurseHospitalRelationService hospitalRelationService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -65,7 +65,7 @@ public class NurseHospitalAPI {
     @LoginAuthentication(requireNurseLogin = true)
     public Response getNurseAndHospitalRelation(@Context HttpServletRequest request) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseHospitalRelationBean relation = hospitalRelationService.getRelationByNurseId(nurseId);
+        NurseHospitalRelationBean relation = hospitalRelationService.getRelationByNurseId(nurseId, "");
         logger.info("user " + nurseId + " get hospital relation ======" + relation);
         return Response.ok(relation).build();
     }
@@ -78,7 +78,7 @@ public class NurseHospitalAPI {
                                                 @FormParam("hospital")      int hospitalId,
                                                 @FormParam("department")    int departmentId) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        long relationId = hospitalRelationService.newOne(nurseId, hospitalId, departmentId);
+        long relationId = hospitalRelationService.setRelation(nurseId, hospitalId, departmentId);
         logger.info("user " + nurseId + " select hospital " + hospitalId + " select department " + departmentId);
         return Response.ok(relationId).build();
     }
@@ -91,7 +91,7 @@ public class NurseHospitalAPI {
                                                 @FormParam("hospital_name") @DefaultValue("") String hospitalName
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        long relationId = hospitalRelationService.newOne(nurseId, hospitalName);
+        long relationId = hospitalRelationService.setRelation(nurseId, hospitalName);
         logger.info("user {} set hospital_name={}", nurseId, hospitalName);
         return Response.ok(relationId).build();
     }

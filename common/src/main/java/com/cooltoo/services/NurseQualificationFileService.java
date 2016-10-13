@@ -1,13 +1,12 @@
-package com.cooltoo.backend.services;
+package com.cooltoo.services;
 
-import com.cooltoo.backend.beans.NurseQualificationFileBean;
+import com.cooltoo.beans.NurseQualificationFileBean;
 import com.cooltoo.beans.WorkFileTypeBean;
-import com.cooltoo.backend.converter.NurseQualificationFileBeanConverter;
-import com.cooltoo.backend.entities.NurseQualificationFileEntity;
-import com.cooltoo.backend.repository.NurseQualificationFileRepository;
+import com.cooltoo.converter.NurseQualificationFileBeanConverter;
+import com.cooltoo.entities.NurseQualificationFileEntity;
+import com.cooltoo.repository.NurseQualificationFileRepository;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.WorkFileTypeService;
 import com.cooltoo.services.file.SecretFileStorageService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -44,43 +43,43 @@ public class NurseQualificationFileService {
     //=============================================================
     //       get qualification file
     //=============================================================
-    public List<NurseQualificationFileBean> getAllFileByQualificationId(long qualificationId) {
+    public List<NurseQualificationFileBean> getAllFileByQualificationId(long qualificationId, String nginxPrefix) {
         logger.info("get all qualification file by qualification id =={}", qualificationId);
         List<NurseQualificationFileEntity> fileEntities  = repository.findByQualificationId(qualificationId, sort);
-        List<NurseQualificationFileBean> fileBeans = new ArrayList<NurseQualificationFileBean>();
+        List<NurseQualificationFileBean> fileBeans = new ArrayList<>();
         for (NurseQualificationFileEntity file : fileEntities) {
             NurseQualificationFileBean fileBean = beanConverter.convert(file);
             fileBeans.add(fileBean);
         }
-        fillOtherProperties(fileBeans);
+        fillOtherProperties(fileBeans, nginxPrefix);
         return fileBeans;
     }
 
 
-    public Map<Long, List<NurseQualificationFileBean>> getAllFileByQualificationId(List<Long> qualificationIds) {
+    public Map<Long, List<NurseQualificationFileBean>> getAllFileByQualificationId(List<Long> qualificationIds, String nginxPrefix) {
         List<NurseQualificationFileEntity> fileEntity     = repository.findByQualificationIdIn(qualificationIds, sort);
-        List<NurseQualificationFileBean>   fileBeans = new ArrayList<NurseQualificationFileBean>();
+        List<NurseQualificationFileBean>   fileBeans = new ArrayList<>();
         for (NurseQualificationFileEntity file : fileEntity) {
             NurseQualificationFileBean bean = beanConverter.convert(file);
             fileBeans.add(bean);
         }
-        fillOtherProperties(fileBeans);
+        fillOtherProperties(fileBeans, nginxPrefix);
 
-        Map<Long, List<NurseQualificationFileBean>> qualificatinoId2Files = new HashMap<>();
+        Map<Long, List<NurseQualificationFileBean>> qualificationId2Files = new HashMap<>();
         for (NurseQualificationFileBean bean : fileBeans) {
-            List<NurseQualificationFileBean> files = qualificatinoId2Files.get(bean.getQualificationId());
+            List<NurseQualificationFileBean> files = qualificationId2Files.get(bean.getQualificationId());
             if (null==files) {
                 files = new ArrayList<>();
-                qualificatinoId2Files.put(bean.getQualificationId(), files);
+                qualificationId2Files.put(bean.getQualificationId(), files);
             }
             files.add(bean);
         }
 
-        return qualificatinoId2Files;
+        return qualificationId2Files;
     }
 
-    private void fillOtherProperties(List<NurseQualificationFileBean> qualFiles) {
-        if (null==qualFiles || qualFiles.isEmpty()) {
+    private void fillOtherProperties(List<NurseQualificationFileBean> qualificationFiles, String nginxPrefix) {
+        if (null==qualificationFiles || qualificationFiles.isEmpty()) {
             return;
         }
         List<WorkFileTypeBean> workFileTypes = workfileTypeService.getAllWorkFileType();
@@ -89,16 +88,16 @@ public class NurseQualificationFileService {
             workFileTypeId2Bean.put(fileType.getId(), fileType);
         }
 
-        List<Long> imageIds = new ArrayList<Long>();
-        for (NurseQualificationFileBean file : qualFiles) {
+        List<Long> imageIds = new ArrayList<>();
+        for (NurseQualificationFileBean file : qualificationFiles) {
             imageIds.add(file.getWorkfileId());
         }
 
         Map<Long, String> imageId2Url = secretStorage.getFilePath(imageIds);
-        for (NurseQualificationFileBean file : qualFiles) {
+        for (NurseQualificationFileBean file : qualificationFiles) {
             String url = imageId2Url.get(file.getWorkfileId());
             if (!VerifyUtil.isStringEmpty(url)) {
-                file.setWorkfileUrl(url);
+                file.setWorkfileUrl(nginxPrefix+url);
             }
             WorkFileTypeBean fileType = workFileTypeId2Bean.get(file.getWorkfileTypeId());
             if (null!=fileType) {
@@ -112,12 +111,12 @@ public class NurseQualificationFileService {
     //=============================================================
     @Transactional
     public List<NurseQualificationFileBean> deleteFileByQualificationId(long qualificationId) {
-        List<NurseQualificationFileBean> files = getAllFileByQualificationId(qualificationId);
+        List<NurseQualificationFileBean> files = getAllFileByQualificationId(qualificationId, "");
         if (null==files||files.isEmpty()) {
             logger.info("the record not exist by qualification id {}", qualificationId);
             return null;
         }
-        List<Long> imageIds = new ArrayList<Long>();
+        List<Long> imageIds = new ArrayList<>();
         for (NurseQualificationFileBean file : files) {
             imageIds.add(file.getWorkfileId());
         }
@@ -173,7 +172,7 @@ public class NurseQualificationFileService {
     }
 
     @Transactional
-    public NurseQualificationFileBean updateQualificationFile(long id, WorkFileTypeBean workFileType, String fileName, InputStream file, Date expiryTime) {
+    public NurseQualificationFileBean updateQualificationFile(long id, WorkFileTypeBean workFileType, String fileName, InputStream file, Date expiryTime, String nginxPrefix) {
         logger.info("update a qualification file parameters is expiryTime={} type={} fileName={} file={}", expiryTime, workFileType, fileName, file);
 
         String filePath = "";
@@ -214,7 +213,7 @@ public class NurseQualificationFileService {
             entity = repository.save(entity);
         }
         NurseQualificationFileBean bean = beanConverter.convert(entity);
-        bean.setWorkfileUrl(filePath);
+        bean.setWorkfileUrl(nginxPrefix+filePath);
         return bean;
     }
 }

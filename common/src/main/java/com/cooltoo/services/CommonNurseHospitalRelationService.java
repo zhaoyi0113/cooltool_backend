@@ -32,11 +32,32 @@ public class CommonNurseHospitalRelationService {
     @Autowired private NurseHospitalRelationRepository repository;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
+    @Autowired private CommonNurseService nurseService;
     @Autowired private NurseHospitalRelationBeanConverter beanConverter;
 
     //====================================================================
     //             get
     //====================================================================
+    public List<NurseHospitalRelationBean> getAll() {
+        logger.info("get all nurse-hospital-department relationship information");
+        Iterable<NurseHospitalRelationEntity> iterable = repository.findAll();
+        List<NurseHospitalRelationBean> all = new ArrayList<NurseHospitalRelationBean>();
+        for (NurseHospitalRelationEntity entity : iterable) {
+            NurseHospitalRelationBean bean = beanConverter.convert(entity);
+            all.add(bean);
+        }
+        return all;
+    }
+
+    public NurseHospitalRelationBean getOneById(Long id) {
+        logger.info("get one nurse-hospital-department relationship information by id={}", id);
+        NurseHospitalRelationEntity entity = repository.findOne(id);
+        if (null == entity) {
+            return null;
+        }
+        return beanConverter.convert(entity);
+    }
+
     public NurseHospitalRelationBean getRelationByNurseId(Long nurseId, String nginxPrefix) {
         logger.info("get one nurse hospital department information by nurseId={}", nurseId);
 
@@ -59,7 +80,7 @@ public class CommonNurseHospitalRelationService {
     }
 
     public Map<Long, NurseHospitalRelationBean> getRelationMapByNurseIds(List<Long> nurseIds, String nginxPrefix) {
-        logger.info("get one nurse hospital-department relationship information by nurseIds={}", nurseIds);
+        logger.info("get nurse<--->hospital-department relationship information map by nurseIds={}", nurseIds);
 
         Map<Long, NurseHospitalRelationBean> userId2Hospital = new HashMap<>();
         List<NurseHospitalRelationBean>      relations       = getRelationByNurseIds(nurseIds, nginxPrefix);
@@ -71,7 +92,9 @@ public class CommonNurseHospitalRelationService {
 
     private List<NurseHospitalRelationBean> getRelationByNurseIds(List<Long> nurseIds, String nginxPrefix) {
         logger.info("get nurses hospital department information by nurseIds={}", nurseIds);
-
+        if (null==nurseIds || nurseIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         List<NurseHospitalRelationEntity> resultSet = repository.findByNurseIdIn(nurseIds);
         if (null==resultSet || resultSet.isEmpty()) {
             return new ArrayList<>();
@@ -149,7 +172,7 @@ public class CommonNurseHospitalRelationService {
     public long setRelation(long nurseId, int hospitalId, int departmentId) {
         logger.info("nurse={} set hospital={} department={}", nurseId, hospitalId, departmentId);
 
-        if (nurseId<=0) {
+        if (!nurseService.existNurse(nurseId)) {
             return 0L;
         }
 
@@ -192,5 +215,79 @@ public class CommonNurseHospitalRelationService {
         repository.delete(relations);
 
         return relation.getId();
+    }
+
+    @Transactional
+    public Long setRelation(long nurseId, String hospitalName) {
+        logger.info("set nurse={}--HospitalName={} relationship", nurseId, hospitalName);
+        if (VerifyUtil.isStringEmpty(hospitalName)) {
+            logger.error("hospital name is invalid");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        hospitalName = hospitalName.trim();
+        List<HospitalBean> hospitals = hospitalService.getHospital(hospitalName);
+        if (!VerifyUtil.isListEmpty(hospitals)) {
+            logger.error("hospital is exist");
+            throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
+        }
+        Integer hospitalId = hospitalService.newOne(hospitalName, "", -1, -1, -1, "", 0, 0);
+        return setRelation(nurseId, hospitalId, -1);
+    }
+
+    //========================================================
+    //              delete
+    //========================================================
+    @Transactional
+    public void deleteByHospitalIds(List<Integer> hospitalIds) {
+        logger.info("delete nurse hospital department relation ship by hospital ids {}", hospitalIds);
+        if (null==hospitalIds || hospitalIds.isEmpty()) {
+            return;
+        }
+
+        List<NurseHospitalRelationEntity> relations = repository.findByHospitalIdIn(hospitalIds);
+        if(null==relations || relations.isEmpty()) {
+            logger.info("delete nothing");
+            return;
+        }
+
+        List<NurseHospitalRelationEntity> needDelete = new ArrayList<>();
+        for (NurseHospitalRelationEntity tmp : relations) {
+            if (tmp.getDepartmentId()<0) {
+                needDelete.add(tmp);
+            }
+            tmp.setHospitalId(-1);
+        }
+        repository.save(relations);
+
+        if (!needDelete.isEmpty()) {
+            repository.delete(needDelete);
+        }
+    }
+
+    @Transactional
+    public void deleteByDepartmentIds(List<Integer> departmentIds) {
+        logger.info("delete nurse hospital department relation ship by department ids {}", departmentIds);
+        if (null==departmentIds || departmentIds.isEmpty()) {
+            return;
+        }
+
+        List<NurseHospitalRelationEntity> relations = repository.findByDepartmentIdIn(departmentIds);
+        if(null==relations || relations.isEmpty()) {
+            logger.info("delete nothing");
+            return;
+        }
+
+        List<NurseHospitalRelationEntity> needDelete = new ArrayList<>();
+        for (NurseHospitalRelationEntity tmp : relations) {
+            if (tmp.getHospitalId()<0) {
+                needDelete.add(tmp);
+            }
+            tmp.setDepartmentId(-1);
+        }
+        repository.save(relations);
+
+        if (!needDelete.isEmpty()) {
+            repository.delete(needDelete);
+        }
     }
 }

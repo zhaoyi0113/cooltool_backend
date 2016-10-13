@@ -1,13 +1,16 @@
-package com.cooltoo.backend.api;
+package com.cooltoo.nurse360.nurse.api;
 
 import com.cooltoo.beans.NurseQualificationBean;
-import com.cooltoo.backend.filter.LoginAuthentication;
-import com.cooltoo.services.NurseQualificationService;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.WorkFileType;
+import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
+import com.cooltoo.nurse360.util.Nurse360Utility;
+import com.cooltoo.services.NurseQualificationService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,42 +20,39 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhaolisong on 16/4/1.
  */
 @Path("/nurse/qualification")
-public class NurseQualificationAPI {
+public class NurseQualificationAPIForNurse360 {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseQualificationAPI.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NurseQualificationAPIForNurse360.class.getName());
 
-    @Autowired
-    private NurseQualificationService service;
+    @Autowired private NurseQualificationService service;
+    @Autowired private Nurse360Utility utility;
 
-    @GET
     @Path("/type")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getWorkFileType() {
         return Response.ok(WorkFileType.getAllValues()).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getAllQualification(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseQualificationBean> qualifications = service.getAllNurseQualifications(userId, "");
-        logger.info("user {} get his qualification is {}.", qualifications);
+        List<NurseQualificationBean> qualifications = service.getAllNurseQualifications(userId, utility.getHttpPrefixForNurseGo());
         return Response.ok(qualifications).build();
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
-    public Response addQualification(@Context HttpServletRequest        request,
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response addQualification(@Context HttpServletRequest request,
                                      @FormDataParam("name")      String name,
                                      @FormDataParam("type")      String type,
                                      @FormDataParam("file_name") String fileName,
@@ -74,10 +74,9 @@ public class NurseQualificationAPI {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireNurseLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response resetQualification(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        logger.info("user {} reset his qualification", userId);
         List<NurseQualificationBean> qualifications = service.deleteNurseQualificationByUserId(userId);
         logger.info("user {} delete qualifications is {}." , userId, qualifications);
         return Response.ok().build();

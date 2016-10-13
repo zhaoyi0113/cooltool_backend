@@ -1,4 +1,4 @@
-package com.cooltoo.backend.beans;
+package com.cooltoo.beans;
 
 import com.cooltoo.constants.VetStatus;
 

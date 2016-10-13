@@ -1,10 +1,9 @@
 package com.cooltoo.admin.api;
 
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
-import com.cooltoo.backend.beans.NurseQualificationBean;
-import com.cooltoo.backend.beans.NurseQualificationFileBean;
-import com.cooltoo.backend.services.NurseQualificationFileService;
-import com.cooltoo.backend.services.NurseQualificationService;
+import com.cooltoo.beans.NurseQualificationBean;
+import com.cooltoo.beans.NurseQualificationFileBean;
+import com.cooltoo.services.NurseQualificationService;
 import com.cooltoo.constants.VetStatus;
 import com.cooltoo.exception.*;
 import com.cooltoo.exception.BadRequestException;
@@ -58,7 +57,7 @@ public class NurseQualificationManageAPI {
                                         @PathParam("number") @DefaultValue("10") int number
     ) {
         logger.info("get qualification by status {} at page {} numberOfPage {}", status, index, number);
-        List<NurseQualificationBean> qualifications = qualificationService.getAllQualifications(status, index, number);
+        List<NurseQualificationBean> qualifications = qualificationService.getAllQualifications(status, index, number, "");
         logger.info("get qualification by status {} at page {} numberOfPage {}, count={}", status, index, number, qualifications.size());
         return Response.ok(qualifications).build();
     }
@@ -70,7 +69,7 @@ public class NurseQualificationManageAPI {
     public Response getAllNurseQualification(@Context HttpServletRequest request,
                                              @PathParam("nurse_id") long nurseId
     ) {
-        List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(nurseId);
+        List<NurseQualificationBean> qualifications = qualificationService.getAllNurseQualifications(nurseId, "");
         return Response.ok(qualifications).build();
     }
 
@@ -124,7 +123,7 @@ public class NurseQualificationManageAPI {
                 fileName = disposition.getFileName();
             }
         }
-        NurseQualificationFileBean qualificationFile = qualificationService.updateQualificationFile(fileId, workfileType, fileName, file, expiryTime);
+        NurseQualificationFileBean qualificationFile = qualificationService.updateQualificationFile(fileId, workfileType, fileName, file, expiryTime, "");
         return Response.ok(qualificationFile).build();
     }
 

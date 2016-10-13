@@ -2,7 +2,6 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.NurseHospitalRelationBean;
-import com.cooltoo.backend.services.NurseHospitalRelationService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
 import org.junit.Assert;
@@ -22,15 +21,11 @@ import java.util.List;
 public class NurseHospitalRelationServiceTest extends AbstractCooltooTest {
 
     @Autowired
-    private NurseHospitalRelationService service;
+    private CommonNurseHospitalRelationService service;
 
     @Test
     public void testNew1() {
-        NurseHospitalRelationBean bean = new NurseHospitalRelationBean();
-        bean.setNurseId(11);
-        bean.setDepartmentId(55);
-        bean.setHospitalId(22);
-        long id = service.newOne(bean);
+        long id = service.setRelation(11, 55, 22);
         Assert.assertTrue(id>0);
         List<NurseHospitalRelationBean> all = service.getAll();
         Assert.assertTrue(all.size()>0);
@@ -38,7 +33,7 @@ public class NurseHospitalRelationServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testNew2() {
-        long id = service.newOne(11, 22, 33);
+        long id = service.setRelation(11, 22, 33);
         Assert.assertTrue(id > 0);
     }
 

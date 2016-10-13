@@ -3,7 +3,6 @@ package com.cooltoo.backend.api;
 import com.cooltoo.backend.beans.SkillBean;
 import com.cooltoo.backend.beans.SocialAbilitiesBean;
 import com.cooltoo.backend.filter.LoginAuthentication;
-import com.cooltoo.backend.services.NurseHospitalRelationService;
 import com.cooltoo.backend.services.NurseSkillService;
 import com.cooltoo.backend.services.NurseSocialAbilitiesService;
 import com.cooltoo.backend.services.SkillService;
@@ -11,6 +10,7 @@ import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.OccupationSkillStatus;
 import com.cooltoo.constants.SocialAbilityType;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class NurseSocialAbilityAPI {
     @Autowired private SkillService skillService;
     @Autowired private NurseSkillService nurseSkillService;
     @Autowired private NurseSocialAbilitiesService  abilitiesService;
-    @Autowired private NurseHospitalRelationService hospitalRelationService;
+    @Autowired private CommonNurseHospitalRelationService hospitalRelationService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -88,7 +88,7 @@ public class NurseSocialAbilityAPI {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get department social ability.", userId);
 
-        NurseHospitalRelationBean hospital = hospitalRelationService.getRelationByNurseId(userId);
+        NurseHospitalRelationBean hospital = hospitalRelationService.getRelationByNurseId(userId, "");
         if (null==hospital || hospital.getDepartmentId()<=0) {
             return Response.ok().build();
         }
@@ -140,7 +140,7 @@ public class NurseSocialAbilityAPI {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("User {} get friend {} department social ability.", userId, friendId);
 
-        NurseHospitalRelationBean hospital = hospitalRelationService.getRelationByNurseId(friendId);
+        NurseHospitalRelationBean hospital = hospitalRelationService.getRelationByNurseId(friendId, "");
         logger.info("friend {} 's hospital--department relation ship is {} ", friendId, hospital);
         if (null==hospital || hospital.getDepartmentId()<=0) {
             return Response.ok().build();

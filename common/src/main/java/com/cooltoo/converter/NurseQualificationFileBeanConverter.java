@@ -1,8 +1,7 @@
-package com.cooltoo.backend.converter;
+package com.cooltoo.converter;
 
-import com.cooltoo.backend.beans.NurseQualificationBean;
-import com.cooltoo.backend.beans.NurseQualificationFileBean;
-import com.cooltoo.backend.entities.NurseQualificationFileEntity;
+import com.cooltoo.beans.NurseQualificationFileBean;
+import com.cooltoo.entities.NurseQualificationFileEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
