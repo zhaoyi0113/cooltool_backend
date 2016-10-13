@@ -82,6 +82,7 @@ public class WeChatService {
 
     public URI login(String code, String state) {
         String appid = state.split("_",2)[0];
+        logger.info("user login appid "+appid);
         Map accessToken = getWebLoginAccessToken(code, appid);
         WeChatUserInfo userInfo = getUserInfo(accessToken);
         URI userTokens = loginWithWeChatUser(userInfo, state.split("_",2)[1], appid);
@@ -95,26 +96,29 @@ public class WeChatService {
             openid = userInfo.getOpenid();
             logger.info("login user openid=" + userInfo.getOpenid());
 
-            List<UserOpenAppEntity> users = new ArrayList<>();
-                users = openAppRepository.findByOpenidAndStatusOrderByCreatedAtDesc(openid, CommonStatus.ENABLED);
+            List<UserOpenAppEntity> users = openAppRepository.findByOpenidAndStatusOrderByCreatedAtDesc(openid, CommonStatus.ENABLED);
             if (!users.isEmpty()) {
-                //when user has open in wechat but has not registered, the user id will be 0
+                //when user has openid in wechat but has not registered, the user id will be 0
                 if(users.get(0).getUserId() != 0) {
                     //user openid already exists, check whether it has login token
                     List<UserTokenAccessEntity> userTokens = tokenAccessRepository.findByUserId(users.get(0).getUserId());
-                    if (!userTokens.isEmpty()) {
-                        try {
-                            String userToken = userTokens.get(0).getToken();
-                            saveTokenToUserWeChat(appid, userToken);
-                            //if found login token, redirect to token url
-                            String url = "http://" + serverHost + "/go2nurse/?token=" + userToken;
-                            if (state != null) {
-                                url += "?redirect=" + state;
-                            }
+                    WeChatAccountEntity weChatAccount = weChatAccountRepository.findFirstByAppId(appid);
+                    if(weChatAccount != null) {
+                        List<UserTokenAccessEntity> userTokenEntity = weChatTokenAccessRepository.getUserAccessTokenByAccountIdAndUserId(weChatAccount.getId(), users.get(0).getUserId());
 
-                            return new URI(url);
-                        } catch (URISyntaxException e) {
-                            logger.error(e.getMessage(), e);
+                        if (!userTokenEntity.isEmpty()) {
+                            try {
+                                String userToken = userTokenEntity.get(0).getToken();
+                                //if found login token, redirect to token url
+                                String url = "http://" + serverHost + "/go2nurse/?token=" + userToken;
+                                if (state != null) {
+                                    url += "?redirect=" + state;
+                                }
+
+                                return new URI(url);
+                            } catch (URISyntaxException e) {
+                                logger.error(e.getMessage(), e);
+                            }
                         }
                     }
                 }
