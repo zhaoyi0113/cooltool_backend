@@ -43,7 +43,7 @@ public class NotificationManageAPI {
         retVal.put("notification", notification);
         retVal.put("hospital", hospitals);
         retVal.put("department", departments);
-        return Response.ok(notification).build();
+        return Response.ok(retVal).build();
     }
 
     // status ==> all/enabled/disabled/deleted
@@ -96,6 +96,16 @@ public class NotificationManageAPI {
             long notificationId = notification.getId();
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
             notificationHospitalRelationService.setNotificationToHospital(notificationId, hospitalId, departmentIds);
+        }
+        if (null!=notification) {
+            long notificationId = notification.getId();
+            List<HospitalBean> hospitals = notificationHospitalRelationService.getHospitalByNotificationId(notificationId, CommonStatus.ENABLED.name());
+            List<HospitalDepartmentBean> departments = notificationHospitalRelationService.getDepartmentByNotificationId(notificationId, CommonStatus.ENABLED.name());
+            Map<String, Object> retVal = new HashMap<>();
+            retVal.put("notification", notification);
+            retVal.put("hospital", hospitals);
+            retVal.put("department", departments);
+            return Response.ok(retVal).build();
         }
         return Response.ok(notification).build();
     }
