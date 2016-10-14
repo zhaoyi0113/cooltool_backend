@@ -86,7 +86,6 @@ public class WeChatService {
         Map accessToken = getWebLoginAccessToken(code, appid);
         WeChatUserInfo userInfo = getUserInfo(accessToken);
         URI userTokens = loginWithWeChatUser(userInfo, state.split("_",2)[1], appid);
-        logger.info("wx login redirect url="+userTokens.toString());
         if (userTokens != null) return userTokens;
         return null;
     }
