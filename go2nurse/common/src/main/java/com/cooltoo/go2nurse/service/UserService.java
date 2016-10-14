@@ -137,7 +137,6 @@ public class UserService {
                         wechatusers.get(0).setUserId(userBean.getId());
                         wechatusers.get(0).setStatus(CommonStatus.ENABLED);
                         openAppRepository.save(wechatusers.get(0));
-                        loginService.login(mobile, password);
                         loginService.login(mobile, password, channel, channelid, openid);
                         return userBean;
                     } else {
@@ -153,7 +152,6 @@ public class UserService {
                             currentUser.setHasDecide(hasDecide);
                         }
                         repository.save(currentUser);
-                        loginService.login(mobile, password);
                         loginService.login(mobile, password, channel, channelid, openid);
                         wechatusers.get(0).setUserId(currentUser.getId());
                         wechatusers.get(0).setStatus(CommonStatus.ENABLED);

@@ -56,6 +56,11 @@ public class UserLoginService {
         if (UserAuthority.DENY_ALL.equals(userEntity.getAuthority())) {
             throw new BadRequestException(ErrorCode.USER_AUTHORITY_DENY_ALL);
         }
+        UserTokenAccessEntity entity = saveToUserTokenAccessEntity(mobile, password, userEntity);
+        return tokenAccessRepository.save(entity);
+    }
+
+    private UserTokenAccessEntity saveToUserTokenAccessEntity(String mobile, String password, UserEntity userEntity) {
         UserTokenAccessEntity entity = new UserTokenAccessEntity();
         entity.setUserId(userEntity.getId());
         entity.setUserType(UserType.NORMAL_USER);
@@ -63,7 +68,7 @@ public class UserLoginService {
         entity.setStatus(CommonStatus.ENABLED);
         String token = tokenGenerator.generateAccessToken(mobile, password);
         entity.setToken(token);
-        return tokenAccessRepository.save(entity);
+        return entity;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
