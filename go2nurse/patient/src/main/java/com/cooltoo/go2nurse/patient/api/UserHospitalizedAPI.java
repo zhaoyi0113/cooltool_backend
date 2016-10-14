@@ -211,7 +211,7 @@ public class UserHospitalizedAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getUserCategoryCourses(@Context HttpServletRequest request,
-                                             @PathParam("id") int categoryId) {
+                                           @PathParam("id") int categoryId) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Map<CourseCategoryBean, List<CourseBean>> courses = userCourseService.getAllPublicExtensionNursingCourses(userId);
         List<UserHospitalizedCoursesBean> beans = parseObjectToBean(courses);
@@ -239,7 +239,7 @@ public class UserHospitalizedAPI {
             return retVal;
         }
 
-        List<DiagnosticEnumeration> allDiagnostics = null;
+        List<DiagnosticEnumeration> remainedDiagnostic = null;
         UserHospitalizedCoursesBean bean = null;
         Map map = (Map)objMap;
         Set keys = map.keySet();
@@ -264,14 +264,15 @@ public class UserHospitalizedAPI {
                 DiagnosticEnumeration key = (DiagnosticEnumeration)obj;
                 Object value = map.get(key);
 
-                if (null==allDiagnostics) {
-                    allDiagnostics = DiagnosticEnumeration.getAllDiagnostic();
-                }
-
-                allDiagnostics.remove(key);
                 if (null == value) {
                     value = new ArrayList<>();
                 }
+
+                if (null == remainedDiagnostic) {
+                    remainedDiagnostic = DiagnosticEnumeration.getAllDiagnostic();
+                }
+                remainedDiagnostic.remove(key);
+
                 bean.setId(key.ordinal());
                 bean.setType(key.name());
                 bean.setName(key.name());
@@ -281,15 +282,17 @@ public class UserHospitalizedAPI {
             }
             retVal.add(bean);
         }
-        if (null!=allDiagnostics) {
-            for (DiagnosticEnumeration tmp : allDiagnostics) {
+
+        if (null!=remainedDiagnostic && !remainedDiagnostic.isEmpty()) {
+            for (DiagnosticEnumeration key : remainedDiagnostic) {
                 bean = new UserHospitalizedCoursesBean();
-                bean.setId(tmp.ordinal());
-                bean.setType(tmp.name());
-                bean.setName(tmp.name());
+                bean.setId(key.ordinal());
+                bean.setType(key.name());
+                bean.setName(key.name());
                 bean.setDescription("");
                 bean.setImageUrl("");
                 bean.setCourses(new ArrayList<>());
+                retVal.add(bean);
             }
         }
 
