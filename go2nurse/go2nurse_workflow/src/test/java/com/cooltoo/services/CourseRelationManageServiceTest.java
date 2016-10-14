@@ -261,8 +261,8 @@ public class CourseRelationManageServiceTest extends AbstractCooltooTest {
         long diagnosticId = 4;
         List<CourseBean> courses = service.getEnabledCoursesByHospitalIdAndDiagnosticId(hospitalId, diagnosticId);
         Assert.assertEquals(2, courses.size());
-        Assert.assertEquals(4, courses.get(0).getId());
-        Assert.assertEquals(5, courses.get(1).getId());
+        Assert.assertEquals(5, courses.get(0).getId());
+        Assert.assertEquals(4, courses.get(1).getId());
     }
 
     @Test
