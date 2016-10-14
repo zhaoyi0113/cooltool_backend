@@ -239,10 +239,12 @@ public class UserHospitalizedAPI {
             return retVal;
         }
 
+        List<DiagnosticEnumeration> allDiagnostics = null;
+        UserHospitalizedCoursesBean bean = null;
         Map map = (Map)objMap;
         Set keys = map.keySet();
         for (Object obj : keys) {
-            UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
+            bean = new UserHospitalizedCoursesBean();
             if (obj instanceof CourseCategoryBean) {
                 CourseCategoryBean key = (CourseCategoryBean)obj;
                 Object value = map.get(key);
@@ -261,10 +263,15 @@ public class UserHospitalizedAPI {
             else if (obj instanceof DiagnosticEnumeration) {
                 DiagnosticEnumeration key = (DiagnosticEnumeration)obj;
                 Object value = map.get(key);
+
+                if (null==allDiagnostics) {
+                    allDiagnostics = DiagnosticEnumeration.getAllDiagnostic();
+                }
+
+                allDiagnostics.remove(key);
                 if (null == value) {
                     value = new ArrayList<>();
                 }
-                bean = new UserHospitalizedCoursesBean();
                 bean.setId(key.ordinal());
                 bean.setType(key.name());
                 bean.setName(key.name());
@@ -273,6 +280,17 @@ public class UserHospitalizedAPI {
                 bean.setCourses(value);
             }
             retVal.add(bean);
+        }
+        if (null!=allDiagnostics) {
+            for (DiagnosticEnumeration tmp : allDiagnostics) {
+                bean = new UserHospitalizedCoursesBean();
+                bean.setId(tmp.ordinal());
+                bean.setType(tmp.name());
+                bean.setName(tmp.name());
+                bean.setDescription("");
+                bean.setImageUrl("");
+                bean.setCourses(new ArrayList<>());
+            }
         }
 
         return retVal;
