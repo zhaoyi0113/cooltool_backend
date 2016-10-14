@@ -99,6 +99,7 @@ public class WeChatService {
             List<UserOpenAppEntity> users = openAppRepository.findByOpenidAndStatusOrderByCreatedAtDesc(openid, CommonStatus.ENABLED);
             if (!users.isEmpty()) {
                 UserOpenAppEntity userOpenAppEntity = users.get(0);
+                logger.debug("find user "+userOpenAppEntity.getUserId()+" from openid "+openid);
                 if(userOpenAppEntity.getAppId()==null){
                     userOpenAppEntity.setAppId(appid);
                     openAppRepository.save(userOpenAppEntity);
@@ -108,7 +109,7 @@ public class WeChatService {
                     //user openid already exists, check whether it has login token
                     WeChatAccountEntity weChatAccount = weChatAccountRepository.findFirstByAppId(appid);
                     if(weChatAccount != null) {
-                        List<UserTokenAccessEntity> userTokenEntity = weChatTokenAccessRepository.getUserAccessTokenByAccountIdAndUserId(weChatAccount.getId(), users.get(0).getUserId());
+                        List<UserTokenAccessEntity> userTokenEntity = weChatTokenAccessRepository.getUserAccessTokenByAccountIdAndUserId(weChatAccount.getId(), userOpenAppEntity.getUserId());
 
                         if (!userTokenEntity.isEmpty()) {
                             try {
@@ -124,7 +125,11 @@ public class WeChatService {
                                 logger.error(e.getMessage(), e);
                             }
                         }
+                    }else{
+                        logger.error("not found appid "+appid);
                     }
+                }else {
+                    logger.debug("open id "+openid+" not bind to a user.");
                 }
             } else {
                 //user open id doesn't exist, add the open id to database
