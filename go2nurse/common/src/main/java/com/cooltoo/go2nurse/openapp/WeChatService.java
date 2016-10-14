@@ -124,7 +124,11 @@ public class WeChatService {
                                 logger.error(e.getMessage(), e);
                             }
                         }
+                    }else{
+                        logger.error("not found appid "+appid);
                     }
+                }else {
+                    logger.debug("open id "+openid+" not bind to a user.");
                 }
             } else {
                 //user open id doesn't exist, add the open id to database
