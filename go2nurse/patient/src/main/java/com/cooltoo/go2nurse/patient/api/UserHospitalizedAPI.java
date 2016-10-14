@@ -138,107 +138,34 @@ public class UserHospitalizedAPI {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         UserBean user = userService.getUser(userId);
         boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
-
         boolean hasCourses = false;
-        UserHospitalizedCoursesBean extensionNursingBean = null;
-        List<UserHospitalizedCoursesBean> beans = new ArrayList<>();
         logger.info("user has selected courses={}, user decide={}", userHasSelectedCourses, user.getHasDecide());
+        List<UserHospitalizedCoursesBean> returnValue = new ArrayList<>();
+        UserHospitalizedCoursesBean extensionNursingBean = null;
+
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
-            Map<DiagnosticEnumeration, List<CourseBean>> courses
-                    = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
-            List<DiagnosticEnumeration> keys = DiagnosticEnumeration.getAllDiagnostic();
-            for (DiagnosticEnumeration tmp : keys) {
-                List<CourseBean> value = courses.get(tmp);
-                if (null == value) {
-                    value = new ArrayList<>();
-                }
-                UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
-                bean.setId(tmp.ordinal());
-                bean.setType(tmp.name());
-                bean.setName(tmp.name());
-                bean.setDescription("");
-                bean.setImageUrl("");
-                bean.setCourses(value);
-                if (DiagnosticEnumeration.EXTENSION_NURSING.equals(tmp)) {
-                    extensionNursingBean = bean;
-                } else {
-                    beans.add(bean);
+            Map<DiagnosticEnumeration, List<CourseBean>> courses = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
+            returnValue = parseObjectToBean(courses);
+            for (UserHospitalizedCoursesBean tmp : returnValue) {
+                if (DiagnosticEnumeration.EXTENSION_NURSING.ordinal()==tmp.getId()) {
+                    extensionNursingBean = tmp;
+                    Map<CourseCategoryBean, List<CourseBean>> tmpCourses = userCourseService.getAllCategoryToCoursesByCourses((List<CourseBean>) tmp.getCourses());
+                    List<UserHospitalizedCoursesBean> extensionNursingCourses = parseObjectToBean(tmpCourses);
+                    extensionNursingBean.setCourses(extensionNursingCourses);
                 }
                 if (!hasCourses) {
-                    hasCourses = !VerifyUtil.isListEmpty(value);
+                    hasCourses = tmp.getCourseSize()>0;
                 }
             }
-            beans.add(extensionNursingBean);
-
-//            if (!VerifyUtil.isListEmpty(extensionNursingBean.getCourses())) {
-//                Map<CourseCategoryBean, List<CourseBean>> extensionNursingMap
-//                        = userCourseService.getAllCategoryToCoursesByCourses(extensionNursingBean.getCourses());
-//                Set<CourseCategoryBean> keySet = extensionNursingMap.keySet();
-//                for (CourseCategoryBean key : keySet) {
-//                    if (CourseCategoryService.category_all.equals(key.getName())) {
-//                        continue;
-//                    }
-//                    List<CourseBean> value = extensionNursingMap.get(key);
-//                    UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
-//                    bean.setId(key.getId());
-//                    bean.setType(key.getName());
-//                    bean.setName(key.getName());
-//                    bean.setDescription(key.getIntroduction());
-//                    bean.setImageUrl(key.getImageUrl());
-//                    bean.setCourses(value);
-//                    beans.add(bean);
-//                    if (!hasCourses) {
-//                        hasCourses = !VerifyUtil.isListEmpty(value);
-//                    }
-//                }
-//            }
         }
-        logger.info("has_courses={}, extension_nursing_courses={}",
-                hasCourses,
-                null == extensionNursingBean ? 0 : extensionNursingBean.getCourses().size());
+
+        logger.info("has_courses={}", hasCourses);
         if (!hasCourses) {
-            Map<CourseCategoryBean, List<CourseBean>> courses
-                    = userCourseService.getAllPublicExtensionNursingCourses(userId);
-            courses.forEach((key, value) -> {
-                UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
-                String name = key.getName();
-                if (CourseCategoryService.category_all.equals(key.getName())) {
-                    name = DiagnosticEnumeration.EXTENSION_NURSING.name();
-                }
-                bean.setId(key.getId());
-                bean.setType(name);
-                bean.setName(name);
-                bean.setDescription(key.getIntroduction());
-                bean.setImageUrl(key.getImageUrl());
-                bean.setCourses(value);
-                beans.add(bean);
-            });
-            sortCourseArrays(beans);
+            Map<CourseCategoryBean, List<CourseBean>> courses = userCourseService.getAllPublicExtensionNursingCourses(userId);
+            returnValue = parseObjectToBean(courses);
+            sortCourseArrays(returnValue);
         }
-        return Response.ok(beans).build();
-    }
-
-    private void sortCourseArrays(List<UserHospitalizedCoursesBean> beans) {
-        Collections.sort(beans, new Comparator<UserHospitalizedCoursesBean>() {
-            @Override
-            public int compare(UserHospitalizedCoursesBean o1, UserHospitalizedCoursesBean o2) {
-                if (null != o1 && null != o2) {
-                    long delta = (o1.getId() - o2.getId());
-                    if (o1.getId() < 0 && o2.getId() < 0) {
-                        return delta > 0 ? 1 : (delta < 0 ? -1 : 0);
-                    } else {
-                        return delta > 0 ? -1 : (delta < 0 ? 1 : 0);
-                    }
-                }
-                if (o1 == null || o1.getId() < 0) {
-                    return 1;
-                }
-                if (o2 == null || o2.getId() < 0) {
-                    return -1;
-                }
-                return 0;
-            }
-        });
+        return Response.ok(returnValue).build();
     }
 
     @Path("/is_select_department")
@@ -264,22 +191,12 @@ public class UserHospitalizedAPI {
         boolean userHasSelectedCourses = userCourseService.isUserSelectedHospitalCoursesNow(userId);
         UserHospitalizedCoursesBean bean = null;
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
-            Map<DiagnosticEnumeration, List<CourseBean>> courses
-                    = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
-            List<DiagnosticEnumeration> keys = DiagnosticEnumeration.getAllDiagnostic();
-            for (DiagnosticEnumeration tmp : keys) {
-                if (tmp.ordinal() == diagnosticId) {
-                    List<CourseBean> value = courses.get(tmp);
-                    if (null == value) {
-                        value = new ArrayList<>();
-                    }
-                    bean = new UserHospitalizedCoursesBean();
-                    bean.setId(tmp.ordinal());
-                    bean.setType(tmp.name());
-                    bean.setName(tmp.name());
-                    bean.setDescription("");
-                    bean.setImageUrl("");
-                    bean.setCourses(value);
+            Map<DiagnosticEnumeration, List<CourseBean>> courses = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
+            List<UserHospitalizedCoursesBean> beans = parseObjectToBean(courses);
+            for (UserHospitalizedCoursesBean tmp : beans) {
+                if (tmp.getId() == diagnosticId) {
+                    bean = tmp;
+                    break;
                 }
             }
         }
@@ -296,25 +213,12 @@ public class UserHospitalizedAPI {
     public Response getUserCategoryCourses(@Context HttpServletRequest request,
                                              @PathParam("id") int categoryId) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
-        Map<CourseCategoryBean, List<CourseBean>> courses
-                = userCourseService.getAllPublicExtensionNursingCourses(userId);
-        courses.forEach((key, value) -> {
-            if(key.getId() == categoryId){
-                String name = key.getName();
-                if (CourseCategoryService.category_all.equals(key.getName())) {
-                    name = DiagnosticEnumeration.EXTENSION_NURSING.name();
-                }
-                bean.setId(key.getId());
-                bean.setType(name);
-                bean.setName(name);
-                bean.setDescription(key.getIntroduction());
-                bean.setImageUrl(key.getImageUrl());
-                bean.setCourses(value);
-            }
-
-        });
-        return Response.ok(bean).build();
+        Map<CourseCategoryBean, List<CourseBean>> courses = userCourseService.getAllPublicExtensionNursingCourses(userId);
+        List<UserHospitalizedCoursesBean> beans = parseObjectToBean(courses);
+        if (beans.isEmpty()) {
+            return Response.ok().build();
+        }
+        return Response.ok(beans.get(0)).build();
     }
 
     @GET
@@ -327,5 +231,74 @@ public class UserHospitalizedAPI {
     ) {
         List<CourseBean> courses = courseManageService.getCoursesByHospitalAndCategory(hospitalId, categoryId);
         return Response.ok(courses).build();
+    }
+
+    private List<UserHospitalizedCoursesBean> parseObjectToBean(Object objMap) {
+        List<UserHospitalizedCoursesBean> retVal = new ArrayList<>();
+        if (!(objMap instanceof Map)) {
+            return retVal;
+        }
+
+        Map map = (Map)objMap;
+        Set keys = map.keySet();
+        for (Object obj : keys) {
+            UserHospitalizedCoursesBean bean = new UserHospitalizedCoursesBean();
+            if (obj instanceof CourseCategoryBean) {
+                CourseCategoryBean key = (CourseCategoryBean)obj;
+                Object value = map.get(key);
+
+                String name = key.getName();
+                if (CourseCategoryService.category_all.equals(key.getName())) {
+                    name = DiagnosticEnumeration.EXTENSION_NURSING.name();
+                }
+                bean.setId(key.getId());
+                bean.setType(name);
+                bean.setName(name);
+                bean.setDescription(key.getIntroduction());
+                bean.setImageUrl(key.getImageUrl());
+                bean.setCourses(value);
+            }
+            else if (obj instanceof DiagnosticEnumeration) {
+                DiagnosticEnumeration key = (DiagnosticEnumeration)obj;
+                Object value = map.get(key);
+                if (null == value) {
+                    value = new ArrayList<>();
+                }
+                bean = new UserHospitalizedCoursesBean();
+                bean.setId(key.ordinal());
+                bean.setType(key.name());
+                bean.setName(key.name());
+                bean.setDescription("");
+                bean.setImageUrl("");
+                bean.setCourses(value);
+            }
+            retVal.add(bean);
+        }
+
+        return retVal;
+    }
+
+
+    private void sortCourseArrays(List<UserHospitalizedCoursesBean> beans) {
+        Collections.sort(beans, new Comparator<UserHospitalizedCoursesBean>() {
+            @Override
+            public int compare(UserHospitalizedCoursesBean o1, UserHospitalizedCoursesBean o2) {
+                if (null != o1 && null != o2) {
+                    long delta = (o1.getId() - o2.getId());
+                    if (o1.getId() < 0 && o2.getId() < 0) {
+                        return delta > 0 ? 1 : (delta < 0 ? -1 : 0);
+                    } else {
+                        return delta > 0 ? -1 : (delta < 0 ? 1 : 0);
+                    }
+                }
+                if (o1 == null || o1.getId() < 0) {
+                    return 1;
+                }
+                if (o2 == null || o2.getId() < 0) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
     }
 }

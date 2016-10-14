@@ -15,7 +15,7 @@ public class UserHospitalizedCoursesBean {
     private String description;
     private String imageUrl;
     private String name;
-    private List<CourseBean> courses = new ArrayList<>();
+    private Object courses = new ArrayList<>();
 
     public long getId() {
         return id;
@@ -49,13 +49,18 @@ public class UserHospitalizedCoursesBean {
         this.imageUrl = imageUrl;
     }
 
-    public List<CourseBean> getCourses() {
+    public int getCourseSize() {
+        if (courses instanceof List) {
+            return ((List) courses).size();
+        }
+        return 0;
+    }
+
+    public Object getCourses() {
         return courses;
     }
 
-    public void setCourses(List<CourseBean> courses) {
-
-
+    public void setCourses(Object courses) {
         this.courses = courses;
     }
 

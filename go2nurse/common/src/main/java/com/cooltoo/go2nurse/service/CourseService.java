@@ -144,7 +144,8 @@ public class CourseService {
         if (VerifyUtil.isListEmpty(courseIds)) {
             return new ArrayList<>();
         }
-        List<CourseEntity> resultSet = repository.findAll(courseIds);
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
+        List<CourseEntity> resultSet = repository.findByIdIn(courseIds, sort);
         List<CourseBean>   beans = entities2BeansWithoutContent(resultSet);
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
