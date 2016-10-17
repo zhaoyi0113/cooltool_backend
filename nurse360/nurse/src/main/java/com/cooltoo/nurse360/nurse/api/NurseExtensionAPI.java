@@ -49,6 +49,17 @@ public class NurseExtensionAPI {
         return Response.ok(course).build();
     }
 
+    // 获取课程详情
+    @Path("/course/detail_html")
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response getCourseDetailHtmlById(@Context HttpServletRequest request,
+                                            @QueryParam("course_id") @DefaultValue("0") long courseId
+    ) {
+        Nurse360CourseBean course = nurseExtensionService.getCourseById(0, courseId);
+        return Response.ok(course.getContent()).build();
+    }
+
 
     @Path("/notification/{index}/{number}")
     @GET

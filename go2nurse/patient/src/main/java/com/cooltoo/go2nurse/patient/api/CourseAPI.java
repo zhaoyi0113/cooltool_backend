@@ -76,6 +76,19 @@ public class CourseAPI {
         return Response.ok(course).build();
     }
 
+    // 获取课程详情
+    @Path("/course_detail_html")
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response getCourseDetailHtmlById(@Context HttpServletRequest request,
+                                            @QueryParam("course_id") @DefaultValue("0") long courseId
+    ) {
+        logger.info("get detail course by id={} nginxPrefix={}", courseId, utility.getHttpPrefix());
+
+        CourseBean course = courseService.getCourseById(courseId, utility.getHttpPrefix());
+        return Response.ok(course.getContent()).build();
+    }
+
     /**
      * 获得学习页面数据
      * @param request
