@@ -22,7 +22,8 @@ import java.util.*;
  * Created by hp on 2016/6/16.
  */
 @Path("/wechat/courses")
-public class WeChatCourseAPI {
+public class WechatCourseAPI {
+
 
     @Autowired private CourseRelationManageService courseManageService;
     @Autowired private UserCourseRelationService userCourseService;
