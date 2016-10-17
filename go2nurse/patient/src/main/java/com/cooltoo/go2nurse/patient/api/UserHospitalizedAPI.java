@@ -151,6 +151,7 @@ public class UserHospitalizedAPI {
                     extensionNursingBean = tmp;
                     Map<CourseCategoryBean, List<CourseBean>> tmpCourses = userCourseService.getAllCategoryToCoursesByCourses((List<CourseBean>) tmp.getCourses());
                     List<UserHospitalizedCoursesBean> extensionNursingCourses = parseObjectToBean(tmpCourses);
+                    sortCourseArrays(extensionNursingCourses);
                     extensionNursingBean.setCourses(extensionNursingCourses);
                 }
                 if (!hasCourses) {

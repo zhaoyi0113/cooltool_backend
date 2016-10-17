@@ -1,5 +1,7 @@
 package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 
 import java.util.Date;
@@ -16,6 +18,10 @@ public class WeChatAccountBean {
     private String mchId;
     private CommonStatus status;
     private String name;
+    private int hospitalId;
+    private int departmentId;
+    private HospitalBean hospital;
+    private HospitalDepartmentBean department;
 
     public int getId() {
         return id;
@@ -73,6 +79,38 @@ public class WeChatAccountBean {
         this.name = name;
     }
 
+    public int getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(int hospitalId) {
+        this.hospitalId = hospitalId;
+    }
+
+    public int getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public HospitalBean getHospital() {
+        return hospital;
+    }
+
+    public void setHospital(HospitalBean hospital) {
+        this.hospital = hospital;
+    }
+
+    public HospitalDepartmentBean getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(HospitalDepartmentBean department) {
+        this.department = department;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -80,10 +118,12 @@ public class WeChatAccountBean {
         msg.append("id=").append(id);
         msg.append(", timeCreated=").append(timeCreated);
         msg.append(", status=").append(status);
-        msg.append(", appId='").append(appId);
-        msg.append(", appSecret='").append(appSecret);
-        msg.append(", mchId='").append(mchId);
-        msg.append(", name='").append(name);
+        msg.append(", appId=").append(appId);
+        msg.append(", appSecret=").append(appSecret);
+        msg.append(", mchId=").append(mchId);
+        msg.append(", name=").append(name);
+        msg.append(", hospitalId=").append(hospitalId);
+        msg.append(", departmentId=").append(departmentId);
         msg.append("]");
         return msg.toString();
     }

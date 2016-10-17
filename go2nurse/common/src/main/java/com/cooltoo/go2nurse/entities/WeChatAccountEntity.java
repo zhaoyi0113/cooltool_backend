@@ -19,6 +19,8 @@ public class WeChatAccountEntity {
     private String mchId;
     private CommonStatus status;
     private String name;
+    private int hospitalId;
+    private int departmentId;
 
     @GeneratedValue
     @Id
@@ -85,6 +87,24 @@ public class WeChatAccountEntity {
         this.name = name;
     }
 
+    @Column(name = "hospital_id")
+    public int getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(int hospitalId) {
+        this.hospitalId = hospitalId;
+    }
+
+    @Column(name = "department_id")
+    public int getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -92,10 +112,12 @@ public class WeChatAccountEntity {
         msg.append("id=").append(id);
         msg.append(", timeCreated=").append(timeCreated);
         msg.append(", status=").append(status);
-        msg.append(", appId='").append(appId);
-        msg.append(", appSecret='").append(appSecret);
+        msg.append(", appId=").append(appId);
+        msg.append(", appSecret=").append(appSecret);
         msg.append(", mchId='").append(mchId);
-        msg.append(", name='").append(name);
+        msg.append(", name=").append(name);
+        msg.append(", hospitalId=").append(hospitalId);
+        msg.append(", departmentId=").append(departmentId);
         msg.append("]");
         return msg.toString();
     }

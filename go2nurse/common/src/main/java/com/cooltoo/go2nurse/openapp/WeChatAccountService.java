@@ -1,12 +1,19 @@
 package com.cooltoo.go2nurse.openapp;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.entities.HospitalDepartmentEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.WeChatAccountBean;
 import com.cooltoo.go2nurse.converter.WeChatAccountBeanConverter;
 import com.cooltoo.go2nurse.entities.WeChatAccountEntity;
 import com.cooltoo.go2nurse.repository.WeChatAccountRepository;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.repository.HospitalDepartmentRepository;
+import com.cooltoo.services.CommonDepartmentService;
+import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 16/10/8.
@@ -31,6 +39,10 @@ public class WeChatAccountService {
 
     @Autowired private WeChatAccountRepository repository;
     @Autowired private WeChatAccountBeanConverter beanConverter;
+    @Autowired private HospitalDepartmentRepository departmentRepository;
+    @Autowired private CommonHospitalService hospitalService;
+    @Autowired private CommonDepartmentService departmentService;
+    @Autowired private Go2NurseUtility utility;
 
     //===============================================================
     //               getting
@@ -41,7 +53,9 @@ public class WeChatAccountService {
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        return beanConverter.convert(entity);
+        WeChatAccountBean bean = beanConverter.convert(entity);
+        fillOtherPropertiesOfSingleBean(bean);
+        return bean;
     }
 
     public long countWeChatAccount(String status) {
@@ -70,6 +84,7 @@ public class WeChatAccountService {
             result = repository.findByStatus(enumStatus, page);
         }
         List<WeChatAccountBean> beans = entitiesToBeans(result);
+        fillOtherProperties(beans);
         logger.info("WeChat account size={}", beans.size());
         return beans;
     }
@@ -82,6 +97,42 @@ public class WeChatAccountService {
             }
         }
         return ret;
+    }
+
+    private void fillOtherProperties(List<WeChatAccountBean> beans) {
+        if (VerifyUtil.isListEmpty(beans)) {
+            return;
+        }
+
+        List<Integer> hospitalIds = new ArrayList<>();
+        List<Integer> departmentIds = new ArrayList<>();
+        for (WeChatAccountBean tmp : beans) {
+            if (!hospitalIds.contains(tmp.getHospitalId())) {
+                hospitalIds.add(tmp.getHospitalId());
+            }
+            if (!departmentIds.contains(tmp.getDepartmentId())) {
+                departmentIds.add(tmp.getDepartmentId());
+            }
+        }
+
+        Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalIds);
+        Map<Integer, HospitalDepartmentBean> departmentIdToBean = departmentService.getDepartmentIdToBean(departmentIds, utility.getHttpPrefixForNurseGo());
+        for (WeChatAccountBean tmp : beans) {
+            HospitalBean hospital = hospitalIdToBean.get(tmp.getHospitalId());
+            HospitalDepartmentBean department = departmentIdToBean.get(tmp.getDepartmentId());
+            tmp.setHospital(hospital);
+            tmp.setDepartment(department);
+        }
+    }
+
+    private void fillOtherPropertiesOfSingleBean(WeChatAccountBean bean) {
+        if (null==bean) {
+            return;
+        }
+        HospitalBean hospital = hospitalService.getHospital(bean.getHospitalId());
+        HospitalDepartmentBean department = departmentService.getById(bean.getDepartmentId(), utility.getHttpPrefixForNurseGo());
+        bean.setHospital(hospital);
+        bean.setDepartment(department);
     }
 
 
@@ -106,7 +157,7 @@ public class WeChatAccountService {
     //===============================================================
 
     @Transactional
-    public WeChatAccountBean updateWeChatAccount(int accountId, String appSecret, String mchId, String name, String status) {
+    public WeChatAccountBean updateWeChatAccount(int accountId, String appSecret, String mchId, String name, String status, Integer hospitalId, Integer departmentId) {
         logger.info("update WeChat account={} with appId={} appSecret={} mchId={} name={} status={}",
                 accountId, appSecret, mchId, name, status);
         WeChatAccountEntity entity = repository.findOne(accountId);
@@ -130,6 +181,15 @@ public class WeChatAccountService {
             changed = true;
         }
 
+        if (null!=hospitalId && null!=departmentId) {
+            HospitalDepartmentEntity department = departmentRepository.findOne(departmentId);
+            if (hospitalId==department.getHospitalId()) {
+                entity.setHospitalId(hospitalId);
+                entity.setDepartmentId(departmentId);
+                changed = true;
+            }
+        }
+
         CommonStatus enumStatus = CommonStatus.parseString(status);
         if (null!=enumStatus && !enumStatus.equals(entity.getStatus())) {
             entity.setStatus(enumStatus);
@@ -141,6 +201,7 @@ public class WeChatAccountService {
         }
 
         WeChatAccountBean bean = beanConverter.convert(entity);
+        fillOtherPropertiesOfSingleBean(bean);
         logger.info("WeChat Account after updated<==>{}", bean);
         return bean;
     }
@@ -150,7 +211,7 @@ public class WeChatAccountService {
     //===============================================================
 
     @Transactional
-    public WeChatAccountBean addWeChatAccount(String appId, String appSecret, String mchId, String name) {
+    public WeChatAccountBean addWeChatAccount(String appId, String appSecret, String mchId, String name, int hospitalId, int departmentId) {
         logger.info("add WeChat account appId={} appSecret={} mchId={} name={}", appId, appSecret, mchId, name);
         if (VerifyUtil.isStringEmpty(appId) || VerifyUtil.isStringEmpty(appSecret)) {
             logger.error("appId or appSecret is empty");
@@ -169,6 +230,14 @@ public class WeChatAccountService {
         }
         else {
             entity = result.get(0);
+        }
+
+        if (hospitalId!=0 && departmentId!=0) {
+            HospitalDepartmentEntity department = departmentRepository.findOne(departmentId);
+            if (null!=department && hospitalId==department.getHospitalId()) {
+                entity.setHospitalId(hospitalId);
+                entity.setDepartmentId(departmentId);
+            }
         }
 
         entity.setName(!VerifyUtil.isStringEmpty(name) ? name.trim() : null);

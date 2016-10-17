@@ -76,6 +76,20 @@ public class CommonDepartmentService {
         return beans;
     }
 
+    public Map<Integer, HospitalDepartmentBean> getDepartmentIdToBean(List<Integer> ids, String nginxPrefix) {
+        Map<Integer, HospitalDepartmentBean> idToBean = new HashMap<>();
+        if (VerifyUtil.isListEmpty(ids)) {
+            return idToBean;
+        }
+        List<HospitalDepartmentEntity> entities = repository.findByIdIn(ids, sort);
+        List<HospitalDepartmentBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans, nginxPrefix);
+        for (HospitalDepartmentBean tmp : beans) {
+            idToBean.put(tmp.getId(), tmp);
+        }
+        return idToBean;
+    }
+
     public List<HospitalDepartmentBean> getByHospitalId(Integer hospitalId, String nginxPrefix) {
         List<HospitalDepartmentEntity> entities = repository.findByHospitalId(hospitalId, sort);
         List<HospitalDepartmentBean> beans = entitiesToBeans(entities);

@@ -67,10 +67,12 @@ public class WeChatAccountManageAPI {
                                   @FormParam("app_id") @DefaultValue("") String appId,
                                   @FormParam("app_secret") @DefaultValue("") String appSecret,
                                   @FormParam("mch_id") @DefaultValue("") String mchId,
-                                  @FormParam("name") @DefaultValue("") String name
+                                  @FormParam("name") @DefaultValue("") String name,
+                                  @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                  @FormParam("department_id") @DefaultValue("0") int departmentId
 
     ) {
-        WeChatAccountBean bean = weChatAccountService.addWeChatAccount(appId, appSecret, mchId, name);
+        WeChatAccountBean bean = weChatAccountService.addWeChatAccount(appId, appSecret, mchId, name, hospitalId, departmentId);
         return Response.ok(bean).build();
     }
 
@@ -82,9 +84,11 @@ public class WeChatAccountManageAPI {
                                    @FormParam("app_secret") @DefaultValue("") String appSecret,
                                    @FormParam("mch_id") @DefaultValue("") String mchId,
                                    @FormParam("name") @DefaultValue("") String name,
+                                   @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                   @FormParam("department_id") @DefaultValue("0") int departmentId,
                                    @FormParam("status") @DefaultValue("") String status /* enabled, disabled, deleted */
     ) {
-        WeChatAccountBean bean = weChatAccountService.updateWeChatAccount(accountId, appSecret, mchId, name, status);
+        WeChatAccountBean bean = weChatAccountService.updateWeChatAccount(accountId, appSecret, mchId, name, status, hospitalId, departmentId);
         return Response.ok().build();
     }
 }

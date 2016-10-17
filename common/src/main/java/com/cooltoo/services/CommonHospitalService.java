@@ -51,6 +51,18 @@ public class CommonHospitalService {
         return hospitalBeans;
     }
 
+    public HospitalBean getHospital(Integer hospitalId) {
+        HospitalEntity hospital = repository.findOne(hospitalId);
+        if (null==hospital) {
+            return null;
+        }
+        List<HospitalEntity> hospitals = new ArrayList<>();
+        hospitals.add(hospital);
+        List<HospitalBean> hospitalBeans = entities2Beans(hospitals);
+        fillOtherProperties(hospitalBeans);
+        return hospitalBeans.get(0);
+    }
+
     public List<HospitalBean> getHospitalByUniqueId(String uniqueId) {
         List<HospitalEntity> hospitals = repository.findByUniqueId(uniqueId);
         List<HospitalBean> hospitalBeans = entities2Beans(hospitals);

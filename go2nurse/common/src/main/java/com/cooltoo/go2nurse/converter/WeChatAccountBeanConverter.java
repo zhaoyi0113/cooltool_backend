@@ -20,6 +20,8 @@ public class WeChatAccountBeanConverter implements Converter<WeChatAccountEntity
         bean.setAppSecret(source.getAppSecret());
         bean.setMchId(source.getMchId());
         bean.setName(source.getName());
+        bean.setHospitalId(source.getHospitalId());
+        bean.setDepartmentId(source.getDepartmentId());
         return bean;
     }
 }
