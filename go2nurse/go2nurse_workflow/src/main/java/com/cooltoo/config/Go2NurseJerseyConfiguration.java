@@ -5,6 +5,8 @@ import com.cooltoo.go2nurse.filters.BadRequestExceptionMapper;
 import com.cooltoo.go2nurse.filters.CORSResponseFilter;
 import com.cooltoo.go2nurse.filters.UserLoginAuthenticationFilter;
 import com.cooltoo.go2nurse.patient.api.*;
+import com.cooltoo.go2nurse.patient.api.wechat.WeChatCourseAPI;
+import com.cooltoo.go2nurse.patient.api.wechat.WeChatQuestionnaireAnswerAPI;
 import io.swagger.annotations.Api;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -72,6 +74,8 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
         register(AdvertisementManageAPI.class);
         register(UserDeviceTokensAPI.class);
         register(WeChatAccountManageAPI.class);
+        register(WeChatCourseAPI.class);
+        register(WeChatQuestionnaireAnswerAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 

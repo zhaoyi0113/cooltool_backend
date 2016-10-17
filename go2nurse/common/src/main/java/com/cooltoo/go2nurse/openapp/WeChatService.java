@@ -226,6 +226,14 @@ public class WeChatService {
         throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
     }
 
+    public String getAppIdByUserId(long userId){
+        UserOpenAppEntity userEntity = openAppRepository.findFirstByUserId(userId);
+        if(userEntity != null){
+            return userEntity.getAppId();
+        }
+        throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
+    }
+
     private Map getWebLoginAccessToken(String code, String appid) {
         WeChatAccountEntity weChatAccount = weChatAccountRepository.findFirstByAppId(appid);
         if(weChatAccount == null){

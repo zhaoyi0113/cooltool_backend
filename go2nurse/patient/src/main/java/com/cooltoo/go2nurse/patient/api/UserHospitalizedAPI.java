@@ -145,12 +145,12 @@ public class UserHospitalizedAPI {
 
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
             Map<DiagnosticEnumeration, List<CourseBean>> courses = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
-            returnValue = parseObjectToBean(courses);
+            returnValue = parseObjectToBean(courses, true);
             for (UserHospitalizedCoursesBean tmp : returnValue) {
                 if (DiagnosticEnumeration.EXTENSION_NURSING.ordinal()==tmp.getId()) {
                     extensionNursingBean = tmp;
                     Map<CourseCategoryBean, List<CourseBean>> tmpCourses = userCourseService.getAllCategoryToCoursesByCourses((List<CourseBean>) tmp.getCourses());
-                    List<UserHospitalizedCoursesBean> extensionNursingCourses = parseObjectToBean(tmpCourses);
+                    List<UserHospitalizedCoursesBean> extensionNursingCourses = parseObjectToBean(tmpCourses, false);
                     sortCourseArrays(extensionNursingCourses);
                     extensionNursingBean.setCourses(extensionNursingCourses);
                 }
@@ -163,7 +163,7 @@ public class UserHospitalizedAPI {
         logger.info("has_courses={}", hasCourses);
         if (!hasCourses) {
             Map<CourseCategoryBean, List<CourseBean>> courses = userCourseService.getAllPublicExtensionNursingCourses(userId);
-            returnValue = parseObjectToBean(courses);
+            returnValue = parseObjectToBean(courses, false);
             sortCourseArrays(returnValue);
         }
         return Response.ok(returnValue).build();
@@ -193,7 +193,7 @@ public class UserHospitalizedAPI {
         UserHospitalizedCoursesBean bean = null;
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide()) && userHasSelectedCourses) {
             Map<DiagnosticEnumeration, List<CourseBean>> courses = userCourseService.getUserCurrentCoursesWithExtensionNursingOfHospital(userId);
-            List<UserHospitalizedCoursesBean> beans = parseObjectToBean(courses);
+            List<UserHospitalizedCoursesBean> beans = parseObjectToBean(courses, true);
             for (UserHospitalizedCoursesBean tmp : beans) {
                 if (tmp.getId() == diagnosticId) {
                     bean = tmp;
@@ -215,7 +215,7 @@ public class UserHospitalizedAPI {
                                            @PathParam("id") int categoryId) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Map<CourseCategoryBean, List<CourseBean>> courses = userCourseService.getAllPublicExtensionNursingCourses(userId);
-        List<UserHospitalizedCoursesBean> beans = parseObjectToBean(courses);
+        List<UserHospitalizedCoursesBean> beans = parseObjectToBean(courses, false);
         if (beans.isEmpty()) {
             return Response.ok().build();
         }
@@ -234,13 +234,17 @@ public class UserHospitalizedAPI {
         return Response.ok(courses).build();
     }
 
-    private List<UserHospitalizedCoursesBean> parseObjectToBean(Object objMap) {
+    private List<UserHospitalizedCoursesBean> parseObjectToBean(Object objMap, boolean diagnosticCourses) {
         List<UserHospitalizedCoursesBean> retVal = new ArrayList<>();
         if (!(objMap instanceof Map)) {
             return retVal;
         }
 
         List<DiagnosticEnumeration> remainedDiagnostic = null;
+        if (diagnosticCourses) {
+            remainedDiagnostic = DiagnosticEnumeration.getAllDiagnostic();
+        }
+
         UserHospitalizedCoursesBean bean = null;
         Map map = (Map)objMap;
         Set keys = map.keySet();
@@ -269,9 +273,6 @@ public class UserHospitalizedAPI {
                     value = new ArrayList<>();
                 }
 
-                if (null == remainedDiagnostic) {
-                    remainedDiagnostic = DiagnosticEnumeration.getAllDiagnostic();
-                }
                 remainedDiagnostic.remove(key);
 
                 bean.setId(key.ordinal());

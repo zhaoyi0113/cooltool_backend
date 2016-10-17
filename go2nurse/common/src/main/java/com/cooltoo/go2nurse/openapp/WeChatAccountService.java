@@ -58,6 +58,17 @@ public class WeChatAccountService {
         return bean;
     }
 
+    public WeChatAccountBean getWeChatAccountByAppId(String appId) {
+        logger.info("get WeChat Account by appId={}", appId);
+        List<WeChatAccountEntity> entities = repository.findByAppId(appId);
+        if (VerifyUtil.isListEmpty(entities)) {
+            return null;
+        }
+        WeChatAccountBean bean = beanConverter.convert(entities.get(0));
+        fillOtherPropertiesOfSingleBean(bean);
+        return bean;
+    }
+
     public long countWeChatAccount(String status) {
         logger.info("count WeChat account by status={}", status);
         long result = 0;
@@ -246,7 +257,7 @@ public class WeChatAccountService {
         entity = repository.save(entity);
 
 
-        result = repository.findByAppIdAndAppSecret(appId, appSecret);
+        result = repository.findByAppId(appId);
         for (int i=0; i<result.size(); i++) {
             WeChatAccountEntity tmp = result.get(i);
             if (tmp.getId()==entity.getId()) {

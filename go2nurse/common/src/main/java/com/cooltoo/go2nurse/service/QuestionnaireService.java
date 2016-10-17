@@ -365,6 +365,34 @@ public class QuestionnaireService {
         return categories;
     }
 
+    public List<QuestionnaireCategoryBean> getCategoryWithQuestionnaireByHospitalId(int hospitalId) {
+        logger.info("get questionnaire category by hospitalId={}", hospitalId);
+        List<QuestionnaireBean> questionnaires = getQuestionnaireByHospitalId(hospitalId);
+
+        List<Long> categoryIds = new ArrayList<>();
+        for (QuestionnaireBean tmp : questionnaires) {
+            if (!categoryIds.contains(tmp.getCategoryId())) {
+                categoryIds.add(tmp.getCategoryId());
+            }
+        }
+
+        List<QuestionnaireCategoryBean> categories = getCategoryByIds(categoryIds);
+        List<QuestionnaireBean> beans;
+        for (QuestionnaireCategoryBean category : categories) {
+            beans = new ArrayList<>();
+            for (QuestionnaireBean questionnaire : questionnaires) {
+                if (category.getId() == questionnaire.getCategoryId()) {
+                    beans.add(questionnaire);
+                }
+            }
+            category.setQuestionnaires(beans);
+        }
+
+        logger.info("count is {}",categories.size());
+        return categories;
+    }
+
+
     private List<QuestionBean> questionEntitiesToBeans(Iterable<QuestionEntity> entities) {
         List<QuestionBean> beans = new ArrayList<>();
         if (null!=entities) {
