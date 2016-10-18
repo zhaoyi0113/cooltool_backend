@@ -5,6 +5,7 @@ import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.CourseCategoryBean;
 import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.patient.beans.CategoryCoursesBean;
 import com.cooltoo.go2nurse.service.CourseCategoryService;
 import com.cooltoo.go2nurse.service.CourseService;
 import com.cooltoo.go2nurse.service.file.AbstractGo2NurseFileStorageService;
@@ -59,7 +60,13 @@ public class CourseAPI {
         logger.info(" get courses by status={} categoryId={}", status, categoryId);
         List<CourseBean> courses = categoryService.getCourseByCategoryId(status, categoryId);
         logger.info("count = {}", courses.size());
-        return Response.ok(courses).build();
+        CourseCategoryBean category = categoryService.getCategoryById(categoryId);
+        CategoryCoursesBean ccB = new CategoryCoursesBean();
+        ccB.setName(category.getName());
+        ccB.setId(category.getId());
+        ccB.setImageUrl(category.getImageUrl());
+        ccB.setCourses(courses);
+        return Response.ok(ccB).build();
     }
 
     // 获取课程详情
