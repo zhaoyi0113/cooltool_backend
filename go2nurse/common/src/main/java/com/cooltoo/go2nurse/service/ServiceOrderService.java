@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.go2nurse.constants.AppType;
 import com.cooltoo.go2nurse.constants.ChargeType;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
+import com.cooltoo.go2nurse.openapp.WeChatPayService;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
 import com.cooltoo.go2nurse.service.notification.MessageBean;
@@ -56,6 +57,7 @@ public class ServiceOrderService {
     @Autowired private ServiceOrderChargePingPPService orderPingPPService;
     @Autowired private PingPPService pingPPService;
     @Autowired private WeChatService weChatService;
+    @Autowired private WeChatPayService weChatPayService;
 
     @Autowired private Notifier notifier;
 
@@ -374,6 +376,81 @@ public class ServiceOrderService {
         orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, channel, ChargeType.CHARGE, charge.getId(), charge.toString());
 
         return charge;
+    }
+
+    @Transactional
+    public Map<String, Object> payForServiceByWeChat(Long userId, Long orderId, String openId, String clientIP, WeChatAccountBean weChatAccount) {
+        logger.info("create charge object for order={} openId={} clientIp={} weChatAccount={}", orderId, openId, clientIP, weChatAccount);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (userId!=entity.getUserId()) {
+            logger.error("this order does not belong to this user");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (VerifyUtil.isStringEmpty(openId)) {
+            logger.warn("openId is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (null==weChatAccount) {
+            logger.warn("weChatAccount is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (!OrderStatus.TO_PAY.equals(entity.getOrderStatus())) {
+            logger.error("order status={}, not to_pay", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        ServiceOrderBean order = beanConverter.convert(entity);
+        String orderNo = order.getOrderNo();
+        String wechatNo = NumberUtil.createNoncestr(31);
+        Map<String, Object> weChatResponse = weChatPayService.payByWeChat(openId, "WEB", clientIP,
+                weChatAccount.getAppId(), weChatAccount.getMchId(), weChatPayService.getApiKey(),
+                wechatNo, "JSAPI", "订单="+orderNo+" 描述="+order.getServiceItem().getName(),
+                "CNY", order.getTotalConsumptionCent(), weChatPayService.getNotifyUrl());
+        // check response value
+        if (!"SUCCESS".equalsIgnoreCase((String)weChatResponse.get("return_code"))
+         || !"SUCCESS".equalsIgnoreCase((String)weChatResponse.get("result_code"))) {
+            entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
+            repository.save(entity);
+            logger.info("wechat make order failed ");
+
+            MessageBean message = new MessageBean();
+            message.setAlertBody("订单状态有更新");
+            message.setType(MessageType.ORDER.name());
+            message.setStatus(entity.getOrderStatus().name());
+            message.setRelativeId(entity.getId());
+            message.setDescription("WeChat make order failed!");
+            notifier.notifyUserPatient(entity.getUserId(), message);
+
+            return weChatResponse;
+        }
+
+        // check sign
+        String sign1 = (String)weChatResponse.get("sign");
+        weChatResponse.remove("sign");
+        String sign2 = weChatPayService.createSign(weChatPayService.getApiKey(), "UTF-8", new TreeMap<>(weChatResponse));
+        if (!sign2.equalsIgnoreCase(sign1)) {
+            entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
+            repository.save(entity);
+            logger.info("wechat sign not match");
+
+            MessageBean message = new MessageBean();
+            message.setAlertBody("订单状态有更新");
+            message.setType(MessageType.ORDER.name());
+            message.setStatus(entity.getOrderStatus().name());
+            message.setRelativeId(entity.getId());
+            message.setDescription("WeChat sign error!");
+            notifier.notifyUserPatient(entity.getUserId(), message);
+
+            return weChatResponse;
+        }
+
+        orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, "wx", ChargeType.CHARGE, wechatNo, weChatResponse.toString());
+        weChatResponse.remove("mch_id");
+        weChatResponse.remove("device_info");
+        return weChatResponse;
     }
 
     @Transactional

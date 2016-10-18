@@ -275,8 +275,7 @@ public class WeChatService {
     private static String signString(String decript, String algorithm) {
         try {
             logger.info(algorithm + " on string:" + decript);
-            MessageDigest digest = java.security.MessageDigest
-                    .getInstance(algorithm);
+            MessageDigest digest = java.security.MessageDigest.getInstance(algorithm);
             digest.update(decript.getBytes());
             byte messageDigest[] = digest.digest();
             // Create Hex String

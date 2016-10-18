@@ -4,6 +4,8 @@ import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NurseServiceForNurse360;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
 
 /**
  * Created by zhaolisong on 16/9/28.
@@ -49,5 +52,52 @@ public class NurseAPIForNurse360 {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean nurse = nurseServiceForNurse360.getNurseById(nurseId);
         return Response.ok(nurse).build();
+    }
+
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response editNurseInformation(@Context HttpServletRequest request,
+                                         @FormParam("real_name") @DefaultValue("") String realName,
+                                         @FormParam("birthday") @DefaultValue("0") int age,
+                                         @FormParam("gender") @DefaultValue("2") int gender,
+                                         @FormParam("hospital_id")  int hospitalId,
+                                         @FormParam("department_id") int departmentId
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        nurseServiceForNurse360.editNurse(nurseId, realName, age, gender, null, null, null, null);
+        nurseServiceForNurse360.setHospitalDepartmentAndJobTitle(nurseId, hospitalId, departmentId, null);
+        NurseBean bean = nurseServiceForNurse360.getNurseById(nurseId);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/head_image")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response editNurseHeadImage(@Context HttpServletRequest request,
+                                       @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                       @FormDataParam("image") InputStream image,
+                                       @FormDataParam("image")FormDataContentDisposition disp
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean bean = nurseServiceForNurse360.editNurse(nurseId, null, -1, -1, imageName, image, null, null);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/back_image")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response editNurseBackImage(@Context HttpServletRequest request,
+                                       @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                       @FormDataParam("image") InputStream image,
+                                       @FormDataParam("image")FormDataContentDisposition disp
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean bean = nurseServiceForNurse360.editNurse(nurseId, null, -1, -1, null, null, imageName, image);
+        return Response.ok(bean).build();
     }
 }

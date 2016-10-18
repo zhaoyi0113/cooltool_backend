@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -302,6 +303,25 @@ public class CommonNurseService {
         return nurses;
     }
 
+    @Transactional
+    public long updateHeadPhoto(NurseEntity nurse, long fileId){
+        logger.info("set head photo for nurse "+nurse+", fileId="+fileId);
+        if (null!=nurse && fileId>0 && fileId!=nurse.getProfilePhotoId()) {
+            nurse.setProfilePhotoId(fileId);
+            nurseRepository.save(nurse);
+        }
+        return fileId;
+    }
+
+    @Transactional
+    public long updateBackgroundImage(NurseEntity nurse, long fileId){
+        logger.info("set background image for nurse "+nurse+", fileId="+fileId);
+        if (null!=nurse && fileId>0 && fileId!=nurse.getBackgroundImageId()) {
+            nurse.setBackgroundImageId(fileId);
+            nurseRepository.save(nurse);
+        }
+        return fileId;
+    }
 
     //========================================================================
     //                        deleting

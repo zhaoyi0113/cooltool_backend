@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,8 +65,12 @@ public class NurseServiceForNurse360 {
         NurseBean bean = nurseBeanConverter.convert(nurse);
         String profilePath = nursegoFileStorage.getFilePath(bean.getProfilePhotoId());
         String backgroundPath = nursegoFileStorage.getFilePath(bean.getBackgroundImageId());
-        bean.setProfilePhotoUrl(utility.getHttpPrefixForNurseGo()+profilePath);
-        bean.setBackgroundImageUrl(utility.getHttpPrefixForNurseGo()+backgroundPath);
+        if (!VerifyUtil.isStringEmpty(profilePath)) {
+            bean.setProfilePhotoUrl(utility.getHttpPrefixForNurseGo() + profilePath);
+        }
+        if (!VerifyUtil.isStringEmpty(backgroundPath)) {
+            bean.setBackgroundImageUrl(utility.getHttpPrefixForNurseGo() + backgroundPath);
+        }
         NurseExtensionBean extension = nurseExtensionService.getExtensionByNurseId(nurseId);
         NurseHospitalRelationBean hospitalDepartment = nurseHospitalRelationService.getRelationByNurseId(nurseId, utility.getHttpPrefixForNurseGo());
         List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseIdAndOrderStatus(nurseId, CommonStatus.ENABLED.name(), OrderStatus.IN_PROCESS);
@@ -167,6 +172,60 @@ public class NurseServiceForNurse360 {
                 bean.setBackgroundImageUrl(utility.getHttpPrefixForNurseGo()+imgPath);
             }
         }
+    }
+
+
+    //===================================================================
+    //                     editing
+    //===================================================================
+    @Transactional
+    public NurseBean editNurse(long nurseId, String realName, int age, int gender,
+                               String headName, InputStream head,
+                               String backName, InputStream back) {
+        logger.info("edit nurse360 realName={} age={} gender={}", realName, age, gender);
+        GenderType genderType = GenderType.parseInt(gender);
+        NurseEntity nurse = commonNurseService.updateBasicInfo(nurseId, null, age, genderType, null, null, null, realName, null, null);
+        updateHeadPhoto(nurse, headName, head);
+        updateBackgroundImage(nurse, backName, back);
+        return getNurseById(nurseId);
+    }
+
+    @Transactional
+    private String updateHeadPhoto(NurseEntity nurse, String fileName, InputStream inputStream){
+        long fileId = 0;
+        try {
+            fileId = nursegoFileStorage.addFile(nurse.getProfilePhotoId(), fileName, inputStream);
+            commonNurseService.updateHeadPhoto(nurse, fileId);
+        }
+        catch (BadRequestException ex) {
+            logger.info("Delete file has exception throwing " + ex);
+            if (ex.getErrorCode().equals(ErrorCode.FILE_DELETE_FAILED)) {
+                throw ex;
+            }
+        }
+        if (fileId<0) {
+            return "";
+        }
+        return nursegoFileStorage.getFilePath(fileId);
+    }
+
+    @Transactional
+    private String updateBackgroundImage(NurseEntity nurse, String fileName, InputStream inputStream){
+        long fileId = 0;
+        try {
+            fileId = nursegoFileStorage.addFile(nurse.getBackgroundImageId(), fileName, inputStream);
+            commonNurseService.updateBackgroundImage(nurse, fileId);
+        }
+        catch (BadRequestException ex) {
+            logger.info("Delete file has exception throwing " + ex);
+            if (ex.getErrorCode().equals(ErrorCode.FILE_DELETE_FAILED)) {
+                throw ex;
+            }
+        }
+        if (fileId<0) {
+            return "";
+        }
+        return nursegoFileStorage.getFilePath(fileId);
     }
 
 

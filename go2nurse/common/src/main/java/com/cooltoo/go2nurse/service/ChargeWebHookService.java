@@ -1,12 +1,11 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.go2nurse.openapp.WeChatPayService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.google.common.io.CharStreams;
 import com.google.gson.JsonSyntaxException;
 import com.pingplusplus.model.Charge;
 import com.pingplusplus.model.Event;
-import com.tencent.common.Configure;
-import com.tencent.common.Signature;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -25,6 +24,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by zhaolisong on 16/9/29.
@@ -36,6 +36,7 @@ public class ChargeWebHookService {
 
     @Autowired private ServiceOrderService orderService;
     @Autowired private Go2NurseUtility utility;
+    @Autowired private WeChatPayService weChatPayService;
 
     @Value("${wechat_go2nurse_appsecret}")
     private String srvAppSecret;
@@ -108,9 +109,9 @@ public class ChargeWebHookService {
         Object returnCode = keyValue.get("return_code");
         if (null!=returnCode && "success".equalsIgnoreCase(returnCode.toString())) {
             //check the sign of WeiXin callback
-            Configure.setKey(srvAppSecret);
             String originSign = keyValue.get("sign").toString();
-            String checkSign = Signature.getSign(forSign);
+            keyValue.remove("sign");
+            String checkSign = weChatPayService.createSign(weChatPayService.getApiKey(), "UTF-8", new TreeMap<>(forSign));
             if (!checkSign.equalsIgnoreCase(originSign)) {
                 return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[checksum sign is wrong]]></return_msg></xml>";
             }

@@ -5,7 +5,14 @@ import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.constants.SpeakType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -378,7 +385,7 @@ public class VerifyUtil {
      * @param parameters  请求参数
      * @return
      */
-    public static String getRequestXml(SortedMap<Object,Object> parameters){
+    public static String getRequestXml(SortedMap<String,Object> parameters){
         StringBuffer sb = new StringBuffer();
         sb.append("<xml>");
         Set es = parameters.entrySet();
@@ -386,15 +393,53 @@ public class VerifyUtil {
         while(it.hasNext()) {
             Map.Entry entry = (Map.Entry)it.next();
             String k = (String)entry.getKey();
-            String v = (String)entry.getValue();
-            if ("attach".equalsIgnoreCase(k)||"body".equalsIgnoreCase(k)||"sign".equalsIgnoreCase(k)) {
-                sb.append("<"+k+">"+"<![CDATA["+v+"]]></"+k+">");
-            }else {
-                sb.append("<"+k+">"+v+"</"+k+">");
+            String v = null==entry.getValue() ? null : entry.getValue().toString();
+            if (null!=v) {
+                if ("attach".equalsIgnoreCase(k) || "body".equalsIgnoreCase(k) || "sign".equalsIgnoreCase(k)) {
+                    sb.append("<" + k + ">" + "<![CDATA[" + v + "]]></" + k + ">");
+                } else {
+                    sb.append("<" + k + ">" + v + "</" + k + ">");
+                }
             }
         }
         sb.append("</xml>");
         return sb.toString();
+    }
+
+    /**
+     * @Description：将响应的返回的xml格式转换为Map
+     * @param xml  响应的返回的xml
+     * @return
+     */
+    public static Map<String, Object> parseResponseXml(String xml){
+        final Map<String, Object> map = new HashMap<>();
+        SAXParserFactory saxFactory = SAXParserFactory.newInstance();
+        try {
+            SAXParser saxParser = saxFactory.newSAXParser();
+            saxParser.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")), new DefaultHandler(){
+                private String tag = null;
+                @Override
+                public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+                    tag = qName;
+                }
+
+                @Override
+                public void characters(char[] ch, int start, int length) throws SAXException {
+                    if (null!=tag && !map.containsKey(tag)) {
+                        map.put(tag, new String(ch, start, length));
+                    }
+                }
+
+                @Override
+                public void endElement(String uri, String localName, String qName) throws SAXException {
+                    tag = null;
+                }
+            });
+        }
+        catch (Exception ex) {
+            map.put("exception", ex);
+        }
+        return map;
     }
 
     /**
