@@ -200,6 +200,13 @@ public class UserHospitalizedAPI {
                     break;
                 }
             }
+            // extension_nursing course should return courses group by category
+            if (null!=bean && DiagnosticEnumeration.EXTENSION_NURSING.ordinal()==bean.getId()) {
+                Map<CourseCategoryBean, List<CourseBean>> tmpCourses = userCourseService.getAllCategoryToCoursesByCourses((List<CourseBean>) bean.getCourses());
+                List<UserHospitalizedCoursesBean> extensionNursingCourses = parseObjectToBean(tmpCourses, false);
+                sortCourseArrays(extensionNursingCourses);
+                bean.setCourses(extensionNursingCourses);
+            }
         }
         if(bean == null){
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -215,11 +222,21 @@ public class UserHospitalizedAPI {
                                            @PathParam("id") int categoryId) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Map<CourseCategoryBean, List<CourseBean>> courses = userCourseService.getAllPublicExtensionNursingCourses(userId);
+        UserHospitalizedCoursesBean bean = null;
         List<UserHospitalizedCoursesBean> beans = parseObjectToBean(courses, false);
-        if (beans.isEmpty()) {
+        if (!beans.isEmpty()) {
+            for (UserHospitalizedCoursesBean tmp : beans) {
+                if (categoryId==tmp.getId()) {
+                    bean = tmp;
+                    break;
+                }
+            }
+        }
+
+        if (null==bean) {
             return Response.ok().build();
         }
-        return Response.ok(beans.get(0)).build();
+        return Response.ok(bean).build();
     }
 
     @GET
