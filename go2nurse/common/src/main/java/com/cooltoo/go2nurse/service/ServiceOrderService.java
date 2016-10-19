@@ -100,29 +100,29 @@ public class ServiceOrderService {
         return count;
     }
 
-    public List<ServiceOrderBean> getOrderByIds(List<Long> orderIds, int pageIndex, int sizePerPage) {
+    public List<ServiceOrderBean> getOrderByIds(List<Long> orderIds) {
         if (VerifyUtil.isListEmpty(orderIds)) {
             return new ArrayList<>();
         }
-        logger.info("get service order by orderId size={} at page={} number={}", orderIds.size(), pageIndex, sizePerPage);
-        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<ServiceOrderEntity> resultSet = repository.findByIdIn(orderIds, pageRequest);
+        logger.info("get service order by orderId size={}", orderIds.size());
+        List<ServiceOrderEntity> resultSet = repository.findByIdIn(orderIds);
         List<ServiceOrderBean> beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
         logger.info("service order count is {}", beans.size());
         return beans;
     }
 
-    public List<ServiceOrderBean> getOrderByIdsAndOrderStatus(List<Long> orderIds, OrderStatus orderStatus) {
+    public List<Long> isOrderIdExisted(List<Long> orderIds, OrderStatus orderStatus) {
         if (VerifyUtil.isListEmpty(orderIds)) {
             return new ArrayList<>();
         }
-        logger.info("get service order by orderId size={} and orderStatus={}", orderIds.size(), orderStatus);
-        List<ServiceOrderEntity> resultSet = repository.findByIdInAndOrderStatus(orderIds, orderStatus, sort);
-        List<ServiceOrderBean> beans = entitiesToBeans(resultSet);
-        fillOtherProperties(beans);
-        logger.info("service order count is {}", beans.size());
-        return beans;
+        logger.info("get service order id by orderId size={} and orderStatus={}", orderIds.size(), orderStatus);
+        List<Long> resultSet = repository.findByIdInAndOrderStatus(orderIds, orderStatus);
+        if (null==resultSet) {
+            resultSet = new ArrayList<>();
+        }
+        logger.info("service order count is {}", resultSet.size());
+        return resultSet;
     }
 
     public List<ServiceOrderBean> getOrder(int pageIndex, int sizePerPage) {

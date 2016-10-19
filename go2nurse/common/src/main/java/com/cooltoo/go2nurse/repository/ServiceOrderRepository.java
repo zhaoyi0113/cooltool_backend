@@ -48,9 +48,9 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrderEntity
             " AND (order1.orderStatus IN (?3))")
     Page<ServiceOrderEntity> findByConditions(ServiceVendorType vendorType, Long vendorId, List<OrderStatus> orderStatus, Pageable page);
 
-    @Query("FROM ServiceOrderEntity order1" +
+    @Query("SELECT order1.id FROM ServiceOrderEntity order1" +
             " WHERE (order1.id IN (?1))" +
             " AND (?2 IS NULL OR order1.orderStatus=?2)")
-    List<ServiceOrderEntity> findByIdInAndOrderStatus(List<Long> orderIds, OrderStatus orderStatus, Sort sort);
-    Page<ServiceOrderEntity> findByIdIn(List<Long> orderIds, Pageable page);
+    List<Long> findByIdInAndOrderStatus(List<Long> orderIds, OrderStatus orderStatus);
+    List<ServiceOrderEntity> findByIdIn(List<Long> orderIds);
 }

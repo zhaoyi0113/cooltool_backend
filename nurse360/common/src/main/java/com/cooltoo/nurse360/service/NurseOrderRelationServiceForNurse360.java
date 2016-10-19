@@ -82,44 +82,56 @@ public class NurseOrderRelationServiceForNurse360 {
                     orderStatuses, pageIndex, sizePerPage);
         }
 
-//        // order ids
-//        List<Long> orderIds = new ArrayList<>();
-//        for (ServiceOrderBean tmp : orders) {
-//            if (!orderIds.contains(tmp.getId())) {
-//                orderIds.add(tmp.getId());
-//            }
-//        }
-//
-//        // get order has been fetchbed or not
-//        CommonStatus status = CommonStatus.parseString(strStatus);
-//        List<NurseOrderRelationEntity> resultSet = repository.findByOrderIdInAndStatus(orderIds, status);
-//        Map<Long, Long> orderIdToGrabberId = new HashMap<>();
-//        if (!VerifyUtil.isListEmpty(resultSet)) {
-//            for (NurseOrderRelationEntity tmp : resultSet) {
-//                orderIdToGrabberId.put(tmp.getOrderId(), tmp.getNurseId());
-//            }
-//        }
+        List<Long> orderId = repository.findOrderIdByNurseId(nurseId);
+        if (null==orderId) { orderId = new ArrayList<>(); }
+        for (ServiceOrderBean tmp : orders) {
+            tmp.setIsNurseFetched(orderId.contains(tmp.getId()) ? YesNoEnum.YES : YesNoEnum.NO);
+        }
 
         logger.info("count is {}", orders.size());
         return orders;
     }
 
-    public List<ServiceOrderBean> getOrderByNurseIdAndOrderStatus(long nurseId, String strStatus, OrderStatus orderStatus) {
-        logger.info("get orders by nurseId={} with status={} and orderStatus={}", nurseId, strStatus, orderStatus);
+    public List<ServiceOrderBean> getOrderByNurseIdAndOrderStatus(long nurseId, String strStatus, OrderStatus orderStatus, int pageIndex, int sizePerPage) {
+        logger.info("get orders by nurseId={} with status={} and orderStatus={} at index={} number={}", nurseId, strStatus, orderStatus, pageIndex, sizePerPage);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        List<NurseOrderRelationEntity> resultSet = repository.findByNurseIdAndStatus(nurseId, status, sort);
-        List<Long> orderIds = new ArrayList<>();
+        List<Long> resultSet = repository.findByNurseIdAndStatus(nurseId, status, sort);
+        List<Long> orderIdExisted = orderService.isOrderIdExisted(resultSet, orderStatus);
+        List<Long> orderIdExistedSorted = new ArrayList<>();
         if (!VerifyUtil.isListEmpty(resultSet)) {
-            for (NurseOrderRelationEntity tmp : resultSet) {
-                if (orderIds.contains(tmp.getOrderId())) {
+            for (Long tmp : resultSet) {
+                if (orderIdExistedSorted.contains(tmp)) {
                     continue;
                 }
-                orderIds.add(tmp.getOrderId());
+                if (!orderIdExisted.contains(tmp)) {
+                    continue;
+                }
+                orderIdExistedSorted.add(tmp);
             }
         }
-        List<ServiceOrderBean> orders = orderService.getOrderByIdsAndOrderStatus(orderIds, orderStatus);
-        logger.info("count is {}", orders.size());
-        return orders;
+        resultSet.clear();
+        int startIndex = (pageIndex*sizePerPage)<0 ? 0 : (pageIndex*sizePerPage);
+        for (int i=startIndex; i<orderIdExistedSorted.size(); i++) {
+            if (i<(pageIndex*sizePerPage + sizePerPage)) {
+                resultSet.add(orderIdExistedSorted.get(i));
+                continue;
+            }
+        }
+
+        List<ServiceOrderBean> beans = orderService.getOrderByIds(resultSet);
+        List<ServiceOrderBean> beanSorted = new ArrayList<>();
+        for (Long tmpId : resultSet) {
+            for (ServiceOrderBean tmp : beans) {
+                if (tmp.getId()==tmpId) {
+                    beanSorted.add(tmp);
+                    tmp.setIsNurseFetched(YesNoEnum.YES);
+                    break;
+                }
+            }
+        }
+
+        logger.info("count is {}", beanSorted.size());
+        return beanSorted;
     }
 
 
@@ -222,7 +234,7 @@ public class NurseOrderRelationServiceForNurse360 {
 
         if (nurseId!=entity.getNurseId()) {
             logger.info("order has been fetched");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.SERVICE_ORDER_BEEN_FETCHED);
         }
 
         // update order status

@@ -38,9 +38,11 @@ public class NurseOrderAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response getSelfOrder(@Context HttpServletRequest request) {
+    public Response getSelfOrder(@Context HttpServletRequest request,
+                                 @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                 @QueryParam("number") @DefaultValue("10") int sizePerPage) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseIdAndOrderStatus(nurseId, CommonStatus.ENABLED.name(), null);
+        List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseIdAndOrderStatus(nurseId, CommonStatus.ENABLED.name(), null, pageIndex, sizePerPage);
         return Response.ok(orders).build();
     }
 
