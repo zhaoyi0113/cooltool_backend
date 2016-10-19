@@ -52,7 +52,6 @@ public class CourseAPI {
     @Path("/get_by_category/{category_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
     public Response getCourseByCategoryId(@Context HttpServletRequest request,
                                           @PathParam("category_id") @DefaultValue("0") long categoryId
     ) {
@@ -126,4 +125,6 @@ public class CourseAPI {
         List<CourseCategoryBean> categories = categoryService.getCategoryByCourseId(CommonStatus.ENABLED.name(), courseIds);
         return Response.ok(categories).build();
     }
+
+
 }
