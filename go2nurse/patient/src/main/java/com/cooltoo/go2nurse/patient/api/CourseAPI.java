@@ -21,6 +21,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,6 +58,11 @@ public class CourseAPI {
     ) {
         String status = CourseStatus.ENABLE.name();
         logger.info(" get courses by status={} categoryId={}", status, categoryId);
+        CategoryCoursesBean ccB = getCategoryCoursesBean(categoryId, status);
+        return Response.ok(ccB).build();
+    }
+
+    private CategoryCoursesBean getCategoryCoursesBean(long categoryId, String status) {
         List<CourseBean> courses = categoryService.getCourseByCategoryId(status, categoryId);
         logger.info("count = {}", courses.size());
         CourseCategoryBean category = categoryService.getCategoryById(categoryId);
@@ -65,7 +71,22 @@ public class CourseAPI {
         ccB.setId(category.getId());
         ccB.setImageUrl(category.getImageUrl());
         ccB.setCourses(courses);
-        return Response.ok(ccB).build();
+        return ccB;
+    }
+
+    @Path("/categories/{ids}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCourseUnderCategories(@PathParam("ids") String ids){
+        String status = CourseStatus.ENABLE.name();
+        logger.info(" get courses by status={} categoryId={}", status, ids);
+        String idArray[] = ids.split("-");
+        List<CategoryCoursesBean> courseBeans = new ArrayList<>();
+        for(String id : idArray){
+            CategoryCoursesBean bean = getCategoryCoursesBean(Long.parseLong(id), CommonStatus.ENABLED.name());
+            courseBeans.add(bean);
+        }
+        return Response.ok(courseBeans).build();
     }
 
     // 获取课程详情
