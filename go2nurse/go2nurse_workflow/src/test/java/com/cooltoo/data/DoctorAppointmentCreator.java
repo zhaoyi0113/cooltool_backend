@@ -66,7 +66,7 @@ public class DoctorAppointmentCreator {
         );
         HospitalEntity hospital = hospitalRepository.findOne(1);
         List<HospitalDepartmentEntity> departments = departmentRepository.findByHospitalId(1, sort);
-        List<DoctorEntity> doctors = doctorRepository.findByHospitalDepartmentStatusIn(1, null, CommonStatus.getAll(), sort);
+        List<DoctorEntity> doctors = doctorRepository.findByHospitalIdAndStatusIn(1, CommonStatus.getAll(), sort);
         List<DoctorClinicDateEntity> clinicDates = clinicDateRepository.findAll();
         List<DoctorClinicHoursEntity> clinicHours = clinicHoursRepository.findAll();
         List<UserPatientRelationEntity> userToPatient = userPatientRelationRepository.findAll();

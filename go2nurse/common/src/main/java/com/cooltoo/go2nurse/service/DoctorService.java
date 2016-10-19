@@ -25,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/7/25.
@@ -46,6 +43,7 @@ public class DoctorService {
     @Autowired private CommonDepartmentService departmentService;
     @Autowired private Go2NurseUtility utility;
     @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
+    @Autowired private DoctorOrderService doctorOrderService;
 
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "grade"),
@@ -76,6 +74,24 @@ public class DoctorService {
         return repository.exists(doctorId);
     }
 
+    public Map<Long, DoctorBean> getDoctorIdToBean(List<Long> doctorIds) {
+        logger.info("get doctor by doctorIds size={}", null==doctorIds ? 0 : doctorIds.size());
+        Map<Long, DoctorBean> map = new HashMap<>();
+        if (!VerifyUtil.isListEmpty(doctorIds)) {
+            List<DoctorEntity> entities = repository.findAll(doctorIds);
+            List<DoctorBean> beans = entitiesToBeans(entities);
+            fillOtherProperties(beans);
+            for (DoctorBean tmp : beans) {
+                map.put(tmp.getId(), tmp);
+            }
+        }
+        else {
+            logger.warn("statuses is empty");
+        }
+        logger.info("count is ={}", map.size());
+        return map;
+    }
+
     public long countDoctor(List<CommonStatus> statuses) {
 
         long count = 0;
@@ -103,24 +119,45 @@ public class DoctorService {
         return beans;
     }
 
-    public long countDoctor(Integer hospitalId, Integer departmentId, List<CommonStatus> statuses) {
+    public long countDoctor(boolean orderByHospital, Integer hospitalId, Integer departmentId, List<CommonStatus> statuses) {
         long count = 0;
         if (!VerifyUtil.isListEmpty(statuses)) {
-            count = repository.countByHospitalDepartmentStatusIn(hospitalId, departmentId, statuses);
+            List<Long> doctorIdsInHospital = doctorOrderService.getDoctorOrderedList(orderByHospital, hospitalId, departmentId);
+            if (!VerifyUtil.isListEmpty(doctorIdsInHospital)) {
+                count = repository.countByIdInAndStatusIn(doctorIdsInHospital, statuses);
+            }
         }
         logger.info("count doctor by hospital={} department={} and status={}, size is {}",
                 hospitalId, departmentId, statuses, count);
         return count;
     }
 
-    public List<DoctorBean> getDoctor(Integer hospitalId, Integer departmentId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+    public List<DoctorBean> getDoctor(boolean orderByHospital, Integer hospitalId, Integer departmentId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
         logger.info("get doctor by hospital={} department={} and status={} at page={} size={}",
                 hospitalId, departmentId, statuses, pageIndex, sizePerPage);
-        List<DoctorBean> beans;
+        List<DoctorBean> beans = new ArrayList<>();
         if (!VerifyUtil.isListEmpty(statuses)) {
-            PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, sort);
-            Page<DoctorEntity> entities = repository.findByHospitalDepartmentStatusIn(hospitalId, departmentId, statuses, pageRequest);
-            beans = entitiesToBeans(entities);
+            List<Long> doctorIdsInHospital = doctorOrderService.getDoctorOrderedList(orderByHospital, hospitalId, departmentId);
+            if (!VerifyUtil.isListEmpty(doctorIdsInHospital)) {
+                List<DoctorEntity> doctorsReturn = repository.findEntityByIdInAndStatusIn(doctorIdsInHospital, statuses);
+                List<DoctorEntity> doctorsSorted = new ArrayList<>();
+                for (Long tmpId : doctorIdsInHospital) {
+                    for (DoctorEntity tmp : doctorsReturn) {
+                        if (tmp.getId()==tmpId) {
+                            doctorsSorted.add(tmp);
+                            break;
+                        }
+                    }
+                }
+                doctorsReturn.clear();
+                int startIndex = (pageIndex*sizePerPage)<0 ? 0 : (pageIndex*sizePerPage);
+                for (int i=startIndex; i<doctorsSorted.size(); i++) {
+                    if (i<(pageIndex*sizePerPage+sizePerPage)) {
+                        doctorsReturn.add(doctorsSorted.get(i));
+                    }
+                }
+                beans = entitiesToBeans(doctorsReturn);
+            }
             fillOtherProperties(beans);
         }
         else {

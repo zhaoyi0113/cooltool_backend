@@ -2,16 +2,13 @@ package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.DoctorBean;
-import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
-import com.cooltoo.go2nurse.beans.ServiceItemBean;
-import com.cooltoo.go2nurse.beans.ServiceVendorBean;
+import com.cooltoo.go2nurse.service.DoctorOrderService;
 import com.cooltoo.go2nurse.service.DoctorService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.enterprise.inject.Default;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -28,6 +25,7 @@ import java.util.List;
 public class DoctorManageAPI {
 
     @Autowired private DoctorService doctorService;
+    @Autowired private DoctorOrderService doctorOrderService;
 
     @Path("/doctor")
     @GET
@@ -75,7 +73,7 @@ public class DoctorManageAPI {
         statuses.add(CommonStatus.DISABLED);
         Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
         Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
-        long doctorsCount = doctorService.countDoctor(hospitalId, departmentId, statuses);
+        long doctorsCount = doctorService.countDoctor(null==departmentId||0==departmentId, hospitalId, departmentId, statuses);
         return Response.ok(doctorsCount).build();
     }
 
@@ -93,7 +91,7 @@ public class DoctorManageAPI {
         statuses.add(CommonStatus.DISABLED);
         Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
         Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
-        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, pageIndex, sizePerPage);
+        List<DoctorBean> doctors = doctorService.getDoctor(null==departmentId||0==departmentId, hospitalId, departmentId, statuses, pageIndex, sizePerPage);
         return Response.ok(doctors).build();
     }
 
@@ -114,6 +112,9 @@ public class DoctorManageAPI {
                                      @FormParam("introduction") String introduction
     ) {
         DoctorBean doctor = doctorService.addDoctor(name, post, jobTitle, beGoodAt, hospitalId, departmentId, grade, introduction);
+        if (hospitalId>0 && departmentId>0) {
+            doctorOrderService.addDoctorOrder(doctor.getId(), hospitalId, departmentId);
+        }
         return Response.ok(doctor).build();
     }
 
@@ -137,6 +138,9 @@ public class DoctorManageAPI {
                                       @FormParam("introduction") String introduction
     ) {
         DoctorBean doctor = doctorService.updateDoctor(doctorId, name, post, jobTitle, beGoodAt, hospitalId, departmentId, status, grade, introduction);
+        if (hospitalId>0 && departmentId>0) {
+            doctorOrderService.addDoctorOrder(doctorId, hospitalId, departmentId);
+        }
         return Response.ok(doctor).build();
     }
 

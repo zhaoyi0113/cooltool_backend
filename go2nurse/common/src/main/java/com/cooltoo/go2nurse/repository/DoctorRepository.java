@@ -19,18 +19,17 @@ public interface DoctorRepository extends JpaRepository<DoctorEntity, Long> {
     Page<DoctorEntity> findByStatusIn(List<CommonStatus> status, Pageable page);
 
     @Query("SELECT count(doctor.id) FROM DoctorEntity doctor" +
-            " WHERE (?1 IS NULL OR doctor.hospitalId=?1)" +
-            " AND (?2 IS NULL OR doctor.departmentId=?2)" +
-            " AND (doctor.status IN (?3))")
-    long countByHospitalDepartmentStatusIn(Integer hospitalId, Integer departmentId, List<CommonStatus> status);
+            " WHERE (doctor.id IN (?1))" +
+            " AND (doctor.status IN (?2))")
+    long countByIdInAndStatusIn(List<Long> doctorIds, List<CommonStatus> status);
     @Query("FROM DoctorEntity doctor" +
-            " WHERE (?1 IS NULL OR doctor.hospitalId=?1)" +
-            " AND (?2 IS NULL OR doctor.departmentId=?2)" +
-            " AND (doctor.status IN (?3))")
-    Page<DoctorEntity> findByHospitalDepartmentStatusIn(Integer hospitalId, Integer departmentId, List<CommonStatus> status, Pageable page);
-    @Query("FROM DoctorEntity doctor" +
-            " WHERE (?1 IS NULL OR doctor.hospitalId=?1)" +
-            " AND (?2 IS NULL OR doctor.departmentId=?2)" +
-            " AND (doctor.status IN (?3))")
-    List<DoctorEntity> findByHospitalDepartmentStatusIn(Integer hospitalId, Integer departmentId, List<CommonStatus> status, Sort sort);
+            " WHERE (doctor.id IN (?1))" +
+            " AND (doctor.status IN (?2))")
+    List<DoctorEntity> findEntityByIdInAndStatusIn(List<Long> doctorIds, List<CommonStatus> status);
+    @Query("SELECT doctor.id FROM DoctorEntity doctor" +
+            " WHERE (doctor.id IN (?1))" +
+            " AND (doctor.status IN (?2))")
+    List<Long> findIdByIdInAndStatusIn(List<Long> doctorIds, List<CommonStatus> status);
+
+    List<DoctorEntity> findByHospitalIdAndStatusIn(Integer hospitalId, List<CommonStatus> status, Sort sort);
 }
