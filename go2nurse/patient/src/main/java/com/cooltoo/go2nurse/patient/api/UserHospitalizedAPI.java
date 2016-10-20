@@ -215,6 +215,19 @@ public class UserHospitalizedAPI {
     }
 
     @GET
+    @Path("/diagnostic")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUserDiagnosticCourses(@Context HttpServletRequest request,
+                                             @QueryParam("diagnostic_name") String diagnosticName
+    ) {
+        DiagnosticEnumeration diagnostic = DiagnosticEnumeration.parseString(diagnosticName);
+        int diagnosticId = null==diagnostic ? Integer.MIN_VALUE : diagnostic.ordinal();
+        return getUserDiagnosticCourses(request, diagnosticId);
+    }
+
+
+    @GET
     @Path("/category/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
