@@ -2,6 +2,7 @@ package com.cooltoo.nurse360.repository;
 
 import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.nurse360.entities.NurseCourseRelationEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,6 +17,11 @@ public interface NurseCourseRelationRepository extends JpaRepository<NurseCourse
             " WHERE (?1 IS NULL OR course.nurseId=?1)" +
             " AND   (?2 IS NULL OR course.readingStatus=?2)")
     List<Long> findCourseIdByNurseIdAndReadingStatus(Long nurseId, ReadingStatus readingStatus);
+
+    @Query("SELECT course.courseId FROM NurseCourseRelationEntity course" +
+            " WHERE (?1 IS NULL OR course.nurseId=?1)" +
+            " AND   (?2 IS NULL OR course.readingStatus=?2)")
+    List<Long> findCourseIdByNurseIdAndReadingStatus(Long nurseId, ReadingStatus readingStatus, Sort sort);
 
     @Query("FROM NurseCourseRelationEntity course" +
             " WHERE (?1 IS NULL OR course.nurseId=?1)" +

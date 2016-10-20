@@ -6,6 +6,7 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.nurse360.beans.Nurse360CourseBean;
 import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.entities.NurseCourseRelationEntity;
@@ -36,6 +37,7 @@ public class NurseExtensionServiceForNurse360 {
     private static final Logger logger = LoggerFactory.getLogger(NurseExtensionServiceForNurse360.class);
 
     private static final Sort nurseHospitalRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
+    private static final Sort nurseCourseRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
     @Autowired private Nurse360Utility utility;
     // nurse hospital, course, notification relation
@@ -79,15 +81,7 @@ public class NurseExtensionServiceForNurse360 {
         List<Long> courseIdInHospital = courseHospitalRelationService.getCourseInHospitalAndDepartment(
                 nurseHospitalRelation.getHospitalId(), 0, CommonStatus.ENABLED.name()
         );
-        for (Long tmpId : courseIdInHospital) {
-            if (null==courseIdInDepartment) {
-                courseIdInDepartment = new ArrayList<>();
-            }
-            if (courseIdInDepartment.contains(tmpId)) {
-                continue;
-            }
-            courseIdInDepartment.add(tmpId);
-        }
+        courseIdInDepartment = mergeListValue(courseIdInHospital, courseIdInDepartment);
 
         // get course
         courses = courseService.getCourseByIds(courseIdInDepartment, pageIndex, number);
@@ -104,6 +98,61 @@ public class NurseExtensionServiceForNurse360 {
         }
 
         return courses;
+    }
+
+    public List<Nurse360CourseBean> getCourseReadByNurseId(long nurseId, int pageIndex, int number) {
+        logger.info("get course by nurseId={}", nurseId);
+        List<Nurse360CourseBean> coursesSorted = new ArrayList<>();
+
+        // sorted course that nurse has read
+        List<Long> courseReadId = nurseCourseRelationRepository.findCourseIdByNurseIdAndReadingStatus(nurseId, ReadingStatus.READ, nurseCourseRelationSort);
+        if (VerifyUtil.isListEmpty(courseReadId)) {
+            return coursesSorted;
+        }
+
+        // get course existed
+        List<Long> courseIdExisted = courseService.getCourseIdByStatusAndIds(CourseStatus.ENABLE.name(), courseReadId);
+        if (VerifyUtil.isListEmpty(courseIdExisted)) {
+            return coursesSorted;
+        }
+
+        // clear course not existed
+        List<Long> courseReadIdSorted = new ArrayList<>();
+        for (Long tmpId : courseReadId) {
+            if (!courseIdExisted.contains(tmpId)) {
+                continue;
+            }
+            if (courseReadIdSorted.contains(tmpId)) {
+                continue;
+            }
+            courseReadIdSorted.add(tmpId);
+        }
+
+        // get return sorted courseId
+        List<Long> returnSortedCourseId = new ArrayList<>();
+        int startIndex = (pageIndex*number)<0 ? 0 : (pageIndex*number);
+        for (int i=startIndex; i<courseReadIdSorted.size(); i++) {
+            if (i>=(pageIndex*number + number)) {
+                break;
+            }
+            returnSortedCourseId.add(courseReadIdSorted.get(i));
+        }
+        if (VerifyUtil.isListEmpty(returnSortedCourseId)) {
+            return coursesSorted;
+        }
+
+        // get course bean
+        List<Nurse360CourseBean> courses = courseService.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), returnSortedCourseId);
+        for (Long tmpId : returnSortedCourseId) {
+            for (Nurse360CourseBean tmp : courses) {
+                if (tmpId == tmp.getId()) {
+                    tmp.setHasRead(YesNoEnum.YES);
+                    coursesSorted.add(tmp);
+                }
+            }
+        }
+
+        return coursesSorted;
     }
 
     //********************
@@ -133,15 +182,7 @@ public class NurseExtensionServiceForNurse360 {
         List<Long> notificationIdInHospital = notificationHospitalRelationService.getNotificationInHospitalAndDepartment(
                 nurseHospitalRelation.getHospitalId(), 0, CommonStatus.ENABLED.name()
         );
-        for (Long tmpId : notificationIdInHospital) {
-            if (null==notificationIdInDepartment) {
-                notificationIdInDepartment = new ArrayList<>();
-            }
-            if (notificationIdInDepartment.contains(tmpId)) {
-                continue;
-            }
-            notificationIdInDepartment.add(tmpId);
-        }
+        notificationIdInDepartment = mergeListValue(notificationIdInHospital, notificationIdInDepartment);
 
         // get notification
         notifications = notificationService.getNotificationByIds(notificationIdInDepartment, pageIndex, number);
@@ -160,6 +201,25 @@ public class NurseExtensionServiceForNurse360 {
         return notifications;
     }
 
+    private List<Long> mergeListValue(List<Long> list1, List<Long> list2) {
+        if (VerifyUtil.isListEmpty(list1) && VerifyUtil.isListEmpty(list2)) {
+            return new ArrayList<>();
+        }
+        if (VerifyUtil.isListEmpty(list1)) {
+            return list2;
+        }
+        if (VerifyUtil.isListEmpty(list2)) {
+            return list1;
+        }
+
+        for (Long tmpId : list1) {
+            if (list2.contains(tmpId)) {
+                continue;
+            }
+            list2.add(tmpId);
+        }
+        return list2;
+    }
     //========================================================================
     //                adding
     //========================================================================

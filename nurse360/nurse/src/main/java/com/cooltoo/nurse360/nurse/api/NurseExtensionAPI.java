@@ -37,6 +37,20 @@ public class NurseExtensionAPI {
         return Response.ok(courses).build();
     }
 
+    @Path("/course/self/{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getCourseOfNurseRead(@Context HttpServletRequest request,
+                                         @PathParam("index") @DefaultValue("0") int pageIndex,
+                                         @PathParam("number") @DefaultValue("10") int sizePerPage
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<Nurse360CourseBean> courses = nurseExtensionService.getCourseReadByNurseId(nurseId, pageIndex, sizePerPage);
+        return Response.ok(courses).build();
+    }
+
+
     @Path("/course/{course_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
