@@ -83,7 +83,7 @@ public class CourseAPI {
         String idArray[] = ids.split("-");
         List<CategoryCoursesBean> courseBeans = new ArrayList<>();
         for(String id : idArray){
-            CategoryCoursesBean bean = getCategoryCoursesBean(Long.parseLong(id), CommonStatus.ENABLED.name());
+            CategoryCoursesBean bean = getCategoryCoursesBean(Long.parseLong(id), CourseStatus.ENABLE.name());
             courseBeans.add(bean);
         }
         return Response.ok(courseBeans).build();
