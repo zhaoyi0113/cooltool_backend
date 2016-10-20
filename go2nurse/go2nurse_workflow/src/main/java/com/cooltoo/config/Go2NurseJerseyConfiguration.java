@@ -5,6 +5,7 @@ import com.cooltoo.go2nurse.filters.BadRequestExceptionMapper;
 import com.cooltoo.go2nurse.filters.CORSResponseFilter;
 import com.cooltoo.go2nurse.filters.UserLoginAuthenticationFilter;
 import com.cooltoo.go2nurse.patient.api.*;
+import com.cooltoo.go2nurse.patient.api.wechat.WeChatHospitalDepartmentAPI;
 import com.cooltoo.go2nurse.patient.api.wechat.WeChatPayAPI;
 import com.cooltoo.go2nurse.patient.api.wechat.WechatCourseAPI;
 import com.cooltoo.go2nurse.patient.api.wechat.WeChatQuestionnaireAnswerAPI;
@@ -79,7 +80,7 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
         register(WeChatQuestionnaireAnswerAPI.class);
         register(WeChatPayAPI.class);
         register(DoctorOrderManageAPI.class);
-
+        register(WeChatHospitalDepartmentAPI.class);
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 
     }
