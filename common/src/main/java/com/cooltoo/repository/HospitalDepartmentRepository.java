@@ -24,4 +24,6 @@ public interface HospitalDepartmentRepository extends CrudRepository<HospitalDep
             " WHERE (?1 IS NOT NULL AND hd.name LIKE %?1)" +
             " AND   (hd.enable=1)")
     List<HospitalDepartmentEntity> findByNameLike(String nameLike);
+
+    HospitalDepartmentEntity findById(int id);
 }

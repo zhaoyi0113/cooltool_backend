@@ -14,6 +14,7 @@ import java.util.List;
  */
 public interface HospitalRepository extends CrudRepository<HospitalEntity, Integer> {
     Page<HospitalEntity> findAll(Pageable page);
+    HospitalEntity findById(int id);
     List<HospitalEntity> findByIdIn(List<Integer> ids);
     List<HospitalEntity> findByName(String name);
     List<HospitalEntity> findByUniqueId(String uniqueId);

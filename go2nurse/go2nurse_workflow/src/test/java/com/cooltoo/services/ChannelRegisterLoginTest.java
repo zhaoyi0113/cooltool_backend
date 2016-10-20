@@ -22,6 +22,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -49,7 +51,8 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired private UserWeChatTokenAccessRepository weChatTokenAccessRepository;
+    @Autowired
+    private UserWeChatTokenAccessRepository weChatTokenAccessRepository;
 
     @Test
     public void test_register_from_existed_wechat_user() {
@@ -64,11 +67,11 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
     public void test_login_from_non_registered_wechat_user() {
         WeChatUserInfo userInfo = new WeChatUserInfo();
         userInfo.setOpenid("100");
-        URI uri = weChatService.loginWithWeChatUser(userInfo, null,"1");
+        URI uri = weChatService.loginWithWeChatUser(userInfo, null, "1");
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("register"));
         userService.registerUser("aa", 0, "aa", "aaa", "aaa", "aaa", "none", AppChannel.WECHAT.name(), "100", "100");
-        uri = weChatService.loginWithWeChatUser(userInfo, null,"1");
+        uri = weChatService.loginWithWeChatUser(userInfo, null, "1");
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.getSchemeSpecificPart().contains("token"));
     }
@@ -78,11 +81,11 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
         WeChatUserInfo userInfo = new WeChatUserInfo();
         userInfo.setUserId(999);
         userInfo.setOpenid("1");
-        URI uri = weChatService.loginWithWeChatUser(userInfo, null,"1");
+        URI uri = weChatService.loginWithWeChatUser(userInfo, null, "1");
         Assert.assertNotNull(uri);
         Assert.assertFalse(uri.toString().contains("token"));
         userService.registerUser("aa", 0, "aa", "13523212122", "aaa", "aaa", "none", AppChannel.WECHAT.name(), null, "1");
-        uri = weChatService.loginWithWeChatUser(userInfo, null,"1");
+        uri = weChatService.loginWithWeChatUser(userInfo, null, "1");
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString(), uri.toString().contains("token"));
     }
@@ -139,7 +142,7 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
         WeChatUserInfo weChatUserInfo = new WeChatUserInfo();
         weChatUserInfo.setOpenid("1");
-        URI uri = weChatService.loginWithWeChatUser(weChatUserInfo, null,"1");
+        URI uri = weChatService.loginWithWeChatUser(weChatUserInfo, null, "1");
         Assert.assertNotNull(uri);
         Assert.assertTrue(uri.toString().contains("token"));
     }
@@ -188,17 +191,17 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
 
     @Test
     public void test_register_duplicate_channelId() {
-        BadRequestException ex =  null;
-        try{
-            userService.registerUser("",0,null,"","","","",AppChannel.WECHAT.name(), "1","");
-        }catch(BadRequestException e){
+        BadRequestException ex = null;
+        try {
+            userService.registerUser("", 0, null, "", "", "", "", AppChannel.WECHAT.name(), "1", "");
+        } catch (BadRequestException e) {
             ex = e;
         }
         Assert.assertNotNull(ex);
     }
 
     @Test
-    public void test_login_save_wechat_token(){
+    public void test_login_save_wechat_token() {
         UserTokenAccessEntity entity = loginService.login("13523212122", "aa03", AppChannel.WECHAT.name(), null, "1");
         UserWeChatTokenAccessEntity wechatToken = weChatTokenAccessRepository.findFirstByTokenAndStatus(entity.getToken(), CommonStatus.ENABLED);
         Assert.assertNotNull(wechatToken);
@@ -206,28 +209,51 @@ public class ChannelRegisterLoginTest extends AbstractCooltooTest {
     }
 
     @Test
-    public void test_find_appid_by_token(){
+    public void test_find_appid_by_token() {
         String appid = weChatTokenAccessRepository.findAppIdFromToken("token1", CommonStatus.ENABLED);
         Assert.assertNotNull(appid);
         Assert.assertEquals("3", appid);
     }
 
     @Test
-    public void test_wechat_login_duplicate_user(){
+    public void test_wechat_login_duplicate_user() {
         WeChatUserInfo userInfo = new WeChatUserInfo();
-        userInfo.setOpenid(System.currentTimeMillis()+"");
-        weChatService.loginWithWeChatUser(userInfo, "",null);
-        weChatService.loginWithWeChatUser(userInfo, "",null);
-        weChatService.loginWithWeChatUser(userInfo, "",null);
+        userInfo.setOpenid(System.currentTimeMillis() + "");
+        weChatService.loginWithWeChatUser(userInfo, "", null);
+        weChatService.loginWithWeChatUser(userInfo, "", null);
+        weChatService.loginWithWeChatUser(userInfo, "", null);
         List<UserOpenAppEntity> userOpenEntties = openAppRepository.findByOpenid(userInfo.getOpenid());
         Assert.assertEquals(1, userOpenEntties.size());
     }
 
     @Test
-    public void test_login_user_has_mutiple_openid(){
+    public void test_login_user_has_mutiple_openid() {
         WeChatUserInfo userInfo = new WeChatUserInfo();
         userInfo.setOpenid("2");
         URI uri = weChatService.loginWithWeChatUser(userInfo, "1", "2");
         Assert.assertTrue(uri.toString(), uri.toString().contains("token2"));
+    }
+
+    @Test
+    public void test_login_with_departmentId(){
+        WeChatUserInfo userInfo = new WeChatUserInfo();
+        userInfo.setOpenid("2");
+        URI uri = weChatService.loginWithWeChatUser(userInfo, "aaa", "2");
+        MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUri(uri).build().getQueryParams();
+        Assert.assertTrue(uri.toString(),parameters.containsKey("departmentId"));
+        Assert.assertEquals("001001", parameters.get("departmentId").get(0));
+        Assert.assertTrue(parameters.containsKey("redirect"));
+        Assert.assertEquals("aaa", parameters.get("redirect").get(0));
+
+    }
+
+    @Test
+    public void test_register_with_departmentId(){
+        WeChatUserInfo userInfo = new WeChatUserInfo();
+        userInfo.setOpenid("999");
+        URI uri = weChatService.loginWithWeChatUser(userInfo, "aaa", "1");
+        Assert.assertTrue(uri.toString(),uri.toString().contains("departmentId=001001"));
+        Assert.assertTrue(uri.toString(),uri.toString().contains("redirect=aaa"));
+        Assert.assertTrue(uri.toString().contains("register"));
     }
 }

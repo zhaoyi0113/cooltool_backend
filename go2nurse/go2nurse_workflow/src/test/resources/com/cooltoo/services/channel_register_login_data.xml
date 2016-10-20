@@ -13,13 +13,16 @@
     <go2nurse_user_openapp_desc id="4" unionid="4" openid="1" channel="2" status="1" user_id="3" appid="1"/>
     <go2nurse_user_openapp_desc id="5" unionid="5" openid="2" channel="2" status="1" user_id="3" appid="2"/>
 
-    <go2nurse_wechat_account id="1" appid="1" appsecret="1" status="1"/>
-    <go2nurse_wechat_account id="2" appid="2" appsecret="2" status="1"/>
-    <go2nurse_wechat_account id="3" appid="3" appsecret="3" status="1"/>
+    <go2nurse_wechat_account id="1" appid="1" appsecret="1" status="1" hospital_id="1" department_id="1"/>
+    <go2nurse_wechat_account id="2" appid="2" appsecret="2" status="1" hospital_id="1" department_id="1"/>
+    <go2nurse_wechat_account id="3" appid="3" appsecret="3" status="1" hospital_id="1" department_id="1"/>
 
     <go2nurse_user_wechat_token_access id="1" token="token1" wechat_account_id="3" status="1"/>
     <go2nurse_user_wechat_token_access id="2" token="token2" wechat_account_id="2" status="1"/>
 
     <go2nurse_user_token_access id="1" user_id="3" status="1" token="token1"/>
     <go2nurse_user_token_access id="2" user_id="3" status="1" token="token2"/>
+
+    <cooltoo_hospital id="1" unique_id="001"/>
+    <cooltoo_hospital_department id="1" unique_id="001"/>
 </dataset>
