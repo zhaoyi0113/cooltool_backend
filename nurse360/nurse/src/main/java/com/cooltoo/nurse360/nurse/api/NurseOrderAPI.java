@@ -54,7 +54,7 @@ public class NurseOrderAPI {
                              @PathParam("order_no") @DefaultValue("0") String orderNo
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<ServiceOrderBean> orders = nurseOrderService.getOrderByOrderNo(orderNo);
+        List<ServiceOrderBean> orders = nurseOrderService.getOrderByOrderNo(nurseId, orderNo);
         return Response.ok(orders).build();
     }
 

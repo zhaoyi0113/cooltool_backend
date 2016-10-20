@@ -48,8 +48,18 @@ public class NurseOrderRelationServiceForNurse360 {
     //============================================================================
     //                 get
     //============================================================================
-    public List<ServiceOrderBean> getOrderByOrderNo(String orderNo) {
+    public List<ServiceOrderBean> getOrderByOrderNo(long nurseId, String orderNo) {
         List<ServiceOrderBean> beans = orderService.getOrderByOrderNo(orderNo);
+        if (!VerifyUtil.isListEmpty(beans)) {
+            long orderId = beans.get(0).getId();
+            List<NurseOrderRelationEntity> relations = repository.findByOrderId(orderId, sort);
+            if (!VerifyUtil.isListEmpty(relations)) {
+                beans.get(0).setIsNurseFetched(nurseId==relations.get(0).getNurseId() ? YesNoEnum.YES : YesNoEnum.NO);
+            }
+            else {
+                beans.get(0).setIsNurseFetched(YesNoEnum.NO);
+            }
+        }
         return beans;
     }
 
