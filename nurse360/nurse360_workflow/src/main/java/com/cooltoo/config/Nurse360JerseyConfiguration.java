@@ -7,6 +7,7 @@ import com.cooltoo.nurse360.admin.api.NotificationManageAPI;
 import com.cooltoo.nurse360.filters.Nurse360BadRequestExceptionMapper;
 import com.cooltoo.nurse360.filters.Nurse360CORSResponseFilter;
 import com.cooltoo.nurse360.filters.Nurse360NurseLoginAuthenticationFilter;
+import com.cooltoo.nurse360.hospital.api.HospitalManagementTestAPI;
 import com.cooltoo.nurse360.nurse.api.*;
 import io.swagger.annotations.Api;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -45,6 +46,7 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(NotificationManageAPI.class);
         register(NurseExtensionAPI.class);
         register(NurseQualificationAPIForNurse360.class);
+        register(HospitalManagementTestAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
     }

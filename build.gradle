@@ -23,6 +23,7 @@ project.ext {
     springfoxSwaggerVersion = '2.4.0'
     togglzVersion = '2.3.0.RC1'
     flywayVersion = '3.2.1'
+    springSecurityVertion = '4.1.3.RELEASE'
 }
 
 buildscript {

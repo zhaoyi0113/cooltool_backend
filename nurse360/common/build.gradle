@@ -8,6 +8,9 @@ repositories {
 }
 
 dependencies {
+    compile("org.springframework.security:spring-security-web:"+springSecurityVertion)
+    compile("org.springframework.security:spring-security-config:"+springSecurityVertion)
+
     compile project(":common")
     compile project(':go2nurse:common')
 }
