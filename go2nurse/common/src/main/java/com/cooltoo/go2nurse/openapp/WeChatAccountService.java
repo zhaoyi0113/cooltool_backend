@@ -141,9 +141,11 @@ public class WeChatAccountService {
             return;
         }
         HospitalBean hospital = hospitalService.getHospital(bean.getHospitalId());
-        HospitalDepartmentBean department = departmentService.getById(bean.getDepartmentId(), utility.getHttpPrefixForNurseGo());
         bean.setHospital(hospital);
-        bean.setDepartment(department);
+        try {
+            HospitalDepartmentBean department = departmentService.getById(bean.getDepartmentId(), utility.getHttpPrefixForNurseGo());
+            bean.setDepartment(department);
+        } catch (Exception ex) {}
     }
 
 
