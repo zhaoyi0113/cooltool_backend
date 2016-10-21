@@ -109,6 +109,7 @@ public class WeChatService {
     public URI loginWithWeChatUser(WeChatUserInfo userInfo, String redirectPath, String appid) {
         String openid = null;
         String departmentId = getDepartmentCode(appid);
+        logger.info("get department code="+departmentId+" from appid "+appid);
         if (userInfo != null) {
             openid = userInfo.getOpenid();
             logger.info("login user openid=" + openid);
@@ -135,7 +136,7 @@ public class WeChatService {
                                 String url = "http://" + serverHost + "/go2nurse/?token=" + userToken;
                                 url = addParameterOnUrl(url, "redirect", redirectPath);
                                 url = addParameterOnUrl(url, "departmentId", departmentId);
-
+                                url = addParameterOnUrl(url, "appid", appid);
                                 return new URI(url);
                             } catch (URISyntaxException e) {
                                 logger.error(e.getMessage(), e);
@@ -170,6 +171,7 @@ public class WeChatService {
             }
             urlStr = addParameterOnUrl(urlStr, "redirect", redirectPath);
             urlStr = addParameterOnUrl(urlStr, "departmentId", departmentId);
+            urlStr = addParameterOnUrl(urlStr, "appid", appid);
             return new URI(urlStr);
         } catch (URISyntaxException e) {
             logger.error(e.getMessage(), e);
