@@ -78,7 +78,9 @@ public class NurseServiceForNurse360 {
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
         bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospitalDepartment);
         bean.setProperty(NurseBean.ORDER, orders);
-        bean.setProperty(NurseBean.QUALIFICATION, qualification);
+        if (null!=qualification && !qualification.isEmpty()) {
+            bean.setProperty(NurseBean.QUALIFICATION, qualification.get(0));
+        }
         return bean;
     }
 
