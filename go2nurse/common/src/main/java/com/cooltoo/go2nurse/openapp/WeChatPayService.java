@@ -141,12 +141,13 @@ public class WeChatPayService {
         key = "time_start";
         keyParam.put(key, timeStart);
 
-        logger.info("request payment parameter map===="+keyParam);
-
         key = "sign";
         keyParam.put(key, createSign(apiKey, "UTF-8", new TreeMap<>(keyParam)));
 
+        logger.info("request payment parameter map===="+keyParam);
+
         String xmlWeChatOrder = VerifyUtil.getRequestXml(new TreeMap<>(keyParam));
+        logger.info("create sign xml "+xmlWeChatOrder);
         String response = NetworkUtil.httpsRequest(UNIFIED_ORDER_URL, "POST", xmlWeChatOrder, null);
         keyParam = VerifyUtil.parseResponseXml(response);
         return keyParam;
