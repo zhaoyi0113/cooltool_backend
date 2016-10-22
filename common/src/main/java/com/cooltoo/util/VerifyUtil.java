@@ -385,7 +385,7 @@ public class VerifyUtil {
      * @param parameters  请求参数
      * @return
      */
-    public static String getRequestXml(SortedMap<String,Object> parameters){
+    public static String getRequestXml(Map<String,Object> parameters){
         StringBuffer sb = new StringBuffer();
         sb.append("<xml>");
         Set es = parameters.entrySet();
