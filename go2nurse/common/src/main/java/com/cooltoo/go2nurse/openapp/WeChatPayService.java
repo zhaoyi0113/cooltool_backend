@@ -3,6 +3,8 @@ package com.cooltoo.go2nurse.openapp;
 import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,8 @@ import java.util.*;
  */
 @Service("WeChatPayService")
 public class WeChatPayService {
+
+    private static final Logger logger = LoggerFactory.getLogger(WeChatPayService.class);
 
     /***************************************
      *           微信基础接口地址            *
@@ -137,7 +141,7 @@ public class WeChatPayService {
         key = "time_start";
         keyParam.put(key, timeStart);
 
-        System.out.println("\r\n\r\n map===="+keyParam+"\r\n\r\n");
+        logger.info("request payment parameter map===="+keyParam);
 
         key = "sign";
         keyParam.put(key, createSign(apiKey, "UTF-8", new TreeMap<>(keyParam)));
