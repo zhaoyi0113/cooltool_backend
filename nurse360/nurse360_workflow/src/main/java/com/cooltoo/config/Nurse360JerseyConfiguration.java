@@ -47,6 +47,7 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(NurseExtensionAPI.class);
         register(NurseQualificationAPIForNurse360.class);
         register(HospitalManagementTestAPI.class);
+        register(NurseConsultationAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
     }

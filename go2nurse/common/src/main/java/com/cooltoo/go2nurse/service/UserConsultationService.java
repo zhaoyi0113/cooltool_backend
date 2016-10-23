@@ -84,9 +84,9 @@ public class UserConsultationService {
     //             get ----  patient using
     //===============================================================
 
-    public List<UserConsultationBean> getUserConsultation(Long userId, String contentLike, int pageIndex, int sizePerPage) {
-        logger.info("user={} get consultation (contentLike={}) at page={} sizePerPage={}",
-                userId, contentLike, pageIndex, sizePerPage);
+    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, Long categoryId, String contentLike, int pageIndex, int sizePerPage) {
+        logger.info("user={} nusre={} get consultation (contentLike={}) categoryId={} at page={} sizePerPage={}",
+                userId, nurseId, contentLike, categoryId, pageIndex, sizePerPage);
         List<UserConsultationBean> beans;
         if (null==userId && VerifyUtil.isStringEmpty(contentLike)) {
             beans = new ArrayList<>();
@@ -94,7 +94,7 @@ public class UserConsultationService {
         else {
             contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
             PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-            Page<UserConsultationEntity> resultSet = repository.findByUserIdAndStatusNotAndContentLike(userId, CommonStatus.DELETED, contentLike, request);
+            Page<UserConsultationEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, nurseId, categoryId, CommonStatus.DELETED, contentLike, request);
             beans = entitiesToBeansForConsultation(resultSet);
             fillOtherPropertiesForConsultation(beans, ConsultationTalkStatus.USER_SPEAK);
         }

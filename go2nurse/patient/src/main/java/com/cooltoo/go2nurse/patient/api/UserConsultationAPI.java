@@ -69,7 +69,7 @@ public class UserConsultationAPI {
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, content, pageIndex, sizePerPage);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, null, null, content, pageIndex, sizePerPage);
         return Response.ok(consultations).build();
     }
 
