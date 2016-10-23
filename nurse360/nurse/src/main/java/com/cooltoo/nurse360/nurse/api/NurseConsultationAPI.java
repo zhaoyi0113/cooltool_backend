@@ -6,10 +6,10 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.ConsultationCategoryBean;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
-import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.ConsultationCategoryService;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.go2nurse.service.UserConsultationTalkService;
+import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class NurseConsultationAPI {
     @Path("/category")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getServiceCategory(@Context HttpServletRequest request) {
         List<CommonStatus> statuses = new ArrayList<>();
         statuses.add(CommonStatus.ENABLED);
@@ -55,7 +55,7 @@ public class NurseConsultationAPI {
     @Path("/content_like")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getConsultation(@Context HttpServletRequest request,
                                     @QueryParam("content") @DefaultValue("") String content,
                                     @QueryParam("category_id") @DefaultValue("0") long lCategoryId,
@@ -71,7 +71,7 @@ public class NurseConsultationAPI {
     @Path("/user")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getConsultation(@Context HttpServletRequest request,
                                     @QueryParam("user_id") @DefaultValue("0") long userId,
                                     @QueryParam("index") @DefaultValue("0") int pageIndex,
@@ -84,7 +84,7 @@ public class NurseConsultationAPI {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getConsultationWithTalks(@Context HttpServletRequest request,
                                              @QueryParam("consultation_id") @DefaultValue("0") long consultationId
     ) {
@@ -94,7 +94,7 @@ public class NurseConsultationAPI {
 
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response editConsultation(@Context HttpServletRequest request,
                                      @FormParam("consultation_id") @DefaultValue("0") long consultationId,
                                      @FormParam("category_id") @DefaultValue("") String strCategoryId,
@@ -115,7 +115,7 @@ public class NurseConsultationAPI {
     @Path("/talk")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response deleteConsultationTalk(@Context HttpServletRequest request,
                                            @FormParam("talk_id") @DefaultValue("0") long talkId
     ) {
@@ -129,7 +129,7 @@ public class NurseConsultationAPI {
     @Path("/talk")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response addConsultationTalk(@Context HttpServletRequest request,
                                         @FormParam("consultation_id") @DefaultValue("0") long consultationId,
                                         @FormParam("talk_content") @DefaultValue("") String talkContent
@@ -146,7 +146,7 @@ public class NurseConsultationAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @LoginAuthentication(requireUserLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response addConsultationTalkImage(@Context HttpServletRequest request,
                                              @FormDataParam("consultation_id") @DefaultValue("0") long consultationId,
                                              @FormDataParam("talk_id") @DefaultValue("0") long talkId,
@@ -161,7 +161,7 @@ public class NurseConsultationAPI {
     @Path("/talk/reading_status")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response addConsultationTalkImage(@Context HttpServletRequest request,
                                              @FormParam("consultation_id") @DefaultValue("0") long consultationId
     ) {
