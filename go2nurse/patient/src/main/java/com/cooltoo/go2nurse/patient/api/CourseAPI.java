@@ -80,7 +80,7 @@ public class CourseAPI {
     public Response getCourseUnderCategories(@PathParam("ids") String ids){
         String status = CourseStatus.ENABLE.name();
         logger.info(" get courses by status={} categoryId={}", status, ids);
-        String idArray[] = ids.split("-");
+        String idArray[] = ids.split("_");
         List<CategoryCoursesBean> courseBeans = new ArrayList<>();
         for(String id : idArray){
             CategoryCoursesBean bean = getCategoryCoursesBean(Long.parseLong(id), CourseStatus.ENABLE.name());
