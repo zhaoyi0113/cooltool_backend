@@ -172,7 +172,6 @@ public class WeChatPayService {
             }
         }
         sb.append("key=" + weChatApiKey);
-        System.out.println(sb);
         String sign = NumberUtil.md5Encode(sb.toString(), characterEncoding, "MD5").toUpperCase();
         return sign;
     }

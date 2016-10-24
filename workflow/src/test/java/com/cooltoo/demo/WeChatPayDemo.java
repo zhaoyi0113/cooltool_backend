@@ -106,8 +106,8 @@ public class WeChatPayDemo {
 
 
         // 订单失效时间,格式为yyyyMMddHHmmss
-        key = "time_expire";
-        keyParam.put(key, "20161022215821");
+//        key = "time_expire";
+//        keyParam.put(key, "20161022215821");
 
         // 订单生成时间,格式为yyyyMMddHHmmss
         key = "time_start";

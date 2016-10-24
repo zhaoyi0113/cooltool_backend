@@ -47,34 +47,45 @@ public class ServiceOrderService {
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 
-    @Autowired private ServiceOrderRepository repository;
-    @Autowired private ServiceOrderBeanConverter beanConverter;
+    @Autowired
+    private ServiceOrderRepository repository;
+    @Autowired
+    private ServiceOrderBeanConverter beanConverter;
 
-    @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
-    @Autowired private PatientService patientService;
-    @Autowired private UserAddressService addressService;
-    @Autowired private Go2NurseUtility go2NurseUtility;
-    @Autowired private ServiceOrderChargePingPPService orderPingPPService;
-    @Autowired private PingPPService pingPPService;
-    @Autowired private WeChatService weChatService;
-    @Autowired private WeChatPayService weChatPayService;
+    @Autowired
+    private ServiceVendorCategoryAndItemService serviceCategoryItemService;
+    @Autowired
+    private PatientService patientService;
+    @Autowired
+    private UserAddressService addressService;
+    @Autowired
+    private Go2NurseUtility go2NurseUtility;
+    @Autowired
+    private ServiceOrderChargePingPPService orderPingPPService;
+    @Autowired
+    private PingPPService pingPPService;
+    @Autowired
+    private WeChatService weChatService;
+    @Autowired
+    private WeChatPayService weChatPayService;
 
-    @Autowired private Notifier notifier;
+    @Autowired
+    private Notifier notifier;
 
-    @Autowired private NurseOrderRelationRepository nurseOrderRelationRepository;
+    @Autowired
+    private NurseOrderRelationRepository nurseOrderRelationRepository;
 
     //=====================================================================
     //                   getting
     //=====================================================================
 
     private String getOrderNo() {
-        String orderNo = System.currentTimeMillis()+"";
-        for (int i = 10; i>0; i--) {
+        String orderNo = System.currentTimeMillis() + "";
+        for (int i = 10; i > 0; i--) {
             orderNo = NumberUtil.getUniqueString();
-            if (repository.countByOrderNo(orderNo)<=0) {
+            if (repository.countByOrderNo(orderNo) <= 0) {
                 break;
-            }
-            else {
+            } else {
                 orderNo = null;
             }
         }
@@ -118,7 +129,7 @@ public class ServiceOrderService {
         }
         logger.info("get service order id by orderId size={} and orderStatus={}", orderIds.size(), orderStatus);
         List<Long> resultSet = repository.findByIdInAndOrderStatus(orderIds, orderStatus);
-        if (null==resultSet) {
+        if (null == resultSet) {
             resultSet = new ArrayList<>();
         }
         logger.info("service order count is {}", resultSet.size());
@@ -179,7 +190,7 @@ public class ServiceOrderService {
     public List<ServiceOrderBean> getOrderByOrderId(long orderId) {
         logger.info("get service order by orderId={}", orderId);
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         List<ServiceOrderEntity> entities = new ArrayList<>();
@@ -200,7 +211,7 @@ public class ServiceOrderService {
     }
 
     private List<ServiceOrderBean> entitiesToBeans(Iterable<ServiceOrderEntity> entities) {
-        if (null==entities) {
+        if (null == entities) {
             return new ArrayList<>();
         }
         List<ServiceOrderBean> beans = new ArrayList<>();
@@ -225,10 +236,9 @@ public class ServiceOrderService {
         Map<Long, List<ServiceOrderChargePingPPBean>> orderId2Charge = orderPingPPService.getOrderPingPPResult(AppType.GO_2_NURSE, orderIds);
         for (ServiceOrderBean tmp : beans) {
             List<ServiceOrderChargePingPPBean> charges = orderId2Charge.get(tmp.getId());
-            if (null==charges) {
+            if (null == charges) {
                 tmp.setPingPP(new ArrayList<>());
-            }
-            else {
+            } else {
                 tmp.setPingPP(charges);
             }
         }
@@ -246,10 +256,9 @@ public class ServiceOrderService {
         Date _1970 = new Date(0); // 1970-01-00 08:00:00
         for (ServiceOrderBean tmp : beans) {
             Date fetchTime = orderIdToFetchTime.get(tmp.getId());
-            if (null==fetchTime) {
+            if (null == fetchTime) {
                 tmp.setFetchTime(_1970);
-            }
-            else {
+            } else {
                 tmp.setFetchTime(fetchTime);
             }
         }
@@ -269,7 +278,7 @@ public class ServiceOrderService {
                 orderId, patientId, addressId, strStartTime, count, leaveAMessage, preferentialCent);
 
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
@@ -279,7 +288,7 @@ public class ServiceOrderService {
         }
 
         boolean changed = false;
-        if (patientId!=null && patientService.existPatient(patientId)) {
+        if (patientId != null && patientService.existPatient(patientId)) {
             PatientBean patient = patientService.getOneById(patientId);
             String patientJson = go2NurseUtility.toJsonString(patient);
             entity.setPatientId(patientId);
@@ -287,7 +296,7 @@ public class ServiceOrderService {
             changed = true;
         }
 
-        if (addressId!=null && addressService.existAddress(addressId)) {
+        if (addressId != null && addressService.existAddress(addressId)) {
             UserAddressBean address = addressService.getOneById(addressId);
             String addressJson = go2NurseUtility.toJsonString(address);
             entity.setAddressId(addressId);
@@ -296,16 +305,16 @@ public class ServiceOrderService {
         }
 
         long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (lStartTime>0) {
+        if (lStartTime > 0) {
             entity.setServiceStartTime(new Date(lStartTime));
             changed = true;
         }
 
-        if (null!=count) {
+        if (null != count) {
             ServiceOrderBean bean = beanConverter.convert(entity);
             ServiceItemBean item = bean.getServiceItem();
-            entity.setServiceTimeDuration(item.getServiceTimeDuration()*count);
-            entity.setTotalConsumptionCent(item.getServicePriceCent()*count);
+            entity.setServiceTimeDuration(item.getServiceTimeDuration() * count);
+            entity.setTotalConsumptionCent(item.getServicePriceCent() * count);
             changed = true;
         }
 
@@ -314,7 +323,7 @@ public class ServiceOrderService {
             changed = true;
         }
 
-        if (preferentialCent>0 && preferentialCent!=entity.getPreferentialCent()) {
+        if (preferentialCent > 0 && preferentialCent != entity.getPreferentialCent()) {
             entity.setPreferentialCent(preferentialCent);
             changed = true;
         }
@@ -332,10 +341,10 @@ public class ServiceOrderService {
     public Charge payForService(Long userId, Long orderId, String channel, String clientIP) {
         logger.info("create charge object for order={} channel={} clientIp={}", orderId, channel, clientIP);
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (userId!=entity.getUserId()) {
+        if (userId != entity.getUserId()) {
             logger.error("this order does not belong to this user");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -351,13 +360,13 @@ public class ServiceOrderService {
         ServiceOrderBean order = beanConverter.convert(entity);
         String orderNo = order.getOrderNo();
         Map extra = new HashMap<>();
-        if(channel.equals("wx_pub")){
+        if (channel.equals("wx_pub")) {
             String openId = weChatService.getOpenIdByUserId(userId);
             extra.put("open_id", openId);
         }
         Charge charge = pingPPService.createCharge(orderNo, channel, order.getTotalConsumptionCent(), clientIP,
                 order.getServiceItem().getName(), order.getServiceItem().getDescription(), order.getLeaveAMessage(), extra);
-        if (null==charge) {
+        if (null == charge) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
             logger.info("create charge object failed ");
@@ -382,10 +391,10 @@ public class ServiceOrderService {
     public Map<String, Object> payForServiceByWeChat(Long userId, Long orderId, String openId, String clientIP, WeChatAccountBean weChatAccount) {
         logger.info("create charge object for order={} openId={} clientIp={} weChatAccount={}", orderId, openId, clientIP, weChatAccount);
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (userId!=entity.getUserId()) {
+        if (userId != entity.getUserId()) {
             logger.error("this order does not belong to this user");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -393,7 +402,7 @@ public class ServiceOrderService {
             logger.warn("openId is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (null==weChatAccount) {
+        if (null == weChatAccount) {
             logger.warn("weChatAccount is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -407,11 +416,11 @@ public class ServiceOrderService {
         String wechatNo = NumberUtil.createNoncestr(31);
         Map<String, Object> weChatResponse = weChatPayService.payByWeChat(openId, "WEB", clientIP,
                 weChatAccount.getAppId(), weChatAccount.getMchId(), weChatPayService.getApiKey(),
-                wechatNo, "JSAPI", "订单="+orderNo+" 描述="+order.getServiceItem().getName(),
+                wechatNo, "JSAPI", "订单=" + orderNo + " 描述=" + order.getServiceItem().getName(),
                 "CNY", order.getTotalConsumptionCent(), weChatPayService.getNotifyUrl());
         // check response value
-        if (!"SUCCESS".equalsIgnoreCase((String)weChatResponse.get("return_code"))
-         || !"SUCCESS".equalsIgnoreCase((String)weChatResponse.get("result_code"))) {
+        if (!"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("return_code"))
+                || !"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("result_code"))) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
             logger.info("wechat make order failed ");
@@ -428,9 +437,10 @@ public class ServiceOrderService {
         }
 
         // check sign
-        String sign1 = (String)weChatResponse.get("sign");
+        String sign1 = (String) weChatResponse.get("sign");
         weChatResponse.remove("sign");
-        String sign2 = weChatPayService.createSign(weChatPayService.getApiKey(), "UTF-8", new TreeMap<>(weChatResponse));
+        String sign2 = weChatPayService.createSign(weChatPayService.getApiKey(), "UTF-8",
+                new TreeMap<>(weChatResponse));
         if (!sign2.equalsIgnoreCase(sign1)) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
@@ -453,6 +463,15 @@ public class ServiceOrderService {
         return weChatResponse;
     }
 
+    private void signWeChatResponse(String appid, String jsapiTicket, String prepayId) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("appId=").append(appid).append("&package=").
+                append(prepayId).append("&nonceStr=").append(NumberUtil.createNoncestr(31))
+                .append("&signType=MD5");
+        String md5 = NumberUtil.md5Encode(buffer.toString(), null, "MD5");
+
+    }
+
     @Transactional
     public ServiceOrderBean orderChargeWebhooks(String chargeId, String webhooksEventId, String webhooksEventJson) {
         logger.info("order charge webhooks event callback chargeId={} webhooksEventId={} webhooksEventJson={}",
@@ -460,7 +479,7 @@ public class ServiceOrderService {
         ServiceOrderChargePingPPBean charge = orderPingPPService.orderChargePingPpWebhooks(chargeId, webhooksEventId, webhooksEventJson);
         long orderId = charge.getOrderId();
         ServiceOrderEntity order = repository.findOne(orderId);
-        if (null==order) {
+        if (null == order) {
             logger.error("order not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
@@ -488,7 +507,7 @@ public class ServiceOrderService {
     public ServiceOrderBean nurseFetchOrder(long orderId) {
         logger.info("nurse fetch order={}", orderId);
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (!OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())) {
@@ -514,7 +533,7 @@ public class ServiceOrderService {
     public ServiceOrderBean nurseGiveUpOrder(long orderId) {
         logger.info("nurse fetch order={}", orderId);
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (!OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
@@ -540,17 +559,17 @@ public class ServiceOrderService {
     public ServiceOrderBean cancelOrder(boolean checkUser, long userId, long orderId) {
         logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (checkUser) {
-            if (entity.getUserId()!=userId) {
+            if (entity.getUserId() != userId) {
                 logger.error("order not belong to user");
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
         if (OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
-          ||OrderStatus.COMPLETED.equals(entity.getOrderStatus())) {
+                || OrderStatus.COMPLETED.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be cancelled", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -573,11 +592,11 @@ public class ServiceOrderService {
     public ServiceOrderBean completedOrder(boolean checkUser, long userId, long orderId) {
         logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (checkUser) {
-            if (entity.getUserId()!=userId) {
+            if (entity.getUserId() != userId) {
                 logger.error("order not belong to user");
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
@@ -606,11 +625,11 @@ public class ServiceOrderService {
     public ServiceOrderBean orderInProcess(boolean checkUser, long userId, long orderId) {
         logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (checkUser) {
-            if (entity.getUserId()!=userId) {
+            if (entity.getUserId() != userId) {
                 logger.error("order not belong to user");
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
@@ -638,17 +657,17 @@ public class ServiceOrderService {
     public ServiceOrderBean scoreOrder(boolean checkUser, long userId, long orderId, float score) {
         logger.info("score order={} by user={} checkFlag={} score={}", orderId, userId, checkUser, score);
         ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null==entity) {
+        if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (checkUser) {
-            if (entity.getUserId()!=userId) {
+            if (entity.getUserId() != userId) {
                 logger.error("order not belong to user");
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
 
-        score = score<0 ? 0 : score;
+        score = score < 0 ? 0 : score;
 
         entity.setScore(score);
         entity = repository.save(entity);
@@ -668,7 +687,7 @@ public class ServiceOrderService {
             logger.error("service item not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (patientId!=0 && !patientService.existPatient(patientId)) {
+        if (patientId != 0 && !patientService.existPatient(patientId)) {
             logger.error("patient not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
@@ -677,11 +696,11 @@ public class ServiceOrderService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (lStartTime<0) {
+        if (lStartTime < 0) {
             logger.error("start time not valid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (count<0) {
+        if (count < 0) {
             logger.error("time duration not valid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -702,8 +721,7 @@ public class ServiceOrderService {
         String vendorJson = null;
         if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
             vendorJson = go2NurseUtility.toJsonString(vendorHospital);
-        }
-        else if (ServiceVendorType.COMPANY.equals(vendorType)) {
+        } else if (ServiceVendorType.COMPANY.equals(vendorType)) {
             vendorJson = go2NurseUtility.toJsonString(vendor);
         }
         logger.info("hospital ========= {}", serviceItem.getHospital());
@@ -717,18 +735,18 @@ public class ServiceOrderService {
         String serviceTopCategoryJson = null;
         if (!VerifyUtil.isListEmpty(serviceCategoryAndParent)) {
             serviceCategory = serviceCategoryAndParent.get(0);
-            if (serviceCategoryAndParent.size()==2) {
+            if (serviceCategoryAndParent.size() == 2) {
                 serviceTopCategory = serviceCategoryAndParent.get(1);
-                if (serviceTopCategory.getId()==serviceItem.getCategoryId()) {
+                if (serviceTopCategory.getId() == serviceItem.getCategoryId()) {
                     ServiceCategoryBean tmp = serviceTopCategory;
                     serviceTopCategory = serviceCategory;
                     serviceCategory = tmp;
                 }
             }
-            if (null!=serviceCategory) {
+            if (null != serviceCategory) {
                 serviceCategoryJson = go2NurseUtility.toJsonString(serviceCategory);
             }
-            if (null!=serviceTopCategory) {
+            if (null != serviceTopCategory) {
                 serviceTopCategoryJson = go2NurseUtility.toJsonString(serviceTopCategory);
             }
         }
@@ -754,13 +772,13 @@ public class ServiceOrderService {
         entity.setVendor(vendorJson);
 
         entity.setCategoryId(0L);
-        if (null!=serviceCategory) {
+        if (null != serviceCategory) {
             entity.setCategoryId(serviceCategory.getId());
             entity.setCategory(serviceCategoryJson);
         }
 
         entity.setTopCategoryId(0L);
-        if (null!=serviceTopCategory) {
+        if (null != serviceTopCategory) {
             entity.setTopCategoryId(serviceTopCategory.getId());
             entity.setTopCategory(serviceTopCategoryJson);
         }
@@ -768,7 +786,7 @@ public class ServiceOrderService {
         entity.setUserId(userId);
 
         entity.setPatientId(0L);
-        if (null!=patient) {
+        if (null != patient) {
             entity.setPatientId(patientId);
             entity.setPatient(patientJson);
         }
@@ -777,17 +795,16 @@ public class ServiceOrderService {
         entity.setAddress(addressJson);
 
         entity.setServiceStartTime(new Date(lStartTime));
-        entity.setServiceTimeDuration(serviceItem.getServiceTimeDuration()*count);
+        entity.setServiceTimeDuration(serviceItem.getServiceTimeDuration() * count);
         entity.setServiceTimeUnit(serviceItem.getServiceTimeUnit());
-        entity.setTotalConsumptionCent(serviceItem.getServicePriceCent()*count);
+        entity.setTotalConsumptionCent(serviceItem.getServicePriceCent() * count);
         entity.setPreferentialCent(preferentialCent);
         entity.setOrderNo(orderNo);
         entity.setLeaveAMessage(leaveAMessage);
 
         if (entity.getTotalConsumptionCent() - entity.getPreferentialCent() > 0) {
             entity.setOrderStatus(OrderStatus.TO_PAY);
-        }
-        else {
+        } else {
             entity.setOrderStatus(OrderStatus.TO_DISPATCH);
         }
         entity.setPayTime(new Date(0));

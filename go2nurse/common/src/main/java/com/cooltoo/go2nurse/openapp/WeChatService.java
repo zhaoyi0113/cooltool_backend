@@ -237,7 +237,7 @@ public class WeChatService {
         }
         logger.info("get appid from user token " + userAccessToken + " is " + appid);
         String noncestr = System.currentTimeMillis() + "";
-        String jsApiTicket = tokenScheduler.getJsApiTicket(appid);
+        String jsApiTicket = getJsApiTicket(appid);
         String timestamp = System.currentTimeMillis() + "";
         StringBuffer str = new StringBuffer();
         str.append("jsapi_ticket=").append(jsApiTicket).append("&noncestr=").append(noncestr).append("&timestamp=").append(timestamp).append("&url=").append(url);
@@ -250,6 +250,10 @@ public class WeChatService {
         signaturemap.put("appid", appid);
         logger.info("generate js api ticket");
         return signaturemap;
+    }
+
+    public String getJsApiTicket(String appid){
+        return tokenScheduler.getJsApiTicket(appid);
     }
 
     public InputStream downloadImageFromWX(String userAccessToken, String mediaId) {
