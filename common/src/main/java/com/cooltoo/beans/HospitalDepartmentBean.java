@@ -21,6 +21,9 @@ public class HospitalDepartmentBean {
     private boolean parentValid;
     private String uniqueId;
     private List<HospitalDepartmentBean> subDepartment;
+    private String phoneNumber;
+    private Double longitude;
+    private Double latitude;
 
     public int getId() {
         return id;
@@ -126,6 +129,30 @@ public class HospitalDepartmentBean {
         this.subDepartment = subDepartment;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -140,6 +167,9 @@ public class HospitalDepartmentBean {
         msg.append(", disableImageUrl=").append(disableImageUrl);
         msg.append(", parentId=").append(parentId);
         msg.append(", uniqueId=").append(uniqueId);
+        msg.append(", phoneNumber=").append(phoneNumber);
+        msg.append(", longitude=").append(longitude);
+        msg.append(", latitude=").append(latitude);
         msg.append("]");
         return msg.toString();
     }

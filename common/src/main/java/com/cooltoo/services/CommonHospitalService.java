@@ -315,6 +315,12 @@ public class CommonHospitalService {
         if (!VerifyUtil.isStringEmpty(value) && !value.equals(entity.getAliasName())) {
             entity.setAliasName(value);
         }
+        if (!VerifyUtil.isStringEmpty(bean.getPhoneNumber()) && !bean.getPhoneNumber().trim().equals(entity.getPhoneNumber())) {
+            entity.setPhoneNumber(bean.getPhoneNumber());
+        }
+        if (!VerifyUtil.isStringEmpty(bean.getZipCode()) && !bean.getZipCode().trim().equals(entity.getZipCode())) {
+            entity.setZipCode(bean.getZipCode());
+        }
         entity.setProvince(bean.getProvince());
         entity.setCity(bean.getCity());
         entity.setDistrict(bean.getDistrict());
@@ -338,7 +344,7 @@ public class CommonHospitalService {
     }
 
     @Transactional
-    public HospitalBean update(int id, String name, String aliasName, int province, int city, int district, String address, int enable, int supportGo2nurse) {
+    public HospitalBean update(int id, String name, String aliasName, int province, int city, int district, String address, int enable, int supportGo2nurse, String phoneNumber, String zipCode) {
         HospitalBean bean = new HospitalBean();
         bean.setId(id);
         bean.setName(name);
@@ -349,6 +355,8 @@ public class CommonHospitalService {
         bean.setEnable(enable);
         bean.setAliasName(aliasName);
         bean.setSupportGo2nurse(supportGo2nurse);
+        bean.setPhoneNumber(phoneNumber);
+        bean.setZipCode(zipCode);
         if (!checkRegion(bean)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -403,7 +411,7 @@ public class CommonHospitalService {
     }
 
     @Transactional
-    public Integer newOne(String name, String aliasName, int province, int city, int district, String address, int enable, int supportGo2nurse) {
+    public Integer newOne(String name, String aliasName, int province, int city, int district, String address, int enable, int supportGo2nurse, String phoneNumber, String zipCode) {
         HospitalBean bean = new HospitalBean();
         bean.setName(name);
         bean.setProvince(province);
@@ -413,6 +421,8 @@ public class CommonHospitalService {
         bean.setEnable(enable);
         bean.setAliasName(aliasName);
         bean.setSupportGo2nurse(supportGo2nurse);
+        bean.setPhoneNumber(phoneNumber);
+        bean.setZipCode(zipCode);
         if (!checkRegion(bean)) {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

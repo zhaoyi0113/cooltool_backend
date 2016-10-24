@@ -3,6 +3,7 @@ package com.cooltoo.admin.api;
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.services.CommonDepartmentService;
+import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -91,8 +92,14 @@ public class HospitalDepartmentAPI {
                            @DefaultValue("")   @FormParam("name")        String name,
                            @DefaultValue("")   @FormParam("description") String description,
                            @DefaultValue("-1") @FormParam("enable")      int enable,
-                           @DefaultValue("-1") @FormParam("parent_id")   int parentId) {
-        HospitalDepartmentBean one = service.update(id, name, description, enable, parentId, null, null, "");
+                           @DefaultValue("-1") @FormParam("parent_id")   int parentId,
+                           @DefaultValue("-1") @FormParam("phone_number") String phoneNumber,
+                           @DefaultValue("-1") @FormParam("longitude")    String strLongitude,
+                           @DefaultValue("-1") @FormParam("latitude")     String strLatitude
+    ) {
+        Double longitude = VerifyUtil.parseDouble(strLongitude);
+        Double latitude = VerifyUtil.parseDouble(strLatitude);
+        HospitalDepartmentBean one = service.update(id, name, description, enable, parentId, null, null, phoneNumber, longitude, latitude, "");
         logger.info("update hospital department is " + one);
         if (null==one) {
             return Response.ok().build();
@@ -107,7 +114,7 @@ public class HospitalDepartmentAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateImage(@FormDataParam("id")       int                        id,
                                 @FormDataParam("file")     InputStream                file) {
-        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, file, null, "");
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, file, null, null, null, null, "");
         logger.info("update hospital department is " + one);
         return Response.ok(one).build();
     }
@@ -119,7 +126,7 @@ public class HospitalDepartmentAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateDisableImage(@FormDataParam("id")       int                        id,
                                        @FormDataParam("file")     InputStream                file) {
-        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, file, "");
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, file, null, null, null, "");
         logger.info("update hospital department is " + one);
         return Response.ok(one).build();
     }
@@ -131,9 +138,14 @@ public class HospitalDepartmentAPI {
                            @DefaultValue("")   @FormParam("name") String name,
                            @DefaultValue("")   @FormParam("description") String description,
                            @DefaultValue("-1") @FormParam("enable") int enable,
-                           @DefaultValue("-1") @FormParam("parent_id") int parentId
+                           @DefaultValue("-1") @FormParam("parent_id") int parentId,
+                           @DefaultValue("-1") @FormParam("phone_number") String phoneNumber,
+                           @DefaultValue("-1") @FormParam("longitude")    String strLongitude,
+                           @DefaultValue("-1") @FormParam("latitude")     String strLatitude
     ) {
-        int id = service.createHospitalDepartment(hospitalId, name, description, enable, parentId, null, null);
+        Double longitude = VerifyUtil.parseDouble(strLongitude);
+        Double latitude = VerifyUtil.parseDouble(strLatitude);
+        int id = service.createHospitalDepartment(hospitalId, name, description, enable, parentId, null, null, phoneNumber, longitude, latitude);
         logger.info("new hospital department id is " + id);
         return Response.ok(id).build();
     }

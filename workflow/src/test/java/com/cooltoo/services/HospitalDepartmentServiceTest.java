@@ -31,7 +31,7 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testNew1() {
-        int id = service.createHospitalDepartment(11, "name111", "department111", -1, -1, null, null);
+        int id = service.createHospitalDepartment(11, "name111", "department111", -1, -1, null, null, null, null, null);
         Assert.assertTrue(id>0);
         List<HospitalDepartmentBean> all = service.getByIds(Arrays.asList(new Integer[]{id}), "");
         Assert.assertEquals(1, all.size());
@@ -69,7 +69,8 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
 
         HospitalDepartmentBean bean = service.update(id, name, desc, enable, parentId,
                                                      new ByteArrayInputStream(desc.getBytes()),
-                                                     new ByteArrayInputStream(desc.getBytes()), "");
+                                                     new ByteArrayInputStream(desc.getBytes()),
+                                                     null, null, null, "");
         Assert.assertEquals(id, bean.getId());
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(parentId, bean.getParentId());

@@ -156,6 +156,15 @@ public class VerifyUtil {
         return recordDate;
     }
 
+    public static Double parseDouble(String strDouble) {
+        try {
+            return Double.parseDouble(strDouble);
+        }
+        catch (Exception ex) {
+            return null;
+        }
+    }
+
 //    public static boolean isNumbers(String numbers) {
 //        logger.info("is numbers={} ", numbers);
 //        if (numbers instanceof String) {

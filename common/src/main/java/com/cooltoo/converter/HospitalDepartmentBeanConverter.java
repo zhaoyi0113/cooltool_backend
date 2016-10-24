@@ -23,6 +23,9 @@ public class HospitalDepartmentBeanConverter implements Converter<HospitalDepart
         bean.setParentId(source.getParentId());
         bean.setParentValid(source.getParentId()>0);
         bean.setUniqueId(source.getUniqueId());
+        bean.setPhoneNumber(source.getPhoneNumber());
+        bean.setLongitude(source.getLongitude());
+        bean.setLatitude(source.getLatitude());
         return bean;
     }
 }

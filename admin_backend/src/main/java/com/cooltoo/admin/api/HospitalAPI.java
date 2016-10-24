@@ -99,15 +99,18 @@ public class HospitalAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response update(
             @DefaultValue("-1") @FormParam("id") int id,
-            @FormParam("name") String name,
-            @DefaultValue("") @FormParam("alias_name") String aliasName,
+            @FormParam("name")  String name,
+            @DefaultValue("")   @FormParam("alias_name") String aliasName,
             @DefaultValue("-1") @FormParam("province") int province,
             @DefaultValue("-1") @FormParam("city") int city,
             @DefaultValue("-1") @FormParam("district") int district,
-            @DefaultValue("") @FormParam("address") String address,
+            @DefaultValue("")   @FormParam("address") String address,
             @DefaultValue("-1") @FormParam("enable") int enable,
-            @DefaultValue("-1")   @FormParam("support_go2nurse") int support) {
-        HospitalBean one = service.update(id, name, aliasName, province, city, district, address, enable, support);
+            @DefaultValue("-1") @FormParam("support_go2nurse") int support,
+            @DefaultValue("")   @FormParam("phone_number") String phoneNumber,
+            @DefaultValue("")   @FormParam("zip_code") String zipCode
+    ) {
+        HospitalBean one = service.update(id, name, aliasName, province, city, district, address, enable, support, phoneNumber, zipCode);
         logger.info("update hospital is " + one);
         if (null==one) {
             return Response.ok().build();
@@ -123,15 +126,17 @@ public class HospitalAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response addHospital(
             @FormParam("name") String name,
-            @DefaultValue("") @FormParam("alias_name") String aliasName,
+            @DefaultValue("")   @FormParam("alias_name") String aliasName,
             @DefaultValue("-1") @FormParam("province") int province,
             @DefaultValue("-1") @FormParam("city") int city,
             @DefaultValue("-1") @FormParam("district") int district,
-            @DefaultValue("") @FormParam("address") String address,
+            @DefaultValue("")   @FormParam("address") String address,
             @DefaultValue("-1") @FormParam("enable") int enable,
-            @DefaultValue("-1")   @FormParam("support_go2nurse") int support
+            @DefaultValue("-1") @FormParam("support_go2nurse") int support,
+            @DefaultValue("")   @FormParam("phone_number") String phoneNumber,
+            @DefaultValue("")   @FormParam("zip_code") String zipCode
     ) {
-        int id = service.newOne(name, aliasName, province, city, district, address, enable, support);
+        int id = service.newOne(name, aliasName, province, city, district, address, enable, support, phoneNumber, zipCode);
         logger.info("new hospital id is " + id);
         return Response.ok(id).build();
     }

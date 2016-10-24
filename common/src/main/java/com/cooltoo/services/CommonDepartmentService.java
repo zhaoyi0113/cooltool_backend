@@ -337,6 +337,22 @@ public class CommonDepartmentService {
         if (!VerifyUtil.isStringEmpty(bean.getDescription())) {
             entity.setDescription(bean.getDescription());
         }
+
+        // phone number
+        if (!VerifyUtil.isStringEmpty(bean.getPhoneNumber()) && !bean.getPhoneNumber().trim().equals(entity.getPhoneNumber())) {
+            entity.setPhoneNumber(bean.getPhoneNumber());
+        }
+
+        // longitude
+        if (null!=bean.getLongitude() && bean.getLongitude()!=entity.getLongitude()) {
+            entity.setLongitude(bean.getLongitude());
+        }
+
+        // latitude
+        if (null!=bean.getLatitude() && bean.getLatitude()!=entity.getLatitude()) {
+            entity.setLatitude(bean.getLatitude());
+        }
+
         logger.info("update department is == " + entity);
         entity = repository.save(entity);
         bean = beanConverter.convert(entity);
@@ -347,13 +363,16 @@ public class CommonDepartmentService {
     }
 
     @Transactional
-    public HospitalDepartmentBean update(int id, String name, String description, int enable, int parentId, InputStream image, InputStream disableImage, String nginxPrefix) {
+    public HospitalDepartmentBean update(int id, String name, String description, int enable, int parentId, InputStream image, InputStream disableImage, String phoneNumber, Double longitude, Double latitude, String nginxPrefix) {
         HospitalDepartmentBean bean = new HospitalDepartmentBean();
         bean.setId(id);
         bean.setName(name);
         bean.setDescription(description);
         bean.setEnable(enable);
         bean.setParentId(parentId);
+        bean.setPhoneNumber(phoneNumber);
+        bean.setLongitude(longitude);
+        bean.setLatitude(latitude);
         return update(bean, image, disableImage, nginxPrefix);
     }
 
@@ -362,7 +381,7 @@ public class CommonDepartmentService {
     //        create department
     //=======================================================
     @Transactional
-    public Integer createHospitalDepartment(int hospitalId, String name, String description, int enable, int parentId, InputStream image, InputStream disableImage) {
+    public Integer createHospitalDepartment(int hospitalId, String name, String description, int enable, int parentId, InputStream image, InputStream disableImage, String phoneNumber, Double longitude, Double latitude) {
         if (!hospitalRepository.exists(hospitalId)) {
             logger.error("hospital is not exist");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -380,6 +399,9 @@ public class CommonDepartmentService {
         HospitalDepartmentEntity entity = new HospitalDepartmentEntity();
         entity.setHospitalId(hospitalId);
         entity.setName(name);
+        entity.setPhoneNumber(phoneNumber);
+        entity.setLongitude(longitude);
+        entity.setLatitude(latitude);
 
         String uniqueId = null;
         for (int i = 10; i>0; i--) {

@@ -18,6 +18,8 @@ public class HospitalEntity {
     private int enable;
     private int supportGo2nurse;
     private String uniqueId;
+    private String phoneNumber;
+    private String zipCode;
 
     @Id
     @GeneratedValue
@@ -111,6 +113,24 @@ public class HospitalEntity {
         this.uniqueId = uniqueId;
     }
 
+    @Column(name = "phone_number")
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    @Column(name = "zip_code")
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -124,6 +144,8 @@ public class HospitalEntity {
         msg.append(", enable=").append(enable);
         msg.append(", supportGo2nurse=").append(supportGo2nurse);
         msg.append(", uniqueId=").append(uniqueId);
+        msg.append(", phoneNumber=").append(phoneNumber);
+        msg.append(", zipCode=").append(zipCode);
         msg.append("]");
         return msg.toString();
     }

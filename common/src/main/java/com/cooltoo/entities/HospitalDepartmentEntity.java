@@ -17,6 +17,9 @@ public class HospitalDepartmentEntity {
     private long disableImageId;
     private int parentId;
     private String uniqueId;
+    private String phoneNumber;
+    private Double longitude;
+    private Double latitude;
 
     @Id
     @GeneratedValue
@@ -101,6 +104,33 @@ public class HospitalDepartmentEntity {
         this.uniqueId = uniqueId;
     }
 
+    @Column(name = "phone_number")
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    @Column(name = "longitude")
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    @Column(name = "latitude")
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -112,6 +142,9 @@ public class HospitalDepartmentEntity {
         msg.append(", disableImageId=").append(disableImageId);
         msg.append(", parentId=").append(parentId);
         msg.append(", uniqueId=").append(uniqueId);
+        msg.append(", phoneNumber=").append(phoneNumber);
+        msg.append(", longitude=").append(longitude);
+        msg.append(", latitude=").append(latitude);
         msg.append("]");
         return msg.toString();
     }
