@@ -67,9 +67,11 @@ public class WeChatService {
     @Autowired
     private UserWeChatTokenAccessRepository weChatTokenAccessRepository;
 
-    @Autowired private HospitalRepository hospitalRepository;
+    @Autowired
+    private HospitalRepository hospitalRepository;
 
-    @Autowired private HospitalDepartmentRepository departmentRepository;
+    @Autowired
+    private HospitalDepartmentRepository departmentRepository;
 
     public boolean validateEntryConnection(String signature, String timeStamp, String nonce) {
         logger.info("validate connection " + signature + ", " + timeStamp + ", " + nonce + ", " + token);
@@ -97,19 +99,24 @@ public class WeChatService {
      * @return
      */
     public URI login(String code, String state) {
-        String appid = state.split(WX_SEPARATOR)[0];
+        String appid = null;
+        if (state.contains(WX_SEPARATOR)) {
+            appid = state.split(WX_SEPARATOR)[0];
+        } else {
+            appid = state;
+        }
         logger.info("user login appid " + appid);
         Map accessToken = getWebLoginAccessToken(code, appid);
         WeChatUserInfo userInfo = getUserInfo(accessToken);
-        URI userTokens = loginWithWeChatUser(userInfo, state.split(WX_SEPARATOR)[1], appid);
+        URI userTokens = loginWithWeChatUser(userInfo, state.split(WX_SEPARATOR)[1], appid, whetherRegisterRequired(state));
         if (userTokens != null) return userTokens;
         return null;
     }
 
-    public URI loginWithWeChatUser(WeChatUserInfo userInfo, String redirectPath, String appid) {
+    public URI loginWithWeChatUser(WeChatUserInfo userInfo, String redirectPath, String appid, boolean registerRequired) {
         String openid = null;
         String departmentId = getDepartmentCode(appid);
-        logger.info("get department code="+departmentId+" from appid "+appid);
+        logger.info("get department code=" + departmentId + " from appid " + appid);
         if (userInfo != null) {
             openid = userInfo.getOpenid();
             logger.info("login user openid=" + openid);
@@ -165,18 +172,32 @@ public class WeChatService {
             }
         }
         try {
-            String urlStr = "http://" + serverHost + "/go2nurse/#/register";
-            if (openid != null) {
-                urlStr += "/" + AppChannel.WECHAT + "/" + openid;
+            String urlStr = "http://" + serverHost + "/go2nurse/";
+            if(registerRequired){
+                urlStr += "#/register";
             }
+//            if (openid != null) {
+//                urlStr += "/" + AppChannel.WECHAT + "/" + openid;
+//            }
             urlStr = addParameterOnUrl(urlStr, "redirect", redirectPath);
             urlStr = addParameterOnUrl(urlStr, "departmentId", departmentId);
             urlStr = addParameterOnUrl(urlStr, "appid", appid);
+            urlStr = addParameterOnUrl(urlStr, "openid", openid);
             return new URI(urlStr);
         } catch (URISyntaxException e) {
             logger.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    private boolean whetherRegisterRequired(String state){
+        if(state.contains(WX_SEPARATOR)){
+            String[] split = state.split(WX_SEPARATOR);
+            if(split.length > 3){
+                return split[2].equalsIgnoreCase("register");
+            }
+        }
+        return false;
     }
 
     private String addParameterOnUrl(String current, String parameter, String value) {
@@ -195,18 +216,18 @@ public class WeChatService {
 
     private String getDepartmentCode(String appid) {
         WeChatAccountEntity accountEntity = weChatAccountRepository.findFirstByAppId(appid);
-        if(accountEntity == null){
+        if (accountEntity == null) {
             return null;
         }
         HospitalEntity hospitalEntity = hospitalRepository.findById(accountEntity.getHospitalId());
-        if(hospitalEntity == null){
+        if (hospitalEntity == null) {
             return null;
         }
         HospitalDepartmentEntity departmentEntity = departmentRepository.findById(accountEntity.getDepartmentId());
-        if(departmentEntity == null){
+        if (departmentEntity == null) {
             return null;
         }
-        return hospitalEntity.getUniqueId()+departmentEntity.getUniqueId();
+        return hospitalEntity.getUniqueId() + departmentEntity.getUniqueId();
     }
 
     public void saveTokenToUserWeChat(String appId, String token) {
@@ -252,7 +273,7 @@ public class WeChatService {
         return signaturemap;
     }
 
-    public String getJsApiTicket(String appid){
+    public String getJsApiTicket(String appid) {
         return tokenScheduler.getJsApiTicket(appid);
     }
 
