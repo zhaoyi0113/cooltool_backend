@@ -100,6 +100,7 @@ public class WeChatService {
      */
     public URI login(String code, String state) {
         String appid = null;
+        logger.info("wx user login state "+state);
         if (state.contains(WX_SEPARATOR)) {
             appid = state.split(WX_SEPARATOR)[0];
         } else {
