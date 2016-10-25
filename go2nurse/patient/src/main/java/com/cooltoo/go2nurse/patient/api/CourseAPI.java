@@ -93,7 +93,6 @@ public class CourseAPI {
     @Path("/get_course_detail")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
     public Response getCourseDetailById(@Context HttpServletRequest request,
                                         @QueryParam("course_id") @DefaultValue("0") long courseId
     ) {
