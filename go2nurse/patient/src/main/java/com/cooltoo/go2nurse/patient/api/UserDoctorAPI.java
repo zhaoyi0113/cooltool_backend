@@ -50,7 +50,6 @@ public class UserDoctorAPI {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
     public Response getDoctorById(@Context HttpServletRequest request,
                                   @QueryParam("doctor_id") @DefaultValue("0") long doctorId
     ) {
