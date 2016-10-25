@@ -3,18 +3,18 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.entities.HospitalDepartmentEntity;
-import com.cooltoo.entities.HospitalEntity;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
-import com.cooltoo.go2nurse.converter.DiagnosticEnumerationBeanConverter;
+import com.cooltoo.go2nurse.entities.CourseCategoryRelationEntity;
+import com.cooltoo.go2nurse.entities.CourseDiagnosticRelationEntity;
 import com.cooltoo.go2nurse.repository.CourseCategoryRelationRepository;
+import com.cooltoo.go2nurse.repository.CourseDepartmentRelationRepository;
+import com.cooltoo.go2nurse.repository.CourseDiagnosticRelationRepository;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
-import com.cooltoo.repository.HospitalDepartmentRepository;
-import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
@@ -24,7 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Created by hp on 2016/6/12.
@@ -34,69 +39,380 @@ public class CourseRelationManageService {
 
     private static final Logger logger = LoggerFactory.getLogger(CourseRelationManageService.class);
 
-    public static final String key_all_courses_in_hospital = "all_courses_in_hospital";
-    public static final String key_diagnostic = "diagnostic";
-    public static final String key_department = "department";
-    public static final String key_others = "others";
+    public static final String category_all = "all";
+    public static final String category_others = "others";
 
     @Autowired private Go2NurseUtility utility;
-    @Autowired private DiagnosticEnumerationBeanConverter diagnosticBeanConverter;
 
+    @Autowired private CourseService courseService;
+    @Autowired private DiagnosticPointService diagnosticService;
     @Autowired private CommonHospitalService hospitalService;
-    @Autowired private HospitalRepository hospital;
     @Autowired private CommonDepartmentService departmentService;
-    @Autowired private HospitalDepartmentRepository department;
-    @Autowired private DiagnosticPointService diagnostic;
-    @Autowired private CourseService course;
+    @Autowired private CourseCategoryService categoryService;
 
-    @Autowired private CourseHospitalRelationService hospitalRelation;
-    @Autowired private CourseDepartmentRelationService departmentRelation;
-    @Autowired private CourseDiagnosticRelationService diagnosticRelation;
-    @Autowired private CourseCategoryRelationRepository categoryRelation;
+
+    @Autowired private UserCourseRelationService userCourseService;
+    @Autowired private CourseCategoryRelationRepository courseCategoryRelation;
+    @Autowired private CourseCategoryRelationService    courseCategoryRelationService;
+    @Autowired private CourseDepartmentRelationRepository courseDepartmentRelation;
+    @Autowired private CourseDepartmentRelationService    courseDepartmentRelationService;
+    @Autowired private CourseDiagnosticRelationRepository diagnosticRelation;
+    @Autowired private CourseDiagnosticRelationService    diagnosticRelationService;
 
     //==============================================================================
     //                    getting
     //==============================================================================
-    public boolean hospitalExist(int hospitalId) {
-        return hospital.exists(hospitalId);
+
+    public List<CourseBean> getCourseByHospitalDepartmentDiagnosticCategory(Integer hospitalId, Integer departmentId, boolean containHospitalCourse,
+                                                                            Long diagnosticId,
+                                                                            List<Long> categoryIds,
+                                                                            boolean isAdmin,
+                                                                            Integer pageIndex, Integer sizePerPage) {
+        logger.info("get courses by hospitalId={} departmentId={} containHospitalCourse={} categoryIds={} diagnosticId={} isAdmin={} pageIndex={} sizePerPage={}",
+                hospitalId, departmentId, containHospitalCourse, categoryIds, diagnosticId, isAdmin, pageIndex, sizePerPage);
+
+        // judge category ids are empty
+        if (null!=categoryIds && VerifyUtil.isListEmpty(categoryIds)) {
+            return new ArrayList<>();
+        }
+
+        // get course in department
+        List<Long> coursesInDepartment = new ArrayList();
+        boolean searchDepartment = false;
+        if (null!=hospitalId) {
+            if (null==departmentId) {
+                departmentId = 0;
+            }
+            coursesInDepartment = courseDepartmentRelation.findCourseIdByHospitalDepartmentAndStatus(hospitalId, departmentId, CommonStatus.ENABLED);
+            // get course just in hospital
+            if (containHospitalCourse && 0!=departmentId) {
+                List<Long> tmpCourseInHos = courseDepartmentRelation.findCourseIdByHospitalDepartmentAndStatus(hospitalId, 0, CommonStatus.ENABLED);
+                for (Long tmpId : tmpCourseInHos) {
+                    if (coursesInDepartment.contains(tmpId)) {
+                        continue;
+                    }
+                    coursesInDepartment.add(tmpId);
+                }
+            }
+            searchDepartment = true;
+        }
+
+        // get course in category
+        List<Long> coursesInCategory = new ArrayList<>();
+        boolean searchCategory = false;
+        if (null!=categoryIds && !VerifyUtil.isListEmpty(categoryIds) ) {
+            if (!VerifyUtil.isListEmpty(coursesInDepartment)) {
+                coursesInCategory = courseCategoryRelation.findCourseIdByStatusAndCategoryIdCourseIds(CommonStatus.ENABLED, categoryIds, coursesInDepartment);
+            }
+            else {
+                coursesInCategory = courseCategoryRelation.findCourseIdByStatusAndCategoryId(CommonStatus.ENABLED, categoryIds);
+            }
+            searchCategory = true;
+        }
+
+        // get course in diagnostic
+        List<Long> coursesInDiagnostic = new ArrayList<>();
+        boolean searchDiagnostic = false;
+        if (null!=diagnosticId) {
+            if (!VerifyUtil.isListEmpty(coursesInDepartment)) {
+                coursesInDiagnostic = diagnosticRelation.findCourseIdByStatusDiagnosticIdCourseIds(CommonStatus.ENABLED, diagnosticId, coursesInDepartment);
+            }
+            else {
+                coursesInDiagnostic = diagnosticRelation.findCourseIdByStatusDiagnosticId(CommonStatus.ENABLED, diagnosticId);
+            }
+            searchDiagnostic = true;
+        }
+
+        // courseId useful
+        List<Long> coursesId = null;
+        if (searchDepartment && searchCategory && searchDiagnostic) {
+            coursesId = intersection(coursesInDepartment, coursesInCategory);
+            coursesId = intersection(coursesId, coursesInDiagnostic);
+        }
+        else if (searchDepartment && searchCategory && !searchDiagnostic) {
+            coursesId = intersection(coursesInDepartment, coursesInCategory);
+        }
+        else if (searchDepartment && !searchCategory && searchDiagnostic) {
+            coursesId = intersection(coursesInDepartment, coursesInDiagnostic);
+        }
+        else if (!searchDepartment && searchCategory && searchDiagnostic) {
+            coursesId = intersection(coursesInCategory, coursesInDiagnostic);
+        }
+        else {
+            if (searchDepartment) {
+                coursesId = coursesInDepartment;
+            }
+            else if (searchCategory) {
+                coursesId = coursesInCategory;
+            }
+            else if (searchDiagnostic) {
+                coursesId = coursesInDiagnostic;
+            }
+        }
+        // get courses
+        List<CourseBean> result = null;
+        if (!isAdmin) {
+            result = courseService.getCourseByStatusAndIds(CourseStatus.ENABLE, coursesId, pageIndex, sizePerPage);
+        }
+        else {
+            result = courseService.getCourseByStatusAndIds(null, coursesId, pageIndex, sizePerPage);
+        }
+        logger.info("courses size={}", result.size());
+        return result;
     }
 
-    public boolean departmentExist(int departmentId) {
-        return department.exists(departmentId);
+    private List<Long> intersection(List<Long> set1, List<Long> set2) {
+        List<Long> result = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(set1) || VerifyUtil.isListEmpty(set2)) {
+            return result;
+        }
+
+        for (Long tmp : set1) {
+            if (set2.contains(tmp)) {
+                if (!result.contains(tmp)) {
+                    result.add(tmp);
+                }
+            }
+        }
+        return result;
     }
 
-    public boolean diagnosticExist(long diagnosticId) {
-        return diagnostic.exitsDiagnostic(diagnosticId);
+    private List<CourseBean> merge(List<CourseBean> set1, List<CourseBean> set2) {
+        List<CourseBean> result = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(set1) && VerifyUtil.isListEmpty(set2)) {
+            return result;
+        }
+
+        for (CourseBean tmp1 : set1) {
+            result.add(tmp1);
+        }
+        boolean exist;
+        for (CourseBean tmp2 : set2) {
+            exist = false;
+            for (CourseBean tmp1 : set1) {
+                if (tmp1.getId() != tmp2.getId()) {
+                    continue;
+                }
+                exist = true;
+                break;
+            }
+            if (!exist) {
+                result.add(tmp2);
+            }
+        }
+        return result;
     }
 
-    public List<CourseBean> getCoursesByHospitalAndCategory(int hospitalId, long categoryId) {
-        logger.info("get courses by hospitalId={} categoryId={}", hospitalId, categoryId);
+    public Map<CourseCategoryBean, List<CourseBean>> categoryToCourses(List<CourseBean> courses) {
+        logger.info("courses divide into groups of category");
+        Map<CourseCategoryBean, List<CourseBean>> result = new HashMap<>();
+        if (VerifyUtil.isListEmpty(courses)) {
+            return result;
+        }
 
-        List<Long> courseIdInHospital = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
-        List<Long> courseIdInCategory = categoryRelation.findCourseIdByStatusAndCategoryId(CommonStatus.ENABLED, categoryId);
+        List<Long> categoriesId = new ArrayList<>();
+        List<Long> coursesId = new ArrayList<>();
+        for (CourseBean tmp : courses) {
+            coursesId.add(tmp.getId());
+        }
+        Map<Long, Long> coursesIdToCategoryId = new HashMap<>();
+        List<CourseCategoryRelationEntity> relations = courseCategoryRelation.findByStatusAndCourseIdIn(CommonStatus.ENABLED, coursesId);
+        for (CourseCategoryRelationEntity tmp : relations) {
+            coursesIdToCategoryId.put(tmp.getCourseId(), tmp.getCourseCategoryId());
+            categoriesId.add(tmp.getCourseCategoryId());
+        }
+        Map<Long, CourseCategoryBean> categoryIdToBean = categoryService.getIdToBeanByStatusAndIds(CommonStatus.ENABLED.name(), categoriesId);
 
-        List<Long> courseIdInHospitalAndCategory = new ArrayList<>();
-        for (Long courseId : courseIdInHospital) {
-            if (courseIdInCategory.contains(courseId)) {
-                courseIdInHospitalAndCategory.add(courseId);
+
+        // all courses
+        List<CourseBean> allCourseSortedByReadStatus = new ArrayList<>();
+        CourseCategoryBean courseCategoryAllSortedByReadStatus = new CourseCategoryBean();
+        courseCategoryAllSortedByReadStatus.setId(-1);
+        courseCategoryAllSortedByReadStatus.setName(category_all);
+        courseCategoryAllSortedByReadStatus.setIntroduction(category_all);
+        result.put(courseCategoryAllSortedByReadStatus, allCourseSortedByReadStatus);
+        // all course without any category property
+        CourseCategoryBean others = new CourseCategoryBean();
+        others.setId(-2);
+        others.setName(category_others);
+        others.setIntroduction(category_others);
+        result.put(others, new ArrayList<>());
+
+        for (CourseBean tmp : courses) {
+            // construct all course sorted by read status
+            if (!ReadingStatus.READ.equals(tmp.getReading())) {
+                allCourseSortedByReadStatus.add(tmp);
+            }
+
+            // set course to the category that it belong to
+            Long categoryId = coursesIdToCategoryId.get(tmp.getId());
+            CourseCategoryBean category = categoryIdToBean.get(categoryId);
+            if (null==category) {
+                category = others;
+            }
+            List<CourseBean> tmpCourses = result.get(category);
+            if (null == tmpCourses) {
+                tmpCourses = new ArrayList<>();
+                result.put(category, tmpCourses);
+            }
+            tmpCourses.add(tmp);
+        }
+
+        for (CourseBean course : courses) {
+            // construct all course sorted by read status
+            if (ReadingStatus.READ.equals(course.getReading())) {
+                allCourseSortedByReadStatus.add(course);
             }
         }
 
-        List<CourseBean> courseInHospitalAndCategory;
-        if (VerifyUtil.isListEmpty(courseIdInHospitalAndCategory)) {
-            courseInHospitalAndCategory = new ArrayList<>();
-        }
-        else {
-            courseInHospitalAndCategory = course.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), courseIdInHospitalAndCategory);
+        return result;
+    }
+
+    public Map<DiagnosticEnumeration, List<CourseBean>> diagnosticEnumToCourses(List<CourseBean> courses) {
+        logger.info("courses divide into groups of diagnostic");
+        Map<DiagnosticEnumeration, List<CourseBean>> result = new HashMap<>();
+        if (VerifyUtil.isListEmpty(courses)) {
+            return result;
         }
 
-        logger.info("course size is {}", courseInHospitalAndCategory.size());
-        return courseInHospitalAndCategory;
+        List<Long> coursesId = new ArrayList<>();
+        for (CourseBean tmp : courses) {
+            coursesId.add(tmp.getId());
+        }
+
+        List<CourseDiagnosticRelationEntity> relations = diagnosticRelation.findByStatusCoursesIds(CommonStatus.ENABLED, coursesId);
+        Map<Long, List<Long>> courseIdToDiagnostic = new HashMap<>();
+        if (!VerifyUtil.isListEmpty(relations)) {
+            for (CourseDiagnosticRelationEntity tmp : relations) {
+                List<Long> diagnostic = courseIdToDiagnostic.get(tmp.getCourseId());
+                if (null==diagnostic) {
+                    diagnostic = new ArrayList<>();
+                    courseIdToDiagnostic.put(tmp.getCourseId(), diagnostic);
+                }
+                diagnostic.add(tmp.getDiagnosticId());
+            }
+        }
+
+        for (CourseBean tmp : courses) {
+            List<Long> diagnosticId = courseIdToDiagnostic.get(tmp.getId());
+            for (Long tmpId : diagnosticId) {
+                DiagnosticEnumeration diagnostic = DiagnosticEnumeration.parseInt(tmpId.intValue());
+                List<CourseBean> tmpCourses = result.get(diagnostic);
+                if (null == tmpCourses) {
+                    tmpCourses = new ArrayList<>();
+                    result.put(diagnostic, tmpCourses);
+                }
+                tmpCourses.add(tmp);
+            }
+        }
+
+        return result;
+    }
+
+    public List<CoursesGroupBean> getHospitalCoursesGroupByDiagnostic(Long userId, Integer hospital, Integer department) {
+        Long extensionNursingId = Long.valueOf(DiagnosticEnumeration.EXTENSION_NURSING.ordinal());
+        List<CourseBean> courses = getCourseByHospitalDepartmentDiagnosticCategory(hospital, department, false, null, null, false, null, null);
+        List<CourseBean> extensionNursingCourses = getCourseByHospitalDepartmentDiagnosticCategory(hospital, null, false, extensionNursingId, null, false, null, null);
+        userCourseService.setCourseReadStatus(userId, courses);
+        userCourseService.setCourseReadStatus(userId, extensionNursingCourses);
+
+        Map<DiagnosticEnumeration, List<CourseBean>> diagnosticToCourses = diagnosticEnumToCourses(courses);
+        List<CourseBean> tmpCourse = diagnosticToCourses.get(DiagnosticEnumeration.EXTENSION_NURSING);
+        extensionNursingCourses = merge(tmpCourse, extensionNursingCourses);
+        diagnosticToCourses.put(DiagnosticEnumeration.EXTENSION_NURSING, extensionNursingCourses);
+
+        Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(extensionNursingCourses);
+
+        List<CoursesGroupBean> diagnosticGroup = CoursesGroupBean.parseObjectToBean(diagnosticToCourses, true);
+
+        List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
+        CoursesGroupBean.sortCourseArrays(categoryGroup);
+
+        for (CoursesGroupBean tmp : diagnosticGroup) {
+            if (tmp.getId() == extensionNursingId.intValue()) {
+                tmp.setCourses(categoryGroup);
+            }
+        }
+
+        return diagnosticGroup;
+    }
+
+    public CoursesGroupBean getHospitalCoursesGroupByDiagnostic(Long userId, Integer hospital, Integer department, Long diagnosticId) {
+        final Long extensionNursingId = Long.valueOf(DiagnosticEnumeration.EXTENSION_NURSING.ordinal());
+        List<CourseBean> courses = getCourseByHospitalDepartmentDiagnosticCategory(hospital, department, false, diagnosticId, null, false, null, null);
+        if (extensionNursingId==diagnosticId) {
+            List<CourseBean> tmpCourses = getCourseByHospitalDepartmentDiagnosticCategory(hospital, null, false, diagnosticId, null, false, null, null);
+            courses = merge(courses, tmpCourses);
+        }
+        userCourseService.setCourseReadStatus(userId, courses);
+
+        Map<DiagnosticEnumeration, List<CourseBean>> diagnosticToCourses = diagnosticEnumToCourses(courses);
+        List<CoursesGroupBean> allGroups = CoursesGroupBean.parseObjectToBean(diagnosticToCourses, true);
+
+        CoursesGroupBean theOneFound = null;
+        for (CoursesGroupBean tmp : allGroups) {
+            if (tmp.getId() == diagnosticId) {
+                theOneFound = tmp;
+                break;
+            }
+        }
+
+        if (null!=theOneFound && extensionNursingId==diagnosticId) {
+            Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(courses);
+            List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
+            CoursesGroupBean.sortCourseArrays(categoryGroup);
+            theOneFound.setCourses(categoryGroup);
+        }
+
+        return theOneFound;
+    }
+
+    public List<CoursesGroupBean> getHospitalCoursesGroupByCategory(Long userId, Integer hospital, Integer department) {
+        List<CourseBean> courses = getCourseByHospitalDepartmentDiagnosticCategory(hospital, department, false, null, null, false, null, null);
+        userCourseService.setCourseReadStatus(userId, courses);
+
+        Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(courses);
+        List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
+        CoursesGroupBean.sortCourseArrays(categoryGroup);
+
+        return categoryGroup;
+    }
+
+    public List<CoursesGroupBean> getHospitalCoursesGroupByCategory(Long userId, Integer hospital, Integer department, List<Long> categoryIds) {
+        List<CourseBean> courses = getCourseByHospitalDepartmentDiagnosticCategory(hospital, department, false, null, categoryIds, false, null, null);
+        userCourseService.setCourseReadStatus(userId, courses);
+
+        Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(courses);
+        List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
+        CoursesGroupBean.sortCourseArrays(categoryGroup);
+
+        return categoryGroup;
+    }
+
+
+
+    //================================================================================
+    //                    get course relation information
+    //================================================================================
+    public boolean hospitalExist(int hospitalId) {
+        return hospitalService.existHospital(hospitalId);
+    }
+
+    public boolean departmentExist(int departmentId) {
+        return departmentService.existsDepartment(departmentId);
+    }
+
+    public boolean diagnosticExist(long diagnosticId) {
+        return diagnosticService.exitsDiagnostic(diagnosticId);
+    }
+
+    public boolean categoryExist(long categoryId) {
+        return categoryService.existsCategory(categoryId);
     }
 
     public List<HospitalBean> getHospitalByCourseId(long courseId, String strStatus) {
         logger.info("get hospital by course id={} and status={}", courseId, strStatus);
-        List<Integer> hospitalIds = hospitalRelation.getHospitalByCourseId(courseId, strStatus);
+        List<Integer> hospitalIds = courseDepartmentRelationService.getHospitalByCourseId(courseId, strStatus);
         List<HospitalBean> hospitals = hospitalService.getHospitalByIds(hospitalIds);
         logger.info("hospital is {}", hospitals);
         return hospitals;
@@ -105,7 +421,7 @@ public class CourseRelationManageService {
     public List<HospitalDepartmentBean> getDepartmentByCourseId(long courseId, String strStatus) {
         logger.info("get department by course id={} and status={}", courseId, strStatus);
         List<Long> courseIds = Arrays.asList(new Long[]{courseId});
-        List<Integer> departmentIds = departmentRelation.getDepartmentByCourseId(courseIds, strStatus);
+        List<Integer> departmentIds = courseDepartmentRelationService.getDepartmentByCourseId(courseIds, strStatus);
         List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefixForNurseGo());
         logger.info("department is {}", departments);
         return departments;
@@ -114,296 +430,65 @@ public class CourseRelationManageService {
     public List<DiagnosticEnumerationBean> getDiagnosticByCourseId(long courseId, String strStatus) {
         logger.info("get diagnostic by course id={} and status={}", courseId, strStatus);
         List<Long> courseIds = Arrays.asList(new Long[]{courseId});
-        List<Long> diagnosticIds = diagnosticRelation.getDiagnosticByCourseId(courseIds, strStatus);
-        List<DiagnosticEnumerationBean> diagnostics = diagnostic.getDiagnosticByIds(diagnosticIds);
+        List<Long> diagnosticIds = diagnosticRelationService.getDiagnosticByCourseId(courseIds);
+        List<DiagnosticEnumerationBean> diagnostics = diagnosticService.getDiagnosticByIds(diagnosticIds);
         logger.info("diagnostic is {}", diagnostics);
         return diagnostics;
     }
 
-    public List<Long> getEnabledCoursesIdInExtensionNursing() {
-        logger.info("get course ids in extension nursing");
-        List<Long> coursesId = hospitalRelation.getCourseInHospital(-1, CommonStatus.ENABLED.name());
-        logger.info("count is {}", coursesId.size());
-        return coursesId;
+    public List<CourseCategoryBean> getCategoryByCourseId(long courseId, String strStatus) {
+        logger.info("get category by course id={} and status={}", courseId, strStatus);
+        List<CourseCategoryBean> diagnostics = courseCategoryRelationService.getCategoryByCourseId(strStatus, courseId);
+        logger.info("category is {}", diagnostics);
+        return diagnostics;
     }
 
-    public List<CourseBean> getEnabledCoursesInExtensionNursing() {
-        logger.info("get course ids in extension nursing");
-        List<Long> coursesId = hospitalRelation.getCourseInHospital(-1, CommonStatus.ENABLED.name());
-        List<CourseBean> courses = course.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), coursesId);
-        logger.info("count is {}", courses.size());
-        return courses;
-    }
+    //================================================================================
+    //                    get course relation information
+    //================================================================================
 
-    public List<CourseBean> getEnabledCoursesByHospitalIdAndDiagnosticId(int hospitalId, long diagnosticId) {
-        logger.info("get courses by hospitalId={} diagnosticId={}", hospitalId, diagnosticId);
-        List<Long> coursesId = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
-        List<Long> coursesIdInDiagnostic = diagnosticRelation.judgeCourseInDiagnostic(diagnosticId, coursesId, CommonStatus.ENABLED.name());
-        List<CourseBean> coursesInDiagnostic = course.getCourseByIds(coursesIdInDiagnostic);
-        logger.info("count is {}", coursesInDiagnostic.size());
-        return coursesInDiagnostic;
-    }
-
-    public List<Long> getEnabledCoursesIdByHospitalIdAndDepartmentId(Integer hospitalId, Integer departmentId) {
-        logger.info("get course ids by hospitalId={} departmentId={}", hospitalId, departmentId);
-        if (!hospitalExist(hospitalId)) {
-            logger.error("hospital not exists!");
-            return new ArrayList<>();
-        }
-        if (!departmentExist(departmentId)) {
-            logger.error("department not exists!");
-            return new ArrayList<>();
-        }
-        List<Long> coursesInHospital = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
-        List<Long> coursesInHospitalDepartment = departmentRelation.judgeCourseInDepartment(departmentId, coursesInHospital, CommonStatus.ENABLED.name());
-        logger.info("course in hospital and department={}", coursesInHospitalDepartment);
-        return coursesInHospitalDepartment;
-    }
-
-    public Map<Long, List<Long>> getDiagnosticIdToCoursesIdMapInDepartment(Integer hospitalId, Integer departmentId) {
-        logger.info("get diagnostic id to courses ids map in department by hospitalId={} departmentId={}", hospitalId, departmentId);
-        List<Long> courseInDepartment = getEnabledCoursesIdByHospitalIdAndDepartmentId(hospitalId, departmentId);
-        Map<Long, List<Long>> diagnosticToCourses = diagnosticRelation.getDiagnosticToCourseIds(courseInDepartment, CommonStatus.ENABLED);
-        logger.info("diagnostic to courses map in department size is {}", diagnosticToCourses.size());
-        return diagnosticToCourses;
-    }
-
-    public List<CourseBean> getAllCourseByHospitalOrDepartmentId(int hospitalId, int departmentId) {
-        logger.info("get course in hospital={} department={}", hospitalId, departmentId);
-        boolean searchHospital = hospital.exists(hospitalId) || -1==hospitalId;
-        boolean searchDepartment = department.exists(departmentId);
-
-        List<Long> courseIds;
-        if (!searchHospital && !searchDepartment) {
-            courseIds = null;
-        }
-        else if (searchHospital && !searchDepartment) {
-            courseIds = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
-        }
-        else if (!searchHospital && searchDepartment) {
-            courseIds = departmentRelation.getCourseInDepartment(departmentId, CommonStatus.ENABLED.name());
-        }
-        else {
-            courseIds = hospitalRelation.getCourseInHospital(hospitalId, CommonStatus.ENABLED.name());
-            courseIds = departmentRelation.judgeCourseInDepartment(departmentId, courseIds, CommonStatus.ENABLED.name());
-        }
-        List<CourseBean> courses = course.getCourseByIds(courseIds);
-        logger.info("count is {}", courses.size());
-        return courses;
-    }
-
-    public Map<DiagnosticEnumeration, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(String hospitalUniqueId, String departmentUniqueId) {
+    public Integer[] getHospitalDepartmentId(String hospitalUniqueId, String departmentUniqueId) {
         logger.info("get diagnostic to courses map in department by hospitalUniqueId={} departmentUniqueId={}",
                 hospitalUniqueId, departmentUniqueId);
-        List<HospitalEntity> hospitals = hospital.findByUniqueId(hospitalUniqueId);
+        List<HospitalBean> hospitals = hospitalService.getHospitalByUniqueId(hospitalUniqueId);
         int hospitalSize = VerifyUtil.isListEmpty(hospitals) ? 0 : hospitals.size();
         if (hospitalSize!=1) {
-            logger.info("hospital size is not 1, size is {}", hospitalSize);
+            logger.error("hospital size is not 1, size is {}", hospitalSize);
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         int hospitalId = hospitals.get(0).getId();
         logger.info("hospitalId={}", hospitalId);
 
-        List<HospitalDepartmentEntity> departments = department.findByUniqueId(departmentUniqueId);
+        List<HospitalDepartmentBean> departments = departmentService.getDepartmentByUniqueId(departmentUniqueId, null);
         int departmentSize = VerifyUtil.isListEmpty(departments) ? 0 : departments.size();
         if (departmentSize!=1) {
-            logger.info("department size is not 1, size is {}", departmentSize);
+            logger.error("department size is not 1, size is {}", departmentSize);
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (departments.get(0).getHospitalId() != hospitalId) {
+            logger.error("department not belong to the hospital");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         int departmentId = departments.get(0).getId();
+
         logger.info("departmentId={}", departmentId);
 
-        return getDiagnosticToCoursesMapInDepartment(hospitalId, departmentId);
+        return new Integer[]{hospitalId, departmentId};
     }
-
-    public Map<DiagnosticEnumeration, List<CourseBean>> getDiagnosticToCoursesMapInDepartment(Integer hospitalId, Integer departmentId) {
-        logger.info("get diagnostic to courses map in department by hospitalId={} departmentId={}", hospitalId, departmentId);
-        List<Long> coursesIdInDepartment = getEnabledCoursesIdByHospitalIdAndDepartmentId(hospitalId, departmentId);
-        List<CourseBean> coursesBeanInDepartment = course.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), coursesIdInDepartment);
-        Map<Long, CourseBean> courseIdToBean = new HashMap<>();
-        for (CourseBean course : coursesBeanInDepartment) {
-            courseIdToBean.put(course.getId(), course);
-        }
-        Map<Long, List<Long>> diagnosticIdToCoursesId = diagnosticRelation.getDiagnosticToCourseIds(coursesIdInDepartment, CommonStatus.ENABLED);
-        Map<DiagnosticEnumeration, List<CourseBean>> diagnosticToCourses = new HashMap<>();
-        Set<Long> keys = diagnosticIdToCoursesId.keySet();
-        for (Long key : keys) {
-            List<Long> coursesId = diagnosticIdToCoursesId.get(key);
-            DiagnosticEnumeration diagnostic = DiagnosticEnumeration.parseInt(key.intValue());
-            List<CourseBean> courses = new ArrayList<>();
-            for (Long courseId : coursesId) {
-                CourseBean course = courseIdToBean.get(courseId);
-                if (null!=course) {
-                    courses.add(course);
-                }
-            }
-            diagnosticToCourses.put(diagnostic, courses);
-        }
-        logger.info("diagnostic to courses map in department size is {}", diagnosticToCourses.size());
-        return diagnosticToCourses;
-    }
-
-    public Map<String, List<Long>> getCoursesIdByConditions(List<Long> courseIds,
-                                                            int hospitalId, int departmentId, long diagnosticId,
-                                                            String strHospitalRelationStatus, String strCourseStatus
-    ) {
-        logger.info("get courses id in hospital={} department={} diagnostic={} with hospitalRelationStatus={} and courseStatus={}",
-                hospitalId, departmentId, diagnosticId, strHospitalRelationStatus, strCourseStatus);
-        logger.info("course id must in {}", courseIds);
-
-        Map<String, List<Long>> hospitalDepartmentDiagnostic = new HashMap<>();
-
-        List<Long> courseInHospital = hospitalRelation.getCourseInHospital(hospitalId, strHospitalRelationStatus);
-        if (VerifyUtil.isListEmpty(courseInHospital)) {
-            return hospitalDepartmentDiagnostic;
-        }
-
-        if (!VerifyUtil.isListEmpty(courseIds)) {
-            List<Long> coursesIdNotInHospital = new ArrayList<>();
-            List<Long> validCoursesInHospital = new ArrayList<>();
-            for (Long courseIdInHospital : courseInHospital) {
-                if (courseIds.contains(courseIdInHospital)) {
-                    validCoursesInHospital.add(courseIdInHospital);
-                }
-                else {
-                    coursesIdNotInHospital.add(courseIdInHospital);
-                }
-            }
-            courseInHospital = validCoursesInHospital;
-            hospitalDepartmentDiagnostic.put(key_others, coursesIdNotInHospital);
-        }
-        List<Long> courseInStatus = course.getCourseIdByStatusAndIds(strCourseStatus, courseInHospital);
-        hospitalDepartmentDiagnostic.put(key_all_courses_in_hospital, courseInStatus);
-
-        List<Long> courseInDepartment = new ArrayList<>();
-        boolean checkCoursesInDepartment = departmentId>0;
-        if (checkCoursesInDepartment) {
-            courseInDepartment = departmentRelation.judgeCourseInDepartment(departmentId, courseInHospital, CommonStatus.ENABLED.name());
-            hospitalDepartmentDiagnostic.put(key_department, courseInDepartment);
-        }
-        else {
-            hospitalDepartmentDiagnostic.put(key_department, new ArrayList<>());
-        }
-
-        boolean checkCoursesInDiagnostic = diagnosticId>=0;
-        if (checkCoursesInDiagnostic) {
-            List<Long> courseInDiagnostic = diagnosticRelation.judgeCourseInDiagnostic(diagnosticId, courseInDepartment, CommonStatus.ENABLED.name());
-            hospitalDepartmentDiagnostic.put(key_diagnostic, courseInDiagnostic);
-        }
-        else {
-            hospitalDepartmentDiagnostic.put(key_diagnostic, new ArrayList<>());
-        }
-        return hospitalDepartmentDiagnostic;
-    }
-
-    public Map<String, List<CourseBean>> getCoursesByConditions(List<Long> courseIds,
-                                                                int hospitalId, int departmentId, long diagnosticId,
-                                                                String strRelationStatus, String strCourseStatus) {
-        Map<String, List<Long>> courseIdsInHospitalDepartmentDiagnostic = getCoursesIdByConditions(courseIds, hospitalId, departmentId, diagnosticId, strRelationStatus, strCourseStatus);
-        List<Long> coursesIdInHospital = courseIdsInHospitalDepartmentDiagnostic.get(key_all_courses_in_hospital);
-        List<Long> coursesIdInDepartment = courseIdsInHospitalDepartmentDiagnostic.get(key_department);
-        List<Long> coursesIdInDiagnostic = courseIdsInHospitalDepartmentDiagnostic.get(key_diagnostic);
-        List<Long> coursesIdInOther = courseIdsInHospitalDepartmentDiagnostic.get(key_others);
-
-        Map<String, List<CourseBean>> coursesInHospitalDepartmentDiagnostic = new HashMap<>();
-        if (!VerifyUtil.isListEmpty(coursesIdInOther)) {
-            List<CourseBean> courses = course.getCourseByIds(coursesIdInOther);
-            coursesInHospitalDepartmentDiagnostic.put(key_others, courses);
-        }
-        if (!VerifyUtil.isListEmpty(coursesIdInHospital)) {
-            List<CourseBean> courses = course.getCourseByIds(coursesIdInHospital);
-            coursesInHospitalDepartmentDiagnostic.put(key_all_courses_in_hospital, courses);
-
-            if (!VerifyUtil.isListEmpty(courses)) {
-                List<CourseBean> coursesInDepartment = new ArrayList<>();
-                if (!VerifyUtil.isListEmpty(coursesIdInDepartment)) {
-                    for (Long courseId : coursesIdInDepartment) {
-                        for (CourseBean course : courses) {
-                            if (course.getId()==courseId) {
-                                coursesInDepartment.add(course);
-                                break;
-                            }
-                        }
-                    }
-                }
-                coursesInHospitalDepartmentDiagnostic.put(key_department, coursesInDepartment);
-
-                List<CourseBean> coursesInDiagnostic = new ArrayList<>();
-                if (!VerifyUtil.isListEmpty(coursesIdInDiagnostic)) {
-                    for (Long courseId : coursesIdInDiagnostic) {
-                        for (CourseBean course : courses) {
-                            if (course.getId()==courseId) {
-                                coursesInDiagnostic.add(course);
-                                break;
-                            }
-                        }
-                    }
-                }
-                coursesInHospitalDepartmentDiagnostic.put(key_diagnostic, coursesInDiagnostic);
-            }
-        }
-        else {
-            coursesInHospitalDepartmentDiagnostic.put(key_all_courses_in_hospital, new ArrayList<>());
-            coursesInHospitalDepartmentDiagnostic.put(key_department, new ArrayList<>());
-            coursesInHospitalDepartmentDiagnostic.put(key_diagnostic, new ArrayList<>());
-        }
-
-        return coursesInHospitalDepartmentDiagnostic;
-    }
-
 
     //==============================================================================
     //                    update
     //==============================================================================
-    @Transactional
-    public CourseHospitalRelationBean updateCourseToHospital(long courseId, int hospitalId, String status) {
-        CourseHospitalRelationBean relation = hospitalRelation.updateStatus(courseId, hospitalId, status);
-        return relation;
-    }
-
-    @Transactional
-    public CourseDepartmentRelationBean updateCourseToDepartment(long courseId, int departmentId, String status) {
-        CourseDepartmentRelationBean relation = departmentRelation.updateStatus(courseId, departmentId, status);
-        return relation;
-    }
 
     @Transactional
     public CourseDiagnosticRelationBean updateCourseToDiagnostic(long courseId, long diagnosticId, String status) {
-        CourseDiagnosticRelationBean relation = diagnosticRelation.updateStatus(courseId, diagnosticId, status);
+        CourseDiagnosticRelationBean relation = diagnosticRelationService.updateStatus(courseId, diagnosticId, status);
         return relation;
     }
 
     //==============================================================================
     //                    add
     //==============================================================================
-    @Transactional
-    public boolean addCourseToHospital(long courseId, int hospitalId) {
-        if (!hospitalExist(hospitalId) && -1!=hospitalId) {
-            logger.error("hospital not exists");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        if (!course.existCourse(courseId)) {
-            logger.error("course not exists");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        CourseHospitalRelationBean relation = hospitalRelation.addCourseToHospital(courseId, hospitalId);
-        return null!=relation && relation.getId()>0;
-    }
-
-    @Transactional
-    public boolean addCourseToDepartment(long courseId, int departmentId) {
-        if (!departmentExist(departmentId)) {
-            logger.error("department not exists");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        if (!course.existCourse(courseId)) {
-            logger.error("course not exists");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        CourseDepartmentRelationBean relation = departmentRelation.addCourseToDepartment(courseId, departmentId);
-        return null != relation && relation.getId() > 0;
-    }
-
     @Transactional
     public boolean addCourseToDiagnostic(long courseId, long diagnosticId) {
 //        if (!diagnostic.exists(diagnosticId)) {
@@ -414,11 +499,11 @@ public class CourseRelationManageService {
             logger.error("diagnostic not exists");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (!course.existCourse(courseId)) {
+        if (!courseService.existCourse(courseId)) {
             logger.error("course not exists");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        CourseDiagnosticRelationBean relation = diagnosticRelation.addCourseToDiagnostic(courseId, diagnosticId);
+        CourseDiagnosticRelationBean relation = diagnosticRelationService.addCourseToDiagnostic(courseId, diagnosticId);
         return null!=relation && relation.getId()>0;
     }
 
@@ -427,19 +512,10 @@ public class CourseRelationManageService {
     //==============================================================================
 
     @Transactional
-    public List<Integer> setCourseToHospitalRelationship(long courseId, List<Integer> hospitalIds) {
-        logger.info("set course_to_hospital relationship, courseId={} hospitalIds={}",
-                courseId, hospitalIds);
-        List<Integer> settingDepartmentIds = hospitalRelation.setCourseToHospitalRelation(courseId, hospitalIds);
-        logger.info("set hospital ids is {}", settingDepartmentIds);
-        return settingDepartmentIds;
-    }
-
-    @Transactional
-    public List<Integer> setCourseToDepartmentRelationship(long courseId, List<Integer> departmentIds) {
+    public List<Integer> setCourseToDepartmentRelationship(long courseId, Integer hospitalId, List<Integer> departmentIds) {
         logger.info("set course_to_department relationship, courseId={} departmentIds={}",
                 courseId, departmentIds);
-        List<Integer> settingDepartmentIds = departmentRelation.setCourseToDepartmentRelation(courseId, departmentIds);
+        List<Integer> settingDepartmentIds = courseDepartmentRelationService.setCourseToDepartmentRelation(courseId, hospitalId, departmentIds);
         logger.info("set department ids is {}", settingDepartmentIds);
         return settingDepartmentIds;
     }
@@ -448,8 +524,17 @@ public class CourseRelationManageService {
     public List<Long> setCourseToDiagnosticRelationship(long courseId, List<Long> diagnosticIds) {
         logger.info("set course_to_diagnostic relationship, courseId={} diagnosticIds={}",
                 courseId, diagnosticIds);
-        List<Long> settingDiagnosticIds = diagnosticRelation.setCourseToDiagnosticRelation(courseId, diagnosticIds);
+        List<Long> settingDiagnosticIds = diagnosticRelationService.setCourseToDiagnosticRelation(courseId, diagnosticIds);
         logger.info("set diagnostic ids is {}", settingDiagnosticIds);
         return settingDiagnosticIds;
+    }
+
+    @Transactional
+    public Long setCourseToCategoryRelationship(long courseId, Long categoryId) {
+        logger.info("set course_to_category relationship, courseId={} categoryId={}",
+                courseId, categoryId);
+        courseCategoryRelationService.setCourseRelation(courseId, categoryId);
+        logger.info("set category ids is {}", categoryId);
+        return categoryId;
     }
 }

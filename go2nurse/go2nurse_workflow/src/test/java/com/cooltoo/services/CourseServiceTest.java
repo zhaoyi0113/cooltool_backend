@@ -134,16 +134,16 @@ public class CourseServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetCourseByStatusAndIds() {
         List<Long> ids = Arrays.asList(new Long[]{4L, 5L, 6L, 7L});
-        List<CourseBean> beans = service.getCourseByStatusAndIds(CourseStatus.ENABLE.name(), ids);
+        List<CourseBean> beans = service.getCourseByStatusAndIds(CourseStatus.ENABLE, ids, null, null);
         Assert.assertEquals(2, beans.size());
         Assert.assertEquals(5L, beans.get(0).getId());
         Assert.assertEquals(4L, beans.get(1).getId());
 
-        beans = service.getCourseByStatusAndIds(CourseStatus.EDITING.name(), ids);
+        beans = service.getCourseByStatusAndIds(CourseStatus.EDITING, ids, null, null);
         Assert.assertEquals(1, beans.size());
         Assert.assertEquals(6L, beans.get(0).getId());
 
-        beans = service.getCourseByStatusAndIds(CourseStatus.DISABLE.name(), ids);
+        beans = service.getCourseByStatusAndIds(CourseStatus.DISABLE, ids, null, null);
         Assert.assertEquals(1, beans.size());
         Assert.assertEquals(7L, beans.get(0).getId());
     }
@@ -153,9 +153,8 @@ public class CourseServiceTest extends AbstractCooltooTest {
         String name = "title test";
         String introduction = "描述 0003";
         String link = "http://afdsafds.com/fdsafd9ejkfdsjakfdjisoafkjfi";
-        int hospitalId = 11;
         String keyword = "描";
-        CourseBean bean = service.createCourse(name, introduction, link, keyword, hospitalId);
+        CourseBean bean = service.createCourse(name, introduction, link, keyword);
         Assert.assertNotNull(bean);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(name, bean.getName());
@@ -245,21 +244,21 @@ public class CourseServiceTest extends AbstractCooltooTest {
             }
         }
 
-        List<CourseBean> beans = service.getCourseByIds(ids);
+        List<CourseBean> beans = service.getCourseByStatusAndIds(null, ids, null, null);
         Assert.assertEquals(3, beans.size());
 
         service.deleteByIds(ids);
 
         ids = Arrays.asList(new Long[]{id1});
-        beans = service.getCourseByIds(ids);
+        beans = service.getCourseByStatusAndIds(null, ids, null, null);
         Assert.assertTrue(beans.isEmpty());
 
         ids = Arrays.asList(new Long[]{id2});
-        beans = service.getCourseByIds(ids);
+        beans = service.getCourseByStatusAndIds(null, ids, null, null);
         Assert.assertTrue(beans.isEmpty());
 
         ids = Arrays.asList(new Long[]{id3});
-        beans = service.getCourseByIds(ids);
+        beans = service.getCourseByStatusAndIds(null, ids, null, null);
         Assert.assertTrue(beans.isEmpty());
 
         for (String filePath : fileRelativePath) {

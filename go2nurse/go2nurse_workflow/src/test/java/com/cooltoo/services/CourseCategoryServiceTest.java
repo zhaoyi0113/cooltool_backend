@@ -6,6 +6,7 @@ import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.CourseCategoryBean;
 import com.cooltoo.go2nurse.beans.CourseCategoryRelationBean;
 import com.cooltoo.go2nurse.constants.CourseStatus;
+import com.cooltoo.go2nurse.service.CourseCategoryRelationService;
 import com.cooltoo.go2nurse.service.CourseCategoryService;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -39,6 +40,7 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
     private static final Logger logger = LoggerFactory.getLogger(CourseCategoryServiceTest.class.getName());
 
     @Autowired private CourseCategoryService service;
+    @Autowired private CourseCategoryRelationService relationService;
     @Autowired private UserGo2NurseFileStorageService userStorage;
 
     private static final String All = "ALL";
@@ -55,26 +57,26 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetCategoryByCourseId() {
         long courseId = 1L;
-        List<CourseCategoryBean> categories = service.getCategoryByCourseId(All, courseId);
+        List<CourseCategoryBean> categories = relationService.getCategoryByCourseId(All, courseId);
         Assert.assertEquals(2, categories.size());
         Assert.assertEquals(1L, categories.get(0).getId());
         Assert.assertEquals(2L, categories.get(1).getId());
 
         courseId = 2L;
-        categories = service.getCategoryByCourseId(All, courseId);
+        categories = relationService.getCategoryByCourseId(All, courseId);
         Assert.assertEquals(4, categories.size());
         Assert.assertEquals(1L, categories.get(0).getId());
         Assert.assertEquals(2L, categories.get(1).getId());
         Assert.assertEquals(6L, categories.get(2).getId());
         Assert.assertEquals(8L, categories.get(3).getId());
-        categories = service.getCategoryByCourseId(CategoryEnabled, courseId);
+        categories = relationService.getCategoryByCourseId(CategoryEnabled, courseId);
         Assert.assertEquals(2, categories.size());
         Assert.assertEquals(1L, categories.get(0).getId());
         Assert.assertEquals(2L, categories.get(1).getId());
-        categories = service.getCategoryByCourseId(CategoryDisabled, courseId);
+        categories = relationService.getCategoryByCourseId(CategoryDisabled, courseId);
         Assert.assertEquals(1, categories.size());
         Assert.assertEquals(6L, categories.get(0).getId());
-        categories = service.getCategoryByCourseId(CategoryDeleted, courseId);
+        categories = relationService.getCategoryByCourseId(CategoryDeleted, courseId);
         Assert.assertEquals(1, categories.size());
         Assert.assertEquals(8L, categories.get(0).getId());
 
@@ -83,20 +85,20 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetCategoryByCourseIds() {
         List<Long> courseIds = Arrays.asList(new Long[]{1L, 2L});
-        List<CourseCategoryBean> categories = service.getCategoryByCourseId(All, courseIds);
+        List<CourseCategoryBean> categories = relationService.getCategoryByCourseId(All, courseIds);
         Assert.assertEquals(4, categories.size());
         Assert.assertEquals(1L, categories.get(0).getId());
         Assert.assertEquals(2L, categories.get(1).getId());
         Assert.assertEquals(6L, categories.get(2).getId());
         Assert.assertEquals(8L, categories.get(3).getId());
-        categories = service.getCategoryByCourseId(CategoryEnabled, courseIds);
+        categories = relationService.getCategoryByCourseId(CategoryEnabled, courseIds);
         Assert.assertEquals(2, categories.size());
         Assert.assertEquals(1L, categories.get(0).getId());
         Assert.assertEquals(2L, categories.get(1).getId());
-        categories = service.getCategoryByCourseId(CategoryDisabled, courseIds);
+        categories = relationService.getCategoryByCourseId(CategoryDisabled, courseIds);
         Assert.assertEquals(1, categories.size());
         Assert.assertEquals(6L, categories.get(0).getId());
-        categories = service.getCategoryByCourseId(CategoryDeleted, courseIds);
+        categories = relationService.getCategoryByCourseId(CategoryDeleted, courseIds);
         Assert.assertEquals(1, categories.size());
         Assert.assertEquals(8L, categories.get(0).getId());
     }
@@ -104,55 +106,24 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
     @Test
     public void testGetCourseByCategoryId() {
         long categoryId = 1L;
-        List<CourseBean> courses = service.getCourseByCategoryId(All, categoryId);
+        List<CourseBean> courses = relationService.getCourseByCategoryId(All, categoryId);
         Assert.assertEquals(5, courses.size());
         Assert.assertEquals(8L, courses.get(0).getId());
         Assert.assertEquals(7L, courses.get(1).getId());
         Assert.assertEquals(6L, courses.get(2).getId());
         Assert.assertEquals(2L, courses.get(3).getId());
         Assert.assertEquals(1L, courses.get(4).getId());
-        courses = service.getCourseByCategoryId(CourseEnable, categoryId);
+        courses = relationService.getCourseByCategoryId(CourseEnable, categoryId);
         Assert.assertEquals(2, courses.size());
         Assert.assertEquals(2L, courses.get(0).getId());
         Assert.assertEquals(1L, courses.get(1).getId());
-        courses = service.getCourseByCategoryId(CourseDisable, categoryId);
+        courses = relationService.getCourseByCategoryId(CourseDisable, categoryId);
         Assert.assertEquals(2, courses.size());
         Assert.assertEquals(8L, courses.get(0).getId());
         Assert.assertEquals(7L, courses.get(1).getId());
-        courses = service.getCourseByCategoryId(CourseEditing, categoryId);
+        courses = relationService.getCourseByCategoryId(CourseEditing, categoryId);
         Assert.assertEquals(1, courses.size());
         Assert.assertEquals(6L, courses.get(0).getId());
-    }
-
-    @Test
-    public void testGetCategoryRelationByCourseId() {
-        List<Long> coursesId = Arrays.asList(new Long[]{
-                1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L
-        });
-        Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = service.getCategoryRelationByCourseId(coursesId);
-        Assert.assertEquals(6, categoryToCourses.size());
-        Set<CourseCategoryBean> categories = categoryToCourses.keySet();
-        for (CourseCategoryBean category : categories) {
-            List<CourseBean> courses = categoryToCourses.get(category);
-            if (category.getId()==1) {
-                Assert.assertEquals(5, courses.size());
-            }
-            else if (category.getId()==2) {
-                Assert.assertEquals(2, courses.size());
-            }
-            else if (category.getId()==6) {
-                Assert.assertEquals(1, courses.size());
-            }
-            else if (category.getId()==8) {
-                Assert.assertEquals(1, courses.size());
-            }
-            else if (category.getId()==0) {
-                Assert.assertEquals(4, courses.size());
-            }
-            else if (category.getId()==-1) {
-                Assert.assertEquals(9, courses.size());
-            }
-        }
     }
 
     //==========================================
@@ -241,22 +212,6 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
     }
 
     //==========================================
-    //   relation update
-    //==========================================
-    @Test
-    public void testUpdateCourseRelation() {
-        long courseId = 1;
-        long categoryId = 3;
-        List<CourseCategoryBean> beans = service.getCategoryByCourseId(CategoryEnabled, courseId);
-        int oldSize = beans.size();
-        service.updateCourseRelation(courseId, categoryId, CommonStatus.ENABLED.name());
-        beans = service.getCategoryByCourseId(CategoryEnabled, courseId);
-        int newSize = beans.size();
-        Assert.assertEquals(oldSize+1, newSize);
-        Assert.assertEquals(courseId, beans.get(0).getId());
-    }
-
-    //==========================================
     //   category update
     //==========================================
     @Test
@@ -297,19 +252,19 @@ public class CourseCategoryServiceTest extends AbstractCooltooTest {
     public void testAddRelation() {
         long courseId = 1;
         long categoryId = 3;
-        CourseCategoryRelationBean relation = service.getRelation(courseId, categoryId);
+        CourseCategoryRelationBean relation = relationService.getRelation(courseId, categoryId);
         Assert.assertNotNull(relation);
         Assert.assertEquals(CommonStatus.DISABLED, relation.getStatus());
-        service.setCourseRelation(courseId, categoryId);
-        relation = service.getRelation(courseId, categoryId);
+        relationService.setCourseRelation(courseId, categoryId);
+        relation = relationService.getRelation(courseId, categoryId);
         Assert.assertNotNull(relation);
         Assert.assertEquals(CommonStatus.ENABLED, relation.getStatus());
 
         courseId = 9;
-        relation = service.getRelation(courseId, categoryId);
+        relation = relationService.getRelation(courseId, categoryId);
         Assert.assertNull(relation);
-        service.setCourseRelation(courseId, categoryId);
-        relation = service.getRelation(courseId, categoryId);
+        relationService.setCourseRelation(courseId, categoryId);
+        relation = relationService.getRelation(courseId, categoryId);
         Assert.assertNotNull(relation);
         Assert.assertEquals(CommonStatus.ENABLED, relation.getStatus());
 

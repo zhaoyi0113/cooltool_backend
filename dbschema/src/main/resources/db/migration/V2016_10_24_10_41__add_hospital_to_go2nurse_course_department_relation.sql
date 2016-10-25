@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_course_department_relation` ADD COLUMN `hospital_id` INT(11) NULL DEFAULT '0';

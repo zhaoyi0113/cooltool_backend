@@ -14,6 +14,7 @@ public class CourseDepartmentRelationBean {
     private CommonStatus status;
     private long courseId;
     private int departmentId;
+    private int hospitalId;
 
     public long getId() {
         return id;
@@ -33,6 +34,10 @@ public class CourseDepartmentRelationBean {
 
     public int getDepartmentId() {
         return departmentId;
+    }
+
+    public int getHospitalId() {
+        return hospitalId;
     }
 
     public void setId(long id) {
@@ -55,6 +60,10 @@ public class CourseDepartmentRelationBean {
         this.departmentId = departmentId;
     }
 
+    public void setHospitalId(int hospitalId) {
+        this.hospitalId = hospitalId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -63,6 +72,7 @@ public class CourseDepartmentRelationBean {
         msg.append(", status=").append(status);
         msg.append(", courseId=").append(courseId);
         msg.append(", departmentId=").append(departmentId);
+        msg.append(", hospitalId=").append(hospitalId);
         msg.append("]");
         return msg.toString();
     }

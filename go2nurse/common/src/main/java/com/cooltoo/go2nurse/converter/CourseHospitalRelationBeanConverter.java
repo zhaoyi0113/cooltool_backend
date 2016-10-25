@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 /**
  * Created by hp on 2016/6/12.
  */
+@Deprecated
 @Component
 public class CourseHospitalRelationBeanConverter implements Converter<CourseHospitalRelationEntity, CourseHospitalRelationBean> {
     @Override

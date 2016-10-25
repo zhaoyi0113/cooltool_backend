@@ -8,6 +8,7 @@ import java.util.Date;
 /**
  * Created by hp on 2016/6/12.
  */
+@Deprecated
 @Entity
 @Table(name = "go2nurse_course_hospital_relation")
 public class CourseHospitalRelationEntity {

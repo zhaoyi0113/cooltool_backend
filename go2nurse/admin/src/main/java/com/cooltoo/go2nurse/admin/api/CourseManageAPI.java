@@ -6,7 +6,7 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.CourseCategoryBean;
 import com.cooltoo.go2nurse.beans.DiagnosticEnumerationBean;
-import com.cooltoo.go2nurse.service.CourseCategoryService;
+import com.cooltoo.go2nurse.service.CourseCategoryRelationService;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import com.cooltoo.go2nurse.service.CourseService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
@@ -17,6 +17,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -34,52 +35,9 @@ public class CourseManageAPI {
     private static final Logger logger = LoggerFactory.getLogger(CourseManageAPI.class.getName());
 
     @Autowired private CourseRelationManageService courseRelationManageService;
-    @Autowired private CourseCategoryService categoryService;
+    @Autowired private CourseCategoryRelationService courseCategoryRelation;
     @Autowired private CourseService courseService;
     @Autowired private Go2NurseUtility utility;
-
-    // status ==> all/enable/disable/editing
-    @Path("/status/count/{status}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response countCourse(@Context HttpServletRequest request,
-                                @QueryParam("title_like") @DefaultValue("") String titleLike,
-                                @PathParam("status") @DefaultValue("") String status
-    ) {
-        logger.info("get course count by status={}", status);
-        long count = courseService.countByNameLikeAndStatus(titleLike, status);
-        logger.info("count = {}", count);
-        return Response.ok(count).build();
-    }
-
-    // status ==> all/enable/disable/editing
-    @Path("/status/{status}/{index}/{number}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCourseByStatus(@Context HttpServletRequest request,
-                                      @QueryParam("title_like") @DefaultValue("") String titleLike,
-                                      @PathParam("status") @DefaultValue("") String status,
-                                      @PathParam("index")  @DefaultValue("0") int index,
-                                      @PathParam("number") @DefaultValue("10") int number
-    ) {
-        logger.info("get course by status={} at page={}, {}/page", status, index, number);
-        List<CourseBean> courses = courseService.getCourseByNameAndStatus(titleLike, status, index, number);
-        logger.info("count = {}", courses.size());
-        return Response.ok(courses).build();
-    }
-
-    @Path("/get_by_course_ids")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCourseByCourseIds(@Context HttpServletRequest request,
-                                         @QueryParam("course_ids") @DefaultValue("0") String strCourseIds
-    ) {
-        logger.info("get course by ids={}", strCourseIds);
-        List<Long> courseIds = VerifyUtil.parseLongIds(strCourseIds);
-        List<CourseBean> courses = courseService.getCourseByIds(courseIds);
-        logger.info("count = {}", courses.size());
-        return Response.ok(courses).build();
-    }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
@@ -95,6 +53,7 @@ public class CourseManageAPI {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
     public Response createCourse(@Context HttpServletRequest request,
                                  @FormParam("name") @DefaultValue("") String name,
                                  @FormParam("introduction") @DefaultValue("") String introduction,
@@ -107,13 +66,13 @@ public class CourseManageAPI {
 
     ) {
         logger.info("create course");
-        CourseBean course = courseService.createCourse(name, introduction, link, keyword, hospitalId);
+        CourseBean course = courseService.createCourse(name, introduction, link, keyword);
         logger.info("course is {}", course);
         if (null!=course) {
             long courseId = course.getId();
-            categoryService.setCourseRelation(courseId, categoryId);
+            courseCategoryRelation.setCourseRelation(courseId, categoryId);
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
-            courseRelationManageService.setCourseToDepartmentRelationship(courseId, departmentIds);
+            courseRelationManageService.setCourseToDepartmentRelationship(courseId, hospitalId, departmentIds);
             List<Long> diagnosticIds = VerifyUtil.parseLongIds(strDiagnosticIds);
             courseRelationManageService.setCourseToDiagnosticRelationship(courseId, diagnosticIds);
         }
@@ -123,6 +82,7 @@ public class CourseManageAPI {
     @Path("/edit/base_information")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
     public Response updateCourseBasicInfo(@Context HttpServletRequest request,
                                           @FormParam("course_id")@DefaultValue("0") long courseId,
                                           @FormParam("name") @DefaultValue("") String name,
@@ -130,7 +90,7 @@ public class CourseManageAPI {
                                           @FormParam("link") @DefaultValue("") String link,
                                           @FormParam("keyword") @DefaultValue("") String keyword,
                                           @FormParam("category_id") @DefaultValue("-1") long categoryId,
-                                          @FormParam("hospital_ids") @DefaultValue("") String strHospitalIds,
+                                          @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
                                           @FormParam("department_ids") @DefaultValue("") String strDepartmentIds,
                                           @FormParam("diagnostic_ids") @DefaultValue("") String strDiagnosticIds
 
@@ -139,11 +99,9 @@ public class CourseManageAPI {
         CourseBean course = courseService.updateCourseBasicInfo(courseId, name, introduction, null, null, link, keyword);
         logger.info("course is {}", course);
         if (null!=course) {
-            categoryService.setCourseRelation(courseId, categoryId);
-            List<Integer> hospitalIds = VerifyUtil.parseIntIds(strHospitalIds);
-            courseRelationManageService.setCourseToHospitalRelationship(courseId, hospitalIds);
+            courseCategoryRelation.setCourseRelation(courseId, categoryId);
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
-            courseRelationManageService.setCourseToDepartmentRelationship(courseId, departmentIds);
+            courseRelationManageService.setCourseToDepartmentRelationship(courseId, hospitalId, departmentIds);
             List<Long> diagnosticIds = VerifyUtil.parseLongIds(strDiagnosticIds);
             courseRelationManageService.setCourseToDiagnosticRelationship(courseId, diagnosticIds);
         }
@@ -197,8 +155,8 @@ public class CourseManageAPI {
         CourseBean course = courseService.getCourseById(courseId, utility.getHttpPrefix());
         List<HospitalBean> hospitals = courseRelationManageService.getHospitalByCourseId(courseId, CommonStatus.ENABLED.name());
         List<HospitalDepartmentBean> departments = courseRelationManageService.getDepartmentByCourseId(courseId, CommonStatus.ENABLED.name());
+        List<CourseCategoryBean> categories = courseCategoryRelation.getCategoryByCourseId(CommonStatus.ENABLED.name(), courseId);
         List<DiagnosticEnumerationBean> diagnostics = courseRelationManageService.getDiagnosticByCourseId(courseId, CommonStatus.ENABLED.name());
-        List<CourseCategoryBean> categories = categoryService.getCategoryByCourseId(CommonStatus.ENABLED.name(), courseId);
         Map<String, Object> retVal = new HashMap<>();
         retVal.put("course", course);
         retVal.put("hospital", hospitals);

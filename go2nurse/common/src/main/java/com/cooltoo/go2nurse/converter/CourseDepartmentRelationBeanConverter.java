@@ -18,6 +18,7 @@ public class CourseDepartmentRelationBeanConverter implements Converter<CourseDe
         bean.setStatus(source.getStatus());
         bean.setCourseId(source.getCourseId());
         bean.setDepartmentId(source.getDepartmentId());
+        bean.setHospitalId(source.getHospitalId());
         return bean;
     }
 }

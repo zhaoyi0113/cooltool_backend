@@ -26,14 +26,28 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
             " WHERE (?1 IS NULL OR course.name LIKE %?1)" +
             " AND (?2 IS NULL OR course.status=?2)")
     Page<CourseEntity> findByNameLikeAndStatus(String nameLike, CourseStatus status, Pageable page);
-    long countByName(String name);
+
+
+
     List<CourseEntity> findByName(String name, Sort sort);
-    List<CourseEntity> findByIdIn(List<Long> ids, Sort sort);
-    List<CourseEntity> findByStatusAndIdIn(CourseStatus status, List<Long> ids, Sort sort);
+    long countByUniqueId(String uniqueId);
+    List<CourseEntity> findByUniqueId(String uniqueId, Sort sort);
     @Query("SELECT course.id FROM CourseEntity course" +
             " WHERE (?1 IS NULL OR course.status=?1)" +
             " AND course.id IN (?2)")
     List<Long> findCourseIdByStatusAndIdIn(CourseStatus status, List<Long> ids, Sort sort);
-    long countByUniqueId(String uniqueId);
-    List<CourseEntity> findByUniqueId(String uniqueId, Sort sort);
+    @Query("FROM CourseEntity course" +
+            " WHERE course.id IN (?1)")
+    List<CourseEntity> findCourseByIdIn(List<Long> ids, Sort sort);
+    @Query("FROM CourseEntity course" +
+            " WHERE course.id IN (?1)")
+    Page<CourseEntity> findCourseByIdIn(List<Long> ids, Pageable page);
+    @Query("FROM CourseEntity course" +
+            " WHERE (?1 IS NULL OR course.status=?1)" +
+            " AND course.id IN (?2)")
+    List<CourseEntity> findCourseByStatusAndIdIn(CourseStatus status, List<Long> ids, Sort sort);
+    @Query("FROM CourseEntity course" +
+           " WHERE (?1 IS NULL OR course.status=?1)" +
+           " AND course.id IN (?2)")
+    Page<CourseEntity> findCourseByStatusAndIdIn(CourseStatus status, List<Long> ids, Pageable page);
 }

@@ -3,11 +3,12 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.beans.CourseDepartmentRelationBean;
 import com.cooltoo.go2nurse.converter.CourseDepartmentRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.CourseDepartmentRelationEntity;
 import com.cooltoo.go2nurse.repository.CourseDepartmentRelationRepository;
 import com.cooltoo.go2nurse.repository.CourseRepository;
+import com.cooltoo.repository.HospitalDepartmentRepository;
+import com.cooltoo.repository.HospitalRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -33,9 +33,13 @@ public class CourseDepartmentRelationService {
             new Sort.Order(Sort.Direction.DESC, "time"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
-    @Autowired private CourseRepository courseRepository;
+
     @Autowired private CourseDepartmentRelationRepository repository;
     @Autowired private CourseDepartmentRelationBeanConverter beanConverter;
+
+    @Autowired private CourseRepository courseRepository;
+    @Autowired private HospitalRepository hospitalRepository;
+    @Autowired private HospitalDepartmentRepository departmentRepository;
 
     //============================================================================
     //                 get
@@ -49,30 +53,20 @@ public class CourseDepartmentRelationService {
 
         Integer departmentId = Integer.valueOf(iDepartmentId);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        if (null==status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                validCourseIds = repository.findByDepartmentIdAndStatusAndCoursesId(departmentId, status, coursesId, sort);
-            }
-        }
-        else {
-            validCourseIds = repository.findByDepartmentIdAndStatusAndCoursesId(departmentId, status, coursesId, sort);
+        if (null!=status || "ALL".equalsIgnoreCase(strStatus)) {
+            validCourseIds = repository.findCourseIdByDepartmentAndStatusAndCourses(departmentId, status, coursesId, sort);
         }
         logger.info("count is {}", validCourseIds.size());
         return validCourseIds;
     }
 
-    public List<Long> getCourseInDepartment(int iDepartmentId, String strStatus) {
+    public List<Long> getCourseIdInDepartment(int iDepartmentId, String strStatus) {
         logger.info("get course in department={} with status={}", iDepartmentId, strStatus);
         List<Long> courseIds = new ArrayList<>();
         Integer departmentId = Integer.valueOf(iDepartmentId);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        if (null==status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                courseIds = repository.findByDepartmentIdAndStatus(departmentId, status, sort);
-            }
-        }
-        else {
-            courseIds = repository.findByDepartmentIdAndStatus(departmentId, status, sort);
+        if (null!=status || "ALL".equalsIgnoreCase(strStatus)) {
+            courseIds = repository.findCourseIdByDepartmentIdAndStatus(departmentId, status, sort);
         }
         logger.info("count is {}", courseIds.size());
         return courseIds;
@@ -86,84 +80,19 @@ public class CourseDepartmentRelationService {
 
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Integer> departmentIds = new ArrayList<>();
-        if (null==status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                departmentIds = repository.findByCourseIdAndStatus(courseIds, status, sort);
-            }
-        }
-        else {
-            departmentIds = repository.findByCourseIdAndStatus(courseIds, status, sort);
+        if (null!=status || "ALL".equalsIgnoreCase(strStatus)) {
+            departmentIds = repository.findDepartmentIdByCourseIdAndStatus(courseIds, status, sort);
         }
         logger.info("count is {}", departmentIds.size());
         return departmentIds;
     }
 
-
-
-
-    //============================================================================
-    //                 update
-    //============================================================================
-    @Transactional
-    public CourseDepartmentRelationBean updateStatus(long lCourseId, int iDepartmentId, String strStatus) {
-        logger.info("update relation status to={} between course={} and department={}",
-                strStatus, lCourseId, iDepartmentId);
+    public List<Integer> getHospitalByCourseId(long courseId, String strStatus) {
+        logger.info("get hospital id by course id ={} and status", courseId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
-        if (null==status) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        Integer departmentId = Integer.valueOf(iDepartmentId);
-        Long courseId = Long.valueOf(lCourseId);
-        List<CourseDepartmentRelationEntity> relations = repository.findByDepartmentIdAndCourseId(departmentId, courseId, sort);
-        if (VerifyUtil.isListEmpty(relations)) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
-        }
-        CourseDepartmentRelationEntity entity = relations.get(0);
-        relations.remove(entity);
-
-        entity.setStatus(status);
-        entity = repository.save(entity);
-
-        if (!VerifyUtil.isListEmpty(relations)) {
-            repository.delete(relations);
-        }
-
-        CourseDepartmentRelationBean bean = beanConverter.convert(entity);
-        logger.info("update relation={}", bean);
-        return bean;
-    }
-
-    //============================================================================
-    //                 add
-    //============================================================================
-    @Transactional
-    public CourseDepartmentRelationBean addCourseToDepartment(long lCourseId, int iDepartmentId) {
-        logger.info("add course={} to department={}", lCourseId, iDepartmentId);
-        Integer departmentId = Integer.valueOf(iDepartmentId);
-        Long courseId = Long.valueOf(lCourseId);
-        CourseDepartmentRelationEntity entity = null;
-        List<CourseDepartmentRelationEntity> relations = repository.findByDepartmentIdAndCourseId(departmentId, courseId, sort);
-        if (!VerifyUtil.isListEmpty(relations)) {
-            entity = relations.get(0);
-            relations.remove(entity);
-        }
-        else {
-            entity = new CourseDepartmentRelationEntity();
-            entity.setDepartmentId(departmentId);
-            entity.setCourseId(courseId);
-            entity.setTime(new Date());
-        }
-
-        entity.setStatus(CommonStatus.ENABLED);
-        entity = repository.save(entity);
-
-        if (!VerifyUtil.isListEmpty(relations)) {
-            repository.delete(relations);
-        }
-
-        CourseDepartmentRelationBean bean = beanConverter.convert(entity);
-        logger.info("add relation={}", bean);
-        return bean;
+        List<Integer> hospitalIds = repository.findHospitalIdByCourseIdAndStatus(courseId, status, sort);
+        logger.info("hospital id is {}", hospitalIds);
+        return hospitalIds;
     }
 
     //=======================================================================
@@ -171,47 +100,67 @@ public class CourseDepartmentRelationService {
     //=======================================================================
 
     @Transactional
-    public List<Integer> setCourseToDepartmentRelation(long courseId, List<Integer> departmentIds) {
-        logger.info("set course_to_department_relationship courseId={} departmentIds={}",
-                courseId, departmentIds);
-        if (VerifyUtil.isListEmpty(departmentIds)) {
-            logger.info("department is empty");
-            return departmentIds;
-        }
+    public List<Integer> setCourseToDepartmentRelation(long courseId, Integer hospitalId, List<Integer> departmentIds) {
+        logger.info("set course_to_department_relationship courseId={} hospitalId={} departmentIds={}",
+                courseId, hospitalId, departmentIds);
+        // check parameters
         if (!courseRepository.exists(courseId)) {
             logger.error("course not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
+        if (hospitalId!=-1/* cooltoo */ && !hospitalRepository.exists(hospitalId)) {
+            logger.error("hospital not exists");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (VerifyUtil.isListEmpty(departmentIds)) {
+            if (null==departmentIds) {
+                departmentIds = new ArrayList<>();
+            }
+            departmentIds.add(0);
+        }
 
-        List<Integer> settingDepartmentIds = new ArrayList<>();
-        List<Long> courseIds = Arrays.asList(new Long[]{courseId});
-        List<Integer> existedDepartmentIds = repository.findByCourseIdAndStatus(courseIds, null, sort);
-        if (VerifyUtil.isListEmpty(existedDepartmentIds)) {
-            for (Integer departmentId : departmentIds) {
-                if (null!=addCourseToDepartment(courseId, departmentId)) {
-                    settingDepartmentIds.add(departmentId);
+        List<CourseDepartmentRelationEntity> existedRelation = repository.findByCourseId(courseId);
+        List<CourseDepartmentRelationEntity> relations = new ArrayList<>();
+        for (Integer depId : departmentIds) {
+            CourseDepartmentRelationEntity tmp = null;
+            if (VerifyUtil.isListEmpty(existedRelation)) {
+                tmp = new CourseDepartmentRelationEntity();
+            }
+            else {
+                tmp = existedRelation.remove(0);
+            }
+            tmp.setCourseId(courseId);
+            tmp.setHospitalId(hospitalId);
+            tmp.setDepartmentId(depId);
+            tmp.setStatus(CommonStatus.ENABLED);
+            tmp.setTime(new Date());
+            relations.add(tmp);
+        }
+
+        relations = repository.save(relations);
+        if (!VerifyUtil.isListEmpty(existedRelation)) {
+            repository.delete(existedRelation);
+        }
+
+        existedRelation = repository.findByCourseId(courseId);
+        for (int i = 0; i < existedRelation.size(); i ++) {
+            CourseDepartmentRelationEntity tmp1 = existedRelation.get(i);
+            boolean exist = false;
+            for (CourseDepartmentRelationEntity tmp2 : relations) {
+                if (tmp1.getId() == tmp2.getId()) {
+                    exist = true;
+                    break;
                 }
+            }
+            if (exist) {
+                existedRelation.remove(tmp1);
+                i--;
             }
         }
-        else {
-            for (Integer existed : existedDepartmentIds) {
-                if (departmentIds.contains(existed)) {
-                    if (null!=updateStatus(courseId, existed, CommonStatus.ENABLED.name())) {
-                        settingDepartmentIds.add(existed);
-                        departmentIds.remove(existed);
-                    }
-                }
-                else {
-                    updateStatus(courseId, existed, CommonStatus.DELETED.name());
-                }
-            }
-            for (Integer needAdding : departmentIds) {
-                if(null!=addCourseToDepartment(courseId, needAdding)) {
-                    settingDepartmentIds.add(needAdding);
-                }
-            }
+        if (!VerifyUtil.isListEmpty(existedRelation)) {
+            repository.delete(existedRelation);
         }
-        logger.info("set department ids is {}", settingDepartmentIds);
-        return settingDepartmentIds;
+
+        return departmentIds;
     }
 }

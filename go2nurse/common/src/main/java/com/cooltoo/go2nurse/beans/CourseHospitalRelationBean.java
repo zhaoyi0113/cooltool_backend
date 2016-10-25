@@ -7,6 +7,7 @@ import java.util.Date;
 /**
  * Created by hp on 2016/6/12.
  */
+@Deprecated
 public class CourseHospitalRelationBean {
 
     private long id;

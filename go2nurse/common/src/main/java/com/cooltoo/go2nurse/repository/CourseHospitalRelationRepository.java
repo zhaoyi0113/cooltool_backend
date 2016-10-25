@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * Created by hp on 2016/6/12.
  */
+@Deprecated
 public interface CourseHospitalRelationRepository extends JpaRepository<CourseHospitalRelationEntity, Long> {
     @Query("SELECT DISTINCT relation.courseId FROM CourseHospitalRelationEntity relation" +
             " WHERE relation.hospitalId=?1" +

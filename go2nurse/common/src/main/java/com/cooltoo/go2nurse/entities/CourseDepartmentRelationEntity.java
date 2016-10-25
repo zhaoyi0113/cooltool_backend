@@ -17,6 +17,7 @@ public class CourseDepartmentRelationEntity {
     private CommonStatus status;
     private long courseId;
     private int departmentId;
+    private int hospitalId;
 
     @Id
     @GeneratedValue
@@ -46,6 +47,11 @@ public class CourseDepartmentRelationEntity {
         return departmentId;
     }
 
+    @Column(name = "hospital_id")
+    public int getHospitalId() {
+        return hospitalId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -66,6 +72,10 @@ public class CourseDepartmentRelationEntity {
         this.departmentId = departmentId;
     }
 
+    public void setHospitalId(int hospitalId) {
+        this.hospitalId = hospitalId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -74,6 +84,7 @@ public class CourseDepartmentRelationEntity {
         msg.append(", status=").append(status);
         msg.append(", courseId=").append(courseId);
         msg.append(", departmentId=").append(departmentId);
+        msg.append(", hospitalId=").append(hospitalId);
         msg.append("]");
         return msg.toString();
     }

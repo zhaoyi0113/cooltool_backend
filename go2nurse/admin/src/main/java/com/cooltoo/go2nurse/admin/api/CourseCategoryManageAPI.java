@@ -1,8 +1,7 @@
 package com.cooltoo.go2nurse.admin.api;
 
-import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.CourseCategoryBean;
-import com.cooltoo.go2nurse.beans.CourseCategoryRelationBean;
+import com.cooltoo.go2nurse.service.CourseCategoryRelationService;
 import com.cooltoo.go2nurse.service.CourseCategoryService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -24,32 +23,7 @@ public class CourseCategoryManageAPI {
     private static final Logger logger = LoggerFactory.getLogger(CourseCategoryManageAPI.class);
 
     @Autowired private CourseCategoryService categoryService;
-
-    @Path("/course")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCourseByCategoryId(@Context HttpServletRequest request,
-                                          @QueryParam("course_status") @DefaultValue("all") String courseStatus,
-                                          @QueryParam("category_id") @DefaultValue("0") long categoryId
-    ) {
-        logger.info("get course by category id and course status");
-        List<CourseBean> courses = categoryService.getCourseByCategoryId(courseStatus, categoryId);
-        logger.info("count is {}", courses.size());
-        return Response.ok(courses).build();
-    }
-
-    @Path("/get_by_course_id")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCategoryByCourseId(@Context HttpServletRequest request,
-                                          @QueryParam("category_status") @DefaultValue("all") String categoryStatus,
-                                          @QueryParam("course_id") @DefaultValue("0") long courseId
-    ) {
-        logger.info("get category by course id and category status");
-        List<CourseCategoryBean> categories = categoryService.getCategoryByCourseId(categoryStatus, courseId);
-        logger.info("count is {}", categories.size());
-        return Response.ok(categories).build();
-    }
+    @Autowired private CourseCategoryRelationService courseCategoryService;
 
     @Path("/{category_id}")
     @GET
@@ -128,32 +102,5 @@ public class CourseCategoryManageAPI {
         logger.info("update cotegory front cover");
         CourseCategoryBean category = categoryService.updateCategory(categoryId, null, null, null, imageName, image);
         return Response.ok(category).build();
-    }
-
-    @Path("/relation/add")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response addCourseCategoryRelation(@Context HttpServletRequest request,
-                                              @FormParam("category_id") @DefaultValue("0") long categoryId,
-                                              @FormParam("course_id") @DefaultValue("0") long courseId
-    ) {
-        logger.info("add course category relation");
-        CourseCategoryRelationBean relation = categoryService.setCourseRelation(courseId, categoryId);
-        logger.info("relation is {}", relation);
-        return Response.ok(relation).build();
-    }
-
-    @Path("/relation/update")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateCourseCategoryRelation(@Context HttpServletRequest request,
-                                              @FormParam("category_id") @DefaultValue("0") long categoryId,
-                                              @FormParam("course_id") @DefaultValue("0") long courseId,
-                                              @FormParam("status") @DefaultValue("disabled") String status
-    ) {
-        logger.info("update course category relation");
-        CourseCategoryRelationBean relation = categoryService.updateCourseRelation(courseId, categoryId, status);
-        logger.info("relation is {}", relation);
-        return Response.ok(relation).build();
     }
 }

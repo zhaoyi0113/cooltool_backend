@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Created by hp on 2016/6/8.
  */
@@ -36,14 +37,14 @@ public class CourseService {
     private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "time")
+            new Sort.Order(Sort.Direction.DESC, "time"),
+            new Sort.Order(Sort.Direction.DESC, "id")
     );
 
     @Autowired private CourseRepository repository;
     @Autowired private CourseBeanConverter beanConverter;
     @Autowired private UserGo2NurseFileStorageService userStorage;
     @Autowired private TemporaryGo2NurseFileStorageService tempStorage;
-    @Autowired private CourseRelationManageService relationManageService;
 
     //===========================================================
     //                    get
@@ -55,6 +56,14 @@ public class CourseService {
         return exist;
     }
 
+    public List<CourseBean> getCourseByUniqueId(String uniqueId) {
+        logger.info("get course by uniqueId={}", uniqueId);
+        List<CourseEntity> resultSet = repository.findByUniqueId(uniqueId, sort);
+        List<CourseBean> beans = entities2BeansWithoutContent(resultSet);
+        fillOtherProperties(beans);
+        return beans;
+    }
+
     public long countByNameLikeAndStatus(String title, String strStatus) {
         logger.info("count all course by status={}", strStatus);
         CourseStatus status = CourseStatus.parseString(strStatus);
@@ -62,14 +71,6 @@ public class CourseService {
         long count = repository.countByNameLikeAndStatus(title, status);
         logger.info("count is {}", count);
         return count;
-    }
-
-    public List<CourseBean> getCourseByUniqueId(String uniqueId) {
-        logger.info("get course by uniqueId={}", uniqueId);
-        List<CourseEntity> resultSet = repository.findByUniqueId(uniqueId, sort);
-        List<CourseBean> beans = entities2BeansWithoutContent(resultSet);
-        fillOtherProperties(beans);
-        return beans;
     }
 
     public List<CourseBean> getCourseByNameAndStatus(String title, String strStatus) {
@@ -117,35 +118,19 @@ public class CourseService {
         return resultSet;
     }
 
-    public List<CourseBean> getCourseByStatusAndIds(String strStatus, List<Long> courseIds) {
-        logger.info("get course by status={} ids={}", strStatus, courseIds);
+    public List<CourseBean> getCourseByStatusAndIds(CourseStatus status, List<Long> courseIds, Integer pageIndex, Integer sizePerPage) {
+        logger.info("get course by status={} ids={}", status, courseIds);
         if (VerifyUtil.isListEmpty(courseIds)) {
             return new ArrayList<>();
         }
-
-        CourseStatus status = CourseStatus.parseString(strStatus);
-        List<CourseEntity> resultSet = null;
-        if (null==status) {
-            if ("ALL".equalsIgnoreCase(strStatus)) {
-                resultSet = repository.findByIdIn(courseIds, sort);
-            }
+        Iterable<CourseEntity> resultSet;
+        if (null==pageIndex || null==sizePerPage) {
+            resultSet = repository.findCourseByStatusAndIdIn(status, courseIds, sort);
         }
         else {
-            resultSet = repository.findByStatusAndIdIn(status, courseIds, sort);
+            PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
+            resultSet = repository.findCourseByStatusAndIdIn(status, courseIds, page);
         }
-        List<CourseBean>   beans = entities2BeansWithoutContent(resultSet);
-        fillOtherProperties(beans);
-        logger.info("count is {}", beans.size());
-        return beans;
-    }
-
-    public List<CourseBean> getCourseByIds(List<Long> courseIds) {
-        logger.info("get course by ids={}", courseIds);
-        if (VerifyUtil.isListEmpty(courseIds)) {
-            return new ArrayList<>();
-        }
-        Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
-        List<CourseEntity> resultSet = repository.findByIdIn(courseIds, sort);
         List<CourseBean>   beans = entities2BeansWithoutContent(resultSet);
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
@@ -288,9 +273,9 @@ public class CourseService {
     //===========================================================
 
     @Transactional
-    public CourseBean createCourse(String name, String introduction, String link, String keyword, int hospitalId) {
-        logger.info("create an course by name={} introduction={} link={} keyword={} and hospitalId={}",
-                name, introduction, link, keyword, hospitalId);
+    public CourseBean createCourse(String name, String introduction, String link, String keyword) {
+        logger.info("create an course by name={} introduction={} link={} keyword={}",
+                name, introduction, link, keyword);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("the name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -339,18 +324,6 @@ public class CourseService {
         entity.setStatus(CourseStatus.ENABLE);
         entity.setTime(new Date());
         entity = repository.save(entity);
-        if (entity.getId()>0) {
-            if (relationManageService.hospitalExist(hospitalId) || -1==hospitalId){
-                boolean success = relationManageService.addCourseToHospital(entity.getId(), hospitalId);
-                if (!success) {
-                    logger.error("add course to hospital failed!");
-                    throw new BadRequestException(ErrorCode.DATA_ERROR);
-                }
-            }
-            else {
-                logger.error("the hospital not exist!");
-            }
-        }
         logger.info("create an course id={}", entity.getId());
         return beanConverter.convert(entity);
     }

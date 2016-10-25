@@ -19,13 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Created by hp on 2016/6/12.
  */
+@Deprecated
 @Service("CourseHospitalRelationService")
 public class CourseHospitalRelationService {
 
