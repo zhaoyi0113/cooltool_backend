@@ -197,7 +197,7 @@ public class WeChatService {
     private boolean whetherRegisterRequired(String state) {
         if (state.contains(WX_SEPARATOR)) {
             String[] split = state.split(WX_SEPARATOR);
-            if (split.length > 3) {
+            if (split.length >= 3) {
                 return split[2].equalsIgnoreCase("register");
             }
         }
