@@ -140,7 +140,10 @@ public class WeChatService {
                             try {
                                 String userToken = userTokenEntity.get(0).getToken();
                                 //if found login token, redirect to token url
-                                String url = "http://" + serverHost + "/go2nurse/?token=" + userToken;
+                                String url = "http://" + serverHost + "/go2nurse/";
+                                if(registerRequired){
+                                    url = addParameterOnUrl(url, "token", userToken);
+                                }
                                 url = addParameterOnUrl(url, "redirect", redirectPath);
                                 url = addParameterOnUrl(url, "departmentId", departmentId);
                                 url = addParameterOnUrl(url, "appid", appid);
@@ -173,7 +176,7 @@ public class WeChatService {
         }
         try {
             String urlStr = "http://" + serverHost + "/go2nurse/";
-            if(registerRequired){
+            if (registerRequired) {
                 urlStr += "#/register";
             }
 //            if (openid != null) {
@@ -190,10 +193,10 @@ public class WeChatService {
         return null;
     }
 
-    private boolean whetherRegisterRequired(String state){
-        if(state.contains(WX_SEPARATOR)){
+    private boolean whetherRegisterRequired(String state) {
+        if (state.contains(WX_SEPARATOR)) {
             String[] split = state.split(WX_SEPARATOR);
-            if(split.length > 3){
+            if (split.length > 3) {
                 return split[2].equalsIgnoreCase("register");
             }
         }
