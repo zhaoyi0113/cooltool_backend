@@ -101,15 +101,20 @@ public class WeChatService {
     public URI login(String code, String state) {
         String appid = null;
         logger.info("wx user login state "+state);
+        String[] split = state.split(WX_SEPARATOR);
         if (state.contains(WX_SEPARATOR)) {
-            appid = state.split(WX_SEPARATOR)[0];
+            appid = split[0];
         } else {
             appid = state;
+        }
+        String redirect = null;
+        if(split.length>1){
+            redirect = split[1];
         }
         logger.info("user login appid " + appid);
         Map accessToken = getWebLoginAccessToken(code, appid);
         WeChatUserInfo userInfo = getUserInfo(accessToken);
-        URI userTokens = loginWithWeChatUser(userInfo, state.split(WX_SEPARATOR)[1], appid, whetherRegisterRequired(state));
+        URI userTokens = loginWithWeChatUser(userInfo, redirect, appid, whetherRegisterRequired(state));
         if (userTokens != null) return userTokens;
         return null;
     }
