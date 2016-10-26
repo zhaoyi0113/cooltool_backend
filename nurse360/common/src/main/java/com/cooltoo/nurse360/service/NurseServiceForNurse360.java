@@ -259,15 +259,13 @@ public class NurseServiceForNurse360 {
     }
 
     @Transactional
-    public NurseBean modifyPassword(long nurseId, String smsCode, String password, String newPassword) {
-        logger.info("modify nurse={}'s password={} newPassword={} smsCode={}", nurseId, password, newPassword, smsCode);
+    public NurseBean modifyPassword(long nurseId, String password, String newPassword) {
+        logger.info("modify nurse={}'s password={} newPassword={}", nurseId, password, newPassword);
         if (!commonNurseService.existNurse(nurseId)) {
             logger.error("nurse not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         NurseBean nurse = nurseBeanConverter.convert(commonNurseService.getNurseById(nurseId));
-
-        leanCloudService.verifySmsCode(smsCode, nurse.getMobile());
 
         if (VerifyUtil.isStringEmpty(password)) {
             throw new BadRequestException(ErrorCode.INVALID_PASSWORD);

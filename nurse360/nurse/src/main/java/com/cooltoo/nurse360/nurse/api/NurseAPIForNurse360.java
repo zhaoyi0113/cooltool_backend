@@ -118,11 +118,10 @@ public class NurseAPIForNurse360 {
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response updatePassword(@Context HttpServletRequest request,
-                                   @FormParam("smscode") String smsCode,
                                    @FormParam("password") String password,
                                    @FormParam("new_password") String newPassword) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NurseBean bean = nurseServiceForNurse360.modifyPassword(nurseId, smsCode, password, newPassword);
+        NurseBean bean = nurseServiceForNurse360.modifyPassword(nurseId, password, newPassword);
         return Response.ok(bean).build();
     }
 
