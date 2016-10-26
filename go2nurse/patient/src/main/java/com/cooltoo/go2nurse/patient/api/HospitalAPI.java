@@ -2,7 +2,6 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
@@ -41,7 +40,6 @@ public class HospitalAPI {
     @Path("/{hospital_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
     public Response getHospital(@Context HttpServletRequest request,
                                 @PathParam("hospital_id") int hospitalId
     ) {
