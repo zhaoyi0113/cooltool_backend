@@ -66,7 +66,8 @@ public enum ErrorCode {
     USER_AUTHORITY_DENY_ALL(256, Response.Status.BAD_REQUEST, "用户权限被禁", "User authority denied all"),
     PATIENT_HAS_APPOINT_DOCTOR_TODAY(257, Response.Status.BAD_REQUEST, "患者已预约过", "the patient has appointment with doctor today"),
     CLINIC_DATE_NOT_ALLOWED(258, Response.Status.BAD_REQUEST, "预约日期无效", "cannot appoint at this clinic date"),
-    SERVICE_ORDER_BEEN_FETCHED(259, Response.Status.BAD_REQUEST, "订单已被抢", "service order has been fetched");
+    SERVICE_ORDER_BEEN_FETCHED(259, Response.Status.BAD_REQUEST, "订单已被抢", "service order has been fetched"),
+    PAY_FAILED(260, Response.Status.BAD_REQUEST , "支付失败" ,"Payment failed" );
 
     private final int code;
 
