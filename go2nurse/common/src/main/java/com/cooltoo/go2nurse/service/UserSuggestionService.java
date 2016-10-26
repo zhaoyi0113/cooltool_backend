@@ -27,6 +27,6 @@ public class UserSuggestionService {
         if (null==user) {
             throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
         }
-        return suggestionService.addSuggestion(userId, UserType.NURSE.name(), user.getName(), strPlatformType, version, suggestion);
+        return suggestionService.addSuggestion(userId, UserType.NORMAL_USER.name(), user.getName(), strPlatformType, version, suggestion);
     }
 }

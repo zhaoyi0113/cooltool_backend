@@ -8,6 +8,9 @@ public enum PlatformType {
     ,GO2NURSE_IOS
     ,GO2NURSE_ANDROID
     ,GO2NURSE_BACKEND_SERVICE
+    ,NURSE360_IOS
+    ,NURSE360_ANDROID
+    ,NURSE360_BACKEND_SERVICE
     ;
 
     public static PlatformType parseString(String type) {
@@ -32,6 +35,15 @@ public enum PlatformType {
         }
         else if (GO2NURSE_BACKEND_SERVICE.name().equalsIgnoreCase(type)) {
             retVal = GO2NURSE_BACKEND_SERVICE;
+        }
+        else if (NURSE360_IOS.name().equalsIgnoreCase(type)) {
+            retVal = NURSE360_IOS;
+        }
+        else if (NURSE360_ANDROID.name().equalsIgnoreCase(type)) {
+            retVal = NURSE360_ANDROID;
+        }
+        else if (NURSE360_BACKEND_SERVICE.name().equalsIgnoreCase(type)) {
+            retVal = NURSE360_BACKEND_SERVICE;
         }
         return retVal;
     }
@@ -58,6 +70,15 @@ public enum PlatformType {
         }
         else if (GO2NURSE_BACKEND_SERVICE.ordinal()==(type)) {
             retVal = GO2NURSE_BACKEND_SERVICE;
+        }
+        else if (NURSE360_IOS.ordinal()==(type)) {
+            retVal = NURSE360_IOS;
+        }
+        else if (NURSE360_ANDROID.ordinal()==(type)) {
+            retVal = NURSE360_ANDROID;
+        }
+        else if (NURSE360_BACKEND_SERVICE.ordinal()==(type)) {
+            retVal = NURSE360_BACKEND_SERVICE;
         }
         return retVal;
     }
