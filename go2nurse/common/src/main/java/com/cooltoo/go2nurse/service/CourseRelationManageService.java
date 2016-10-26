@@ -295,6 +295,9 @@ public class CourseRelationManageService {
 
         for (CourseBean tmp : courses) {
             List<Long> diagnosticId = courseIdToDiagnostic.get(tmp.getId());
+            if (null==diagnosticId) {
+                continue;
+            }
             for (Long tmpId : diagnosticId) {
                 DiagnosticEnumeration diagnostic = DiagnosticEnumeration.parseInt(tmpId.intValue());
                 List<CourseBean> tmpCourses = result.get(diagnostic);

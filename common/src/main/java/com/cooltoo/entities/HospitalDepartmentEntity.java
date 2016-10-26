@@ -18,10 +18,12 @@ public class HospitalDepartmentEntity {
     private int parentId;
     private String uniqueId;
     private String phoneNumber;
-    private Double longitude;
-    private Double latitude;
-    private long addressImageId;
-    private String addressLink;
+    private Double longitude;   // 科室地址经度
+    private Double latitude;    // 科室地址纬度
+    private long addressImageId;// 科室地址图片
+    private String addressLink;// 科室地址链接
+    private String address;// 科室地址
+    private String outpatientAddress;//门诊地址
 
     @Id
     @GeneratedValue
@@ -151,6 +153,24 @@ public class HospitalDepartmentEntity {
         this.addressLink = addressLink;
     }
 
+    @Column(name = "address")
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    @Column(name = "outpatient_address")
+    public String getOutpatientAddress() {
+        return outpatientAddress;
+    }
+
+    public void setOutpatientAddress(String outpatientAddress) {
+        this.outpatientAddress = outpatientAddress;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -167,6 +187,8 @@ public class HospitalDepartmentEntity {
         msg.append(", latitude=").append(latitude);
         msg.append(", addressImageId=").append(addressImageId);
         msg.append(", addressLink=").append(addressLink);
+        msg.append(", address=").append(address);
+        msg.append(", outpatientAddress=").append(outpatientAddress);
         msg.append("]");
         return msg.toString();
     }

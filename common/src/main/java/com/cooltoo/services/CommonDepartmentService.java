@@ -374,6 +374,16 @@ public class CommonDepartmentService {
             entity.setAddressLink(bean.getAddressLink());
         }
 
+        // address
+        if (!VerifyUtil.isStringEmpty(bean.getAddress()) && !bean.getAddress().trim().equals(entity.getAddress())) {
+            entity.setAddress(bean.getAddress());
+        }
+
+        // outpatient address
+        if (!VerifyUtil.isStringEmpty(bean.getOutpatientAddress()) && !bean.getOutpatientAddress().trim().equals(entity.getOutpatientAddress())) {
+            entity.setOutpatientAddress(bean.getOutpatientAddress());
+        }
+
         logger.info("update department is == " + entity);
         entity = repository.save(entity);
         bean = beanConverter.convert(entity);
@@ -388,7 +398,7 @@ public class CommonDepartmentService {
     public HospitalDepartmentBean update(int id, String name, String description, int enable, int parentId,
                                          InputStream image, InputStream disableImage,
                                          String phoneNumber, Double longitude, Double latitude,
-                                         String addressLink, InputStream addressImage,
+                                         String addressLink, InputStream addressImage, String address, String outpatientAddress,
                                          String nginxPrefix) {
         HospitalDepartmentBean bean = new HospitalDepartmentBean();
         bean.setId(id);
@@ -400,6 +410,8 @@ public class CommonDepartmentService {
         bean.setLongitude(longitude);
         bean.setLatitude(latitude);
         bean.setAddressLink(addressLink);
+        bean.setAddress(address);
+        bean.setOutpatientAddress(outpatientAddress);
         return update(bean, image, disableImage, addressImage, nginxPrefix);
     }
 
@@ -411,7 +423,7 @@ public class CommonDepartmentService {
     public Integer createHospitalDepartment(int hospitalId, String name, String description, int enable, int parentId,
                                             InputStream image, InputStream disableImage,
                                             String phoneNumber, Double longitude, Double latitude,
-                                            String addressLink, InputStream addressImage) {
+                                            String addressLink, InputStream addressImage, String address, String outpatientAddress) {
         if (!hospitalRepository.exists(hospitalId)) {
             logger.error("hospital is not exist");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -433,6 +445,8 @@ public class CommonDepartmentService {
         entity.setLongitude(longitude);
         entity.setLatitude(latitude);
         entity.setAddressLink(addressLink);
+        entity.setAddress(address);
+        entity.setOutpatientAddress(outpatientAddress);
 
         String uniqueId = null;
         for (int i = 10; i>0; i--) {

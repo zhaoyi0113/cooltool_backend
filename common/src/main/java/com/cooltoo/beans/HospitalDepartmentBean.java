@@ -1,8 +1,6 @@
 package com.cooltoo.beans;
 
-import javax.persistence.Column;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Created by lg380357 on 2016/3/5.
@@ -28,6 +26,8 @@ public class HospitalDepartmentBean {
     private long addressImageId;
     private String addressImageUrl;
     private String addressLink;
+    private String address;// 科室地址
+    private String outpatientAddress;//门诊地址
 
     public int getId() {
         return id;
@@ -181,6 +181,22 @@ public class HospitalDepartmentBean {
         this.addressLink = addressLink;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getOutpatientAddress() {
+        return outpatientAddress;
+    }
+
+    public void setOutpatientAddress(String outpatientAddress) {
+        this.outpatientAddress = outpatientAddress;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -201,6 +217,8 @@ public class HospitalDepartmentBean {
         msg.append(", addressImageId=").append(addressImageId);
         msg.append(", addressImageUrl=").append(addressImageUrl);
         msg.append(", addressLink=").append(addressLink);
+        msg.append(", address=").append(address);
+        msg.append(", outpatientAddress=").append(outpatientAddress);
         msg.append("]");
         return msg.toString();
     }

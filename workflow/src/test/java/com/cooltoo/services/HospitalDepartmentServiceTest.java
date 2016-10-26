@@ -31,7 +31,7 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testNew1() {
-        int id = service.createHospitalDepartment(11, "name111", "department111", -1, -1, null, null, null, null, null, null, null);
+        int id = service.createHospitalDepartment(11, "name111", "department111", -1, -1, null, null, null, null, null, null, null, null, null);
         Assert.assertTrue(id>0);
         List<HospitalDepartmentBean> all = service.getByIds(Arrays.asList(new Integer[]{id}), "");
         Assert.assertEquals(1, all.size());
@@ -66,18 +66,22 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
         int    enable   = 1;
         int    parentId = 33;
         String addressLink = "fdasfdafdsafdsaf";
+        String address = "fdasfdafdsafd34323432345432saf";
+        String outpatientAddress = "fdasfdafdsfdsafdsaafdsaf";
 
 
         HospitalDepartmentBean bean = service.update(id, name, desc, enable, parentId,
                                                      new ByteArrayInputStream(desc.getBytes()),
                                                      new ByteArrayInputStream(desc.getBytes()),
-                                                     null, null, null, addressLink, null, "");
+                                                     null, null, null, addressLink, null, address, outpatientAddress, "");
         Assert.assertEquals(id, bean.getId());
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(parentId, bean.getParentId());
         Assert.assertEquals(enable, bean.getEnable());
         Assert.assertEquals(desc, bean.getDescription());
         Assert.assertEquals(addressLink, bean.getAddressLink());
+        Assert.assertEquals(address, bean.getAddress());
+        Assert.assertEquals(outpatientAddress, bean.getOutpatientAddress());
         Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
         Assert.assertTrue(officialStorage.fileExist(bean.getDisableImageId()));
         officialStorage.deleteFile(bean.getImageId());

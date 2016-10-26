@@ -119,8 +119,10 @@ public class CommonHospitalService {
         logger.info("count by isAnd={} name={} province={} city={} district={} address={} enable={} supportGo2nurse={}",
                 isAnd, name, province, city, district, address, enable, supportGo2nurse);
         long count = 0;
-        name = VerifyUtil.isStringEmpty(name) ? null : VerifyUtil.reconstructSQLContentLike(name.trim());
-        address = VerifyUtil.isStringEmpty(address) ? null : VerifyUtil.reconstructSQLContentLike(address.trim());
+//      name = VerifyUtil.isStringEmpty(name) ? null : VerifyUtil.reconstructSQLContentLike(name.trim());
+//      address = VerifyUtil.isStringEmpty(address) ? null : VerifyUtil.reconstructSQLContentLike(address.trim());
+        name = VerifyUtil.isStringEmpty(name) ? null : name.trim();
+        address = VerifyUtil.isStringEmpty(address) ? null : address.trim();
         if (isAnd) {
             count = repository.countByConditionsAND(name, province, city, district, address, enable, supportGo2nurse);
         }
@@ -143,8 +145,10 @@ public class CommonHospitalService {
         }
         PageRequest page = new PageRequest(index, number, sort);
 
-        name = VerifyUtil.isStringEmpty(name) ? null : VerifyUtil.reconstructSQLContentLike(name.trim());
-        address = VerifyUtil.isStringEmpty(address) ? null : VerifyUtil.reconstructSQLContentLike(address.trim());
+//      name = VerifyUtil.isStringEmpty(name) ? null : VerifyUtil.reconstructSQLContentLike(name.trim());
+//      address = VerifyUtil.isStringEmpty(address) ? null : VerifyUtil.reconstructSQLContentLike(address.trim());
+        name = VerifyUtil.isStringEmpty(name) ? null : name.trim();
+        address = VerifyUtil.isStringEmpty(address) ? null : address.trim();
 
         Page<HospitalEntity> entities;
         if (isAnd) {
