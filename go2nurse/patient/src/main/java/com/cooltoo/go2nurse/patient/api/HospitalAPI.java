@@ -34,12 +34,23 @@ public class HospitalAPI {
         return Response.ok(hospitals).build();
     }
 
+    @Path("/{hospital_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getHospital(@Context HttpServletRequest request,
+                                @PathParam("hospital_id") int hospitalId
+    ) {
+        HospitalBean hospital = hospitalService.getHospital(hospitalId);
+        return Response.ok(hospital).build();
+    }
+
     @Path("/department/{department_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getDepartment(@Context HttpServletRequest request,
-                                          @PathParam("department_id") int departmentId
+                                  @PathParam("department_id") int departmentId
     ) {
         HospitalDepartmentBean department = departmentService.getById(departmentId, utility.getHttpPrefixForNurseGo());
         return Response.ok(department).build();
@@ -61,8 +72,8 @@ public class HospitalAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getSecondLevelDepartment(@Context HttpServletRequest request,
-                                     @PathParam("hospital_id") int hospitalId,
-                                     @PathParam("top_department_id") int topDepId
+                                             @PathParam("hospital_id") int hospitalId,
+                                             @PathParam("top_department_id") int topDepId
     ) {
         List<HospitalDepartmentBean> secondLevelDep = departmentService.getSecondLevelDepartmentEnable(hospitalId, topDepId, utility.getHttpPrefixForNurseGo());
         return Response.ok(secondLevelDep).build();
