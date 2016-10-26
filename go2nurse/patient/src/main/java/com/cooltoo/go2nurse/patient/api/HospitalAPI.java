@@ -25,9 +25,13 @@ public class HospitalAPI {
     @Autowired private CommonDepartmentService departmentService;
     @Autowired private Go2NurseUtility utility;
 
+    /**
+     * 获取全部全时护理医院
+     * @param request
+     * @return
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
     public Response getHospital(@Context HttpServletRequest request) {
         int count = (int)hospitalService.countHospitalByConditions(true, null, null, null, null, null, 1, 1);
         List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, null, null, null, null, null, 1, 1, 0, count);
@@ -48,7 +52,6 @@ public class HospitalAPI {
     @Path("/department/{department_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
     public Response getDepartment(@Context HttpServletRequest request,
                                   @PathParam("department_id") int departmentId
     ) {
@@ -59,7 +62,6 @@ public class HospitalAPI {
     @Path("/department/top/{hospital_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
     public Response getTopLevelDepartment(@Context HttpServletRequest request,
                                           @PathParam("hospital_id") int hospitalId
     ) {
@@ -70,7 +72,6 @@ public class HospitalAPI {
     @Path("/department/second/{hospital_id}/{top_department_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
     public Response getSecondLevelDepartment(@Context HttpServletRequest request,
                                              @PathParam("hospital_id") int hospitalId,
                                              @PathParam("top_department_id") int topDepId
