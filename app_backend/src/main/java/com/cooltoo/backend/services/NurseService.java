@@ -442,7 +442,7 @@ public class NurseService {
             newMobile = nurse.getMobile();
         }
         /* check the verify code */
-        //leanCloudService.verifySmsCode(smsCode, newMobile);
+        leanCloudService.verifySmsCode(smsCode, newMobile);
 
         // check password
         if (!VerifyUtil.isStringEmpty(password)) {

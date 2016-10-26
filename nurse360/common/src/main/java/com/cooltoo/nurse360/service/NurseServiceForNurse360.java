@@ -56,6 +56,16 @@ public class NurseServiceForNurse360 {
         return commonNurseService.existNurse(nurseId);
     }
 
+    public NurseBean getNurse(String mobile) {
+        List<NurseEntity> nurses = commonNurseService.getNurseByMobile(mobile);
+        if (null!=nurses && !nurses.isEmpty() && nurses.size()==1) {
+            NurseEntity nurseE = nurses.get(0);
+            return nurseBeanConverter.convert(nurseE);
+        }
+        logger.error("Get nurse by mobile is error, result is {}.", nurses);
+        throw new BadRequestException(ErrorCode.DATA_ERROR);
+    }
+
     public NurseBean getNurseById(long nurseId) {
         logger.info("get nurse by nurseId={}", nurseId);
         NurseEntity nurse = commonNurseService.getNurseById(nurseId);
@@ -228,6 +238,78 @@ public class NurseServiceForNurse360 {
             return "";
         }
         return nursegoFileStorage.getFilePath(fileId);
+    }
+
+    @Transactional
+    public NurseBean modifyMobile(long nurseId, String smsCode, String mobile) {
+        logger.info("modify nurse={}'s mobile={} smsCode={}", nurseId, mobile, smsCode);
+        if (!commonNurseService.existNurse(nurseId)) {
+            logger.error("nurse not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        leanCloudService.verifySmsCode(smsCode, mobile);
+
+        NurseBean nurse = nurseBeanConverter.convert(commonNurseService.getNurseById(nurseId));
+        if (!VerifyUtil.isStringEmpty(mobile) && !mobile.trim().equals(nurse.getMobile())) {
+            commonNurseService.updateBasicInfo(nurseId, null, -1, null, mobile.trim(), null, null, null, null, null);
+            nurse.setMobile(mobile.trim());
+        }
+
+        return nurse;
+    }
+
+    @Transactional
+    public NurseBean modifyPassword(long nurseId, String smsCode, String password, String newPassword) {
+        logger.info("modify nurse={}'s password={} newPassword={} smsCode={}", nurseId, password, newPassword, smsCode);
+        if (!commonNurseService.existNurse(nurseId)) {
+            logger.error("nurse not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        NurseBean nurse = nurseBeanConverter.convert(commonNurseService.getNurseById(nurseId));
+
+        leanCloudService.verifySmsCode(smsCode, nurse.getMobile());
+
+        if (VerifyUtil.isStringEmpty(password)) {
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+        }
+        if (VerifyUtil.isStringEmpty(newPassword)) {
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+        }
+        if (!password.equals(nurse.getPassword())) {
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+        }
+        if (newPassword.equals(password)) {
+            logger.info("the new password is same with old password.");
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        commonNurseService.updateBasicInfo(nurseId, null, -1, null, null, newPassword.trim(), null, null, null, null);
+        nurse.setMobile(newPassword.trim());
+
+        return nurse;
+    }
+
+    @Transactional
+    public NurseBean resetPassword(String smsCode, String mobile, String newPassword) {
+        logger.info("reset password : mobile={} newPassword={} smsCode={}", mobile, newPassword, smsCode);
+        List<NurseEntity> nurses= commonNurseService.getNurseByMobile(mobile);
+        if (VerifyUtil.isListEmpty(nurses) || nurses.size()!=1) {
+            logger.error("nurse not exist or mobile has more people--{}", nurses);
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        leanCloudService.verifySmsCode(smsCode, mobile);
+
+        if (VerifyUtil.isStringEmpty(newPassword)) {
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        NurseBean nurse = nurseBeanConverter.convert(nurses.get(0));
+        if (!newPassword.trim().equals(nurse.getPassword())) {
+            commonNurseService.updateBasicInfo(nurse.getId(), null, -1, null, null, newPassword.trim(), null, null, null, null);
+            nurse.setPassword(newPassword.trim());
+        }
+
+        return nurse;
     }
 
 

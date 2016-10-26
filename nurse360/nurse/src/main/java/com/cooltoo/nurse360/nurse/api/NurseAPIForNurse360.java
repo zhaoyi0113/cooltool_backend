@@ -100,4 +100,40 @@ public class NurseAPIForNurse360 {
         NurseBean bean = nurseServiceForNurse360.editNurse(nurseId, null, -1, -1, null, null, imageName, image);
         return Response.ok(bean).build();
     }
+
+    @Path("/mobile")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response updateMobile(@Context HttpServletRequest request,
+                                 @FormParam("smscode") String smsCode,
+                                 @FormParam("mobile") String newMobile) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean bean = nurseServiceForNurse360.modifyMobile(nurseId, smsCode, newMobile);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/password")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response updatePassword(@Context HttpServletRequest request,
+                                   @FormParam("smscode") String smsCode,
+                                   @FormParam("password") String password,
+                                   @FormParam("new_password") String newPassword) {
+        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean bean = nurseServiceForNurse360.modifyPassword(nurseId, smsCode, password, newPassword);
+        return Response.ok(bean).build();
+    }
+
+    @Path("/password/reset")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response resetPassword(@Context HttpServletRequest request,
+                                  @FormParam("smscode") String smsCode,
+                                  @FormParam("mobile") String mobile,
+                                  @FormParam("new_password") String newPassword) {
+        NurseBean bean = nurseServiceForNurse360.resetPassword(smsCode, mobile, newPassword);
+        return Response.ok(bean).build();
+    }
 }
