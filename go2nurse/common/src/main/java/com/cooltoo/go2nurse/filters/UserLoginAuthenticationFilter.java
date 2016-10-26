@@ -78,6 +78,7 @@ public class UserLoginAuthenticationFilter implements ContainerRequestFilter {
             logger.info("get user id "+userId);
             UserEntity userEntity = userRepository.findOne(userId);
             if (null==userEntity) {
+                logger.error("user "+userId+" doesn't exist.");
                 throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
             }
             if (!isLogoutLogin && UserAuthority.DENY_ALL.equals(userEntity.getAuthority())) {
