@@ -20,6 +20,8 @@ public class HospitalDepartmentEntity {
     private String phoneNumber;
     private Double longitude;
     private Double latitude;
+    private long addressImageId;
+    private String addressLink;
 
     @Id
     @GeneratedValue
@@ -131,6 +133,24 @@ public class HospitalDepartmentEntity {
         this.latitude = latitude;
     }
 
+    @Column(name = "address_image_id")
+    public long getAddressImageId() {
+        return addressImageId;
+    }
+
+    public void setAddressImageId(long addressImageId) {
+        this.addressImageId = addressImageId;
+    }
+
+    @Column(name = "address_link")
+    public String getAddressLink() {
+        return addressLink;
+    }
+
+    public void setAddressLink(String addressLink) {
+        this.addressLink = addressLink;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -145,6 +165,8 @@ public class HospitalDepartmentEntity {
         msg.append(", phoneNumber=").append(phoneNumber);
         msg.append(", longitude=").append(longitude);
         msg.append(", latitude=").append(latitude);
+        msg.append(", addressImageId=").append(addressImageId);
+        msg.append(", addressLink=").append(addressLink);
         msg.append("]");
         return msg.toString();
     }

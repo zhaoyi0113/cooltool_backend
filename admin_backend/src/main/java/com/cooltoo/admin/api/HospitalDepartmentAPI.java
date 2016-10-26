@@ -93,13 +93,15 @@ public class HospitalDepartmentAPI {
                            @DefaultValue("")   @FormParam("description") String description,
                            @DefaultValue("-1") @FormParam("enable")      int enable,
                            @DefaultValue("-1") @FormParam("parent_id")   int parentId,
-                           @DefaultValue("-1") @FormParam("phone_number") String phoneNumber,
-                           @DefaultValue("-1") @FormParam("longitude")    String strLongitude,
-                           @DefaultValue("-1") @FormParam("latitude")     String strLatitude
+                           @DefaultValue("")   @FormParam("phone_number") String phoneNumber,
+                           @DefaultValue("0")  @FormParam("longitude")    String strLongitude,
+                           @DefaultValue("0")  @FormParam("latitude")     String strLatitude,
+                           @DefaultValue("")   @FormParam("address_link") String addressLink
+
     ) {
         Double longitude = VerifyUtil.parseDouble(strLongitude);
         Double latitude = VerifyUtil.parseDouble(strLatitude);
-        HospitalDepartmentBean one = service.update(id, name, description, enable, parentId, null, null, phoneNumber, longitude, latitude, "");
+        HospitalDepartmentBean one = service.update(id, name, description, enable, parentId, null, null, phoneNumber, longitude, latitude, addressLink, null, "");
         logger.info("update hospital department is " + one);
         if (null==one) {
             return Response.ok().build();
@@ -114,7 +116,7 @@ public class HospitalDepartmentAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateImage(@FormDataParam("id")       int                        id,
                                 @FormDataParam("file")     InputStream                file) {
-        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, file, null, null, null, null, "");
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, file, null, null, null, null, null, null, "");
         logger.info("update hospital department is " + one);
         return Response.ok(one).build();
     }
@@ -126,7 +128,19 @@ public class HospitalDepartmentAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateDisableImage(@FormDataParam("id")       int                        id,
                                        @FormDataParam("file")     InputStream                file) {
-        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, file, null, null, null, "");
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, file, null, null, null, null, null, "");
+        logger.info("update hospital department is " + one);
+        return Response.ok(one).build();
+    }
+
+    @Path("/edit_address_image")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response updateAddressImage(@FormDataParam("id")       int                        id,
+                                       @FormDataParam("file")     InputStream                file) {
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, null, null, null, null, null, file, "");
         logger.info("update hospital department is " + one);
         return Response.ok(one).build();
     }
@@ -139,13 +153,14 @@ public class HospitalDepartmentAPI {
                            @DefaultValue("")   @FormParam("description") String description,
                            @DefaultValue("-1") @FormParam("enable") int enable,
                            @DefaultValue("-1") @FormParam("parent_id") int parentId,
-                           @DefaultValue("-1") @FormParam("phone_number") String phoneNumber,
-                           @DefaultValue("-1") @FormParam("longitude")    String strLongitude,
-                           @DefaultValue("-1") @FormParam("latitude")     String strLatitude
+                           @DefaultValue("")   @FormParam("phone_number") String phoneNumber,
+                           @DefaultValue("0")  @FormParam("longitude")    String strLongitude,
+                           @DefaultValue("0")  @FormParam("latitude")     String strLatitude,
+                           @DefaultValue("")   @FormParam("address_link") String addressLink
     ) {
         Double longitude = VerifyUtil.parseDouble(strLongitude);
         Double latitude = VerifyUtil.parseDouble(strLatitude);
-        int id = service.createHospitalDepartment(hospitalId, name, description, enable, parentId, null, null, phoneNumber, longitude, latitude);
+        int id = service.createHospitalDepartment(hospitalId, name, description, enable, parentId, null, null, phoneNumber, longitude, latitude, addressLink, null);
         logger.info("new hospital department id is " + id);
         return Response.ok(id).build();
     }

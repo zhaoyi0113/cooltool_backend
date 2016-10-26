@@ -31,7 +31,7 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testNew1() {
-        int id = service.createHospitalDepartment(11, "name111", "department111", -1, -1, null, null, null, null, null);
+        int id = service.createHospitalDepartment(11, "name111", "department111", -1, -1, null, null, null, null, null, null, null);
         Assert.assertTrue(id>0);
         List<HospitalDepartmentBean> all = service.getByIds(Arrays.asList(new Integer[]{id}), "");
         Assert.assertEquals(1, all.size());
@@ -65,17 +65,19 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
         String desc     = "description123";
         int    enable   = 1;
         int    parentId = 33;
+        String addressLink = "fdasfdafdsafdsaf";
 
 
         HospitalDepartmentBean bean = service.update(id, name, desc, enable, parentId,
                                                      new ByteArrayInputStream(desc.getBytes()),
                                                      new ByteArrayInputStream(desc.getBytes()),
-                                                     null, null, null, "");
+                                                     null, null, null, addressLink, null, "");
         Assert.assertEquals(id, bean.getId());
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(parentId, bean.getParentId());
         Assert.assertEquals(enable, bean.getEnable());
         Assert.assertEquals(desc, bean.getDescription());
+        Assert.assertEquals(addressLink, bean.getAddressLink());
         Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
         Assert.assertTrue(officialStorage.fileExist(bean.getDisableImageId()));
         officialStorage.deleteFile(bean.getImageId());
@@ -86,7 +88,7 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
 
         name = "name789";
         bean.setName(name);
-        bean =  service.update(bean, null, null, "");
+        bean =  service.update(bean, null, null, null, "");
         Assert.assertEquals(22, bean.getId());
         Assert.assertEquals(name, bean.getName());
     }

@@ -2,6 +2,7 @@ package com.cooltoo.beans;
 
 import javax.persistence.Column;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Created by lg380357 on 2016/3/5.
@@ -24,6 +25,9 @@ public class HospitalDepartmentBean {
     private String phoneNumber;
     private Double longitude;
     private Double latitude;
+    private long addressImageId;
+    private String addressImageUrl;
+    private String addressLink;
 
     public int getId() {
         return id;
@@ -153,6 +157,30 @@ public class HospitalDepartmentBean {
         this.latitude = latitude;
     }
 
+    public long getAddressImageId() {
+        return addressImageId;
+    }
+
+    public void setAddressImageId(long addressImageId) {
+        this.addressImageId = addressImageId;
+    }
+
+    public String getAddressImageUrl() {
+        return addressImageUrl;
+    }
+
+    public void setAddressImageUrl(String addressImageUrl) {
+        this.addressImageUrl = addressImageUrl;
+    }
+
+    public String getAddressLink() {
+        return addressLink;
+    }
+
+    public void setAddressLink(String addressLink) {
+        this.addressLink = addressLink;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -170,6 +198,9 @@ public class HospitalDepartmentBean {
         msg.append(", phoneNumber=").append(phoneNumber);
         msg.append(", longitude=").append(longitude);
         msg.append(", latitude=").append(latitude);
+        msg.append(", addressImageId=").append(addressImageId);
+        msg.append(", addressImageUrl=").append(addressImageUrl);
+        msg.append(", addressLink=").append(addressLink);
         msg.append("]");
         return msg.toString();
     }

@@ -17,6 +17,7 @@ public class PatientBean {
     private String name;
     private GenderType gender;
     private Date birthday;
+    private long age;
     private String identityCard;
     private String mobile;
     private YesNoEnum isDefault;
@@ -44,6 +45,14 @@ public class PatientBean {
 
     public Date getBirthday() { return birthday; }
     public void setBirthday(Date birthday) { this.birthday = birthday; }
+
+    public long getAge() {
+        return age;
+    }
+
+    public void setAge(long age) {
+        this.age = age;
+    }
 
     public String getIdentityCard() {
         return identityCard;
