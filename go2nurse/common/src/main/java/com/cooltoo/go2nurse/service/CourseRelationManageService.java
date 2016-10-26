@@ -379,12 +379,24 @@ public class CourseRelationManageService {
     }
 
     public List<CoursesGroupBean> getHospitalCoursesGroupByCategory(Long userId, Integer hospital, Integer department, List<Long> categoryIds) {
+        if (VerifyUtil.isListEmpty(categoryIds)) {
+            return new ArrayList<>();
+        }
+
         List<CourseBean> courses = getCourseByHospitalDepartmentDiagnosticCategory(hospital, department, false, null, categoryIds, false, null, null);
         userCourseService.setCourseReadStatus(userId, courses);
 
         Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(courses);
         List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
         CoursesGroupBean.sortCourseArrays(categoryGroup);
+
+        for (int i = 0; i < categoryGroup.size(); i ++) {
+            CoursesGroupBean tmp = categoryGroup.get(i);
+            if (!categoryIds.contains(tmp.getId())) {
+                categoryGroup.remove(i);
+                i--;
+            }
+        }
 
         return categoryGroup;
     }
