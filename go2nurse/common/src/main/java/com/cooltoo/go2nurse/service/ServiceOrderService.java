@@ -388,7 +388,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    public Map<String, Object> payForServiceByWeChat(Long userId, Long orderId, String openId, String clientIP, WeChatAccountBean weChatAccount) {
+    public Map<String, String> payForServiceByWeChat(Long userId, Long orderId, String openId, String clientIP, WeChatAccountBean weChatAccount) {
         logger.info("create charge object for order={} openId={} clientIp={} weChatAccount={}", orderId, openId, clientIP, weChatAccount);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
@@ -432,8 +432,7 @@ public class ServiceOrderService {
             message.setRelativeId(entity.getId());
             message.setDescription("WeChat make order failed!");
             notifier.notifyUserPatient(entity.getUserId(), message);
-
-            return weChatResponse;
+            throw new BadRequestException(ErrorCode.PAY_FAILED);
         }
 
         // check sign
@@ -453,22 +452,32 @@ public class ServiceOrderService {
             message.setRelativeId(entity.getId());
             message.setDescription("WeChat sign error!");
             notifier.notifyUserPatient(entity.getUserId(), message);
-
-            return weChatResponse;
+            throw new BadRequestException(ErrorCode.PAY_FAILED);
         }
 
         orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, "wx", ChargeType.CHARGE, wechatNo, weChatResponse.toString());
         weChatResponse.remove("mch_id");
         weChatResponse.remove("device_info");
-        return weChatResponse;
+        return signWeChatResponse(weChatAccount.getAppId(), (String)weChatResponse.get("prepay_id"));
     }
 
-    private void signWeChatResponse(String appid, String jsapiTicket, String prepayId) {
+    private Map<String, String> signWeChatResponse(String appid, String prepayId) {
         StringBuffer buffer = new StringBuffer();
+        String noncestr = NumberUtil.createNoncestr(31);
+        String signType = "MD5";
+        String timeStamp = System.currentTimeMillis()+"";
         buffer.append("appId=").append(appid).append("&package=").
-                append(prepayId).append("&nonceStr=").append(NumberUtil.createNoncestr(31))
-                .append("&signType=MD5");
-        String md5 = NumberUtil.md5Encode(buffer.toString(), null, "MD5");
+                append(prepayId).append("&nonceStr=").append(noncestr)
+                .append("&signType="+signType).append("&timeStamp=").append(timeStamp);
+        String md5 = NumberUtil.md5Encode(buffer.toString(), null, "MD5").toUpperCase();
+        Map<String, String> sign = new HashMap<>();
+        sign.put("timestamp", timeStamp);
+        sign.put("nonceStr", noncestr);
+        sign.put("package", prepayId);
+        sign.put("signType", signType);
+        sign.put("paySign", md5);
+        logger.debug("create sign for payment "+sign);
+        return sign;
 
     }
 
