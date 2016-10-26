@@ -42,6 +42,23 @@ public class CourseRelationManageAPI {
         return Response.ok(courses).build();
     }
 
+    @Path("/conditions")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCourseByConditions(@Context HttpServletRequest request,
+                                                      @QueryParam("hospital_id")   @DefaultValue("") String strHospitalId,
+                                                      @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
+                                                      @QueryParam("diagnostic_id") @DefaultValue("") String strDiagnosticId,
+                                                      @QueryParam("category_id")   @DefaultValue("") String strCategoryId
+    ) {
+        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
+        Long diagnosticId = VerifyUtil.isIds(strDiagnosticId) ? VerifyUtil.parseLongIds(strDiagnosticId).get(0) : null;
+        Integer hospitalId = VerifyUtil.isIds(strHospitalId) ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
+        List<Long> categoryId = VerifyUtil.isIds(strCategoryId) ? VerifyUtil.parseLongIds(strCategoryId) : null;
+        List<CourseBean> courses = relationManage.getCourseByHospitalDepartmentDiagnosticCategory(hospitalId, departmentId, false, diagnosticId, categoryId, true, null, null);
+        return Response.ok(courses).build();
+    }
+
     @Path("/diagnostic/edit")
     @POST
     @Produces(MediaType.APPLICATION_JSON)

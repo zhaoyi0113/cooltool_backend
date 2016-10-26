@@ -80,7 +80,7 @@ public class CourseRelationManageService {
         List<Long> coursesInDepartment = new ArrayList();
         boolean searchDepartment = false;
         if (null!=hospitalId) {
-            if (null==departmentId) {
+            if (!isAdmin && null==departmentId) {
                 departmentId = 0;
             }
             coursesInDepartment = courseDepartmentRelation.findCourseIdByHospitalDepartmentAndStatus(hospitalId, departmentId, CommonStatus.ENABLED);

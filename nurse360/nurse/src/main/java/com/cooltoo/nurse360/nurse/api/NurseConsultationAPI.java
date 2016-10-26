@@ -73,11 +73,12 @@ public class NurseConsultationAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getConsultation(@Context HttpServletRequest request,
-                                    @QueryParam("user_id") @DefaultValue("0") long userId,
+                                    @QueryParam("user_id") @DefaultValue("") String strUserId,
                                     @QueryParam("index") @DefaultValue("0") int pageIndex,
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        Long userId = VerifyUtil.isIds(strUserId) ? VerifyUtil.parseLongIds(strUserId).get(0) : null;
         List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, pageIndex, sizePerPage);
         return Response.ok(consultations).build();
     }
