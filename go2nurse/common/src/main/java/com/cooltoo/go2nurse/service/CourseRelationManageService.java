@@ -321,13 +321,17 @@ public class CourseRelationManageService {
 
         Map<DiagnosticEnumeration, List<CourseBean>> diagnosticToCourses = diagnosticEnumToCourses(courses);
         List<CourseBean> tmpCourse = diagnosticToCourses.get(DiagnosticEnumeration.EXTENSION_NURSING);
-        extensionNursingCourses = merge(tmpCourse, extensionNursingCourses);
-        diagnosticToCourses.put(DiagnosticEnumeration.EXTENSION_NURSING, extensionNursingCourses);
-
-        Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(extensionNursingCourses);
+        if (!VerifyUtil.isMapEmpty(diagnosticToCourses)) {
+            extensionNursingCourses = merge(tmpCourse, extensionNursingCourses);
+            diagnosticToCourses.put(DiagnosticEnumeration.EXTENSION_NURSING, extensionNursingCourses);
+        }
+        else {
+            return new ArrayList<>();
+        }
 
         List<CoursesGroupBean> diagnosticGroup = CoursesGroupBean.parseObjectToBean(diagnosticToCourses, true);
 
+        Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(extensionNursingCourses);
         List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
         CoursesGroupBean.sortCourseArrays(categoryGroup);
 
