@@ -3,12 +3,14 @@ package com.cooltoo.nurse360.service;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.entities.HospitalDepartmentEntity;
 import com.cooltoo.nurse360.beans.Nurse360NotificationHospitalRelationBean;
 import com.cooltoo.nurse360.converters.Nurse360NotificationHospitalRelationBeanConverter;
 import com.cooltoo.nurse360.entities.Nurse360NotificationHospitalRelationEntity;
 import com.cooltoo.nurse360.repository.Nurse360NotificationHospitalRelationRepository;
 import com.cooltoo.nurse360.repository.Nurse360NotificationRepository;
 import com.cooltoo.nurse360.util.Nurse360Utility;
+import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
@@ -41,6 +43,7 @@ public class NotificationHospitalRelationServiceForNurse360 {
     @Autowired private Nurse360NotificationHospitalRelationBeanConverter beanConverter;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
+    @Autowired private HospitalDepartmentRepository departmentRepository;
     @Autowired private Nurse360Utility utility;
 
     //============================================================================
@@ -128,65 +131,72 @@ public class NotificationHospitalRelationServiceForNurse360 {
             logger.error("the notification not exist!");
             return new ArrayList<>();
         }
-        if (!hospitalService.existHospital(hospitalId) && -1==hospitalId/*cooltoo's notification*/){
-            logger.error("the hospital not exist!");
+        if (VerifyUtil.isListEmpty(departmentIds)) {
+            logger.error("departmentIds is empty");
             return new ArrayList<>();
         }
 
-        List<Nurse360NotificationHospitalRelationEntity> entities = new ArrayList<>();
-        List<Nurse360NotificationHospitalRelationEntity> relations = repository.findByNotificationId(notificationId, sort);
-        // just add to hospital
-        if (VerifyUtil.isListEmpty(departmentIds) || departmentIds.contains(0)) {
-            Nurse360NotificationHospitalRelationEntity entity;
-            if (!VerifyUtil.isListEmpty(relations)) {
-                entity = relations.get(0);
-                relations.remove(entity);
-            } else {
-                entity = new Nurse360NotificationHospitalRelationEntity();
-                entity.setNotificationId(notificationId);
-                entity.setTime(new Date());
-            }
-            entity.setHospitalId(hospitalId);
-            entity.setDepartmentId(0);
-            entity.setStatus(CommonStatus.ENABLED);
-            entities.add(entity);
+        boolean hasCooltoo = departmentIds.contains(Integer.valueOf(-1));
+        departmentIds.remove(Integer.valueOf(-1));
+
+        List<HospitalDepartmentEntity> departments = departmentRepository.findByIdIn(departmentIds, new Sort(new Sort.Order(Sort.Direction.ASC, "id")));
+        if (VerifyUtil.isListEmpty(departments) && !hasCooltoo) {
+            logger.error("department not exist");
+            return new ArrayList<>();
         }
+
+        if (hasCooltoo) {
+            HospitalDepartmentEntity cooltoo = new HospitalDepartmentEntity();
+            cooltoo.setId(0);
+            cooltoo.setHospitalId(-1);
+            departments.add(cooltoo);
+        }
+
+        List<Nurse360NotificationHospitalRelationEntity> relations = new ArrayList<>();
+        List<Nurse360NotificationHospitalRelationEntity> existedRelations = repository.findByNotificationId(notificationId, sort);
         // add to department
-        else {
-            Nurse360NotificationHospitalRelationEntity entity = null;
-            for (Integer tmpId : departmentIds) {
-                if (null==tmpId && tmpId<0) {
-                    continue;
-                }
-                for (Nurse360NotificationHospitalRelationEntity tmp : relations) {
-                    if (tmp.getDepartmentId()==tmpId && tmp.getHospitalId()==hospitalId) {
-                        entity = tmp;
-                        break;
-                    }
-                }
+        for (HospitalDepartmentEntity tmpDep : departments) {
+            Nurse360NotificationHospitalRelationEntity tmp = null;
+            if (VerifyUtil.isListEmpty(existedRelations)) {
+                tmp = new Nurse360NotificationHospitalRelationEntity();
+            }
+            else {
+                tmp = existedRelations.remove(0);
+            }
+            tmp.setNotificationId(notificationId);
+            tmp.setHospitalId(tmpDep.getHospitalId());
+            tmp.setDepartmentId(tmpDep.getId());
+            tmp.setStatus(CommonStatus.ENABLED);
+            tmp.setTime(new Date());
+            relations.add(tmp);
+        }
 
-                if (null!=entity) {
-                    relations.remove(entity);
-                } else {
-                    entity = new Nurse360NotificationHospitalRelationEntity();
-                    entity.setHospitalId(hospitalId);
-                    entity.setNotificationId(notificationId);
-                    entity.setDepartmentId(tmpId);
-                    entity.setTime(new Date());
+        relations = repository.save(relations);
+
+        if (!VerifyUtil.isListEmpty(existedRelations)) {
+            repository.delete(existedRelations);
+        }
+
+        existedRelations = repository.findByNotificationId(notificationId, new Sort(new Sort.Order(Sort.Direction.ASC, "id")));
+        for (int i = 0; i < existedRelations.size(); i ++) {
+            Nurse360NotificationHospitalRelationEntity tmp1 = existedRelations.get(i);
+            boolean exist = false;
+            for (Nurse360NotificationHospitalRelationEntity tmp2 : relations) {
+                if (tmp1.getId() == tmp2.getId()) {
+                    exist = true;
+                    break;
                 }
-                entity.setStatus(CommonStatus.ENABLED);
-                entities.add(entity);
-                entity = null;
+            }
+            if (exist) {
+                existedRelations.remove(tmp1);
+                i--;
             }
         }
-
-        entities = repository.save(entities);
-
-        if (!VerifyUtil.isListEmpty(relations)) {
-            repository.delete(relations);
+        if (!VerifyUtil.isListEmpty(existedRelations)) {
+            repository.delete(existedRelations);
         }
 
-        List<Nurse360NotificationHospitalRelationBean> beans = entitiesToBeans(entities);
+        List<Nurse360NotificationHospitalRelationBean> beans = entitiesToBeans(relations);
         logger.info("set relation={}", beans);
         return beans;
     }

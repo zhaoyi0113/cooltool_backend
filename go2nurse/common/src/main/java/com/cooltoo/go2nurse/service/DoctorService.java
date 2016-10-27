@@ -4,6 +4,7 @@ import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.UserType;
+import com.cooltoo.entities.HospitalDepartmentEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.DoctorBean;
@@ -12,6 +13,7 @@ import com.cooltoo.go2nurse.entities.DoctorEntity;
 import com.cooltoo.go2nurse.repository.DoctorRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
@@ -41,6 +43,7 @@ public class DoctorService {
 
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
+    @Autowired private HospitalDepartmentRepository departmentRepository;
     @Autowired private Go2NurseUtility utility;
     @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
     @Autowired private DoctorOrderService doctorOrderService;
@@ -261,11 +264,11 @@ public class DoctorService {
     @Transactional
     public DoctorBean updateDoctor(long doctorId,
                                    String name, String post, String jobTitle, String beGoodAt,
-                                   int hospitalId, int departmentId, String strStatus, int grade,
+                                   int departmentId, String strStatus, int grade,
                                    String introduction
     ) {
-        logger.info("update doctor={} by name={} post={} jobTitle={} beGoodAt={} hospitalId={} departmentId={} status={} grade={} introduction={}",
-                doctorId, name, post, jobTitle, beGoodAt, hospitalId, departmentId, strStatus, grade, introduction);
+        logger.info("update doctor={} by name={} post={} jobTitle={} beGoodAt={} departmentId={} status={} grade={} introduction={}",
+                doctorId, name, post, jobTitle, beGoodAt, departmentId, strStatus, grade, introduction);
         DoctorEntity entity = repository.findOne(doctorId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -295,13 +298,13 @@ public class DoctorService {
             entity.setIntroduction(introduction.trim());
             changed = true;
         }
-        if (hospitalId>=0 && hospitalId!=entity.getHospitalId()) {
-            entity.setHospitalId(hospitalId);
-            changed = true;
-        }
-        if (departmentId>=0 && departmentId!=entity.getDepartmentId()) {
-            entity.setDepartmentId(departmentId);
-            changed = true;
+        if (departmentId>=0 && departmentId!=entity.getDepartmentId() && departmentRepository.exists(departmentId)) {
+            HospitalDepartmentEntity department = departmentRepository.findOne(departmentId);
+            if (null!=department) {
+                entity.setHospitalId(department.getHospitalId());
+                entity.setDepartmentId(departmentId);
+                changed = true;
+            }
         }
         CommonStatus status = CommonStatus.parseString(strStatus);
         if (null!=status) {
@@ -353,9 +356,9 @@ public class DoctorService {
     //=====================================================================
 
     @Transactional
-    public DoctorBean addDoctor(String name, String post, String jobTitle, String beGoodAt, int hospitalId, int departmentId, int grade, String introduction) {
-        logger.info("add doctor by name={} post={} jobTitle={} beGoodAt={} hospitalId={} departmentId={} grade={} introduction={}",
-                name, post, jobTitle, beGoodAt, hospitalId, departmentId, grade, introduction);
+    public DoctorBean addDoctor(String name, String post, String jobTitle, String beGoodAt, int departmentId, int grade, String introduction) {
+        logger.info("add doctor by name={} post={} jobTitle={} beGoodAt={} departmentId={} grade={} introduction={}",
+                name, post, jobTitle, beGoodAt, departmentId, grade, introduction);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -376,8 +379,15 @@ public class DoctorService {
         if (!VerifyUtil.isStringEmpty(introduction)) {
             entity.setIntroduction(introduction);
         }
-        entity.setHospitalId(hospitalId<0 ? 0 : hospitalId);
-        entity.setDepartmentId(departmentId<0 ? 0 : departmentId);
+
+        entity.setHospitalId(0);
+        entity.setDepartmentId(0);
+        HospitalDepartmentEntity department = departmentRepository.findOne(departmentId);
+        if (null!=department) {
+            entity.setHospitalId(department.getHospitalId());
+            entity.setDepartmentId(departmentId);
+        }
+
         entity.setGrade(grade);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());

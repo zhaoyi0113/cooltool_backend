@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.entities.HospitalDepartmentEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.DoctorBean;
@@ -282,6 +283,11 @@ public class DoctorOrderService {
         if (!departmentRepository.existsDepartment(departmentId)) {
             logger.error("department not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        HospitalDepartmentBean department = departmentRepository.deleteById(departmentId);
+        if (department.getHospitalId()!=hospitalId) {
+            logger.error("department not belong to the hospital");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
         DoctorOrderEntity order = null;

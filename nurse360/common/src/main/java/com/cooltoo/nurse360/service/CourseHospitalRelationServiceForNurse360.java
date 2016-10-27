@@ -3,12 +3,16 @@ package com.cooltoo.nurse360.service;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.entities.HospitalDepartmentEntity;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.beans.Nurse360CourseHospitalRelationBean;
 import com.cooltoo.nurse360.converters.Nurse360CourseHospitalRelationBeanConverter;
 import com.cooltoo.nurse360.entities.Nurse360CourseHospitalRelationEntity;
 import com.cooltoo.nurse360.repository.Nurse360CourseHospitalRelationRepository;
 import com.cooltoo.nurse360.repository.Nurse360CourseRepository;
 import com.cooltoo.nurse360.util.Nurse360Utility;
+import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
@@ -41,6 +45,7 @@ public class CourseHospitalRelationServiceForNurse360 {
     @Autowired private Nurse360CourseHospitalRelationBeanConverter beanConverter;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
+    @Autowired private HospitalDepartmentRepository departmentRepository;
     @Autowired private Nurse360Utility utility;
 
     //============================================================================
@@ -120,73 +125,79 @@ public class CourseHospitalRelationServiceForNurse360 {
     //                 set
     //============================================================================
     @Transactional
-    public List<Nurse360CourseHospitalRelationBean> setCourseToHospital(long lCourseId, int iHospitalId, List<Integer> departmentIds) {
-        logger.info("set course={} to hospital={} and departments={}", lCourseId, iHospitalId, departmentIds);
-        Integer hospitalId = Integer.valueOf(iHospitalId);
+    public List<Nurse360CourseHospitalRelationBean> setCourseToHospital(long lCourseId, List<Integer> departmentIds) {
+        logger.info("set course={} to departments={}", lCourseId, departmentIds);
         Long courseId = Long.valueOf(lCourseId);
         if (!courseRepository.exists(courseId)) {
             logger.error("the course not exist!");
             return new ArrayList<>();
         }
-        if (!hospitalService.existHospital(hospitalId) && -1==hospitalId/*cooltoo's course*/){
-            logger.error("the hospital not exist!");
-            return new ArrayList<>();
+        if (VerifyUtil.isListEmpty(departmentIds)) {
+            logger.error("departmentIds is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        List<Nurse360CourseHospitalRelationEntity> entities = new ArrayList<>();
-        List<Nurse360CourseHospitalRelationEntity> relations = repository.findByCourseId(courseId, sort);
-        // just add to hospital
-        if (VerifyUtil.isListEmpty(departmentIds) || departmentIds.contains(0)) {
-            Nurse360CourseHospitalRelationEntity entity;
-            if (!VerifyUtil.isListEmpty(relations)) {
-                entity = relations.get(0);
-                relations.remove(entity);
-            } else {
-                entity = new Nurse360CourseHospitalRelationEntity();
-                entity.setCourseId(courseId);
-                entity.setTime(new Date());
-            }
-            entity.setHospitalId(hospitalId);
-            entity.setDepartmentId(0);
-            entity.setStatus(CommonStatus.ENABLED);
-            entities.add(entity);
+        boolean hasCooltoo = departmentIds.contains(Integer.valueOf(-1));
+        departmentIds.remove(Integer.valueOf(-1));
+
+        List<HospitalDepartmentEntity> departments = departmentRepository.findByIdIn(departmentIds, new Sort(new Sort.Order(Sort.Direction.ASC, "id")));
+        if (VerifyUtil.isListEmpty(departments) && !hasCooltoo) {
+            logger.error("department not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
+
+        if (hasCooltoo) {
+            HospitalDepartmentEntity cooltoo = new HospitalDepartmentEntity();
+            cooltoo.setId(0);
+            cooltoo.setHospitalId(-1);
+            departments.add(cooltoo);
+        }
+
+        List<Nurse360CourseHospitalRelationEntity> relations = new ArrayList<>();
+        List<Nurse360CourseHospitalRelationEntity> existedRelations = repository.findByCourseId(courseId, sort);
         // add to department
-        else {
-            Nurse360CourseHospitalRelationEntity entity = null;
-            for (Integer tmpId : departmentIds) {
-                if (null==tmpId && tmpId<0) {
-                    continue;
-                }
-                for (Nurse360CourseHospitalRelationEntity tmp : relations) {
-                    if (tmp.getDepartmentId()==tmpId && tmp.getHospitalId()==hospitalId) {
-                        entity = tmp;
-                        break;
-                    }
-                }
+        for (HospitalDepartmentEntity tmpDep : departments) {
+            Nurse360CourseHospitalRelationEntity tmp = null;
+            if (VerifyUtil.isListEmpty(existedRelations)) {
+                tmp = new Nurse360CourseHospitalRelationEntity();
+            }
+            else {
+                tmp = existedRelations.remove(0);
+            }
+            tmp.setCourseId(courseId);
+            tmp.setHospitalId(tmpDep.getHospitalId());
+            tmp.setDepartmentId(tmpDep.getId());
+            tmp.setStatus(CommonStatus.ENABLED);
+            tmp.setTime(new Date());
+            relations.add(tmp);
+        }
 
-                if (null!=entity) {
-                    relations.remove(entity);
-                } else {
-                    entity = new Nurse360CourseHospitalRelationEntity();
-                    entity.setHospitalId(hospitalId);
-                    entity.setCourseId(courseId);
-                    entity.setDepartmentId(tmpId);
-                    entity.setTime(new Date());
+        relations = repository.save(relations);
+
+        if (!VerifyUtil.isListEmpty(existedRelations)) {
+            repository.delete(existedRelations);
+        }
+
+        existedRelations = repository.findByCourseId(courseId, new Sort(new Sort.Order(Sort.Direction.ASC, "id")));
+        for (int i = 0; i < existedRelations.size(); i ++) {
+            Nurse360CourseHospitalRelationEntity tmp1 = existedRelations.get(i);
+            boolean exist = false;
+            for (Nurse360CourseHospitalRelationEntity tmp2 : relations) {
+                if (tmp1.getId() == tmp2.getId()) {
+                    exist = true;
+                    break;
                 }
-                entity.setStatus(CommonStatus.ENABLED);
-                entities.add(entity);
-                entity = null;
+            }
+            if (exist) {
+                existedRelations.remove(tmp1);
+                i--;
             }
         }
-
-        entities = repository.save(entities);
-
-        if (!VerifyUtil.isListEmpty(relations)) {
-            repository.delete(relations);
+        if (!VerifyUtil.isListEmpty(existedRelations)) {
+            repository.delete(existedRelations);
         }
 
-        List<Nurse360CourseHospitalRelationBean> beans = entitiesToBeans(entities);
+        List<Nurse360CourseHospitalRelationBean> beans = entitiesToBeans(relations);
         logger.info("set relation={}", beans);
         return beans;
     }

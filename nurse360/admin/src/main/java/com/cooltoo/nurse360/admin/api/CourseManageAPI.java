@@ -128,8 +128,8 @@ public class CourseManageAPI {
                                  @FormParam("introduction") @DefaultValue("") String introduction,
                                  @FormParam("link") @DefaultValue("") String link,
                                  @FormParam("keyword") @DefaultValue("") String keyword,
-                                 @FormParam("category_id") @DefaultValue("-1") long categoryId,
-                                 @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
+                                 @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                 @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
                                  @FormParam("department_ids") @DefaultValue("") String strDepartmentIds
 
     ) {
@@ -139,7 +139,10 @@ public class CourseManageAPI {
         if (null!=course) {
             long courseId = course.getId();
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
-            courseHospitalRelationService.setCourseToHospital(courseId, hospitalId, departmentIds);
+            if (-1==hospitalId) {
+                departmentIds.add(Integer.valueOf(-1));
+            }
+            courseHospitalRelationService.setCourseToHospital(courseId, departmentIds);
         }
         return Response.ok(course).build();
     }
@@ -153,8 +156,8 @@ public class CourseManageAPI {
                                           @FormParam("introduction") @DefaultValue("") String introduction,
                                           @FormParam("link") @DefaultValue("") String link,
                                           @FormParam("keyword") @DefaultValue("") String keyword,
-                                          @FormParam("category_id") @DefaultValue("-1") long categoryId,
-                                          @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
+                                          @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                          @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
                                           @FormParam("department_ids") @DefaultValue("") String strDepartmentIds
 
     ) {
@@ -163,7 +166,10 @@ public class CourseManageAPI {
         logger.info("course is {}", course);
         if (null!=course) {
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
-            courseHospitalRelationService.setCourseToHospital(courseId, hospitalId, departmentIds);
+            if (-1==hospitalId) {
+                departmentIds.add(Integer.valueOf(-1));
+            }
+            courseHospitalRelationService.setCourseToHospital(courseId, departmentIds);
         }
         return Response.ok(course).build();
     }

@@ -532,10 +532,10 @@ public class CourseRelationManageService {
     //==============================================================================
 
     @Transactional
-    public List<Integer> setCourseToDepartmentRelationship(long courseId, Integer hospitalId, List<Integer> departmentIds) {
+    public List<Integer> setCourseToDepartmentRelationship(long courseId, List<Integer> departmentIds) {
         logger.info("set course_to_department relationship, courseId={} departmentIds={}",
                 courseId, departmentIds);
-        List<Integer> settingDepartmentIds = courseDepartmentRelationService.setCourseToDepartmentRelation(courseId, hospitalId, departmentIds);
+        List<Integer> settingDepartmentIds = courseDepartmentRelationService.setCourseToDepartmentRelation(courseId, departmentIds);
         logger.info("set department ids is {}", settingDepartmentIds);
         return settingDepartmentIds;
     }

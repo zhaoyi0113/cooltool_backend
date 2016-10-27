@@ -111,9 +111,9 @@ public class DoctorManageAPI {
                                      @FormParam("department_id") @DefaultValue("0") int departmentId,
                                      @FormParam("introduction") String introduction
     ) {
-        DoctorBean doctor = doctorService.addDoctor(name, post, jobTitle, beGoodAt, hospitalId, departmentId, grade, introduction);
+        DoctorBean doctor = doctorService.addDoctor(name, post, jobTitle, beGoodAt, departmentId, grade, introduction);
         if (hospitalId>0 && departmentId>0) {
-            doctorOrderService.addDoctorOrder(doctor.getId(), hospitalId, departmentId);
+            doctorOrderService.addDoctorOrder(doctor.getId(), doctor.getHospitalId(), doctor.getDepartmentId());
         }
         return Response.ok(doctor).build();
     }
@@ -131,13 +131,13 @@ public class DoctorManageAPI {
                                       @FormParam("post") @DefaultValue("") String post,
                                       @FormParam("job_title") @DefaultValue("") String jobTitle,
                                       @FormParam("be_good_at") @DefaultValue("") String beGoodAt,
-                                      @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                      @FormParam("department_id") @DefaultValue("-1") int departmentId,
+                                      @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                      @FormParam("department_id") @DefaultValue("0") int departmentId,
                                       @FormParam("status") @DefaultValue("") String status,
-                                      @FormParam("grade") @DefaultValue("-1") int grade,
+                                      @FormParam("grade") @DefaultValue("0") int grade,
                                       @FormParam("introduction") String introduction
     ) {
-        DoctorBean doctor = doctorService.updateDoctor(doctorId, name, post, jobTitle, beGoodAt, hospitalId, departmentId, status, grade, introduction);
+        DoctorBean doctor = doctorService.updateDoctor(doctorId, name, post, jobTitle, beGoodAt, departmentId, status, grade, introduction);
         if (hospitalId>0 && departmentId>0) {
             doctorOrderService.addDoctorOrder(doctorId, hospitalId, departmentId);
         }

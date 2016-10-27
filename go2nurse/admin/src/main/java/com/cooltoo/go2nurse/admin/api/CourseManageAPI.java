@@ -59,8 +59,8 @@ public class CourseManageAPI {
                                  @FormParam("introduction") @DefaultValue("") String introduction,
                                  @FormParam("link") @DefaultValue("") String link,
                                  @FormParam("keyword") @DefaultValue("") String keyword,
-                                 @FormParam("category_id") @DefaultValue("-1") long categoryId,
-                                 @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
+                                 @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                 @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
                                  @FormParam("department_ids") @DefaultValue("") String strDepartmentIds,
                                  @FormParam("diagnostic_ids") @DefaultValue("") String strDiagnosticIds
 
@@ -72,7 +72,10 @@ public class CourseManageAPI {
             long courseId = course.getId();
             courseCategoryRelation.setCourseRelation(courseId, categoryId);
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
-            courseRelationManageService.setCourseToDepartmentRelationship(courseId, hospitalId, departmentIds);
+            if (-1==hospitalId && !departmentIds.contains(Integer.valueOf(-1))) {
+                departmentIds.add(Integer.valueOf(-1));
+            }
+            courseRelationManageService.setCourseToDepartmentRelationship(courseId, departmentIds);
             List<Long> diagnosticIds = VerifyUtil.parseLongIds(strDiagnosticIds);
             courseRelationManageService.setCourseToDiagnosticRelationship(courseId, diagnosticIds);
         }
@@ -89,8 +92,8 @@ public class CourseManageAPI {
                                           @FormParam("introduction") @DefaultValue("") String introduction,
                                           @FormParam("link") @DefaultValue("") String link,
                                           @FormParam("keyword") @DefaultValue("") String keyword,
-                                          @FormParam("category_id") @DefaultValue("-1") long categoryId,
-                                          @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
+                                          @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                          @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
                                           @FormParam("department_ids") @DefaultValue("") String strDepartmentIds,
                                           @FormParam("diagnostic_ids") @DefaultValue("") String strDiagnosticIds
 
@@ -101,7 +104,10 @@ public class CourseManageAPI {
         if (null!=course) {
             courseCategoryRelation.setCourseRelation(courseId, categoryId);
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
-            courseRelationManageService.setCourseToDepartmentRelationship(courseId, hospitalId, departmentIds);
+            if (-1==hospitalId && !departmentIds.contains(Integer.valueOf(-1))) {
+                departmentIds.add(Integer.valueOf(-1));
+            }
+            courseRelationManageService.setCourseToDepartmentRelationship(courseId, departmentIds);
             List<Long> diagnosticIds = VerifyUtil.parseLongIds(strDiagnosticIds);
             courseRelationManageService.setCourseToDiagnosticRelationship(courseId, diagnosticIds);
         }

@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.entities.HospitalDepartmentEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.converter.CourseDepartmentRelationBeanConverter;
@@ -100,28 +101,39 @@ public class CourseDepartmentRelationService {
     //=======================================================================
 
     @Transactional
-    public List<Integer> setCourseToDepartmentRelation(long courseId, Integer hospitalId, List<Integer> departmentIds) {
-        logger.info("set course_to_department_relationship courseId={} hospitalId={} departmentIds={}",
-                courseId, hospitalId, departmentIds);
+    public List<Integer> setCourseToDepartmentRelation(long courseId, List<Integer> departmentIds) {
+        logger.info("set course_to_department_relationship courseId={} departmentIds={}",
+                courseId, departmentIds);
         // check parameters
         if (!courseRepository.exists(courseId)) {
             logger.error("course not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (hospitalId!=-1/* cooltoo */ && !hospitalRepository.exists(hospitalId)) {
-            logger.error("hospital not exists");
+        if (VerifyUtil.isListEmpty(departmentIds)) {
+            logger.error("departmentIds is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        boolean hasCooltoo = departmentIds.contains(Integer.valueOf(-1));
+        departmentIds.remove(Integer.valueOf(-1));
+
+        List<HospitalDepartmentEntity> departments = departmentRepository.findByIdIn(departmentIds, new Sort(new Sort.Order(Sort.Direction.ASC, "id")));
+        if (VerifyUtil.isListEmpty(departments) && !hasCooltoo) {
+            logger.error("department not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (VerifyUtil.isListEmpty(departmentIds)) {
-            if (null==departmentIds) {
-                departmentIds = new ArrayList<>();
-            }
-            departmentIds.add(0);
+
+        if (hasCooltoo) {
+            HospitalDepartmentEntity cooltoo = new HospitalDepartmentEntity();
+            cooltoo.setId(0);
+            cooltoo.setHospitalId(-1);
+            departments.add(cooltoo);
         }
+
 
         List<CourseDepartmentRelationEntity> existedRelation = repository.findByCourseId(courseId);
         List<CourseDepartmentRelationEntity> relations = new ArrayList<>();
-        for (Integer depId : departmentIds) {
+        for (HospitalDepartmentEntity tmpDep : departments) {
             CourseDepartmentRelationEntity tmp = null;
             if (VerifyUtil.isListEmpty(existedRelation)) {
                 tmp = new CourseDepartmentRelationEntity();
@@ -130,8 +142,8 @@ public class CourseDepartmentRelationService {
                 tmp = existedRelation.remove(0);
             }
             tmp.setCourseId(courseId);
-            tmp.setHospitalId(hospitalId);
-            tmp.setDepartmentId(depId);
+            tmp.setHospitalId(tmpDep.getHospitalId());
+            tmp.setDepartmentId(tmpDep.getId());
             tmp.setStatus(CommonStatus.ENABLED);
             tmp.setTime(new Date());
             relations.add(tmp);
