@@ -118,6 +118,19 @@ public class UserHospitalizedAPI {
         return Response.ok(categoryGroup).build();
     }
 
+    @Path("/courses/{hospital_id}/{department_id}/{category_ids}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDepartmentCourseCategories(@PathParam("hospital_id") int hosId,
+                                                  @PathParam("department_id") int depId,
+                                                  @PathParam("category_ids") String strCategoryIds){
+        strCategoryIds = null!=strCategoryIds ? strCategoryIds.replace('_', ',') : null;
+        List<Long> categoryIds = VerifyUtil.parseLongIds(strCategoryIds);
+        List<CoursesGroupBean> categoryGroup = courseManageService.getHospitalCoursesGroupByCategory(null, hosId, depId, categoryIds);
+        return Response.ok(categoryGroup).build();
+
+    }
+
     @Path("/get_courses/{hospital_department_unique_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
