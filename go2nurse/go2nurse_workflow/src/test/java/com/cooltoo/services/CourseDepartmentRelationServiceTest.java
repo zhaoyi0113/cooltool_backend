@@ -121,7 +121,7 @@ public class CourseDepartmentRelationServiceTest extends AbstractCooltooTest {
         Assert.assertTrue(existed.contains(Integer.valueOf(33)));
 
 
-        service.setCourseToDepartmentRelation(courseId, hospitalId, settingDepartmentIds);
+        service.setCourseToDepartmentRelation(courseId, settingDepartmentIds);
 
         List<Integer> newExisted = service.getDepartmentByCourseId(Arrays.asList(new Long[]{courseId}), "ENABLED");
         Assert.assertEquals(3, newExisted.size());
