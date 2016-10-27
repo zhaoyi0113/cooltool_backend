@@ -24,6 +24,7 @@ public class DoctorEntity {
     private int hospitalId;
     private int departmentId;
     private String introduction;
+    private long headImageId;
 
     @Id
     @GeneratedValue
@@ -88,6 +89,11 @@ public class DoctorEntity {
         return introduction;
     }
 
+    @Column(name = "head_image_id")
+    public long getHeadImageId() {
+        return headImageId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -136,6 +142,10 @@ public class DoctorEntity {
         this.introduction = introduction;
     }
 
+    public void setHeadImageId(long headImageId) {
+        this.headImageId = headImageId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -151,6 +161,7 @@ public class DoctorEntity {
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", departmentId=").append(departmentId);
         msg.append(", introduction=").append(introduction);
+        msg.append(", headImageId=").append(headImageId);
         msg.append("]");
         return msg.toString();
     }

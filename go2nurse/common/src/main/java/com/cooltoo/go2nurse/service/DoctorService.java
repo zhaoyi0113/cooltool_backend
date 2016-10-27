@@ -326,7 +326,7 @@ public class DoctorService {
     }
 
     @Transactional
-    public DoctorBean updateDoctorHeadImage(long doctorId, String imageName, InputStream image) {
+    public DoctorBean updateDoctorHeadImage(long doctorId, String imageName, InputStream image, boolean isHeaderImage) {
         logger.info("update doctor={} by imageName={} image={}",
                 doctorId, imageName, null!=image);
 
@@ -342,11 +342,21 @@ public class DoctorService {
             }
             long imageId = userFileStorage.addFile(entity.getImageId(), imageName, image);
             imageUrl = userFileStorage.getFileURL(imageId);
-            entity.setImageId(imageId);
+            if (isHeaderImage) {
+                entity.setHeadImageId(imageId);
+            }
+            else {
+                entity.setImageId(imageId);
+            }
         }
 
         DoctorBean bean = beanConverter.convert(entity);
-        bean.setImageUrl(imageUrl);
+        if (isHeaderImage) {
+            bean.setHeadImageUrl(imageUrl);
+        }
+        else {
+            bean.setImageUrl(imageUrl);
+        }
         logger.info("doctor updated is {}", bean);
         return bean;
     }

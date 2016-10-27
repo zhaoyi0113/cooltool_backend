@@ -27,6 +27,8 @@ public class DoctorBean {
     private HospitalDepartmentBean department;
     private float score;
     private String introduction;
+    private long headImageId;
+    private String headImageUrl;
 
     public long getId() {
         return id;
@@ -90,6 +92,14 @@ public class DoctorBean {
 
     public String getIntroduction() {
         return introduction;
+    }
+
+    public long getHeadImageId() {
+        return headImageId;
+    }
+
+    public String getHeadImageUrl() {
+        return headImageUrl;
     }
 
     public void setId(long id) {
@@ -156,6 +166,14 @@ public class DoctorBean {
         this.introduction = introduction;
     }
 
+    public void setHeadImageId(long headImageId) {
+        this.headImageId = headImageId;
+    }
+
+    public void setHeadImageUrl(String headImageUrl) {
+        this.headImageUrl = headImageUrl;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -173,6 +191,8 @@ public class DoctorBean {
         msg.append(", departmentId=").append(departmentId);
         msg.append(", score=").append(score);
         msg.append(", introduction=").append(introduction);
+        msg.append(", headImageId=").append(headImageId);
+        msg.append(", headImageUrl=").append(headImageUrl);
         msg.append("]");
         return msg.toString();
     }

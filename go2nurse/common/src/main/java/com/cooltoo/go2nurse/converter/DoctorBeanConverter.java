@@ -25,6 +25,7 @@ public class DoctorBeanConverter implements Converter<DoctorEntity, DoctorBean> 
         bean.setHospitalId(source.getHospitalId());
         bean.setDepartmentId(source.getDepartmentId());
         bean.setIntroduction(null==source.getIntroduction() ? "" : source.getIntroduction());
+        bean.setHeadImageId(source.getHeadImageId());
         return bean;
     }
 }

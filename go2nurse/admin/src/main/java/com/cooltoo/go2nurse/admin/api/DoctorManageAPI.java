@@ -101,15 +101,15 @@ public class DoctorManageAPI {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addServiceVendor(@Context HttpServletRequest request,
-                                     @FormParam("name") @DefaultValue("") String name,
-                                     @FormParam("post") @DefaultValue("") String post,
-                                     @FormParam("job_title") @DefaultValue("") String jobTitle,
-                                     @FormParam("be_good_at") @DefaultValue("") String beGoodAt,
-                                     @FormParam("grade") @DefaultValue("0") int grade,
-                                     @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                     @FormParam("department_id") @DefaultValue("0") int departmentId,
-                                     @FormParam("introduction") String introduction
+    public Response addDoctor(@Context HttpServletRequest request,
+                              @FormParam("name") @DefaultValue("") String name,
+                              @FormParam("post") @DefaultValue("") String post,
+                              @FormParam("job_title") @DefaultValue("") String jobTitle,
+                              @FormParam("be_good_at") @DefaultValue("") String beGoodAt,
+                              @FormParam("grade") @DefaultValue("0") int grade,
+                              @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                              @FormParam("department_id") @DefaultValue("0") int departmentId,
+                              @FormParam("introduction") String introduction
     ) {
         DoctorBean doctor = doctorService.addDoctor(name, post, jobTitle, beGoodAt, departmentId, grade, introduction);
         if (hospitalId>0 && departmentId>0) {
@@ -125,17 +125,17 @@ public class DoctorManageAPI {
     @Path("/edit")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response editServiceVendor(@Context HttpServletRequest request,
-                                      @FormParam("doctor_id") @DefaultValue("0") long doctorId,
-                                      @FormParam("name") @DefaultValue("") String name,
-                                      @FormParam("post") @DefaultValue("") String post,
-                                      @FormParam("job_title") @DefaultValue("") String jobTitle,
-                                      @FormParam("be_good_at") @DefaultValue("") String beGoodAt,
-                                      @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                      @FormParam("department_id") @DefaultValue("0") int departmentId,
-                                      @FormParam("status") @DefaultValue("") String status,
-                                      @FormParam("grade") @DefaultValue("0") int grade,
-                                      @FormParam("introduction") String introduction
+    public Response editDoctor(@Context HttpServletRequest request,
+                               @FormParam("doctor_id") @DefaultValue("0") long doctorId,
+                               @FormParam("name") @DefaultValue("") String name,
+                               @FormParam("post") @DefaultValue("") String post,
+                               @FormParam("job_title") @DefaultValue("") String jobTitle,
+                               @FormParam("be_good_at") @DefaultValue("") String beGoodAt,
+                               @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                               @FormParam("department_id") @DefaultValue("0") int departmentId,
+                               @FormParam("status") @DefaultValue("") String status,
+                               @FormParam("grade") @DefaultValue("0") int grade,
+                               @FormParam("introduction") String introduction
     ) {
         DoctorBean doctor = doctorService.updateDoctor(doctorId, name, post, jobTitle, beGoodAt, departmentId, status, grade, introduction);
         if (hospitalId>0 && departmentId>0) {
@@ -148,13 +148,27 @@ public class DoctorManageAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response editServiceVendorLogo(@Context HttpServletRequest request,
+    public Response editDoctorHeaderImage(@Context HttpServletRequest request,
                                           @FormDataParam("doctor_id") @DefaultValue("0") long doctorId,
                                           @FormDataParam("image_name") @DefaultValue("") String imageName,
                                           @FormDataParam("image") InputStream image,
                                           @FormDataParam("image")FormDataContentDisposition disposition
     ) {
-        DoctorBean doctor = doctorService.updateDoctorHeadImage(doctorId, imageName, image);
+        DoctorBean doctor = doctorService.updateDoctorHeadImage(doctorId, imageName, image, true);
+        return Response.ok(doctor).build();
+    }
+
+    @Path("/edit_full_length_image")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response editDoctorFullLengthImage(@Context HttpServletRequest request,
+                                              @FormDataParam("doctor_id") @DefaultValue("0") long doctorId,
+                                              @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                              @FormDataParam("image") InputStream image,
+                                              @FormDataParam("image")FormDataContentDisposition disposition
+    ) {
+        DoctorBean doctor = doctorService.updateDoctorHeadImage(doctorId, imageName, image, false);
         return Response.ok(doctor).build();
     }
 }
