@@ -196,6 +196,9 @@ public class DoctorService {
             if (!imagesId.contains(item.getImageId())) {
                 imagesId.add(item.getImageId());
             }
+            if (!imagesId.contains(item.getHeadImageId())) {
+                imagesId.add(item.getHeadImageId());
+            }
             if (!hospitalIds.contains(item.getHospitalId())) {
                 hospitalIds.add(item.getHospitalId());
             }
@@ -215,6 +218,10 @@ public class DoctorService {
             String imageUrl = imageIdToUrl.get(item.getImageId());
             if (!VerifyUtil.isStringEmpty(imageUrl)) {
                 item.setImageUrl(imageUrl);
+            }
+            imageUrl = imageIdToUrl.get(item.getHeadImageId());
+            if (!VerifyUtil.isStringEmpty(imageUrl)) {
+                item.setHeadImageUrl(imageUrl);
             }
             HospitalBean hospital = hospitalIdToBean.get(item.getHospitalId());
             if (null!=hospital) {
@@ -246,10 +253,12 @@ public class DoctorService {
 
         List<Long> imagesId = new ArrayList<>();
         for (DoctorEntity entity : entities) {
-            if (imagesId.contains(entity.getImageId())) {
-                continue;
+            if (!imagesId.contains(entity.getImageId())) {
+                imagesId.add(entity.getImageId());
             }
-            imagesId.add(entity.getImageId());
+            if (!imagesId.contains(entity.getHeadImageId())) {
+                imagesId.add(entity.getHeadImageId());
+            }
         }
         userFileStorage.deleteFiles(imagesId);
         repository.delete(entities);
