@@ -349,7 +349,14 @@ public class DoctorService {
             if (VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "doctor_head_" + System.nanoTime();
             }
-            long imageId = userFileStorage.addFile(entity.getImageId(), imageName, image);
+            long imageId = 0;
+            if (isHeaderImage) {
+                imageId = entity.getHeadImageId();
+            }
+            else {
+                imageId = entity.getImageId();
+            }
+            imageId = userFileStorage.addFile(imageId, imageName, image);
             imageUrl = userFileStorage.getFileURL(imageId);
             if (isHeaderImage) {
                 entity.setHeadImageId(imageId);
@@ -357,6 +364,7 @@ public class DoctorService {
             else {
                 entity.setImageId(imageId);
             }
+            repository.save(entity);
         }
 
         DoctorBean bean = beanConverter.convert(entity);
