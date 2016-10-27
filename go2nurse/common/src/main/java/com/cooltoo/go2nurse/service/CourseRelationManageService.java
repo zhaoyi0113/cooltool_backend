@@ -391,17 +391,18 @@ public class CourseRelationManageService {
 
         Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(courses);
         List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
-        CoursesGroupBean.sortCourseArrays(categoryGroup);
 
-        for (int i = 0; i < categoryGroup.size(); i ++) {
-            CoursesGroupBean tmp = categoryGroup.get(i);
-            if (!categoryIds.contains(tmp.getId())) {
-                categoryGroup.remove(i);
-                i--;
+        List<CoursesGroupBean> resultGroup = new ArrayList<>();
+        for (Long tmpId : categoryIds) {
+            for (int i = 0; i < categoryGroup.size(); i++) {
+                CoursesGroupBean tmp = categoryGroup.get(i);
+                if (tmpId==tmp.getId()) {
+                    resultGroup.add(tmp);
+                }
             }
         }
 
-        return categoryGroup;
+        return resultGroup;
     }
 
 
