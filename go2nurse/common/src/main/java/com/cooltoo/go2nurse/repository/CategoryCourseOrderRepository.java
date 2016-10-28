@@ -20,15 +20,15 @@ public interface CategoryCourseOrderRepository extends JpaRepository<CategoryCou
 
     List<CategoryCourseOrderEntity> findOrderByCourseIdIn(List<Long> courseIds, Sort sort);
 
-    @Query("SELECT count(order.id) FROM CategoryCourseOrderEntity order" +
-            " WHERE (?1 IS NULL OR order.hospitalId)" +
-            " AND   (?2 IS NULL OR order.departmentId)" +
-            " AND   (?3 IS NULL OR order.categoryId)")
+    @Query("SELECT count(cr.id) FROM CategoryCourseOrderEntity cr" +
+            " WHERE (?1 IS NULL OR cr.hospitalId=?1)" +
+            " AND   (?2 IS NULL OR cr.departmentId=?2)" +
+            " AND   (?3 IS NULL OR cr.categoryId=?3)")
     long countOrderByConditions(Integer hospitalId, Integer departmentId, Long categoryId);
 
-    @Query("FROM CategoryCourseOrderEntity order" +
-            " WHERE (?1 IS NULL OR order.hospitalId)" +
-            " AND   (?2 IS NULL OR order.departmentId)" +
-            " AND   (?3 IS NULL OR order.categoryId)")
+    @Query("FROM CategoryCourseOrderEntity cr" +
+            " WHERE (?1 IS NULL OR cr.hospitalId=?1)" +
+            " AND   (?2 IS NULL OR cr.departmentId=?2)" +
+            " AND   (?3 IS NULL OR cr.categoryId=?3)")
     Page<CategoryCourseOrderEntity> findOrderByConditions(Integer hospitalId, Integer departmentId, Long categoryId, Pageable page);
 }
