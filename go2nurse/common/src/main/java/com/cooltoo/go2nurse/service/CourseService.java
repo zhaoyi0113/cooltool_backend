@@ -586,7 +586,7 @@ public class CourseService {
     //=============================================================
     @Transactional
     public CourseBean deleteCourseFrontCover(long courseId) {
-        logger.info("delete course={} 's front cover", strIds);
+        logger.info("delete course={} 's front cover", courseId);
         CourseEntity course = repository.findOne(courseId);
         if (null==course) {
             logger.info("the course do not exist");
