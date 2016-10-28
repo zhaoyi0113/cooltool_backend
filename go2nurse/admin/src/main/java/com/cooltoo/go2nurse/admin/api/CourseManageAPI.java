@@ -119,14 +119,27 @@ public class CourseManageAPI {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCourseFrontCover(@Context HttpServletRequest request,
-                                             @FormDataParam("course_id") @DefaultValue("0") long courseId,
-                                             @FormDataParam("image_name") @DefaultValue("") String imageName,
-                                             @FormDataParam("image") InputStream image,
-                                             @FormDataParam("image") FormDataContentDisposition disposition
+                                           @FormDataParam("course_id") @DefaultValue("0") long courseId,
+                                           @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                           @FormDataParam("image") InputStream image,
+                                           @FormDataParam("image") FormDataContentDisposition disposition
 
     ) {
         logger.info("update course front cover");
         CourseBean course = courseService.updateCourseBasicInfo(courseId, null, null, imageName, image, null, null);
+        logger.info("course is {}", course);
+        return Response.ok(course).build();
+    }
+
+    @Path("/delete/front_cover")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateCourseFrontCover(@Context HttpServletRequest request,
+                                           @FormDataParam("course_id") @DefaultValue("0") long courseId
+
+    ) {
+        logger.info("delete course front cover");
+        CourseBean course = courseService.deleteCourseFrontCover(courseId);
         logger.info("course is {}", course);
         return Response.ok(course).build();
     }

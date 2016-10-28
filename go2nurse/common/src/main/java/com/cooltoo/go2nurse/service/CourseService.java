@@ -584,6 +584,29 @@ public class CourseService {
     //=============================================================
     //          delete   for administrator use
     //=============================================================
+    @Transactional
+    public CourseBean deleteCourseFrontCover(long courseId) {
+        logger.info("delete course={} 's front cover", strIds);
+        CourseEntity course = repository.findOne(courseId);
+        if (null==course) {
+            logger.info("the course do not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        long frontCoverId = course.getFrontCover();
+        String frontCoverUrl = userStorage.getFileURL(frontCoverId);
+        if (userStorage.fileExist(frontCoverId)) {
+            boolean deleted = userStorage.deleteFile(frontCoverId);
+            if (deleted) {
+                frontCoverUrl = "";
+                course.setFrontCover(0);
+                repository.save(course);
+            }
+        }
+
+        CourseBean bean = beanConverter.convert(course);
+        bean.setFrontCoverUrl(frontCoverUrl);
+        return bean;
+    }
 
     @Transactional
     public String deleteByIds(String strIds) {
