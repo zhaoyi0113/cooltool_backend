@@ -135,7 +135,7 @@ public class CourseManageAPI {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCourseFrontCover(@Context HttpServletRequest request,
-                                           @FormDataParam("course_id") @DefaultValue("0") long courseId
+                                           @FormParam("course_id") @DefaultValue("0") long courseId
 
     ) {
         logger.info("delete course front cover");
