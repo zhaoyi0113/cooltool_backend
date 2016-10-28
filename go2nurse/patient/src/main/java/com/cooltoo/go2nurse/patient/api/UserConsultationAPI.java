@@ -69,7 +69,7 @@ public class UserConsultationAPI {
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, null, null, content, pageIndex, sizePerPage);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, null, null, content, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
         return Response.ok(consultations).build();
     }
 
@@ -83,7 +83,7 @@ public class UserConsultationAPI {
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, pageIndex, sizePerPage);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
         return Response.ok(consultations).build();
     }
 
@@ -93,7 +93,7 @@ public class UserConsultationAPI {
     public Response getConsultationWithTalks(@Context HttpServletRequest request,
                                              @QueryParam("consultation_id") @DefaultValue("0") long consultationId
     ) {
-        UserConsultationBean consultation = userConsultationService.getUserConsultationWithTalk(consultationId);
+        UserConsultationBean consultation = userConsultationService.getUserConsultationWithTalk(consultationId, ConsultationTalkStatus.USER_SPEAK);
         return Response.ok(consultation).build();
     }
 

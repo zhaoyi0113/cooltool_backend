@@ -51,6 +51,7 @@ public class CourseRelationManageService {
     @Autowired private CourseCategoryService categoryService;
 
 
+    @Autowired private CategoryCourseOrderService categoryCourseOrderService;
     @Autowired private UserCourseRelationService userCourseService;
     @Autowired private CourseCategoryRelationRepository courseCategoryRelation;
     @Autowired private CourseCategoryRelationService    courseCategoryRelationService;
@@ -396,6 +397,11 @@ public class CourseRelationManageService {
         Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(courses);
         List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
 
+        Map<CategoryCoursesOrderGroup, List<Long>> categoryCourseOrder = null;
+        if (null!=hospital && null!=department && !VerifyUtil.isListEmpty(categoryIds)) {
+            categoryCourseOrder = categoryCourseOrderService.getCategoryGroupToCourseIdsSorted(hospital, department, categoryIds);
+        }
+
         List<CoursesGroupBean> resultGroup = new ArrayList<>();
         for (Long tmpId : categoryIds) {
             for (int i = 0; i < categoryGroup.size(); i++) {
@@ -406,7 +412,60 @@ public class CourseRelationManageService {
             }
         }
 
+        if (!VerifyUtil.isMapEmpty(categoryCourseOrder)) {
+            CategoryCoursesOrderGroup orderGroup = new CategoryCoursesOrderGroup();
+            orderGroup.setHospitalId(hospital);
+            orderGroup.setDepartmentId(department);
+            for (CoursesGroupBean tmp : resultGroup) {
+                orderGroup.setCategoryId(tmp.getId());
+                orderGroup.resetHashCode();
+
+                List<Long> courseIdSorted = categoryCourseOrder.get(orderGroup);
+                if (VerifyUtil.isListEmpty(courseIdSorted)) {
+                    continue;
+                }
+
+                sortCourseByCourseIdSorted(tmp, courseIdSorted);
+            }
+        }
+
         return resultGroup;
+    }
+
+    private void sortCourseByCourseIdSorted(CoursesGroupBean courseGroup, List<Long> coursesIdSorted) {
+        // is null or empty
+        if (null==courseGroup
+                || !(courseGroup.getCourses() instanceof List)
+                || VerifyUtil.isListEmpty(((List)courseGroup.getCourses()))
+                || VerifyUtil.isListEmpty(coursesIdSorted)) {
+            return;
+        }
+
+        // is course
+        List set = (List)courseGroup.getCourses();
+        Object obj = set.get(0);
+        if (!(obj instanceof CourseBean)) {
+            return;
+        }
+
+        List<CourseBean> courses = (List<CourseBean>) courseGroup.getCourses();
+        List<CourseBean> courseSorted = new ArrayList<>();
+        for (Long tmpId : coursesIdSorted) {
+            for (int i = 0; i<courses.size(); i ++) {
+                CourseBean tmp = courses.get(i);
+                if (tmp.getId() == tmpId) {
+                    courseSorted.add(tmp);
+                    courses.remove(i);
+                    break;
+                }
+            }
+        }
+        for (CourseBean tmp : courses) {
+            courseSorted.add(tmp);
+        }
+        courses.clear();
+
+        courseGroup.setCourses(coursesIdSorted);
     }
 
 

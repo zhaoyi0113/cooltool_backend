@@ -79,7 +79,7 @@ public class NurseConsultationAPI {
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         Long userId = VerifyUtil.isIds(strUserId) ? VerifyUtil.parseLongIds(strUserId).get(0) : null;
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, pageIndex, sizePerPage);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, pageIndex, sizePerPage, ConsultationTalkStatus.NURSE_SPEAK);
         return Response.ok(consultations).build();
     }
 
@@ -89,7 +89,7 @@ public class NurseConsultationAPI {
     public Response getConsultationWithTalks(@Context HttpServletRequest request,
                                              @QueryParam("consultation_id") @DefaultValue("0") long consultationId
     ) {
-        UserConsultationBean consultation = userConsultationService.getUserConsultationWithTalk(consultationId);
+        UserConsultationBean consultation = userConsultationService.getUserConsultationWithTalk(consultationId, ConsultationTalkStatus.NURSE_SPEAK);
         return Response.ok(consultation).build();
     }
 

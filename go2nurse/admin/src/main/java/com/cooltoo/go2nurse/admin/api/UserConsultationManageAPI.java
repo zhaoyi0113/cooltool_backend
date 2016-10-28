@@ -71,7 +71,7 @@ public class UserConsultationManageAPI {
     public Response getConsultationWithTalks(@Context HttpServletRequest request,
                                              @QueryParam("consultation_id") @DefaultValue("0") long consultationId
     ) {
-        UserConsultationBean consultation = userConsultationService.getUserConsultationWithTalk(consultationId);
+        UserConsultationBean consultation = userConsultationService.getUserConsultationWithTalk(consultationId, ConsultationTalkStatus.ADMIN_SPEAK);
         return Response.ok(consultation).build();
     }
 

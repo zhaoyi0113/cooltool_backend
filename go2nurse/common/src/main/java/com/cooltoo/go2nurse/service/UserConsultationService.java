@@ -84,7 +84,7 @@ public class UserConsultationService {
     //             get ----  patient using
     //===============================================================
 
-    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, Long categoryId, String contentLike, int pageIndex, int sizePerPage) {
+    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, Long categoryId, String contentLike, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
         logger.info("user={} nusre={} get consultation (contentLike={}) categoryId={} at page={} sizePerPage={}",
                 userId, nurseId, contentLike, categoryId, pageIndex, sizePerPage);
         List<UserConsultationBean> beans;
@@ -96,24 +96,24 @@ public class UserConsultationService {
             PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
             Page<UserConsultationEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, nurseId, categoryId, CommonStatus.DELETED, contentLike, request);
             beans = entitiesToBeansForConsultation(resultSet);
-            fillOtherPropertiesForConsultation(beans, ConsultationTalkStatus.USER_SPEAK);
+            fillOtherPropertiesForConsultation(beans, talkStatus);
         }
         logger.warn("speak count={}", beans.size());
         return beans;
     }
 
-    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, int pageIndex, int sizePerPage) {
+    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
         logger.info("user={} get consultation nurseId={} at page={} sizePerPage={}", userId, nurseId, pageIndex, sizePerPage);
         List<UserConsultationBean> beans;
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
         Page<UserConsultationEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, CommonStatus.DELETED, nurseId, request);
         beans = entitiesToBeansForConsultation(resultSet);
-        fillOtherPropertiesForConsultation(beans, ConsultationTalkStatus.USER_SPEAK);
+        fillOtherPropertiesForConsultation(beans, talkStatus);
         logger.warn("speak count={}", beans.size());
         return beans;
     }
 
-    public UserConsultationBean getUserConsultation(long consultationId) {
+    public UserConsultationBean getUserConsultation(long consultationId, ConsultationTalkStatus talkStatus) {
         logger.info("get consultationId={}", consultationId);
         UserConsultationEntity resultSet = repository.findOne(consultationId);
         if (null==resultSet) {
@@ -124,13 +124,13 @@ public class UserConsultationService {
         entities.add(resultSet);
 
         List<UserConsultationBean> userConsultation = entitiesToBeansForConsultation(entities);
-        fillOtherPropertiesForConsultation(userConsultation, ConsultationTalkStatus.USER_SPEAK);
+        fillOtherPropertiesForConsultation(userConsultation, talkStatus);
         return userConsultation.get(0);
     }
 
-    public UserConsultationBean getUserConsultationWithTalk(Long consultationId) {
+    public UserConsultationBean getUserConsultationWithTalk(Long consultationId, ConsultationTalkStatus talkStatus) {
         logger.info("get consultation={} with talks", consultationId);
-        UserConsultationBean consultation = getUserConsultation(consultationId);
+        UserConsultationBean consultation = getUserConsultation(consultationId, talkStatus);
         List<UserConsultationTalkBean> talks = getTalkByConsultationId(consultationId);
         consultation.setTalks(talks);
         return consultation;

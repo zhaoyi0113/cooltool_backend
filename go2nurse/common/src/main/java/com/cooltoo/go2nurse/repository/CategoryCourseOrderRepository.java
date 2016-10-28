@@ -17,8 +17,8 @@ public interface CategoryCourseOrderRepository extends JpaRepository<CategoryCou
     List<CategoryCourseOrderEntity> findOrderByHospitalIdAndDepartmentIdAndCategoryIdAndCourseId(
             int hospitalId, int departmentId, long categoryId, long courseId
     );
-
-    List<CategoryCourseOrderEntity> findOrderByCourseIdIn(List<Long> courseIds, Sort sort);
+    List<CategoryCourseOrderEntity> findOrderByHospitalIdAndDepartmentIdAndCategoryIdIn(
+            int hospitalId, int departmentId, List<Long> categoryId, Sort sort);
 
     @Query("SELECT count(cr.id) FROM CategoryCourseOrderEntity cr" +
             " WHERE (?1 IS NULL OR cr.hospitalId=?1)" +

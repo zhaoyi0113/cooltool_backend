@@ -94,15 +94,25 @@ public class CategoryCourseOrderService {
         return beans;
     }
 
-    public Map<CategoryCoursesOrderGroup, List<Long>> getCategoryGroupToCourseIdsSorted(List<Long> courseIds) {
-        logger.info("get categoryId--courseIdsSorted by courseIds_size={}", null==courseIds ? 0 : courseIds.size());
-        Map<CategoryCoursesOrderGroup, List<Long>> result = new HashMap<>();
-        if (VerifyUtil.isListEmpty(courseIds)) {
-            return result;
-        }
+    public Map<CategoryCoursesOrderGroup, List<Long>> getCategoryGroupToCourseIdsSorted(int hospital, int department, List<Long> categories) {
+        logger.info("get categoryId--courseIdsSorted by hospital={} department={} category={}", hospital, department, categories);
 
         // get courses order sorted
-        List<CategoryCourseOrderEntity> entities = repository.findOrderByCourseIdIn(courseIds, sort);
+        List<CategoryCourseOrderEntity> entities = null;
+        if (!VerifyUtil.isListEmpty(categories)) {
+            entities = repository.findOrderByHospitalIdAndDepartmentIdAndCategoryIdIn(
+                    hospital, department, categories, sort);
+        }
+        Map<CategoryCoursesOrderGroup, List<Long>> result = parseCategoryGroup(entities);
+        logger.info("get categoryId--courseIdsSorted size={}", result.size());
+        return result;
+    }
+
+    private Map<CategoryCoursesOrderGroup, List<Long>> parseCategoryGroup(Iterable<CategoryCourseOrderEntity> entities) {
+        Map<CategoryCoursesOrderGroup, List<Long>> result = new HashMap<>();
+        if (null==entities) {
+            return result;
+        }
 
         CategoryCoursesOrderGroup group = new CategoryCoursesOrderGroup();
         for (CategoryCourseOrderEntity tmp : entities) {
@@ -128,7 +138,6 @@ public class CategoryCourseOrderService {
                 courseIdsSorted.add(tmp.getCourseId());
             }
         }
-
         return result;
     }
 

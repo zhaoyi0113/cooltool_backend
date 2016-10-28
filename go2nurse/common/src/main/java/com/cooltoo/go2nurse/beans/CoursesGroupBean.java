@@ -83,7 +83,6 @@ public class CoursesGroupBean {
     }
 
 
-
     public static List<CoursesGroupBean> parseObjectToBean(Object objMap, boolean diagnosticCourses) {
         List<CoursesGroupBean> retVal = new ArrayList<>();
         if (!(objMap instanceof Map)) {
@@ -164,7 +163,6 @@ public class CoursesGroupBean {
         }
         return false;
     }
-
 
     public static void sortCourseArrays(List<CoursesGroupBean> beans) {
         Collections.sort(beans, new Comparator<CoursesGroupBean>() {
