@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 
 /**
@@ -135,6 +136,15 @@ public class CourseService {
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
         return beans;
+    }
+
+    public Map<Long, CourseBean> getCourseMapByStatusAndIds(CourseStatus status, List<Long> courseIds, Integer pageIndex, Integer sizePerPage) {
+        List<CourseBean> beans = getCourseByStatusAndIds(status, courseIds, pageIndex, sizePerPage);
+        Map<Long, CourseBean> map = new HashMap<>();
+        for (CourseBean tmp : beans) {
+            map.put(tmp.getId(), tmp);
+        }
+        return map;
     }
 
     private List<CourseBean> entities2BeansWithoutContent(Iterable<CourseEntity> entities) {
