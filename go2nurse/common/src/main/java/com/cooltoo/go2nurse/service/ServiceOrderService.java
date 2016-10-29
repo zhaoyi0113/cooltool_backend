@@ -467,7 +467,7 @@ public class ServiceOrderService {
         String signType = "MD5";
         String timeStamp = System.currentTimeMillis()+"";
         buffer.append("appId=").append(appid).append("&nonceStr=").append(noncestr)
-                .append("&package=").append(prepayId)
+                .append("&package=prepay_id=").append(prepayId)
                 .append("&signType="+signType).append("&timeStamp=").append(timeStamp)
                 .append("&key=").append(weChatPayService.getApiKey());
         String md5 = NumberUtil.md5Encode(buffer.toString(), null, "MD5").toUpperCase();
