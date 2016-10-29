@@ -468,7 +468,8 @@ public class ServiceOrderService {
         String timeStamp = System.currentTimeMillis()+"";
         buffer.append("appId=").append(appid).append("&nonceStr=").append(noncestr)
                 .append("&package=").append(prepayId)
-                .append("&signType="+signType).append("&timeStamp=").append(timeStamp);
+                .append("&signType="+signType).append("&timeStamp=").append(timeStamp)
+                .append("&key=").append(weChatPayService.getApiKey());
         String md5 = NumberUtil.md5Encode(buffer.toString(), null, "MD5").toUpperCase();
         Map<String, String> sign = new HashMap<>();
         sign.put("timestamp", timeStamp);
