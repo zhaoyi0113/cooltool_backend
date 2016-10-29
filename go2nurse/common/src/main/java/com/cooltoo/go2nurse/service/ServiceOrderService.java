@@ -466,8 +466,8 @@ public class ServiceOrderService {
         String noncestr = NumberUtil.createNoncestr(31);
         String signType = "MD5";
         String timeStamp = System.currentTimeMillis()+"";
-        buffer.append("appId=").append(appid).append("&package=").
-                append(prepayId).append("&nonceStr=").append(noncestr)
+        buffer.append("appId=").append(appid).append("&nonceStr=").append(noncestr)
+                .append("&package=").append(prepayId)
                 .append("&signType="+signType).append("&timeStamp=").append(timeStamp);
         String md5 = NumberUtil.md5Encode(buffer.toString(), null, "MD5").toUpperCase();
         Map<String, String> sign = new HashMap<>();

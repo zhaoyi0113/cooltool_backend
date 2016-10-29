@@ -74,7 +74,7 @@ public class UserLoginService {
     @Transactional(propagation = Propagation.REQUIRED)
     public UserTokenAccessEntity login(String mobile, String password, String channel, String channelid, String openId){
         if(channel != null && (channelid != null || openId != null)){
-            //user can login either by unionid or unionid
+            //user can login either by unionid or openid
             List<UserOpenAppEntity> channelUsers = null;
             if(channelid != null){
                 channelUsers = openAppRepository.findByUnionidAndStatus(channelid, CommonStatus.ENABLED);
