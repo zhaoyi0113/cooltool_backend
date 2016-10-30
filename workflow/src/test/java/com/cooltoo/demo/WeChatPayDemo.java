@@ -65,7 +65,7 @@ public class WeChatPayDemo {
     }
 
     public static void main(String[] args) {
-        Map<String, Object> keyParam = new HashMap();
+        Map<String, String> keyParam = new HashMap();
 
         String key = "openid";
         keyParam.put(key, "oFmjasjc8rv0E8Gq63IHGD5fP49A");

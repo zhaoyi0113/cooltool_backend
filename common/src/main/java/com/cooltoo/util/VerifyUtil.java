@@ -394,7 +394,7 @@ public class VerifyUtil {
      * @param parameters  请求参数
      * @return
      */
-    public static String getRequestXml(Map<String,Object> parameters){
+    public static String getRequestXml(Map<String,String> parameters){
         StringBuffer sb = new StringBuffer();
         sb.append("<xml>");
         Set es = parameters.entrySet();
@@ -420,8 +420,8 @@ public class VerifyUtil {
      * @param xml  响应的返回的xml
      * @return
      */
-    public static Map<String, Object> parseResponseXml(String xml){
-        final Map<String, Object> map = new HashMap<>();
+    public static Map<String, String> parseResponseXml(String xml){
+        final Map<String, String> map = new HashMap<>();
         SAXParserFactory saxFactory = SAXParserFactory.newInstance();
         try {
             SAXParser saxParser = saxFactory.newSAXParser();
@@ -446,7 +446,7 @@ public class VerifyUtil {
             });
         }
         catch (Exception ex) {
-            map.put("exception", ex);
+            map.put("exception", ex.toString());
         }
         return map;
     }

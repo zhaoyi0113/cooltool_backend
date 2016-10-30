@@ -459,7 +459,7 @@ public class ServiceOrderService {
         orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, "wx", ChargeType.CHARGE, wechatNo, weChatResponse.toString());
         weChatResponse.remove("mch_id");
         weChatResponse.remove("device_info");
-        return signWeChatResponse(weChatAccount.getAppId(), (String)weChatResponse.get("prepay_id"), (String) weChatResponse.get("nonce_str"));
+        return signWeChatResponse(weChatAccount.getAppId(), weChatResponse.get("prepay_id"),  weChatResponse.get("nonce_str"));
     }
 
     private Map<String, String> signWeChatResponse(String appid, String prepayId, String noncestr) {
