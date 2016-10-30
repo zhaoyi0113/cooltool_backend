@@ -81,13 +81,13 @@ public class WeChatPayService {
      * @param totalFee 订单总金额,单位为分,详见支付金额
      * @param notifyUrl 接收微信支付异步通知回调地址,通知url必须为直接可访问的url,不能携带参数.
      */
-    public Map<String, Object> payByWeChat(String openId, String devInfo, String spbillCreateIp,
+    public Map<String, String> payByWeChat(String openId, String devInfo, String spbillCreateIp,
                                            String appId, String mchId, String apiKey,
                                            String outTradeNo, String tradeType, String body,
                                            String feeType, int totalFee,
                                            String notifyUrl
     ) {
-        Map<String, Object> keyParam = new HashMap();
+        Map<String, String> keyParam = new HashMap();
 
         String key = "openid";
         keyParam.put(key, openId);
@@ -121,7 +121,7 @@ public class WeChatPayService {
         keyParam.put(key, feeType);
 
         key = "total_fee";
-        keyParam.put(key, totalFee);
+        keyParam.put(key, String.valueOf(totalFee));
 
         key = "notify_url";
         keyParam.put(key, notifyUrl);

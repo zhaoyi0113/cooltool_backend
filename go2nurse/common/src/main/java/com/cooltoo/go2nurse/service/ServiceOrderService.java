@@ -414,7 +414,7 @@ public class ServiceOrderService {
         ServiceOrderBean order = beanConverter.convert(entity);
         String orderNo = order.getOrderNo();
         String wechatNo = NumberUtil.createNoncestr(31);
-        Map<String, Object> weChatResponse = weChatPayService.payByWeChat(openId, "WEB", clientIP,
+        Map<String, String> weChatResponse = weChatPayService.payByWeChat(openId, "WEB", clientIP,
                 weChatAccount.getAppId(), weChatAccount.getMchId(), weChatPayService.getApiKey(),
                 wechatNo, "JSAPI", "订单=" + orderNo + " 描述=" + order.getServiceItem().getName(),
                 "CNY", order.getTotalConsumptionCent(), weChatPayService.getNotifyUrl());
