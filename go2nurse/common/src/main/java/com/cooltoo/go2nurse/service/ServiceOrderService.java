@@ -470,7 +470,7 @@ public class ServiceOrderService {
                 .append("&signType="+signType).append("&timeStamp=").append(timeStamp)
                 .append("&key=").append(weChatPayService.getApiKey());
         logger.debug("pay sign parameter:"+buffer.toString());
-        String md5 = NumberUtil.md5Encode(buffer.toString(), null, "MD5").toUpperCase();
+        String md5 = NumberUtil.signString(buffer.toString(), "MD5").toUpperCase();
         logger.debug("MD5 sign:"+md5);
         Map<String, String> sign = new HashMap<>();
         sign.put("timestamp", timeStamp);

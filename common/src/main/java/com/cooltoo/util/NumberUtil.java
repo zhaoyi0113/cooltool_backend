@@ -2,6 +2,7 @@ package com.cooltoo.util;
 
 import java.math.BigDecimal;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -220,5 +221,30 @@ public class NumberUtil {
             e.printStackTrace();
         }
         return resultString;
+    }
+
+    public static String signString(String decript, String algorithm) {
+        try {
+            MessageDigest digest = MessageDigest
+                    .getInstance(algorithm);
+            digest.update(decript.getBytes());
+            byte messageDigest[] = digest.digest();
+            // Create Hex String
+            StringBuffer hexString = new StringBuffer();
+            // 字节数组转换为 十六进制 数
+            for (int i = 0; i < messageDigest.length; i++) {
+                String shaHex = Integer.toHexString(messageDigest[i] & 0xFF);
+                if (shaHex.length() < 2) {
+                    hexString.append(0);
+                }
+                hexString.append(shaHex);
+            }
+            String sign = hexString.toString();
+            return sign;
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
