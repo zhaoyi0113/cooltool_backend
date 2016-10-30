@@ -469,7 +469,9 @@ public class ServiceOrderService {
                 .append("&package=prepay_id=").append(prepayId)
                 .append("&signType="+signType).append("&timeStamp=").append(timeStamp)
                 .append("&key=").append(weChatPayService.getApiKey());
+        logger.debug("pay sign parameter:"+buffer.toString());
         String md5 = NumberUtil.md5Encode(buffer.toString(), null, "MD5").toUpperCase();
+        logger.debug("MD5 sign:"+md5);
         Map<String, String> sign = new HashMap<>();
         sign.put("timestamp", timeStamp);
         sign.put("nonceStr", noncestr);
