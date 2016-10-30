@@ -418,6 +418,7 @@ public class ServiceOrderService {
                 weChatAccount.getAppId(), weChatAccount.getMchId(), weChatPayService.getApiKey(),
                 wechatNo, "JSAPI", "订单=" + orderNo + " 描述=" + order.getServiceItem().getName(),
                 "CNY", order.getTotalConsumptionCent(), weChatPayService.getNotifyUrl());
+        logger.debug("get wei chat pay response "+weChatResponse);
         // check response value
         if (!"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("return_code"))
                 || !"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("result_code"))) {
