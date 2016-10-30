@@ -82,7 +82,7 @@ public class CategoryCourseOrderService {
         logger.info("get course order by hospitalId={} departmentId={} categoryId={}, pageIndex={} sizePerPage={}",
                 hospitalId, departmentId, categoryId, pageIndex, sizePerPage);
         PageRequest page;
-        if (null!=categoryId && null!=departmentId) {
+        if (null==categoryId && null==departmentId) {
             page = new PageRequest(pageIndex, sizePerPage, sortById);
         }
         else {
