@@ -247,4 +247,17 @@ public class CourseManageAPI {
         logger.info("course is {}", course);
         return Response.ok(course).build();
     }
+
+    @Path("/edit/content/submit/html")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateCourseContentWithImageNeedDownload(@Context HttpServletRequest request,
+                                                            @FormParam("course_id") long courseId,
+                                                            @FormParam("content") String htmlContent
+    ) {
+        logger.info("submit course with html, need to download images automatically");
+        CourseBean course = courseService.setCourseContentWithHtml(courseId, htmlContent);
+        logger.info("course is {}", course);
+        return Response.ok(course).build();
+    }
 }
