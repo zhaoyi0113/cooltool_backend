@@ -434,7 +434,7 @@ public class ActivityServiceTest extends AbstractCooltooTest {
         ByteArrayInputStream input = new ByteArrayInputStream(activity_dir.getBytes());
         try {
             for (int i=0; i<files.length; i++) {
-                FileUtil.writeFile(input, files[i]);
+                FileUtil.getInstance().writeFile(input, files[i]);
             }
         } catch (Exception ex) {}
     }

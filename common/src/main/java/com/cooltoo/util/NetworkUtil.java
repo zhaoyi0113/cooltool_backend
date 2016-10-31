@@ -1,5 +1,7 @@
 package com.cooltoo.util;
 
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,8 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.ConnectException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by hp on 2016/8/10.
@@ -17,6 +24,96 @@ import java.security.cert.X509Certificate;
 public final class NetworkUtil {
 
     private static Logger logger = LoggerFactory.getLogger(NetworkUtil.class);
+
+    public static final long _2M = 2 * 1024 * 1024;
+
+    /**
+     * 抓取网络文件落地到本地；如果有一个抓取失败，则全部删掉。
+     * @param urls 网络文件路径
+     * @param localStoragePath 本地存储路径
+     * @return 网络文件路径对保存在本地的文件路径的映射关系
+     */
+    public final static Map<String, String> fetchAllWebFile(List<String> urls, String localStoragePath) {
+        if (VerifyUtil.isListEmpty(urls)) {
+            return new HashMap<>();
+        }
+        if (VerifyUtil.isStringEmpty(localStoragePath)) {
+            logger.error("local storage path is empty");
+            throw new BadRequestException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        File directory = new File(localStoragePath);
+        if (!(directory.exists() && directory.isDirectory())) {
+            logger.error("local storage path is not existed or not a directory");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        final FileUtil fileUtil = FileUtil.getInstance();
+
+        Map<String, String> result = new HashMap<>();
+        byte[] buffer = new byte[1024*1024];
+        boolean error = false;
+        for (int i=0; i<urls.size(); i++) {
+            InputStream is = null;
+            OutputStream os = null;
+            try {
+                String tmpUrl = urls.get(i);
+                if (result.containsKey(tmpUrl)) {
+                    continue;
+                }
+
+                URL url = new URL(tmpUrl);
+                URLConnection conn = url.openConnection();
+                long contentLength = conn.getContentLengthLong();
+
+                // big than 2M
+                if (contentLength > _2M) {
+                    error = true;
+                }
+
+                String fileName = fileUtil.getFileName(url.getFile());
+                fileName += "_"+i;
+                File file = new File(directory, fileName);
+
+                if (!error) {
+                    is = conn.getInputStream();
+                    os = new FileOutputStream(file);
+                    int read = 0;
+                    while ((read = is.read(buffer, 0, buffer.length)) > 0) {
+                        os.write(buffer, 0, read);
+                    }
+                    os.flush();
+                    is.close();
+                    os.close();
+                    result.put(tmpUrl, file.getAbsolutePath());
+                }
+            }
+            catch (IOException ex) {
+                error = true;
+                if (null!=is) {
+                    try { is.close(); } catch (IOException ioex) {}
+                }
+                if (null!=os) {
+                    try { os.close(); } catch (IOException ioex) {}
+                }
+            }
+
+            if (error) {
+                break;
+            }
+        }
+
+        // delete files and clear result set
+        if (error) {
+            Set<String> keys = result.keySet();
+            for (String tmp : keys) {
+                String val = result.get(tmp);
+                fileUtil.deleteFile(val);
+            }
+            result.clear();
+        }
+
+        return result;
+    }
 
     /**
      * 获取请求主机IP地址,如果通过代理进来，则透过防火墙获取真实IP地址;

@@ -62,6 +62,7 @@ public class TemporaryGo2NurseFileStorageServiceTest extends AbstractCooltooTest
         File   destFile        = null;
         ByteArrayInputStream file = null;
         List<String> filePaths  = new ArrayList<>();
+        FileUtil fileUtil = FileUtil.getInstance();
 
         // create test data
         for (int i=0; i<3; i++) {
@@ -75,11 +76,11 @@ public class TemporaryGo2NurseFileStorageServiceTest extends AbstractCooltooTest
                 dirFile.mkdir();
             }
 
-            try { FileUtil.writeFile(file, destFile); }
+            try { fileUtil.writeFile(file, destFile); }
             catch (Exception ex) {
                 continue;
             }
-            Assert.assertTrue(FileUtil.fileExist(destPath));
+            Assert.assertTrue(fileUtil.fileExist(destPath));
             filePaths.add(destPath);
         }
 

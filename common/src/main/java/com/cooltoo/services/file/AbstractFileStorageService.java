@@ -2,18 +2,14 @@ package com.cooltoo.services.file;
 
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.services.FileStorageDBService;
 import com.cooltoo.util.FileUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -23,35 +19,50 @@ public abstract class AbstractFileStorageService {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractFileStorageService.class.getName());
 
-    @Autowired
-    private FileStorageDBService dbService;
 
-    @Value("${storage.base.path}")
-    private String storageBasePath;
+    public final FileUtil fileUtil = FileUtil.getInstance();
 
     public String getName() {
         return "abstract";
     }
 
-    public String getStoragePath() {
-        logger.info("get storage base path={}", storageBasePath);
-        return storageBasePath;
-    }
+    abstract public String getStoragePath();
 
     abstract public String getNginxRelativePath();
 
+    abstract public InterfaceFileStorageDB getDbService();
+
+    public long addNewFile(String fileName, InputStream file) {
+        return addFile(-1, fileName, file);
+    }
+
     public long addFile(long oldFileId, String fileName, InputStream file) {
+        return (Long)addFile(oldFileId, fileName, file, true);
+    }
+
+    public Object addFile(long oldFileId, String fileName, InputStream file, boolean needDBSave) {
         logger.info("add file oldFileId={} filename={} file={}", oldFileId, fileName, file);
         if (null==file) {
             logger.warn("file is empty, not found input stream");
-            return -1;
+            if (needDBSave) {
+                return -1L;
+            }
+            else {
+                return "";
+            }
         }
         if (!deleteFile(oldFileId)) {
-            return -1;
+            if (needDBSave) {
+                return -1L;
+            }
+            else {
+                return "";
+            }
         }
 
+        File destFile = null;
         try {
-            String[] dirAndSHA1   = encodeFilePath(fileName);
+            String[] dirAndSHA1   = fileUtil.encodeFilePath(fileName);
             String   folderName   = dirAndSHA1[0];
             String   newFileName  = dirAndSHA1[1];
             String   relativePath = folderName + File.separator + newFileName;
@@ -62,14 +73,32 @@ public abstract class AbstractFileStorageService {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            File destFile = new File(destFileDir, newFileName);
-            FileUtil.writeFile(file, destFile);
+            destFile = new File(destFileDir, newFileName);
+            fileUtil.writeFile(file, destFile);
 
-            return dbRecordAdd(fileName, relativePath);
+            if (needDBSave) {
+                return dbRecordAdd(fileName, relativePath);
+            }
+            else {
+                return relativePath;
+            }
         } catch (Exception ex) {
             logger.error("failed to add official file", ex);
+
+            // if has error delete the cache file.
+            if (null!=destFile) {
+                if (destFile.exists()) {
+                    destFile.delete();
+                }
+            }
         }
-        return -1;
+
+        if (needDBSave) {
+            return -1L;
+        }
+        else {
+            return "";
+        }
     }
 
     public boolean deleteFile(long fileId) {
@@ -96,25 +125,14 @@ public abstract class AbstractFileStorageService {
         dbRecordDelete(fileIds);
     }
 
-    protected void deleteFileByPaths(List<String> fileRelativePaths) {
-        if (VerifyUtil.isListEmpty(fileRelativePaths)) {
-            return;
-        }
-        for (String relPath : fileRelativePaths) {
-            boolean success = deleteFile(relPath);
-            if (!success) {
-                logger.warn("fail to delete file={}", relPath);
-            }
-        }
-    }
-
     /** do not invoke this method, except TemporaryFileStorageService */
-    protected boolean deleteFile(String fileRelativePath) {
+    public boolean deleteFile(String fileRelativePath) {
         logger.info("delete file by file filepath={}", fileRelativePath);
         if (VerifyUtil.isStringEmpty(fileRelativePath)) {
             logger.info("filepath not exist");
             return true;
         }
+        fileRelativePath = fileUtil.getCooltooFileRelativePath("", fileRelativePath);
 
         String absolutePath = getStoragePath() + fileRelativePath;
         File deleteFile = new File(absolutePath);
@@ -136,6 +154,19 @@ public abstract class AbstractFileStorageService {
             throw new BadRequestException(ErrorCode.FILE_DELETE_FAILED);
         }
         return delete;
+    }
+
+    /** do not invoke this method, except TemporaryFileStorageService */
+    public void deleteFileByPaths(List<String> fileRelativePaths) {
+        if (VerifyUtil.isListEmpty(fileRelativePaths)) {
+            return;
+        }
+        for (String relPath : fileRelativePaths) {
+            boolean success = deleteFile(relPath);
+            if (!success) {
+                logger.warn("fail to delete file={}", relPath);
+            }
+        }
     }
 
     /**
@@ -186,72 +217,75 @@ public abstract class AbstractFileStorageService {
         return id2Path;
     }
 
-    /** (official/temporary/user/secret)_storage_path/dir/sha1 */
-    public String getRelativePathInBase(String filePath) {
-        logger.info("get relative path in base, filepath={}", filePath);
-        String relativePathInStorage = getRelativePathInStorage(filePath);
-        if (VerifyUtil.isStringEmpty(relativePathInStorage)) {
+    /**
+     * get file url with nginx prefix path
+     * @param fileId file id in file_storage table
+     * @return
+     */
+    public String getFileURL(long fileId, String httpPrefix) {
+        logger.info("get file path by fileId={}", fileId);
+        String filePath = dbRecordGet(fileId);
+        if (VerifyUtil.isStringEmpty(filePath)) {
             return "";
         }
-        return getNginxRelativePath()+relativePathInStorage;
+        logger.info("relative file path={}", filePath);
+        filePath = getNginxRelativePath()+filePath;
+        logger.info("nginx relative file path={}", filePath);
+        filePath = httpPrefix + filePath;
+        logger.info("nginx file url={}", filePath);
+        return filePath;
     }
 
-    /** (official/temporary/user/secret) ----> xxx_storage_path/dir/sha1 */
-    public Map<String, String> getRelativePathInBase(List<String> filePath) {
-        logger.info("get relative path in base, filepath={}", filePath);
-        Map<String, String> relativePathInStorage = getRelativePathInStorage(filePath);
-        if (VerifyUtil.isMapEmpty(relativePathInStorage)) {
+
+    /**
+     * get file relative path with nginx prefix path
+     * @param fileIds file ids in file_storage table
+     * @return
+     */
+    public Map<Long, String> getFileUrl(List<Long> fileIds, String httpPrefix) {
+        if (VerifyUtil.isListEmpty(fileIds)) {
+            logger.warn("file ids is empty");
             return new HashMap<>();
         }
-
-        Map<String, String> relativePathsInBase = new HashMap<>();
-        Set<String> paths = relativePathInStorage.keySet();
-        for (String path : paths) {
-            String relativePath = relativePathInStorage.get(path);
-            String relativePathInBase = getNginxRelativePath() + relativePath;
-            relativePathsInBase.put(path, relativePathInBase);
+        List<Long> validIds = new ArrayList<>();
+        for (Long fileId : fileIds) {
+            if (validIds.contains(fileId)) {
+                continue;
+            }
+            validIds.add(fileId);
         }
-        return relativePathsInBase;
+        logger.info("get file path by valid fileIds={}", validIds);
+
+        String nginxRelativePath = getNginxRelativePath();
+        logger.info("nginx relative path={}", nginxRelativePath);
+
+        Map<Long, String> id2Path =  dbRecordGet(validIds);
+        Set<Long> ids = id2Path.keySet();
+        for (Long id : ids) {
+            String relativePath = id2Path.get(id);
+            id2Path.put(id, httpPrefix + nginxRelativePath + relativePath);
+        }
+        return id2Path;
+    }
+
+    /** (official/temporary/user/secret)_storage_path/dir/sha1 */
+    public String getRelativePathInBase(String filePath) {
+        return fileUtil.getCooltooFileRelativePath(getNginxRelativePath(), filePath);
+    }
+
+    /** file_path ----> (official/temporary/user/secret)_storage_path/dir/sha1 */
+    public Map<String, String> getRelativePathInBase(List<String> filePath) {
+        return fileUtil.getCooltooFileRelativePath(getNginxRelativePath(), filePath);
     }
 
     /** filePath --> dir/sha1 */
     public String getRelativePathInStorage(String filePath) {
-        logger.info("get filepath's relative path in {} stroage, filepath={}", getName(), filePath);
-        if (VerifyUtil.isStringEmpty(filePath)) {
-            logger.info("filepath is empty");
-            return "";
-        }
-        String[] baseurlDirSha1 = decodeFilePath(filePath);
-        if (VerifyUtil.isStringEmpty(baseurlDirSha1[1]) && VerifyUtil.isStringEmpty(baseurlDirSha1[2])) {
-            logger.info("decode dir and filename is empty");
-            return "";
-        }
-        String relativePath = baseurlDirSha1[1] + File.separator + baseurlDirSha1[2];
-        logger.info("relative path={}", relativePath);
-        return relativePath;
+        return fileUtil.getCooltooFileRelativePath("", filePath);
     }
 
     /** filePath --> dir/sha1 */
     public Map<String, String> getRelativePathInStorage(List<String> filePaths) {
-        logger.info("get files relative path in {} storage", getName());
-
-        Map<String, String> fileRelativePaths = new HashMap<>();
-        if (VerifyUtil.isListEmpty(filePaths)) {
-            logger.info("the file list is empty");
-            return fileRelativePaths;
-        }
-
-        for (String filepath : filePaths) {
-            String relativePath = getRelativePathInStorage(filepath);
-            if (VerifyUtil.isStringEmpty(relativePath)) {
-                logger.info("decode file={} dir and filename is empty", filepath);
-                fileRelativePaths.clear();
-                return fileRelativePaths;
-            }
-            fileRelativePaths.put(filepath, relativePath);
-        }
-
-        return fileRelativePaths;
+        return fileUtil.getCooltooFileRelativePath("", filePaths);
     }
 
     abstract public Map<String, String> moveFileToHere(List<String> srcFileAbsolutePath);
@@ -263,121 +297,41 @@ public abstract class AbstractFileStorageService {
             logger.info("file path is empty");
             return false;
         }
-        return fileExist(filePath);
+        return fileUtil.cooltooFileExistInPath(getStoragePath(), filePath);
     }
 
+    /** file moved map(after_move_path-->before_move_path) */
     public boolean fileExist(String fileRelativePath) {
-        logger.info("file {} is exist?", fileRelativePath);
-        if (VerifyUtil.isStringEmpty(fileRelativePath)) {
-            logger.info("file path is empty");
-            return false;
-        }
-        String[] baseurlDirSha1 = decodeFilePath(fileRelativePath);
-        logger.info("baseUrl={} dir={} filename={}",
-                baseurlDirSha1[0], baseurlDirSha1[1], baseurlDirSha1[2]);
-        String filePath = getStoragePath()+baseurlDirSha1[1]+File.separator+baseurlDirSha1[2];
-        return FileUtil.fileExist(filePath);
+        return fileUtil.cooltooFileExistInPath(getStoragePath(), fileRelativePath);
     }
 
     /** file moved map(after_move_path-->before_move_path) */
     protected void rollbackFileMoved(Map<String, String> dest2SrcFileMoved) {
-        logger.info("rollbacke file moved");
-        if (VerifyUtil.isMapEmpty(dest2SrcFileMoved)) {
-            logger.info("rollbacke file list is empty");
-            return;
-        }
-        Set<String> destKeys = dest2SrcFileMoved.keySet();
-        for (String dest : destKeys) {
-            String src = dest2SrcFileMoved.get(dest);
-            try {
-                FileUtil.moveFile(dest, src);
-            }
-            catch (Exception e) {
-                logger.warn("move file {} to {} failed!", dest, src);
-            }
-        }
+        fileUtil.moveFiles(dest2SrcFileMoved);
     }
 
-    /** dir, sha1 */
-    protected String[] encodeFilePath(String fileName) throws NoSuchAlgorithmException {
-        logger.info("construct file name={}", fileName);
-        if (VerifyUtil.isStringEmpty(fileName)) {
-            fileName = "unknow";
-            logger.warn("the file name is invalid, set it to={}", fileName);
-        }
-
-        long   nanoTime         = System.nanoTime();
-        String strNanoTime      = fileName+"_"+nanoTime;
-        String sha1             = VerifyUtil.sha1(strNanoTime);
-        String newDir           = sha1.substring(0, 2);
-        String newFileName      = sha1.substring(2);
-        return new String[]{newDir, newFileName};
-    }
-
-    /** url,dir,sha1 */
-    protected String[] decodeFilePath(String filepath) {
-        logger.info("deconstruct file name={}", filepath);
-        if (VerifyUtil.isStringEmpty(filepath)) {
-            logger.error("the file name is invalid");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-
-        StringBuilder splash = new StringBuilder();
-        splash.append('\\').append('\\');
-        filepath = filepath.replaceAll(splash.toString(), "/");
-        logger.info("after repalce \\ to /  ={}", filepath);
-
-        String[] component    = filepath.split("/");
-        if (component.length<2) {
-            return new String[]{"", "", component[0]};
-        }
-        String   tmpFileName  = component[component.length-1];
-        String   tmpDirectory = component[component.length-2];
-
-        int      baseUrlEndIdx= filepath.indexOf(tmpDirectory+"/"+tmpFileName);
-        String   baseUrl      = "";
-        if (baseUrlEndIdx>1) {
-            baseUrl = filepath.substring(0, baseUrlEndIdx-1);
-        }
-
-        String sha1 = tmpFileName;
-        return new String[]{baseUrl, tmpDirectory, sha1};
-    }
-
-    /** url,dir,sha1 */
-    protected Map<String, String[]> decodeFilePaths(List<String> filepaths) {
-        if (VerifyUtil.isListEmpty(filepaths)) {
-            return new HashMap<>();
-        }
-        Map<String, String[]> path2UrlDirSha1 = new HashMap<>();
-        for (String filepath : filepaths) {
-            String[] urlDirSha1 = decodeFilePath(filepath);
-            path2UrlDirSha1.put(filepath, urlDirSha1);
-        }
-        return path2UrlDirSha1;
-    }
     @Transactional
     private long dbRecordAdd(String fileRealName, String filePath) {
-        return dbService.recordFileStorage(fileRealName, filePath);
+        return getDbService().addRecord(fileRealName, filePath);
     }
 
     private String dbRecordGet(long fileRecordId) {
-        String filePath = dbService.getFilePath(fileRecordId);
+        String filePath = getDbService().getFilePath(fileRecordId);
         return filePath;
     }
 
     private Map<Long, String> dbRecordGet(List<Long> fileRecordIds) {
-        Map<Long, String> fileId2FilePath = dbService.getFilePath(fileRecordIds);
+        Map<Long, String> fileId2FilePath = getDbService().getFilePath(fileRecordIds);
         return fileId2FilePath;
     }
 
     @Transactional
     private void dbRecordDelete(long fileRecordId) {
-        dbService.deleteRecord(fileRecordId);
+        getDbService().deleteRecord(fileRecordId);
     }
 
     @Transactional
     private void dbRecordDelete(List<Long> fileRecordIds) {
-        dbService.deleteRecord(fileRecordIds);
+        getDbService().deleteRecord(fileRecordIds);
     }
 }

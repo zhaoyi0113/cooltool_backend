@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.go2nurse.entities.Go2NurseFileStorageEntity;
 import com.cooltoo.go2nurse.repository.Go2NurseFileStorageRepository;
+import com.cooltoo.services.file.InterfaceFileStorageDB;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +18,14 @@ import java.util.Map;
  * Created by hp on 2016/6/8.
  */
 @Service("Go2NurseFileStorageService")
-public class Go2NurseFileStorageDBService {
+public class Go2NurseFileStorageDBService implements InterfaceFileStorageDB {
 
     private static final Logger logger = LoggerFactory.getLogger(Go2NurseFileStorageDBService.class);
 
     @Autowired private Go2NurseFileStorageRepository repository;
 
     @Transactional
-    public long recordFileStorage(String fileName, String path) {
+    public long addRecord(String fileName, String path) {
         logger.info("save to database the filename={} path={}", fileName, path);
         Go2NurseFileStorageEntity entity = new Go2NurseFileStorageEntity();
         entity.setRealName(fileName);

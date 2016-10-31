@@ -203,7 +203,7 @@ public class TagsServiceTest extends AbstractCooltooTest {
         String storagePath = officialStorage.getStoragePath();
         String imagePath   = "aa/c7c653fdc989b9fa7463717fcd29c0ea157710";
         try {
-            FileUtil.writeFile(new ByteArrayInputStream(imagePath.getBytes()), new File(storagePath + imagePath));
+            FileUtil.getInstance().writeFile(new ByteArrayInputStream(imagePath.getBytes()), new File(storagePath + imagePath));
         } catch (Exception ex) {}
 
         TagsBean bean = tagService.getTag(tagId);

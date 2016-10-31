@@ -9,6 +9,8 @@ import com.cooltoo.go2nurse.entities.CourseEntity;
 import com.cooltoo.go2nurse.repository.CourseRepository;
 import com.cooltoo.go2nurse.service.file.TemporaryGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.cooltoo.util.FileUtil;
+import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -21,12 +23,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 
 /**
@@ -48,6 +52,7 @@ public class CourseService {
     @Autowired private TemporaryGo2NurseFileStorageService tempStorage;
     @Autowired private CourseRelationManageService relationManageService;
 
+    private FileUtil fileUtil = FileUtil.getInstance();
 
     //===========================================================
     //                    get
@@ -591,6 +596,64 @@ public class CourseService {
         return relativePath;
     }
 
+    @Transactional
+    public CourseBean setCourseContentWithHtml(long courseId, String htmlContent) {
+        logger.info("update course {} token={} content={}", courseId, htmlContent);
+
+        CourseEntity entity = repository.findOne(courseId);
+        if (null==entity) {
+            logger.error("the course is not exist (and clean token cache)");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        if (!CourseStatus.EDITING.equals(entity.getStatus())) {
+            logger.error("the course is not editing");
+            throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+        }
+
+        if (VerifyUtil.isStringEmpty(htmlContent)) {
+            htmlContent = "";  // avoid NullException
+        }
+        else {
+            HtmlParser htmlParser = HtmlParser.newInstance();
+            // get image tags src attribute url
+            List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
+
+            // fetch the image tags src to /temp path
+            Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
+
+            // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path
+            Map<String, String> fileInTempBaseToRelativeTempPath = new HashMap<>();
+            Map<String, String> srcUrlsToRelativeUrl = new HashMap<>();
+            Set<String> fetchUrls = srcUrlToFileInTempBasePath.keySet();
+            for (String url : fetchUrls) {
+                try {
+                    String[] relativePath = fileUtil.encodeFilePath(fileUtil.getFileName(url));
+                    String fileInTempBase = srcUrlToFileInTempBasePath.get(url);
+
+                    srcUrlsToRelativeUrl.put(url, relativePath[0] + File.separator + relativePath[1]);
+                    fileInTempBaseToRelativeTempPath.put(fileInTempBase, tempStorage.getStoragePath() + relativePath[0] + File.separator + relativePath[1]);
+
+                } catch (Exception ex) {
+                    logger.error("move temp files to directory failed!");
+                    throw new BadRequestException(ErrorCode.DATA_ERROR);
+                }
+            }
+            fileUtil.moveFiles(fileInTempBaseToRelativeTempPath);
+
+            // get all image tag and its src attribute value
+            Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(htmlContent);
+            // replace image tags src url
+            htmlContent = htmlParser.replaceImgTagSrcUrl(htmlContent, imgTag2SrcValue, srcUrlsToRelativeUrl);
+
+            // move temporary
+            moveTemporaryFileToOfficial(htmlContent);
+        }
+        entity.setContent(htmlContent);
+        entity.setStatus(CourseStatus.ENABLE);
+        entity = repository.save(entity);
+        return entities2BeansWithContent(entity);
+    }
 
 
     //=============================================================

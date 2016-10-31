@@ -24,6 +24,8 @@ public abstract class AbstractFileStorageServiceForNurse360 {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractFileStorageServiceForNurse360.class.getName());
 
+    public FileUtil fileUtil = FileUtil.getInstance();
+
     @Autowired
     private Nurse360Utility utility;
 
@@ -71,7 +73,7 @@ public abstract class AbstractFileStorageServiceForNurse360 {
                 dir.mkdirs();
             }
             File destFile = new File(destFileDir, newFileName);
-            FileUtil.writeFile(file, destFile);
+            FileUtil.getInstance().writeFile(file, destFile);
 
             return dbRecordAdd(fileName, relativePath);
         } catch (Exception ex) {
@@ -304,7 +306,7 @@ public abstract class AbstractFileStorageServiceForNurse360 {
         logger.info("baseUrl={} dir={} filename={}",
                 baseurlDirSha1[0], baseurlDirSha1[1], baseurlDirSha1[2]);
         String filePath = getStoragePath()+baseurlDirSha1[1]+File.separator+baseurlDirSha1[2];
-        return FileUtil.fileExist(filePath);
+        return fileUtil.fileExist(filePath);
     }
 
     /** file moved map(after_move_path-->before_move_path) */
@@ -318,7 +320,7 @@ public abstract class AbstractFileStorageServiceForNurse360 {
         for (String dest : destKeys) {
             String src = dest2SrcFileMoved.get(dest);
             try {
-                FileUtil.moveFile(dest, src);
+                fileUtil.moveFile(dest, src);
             }
             catch (Exception e) {
                 logger.warn("move file {} to {} failed!", dest, src);

@@ -93,7 +93,7 @@ public class NurseFileStorageServiceForNurse360 extends AbstractFileStorageServi
                 }
 
                 // move temporary file to storage dir
-                FileUtil.moveFile(srcFilePath, destFilePath);
+                fileUtil.moveFile(srcFilePath, destFilePath);
                 successMoved.put(destFilePath, srcFilePath);
 
                 filePath2StoragePath.put(srcFilePath, relativeFilePath);

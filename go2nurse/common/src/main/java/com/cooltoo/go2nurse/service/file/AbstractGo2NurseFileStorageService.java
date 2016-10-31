@@ -27,6 +27,8 @@ public abstract class AbstractGo2NurseFileStorageService {
     @Autowired
     private Go2NurseUtility utility;
 
+    FileUtil fileUtil = FileUtil.getInstance();
+
     @Autowired
     private Go2NurseFileStorageDBService dbService;
 
@@ -59,7 +61,7 @@ public abstract class AbstractGo2NurseFileStorageService {
         }
 
         try {
-            String[] dirAndSHA1   = encodeFilePath(fileName);
+            String[] dirAndSHA1   = fileUtil.encodeFilePath(fileName);
             String   folderName   = dirAndSHA1[0];
             String   newFileName  = dirAndSHA1[1];
             String   relativePath = folderName + File.separator + newFileName;
@@ -71,7 +73,7 @@ public abstract class AbstractGo2NurseFileStorageService {
                 dir.mkdirs();
             }
             File destFile = new File(destFileDir, newFileName);
-            FileUtil.writeFile(file, destFile);
+            fileUtil.writeFile(file, destFile);
 
             return dbRecordAdd(fileName, relativePath);
         } catch (Exception ex) {
@@ -217,69 +219,18 @@ public abstract class AbstractGo2NurseFileStorageService {
     /** (official/temporary/user/secret)_storage_path/dir/sha1 */
     public String getRelativePathInBase(String filePath) {
         logger.info("get relative path in base, filepath={}", filePath);
-        String relativePathInStorage = getRelativePathInStorage(filePath);
+        String relativePathInStorage = fileUtil.getCooltooFileRelativePath(getNginxRelativePath(), filePath);
         if (VerifyUtil.isStringEmpty(relativePathInStorage)) {
             return "";
         }
-        return getNginxRelativePath()+relativePathInStorage;
+        return relativePathInStorage;
     }
 
-    /** (official/temporary/user/secret) ----> xxx_storage_path/dir/sha1 */
+    /** filePath ----> (official/temporary/user/secret)_storage_path/dir/sha1 */
     public Map<String, String> getRelativePathInBase(List<String> filePath) {
         logger.info("get relative path in base, filepath={}", filePath);
-        Map<String, String> relativePathInStorage = getRelativePathInStorage(filePath);
-        if (VerifyUtil.isMapEmpty(relativePathInStorage)) {
-            return new HashMap<>();
-        }
-
-        Map<String, String> relativePathsInBase = new HashMap<>();
-        Set<String> paths = relativePathInStorage.keySet();
-        for (String path : paths) {
-            String relativePath = relativePathInStorage.get(path);
-            String relativePathInBase = getNginxRelativePath() + relativePath;
-            relativePathsInBase.put(path, relativePathInBase);
-        }
-        return relativePathsInBase;
-    }
-
-    /** filePath --> dir/sha1 */
-    public String getRelativePathInStorage(String filePath) {
-        logger.info("get filepath's relative path in {} stroage, filepath={}", getName(), filePath);
-        if (VerifyUtil.isStringEmpty(filePath)) {
-            logger.info("filepath is empty");
-            return "";
-        }
-        String[] baseurlDirSha1 = decodeFilePath(filePath);
-        if (VerifyUtil.isStringEmpty(baseurlDirSha1[1]) && VerifyUtil.isStringEmpty(baseurlDirSha1[2])) {
-            logger.info("decode dir and filename is empty");
-            return "";
-        }
-        String relativePath = baseurlDirSha1[1] + File.separator + baseurlDirSha1[2];
-        logger.info("relative path={}", relativePath);
-        return relativePath;
-    }
-
-    /** filePath --> dir/sha1 */
-    public Map<String, String> getRelativePathInStorage(List<String> filePaths) {
-        logger.info("get files relative path in {} storage", getName());
-
-        Map<String, String> fileRelativePaths = new HashMap<>();
-        if (VerifyUtil.isListEmpty(filePaths)) {
-            logger.info("the file list is empty");
-            return fileRelativePaths;
-        }
-
-        for (String filepath : filePaths) {
-            String relativePath = getRelativePathInStorage(filepath);
-            if (VerifyUtil.isStringEmpty(relativePath)) {
-                logger.info("decode file={} dir and filename is empty", filepath);
-                fileRelativePaths.clear();
-                return fileRelativePaths;
-            }
-            fileRelativePaths.put(filepath, relativePath);
-        }
-
-        return fileRelativePaths;
+        Map<String, String> relativePathInStorage = fileUtil.getCooltooFileRelativePath(getNginxRelativePath(), filePath);
+        return relativePathInStorage;
     }
 
     abstract public Map<String, String> moveFileToHere(List<String> srcFileAbsolutePath);
@@ -295,98 +246,13 @@ public abstract class AbstractGo2NurseFileStorageService {
     }
 
     public boolean fileExist(String fileRelativePath) {
-        logger.info("file {} is exist?", fileRelativePath);
-        if (VerifyUtil.isStringEmpty(fileRelativePath)) {
-            logger.info("file path is empty");
-            return false;
-        }
-        String[] baseurlDirSha1 = decodeFilePath(fileRelativePath);
-        logger.info("baseUrl={} dir={} filename={}",
-                baseurlDirSha1[0], baseurlDirSha1[1], baseurlDirSha1[2]);
-        String filePath = getStoragePath()+baseurlDirSha1[1]+File.separator+baseurlDirSha1[2];
-        return FileUtil.fileExist(filePath);
+        return fileUtil.cooltooFileExistInPath(getStoragePath(), fileRelativePath);
     }
 
-    /** file moved map(after_move_path-->before_move_path) */
-    protected void rollbackFileMoved(Map<String, String> dest2SrcFileMoved) {
-        logger.info("rollbacke file moved");
-        if (VerifyUtil.isMapEmpty(dest2SrcFileMoved)) {
-            logger.info("rollbacke file list is empty");
-            return;
-        }
-        Set<String> destKeys = dest2SrcFileMoved.keySet();
-        for (String dest : destKeys) {
-            String src = dest2SrcFileMoved.get(dest);
-            try {
-                FileUtil.moveFile(dest, src);
-            }
-            catch (Exception e) {
-                logger.warn("move file {} to {} failed!", dest, src);
-            }
-        }
-    }
 
-    /** dir, sha1 */
-    protected String[] encodeFilePath(String fileName) throws NoSuchAlgorithmException {
-        logger.info("construct file name={}", fileName);
-        if (VerifyUtil.isStringEmpty(fileName)) {
-            fileName = "unknow";
-            logger.warn("the file name is invalid, set it to={}", fileName);
-        }
-
-        long   nanoTime         = System.nanoTime();
-        String strNanoTime      = fileName+"_"+nanoTime;
-        String sha1             = VerifyUtil.sha1(strNanoTime);
-        String newDir           = sha1.substring(0, 2);
-        String newFileName      = sha1.substring(2);
-        return new String[]{newDir, newFileName};
-    }
-
-    /** url,dir,sha1 */
-    protected String[] decodeFilePath(String filepath) {
-        logger.info("deconstruct file name={}", filepath);
-        if (VerifyUtil.isStringEmpty(filepath)) {
-            logger.error("the file name is invalid");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-
-        StringBuilder splash = new StringBuilder();
-        splash.append('\\').append('\\');
-        filepath = filepath.replaceAll(splash.toString(), "/");
-        logger.info("after repalce \\ to /  ={}", filepath);
-
-        String[] component    = filepath.split("/");
-        if (component.length<2) {
-            return new String[]{"", "", component[0]};
-        }
-        String   tmpFileName  = component[component.length-1];
-        String   tmpDirectory = component[component.length-2];
-
-        int      baseUrlEndIdx= filepath.indexOf(tmpDirectory+"/"+tmpFileName);
-        String   baseUrl      = "";
-        if (baseUrlEndIdx>1) {
-            baseUrl = filepath.substring(0, baseUrlEndIdx-1);
-        }
-
-        String sha1 = tmpFileName;
-        return new String[]{baseUrl, tmpDirectory, sha1};
-    }
-
-    /** url,dir,sha1 */
-    protected Map<String, String[]> decodeFilePaths(List<String> filepaths) {
-        if (VerifyUtil.isListEmpty(filepaths)) {
-            return new HashMap<>();
-        }
-        Map<String, String[]> path2UrlDirSha1 = new HashMap<>();
-        for (String filepath : filepaths) {
-            String[] urlDirSha1 = decodeFilePath(filepath);
-            path2UrlDirSha1.put(filepath, urlDirSha1);
-        }
-        return path2UrlDirSha1;
-    }
     @Transactional
     private long dbRecordAdd(String fileRealName, String filePath) {
-        return dbService.recordFileStorage(fileRealName, filePath);
+        return dbService.addRecord(fileRealName, filePath);
     }
 
     private String dbRecordGet(long fileRecordId) {

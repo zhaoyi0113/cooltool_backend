@@ -31,6 +31,8 @@ public class TemporaryFileStorageServiceTest extends AbstractCooltooTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TemporaryFileStorageServiceTest.class.getName());
 
+    private FileUtil fileUtil = FileUtil.getInstance();
+
     @Autowired
     private TemporaryFileStorageService tempStorage;
 
@@ -74,11 +76,11 @@ public class TemporaryFileStorageServiceTest extends AbstractCooltooTest {
                 dirFile.mkdir();
             }
 
-            try { FileUtil.writeFile(file, destFile); }
+            try { fileUtil.writeFile(file, destFile); }
             catch (Exception ex) {
                 continue;
             }
-            Assert.assertTrue(FileUtil.fileExist(destPath));
+            Assert.assertTrue(fileUtil.fileExist(destPath));
             filePaths.add(destPath);
         }
 

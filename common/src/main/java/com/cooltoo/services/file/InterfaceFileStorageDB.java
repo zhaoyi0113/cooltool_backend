@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by zhaolisong on 2016/10/31.
  */
-public interface IterfaceFileStorageDB {
+public interface InterfaceFileStorageDB {
 
     public String getFilePath(long recordFileStorageId);
     public Map<Long, String> getFilePath(List<Long> recordFileStorageIds);

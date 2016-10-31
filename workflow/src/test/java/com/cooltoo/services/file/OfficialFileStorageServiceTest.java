@@ -28,6 +28,8 @@ public class OfficialFileStorageServiceTest extends AbstractCooltooTest {
 
     private static final Logger logger = LoggerFactory.getLogger(OfficialFileStorageServiceTest.class.getName());
 
+    private FileUtil fileUtil = FileUtil.getInstance();
+
     @Autowired
     private OfficialFileStorageService officialStorage;
 
@@ -84,12 +86,12 @@ public class OfficialFileStorageServiceTest extends AbstractCooltooTest {
         String relativePath2 = "11/fdsafdjklfjdslajfkdsajflk";
         String absolutePath1 = "http://jkfdsivjnkcanfejwvnid/fjdisfds/11/fdsafdjklfjdslajfkdsajflk";
         String absolutePath2 = "http://jkfdsivjnk.ca/fjdisfds/11/fdsafdjklfjdslajfkdsajflk";
-        String relaPath1 = officialStorage.getRelativePathInBase(absolutePath1);
+        String relaPath1 = officialStorage.fileUtil.getCooltooFileRelativePath(officialStorage.getNginxRelativePath(), absolutePath1);
         Assert.assertEquals(nginxPath+relativePath1, relaPath1.replace('\\', '/'));
 
         String[] array = new String[]{absolutePath1, absolutePath2};
         List<String> absolutePaths = Arrays.asList(array);
-        Map<String, String> absolute2relative = officialStorage.getRelativePathInBase(absolutePaths);
+        Map<String, String> absolute2relative = officialStorage.fileUtil.getCooltooFileRelativePath(officialStorage.getNginxRelativePath(), absolutePaths);
         Assert.assertEquals(nginxPath+relativePath1, absolute2relative.get(absolutePath1).replace('\\', '/'));
         Assert.assertEquals(nginxPath+relativePath2, absolute2relative.get(absolutePath2).replace('\\', '/'));
     }
@@ -149,11 +151,11 @@ public class OfficialFileStorageServiceTest extends AbstractCooltooTest {
                 dirFile.mkdir();
             }
 
-            try { FileUtil.writeFile(file, destFile); }
+            try { fileUtil.writeFile(file, destFile); }
             catch (Exception ex) {
                 continue;
             }
-            Assert.assertTrue(FileUtil.fileExist(destPath));
+            Assert.assertTrue(fileUtil.fileExist(destPath));
             filePaths.add(destPath);
         }
 

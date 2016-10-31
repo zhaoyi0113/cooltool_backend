@@ -2,6 +2,7 @@ package com.cooltoo.services.file;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.VerifyUtil;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseSetups;
@@ -32,6 +33,8 @@ public class UserGo2NurseFileStorageServiceTest extends AbstractCooltooTest {
 
     @Autowired
     private UserGo2NurseFileStorageService userStorage;
+
+    @Autowired private Go2NurseUtility utility;
 
     @Test
     public void testAddDeleteGetExistFile() {
@@ -82,7 +85,7 @@ public class UserGo2NurseFileStorageServiceTest extends AbstractCooltooTest {
             fileIds.add(fileId);
             logger.info("fileid={} filepath={}", fileId, filePath);
         }
-        Map<Long, String> id2Path = userStorage.getFileUrl(fileIds);
+        Map<Long, String> id2Path = userStorage.getFileUrl(fileIds, utility.getHttpPrefix());
         Assert.assertEquals(3, id2Path.size());
         logger.info("fileid-->filepath={}", id2Path);
 

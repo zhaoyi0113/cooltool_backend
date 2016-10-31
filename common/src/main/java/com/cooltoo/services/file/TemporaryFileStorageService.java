@@ -2,10 +2,12 @@ package com.cooltoo.services.file;
 
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.util.FileUtil;
+import com.cooltoo.services.FileStorageDBService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,17 @@ public class TemporaryFileStorageService extends AbstractFileStorageService {
     @Value("${storage.tmp.path}")
     private String tmpPath;
 
+    @Value("${storage.base.path}")
+    private String storageBasePath;
+
+    @Autowired
+    @Qualifier("FileStorageDBService")
+    private InterfaceFileStorageDB dbService;
+
+    public InterfaceFileStorageDB getDbService() {
+        return dbService;
+    }
+
     @Override
     public String getName() {
         return "temporary";
@@ -32,7 +45,7 @@ public class TemporaryFileStorageService extends AbstractFileStorageService {
     @Override
     public String getStoragePath() {
         StringBuilder path = new StringBuilder();
-        path.append(super.getStoragePath());
+        path.append(storageBasePath);
         path.append(tmpPath);
         logger.info("get temporary storage path={}", path.toString());
         return path.toString();
@@ -60,7 +73,7 @@ public class TemporaryFileStorageService extends AbstractFileStorageService {
         String cacheFilePath         = null;
         try {
             // get the new dir and fileName
-            String[] dirAndSha1  = encodeFilePath(fileName);
+            String[] dirAndSha1  = fileUtil.encodeFilePath(fileName);
             // construct the cache directory
             String   fileCacheDir= getStoragePath()+File.separator+dirAndSha1[0];
 
@@ -73,7 +86,7 @@ public class TemporaryFileStorageService extends AbstractFileStorageService {
             // save the file to the cache directory
             File cacheFile = new File(tmpDir, dirAndSha1[1]);
             cacheFilePath  = cacheFile.getAbsolutePath();
-            FileUtil.writeFile(file, cacheFile);
+            fileUtil.writeFile(file, cacheFile);
 
             // construct the relative path
             cacheFileRelativePath = getNginxRelativePath()+dirAndSha1[0]+File.separator+dirAndSha1[1];
@@ -142,7 +155,7 @@ public class TemporaryFileStorageService extends AbstractFileStorageService {
         Map<String, String> successMoved = new Hashtable<>();
         try {
             for (String filePath : srcFileAbsolutePath) {
-                String[] baseurlDirSha1 = decodeFilePath(filePath);
+                String[] baseurlDirSha1 = fileUtil.decodeFilePath(filePath);
                 // relative_file_path_in_storage--->dir/sha1
                 String relativeFilePath = baseurlDirSha1[1]
                                         + File.separator
@@ -165,7 +178,7 @@ public class TemporaryFileStorageService extends AbstractFileStorageService {
                 }
 
                 // move storage file to temporary dir
-                FileUtil.moveFile(filePath, destFilePath);
+                fileUtil.moveFile(filePath, destFilePath);
                 successMoved.put(destFilePath, filePath);
 
                 token2Images.add(relativeFilePath);

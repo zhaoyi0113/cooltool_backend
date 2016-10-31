@@ -73,7 +73,7 @@ public class TemporaryFileStorageServiceForNurse360 extends AbstractFileStorageS
             // save the file to the cache directory
             File cacheFile = new File(tmpDir, dirAndSha1[1]);
             cacheFilePath  = cacheFile.getAbsolutePath();
-            FileUtil.writeFile(file, cacheFile);
+            fileUtil.writeFile(file, cacheFile);
 
             // construct the relative path
             cacheFileRelativePath = getNginxRelativePath()+dirAndSha1[0]+File.separator+dirAndSha1[1];
@@ -165,7 +165,7 @@ public class TemporaryFileStorageServiceForNurse360 extends AbstractFileStorageS
                 }
 
                 // move storage file to temporary dir
-                FileUtil.moveFile(filePath, destFilePath);
+                fileUtil.moveFile(filePath, destFilePath);
                 successMoved.put(destFilePath, filePath);
 
                 token2Images.add(relativeFilePath);

@@ -28,6 +28,8 @@ import java.util.Set;
 })
 public class TemporaryFileStorageServiceForNurse360Test extends AbstractCooltooTest {
 
+    private FileUtil fileUtil = FileUtil.getInstance();
+
     @Autowired private TemporaryFileStorageServiceForNurse360 tempStorage;
 
     @Value("${nurse360.storage.base.path}")
@@ -70,11 +72,11 @@ public class TemporaryFileStorageServiceForNurse360Test extends AbstractCooltooT
                 dirFile.mkdir();
             }
 
-            try { FileUtil.writeFile(file, destFile); }
+            try { fileUtil.writeFile(file, destFile); }
             catch (Exception ex) {
                 continue;
             }
-            Assert.assertTrue(FileUtil.fileExist(destPath));
+            Assert.assertTrue(fileUtil.fileExist(destPath));
             filePaths.add(destPath);
         }
 

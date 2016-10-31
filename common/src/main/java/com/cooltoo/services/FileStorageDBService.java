@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.entities.FileStorageEntity;
 import com.cooltoo.repository.FileStorageRepository;
+import com.cooltoo.services.file.InterfaceFileStorageDB;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ import java.util.Map;
  * Created by zhaolisong on 16/4/25.
  */
 @Service("FileStorageDBService")
-public class FileStorageDBService {
+public class FileStorageDBService implements InterfaceFileStorageDB {
 
     private static final Logger logger = LoggerFactory.getLogger(FileStorageDBService.class.getName());
 
@@ -26,7 +27,7 @@ public class FileStorageDBService {
     private FileStorageRepository repository;
 
     @Transactional
-    public long recordFileStorage(String fileName, String path) {
+    public long addRecord(String fileName, String path) {
         logger.info("save to database the filename={} path={}", fileName, path);
         FileStorageEntity entity = new FileStorageEntity();
         entity.setFileRealname(fileName);

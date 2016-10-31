@@ -2,10 +2,12 @@ package com.cooltoo.services.file;
 
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.util.FileUtil;
+import com.cooltoo.services.FileStorageDBService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +31,20 @@ public class OfficialFileStorageService extends AbstractFileStorageService {
     @Value("${storage.official.speak.profile.photo.path}")
     private String officialSpeakProfilePhotoPath;
 
+    @Value("${storage.base.path}")
+    private String storageBasePath;
+
+    @Autowired
+    @Qualifier("FileStorageDBService")
+    private InterfaceFileStorageDB dbService;
+
+    public InterfaceFileStorageDB getDbService() {
+        return dbService;
+    }
+
     public String getOfficialSpeakProfilePhotoPath() {
         StringBuilder path = new StringBuilder();
-        path.append(getStoragePath());
+        path.append(storageBasePath);
         path.append(officialSpeakProfilePhotoPath);
         logger.info("get official speak profile photo path={}", path.toString());
         return path.toString();
@@ -51,7 +64,7 @@ public class OfficialFileStorageService extends AbstractFileStorageService {
     @Override
     public String getStoragePath() {
         StringBuilder path = new StringBuilder();
-        path.append(super.getStoragePath());
+        path.append(storageBasePath);
         path.append(officialPath);
         logger.info("get official storage path={}", path.toString());
         return path.toString();
@@ -70,7 +83,7 @@ public class OfficialFileStorageService extends AbstractFileStorageService {
             logger.info("filepath is empty");
             return true;
         }
-        String[] baseurlDirSha1 = decodeFilePath(filePath);
+        String[] baseurlDirSha1 = fileUtil.decodeFilePath(filePath);
         if (VerifyUtil.isStringEmpty(baseurlDirSha1[1]) && VerifyUtil.isStringEmpty(baseurlDirSha1[2])) {
             logger.info("decode dir and filename is empty");
             return false;
@@ -92,7 +105,7 @@ public class OfficialFileStorageService extends AbstractFileStorageService {
         Map<String, String> successMoved         = new Hashtable<>();
         try {
             for (String srcFilePath : srcFileAbsolutePath) {
-                String[] baseurlDirSha1 = decodeFilePath(srcFilePath);
+                String[] baseurlDirSha1 = fileUtil.decodeFilePath(srcFilePath);
                 // relative_file_path_in_temporary--->dir/sha1
                 String relativeFilePath = baseurlDirSha1[1]
                                         + File.separator
@@ -111,7 +124,7 @@ public class OfficialFileStorageService extends AbstractFileStorageService {
                 }
 
                 // move temporary file to storage dir
-                FileUtil.moveFile(srcFilePath, destFilePath);
+                fileUtil.moveFile(srcFilePath, destFilePath);
                 successMoved.put(destFilePath, srcFilePath);
 
                 filePath2StoragePath.put(srcFilePath, relativeFilePath);

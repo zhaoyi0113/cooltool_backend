@@ -1,8 +1,11 @@
 package com.cooltoo.services.file;
 
+import com.cooltoo.services.FileStorageDBService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,17 @@ public class SecretFileStorageService extends AbstractFileStorageService {
     @Value("${storage.secret.path}")
     private String secretPath;
 
+    @Value("${storage.base.path}")
+    private String storageBasePath;
+
+    @Autowired
+    @Qualifier("FileStorageDBService")
+    private InterfaceFileStorageDB dbService;
+
+    public InterfaceFileStorageDB getDbService() {
+        return dbService;
+    }
+
     @Override
     public String getName() {
         return "secret";
@@ -28,7 +42,7 @@ public class SecretFileStorageService extends AbstractFileStorageService {
     @Override
     public String getStoragePath() {
         StringBuilder path = new StringBuilder();
-        path.append(super.getStoragePath());
+        path.append(storageBasePath);
         path.append(secretPath);
         logger.info("get secret storage path={}", path.toString());
         return path.toString();
