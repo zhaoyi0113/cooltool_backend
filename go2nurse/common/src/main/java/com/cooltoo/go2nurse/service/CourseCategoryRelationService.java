@@ -73,6 +73,21 @@ public class CourseCategoryRelationService {
         return courses;
     }
 
+
+    //============================================================================
+    //                 delete relation permanently
+    //============================================================================
+    @Transactional
+    public List<Long> deleteRelationPermanentlyByCourseIds(List<Long> courseIds) {
+        logger.info("delete relation by courseIds={}", courseIds);
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return new ArrayList<>();
+        }
+        List<CourseCategoryRelationEntity> set = relationRepository.findByStatusAndCourseIdIn(null, courseIds);
+        relationRepository.delete(set);
+        return courseIds;
+    }
+
     //=================================================================
     //         add
     //=================================================================

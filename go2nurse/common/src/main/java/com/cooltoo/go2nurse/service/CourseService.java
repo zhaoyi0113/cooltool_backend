@@ -46,6 +46,8 @@ public class CourseService {
     @Autowired private CourseBeanConverter beanConverter;
     @Autowired private UserGo2NurseFileStorageService userStorage;
     @Autowired private TemporaryGo2NurseFileStorageService tempStorage;
+    @Autowired private CourseRelationManageService relationManageService;
+
 
     //===========================================================
     //                    get
@@ -677,9 +679,15 @@ public class CourseService {
         }
 
         //
-        // remove the activities
+        // remove the course
         //
         repository.delete(resultSet);
+
+
+        //
+        // remove the course relation with department, diagnostic, category  permanently
+        //
+        relationManageService.deleteRelationsByCourseId(lIds);
 
         return lIds;
     }

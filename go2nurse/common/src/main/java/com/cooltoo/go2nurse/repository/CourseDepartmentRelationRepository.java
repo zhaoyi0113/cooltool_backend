@@ -38,6 +38,8 @@ public interface CourseDepartmentRelationRepository extends JpaRepository<Course
            " WHERE (?1 IS NULL OR relation.courseId=?1)")
     List<CourseDepartmentRelationEntity> findByCourseId(Long courseId);
 
+    List<CourseDepartmentRelationEntity> findByCourseIdIn(List<Long> courseIds);
+
     @Query("SELECT DISTINCT relation.courseId FROM CourseDepartmentRelationEntity relation" +
             " WHERE " +
             "     (?1 IS NULL OR relation.hospitalId=?1)" +

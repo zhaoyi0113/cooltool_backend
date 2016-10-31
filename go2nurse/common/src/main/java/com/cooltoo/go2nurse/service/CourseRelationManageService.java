@@ -556,6 +556,18 @@ public class CourseRelationManageService {
     }
 
     //==============================================================================
+    //                    deleted relation permanently
+    //==============================================================================
+
+    @Transactional
+    public boolean deleteRelationsByCourseId(List<Long> courseIds) {
+        courseCategoryRelationService.deleteRelationPermanentlyByCourseIds(courseIds);
+        courseDepartmentRelationService.deleteRelationPermanentlyByCourseIds(courseIds);
+        diagnosticRelationService.deleteRelationPermanentlyByCourseIds(courseIds);
+        return true;
+    }
+
+    //==============================================================================
     //                    update
     //==============================================================================
 
