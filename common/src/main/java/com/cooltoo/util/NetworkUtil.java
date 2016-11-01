@@ -55,8 +55,8 @@ public final class NetworkUtil {
         for (int i=0; i<urls.size(); i++) {
             InputStream is = null;
             OutputStream os = null;
+            String tmpUrl = urls.get(i);
             try {
-                String tmpUrl = urls.get(i);
                 if (result.containsKey(tmpUrl)) {
                     continue;
                 }
@@ -88,6 +88,7 @@ public final class NetworkUtil {
                 }
             }
             catch (IOException ex) {
+                logger.error("download image failed; image={}", tmpUrl);
                 error = true;
                 if (null!=is) {
                     try { is.close(); } catch (IOException ioex) {}
@@ -104,6 +105,7 @@ public final class NetworkUtil {
 
         // delete files and clear result set
         if (error) {
+            logger.error("download image failed; clear image downloaded={}", result);
             Set<String> keys = result.keySet();
             for (String tmp : keys) {
                 String val = result.get(tmp);
