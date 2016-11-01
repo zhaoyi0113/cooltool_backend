@@ -89,6 +89,7 @@ public final class NetworkUtil {
             }
             catch (IOException ex) {
                 logger.error("download image failed; image={}", tmpUrl);
+                logger.error("download image failed; exception={}", ex);
                 error = true;
                 if (null!=is) {
                     try { is.close(); } catch (IOException ioex) {}
