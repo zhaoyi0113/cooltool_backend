@@ -19,6 +19,7 @@ public class UserBean {
     private String name;
     private GenderType gender;
     private Date birthday;
+    private int age;
     private String mobile;
     private String password;
     private long profilePhoto;
@@ -156,6 +157,14 @@ public class UserBean {
 
     public void setChannel(int channel) {
         this.channel = channel;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 
     public String toString() {

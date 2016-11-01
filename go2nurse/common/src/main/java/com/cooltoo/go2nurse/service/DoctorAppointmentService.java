@@ -277,7 +277,7 @@ public class DoctorAppointmentService {
 
         DoctorClinicHoursBean clinicHoursBean = clinicDateHoursService.getClinicHourById(newClinicHoursId);
         DoctorClinicDateBean clinicDateBean = clinicDateHoursService.getClinicDateById(clinicHoursBean.getClinicDateId());
-        DoctorBean doctorBean = doctorService.getDoctorById(clinicHoursBean.getDoctorId());
+        DoctorBean doctorBean = doctorService.getDoctorById(clinicHoursBean.getDoctorId(), null);
 
         // check time is valid
         if (!isTimeValid(clinicDateBean.getClinicDate())) {
@@ -341,7 +341,7 @@ public class DoctorAppointmentService {
 
         DoctorClinicHoursBean clinicHoursBean = clinicDateHoursService.getClinicHourById(clinicHoursId);
         DoctorClinicDateBean clinicDateBean = clinicDateHoursService.getClinicDateById(clinicHoursBean.getClinicDateId());
-        DoctorBean doctorBean = doctorService.getDoctorById(clinicHoursBean.getDoctorId());
+        DoctorBean doctorBean = doctorService.getDoctorById(clinicHoursBean.getDoctorId(), null);
 
         // check time is valid
         if (!isTimeValid(clinicDateBean.getClinicDate())) {

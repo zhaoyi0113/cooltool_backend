@@ -225,7 +225,20 @@ public class CourseService {
             bean.setFrontCoverUrl(imgUrl);
         }
 
-        addBaseUrl2ImgTagSrcAttr(bean, httpNginxBaseUrl);
+
+        String nginxSubUrl = "";
+        if (CourseStatus.EDITING.equals(bean.getStatus())) {
+            nginxSubUrl = tempStorage.getNginxRelativePath();
+        }
+        else {
+            nginxSubUrl = userStorage.getNginxRelativePath();
+        }
+        String content = null==bean ? null : bean.getContent();
+        if (!VerifyUtil.isStringEmpty(httpNginxBaseUrl)) {
+            content = HtmlParser.newInstance().addPrefixToImgTagSrcUrl(content, httpNginxBaseUrl, nginxSubUrl);
+        }
+        bean.setContent(content);
+
         return bean;
     }
 
@@ -247,42 +260,19 @@ public class CourseService {
             bean.setFrontCoverUrl(imgUrl);
         }
 
-        addBaseUrl2ImgTagSrcAttr(bean, httpNginxBaseUrl);
-        return bean;
-    }
 
-    /** the nginxBaseUrl need user judge tmp_or_storage and send*/
-    private void addBaseUrl2ImgTagSrcAttr(CourseBean course, String nginxBaseUrl) {
-        logger.info("convert course img tags src attribute with nginxUrl={}", nginxBaseUrl);
-        if (null==course || VerifyUtil.isStringEmpty(course.getContent())) {
-            logger.warn("course content is empty");
-            return;
-        }
-        if (VerifyUtil.isStringEmpty(nginxBaseUrl)) {
-            logger.warn("nginxUrl is empty");
-            return;
-        }
-
-        nginxBaseUrl = nginxBaseUrl.replace('\\', '/');
-        if (!nginxBaseUrl.endsWith("/")) {
-            nginxBaseUrl = nginxBaseUrl+"/";
-        }
-
-        String tempNginxRelativePath;
-        if (CourseStatus.EDITING.equals(course.getStatus())) {
-            tempNginxRelativePath = tempStorage.getNginxRelativePath();
+        String nginxSubUrl = "";
+        if (CourseStatus.EDITING.equals(bean.getStatus())) {
+            nginxSubUrl = tempStorage.getNginxRelativePath();
         }
         else {
-            tempNginxRelativePath = userStorage.getNginxRelativePath();
+            nginxSubUrl = userStorage.getNginxRelativePath();
         }
+        String content = null==bean ? null : bean.getContent();
+        content = HtmlParser.newInstance().addPrefixToImgTagSrcUrl(content, httpNginxBaseUrl, nginxSubUrl);
+        bean.setContent(content);
 
-        nginxBaseUrl += tempNginxRelativePath;
-
-        String              content    = course.getContent();
-        HtmlParser          htmlParser = HtmlParser.newInstance();
-        Map<String, String> imgTag2Src = htmlParser.getImgTag2SrcUrlMap(content);
-        content = htmlParser.addPrefixToImgTagSrcUrl(content, imgTag2Src, nginxBaseUrl);
-        course.setContent(content);
+        return bean;
     }
 
     //===========================================================

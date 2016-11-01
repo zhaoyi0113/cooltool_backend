@@ -129,7 +129,7 @@ public class DoctorOrderManageAPI {
 
     private void fillHospitalDepartment(DoctorOrderBean order) {
         if (null!=order) {
-            DoctorBean doctor = doctorService.getDoctorById(order.getDoctorId());
+            DoctorBean doctor = doctorService.getDoctorById(order.getDoctorId(), null);
             HospitalBean hospital = hospitalService.getOneById(order.getHospitalId());
             HospitalDepartmentBean department = departmentService.getById(order.getDepartmentId(), utility.getHttpPrefixForNurseGo());
             order.setDoctor(doctor);

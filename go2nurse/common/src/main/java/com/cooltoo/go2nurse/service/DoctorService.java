@@ -11,11 +11,15 @@ import com.cooltoo.go2nurse.beans.DoctorBean;
 import com.cooltoo.go2nurse.converter.DoctorBeanConverter;
 import com.cooltoo.go2nurse.entities.DoctorEntity;
 import com.cooltoo.go2nurse.repository.DoctorRepository;
+import com.cooltoo.go2nurse.service.file.TemporaryGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
+import com.cooltoo.util.FileUtil;
+import com.cooltoo.util.HtmlParser;
+import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +29,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.html.HTMLPreElement;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.*;
 
@@ -48,6 +54,12 @@ public class DoctorService {
     @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
     @Autowired private DoctorOrderService doctorOrderService;
 
+    @Autowired private TemporaryGo2NurseFileStorageService tempStorage;
+    @Autowired private UserGo2NurseFileStorageService userStorage;
+    private final HtmlParser htmlParser = HtmlParser.newInstance();
+    private final FileUtil fileUtil = FileUtil.getInstance();
+
+
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "grade"),
             new Sort.Order(Sort.Direction.ASC, "id")
@@ -56,7 +68,7 @@ public class DoctorService {
     //=====================================================================
     //                   getting
     //=====================================================================
-    public DoctorBean getDoctorById(long doctorId) {
+    public DoctorBean getDoctorById(long doctorId, String nginxBaseUrl) {
         logger.info("get doctor by id={}", doctorId);
         DoctorEntity doctor = repository.findOne(doctorId);
         if (null!=doctor) {
@@ -67,6 +79,14 @@ public class DoctorService {
             beans.add(bean);
             fillOtherProperties(beans);
 
+            if (VerifyUtil.isStringEmpty(nginxBaseUrl)) {
+                bean.setIntroduction(null);
+            }
+            else {
+                String introduction = bean.getIntroduction();
+                introduction = htmlParser.addPrefixToImgTagSrcUrl(introduction, nginxBaseUrl, userStorage.getNginxRelativePath());
+                bean.setIntroduction(introduction);
+            }
             logger.info("result is {}", bean);
             return bean;
         }
@@ -177,6 +197,7 @@ public class DoctorService {
             return beans;
         }
         for (DoctorEntity entity : entities) {
+            entity.setIntroduction(null);
             DoctorBean bean = beanConverter.convert(entity);
             beans.add(bean);
         }
@@ -273,11 +294,10 @@ public class DoctorService {
     @Transactional
     public DoctorBean updateDoctor(long doctorId,
                                    String name, String post, String jobTitle, String beGoodAt,
-                                   int departmentId, String strStatus, int grade,
-                                   String introduction
+                                   int departmentId, String strStatus, int grade
     ) {
         logger.info("update doctor={} by name={} post={} jobTitle={} beGoodAt={} departmentId={} status={} grade={} introduction={}",
-                doctorId, name, post, jobTitle, beGoodAt, departmentId, strStatus, grade, introduction);
+                doctorId, name, post, jobTitle, beGoodAt, departmentId, strStatus, grade);
         DoctorEntity entity = repository.findOne(doctorId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -301,10 +321,6 @@ public class DoctorService {
         }
         if (!VerifyUtil.isStringEmpty(beGoodAt)) {
             entity.setBeGoodAt(beGoodAt.trim());
-            changed = true;
-        }
-        if (!VerifyUtil.isStringEmpty(introduction)) {
-            entity.setIntroduction(introduction.trim());
             changed = true;
         }
         if (departmentId>=0 && departmentId!=entity.getDepartmentId() && departmentRepository.exists(departmentId)) {
@@ -378,14 +394,119 @@ public class DoctorService {
         return bean;
     }
 
+    @Transactional
+    public DoctorBean setDoctorIntroductionWithHtml(long doctorId, String htmlContent) {
+        logger.info("update doctor {} introduction={}", doctorId, htmlContent);
+
+        DoctorEntity entity = repository.findOne(doctorId);
+        if (null==entity) {
+            logger.error("the doctor is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        if (VerifyUtil.isStringEmpty(htmlContent)) {
+            htmlContent = "";  // avoid NullException
+        }
+        else {
+            // move all file to temporary
+            moveOfficialFileToTemporary(htmlContent);
+
+            // get image tags src attribute url
+            List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
+
+            // fetch the image tags src to /temp path
+            Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
+
+            // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path
+            Map<String, String> fileInTempBaseToRelativeTempPath = new HashMap<>();
+            Map<String, String> srcUrlsToRelativeUrl = new HashMap<>();
+            Set<String> fetchUrls = srcUrlToFileInTempBasePath.keySet();
+            for (String url : fetchUrls) {
+                try {
+                    String[] relativePath = fileUtil.encodeFilePath(fileUtil.getFileName(url));
+                    String fileInTempBase = srcUrlToFileInTempBasePath.get(url);
+
+                    srcUrlsToRelativeUrl.put(url, relativePath[0] + File.separator + relativePath[1]);
+                    fileInTempBaseToRelativeTempPath.put(fileInTempBase, tempStorage.getStoragePath() + relativePath[0] + File.separator + relativePath[1]);
+
+                } catch (Exception ex) {
+                    logger.error("move temp files to directory failed!");
+                    throw new BadRequestException(ErrorCode.DATA_ERROR);
+                }
+            }
+            fileUtil.moveFiles(fileInTempBaseToRelativeTempPath);
+
+            // get all image tag and its src attribute value
+            Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(htmlContent);
+            // replace image tags src url
+            htmlContent = htmlParser.replaceImgTagSrcUrl(htmlContent, imgTag2SrcValue, srcUrlsToRelativeUrl);
+
+            // move temporary file to official path
+            moveTemporaryFileToOfficial(htmlContent);
+        }
+        entity.setIntroduction(htmlContent);
+        entity = repository.save(entity);
+        return beanConverter.convert(entity);
+    }
+
+    private void moveTemporaryFileToOfficial(String htmlContent) {
+        logger.info("move html img tag src 's images to user storage");
+        if (VerifyUtil.isStringEmpty(htmlContent)) {
+            logger.info("html content is empty. nothing move to user directory");
+        }
+
+        // get image tags src attribute url
+        List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
+
+        if (!VerifyUtil.isListEmpty(srcUrls)) {
+            List<String> srcFilesInStorage = new ArrayList<>();
+            for (String srcUrl : srcUrls) {
+                String relativePath = tempStorage.getRelativePathInStorage(srcUrl);
+                if (VerifyUtil.isStringEmpty(relativePath)) {
+                    continue;
+                }
+                srcFilesInStorage.add(tempStorage.getStoragePath() + relativePath);
+            }
+            userStorage.moveFileToHere(srcFilesInStorage);
+        }
+        else {
+            logger.info("img tag is empty. nothing move to official directory");
+        }
+    }
+
+    private void moveOfficialFileToTemporary(String htmlContent) {
+        logger.info("move html img tag src 's images to temporary storage");
+        if (VerifyUtil.isStringEmpty(htmlContent)) {
+            logger.info("html content is empty. nothing move to temporary directory");
+        }
+
+        // get image tags src attribute url
+        List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
+
+        if (!VerifyUtil.isListEmpty(srcUrls)) {
+            List<String> srcFilesInStorage = new ArrayList<>();
+            for (String srcUrl : srcUrls) {
+                String relativePath = userStorage.getRelativePathInStorage(srcUrl);
+                if (VerifyUtil.isStringEmpty(relativePath)) {
+                    continue;
+                }
+                srcFilesInStorage.add(userStorage.getStoragePath() + relativePath);
+            }
+            tempStorage.moveFileToHere(srcFilesInStorage);
+        }
+        else {
+            logger.info("img tag is empty. nothing move to temporary directory");
+        }
+    }
+
     //=====================================================================
     //                   adding
     //=====================================================================
 
     @Transactional
-    public DoctorBean addDoctor(String name, String post, String jobTitle, String beGoodAt, int departmentId, int grade, String introduction) {
+    public DoctorBean addDoctor(String name, String post, String jobTitle, String beGoodAt, int departmentId, int grade) {
         logger.info("add doctor by name={} post={} jobTitle={} beGoodAt={} departmentId={} grade={} introduction={}",
-                name, post, jobTitle, beGoodAt, departmentId, grade, introduction);
+                name, post, jobTitle, beGoodAt, departmentId, grade);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -402,9 +523,6 @@ public class DoctorService {
         }
         if (!VerifyUtil.isStringEmpty(beGoodAt)) {
             entity.setBeGoodAt(beGoodAt.trim());
-        }
-        if (!VerifyUtil.isStringEmpty(introduction)) {
-            entity.setIntroduction(introduction);
         }
 
         entity.setHospitalId(0);

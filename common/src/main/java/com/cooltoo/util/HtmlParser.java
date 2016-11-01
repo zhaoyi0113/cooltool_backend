@@ -85,6 +85,40 @@ public class HtmlParser {
         return content;
     }
 
+    public String addPrefixToImgTagSrcUrl(String introduction, String nginxBaseUrl, String nginxSubUrl) {
+        logger.info("convert img tags src attribute with nginxUrl={} nginxSubUrl={}", nginxBaseUrl, nginxSubUrl);
+        if (VerifyUtil.isStringEmpty(introduction)) {
+            logger.warn("course content is empty");
+            return "";
+        }
+        if (VerifyUtil.isStringEmpty(nginxBaseUrl)) {
+            logger.warn("nginxUrl is empty");
+            return "";
+        }
+        if (VerifyUtil.isStringEmpty(nginxSubUrl)) {
+            logger.warn("nginxSubUrl is empty");
+            nginxSubUrl = "";
+        }
+
+        nginxBaseUrl = nginxBaseUrl.replace('\\', '/');
+        if (!nginxBaseUrl.endsWith("/")) {
+            nginxBaseUrl = nginxBaseUrl+"/";
+        }
+        nginxSubUrl = nginxSubUrl.replace('\\', '/');
+        if (!nginxSubUrl.endsWith("/")) {
+            nginxSubUrl = nginxSubUrl+"/";
+        }
+        if (nginxSubUrl.startsWith("/")) {
+            nginxSubUrl = nginxSubUrl.substring(1);
+        }
+
+        String nginxUrlPrefix = nginxBaseUrl + nginxSubUrl;
+
+        Map<String, String> imgTag2Src = getImgTag2SrcUrlMap(introduction);
+        introduction = addPrefixToImgTagSrcUrl(introduction, imgTag2Src, nginxUrlPrefix);
+        return introduction;
+    }
+
     public String replaceImgTagSrcUrl(String content,
                                       Map<String, String> imageTag2SrcAttrValue,
                                       Map<String, String> srcUrl2NewUrl) {

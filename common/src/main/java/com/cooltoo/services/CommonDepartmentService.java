@@ -384,6 +384,11 @@ public class CommonDepartmentService {
             entity.setOutpatientAddress(bean.getOutpatientAddress());
         }
 
+        // address
+        if (!VerifyUtil.isStringEmpty(bean.getTransportation()) && !bean.getTransportation().trim().equals(entity.getTransportation())) {
+            entity.setTransportation(bean.getTransportation());
+        }
+
         logger.info("update department is == " + entity);
         entity = repository.save(entity);
         bean = beanConverter.convert(entity);
@@ -399,6 +404,7 @@ public class CommonDepartmentService {
                                          InputStream image, InputStream disableImage,
                                          String phoneNumber, Double longitude, Double latitude,
                                          String addressLink, InputStream addressImage, String address, String outpatientAddress,
+                                         String transportation,
                                          String nginxPrefix) {
         HospitalDepartmentBean bean = new HospitalDepartmentBean();
         bean.setId(id);
@@ -412,6 +418,7 @@ public class CommonDepartmentService {
         bean.setAddressLink(addressLink);
         bean.setAddress(address);
         bean.setOutpatientAddress(outpatientAddress);
+        bean.setTransportation(transportation);
         return update(bean, image, disableImage, addressImage, nginxPrefix);
     }
 
@@ -423,7 +430,8 @@ public class CommonDepartmentService {
     public Integer createHospitalDepartment(int hospitalId, String name, String description, int enable, int parentId,
                                             InputStream image, InputStream disableImage,
                                             String phoneNumber, Double longitude, Double latitude,
-                                            String addressLink, InputStream addressImage, String address, String outpatientAddress) {
+                                            String addressLink, InputStream addressImage, String address, String outpatientAddress,
+                                            String transportation) {
         if (!hospitalRepository.exists(hospitalId)) {
             logger.error("hospital is not exist");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -447,6 +455,7 @@ public class CommonDepartmentService {
         entity.setAddressLink(addressLink);
         entity.setAddress(address);
         entity.setOutpatientAddress(outpatientAddress);
+        entity.setTransportation(transportation);
 
         String uniqueId = null;
         for (int i = 10; i>0; i--) {

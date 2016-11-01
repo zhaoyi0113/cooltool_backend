@@ -30,6 +30,7 @@ public class HospitalDepartmentBeanConverter implements Converter<HospitalDepart
         bean.setAddressLink(source.getAddressLink());
         bean.setAddress(source.getAddress());
         bean.setOutpatientAddress(source.getOutpatientAddress());
+        bean.setTransportation(source.getTransportation());
         return bean;
     }
 }

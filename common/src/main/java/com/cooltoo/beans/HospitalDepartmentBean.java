@@ -28,6 +28,7 @@ public class HospitalDepartmentBean {
     private String addressLink;
     private String address;// 科室地址
     private String outpatientAddress;//门诊地址
+    private String transportation;//乘车方式
 
     public int getId() {
         return id;
@@ -197,6 +198,14 @@ public class HospitalDepartmentBean {
         this.outpatientAddress = outpatientAddress;
     }
 
+    public String getTransportation() {
+        return transportation;
+    }
+
+    public void setTransportation(String transportation) {
+        this.transportation = transportation;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -219,6 +228,7 @@ public class HospitalDepartmentBean {
         msg.append(", addressLink=").append(addressLink);
         msg.append(", address=").append(address);
         msg.append(", outpatientAddress=").append(outpatientAddress);
+        msg.append(", transportation=").append(transportation);
         msg.append("]");
         return msg.toString();
     }

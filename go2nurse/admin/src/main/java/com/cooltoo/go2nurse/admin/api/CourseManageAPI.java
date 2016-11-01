@@ -144,8 +144,8 @@ public class CourseManageAPI {
         return Response.ok(course).build();
     }
 
-    @Path("/edit/status")
-    @POST
+    @Path("/status")
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCourseStatus(@Context HttpServletRequest request,
                                        @FormParam("course_id") @DefaultValue("0") long courseId,
@@ -187,8 +187,8 @@ public class CourseManageAPI {
 
 
     // 将课程置为 editing, 并且将课程对应的图片迁至临时文件夹
-    @Path("/edit/content/cache")
-    @POST
+    @Path("/content/cache")
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response cacheCourse2Temporary(@Context HttpServletRequest request,
                                           @FormParam("course_id") @DefaultValue("0") long courseId
@@ -202,8 +202,8 @@ public class CourseManageAPI {
 
 
     // 课程为 editing 时, 向课程中添加图片，图片缓存在临时文件夹
-    @Path("/edit/content/add_image")
-    @POST
+    @Path("/content/add_image")
+    @PUT
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addImage2Temporary(@Context HttpServletRequest request,
@@ -233,8 +233,8 @@ public class CourseManageAPI {
 
     // 提交课程，将获取置为 disable, 将缓存在临时文件夹的图片，导入 storage 文件夹，
     // 并替换 content 中 <img/> src 的引用值。
-    @Path("/edit/content/submit")
-    @POST
+    @Path("/content/submit")
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCourseContent(@Context HttpServletRequest request,
                                           @FormParam("course_id") long courseId,
@@ -248,7 +248,7 @@ public class CourseManageAPI {
         return Response.ok(course).build();
     }
 
-    @Path("/edit/content/submit/html")
+    @Path("/content/submit/html")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCourseContentWithImageNeedDownload(@Context HttpServletRequest request,

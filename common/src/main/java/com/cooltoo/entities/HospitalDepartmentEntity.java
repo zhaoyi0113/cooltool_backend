@@ -24,6 +24,7 @@ public class HospitalDepartmentEntity {
     private String addressLink;// 科室地址链接
     private String address;// 科室地址
     private String outpatientAddress;//门诊地址
+    private String transportation;//乘车方式
 
     @Id
     @GeneratedValue
@@ -171,6 +172,15 @@ public class HospitalDepartmentEntity {
         this.outpatientAddress = outpatientAddress;
     }
 
+    @Column(name = "transportation")
+    public String getTransportation() {
+        return transportation;
+    }
+
+    public void setTransportation(String transportation) {
+        this.transportation = transportation;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -189,6 +199,7 @@ public class HospitalDepartmentEntity {
         msg.append(", addressLink=").append(addressLink);
         msg.append(", address=").append(address);
         msg.append(", outpatientAddress=").append(outpatientAddress);
+        msg.append(", transportation=").append(transportation);
         msg.append("]");
         return msg.toString();
     }

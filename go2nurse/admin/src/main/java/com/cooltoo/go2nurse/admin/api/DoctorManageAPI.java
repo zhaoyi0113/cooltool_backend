@@ -4,6 +4,7 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.DoctorBean;
 import com.cooltoo.go2nurse.service.DoctorOrderService;
 import com.cooltoo.go2nurse.service.DoctorService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -26,6 +27,7 @@ public class DoctorManageAPI {
 
     @Autowired private DoctorService doctorService;
     @Autowired private DoctorOrderService doctorOrderService;
+    @Autowired private Go2NurseUtility utility;
 
     @Path("/doctor")
     @GET
@@ -33,7 +35,7 @@ public class DoctorManageAPI {
     public Response getDoctorById(@Context HttpServletRequest request,
                                   @QueryParam("doctor_id") @DefaultValue("0") long doctorId
     ) {
-        DoctorBean doctor = doctorService.getDoctorById(doctorId);
+        DoctorBean doctor = doctorService.getDoctorById(doctorId, utility.getHttpPrefix());
         return Response.ok(doctor).build();
     }
 
@@ -108,10 +110,9 @@ public class DoctorManageAPI {
                               @FormParam("be_good_at") @DefaultValue("") String beGoodAt,
                               @FormParam("grade") @DefaultValue("0") int grade,
                               @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
-                              @FormParam("department_id") @DefaultValue("0") int departmentId,
-                              @FormParam("introduction") String introduction
+                              @FormParam("department_id") @DefaultValue("0") int departmentId
     ) {
-        DoctorBean doctor = doctorService.addDoctor(name, post, jobTitle, beGoodAt, departmentId, grade, introduction);
+        DoctorBean doctor = doctorService.addDoctor(name, post, jobTitle, beGoodAt, departmentId, grade);
         if (hospitalId>0 && departmentId>0) {
             doctorOrderService.addDoctorOrder(doctor.getId(), doctor.getHospitalId(), doctor.getDepartmentId());
         }
@@ -123,7 +124,7 @@ public class DoctorManageAPI {
     //==============================================================
 
     @Path("/edit")
-    @POST
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response editDoctor(@Context HttpServletRequest request,
                                @FormParam("doctor_id") @DefaultValue("0") long doctorId,
@@ -134,18 +135,17 @@ public class DoctorManageAPI {
                                @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
                                @FormParam("department_id") @DefaultValue("0") int departmentId,
                                @FormParam("status") @DefaultValue("") String status,
-                               @FormParam("grade") @DefaultValue("0") int grade,
-                               @FormParam("introduction") String introduction
+                               @FormParam("grade") @DefaultValue("0") int grade
     ) {
-        DoctorBean doctor = doctorService.updateDoctor(doctorId, name, post, jobTitle, beGoodAt, departmentId, status, grade, introduction);
+        DoctorBean doctor = doctorService.updateDoctor(doctorId, name, post, jobTitle, beGoodAt, departmentId, status, grade);
         if (hospitalId>0 && departmentId>0) {
             doctorOrderService.addDoctorOrder(doctorId, hospitalId, departmentId);
         }
         return Response.ok(doctor).build();
     }
 
-    @Path("/edit_image")
-    @POST
+    @Path("/image")
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response editDoctorHeaderImage(@Context HttpServletRequest request,
@@ -158,8 +158,8 @@ public class DoctorManageAPI {
         return Response.ok(doctor).build();
     }
 
-    @Path("/edit_full_length_image")
-    @POST
+    @Path("/full_length_image")
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response editDoctorFullLengthImage(@Context HttpServletRequest request,
@@ -169,6 +169,17 @@ public class DoctorManageAPI {
                                               @FormDataParam("image")FormDataContentDisposition disposition
     ) {
         DoctorBean doctor = doctorService.updateDoctorHeadImage(doctorId, imageName, image, false);
+        return Response.ok(doctor).build();
+    }
+
+    @Path("/introduction")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editDoctorFullLengthImage(@Context HttpServletRequest request,
+                                              @FormParam("doctor_id") @DefaultValue("0") long doctorId,
+                                              @FormParam("introduction") @DefaultValue("") String introduction
+    ) {
+        DoctorBean doctor = doctorService.setDoctorIntroductionWithHtml(doctorId, introduction);
         return Response.ok(doctor).build();
     }
 }

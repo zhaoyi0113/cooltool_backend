@@ -9,6 +9,7 @@ import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.DoctorAppointmentService;
 import com.cooltoo.go2nurse.service.DoctorClinicDateHoursService;
 import com.cooltoo.go2nurse.service.DoctorService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,6 +30,7 @@ public class UserDoctorAPI {
     @Autowired private DoctorService doctorService;
     @Autowired private DoctorClinicDateHoursService clinicDateHoursService;
     @Autowired private DoctorAppointmentService doctorAppointmentService;
+    @Autowired private Go2NurseUtility utility;
 
     @Path("/count/by_hospital_department")
     @GET
@@ -53,7 +55,7 @@ public class UserDoctorAPI {
     public Response getDoctorById(@Context HttpServletRequest request,
                                   @QueryParam("doctor_id") @DefaultValue("0") long doctorId
     ) {
-        DoctorBean doctor = doctorService.getDoctorById(doctorId);
+        DoctorBean doctor = doctorService.getDoctorById(doctorId, null);
         return Response.ok(doctor).build();
     }
 
