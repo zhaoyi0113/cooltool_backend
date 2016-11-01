@@ -611,7 +611,7 @@ public class CourseService {
 
             // fetch the image tags src to /temp path
             Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
-            logger.info("html image tag url -> tmp base path map ===== {}", srcUrlToFileInTempBasePath);
+            logger.info("html image tag url -> tmp base path map ===== "+srcUrlToFileInTempBasePath);
 
             // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path
             Map<String, String> fileInTempBaseToRelativeTempPath = new HashMap<>();
@@ -630,8 +630,8 @@ public class CourseService {
                     throw new BadRequestException(ErrorCode.DATA_ERROR);
                 }
             }
-            logger.info("html image tag url -> tmp relative path map ===== {}", srcUrlsToRelativeUrl);
-            logger.info("tmp base path      -> tmp relative path map ===== {}", srcUrlToFileInTempBasePath);
+            logger.info("html image tag url -> tmp relative path map ===== " + srcUrlsToRelativeUrl);
+            logger.info("tmp base path      -> tmp relative path map ===== " + srcUrlToFileInTempBasePath);
             fileUtil.moveFiles(fileInTempBaseToRelativeTempPath);
 
             // get all image tag and its src attribute value
