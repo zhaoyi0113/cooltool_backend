@@ -30,10 +30,10 @@ public class FileUtil {
         int lastIndexOfSlash = fileName.lastIndexOf('\\');
         int lastIndexOfBackslash = fileName.lastIndexOf('/');
         if (lastIndexOfBackslash>0) {
-            fileName = fileName.substring(lastIndexOfBackslash);
+            fileName = fileName.substring(lastIndexOfBackslash+1);
         }
         else if (lastIndexOfSlash>0) {
-            fileName = fileName.substring(lastIndexOfSlash);
+            fileName = fileName.substring(lastIndexOfSlash+1);
         }
         else {
             fileName = System.currentTimeMillis()+"";
@@ -232,6 +232,14 @@ public class FileUtil {
         if (VerifyUtil.isStringEmpty(fileName)) {
             fileName = "unknow";
             logger.warn("the file name is invalid, set it to={}", fileName);
+        }
+        if (VerifyUtil.isStringEmpty(fileName)) {
+            fileName = System.currentTimeMillis()+"_"+System.nanoTime();
+        }
+        else {
+            if (fileName.length()>50) {
+                fileName = fileName.substring(0, 50);
+            }
         }
 
         long   nanoTime     = System.nanoTime();
