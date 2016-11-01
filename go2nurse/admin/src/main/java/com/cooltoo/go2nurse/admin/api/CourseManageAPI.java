@@ -82,8 +82,8 @@ public class CourseManageAPI {
         return Response.ok(course).build();
     }
 
-    @Path("/edit/base_information")
-    @POST
+    @Path("/base_information")
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response updateCourseBasicInfo(@Context HttpServletRequest request,
@@ -114,8 +114,8 @@ public class CourseManageAPI {
         return Response.ok(course).build();
     }
 
-    @Path("/edit/front_cover")
-    @POST
+    @Path("/front_cover")
+    @PUT
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCourseFrontCover(@Context HttpServletRequest request,
@@ -131,7 +131,7 @@ public class CourseManageAPI {
         return Response.ok(course).build();
     }
 
-    @Path("/delete/front_cover")
+    @Path("/front_cover")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCourseFrontCover(@Context HttpServletRequest request,
@@ -164,7 +164,7 @@ public class CourseManageAPI {
 
     // 获取课程详情
     // param={"course_id":"1","nginx_url":"http://nginx_server_ip:port/storage_or_temporary_path/"}
-    @Path("/get_detail")
+    @Path("/detail")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDetailById(@Context HttpServletRequest request,
