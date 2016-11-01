@@ -588,7 +588,7 @@ public class CourseService {
 
     @Transactional
     public CourseBean setCourseContentWithHtml(long courseId, String htmlContent) {
-        logger.info("update course {} token={} content={}", courseId, htmlContent);
+        logger.info("update course {} content={}", courseId, htmlContent);
 
         CourseEntity entity = repository.findOne(courseId);
         if (null==entity) {
