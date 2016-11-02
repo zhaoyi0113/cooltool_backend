@@ -55,7 +55,7 @@ public class UserDoctorAPI {
     public Response getDoctorById(@Context HttpServletRequest request,
                                   @QueryParam("doctor_id") @DefaultValue("0") long doctorId
     ) {
-        DoctorBean doctor = doctorService.getDoctorById(doctorId, null);
+        DoctorBean doctor = doctorService.getDoctorById(doctorId, utility.getHttpPrefix());
         return Response.ok(doctor).build();
     }
 
