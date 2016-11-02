@@ -58,7 +58,7 @@ public class FileUtil {
         output.close();
     }
 
-    public boolean moveFile(String srcPath, String destPath) throws IOException {
+    public boolean moveFile(String srcPath, String destPath) {
         logger.info("move file  " + srcPath + " to " + destPath);
         File src = new File(srcPath);
         File dest = new File(destPath);
@@ -94,12 +94,7 @@ public class FileUtil {
         Set<String> srcKeys = src2dest.keySet();
         for (String src : srcKeys) {
             String dest = src2dest.get(src);
-            try {
-                moveFile(src, dest);
-            }
-            catch (Exception e) {
-                logger.warn("move file {} to {} failed!", src, dest);
-            }
+            moveFile(src, dest);
         }
     }
 

@@ -11,6 +11,7 @@ import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
+import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,12 +33,15 @@ public class NursePatientAPI {
 
     @Autowired private NursePatientRelationServiceForNurse360 nursePatientService;
     @Autowired private UserService userService;
+    private static final SetUtil setUtil = SetUtil.newInstance();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getPatient(@Context HttpServletRequest request,
-                               @QueryParam("is_in_hospital") @DefaultValue("0") String isInHospital /* YES, NO */
+                               @QueryParam("is_in_hospital") @DefaultValue("0") String isInHospital /* YES, NO */,
+                               @QueryParam("index") @DefaultValue("0") int index,
+                               @QueryParam("number") @DefaultValue("10") int number
     ) {
         YesNoEnum inHospital = YesNoEnum.parseString(isInHospital);
         UserHospitalizedStatus userInHospital = YesNoEnum.YES.equals(inHospital)
@@ -57,6 +61,7 @@ public class NursePatientAPI {
                 returnVal.add(tmp);
             }
         }
+        returnVal = setUtil.getSetByPage(returnVal, index, number, null);
         return Response.ok(returnVal).build();
     }
 
