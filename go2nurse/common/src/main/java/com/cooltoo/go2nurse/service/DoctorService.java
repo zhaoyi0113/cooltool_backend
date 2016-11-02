@@ -29,7 +29,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.html.HTMLPreElement;
 
 import java.io.File;
 import java.io.InputStream;
@@ -45,7 +44,6 @@ public class DoctorService {
 
     @Autowired private DoctorRepository repository;
     @Autowired private DoctorBeanConverter beanConverter;
-    @Autowired private UserGo2NurseFileStorageService userFileStorage;
 
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
@@ -231,7 +229,7 @@ public class DoctorService {
             }
         }
 
-        Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
+        Map<Long, String> imageIdToUrl = userStorage.getFileUrl(imagesId);
         Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalIds);
         List<HospitalDepartmentBean> departments = departmentService.getByIds(departmentIds, utility.getHttpPrefixForNurseGo());
         Map<Long, Float> doctorIdToScore = nurseDoctorScoreService.getScoreByReceiverTypeAndIds(UserType.DOCTOR, doctorIds);
@@ -281,7 +279,7 @@ public class DoctorService {
                 imagesId.add(entity.getHeadImageId());
             }
         }
-        userFileStorage.deleteFiles(imagesId);
+        userStorage.deleteFiles(imagesId);
         repository.delete(entities);
 
         logger.info("delete doctor={}", entities);
@@ -372,8 +370,8 @@ public class DoctorService {
             else {
                 imageId = entity.getImageId();
             }
-            imageId = userFileStorage.addFile(imageId, imageName, image);
-            imageUrl = userFileStorage.getFileURL(imageId);
+            imageId = userStorage.addFile(imageId, imageName, image);
+            imageUrl = userStorage.getFileURL(imageId);
             if (isHeaderImage) {
                 entity.setHeadImageId(imageId);
             }
@@ -408,95 +406,68 @@ public class DoctorService {
             htmlContent = "";  // avoid NullException
         }
         else {
-            // move all file to temporary
-            moveOfficialFileToTemporary(htmlContent);
+            // move the exited images in introduction to temporary path
+            List<String> srcUrls = htmlParser.getSrcUrls(entity.getIntroduction());
+            if (!VerifyUtil.isListEmpty(srcUrls)) {
+                fileUtil.moveFileFromSrcToDest(srcUrls, userStorage, tempStorage);
+            }
 
             // get image tags src attribute url
-            List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
+            srcUrls = htmlParser.getSrcUrls(htmlContent);
 
-            // fetch the image tags src to /temp path
-            Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
+            // images need to download
+            if (!VerifyUtil.isListEmpty(srcUrls)) {
 
-            // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path
-            Map<String, String> fileInTempBaseToRelativeTempPath = new HashMap<>();
-            Map<String, String> srcUrlsToRelativeUrl = new HashMap<>();
-            Set<String> fetchUrls = srcUrlToFileInTempBasePath.keySet();
-            for (String url : fetchUrls) {
-                try {
-                    String[] relativePath = fileUtil.encodeFilePath(fileUtil.getFileName(url));
-                    String fileInTempBase = srcUrlToFileInTempBasePath.get(url);
-
-                    srcUrlsToRelativeUrl.put(url, relativePath[0] + File.separator + relativePath[1]);
-                    fileInTempBaseToRelativeTempPath.put(fileInTempBase, tempStorage.getStoragePath() + relativePath[0] + File.separator + relativePath[1]);
-
-                } catch (Exception ex) {
-                    logger.error("move temp files to directory failed!");
-                    throw new BadRequestException(ErrorCode.DATA_ERROR);
+                // is url not matched cooltoo file storage system
+                for (int i=0; i<srcUrls.size(); i++) {
+                    String tmp = srcUrls.get(i);
+                    if (!tmp.matches(FileUtil.CooltooFileFormatter)) {
+                        continue;
+                    }
+                    srcUrls.remove(i);
+                    i--;
                 }
+
+                // download all image needed download
+                // move them to temporary file storage path
+                // replace the image tag src url to temporary file storage relative path
+                if (!VerifyUtil.isListEmpty(srcUrls)) {
+                    // download the image tags src to /temp path
+                    Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
+
+                    // move image to cooltoo file storage system
+                    // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path
+                    Map<String, String> fileInTempBaseToRelativeTempPath = new HashMap<>();
+                    Map<String, String> srcUrlsToRelativeUrl = new HashMap<>();
+                    Set<String> fetchUrls = srcUrlToFileInTempBasePath.keySet();
+                    for (String url : fetchUrls) {
+                        try {
+                            String[] relativePath = fileUtil.encodeFilePath(fileUtil.getFileName(url));
+                            String fileInTempBase = srcUrlToFileInTempBasePath.get(url);
+
+                            srcUrlsToRelativeUrl.put(url, relativePath[0] + File.separator + relativePath[1]);
+                            fileInTempBaseToRelativeTempPath.put(fileInTempBase, tempStorage.getStoragePath() + relativePath[0] + File.separator + relativePath[1]);
+                        }
+                        catch (Exception ex) {
+                            logger.error("move temp files to directory failed!");
+                            throw new BadRequestException(ErrorCode.DATA_ERROR);
+                        }
+                    }
+                    fileUtil.moveFiles(fileInTempBaseToRelativeTempPath);
+
+                    // change image url to cooltoo file storage system path
+                    Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(htmlContent);
+                    htmlContent = htmlParser.replaceImgTagSrcUrl(htmlContent, imgTag2SrcValue, srcUrlsToRelativeUrl);
+                }
+
+                // move temporary file to official path
+                srcUrls = htmlParser.getSrcUrls(htmlContent);
+                fileUtil.moveFileFromSrcToDest(srcUrls, tempStorage, userStorage);
             }
-            fileUtil.moveFiles(fileInTempBaseToRelativeTempPath);
-
-            // get all image tag and its src attribute value
-            Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(htmlContent);
-            // replace image tags src url
-            htmlContent = htmlParser.replaceImgTagSrcUrl(htmlContent, imgTag2SrcValue, srcUrlsToRelativeUrl);
-
-            // move temporary file to official path
-            moveTemporaryFileToOfficial(htmlContent);
         }
         entity.setIntroduction(htmlContent);
         entity = repository.save(entity);
         return beanConverter.convert(entity);
-    }
-
-    private void moveTemporaryFileToOfficial(String htmlContent) {
-        logger.info("move html img tag src 's images to user storage");
-        if (VerifyUtil.isStringEmpty(htmlContent)) {
-            logger.info("html content is empty. nothing move to user directory");
-        }
-
-        // get image tags src attribute url
-        List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
-
-        if (!VerifyUtil.isListEmpty(srcUrls)) {
-            List<String> srcFilesInStorage = new ArrayList<>();
-            for (String srcUrl : srcUrls) {
-                String relativePath = tempStorage.getRelativePathInStorage(srcUrl);
-                if (VerifyUtil.isStringEmpty(relativePath)) {
-                    continue;
-                }
-                srcFilesInStorage.add(tempStorage.getStoragePath() + relativePath);
-            }
-            userStorage.moveFileToHere(srcFilesInStorage);
-        }
-        else {
-            logger.info("img tag is empty. nothing move to official directory");
-        }
-    }
-
-    private void moveOfficialFileToTemporary(String htmlContent) {
-        logger.info("move html img tag src 's images to temporary storage");
-        if (VerifyUtil.isStringEmpty(htmlContent)) {
-            logger.info("html content is empty. nothing move to temporary directory");
-        }
-
-        // get image tags src attribute url
-        List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
-
-        if (!VerifyUtil.isListEmpty(srcUrls)) {
-            List<String> srcFilesInStorage = new ArrayList<>();
-            for (String srcUrl : srcUrls) {
-                String relativePath = userStorage.getRelativePathInStorage(srcUrl);
-                if (VerifyUtil.isStringEmpty(relativePath)) {
-                    continue;
-                }
-                srcFilesInStorage.add(userStorage.getStoragePath() + relativePath);
-            }
-            tempStorage.moveFileToHere(srcFilesInStorage);
-        }
-        else {
-            logger.info("img tag is empty. nothing move to temporary directory");
-        }
     }
 
     //=====================================================================

@@ -46,12 +46,15 @@ public class HtmlParser {
             String srcUrl = imgTag2SrcUrl.get(key);
             srcUrls.add(srcUrl);
         }
+        logger.info("all image tag src urls={}", srcUrls);
         return srcUrls;
     }
 
     public Map<String,String> getImgTag2SrcUrlMap(String content) {
         List<String> imageTags = getAllImageTag(content);
-        return getImageSrcAttribute(imageTags);
+        Map<String,String> tagToSrcMap = getImageSrcAttribute(imageTags);
+        logger.info("all image tag ===> src urls={}", tagToSrcMap);
+        return tagToSrcMap;
     }
 
     public String addPrefixToImgTagSrcUrl(String content,
@@ -164,7 +167,6 @@ public class HtmlParser {
         Pattern pattern = Pattern.compile(imgSrcAttributePattern);
         Matcher matcher = null;
         for (String tmp : imageTags) {
-            logger.info("get image tag     ==> {}", tmp);
             if (null==matcher) {
                 matcher = pattern.matcher(tmp);
             }
@@ -174,16 +176,14 @@ public class HtmlParser {
 
             boolean srcAttrExist = matcher.find();
             if (!srcAttrExist) {
-                logger.info("get image tag     ==> src attribute not exist");
+                logger.warn("get image tag do not have src attribute={}", tmp);
                 continue;
             }
             String srcAttribute = tmp.substring(matcher.start(), matcher.end());
             srcAttribute = srcAttribute.replace('\'', '\"');
-            logger.info("get image tag src ==> {}", srcAttribute);
             int indexOfFirst = srcAttribute.indexOf('\"');
             int indexOfSecond = srcAttribute.indexOf('\"', indexOfFirst+1);
             srcAttribute = srcAttribute.substring(indexOfFirst+1, indexOfSecond);
-            logger.info("get image tag src value ==> {}", srcAttribute);
             imageTag2SrcAttrValue.put(tmp, srcAttribute);
         }
 
@@ -191,7 +191,6 @@ public class HtmlParser {
     }
 
     private List<String> getAllImageTag(String content) {
-        logger.info("get all image tag for content");
         if (null == content || content.isEmpty()) {
             return new ArrayList<>();
         }
@@ -213,16 +212,15 @@ public class HtmlParser {
             indexOfImage = startEndIdx[1];
         }
 
-        logger.info("get all image tag for content, count={}", imageTags.size());
         return imageTags;
     }
 
     private int[] getNextImageTag(String content, int startIndex) {
-        logger.info("get next image tag in content from startIndex={}", startIndex);
         int nextImageTagStart = indexOfFirstImageTag(content, startIndex);
         int nextImageTagEnd   = indexOfFirstGreaterThan(content, nextImageTagStart);
-        logger.info("get next image tag startIndex={} endIndex={}", nextImageTagStart, nextImageTagEnd);
         if (nextImageTagStart < 0 || nextImageTagEnd < 0) {
+            logger.warn("get next image tag in content from startIndex={} failed; nextImgTagStartEndIndex={}_{}",
+                    startIndex, nextImageTagStart, nextImageTagEnd);
             return null;
         }
         return new int[]{nextImageTagStart, nextImageTagEnd};

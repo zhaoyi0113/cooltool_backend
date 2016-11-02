@@ -32,6 +32,27 @@ public abstract class AbstractFileStorageService {
 
     abstract public InterfaceFileStorageDB getDbService();
 
+    public String addCacheFile(String fileName, InputStream file) {
+        logger.info("cache file");
+        if (null==file) {
+            logger.error("the file is invalid");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        if (VerifyUtil.isStringEmpty(fileName)) {
+            fileName = "tmp_cache";
+        }
+
+        Object ret = addFile(-1, fileName, file, false);
+        if (!(ret instanceof String)) {
+            logger.error("add file failed!");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        String savedRelativePath = (String)ret;
+        String cacheFileRelativePath = getNginxRelativePath()+savedRelativePath;
+        return cacheFileRelativePath;
+    }
+
     public long addNewFile(String fileName, InputStream file) {
         return addFile(-1, fileName, file);
     }
@@ -41,7 +62,8 @@ public abstract class AbstractFileStorageService {
     }
 
     public Object addFile(long oldFileId, String fileName, InputStream file, boolean needDBSave) {
-        logger.info("add file oldFileId={} filename={} file={}", oldFileId, fileName, file);
+        logger.info("add file oldFileId={} filename={} file={} to fileStorage={}, needDBSave={}",
+                oldFileId, fileName, file, getName(), needDBSave);
         if (null==file) {
             logger.warn("file is empty, not found input stream");
             if (needDBSave) {

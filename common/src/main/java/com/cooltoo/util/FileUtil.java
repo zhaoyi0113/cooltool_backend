@@ -2,15 +2,13 @@ package com.cooltoo.util;
 
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.services.file.AbstractFileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by hp on 2016/4/21.
@@ -60,27 +58,31 @@ public class FileUtil {
         output.close();
     }
 
-    public void moveFile(String srcPath, String destPath) throws IOException {
-        logger.info("move {} to {}", srcPath, destPath);
+    public boolean moveFile(String srcPath, String destPath) throws IOException {
+        logger.info("move file  " + srcPath + " to " + destPath);
         File src = new File(srcPath);
         File dest = new File(destPath);
 
         if (dest.exists()) {
-            logger.info("dest file is exist, destFile={}", dest);
+            logger.warn("dest file is exist, destFile={}", dest);
             dest.delete();
         }
         if (!dest.getParentFile().exists()) {
             if (!dest.getParentFile().mkdirs()) {
                 logger.error("make parent directory failed!");
-                throw new IOException("Failed to move "+src+" to "+dest);
+                return false;
             }
+        }
+        if (!(src.isFile() && src.exists())) {
+            logger.error("src file is not file, or not existed!");
+            return false;
         }
 
         boolean success = src.renameTo(dest);
-        logger.info("move status={}", success);
         if (!success) {
-            throw new IOException("Failed to move "+src+" to "+dest);
+            logger.error("Failed to move "+src+" to "+dest);
         }
+        return success;
     }
 
     public void moveFiles(Map<String, String> src2dest) {
@@ -133,6 +135,7 @@ public class FileUtil {
     /*=================================================================
      *       cooltoo storage file system structure utilities
      *=================================================================*/
+    public static final String CooltooFileFormatter = "^[0-9|a-f|A-F]{2,2}/[0-9|a-f|A-F]+$";
 
     /**
      * 例如：
@@ -186,7 +189,6 @@ public class FileUtil {
         if (!VerifyUtil.isStringEmpty(baseDirectory)) {
             relativePath = baseDirectory + relativePath;
         }
-        logger.info("relative path={}", relativePath);
         return relativePath;
     }
 
@@ -228,7 +230,6 @@ public class FileUtil {
      * @return  [dir, sha1]
      */
     public String[] encodeFilePath(String fileName) throws NoSuchAlgorithmException {
-        logger.info("construct cooltoo file name={}", fileName);
         if (VerifyUtil.isStringEmpty(fileName)) {
             fileName = "unknow";
             logger.warn("the file name is invalid, set it to={}", fileName);
@@ -256,16 +257,14 @@ public class FileUtil {
      * @return  [url 前缀, dir 子目录, sha1 文件名]
      */
     public String[] decodeFilePath(String cooltooFilePath) {
-        logger.info("deconstruct cooltoo file path={}", cooltooFilePath);
         if (VerifyUtil.isStringEmpty(cooltooFilePath)) {
-            logger.error("the file path is invalid");
+            logger.error("the file path is empth");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
         StringBuilder splash = new StringBuilder();
         splash.append('\\').append('\\');
         cooltooFilePath = cooltooFilePath.replaceAll(splash.toString(), "/");
-        logger.info("after repalce \\ to /  ={}", cooltooFilePath);
 
         String[] component    = cooltooFilePath.split("/");
         if (component.length<2) {
@@ -301,5 +300,107 @@ public class FileUtil {
         return path2UrlDirSha1;
     }
 
+    /** srcFileAbsolutePath---->dir/sha1 */
+    /**
+     * 文件系统中的文件移动到 dest 中
+     * @param srcFileAbsolutePath 文件系统路径
+     * @param dest 目标文件系统
+     * @return  源文件路径与移动后路径的映射
+     */
+    public Map<String, String> moveFilesToDest(List<String> srcFileAbsolutePath,
+                                               AbstractFileStorageService dest,
+                                               boolean needEveryFileMovedSuccessfully) {
+        if (VerifyUtil.isListEmpty(srcFileAbsolutePath)) {
+            logger.info("the files list is empty");
+            return new HashMap<>();
+        }
+        if (null==dest) {
+            logger.info("the dest storage is empty");
+            return new HashMap<>();
+        }
+        logger.info("move files to dest={}. files={}", dest.getName(), srcFileAbsolutePath);
+
+        // absolute_or_relative_file_path_in_temporary---->relative_file_path_in_storage
+        String currentMoving = "currentMoving";
+        Map<String, String> filePath2StoragePath = new Hashtable<>();
+        Map<String, String> successMoved         = new Hashtable<>();
+        try {
+            for (String srcFilePath : srcFileAbsolutePath) {
+                currentMoving = srcFilePath;
+                String[] baseurlDirSha1 = decodeFilePath(srcFilePath);
+                // relative_file_path_in_temporary--->dir/sha1
+                String relativeFilePath = baseurlDirSha1[1]
+                        + File.separator
+                        + baseurlDirSha1[2];
+
+                String storagePath  = dest.getStoragePath();
+                // dest_file_dir--->storage_base_path/dir
+                String destDirPath  = storagePath + baseurlDirSha1[1] + File.separator;
+                // dest_file_path--->storage_base_path/dir/sha1
+                String destFilePath = destDirPath + baseurlDirSha1[2];
+
+                // make the storage directory if necessary
+                File destDir = new File(destDirPath);
+                if (!destDir.exists()) {
+                    destDir.mkdirs();
+                }
+
+                // move temporary file to storage dir
+                boolean movedSuccessfully = moveFile(srcFilePath, destFilePath);
+                if (needEveryFileMovedSuccessfully && !movedSuccessfully) {
+                    throw new IOException("move file failed!");
+                }
+                successMoved.put(destFilePath, srcFilePath);
+
+                filePath2StoragePath.put(srcFilePath, relativeFilePath);
+            }
+            return filePath2StoragePath;
+        }
+        catch (Exception ex) {
+            logger.error("move file="+currentMoving+" failed! exception="+ex);
+            filePath2StoragePath.clear();
+            moveFiles(successMoved);/* rollback file moved */
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+    }
+
+    /**
+     * 将 cooltoo 文件系统中的文件从 src 移动到 dest 中
+     * @param pathsInStorage cooltoo 文件路径
+     * @param src 源文件系统
+     * @param dest 目标文件系统
+     * @return  文件在目标文件系统中的路径
+     */
+    public List<String> moveFileFromSrcToDest(List<String> pathsInStorage,
+                                              AbstractFileStorageService src,
+                                              AbstractFileStorageService dest) {
+        if (VerifyUtil.isListEmpty(pathsInStorage)) {
+            logger.info("nothing need to move");
+            return new ArrayList<>();
+        }
+        if (null==src) {
+            logger.info("src is empty");
+            return new ArrayList<>();
+        }
+        if (null==dest) {
+            logger.info("dest is empty");
+            return new ArrayList<>();
+        }
+        logger.debug("move files to from={} to={}", src.getName(), dest.getName());
+
+        List<String> srcFilesInStorage = new ArrayList<>();
+        for (String tmp : pathsInStorage) {
+            String relativePath = src.getRelativePathInStorage(tmp);
+            if (VerifyUtil.isStringEmpty(relativePath)) {
+                continue;
+            }
+            srcFilesInStorage.add(src.getStoragePath() + relativePath);
+        }
+        if (!VerifyUtil.isListEmpty(srcFilesInStorage)) {
+            dest.moveFileToHere(srcFilesInStorage);
+        }
+
+        return srcFilesInStorage;
+    }
 
 }

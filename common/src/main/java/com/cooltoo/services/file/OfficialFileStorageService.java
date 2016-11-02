@@ -94,48 +94,6 @@ public class OfficialFileStorageService extends AbstractFileStorageService {
     /** srcFileAbsolutePath---->dir/sha1 */
     @Override
     public Map<String, String> moveFileToHere(List<String> srcFileAbsolutePath) {
-        logger.info("move files to official path. files={}", srcFileAbsolutePath);
-        if (VerifyUtil.isListEmpty(srcFileAbsolutePath)) {
-            logger.info("the files list is empty");
-            return new HashMap<>();
-        }
-
-        // absolute_or_relative_file_path_in_temporary---->relative_file_path_in_storage
-        Map<String, String> filePath2StoragePath = new Hashtable<>();
-        Map<String, String> successMoved         = new Hashtable<>();
-        try {
-            for (String srcFilePath : srcFileAbsolutePath) {
-                String[] baseurlDirSha1 = fileUtil.decodeFilePath(srcFilePath);
-                // relative_file_path_in_temporary--->dir/sha1
-                String relativeFilePath = baseurlDirSha1[1]
-                                        + File.separator
-                                        + baseurlDirSha1[2];
-
-                String storagePath  = getStoragePath();
-                // dest_file_dir--->storage_base_path/dir
-                String destDirPath  = storagePath + baseurlDirSha1[1] + File.separator;
-                // dest_file_path--->storage_base_path/dir/sha1
-                String destFilePath = destDirPath + baseurlDirSha1[2];
-
-                // make the storage directory if necessary
-                File destDir = new File(destDirPath);
-                if (!destDir.exists()) {
-                    destDir.mkdirs();
-                }
-
-                // move temporary file to storage dir
-                fileUtil.moveFile(srcFilePath, destFilePath);
-                successMoved.put(destFilePath, srcFilePath);
-
-                filePath2StoragePath.put(srcFilePath, relativeFilePath);
-            }
-            return filePath2StoragePath;
-        }
-        catch (Exception ex) {
-            logger.error("move file failed!", ex);
-            filePath2StoragePath.clear();
-            rollbackFileMoved(successMoved);
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+        return fileUtil.moveFilesToDest(srcFileAbsolutePath, this, true);
     }
 }
