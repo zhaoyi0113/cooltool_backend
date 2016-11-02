@@ -64,13 +64,12 @@ public class CourseRelationManageService {
     //                    getting
     //==============================================================================
 
-    public List<CourseBean> getCourseByHospitalDepartmentDiagnosticCategory(Integer hospitalId, Integer departmentId, boolean containHospitalCourse,
-                                                                            Long diagnosticId,
-                                                                            List<Long> categoryIds,
-                                                                            boolean isAdmin,
-                                                                            Integer pageIndex, Integer sizePerPage) {
-        logger.info("get courses by hospitalId={} departmentId={} containHospitalCourse={} categoryIds={} diagnosticId={} isAdmin={} pageIndex={} sizePerPage={}",
-                hospitalId, departmentId, containHospitalCourse, categoryIds, diagnosticId, isAdmin, pageIndex, sizePerPage);
+    private List<Long> getCourseIdsInHospitalDepartmentDiagnosticCategory(Integer hospitalId, Integer departmentId, boolean containHospitalCourse,
+                                                                          Long diagnosticId,
+                                                                          List<Long> categoryIds,
+                                                                          boolean isAdmin) {
+        logger.info("get coursesId by hospitalId={} departmentId={} containHospitalCourse={} categoryIds={} diagnosticId={} isAdmin={}",
+                hospitalId, departmentId, containHospitalCourse, categoryIds, diagnosticId, isAdmin);
 
         // judge category ids are empty
         if (null!=categoryIds && VerifyUtil.isListEmpty(categoryIds)) {
@@ -150,13 +149,55 @@ public class CourseRelationManageService {
                 coursesId = coursesInDiagnostic;
             }
         }
+
+        return coursesId;
+    }
+
+    public long countCourseByHospitalDepartmentDiagnosticCategory(Integer hospitalId, Integer departmentId, boolean containHospitalCourse,
+                                                                  Long diagnosticId,
+                                                                  List<Long> categoryIds,
+                                                                  boolean isAdmin) {
+        List<Long> coursesIdIn = getCourseIdsInHospitalDepartmentDiagnosticCategory(
+                hospitalId, departmentId, containHospitalCourse,
+                diagnosticId,
+                categoryIds,
+                isAdmin);
+
+
+        // get coursesId existed
+        List<Long> result = null;
+        if (!isAdmin) {
+            result = courseService.getCourseIdByStatusAndIds(CourseStatus.ENABLE.name(), coursesIdIn);
+        }
+        else {
+            result = courseService.getCourseIdByStatusAndIds(null, coursesIdIn);
+        }
+        logger.info("courses size={}", result.size());
+
+        return null==result ? 0 : result.size();
+    }
+
+    public List<CourseBean> getCourseByHospitalDepartmentDiagnosticCategory(Integer hospitalId, Integer departmentId, boolean containHospitalCourse,
+                                                                            Long diagnosticId,
+                                                                            List<Long> categoryIds,
+                                                                            boolean isAdmin,
+                                                                            Integer pageIndex, Integer sizePerPage) {
+        logger.info("get courses by hospitalId={} departmentId={} containHospitalCourse={} categoryIds={} diagnosticId={} isAdmin={} pageIndex={} sizePerPage={}",
+                hospitalId, departmentId, containHospitalCourse, categoryIds, diagnosticId, isAdmin, pageIndex, sizePerPage);
+
+        List<Long> coursesIdIn = getCourseIdsInHospitalDepartmentDiagnosticCategory(
+                hospitalId, departmentId, containHospitalCourse,
+                diagnosticId,
+                categoryIds,
+                isAdmin);
+
         // get courses
         List<CourseBean> result = null;
         if (!isAdmin) {
-            result = courseService.getCourseByStatusAndIds(CourseStatus.ENABLE, coursesId, pageIndex, sizePerPage);
+            result = courseService.getCourseByStatusAndIds(CourseStatus.ENABLE, coursesIdIn, pageIndex, sizePerPage);
         }
         else {
-            result = courseService.getCourseByStatusAndIds(null, coursesId, pageIndex, sizePerPage);
+            result = courseService.getCourseByStatusAndIds(null, coursesIdIn, pageIndex, sizePerPage);
         }
         logger.info("courses size={}", result.size());
         return result;

@@ -222,7 +222,9 @@ public class CourseService {
         CourseBean bean = beanConverter.convert(entity);
         if (bean.getFrontCover()>0) {
             String imgUrl = userStorage.getFileURL(bean.getFrontCover());
-            bean.setFrontCoverUrl(imgUrl);
+            if (!VerifyUtil.isStringEmpty(imgUrl)) {
+                bean.setFrontCoverUrl(httpNginxBaseUrl+imgUrl);
+            }
         }
 
 
