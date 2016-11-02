@@ -269,6 +269,7 @@ public class DoctorService {
         if (VerifyUtil.isListEmpty(entities)) {
             return doctorIds;
         }
+        List<DoctorBean> beans = entitiesToBeans(entities);
 
         List<Long> imagesId = new ArrayList<>();
         for (DoctorEntity entity : entities) {
@@ -281,6 +282,15 @@ public class DoctorService {
         }
         userStorage.deleteFiles(imagesId);
         repository.delete(entities);
+
+        // move introduction images to tmp storage path
+        for (DoctorBean tmp : beans) {
+            List<String> srcUrls = htmlParser.getSrcUrls(tmp.getIntroduction());
+            if (!VerifyUtil.isListEmpty(srcUrls)) {
+                fileUtil.moveFileFromSrcToDest(srcUrls, userStorage, tempStorage);
+            }
+        }
+
 
         logger.info("delete doctor={}", entities);
         return doctorIds;
