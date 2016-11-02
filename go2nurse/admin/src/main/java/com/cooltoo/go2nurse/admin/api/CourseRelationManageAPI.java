@@ -69,7 +69,6 @@ public class CourseRelationManageAPI {
                                           @QueryParam("course_id") @DefaultValue("") String strCourseId,
                                           @QueryParam("index") @DefaultValue("0") int pageIndex,
                                           @QueryParam("number") @DefaultValue("10") int sizePerPage
-                                          @
     ) {
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         Long diagnosticId = VerifyUtil.isIds(strDiagnosticId) ? VerifyUtil.parseLongIds(strDiagnosticId).get(0) : null;

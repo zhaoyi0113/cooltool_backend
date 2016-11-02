@@ -90,12 +90,9 @@ public class CategoryCourseOrderService {
         }
         Page<CategoryCourseOrderEntity> entities = repository.findOrderByConditions(hospitalId, departmentId, categoryId, page);
         List<CategoryCourseOrderBean> beans = entitiesToBean(entities);
-
         fillOtherProperties(beans);
         return beans;
     }
-
-    private List<Long> getCourseIds
 
     public Map<CategoryCoursesOrderGroup, List<Long>> getCategoryGroupToCourseIdsSorted(int hospital, int department, List<Long> categories) {
         logger.info("get categoryId--courseIdsSorted by hospital={} department={} category={}", hospital, department, categories);
