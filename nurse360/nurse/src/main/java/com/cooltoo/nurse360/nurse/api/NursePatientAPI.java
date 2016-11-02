@@ -3,6 +3,7 @@ package com.cooltoo.nurse360.nurse.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.*;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.go2nurse.beans.UserBean;
@@ -35,32 +36,35 @@ public class NursePatientAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response grabOrder(@Context HttpServletRequest request,
-                              @QueryParam("index") @DefaultValue("0") int pageIndex,
-                              @QueryParam("number") @DefaultValue("10") int sizePerPage
+    public Response getPatient(@Context HttpServletRequest request,
+                               @QueryParam("is_in_hospital") @DefaultValue("0") String isInHospital /* YES, NO */
     ) {
+        YesNoEnum inHospital = YesNoEnum.parseString(isInHospital);
+        UserHospitalizedStatus userInHospital = YesNoEnum.YES.equals(inHospital)
+                ? UserHospitalizedStatus.IN_HOSPITAL
+                : UserHospitalizedStatus.IN_HOME;
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+
         List<Long> userIds = nursePatientService.getUserByNurseId(nurseId, CommonStatus.ENABLED.name());
         List<UserBean> users = userService.getUser(userIds, UserAuthority.AGREE_ALL);
-        Map<UserHospitalizedStatus, List<UserBean>> group = new HashMap<>();
+
+        List<UserBean> returnVal = new ArrayList<>();
         for (UserBean tmp : users) {
             UserHospitalizedStatus status = UserHospitalizedStatus.IN_HOSPITAL.equals(tmp.getHasDecide())
-                    ? UserHospitalizedStatus.IN_HOSPITAL : UserHospitalizedStatus.IN_HOME;
-            List<UserBean> set = group.get(status);
-            if (null==set) {
-                set = new ArrayList<>();
-                group.put(status, set);
+                    ? UserHospitalizedStatus.IN_HOSPITAL
+                    : UserHospitalizedStatus.IN_HOME;
+            if (userInHospital.equals(status)) {
+                returnVal.add(tmp);
             }
-            set.add(tmp);
         }
-        return Response.ok(group).build();
+        return Response.ok(returnVal).build();
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response grabOrder(@Context HttpServletRequest request,
-                              @FormParam("user_code") @DefaultValue("0") String userUniqueId
+    public Response addPatient(@Context HttpServletRequest request,
+                               @FormParam("user_code") @DefaultValue("0") String userUniqueId
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<UserBean> users = userService.getUserByUniqueId(userUniqueId);
