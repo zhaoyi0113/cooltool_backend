@@ -256,7 +256,7 @@ public class CourseManageAPI {
                                                             @FormParam("content") String htmlContent
     ) {
         logger.info("submit course with html, need to download images automatically");
-        CourseBean course = courseService.setCourseContentWithHtml(courseId, htmlContent);
+        CourseBean course = courseService.updateCourseContent(courseId, htmlContent);
         logger.info("course is {}", course);
         return Response.ok(course).build();
     }

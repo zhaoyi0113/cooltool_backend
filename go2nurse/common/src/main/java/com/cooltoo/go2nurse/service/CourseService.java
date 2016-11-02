@@ -443,51 +443,6 @@ public class CourseService {
     //===========================================================
     //         update for the image src attribute
     //===========================================================
-
-    @Transactional
-    public CourseBean updateCourseContent(long courseId, String content) {
-        logger.info("update course {} token={} content={}", courseId, content);
-
-        CourseEntity entity = repository.findOne(courseId);
-        if (null==entity) {
-            logger.error("the course is not exist (and clean token cache)");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
-        }
-
-        if (!CourseStatus.EDITING.equals(entity.getStatus())) {
-            logger.error("the course is not editing");
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
-        }
-
-        if (VerifyUtil.isStringEmpty(content)) {
-            content = "";  // avoid NullException
-        }
-        else {
-            // move temporary
-            moveTemporaryFileToOfficial(content);
-
-            //
-            // replace the content src url
-            //
-            // get a html_parser instance
-            HtmlParser htmlParser = HtmlParser.newInstance();
-            // get all image tag and its src attribute value
-            Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(content);
-            // get all src attribute value
-            List<String>        srcAttValues    = htmlParser.getSrcUrls(content);
-            Map<String, String> srcUrl2RelativeFilePathInStorage;
-            // move all src attribute urls to storage, and get relative_file_path_in_storage
-            srcUrl2RelativeFilePathInStorage = userStorage.getRelativePathInStorage(srcAttValues);
-            // replace all image src attribute to relative_file_path_in_storage
-            content = htmlParser.replaceImgTagSrcUrl(content, imgTag2SrcValue, srcUrl2RelativeFilePathInStorage);
-        }
-
-        entity.setContent(content);
-        entity.setStatus(CourseStatus.ENABLE);
-        entity = repository.save(entity);
-        return entities2BeansWithContent(entity);
-    }
-
     @Transactional
     public CourseBean moveCourse2Temporary(long courseId) {
         logger.info("move course {} image file to temporary directory", courseId);
@@ -505,7 +460,9 @@ public class CourseService {
         // has content need to move to temporary
         boolean needMove = !VerifyUtil.isStringEmpty(entity.getContent());
         if (needMove) {
-            moveOfficialFileToTemporary(entity.getContent());
+            HtmlParser htmlParser = HtmlParser.newInstance();
+            List<String> srcUrls = htmlParser.getSrcUrls(entity.getContent());
+            fileUtil.moveFileFromSrcToDest(srcUrls, userStorage, tempStorage);
         }
 
         // update to editing
@@ -515,58 +472,6 @@ public class CourseService {
         CourseBean bean = entities2BeansWithContent(entity);
         bean.setContent(null);
         return bean;
-    }
-
-    private void moveOfficialFileToTemporary(String htmlContent) {
-        logger.info("move html img tag src 's images to temporary storage");
-        if (VerifyUtil.isStringEmpty(htmlContent)) {
-            logger.info("html content is empty. nothing move to temporary directory");
-        }
-
-        HtmlParser htmlParser = HtmlParser.newInstance();
-        // get image tags src attribute url
-        List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
-
-        if (!VerifyUtil.isListEmpty(srcUrls)) {
-            List<String> srcFilesInStorage = new ArrayList<>();
-            for (String srcUrl : srcUrls) {
-                String relativePath = userStorage.getRelativePathInStorage(srcUrl);
-                if (VerifyUtil.isStringEmpty(relativePath)) {
-                    continue;
-                }
-                srcFilesInStorage.add(userStorage.getStoragePath() + relativePath);
-            }
-            tempStorage.moveFileToHere(srcFilesInStorage);
-        }
-        else {
-            logger.info("img tag is empty. nothing move to temporary directory");
-        }
-    }
-
-    private void moveTemporaryFileToOfficial(String htmlContent) {
-        logger.info("move html img tag src 's images to user storage");
-        if (VerifyUtil.isStringEmpty(htmlContent)) {
-            logger.info("html content is empty. nothing move to user directory");
-        }
-
-        HtmlParser htmlParser = HtmlParser.newInstance();
-        // get image tags src attribute url
-        List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
-
-        if (!VerifyUtil.isListEmpty(srcUrls)) {
-            List<String> srcFilesInStorage = new ArrayList<>();
-            for (String srcUrl : srcUrls) {
-                String relativePath = tempStorage.getRelativePathInStorage(srcUrl);
-                if (VerifyUtil.isStringEmpty(relativePath)) {
-                    continue;
-                }
-                srcFilesInStorage.add(tempStorage.getStoragePath() + relativePath);
-            }
-            userStorage.moveFileToHere(srcFilesInStorage);
-        }
-        else {
-            logger.info("img tag is empty. nothing move to official directory");
-        }
     }
 
     @Transactional
@@ -587,7 +492,7 @@ public class CourseService {
     }
 
     @Transactional
-    public CourseBean setCourseContentWithHtml(long courseId, String htmlContent) {
+    public CourseBean updateCourseContent(long courseId, String htmlContent) {
         logger.info("update course {} content={}", courseId, htmlContent);
 
         CourseEntity entity = repository.findOne(courseId);
