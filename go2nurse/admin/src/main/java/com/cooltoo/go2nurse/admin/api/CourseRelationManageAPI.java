@@ -46,7 +46,11 @@ public class CourseRelationManageAPI {
         Long courseId = VerifyUtil.isIds(strCourseId) ? VerifyUtil.parseLongIds(strCourseId).get(0) : null;
         long coursesCount;
         if (null==courseId) {
-            coursesCount = relationManage.countCourseByHospitalDepartmentDiagnosticCategory(hospitalId, departmentId, false, diagnosticId, categoryId, true);
+            coursesCount = relationManage.countCourseByHospitalDepartmentDiagnosticCategory(
+                    hospitalId, departmentId, false,
+                    diagnosticId,
+                    categoryId,
+                    true);
         }
         else {
             coursesCount = courseService.existCourse(courseId) ? 1 : 0;
@@ -62,7 +66,10 @@ public class CourseRelationManageAPI {
                                           @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
                                           @QueryParam("diagnostic_id") @DefaultValue("") String strDiagnosticId,
                                           @QueryParam("category_id")   @DefaultValue("") String strCategoryId,
-                                          @QueryParam("course_id") @DefaultValue("") String strCourseId
+                                          @QueryParam("course_id") @DefaultValue("") String strCourseId,
+                                          @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                          @QueryParam("number") @DefaultValue("10") int sizePerPage
+                                          @
     ) {
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         Long diagnosticId = VerifyUtil.isIds(strDiagnosticId) ? VerifyUtil.parseLongIds(strDiagnosticId).get(0) : null;
@@ -71,7 +78,12 @@ public class CourseRelationManageAPI {
         Long courseId = VerifyUtil.isIds(strCourseId) ? VerifyUtil.parseLongIds(strCourseId).get(0) : null;
         List<CourseBean> courses;
         if (null==courseId) {
-            courses = relationManage.getCourseByHospitalDepartmentDiagnosticCategory(hospitalId, departmentId, false, diagnosticId, categoryId, true, null, null);
+            courses = relationManage.getCourseByHospitalDepartmentDiagnosticCategory(
+                    hospitalId, departmentId, false,
+                    diagnosticId,
+                    categoryId,
+                    true,
+                    pageIndex, sizePerPage);
         }
         else {
             courses = new ArrayList<>();
