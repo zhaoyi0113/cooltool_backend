@@ -153,10 +153,10 @@ public class CourseRelationManageService {
         return coursesId;
     }
 
-    public long countCourseByHospitalDepartmentDiagnosticCategory(Integer hospitalId, Integer departmentId, boolean containHospitalCourse,
-                                                                  Long diagnosticId,
-                                                                  List<Long> categoryIds,
-                                                                  boolean isAdmin) {
+    public List<Long> getValidCourseIdByHospitalDepartmentDiagnosticCategory(Integer hospitalId, Integer departmentId, boolean containHospitalCourse,
+                                                                             Long diagnosticId,
+                                                                             List<Long> categoryIds,
+                                                                             boolean isAdmin) {
         List<Long> coursesIdIn = getCourseIdsInHospitalDepartmentDiagnosticCategory(
                 hospitalId, departmentId, containHospitalCourse,
                 diagnosticId,
@@ -170,11 +170,11 @@ public class CourseRelationManageService {
             result = courseService.getCourseIdByStatusAndIds(CourseStatus.ENABLE.name(), coursesIdIn);
         }
         else {
-            result = courseService.getCourseIdByStatusAndIds(null, coursesIdIn);
+            result = courseService.getCourseIdByStatusAndIds("ALL", coursesIdIn);
         }
         logger.info("courses size={}", result.size());
 
-        return null==result ? 0 : result.size();
+        return null==result ? new ArrayList<>() : result;
     }
 
     public List<CourseBean> getCourseByHospitalDepartmentDiagnosticCategory(Integer hospitalId, Integer departmentId, boolean containHospitalCourse,
@@ -436,32 +436,32 @@ public class CourseRelationManageService {
         userCourseService.setCourseReadStatus(userId, courses);
 
         Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(courses);
-        List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
+        List<CoursesGroupBean> categoryGroups = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
 
-        Map<CategoryCoursesOrderGroup, List<Long>> categoryCourseOrder = null;
+        Map<CategoryCoursesOrderGroup, List<Long>> orderGroups = null;
         if (null!=hospital && null!=department && !VerifyUtil.isListEmpty(categoryIds)) {
-            categoryCourseOrder = categoryCourseOrderService.getCategoryGroupToCourseIdsSorted(hospital, department, categoryIds);
+            orderGroups = categoryCourseOrderService.getCategoryGroupToCourseIdsSorted(hospital, department, categoryIds);
         }
 
         List<CoursesGroupBean> resultGroup = new ArrayList<>();
         for (Long tmpId : categoryIds) {
-            for (int i = 0; i < categoryGroup.size(); i++) {
-                CoursesGroupBean tmp = categoryGroup.get(i);
+            for (int i = 0; i < categoryGroups.size(); i++) {
+                CoursesGroupBean tmp = categoryGroups.get(i);
                 if (tmpId==tmp.getId()) {
                     resultGroup.add(tmp);
                 }
             }
         }
 
-        if (!VerifyUtil.isMapEmpty(categoryCourseOrder)) {
-            CategoryCoursesOrderGroup orderGroup = new CategoryCoursesOrderGroup();
-            orderGroup.setHospitalId(hospital);
-            orderGroup.setDepartmentId(department);
+        if (!VerifyUtil.isMapEmpty(orderGroups)) {
+            CategoryCoursesOrderGroup key = new CategoryCoursesOrderGroup();
+            key.setHospitalId(hospital);
+            key.setDepartmentId(department);
             for (CoursesGroupBean tmp : resultGroup) {
-                orderGroup.setCategoryId(tmp.getId());
-                orderGroup.resetHashCode();
+                key.setCategoryId(tmp.getId());
+                key.resetHashCode();
 
-                List<Long> courseIdSorted = categoryCourseOrder.get(orderGroup);
+                List<Long> courseIdSorted = orderGroups.get(key);
                 if (VerifyUtil.isListEmpty(courseIdSorted)) {
                     continue;
                 }
@@ -506,7 +506,7 @@ public class CourseRelationManageService {
         }
         courses.clear();
 
-        courseGroup.setCourses(coursesIdSorted);
+        courseGroup.setCourses(courseSorted);
     }
 
 

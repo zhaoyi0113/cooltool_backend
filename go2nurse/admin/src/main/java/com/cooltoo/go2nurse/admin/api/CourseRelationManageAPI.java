@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by hp on 2016/6/13.
@@ -46,11 +45,12 @@ public class CourseRelationManageAPI {
         Long courseId = VerifyUtil.isIds(strCourseId) ? VerifyUtil.parseLongIds(strCourseId).get(0) : null;
         long coursesCount;
         if (null==courseId) {
-            coursesCount = relationManage.countCourseByHospitalDepartmentDiagnosticCategory(
+            List<Long> courseIds = relationManage.getValidCourseIdByHospitalDepartmentDiagnosticCategory(
                     hospitalId, departmentId, false,
                     diagnosticId,
                     categoryId,
                     true);
+            coursesCount = courseIds.size();
         }
         else {
             coursesCount = courseService.existCourse(courseId) ? 1 : 0;

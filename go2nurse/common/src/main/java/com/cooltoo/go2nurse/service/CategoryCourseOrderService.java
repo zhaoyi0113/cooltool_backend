@@ -15,12 +15,11 @@ import com.cooltoo.go2nurse.repository.CategoryCourseOrderRepository;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
+import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,10 +42,6 @@ public class CategoryCourseOrderService {
             new Sort.Order(Sort.Direction.ASC, "id")
             );
 
-    private static final Sort sortById = new Sort(
-            new Sort.Order(Sort.Direction.DESC, "id")
-    );
-
     @Autowired private CategoryCourseOrderRepository repository;
     @Autowired private CategoryCourseBeanConverter beanConverter;
 
@@ -54,6 +49,7 @@ public class CategoryCourseOrderService {
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
     @Autowired private CourseCategoryService categoryService;
+    @Autowired private CourseRelationManageService courseRelationManage;
     @Autowired private Go2NurseUtility utility;
 
     //==========================================================
@@ -72,26 +68,77 @@ public class CategoryCourseOrderService {
     }
 
     public long countOrderByConditions(Integer hospitalId, Integer departmentId, Long categoryId) {
-        long count = repository.countOrderByConditions(hospitalId, departmentId, categoryId);
+        List<Long> count = new ArrayList<>();
+        if (null!=hospitalId && null!=departmentId && null!=categoryId) {
+            count = courseRelationManage.getValidCourseIdByHospitalDepartmentDiagnosticCategory(
+                    hospitalId, departmentId, false,
+                    null,
+                    Arrays.asList(new Long[]{categoryId}),
+                    true);
+        }
         logger.info("count course order by hospitalId={} departmentId={} categoryId={}, size={}",
                 hospitalId, departmentId, categoryId, count);
-        return count;
+        return count.size();
     }
 
     public List<CategoryCourseOrderBean> getOrderByConditions(Integer hospitalId, Integer departmentId, Long categoryId, Integer pageIndex, Integer sizePerPage) {
         logger.info("get course order by hospitalId={} departmentId={} categoryId={}, pageIndex={} sizePerPage={}",
                 hospitalId, departmentId, categoryId, pageIndex, sizePerPage);
-        PageRequest page;
-        if (null==categoryId && null==departmentId) {
-            page = new PageRequest(pageIndex, sizePerPage, sortById);
+
+        if (null==hospitalId && null==departmentId && null==categoryId) {
+            logger.warn("hospitalId_departmentId_categoryId not set!!");
+            return new ArrayList<>();
         }
-        else {
-            page = new PageRequest(pageIndex, sizePerPage, sort);
+
+        List<CategoryCourseOrderEntity> entities = repository.findOrderByHospitalIdAndDepartmentIdAndCategoryIdIn(
+                hospitalId, departmentId,
+                Arrays.asList(new Long[]{categoryId}),
+                sort);
+        List<CategoryCourseOrderBean> orderBeans = entitiesToBean(entities);
+        List<Long> coursesIdInHospitalDepartCategory = courseRelationManage.getValidCourseIdByHospitalDepartmentDiagnosticCategory(
+                hospitalId, departmentId, false,
+                null,
+                Arrays.asList(new Long[]{categoryId}),
+                true
+        );
+        orderBeans = getCoursesIdSorted(
+                hospitalId, departmentId, categoryId,
+                orderBeans,
+                coursesIdInHospitalDepartCategory);
+        orderBeans = SetUtil.newInstance().getSetByPage(orderBeans, pageIndex, sizePerPage, null);
+
+        fillOtherProperties(orderBeans);
+
+        return orderBeans;
+    }
+
+    private List<CategoryCourseOrderBean> getCoursesIdSorted(
+            int hospitalId, int departmentId, long categoryId,
+            List<CategoryCourseOrderBean> coursesSorted,
+            List<Long> coursesIdInHospitalDepartCategory) {
+        if (null==coursesSorted) {
+            coursesSorted = new ArrayList<>();
         }
-        Page<CategoryCourseOrderEntity> entities = repository.findOrderByConditions(hospitalId, departmentId, categoryId, page);
-        List<CategoryCourseOrderBean> beans = entitiesToBean(entities);
-        fillOtherProperties(beans);
-        return beans;
+
+        List<Long> coursesIdSorted = getCourseIds(coursesSorted);
+
+        if (!VerifyUtil.isListEmpty(coursesIdInHospitalDepartCategory)) {
+            for (Long tmpId :coursesIdInHospitalDepartCategory) {
+                if (coursesIdSorted.contains(tmpId)) {
+                    continue;
+                }
+                coursesIdSorted.add(tmpId);
+
+                CategoryCourseOrderBean bean = new CategoryCourseOrderBean();
+                bean.setHospitalId(hospitalId);
+                bean.setDepartmentId(departmentId);
+                bean.setCategoryId(categoryId);
+                bean.setCourseId(tmpId);
+                bean.setOrder(Integer.MAX_VALUE);
+                coursesSorted.add(bean);
+            }
+        }
+        return coursesSorted;
     }
 
     public Map<CategoryCoursesOrderGroup, List<Long>> getCategoryGroupToCourseIdsSorted(int hospital, int department, List<Long> categories) {
@@ -139,6 +186,19 @@ public class CategoryCourseOrderService {
             }
         }
         return result;
+    }
+
+    private List<Long> getCourseIds(List<CategoryCourseOrderBean> beans) {
+        List<Long> list = new ArrayList<>();
+        if (null==beans) {
+            return list;
+        }
+        for (CategoryCourseOrderBean tmp : beans) {
+            if (!list.contains(tmp.getCourseId())) {
+                list.add(tmp.getCourseId());
+            }
+        }
+        return list;
     }
 
     private List<CategoryCourseOrderBean> entitiesToBean(Iterable<CategoryCourseOrderEntity> entities) {

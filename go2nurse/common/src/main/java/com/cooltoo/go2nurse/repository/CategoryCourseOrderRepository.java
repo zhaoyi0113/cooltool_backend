@@ -18,7 +18,9 @@ public interface CategoryCourseOrderRepository extends JpaRepository<CategoryCou
             int hospitalId, int departmentId, long categoryId, long courseId
     );
     List<CategoryCourseOrderEntity> findOrderByHospitalIdAndDepartmentIdAndCategoryIdIn(
-            int hospitalId, int departmentId, List<Long> categoryId, Sort sort);
+            int hospitalId, int departmentId,
+            List<Long> categoryId,
+            Sort sort);
 
     @Query("SELECT count(cr.id) FROM CategoryCourseOrderEntity cr" +
             " WHERE (?1 IS NULL OR cr.hospitalId=?1)" +
@@ -30,5 +32,7 @@ public interface CategoryCourseOrderRepository extends JpaRepository<CategoryCou
             " WHERE (?1 IS NULL OR cr.hospitalId=?1)" +
             " AND   (?2 IS NULL OR cr.departmentId=?2)" +
             " AND   (?3 IS NULL OR cr.categoryId=?3)")
-    Page<CategoryCourseOrderEntity> findOrderByConditions(Integer hospitalId, Integer departmentId, Long categoryId, Pageable page);
+    Page<CategoryCourseOrderEntity> findOrderByConditions(Integer hospitalId, Integer departmentId,
+                                                          Long categoryId,
+                                                          Pageable page);
 }
