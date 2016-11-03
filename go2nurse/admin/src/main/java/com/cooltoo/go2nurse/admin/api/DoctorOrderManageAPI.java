@@ -95,7 +95,7 @@ public class DoctorOrderManageAPI {
     public Response addServiceVendor(@Context HttpServletRequest request,
                                      @FormParam("order_id") @DefaultValue("0") long orderId,
                                      @FormParam("doctor_id") @DefaultValue("0") long doctorId,
-                                     @FormParam("doctor_id") @DefaultValue("0") int doctorOrder,
+                                     @FormParam("doctor_order") @DefaultValue("0") int doctorOrder,
                                      @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
                                      @FormParam("hospital_order") @DefaultValue("0") int hospitalOrder,
                                      @FormParam("department_id") @DefaultValue("0") int departmentId,
@@ -118,7 +118,7 @@ public class DoctorOrderManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addServiceVendor(@Context HttpServletRequest request,
                                      @FormParam("doctor_id") @DefaultValue("0") long doctorId,
-                                     @FormParam("doctor_id") @DefaultValue("0") int doctorOrder,
+                                     @FormParam("doctor_order") @DefaultValue("0") int doctorOrder,
                                      @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
                                      @FormParam("hospital_order") @DefaultValue("0") int hospitalOrder,
                                      @FormParam("department_id") @DefaultValue("0") int departmentId,
