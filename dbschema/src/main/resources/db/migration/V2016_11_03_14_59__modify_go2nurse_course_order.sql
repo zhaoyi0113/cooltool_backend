@@ -1,0 +1,1 @@
+ALTER TABLE `go2nurse_course_order` CHANGE COLUMN `id` `id` BIGINT(64) NOT NULL AUTO_INCREMENT ;

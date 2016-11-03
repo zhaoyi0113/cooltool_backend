@@ -115,10 +115,34 @@ public class CategoryCourseOrderManageAPI {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response changeCategoryCourseOrder(@Context HttpServletRequest request,
+                                              @FormParam("order_id") @DefaultValue("0") long orderId,
+                                              @FormParam("order") @DefaultValue("0") int order
+    ) {
+        categoryCourseOrderService.changeTwoCategoryOrderInCategory(orderId, order);
+        return Response.ok().build();
+    }
+
+    @Path("/change")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response changeCategoryCourseOrder(@Context HttpServletRequest request,
                                               @FormParam("first_order_id") @DefaultValue("0") long firstOrderId,
                                               @FormParam("second_order_id") @DefaultValue("0") long secondOrderId
     ) {
         categoryCourseOrderService.changeTwoCategoryOrderInCategory(firstOrderId, secondOrderId);
+        return Response.ok().build();
+    }
+
+    @Path("/change/course_id")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response changeCategoryCourseOrder(@Context HttpServletRequest request,
+                                              @FormParam("department_id") @DefaultValue("0") int departmentId,
+                                              @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                              @FormParam("first_course_id") @DefaultValue("0") long firstCourseId,
+                                              @FormParam("second_course_id") @DefaultValue("0") long secondCourseId
+    ) {
+        categoryCourseOrderService.changeTwoCategoryOrderInCategory(departmentId, categoryId, firstCourseId, secondCourseId);
         return Response.ok().build();
     }
 }

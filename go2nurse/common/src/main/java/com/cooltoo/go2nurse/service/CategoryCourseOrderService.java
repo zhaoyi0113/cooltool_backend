@@ -273,6 +273,24 @@ public class CategoryCourseOrderService {
     //               update
     //==========================================================
     @Transactional
+    public void changeCategoryOrder(long firstOrderId, int order) {
+        logger.info("change course order to {} in department orderId={}",  order, firstOrderId);
+
+        CategoryCourseOrderEntity _1st = repository.findOne(firstOrderId);
+        if (null==_1st) {
+            logger.error("the course order in department is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        if (order!=_1st.getOrder()) {
+            _1st.setOrder(order);
+        }
+        repository.save(_1st);
+
+        return;
+    }
+
+    @Transactional
     public void changeTwoCategoryOrderInCategory(long firstOrderId, long secondOrderId) {
         logger.info("change two course order in department 1stId={}, 2ndId={}",
                 firstOrderId, secondOrderId);
@@ -298,6 +316,59 @@ public class CategoryCourseOrderService {
 
         logger.error("the two order belong to different hospital or department or category");
         throw new BadRequestException(ErrorCode.DATA_ERROR);
+    }
+
+    @Transactional
+    public void changeTwoCategoryOrderInCategory(int departmentId, long categoryId,
+                                                 long firstCourseId, long secondCourseId
+    ) {
+        logger.info("change two course order in department={} category={} 1stId={}, 2ndId={}",
+                departmentId, categoryId, firstCourseId, secondCourseId);
+        if (!departmentService.existsDepartment(departmentId)) {
+            logger.error("department not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (!categoryService.existsCategory(categoryId)) {
+            logger.error("category not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        HospitalDepartmentBean department = departmentService.getById(departmentId, null);
+        int hospitalId = department.getHospitalId();
+
+        CategoryCourseOrderEntity _1st;
+        CategoryCourseOrderEntity _2nd;
+
+        List<CategoryCourseOrderEntity>
+        tmpSet = repository.findOrderByHospitalIdAndDepartmentIdAndCategoryIdAndCourseId(hospitalId, departmentId, categoryId, firstCourseId);
+        if (VerifyUtil.isListEmpty(tmpSet)) {
+            long id = setCourseOrder(departmentId, categoryId, firstCourseId, (int)firstCourseId);
+            _1st = repository.findOne(id);
+        }
+        else {
+            _1st = tmpSet.get(0);
+        }
+        tmpSet = repository.findOrderByHospitalIdAndDepartmentIdAndCategoryIdAndCourseId(hospitalId, departmentId, categoryId, secondCourseId);
+        if (VerifyUtil.isListEmpty(tmpSet)) {
+            long id = setCourseOrder(departmentId, categoryId, secondCourseId, (int)secondCourseId);
+            _2nd = repository.findOne(id);
+        }
+        else {
+            _2nd = tmpSet.get(0);
+        }
+
+        if (null==_1st || null==_2nd) {
+            logger.error("the course order in department is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        int swapOrder1 = _1st.getOrder();
+        int swapOrder2 = _2nd.getOrder();
+        _1st.setOrder(swapOrder2);
+        _2nd.setOrder(swapOrder1);
+        repository.save(_1st);
+        repository.save(_2nd);
+
+        return;
     }
 
     //==========================================================
