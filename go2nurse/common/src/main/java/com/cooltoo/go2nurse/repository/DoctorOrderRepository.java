@@ -32,4 +32,7 @@ public interface DoctorOrderRepository extends JpaRepository<DoctorOrderEntity, 
 
     List<DoctorOrderEntity> findOrderByHospitalIdAndDoctorId(Integer hospitalId, Long doctorId, Sort sort);
     List<DoctorOrderEntity> findOrderByHospitalIdAndDepartmentIdAndDoctorId(Integer hospitalId, Integer departmentId, Long doctorId, Sort sort);
+
+
+    List<DoctorOrderEntity> findOrderByDoctorId(Long doctorId, Sort sort);
 }

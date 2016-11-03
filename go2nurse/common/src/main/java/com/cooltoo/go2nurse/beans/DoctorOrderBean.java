@@ -21,6 +21,7 @@ public class DoctorOrderBean {
     private int departmentOrder;
     private long doctorId;
     private DoctorBean doctor;
+    private int doctorOrder;
 
     public long getId() {
         return id;
@@ -102,6 +103,14 @@ public class DoctorOrderBean {
         this.doctorId = doctorId;
     }
 
+    public int getDoctorOrder() {
+        return doctorOrder;
+    }
+
+    public void setDoctorOrder(int doctorOrder) {
+        this.doctorOrder = doctorOrder;
+    }
+
     public DoctorBean getDoctor() {
         return doctor;
     }
@@ -118,6 +127,7 @@ public class DoctorOrderBean {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", doctorId=").append(doctorId);
+        msg.append(", doctorOrder=").append(doctorOrder);
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", hospitalOrder").append(hospitalOrder);
         msg.append(", departmentId=").append(departmentId);

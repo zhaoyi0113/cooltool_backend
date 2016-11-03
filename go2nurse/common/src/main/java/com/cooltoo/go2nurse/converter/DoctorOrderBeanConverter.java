@@ -17,6 +17,7 @@ public class DoctorOrderBeanConverter implements Converter<DoctorOrderEntity, Do
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
         bean.setDoctorId(source.getDoctorId());
+        bean.setDoctorOrder(source.getDoctorOrder());
         bean.setHospitalId(source.getHospitalId());
         bean.setHospitalOrder(source.getHospitalOrder());
         bean.setDepartmentId(source.getDepartmentId());

@@ -39,6 +39,7 @@ public class DoctorOrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(DoctorOrderService.class);
 
+    private static final Sort doctorSort = new Sort(new Sort.Order(Sort.Direction.ASC, "doctorOrder"));
     private static final Sort hospitalSort = new Sort(new Sort.Order(Sort.Direction.ASC, "hospitalOrder"));
     private static final Sort departmentSort = new Sort(new Sort.Order(Sort.Direction.ASC, "departmentOrder"));
 
@@ -67,6 +68,15 @@ public class DoctorOrderService {
         DoctorOrderBean bean = orderBeanConverter.convert(entity);
         logger.info("get order={}", bean);
         return bean;
+    }
+
+    public List<DoctorOrderBean> getOrderByDoctorId(long doctorId) {
+        logger.info("get doctorId ordered by doctorId={}", doctorId);
+        List<DoctorOrderEntity> entities = orderRepository.findOrderByDoctorId(doctorId, doctorSort);
+        List<DoctorOrderBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
+        logger.info("get order size={}", beans.size());
+        return beans;
     }
 
     public List<Long> getDoctorOrderedList(boolean orderByHospital, Integer hospitalId, Integer departmentId) {
@@ -228,6 +238,29 @@ public class DoctorOrderService {
     //                       update
     //============================================================
     @Transactional
+    public void changeTwoDoctorOrderInDoctor(long firstOrderId, long secondOrderId) {
+        logger.info("change two doctor order in hospital 1stId={}, 2ndId={}",
+                firstOrderId, secondOrderId);
+        DoctorOrderEntity _1st = orderRepository.findOne(firstOrderId);
+        DoctorOrderEntity _2nd = orderRepository.findOne(secondOrderId);
+        if (null==_1st || null==_2nd) {
+            logger.error("the doctor order in hospital is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (_1st.getDoctorId()!=_2nd.getDoctorId()) {
+            logger.error("the doctor order not belong to the same doctor");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        int swapOrder1 = _1st.getDoctorOrder();
+        int swapOrder2 = _2nd.getDoctorOrder();
+        _1st.setDoctorOrder(swapOrder2);
+        _2nd.setDoctorOrder(swapOrder1);
+        orderRepository.save(_1st);
+        orderRepository.save(_2nd);
+        return;
+    }
+
+    @Transactional
     public void changeTwoDoctorOrderInHospital(long firstOrderId, long secondOrderId) {
         logger.info("change two doctor order in hospital 1stId={}, 2ndId={}",
                 firstOrderId, secondOrderId);
@@ -235,6 +268,10 @@ public class DoctorOrderService {
         DoctorOrderEntity _2nd = orderRepository.findOne(secondOrderId);
         if (null==_1st || null==_2nd) {
             logger.error("the doctor order in hospital is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (_1st.getHospitalId()!=_2nd.getHospitalId()) {
+            logger.error("the doctor order not belong to the same hospital");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         int swapOrder1 = _1st.getHospitalOrder();
@@ -256,6 +293,10 @@ public class DoctorOrderService {
             logger.error("the doctor order in department is not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
+        if (_1st.getHospitalId()!=_2nd.getHospitalId() || _1st.getDepartmentId()!=_2nd.getDepartmentId()) {
+            logger.error("the doctor order not belong to the same department");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
         int swapOrder1 = _1st.getDepartmentOrder();
         int swapOrder2 = _2nd.getDepartmentOrder();
         _1st.setDepartmentOrder(swapOrder2);
@@ -270,8 +311,19 @@ public class DoctorOrderService {
     //                       add
     //============================================================
     @Transactional
-    public DoctorOrderBean addDoctorOrder(long doctorId, int hospitalId, int departmentId) {
-        logger.info("set doctor={} order in hospital={} department={}");
+    public DoctorOrderBean setDoctorOrder(long orderId,
+                                          long doctorId, int doctorOrder,
+                                          int hospitalId, int hospitalOrder,
+                                          int departmentId, int departmentOrder) {
+        logger.info("set doctor order with doctor_order={}_{} hospital_order={}_{} department_order={}_{}",
+                doctorId, doctorOrder, hospitalId, hospitalOrder, departmentId, departmentOrder);
+
+        //==================================================================
+        //                   check parameters
+        //
+        // NOTE : doctorId and hospitalId are the primary key of this table
+        //==================================================================
+
         if (!doctorRepository.exists(doctorId)) {
             logger.error("doctor not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -280,80 +332,125 @@ public class DoctorOrderService {
             logger.error("hospital not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (!departmentRepository.existsDepartment(departmentId)) {
-            logger.error("department not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
-        }
-        HospitalDepartmentBean department = departmentRepository.deleteById(departmentId);
-        if (department.getHospitalId()!=hospitalId) {
-            logger.error("department not belong to the hospital");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+        if (departmentId>0) {
+            if (!departmentRepository.existsDepartment(departmentId)) {
+                logger.error("department not exist");
+                throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            }
 
-        DoctorOrderEntity order = null;
-        boolean existOrderInDepartment = false;
-
-        List<DoctorOrderEntity> orders = orderRepository.findOrderByHospitalIdAndDoctorId(hospitalId, doctorId, hospitalSort);
-        // order has exist
-        if (!VerifyUtil.isListEmpty(orders)) {
-            for (int i = 0; i < orders.size(); i++) {
-                DoctorOrderEntity tmp = orders.get(i);
-                if (tmp.getDepartmentId() == departmentId) {
-                    order = orders.get(i);
-                    orders.remove(i);
-                    existOrderInDepartment = true;
-                    break;
-                }
-                if (null==order) {
-                    order = orders.get(0);
-                    orders.remove(0);
-                }
+            HospitalDepartmentBean department = departmentRepository.getById(departmentId, "");
+            if (department.getHospitalId()!=hospitalId) {
+                logger.error("department not belong to the hospital");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
-        // order not exist
-        List<DoctorOrderEntity> tmpOrders = null;
+        departmentId = departmentId<0  ? 0 : departmentId;
+
+        //=====================================================
+        //                   get order exist
+        //=====================================================
+        DoctorOrderEntity order = null;
+        List<DoctorOrderEntity> tmpMatchOrders = orderRepository.findOrderByHospitalIdAndDoctorId(hospitalId, doctorId, hospitalSort);
+        // order in hospital exist, selected one
+        if (!VerifyUtil.isListEmpty(tmpMatchOrders)) {
+            for (int i=0; i<tmpMatchOrders.size(); i++) {
+                DoctorOrderEntity tmp = tmpMatchOrders.get(i);
+                if (tmp.getId() == orderId) {
+                    order = tmp;
+                    tmpMatchOrders.remove(i);
+                    break;
+                }
+            }
+            if (null==order) {
+                order = tmpMatchOrders.get(0);
+                tmpMatchOrders.remove(0);
+            }
+        }
+
+        // if update by orderId,
+        // recheck the orderId to make sure it in the same hospital.
+        // if not, must delete all the tmpMatchOrders
+        if (orderId>0) {
+            if (!orderRepository.exists(orderId)) {
+                logger.error("order not exist");
+                throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            }
+
+            if (null!=order && order.getId()!=orderId) {
+                // add order to tmpMatchOrders for removing
+                tmpMatchOrders.add(order);
+
+                // get the specific order
+                order = orderRepository.findOne(orderId);
+            }
+        }
+
+        // order not exist, new one
         if (null==order) {
             order = new DoctorOrderEntity();
-            order.setDoctorId(doctorId);
-
-            // get hospital max order
-            order.setHospitalId(hospitalId);
-            tmpOrders = orderRepository.findOrderByHospitalId(hospitalId, hospitalSort);
-            order.setHospitalOrder(VerifyUtil.isListEmpty(tmpOrders) ? 1 : (tmpOrders.get(tmpOrders.size()-1).getHospitalOrder() + 1));
-
-            // get department max order
-            order.setDepartmentId(departmentId);
-            tmpOrders = orderRepository.findOrderByHospitalIdAndDepartmentId(hospitalId, departmentId, hospitalSort);
-            order.setDepartmentOrder(VerifyUtil.isListEmpty(tmpOrders) ? 1 : (tmpOrders.get(tmpOrders.size()-1).getDepartmentOrder() + 1));
-
-            // clean
-            tmpOrders = null;
         }
-        // order exist
+
+        // delete extra records
+        if (!VerifyUtil.isListEmpty(tmpMatchOrders)) {
+            orderRepository.delete(tmpMatchOrders);
+        }
+
+
+        //=====================================================
+        //              replace settings
+        //=====================================================
+        List<DoctorOrderEntity> tmpOrders = null;
+        // get doctor max order
+        order.setDoctorId(doctorId);
+        if (orderId>0) {
+            if (doctorOrder>0){
+                order.setDoctorOrder(doctorOrder);
+            }
+        }
         else {
-            if (!existOrderInDepartment) {
-                // get hospital max order
-                order.setHospitalId(hospitalId);
+            if (doctorOrder <= 0) {
+                tmpOrders = orderRepository.findOrderByDoctorId(doctorId, doctorSort);
+                order.setDoctorOrder(VerifyUtil.isListEmpty(tmpOrders) ? 1 : (tmpOrders.get(tmpOrders.size() - 1).getDoctorOrder() + 1));
+            } else {
+                order.setDoctorOrder(doctorOrder);
+            }
+        }
+
+        // get hospital max order
+        order.setHospitalId(hospitalId);
+        if (orderId>0) {
+            if (hospitalOrder>0) {
+                order.setHospitalOrder(hospitalOrder);
+            }
+        }
+        else {
+            if (hospitalOrder <= 0) {
                 tmpOrders = orderRepository.findOrderByHospitalId(hospitalId, hospitalSort);
-                order.setHospitalOrder(VerifyUtil.isListEmpty(tmpOrders) ? 1 : (tmpOrders.get(tmpOrders.size()-1).getHospitalOrder() + 1));
+                order.setHospitalOrder(VerifyUtil.isListEmpty(tmpOrders) ? 1 : (tmpOrders.get(tmpOrders.size() - 1).getHospitalOrder() + 1));
+            } else {
+                order.setHospitalOrder(hospitalOrder);
+            }
+        }
 
-                // get department max order
-                order.setDepartmentId(departmentId);
-                tmpOrders = orderRepository.findOrderByHospitalIdAndDepartmentId(hospitalId, departmentId, hospitalSort);
-                order.setDepartmentOrder(VerifyUtil.isListEmpty(tmpOrders) ? 1 : (tmpOrders.get(tmpOrders.size()-1).getDepartmentOrder() + 1));
-
-                // clean
-                tmpOrders = null;
+        // get department max order (department order can be zero)
+        order.setDepartmentId(departmentId);
+        if (orderId>0) {
+            if (departmentId>=0) {
+                order.setDepartmentOrder(departmentOrder);
+            }
+        }
+        else {
+            if (departmentOrder < 0) {
+                tmpOrders = orderRepository.findOrderByHospitalIdAndDepartmentId(hospitalId, departmentId, departmentSort);
+                order.setDepartmentOrder(VerifyUtil.isListEmpty(tmpOrders) ? 1 : (tmpOrders.get(tmpOrders.size() - 1).getDepartmentOrder() + 1));
+            } else {
+                order.setDepartmentOrder(departmentOrder);
             }
         }
 
         order.setStatus(CommonStatus.ENABLED);
         order.setTime(new Date());
         order = orderRepository.save(order);
-
-        if (!VerifyUtil.isListEmpty(orders)) {
-            orderRepository.delete(orders);
-        }
 
         DoctorOrderBean bean = orderBeanConverter.convert(order);
         logger.info("doctor order in department is=={}", bean);

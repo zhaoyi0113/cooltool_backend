@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.DoctorBean;
+import com.cooltoo.go2nurse.beans.DoctorOrderBean;
 import com.cooltoo.go2nurse.service.DoctorOrderService;
 import com.cooltoo.go2nurse.service.DoctorService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
@@ -36,6 +37,8 @@ public class DoctorManageAPI {
                                   @QueryParam("doctor_id") @DefaultValue("0") long doctorId
     ) {
         DoctorBean doctor = doctorService.getDoctorById(doctorId, utility.getHttpPrefix());
+        List<DoctorOrderBean> orders = doctorOrderService.getOrderByDoctorId(doctorId);
+        doctor.setProperties(DoctorBean.ORDER, orders);
         return Response.ok(doctor).build();
     }
 
@@ -114,7 +117,7 @@ public class DoctorManageAPI {
     ) {
         DoctorBean doctor = doctorService.addDoctor(name, post, jobTitle, beGoodAt, departmentId, grade);
         if (hospitalId>0 && departmentId>0) {
-            doctorOrderService.addDoctorOrder(doctor.getId(), doctor.getHospitalId(), doctor.getDepartmentId());
+            doctorOrderService.setDoctorOrder(-1, doctor.getId(), -1, doctor.getHospitalId(), -1, doctor.getDepartmentId(), -1);
         }
         return Response.ok(doctor).build();
     }
@@ -139,7 +142,13 @@ public class DoctorManageAPI {
     ) {
         DoctorBean doctor = doctorService.updateDoctor(doctorId, name, post, jobTitle, beGoodAt, departmentId, status, grade);
         if (hospitalId>0 && departmentId>0) {
-            doctorOrderService.addDoctorOrder(doctorId, hospitalId, departmentId);
+            List<DoctorOrderBean> orders = doctorOrderService.getOrderByDoctorId(doctorId);
+            if (VerifyUtil.isListEmpty(orders)) {
+                doctorOrderService.setDoctorOrder(-1, doctorId, -1, hospitalId, -1, departmentId, -1);
+            }
+            else {
+                doctorOrderService.setDoctorOrder(orders.get(0).getId(), doctorId, -1, hospitalId, -1, departmentId, -1);
+            }
         }
         return Response.ok(doctor).build();
     }

@@ -88,16 +88,48 @@ public class DoctorOrderManageAPI {
 
 
     //==============================================================
+    //                         updating
+    //==============================================================
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addServiceVendor(@Context HttpServletRequest request,
+                                     @FormParam("order_id") @DefaultValue("0") long orderId,
+                                     @FormParam("doctor_id") @DefaultValue("0") long doctorId,
+                                     @FormParam("doctor_id") @DefaultValue("0") int doctorOrder,
+                                     @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                     @FormParam("hospital_order") @DefaultValue("0") int hospitalOrder,
+                                     @FormParam("department_id") @DefaultValue("0") int departmentId,
+                                     @FormParam("department_order") @DefaultValue("-1") int departmentOrder
+    ) {
+        doctorOrderService.deleteOrder(orderId);
+        DoctorOrderBean order = doctorOrderService.setDoctorOrder(
+                orderId,
+                doctorId, doctorOrder,
+                hospitalId, hospitalOrder,
+                departmentId, departmentOrder);
+        fillHospitalDepartment(order);
+        return Response.ok(order).build();
+    }
+
+
+    //==============================================================
     //                         adding
     //==============================================================
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response addServiceVendor(@Context HttpServletRequest request,
                                      @FormParam("doctor_id") @DefaultValue("0") long doctorId,
+                                     @FormParam("doctor_id") @DefaultValue("0") int doctorOrder,
                                      @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                     @FormParam("department_id") @DefaultValue("0") int departmentId
+                                     @FormParam("hospital_order") @DefaultValue("0") int hospitalOrder,
+                                     @FormParam("department_id") @DefaultValue("0") int departmentId,
+                                     @FormParam("department_order") @DefaultValue("-1") int departmentOrder
     ) {
-        DoctorOrderBean order = doctorOrderService.addDoctorOrder(doctorId, hospitalId, departmentId);
+        DoctorOrderBean order = doctorOrderService.setDoctorOrder(
+                -1,
+                doctorId, doctorOrder,
+                hospitalId, hospitalOrder,
+                departmentId, departmentOrder);
         fillHospitalDepartment(order);
         return Response.ok(order).build();
     }
@@ -105,6 +137,17 @@ public class DoctorOrderManageAPI {
     //==============================================================
     //                         editing
     //==============================================================
+    @Path("/change/doctor_order")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response changeDoctorOrder(@Context HttpServletRequest request,
+                                      @FormParam("first_order_id") @DefaultValue("0") long firstOrderId,
+                                      @FormParam("second_order_id") @DefaultValue("0") long secondOrderId
+    ) {
+        doctorOrderService.changeTwoDoctorOrderInDoctor(firstOrderId, secondOrderId);
+        return Response.ok().build();
+    }
+
     @Path("/change/hospital_order")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)

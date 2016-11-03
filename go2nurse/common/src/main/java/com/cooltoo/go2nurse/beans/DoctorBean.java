@@ -5,11 +5,15 @@ import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/7/25.
  */
 public class DoctorBean {
+
+    public static final String ORDER = "order";
 
     private long id;
     private Date time;
@@ -29,6 +33,7 @@ public class DoctorBean {
     private String introduction;
     private long headImageId;
     private String headImageUrl;
+    private Map<String, Object> properties = new HashMap<>();
 
     public long getId() {
         return id;
@@ -174,6 +179,22 @@ public class DoctorBean {
         this.headImageUrl = headImageUrl;
     }
 
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        if (null!=properties) {
+            this.properties = properties;
+        }
+    }
+
+    public void setProperties(String key, Object obj) {
+        if (null!=key && null!=obj) {
+            properties.put(key, obj);
+        }
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -193,6 +214,7 @@ public class DoctorBean {
         msg.append(", introduction=").append(introduction);
         msg.append(", headImageId=").append(headImageId);
         msg.append(", headImageUrl=").append(headImageUrl);
+        msg.append(", properties=").append(properties);
         msg.append("]");
         return msg.toString();
     }

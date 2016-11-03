@@ -238,7 +238,7 @@ public class CategoryCourseOrderService {
         }
 
         Map<Long, CourseBean> courseIdToBean = courseService.getCourseMapByStatusAndIds(null, courseIds, null, null);
-        Map<Long, CourseCategoryBean> categoryIdToBean = categoryService.getIdToBeanByStatusAndIds(null, categoryIds);
+        Map<Long, CourseCategoryBean> categoryIdToBean = categoryService.getIdToBeanByStatusAndIds("ALL", categoryIds);
         Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalIds);
         Map<Integer, HospitalDepartmentBean> departIdToBean = departmentService.getDepartmentIdToBean(departmentIds, utility.getHttpPrefixForNurseGo());
 

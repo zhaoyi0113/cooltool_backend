@@ -19,6 +19,7 @@ public class DoctorOrderEntity {
     private int departmentId;
     private int departmentOrder;
     private long doctorId;
+    private int doctorOrder;
 
 
     @Id
@@ -96,6 +97,15 @@ public class DoctorOrderEntity {
         this.doctorId = doctorId;
     }
 
+    @Column(name = "dortor_order")
+    public int getDoctorOrder() {
+        return doctorOrder;
+    }
+
+    public void setDoctorOrder(int doctorOrder) {
+        this.doctorOrder = doctorOrder;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -104,6 +114,7 @@ public class DoctorOrderEntity {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", doctorId=").append(doctorId);
+        msg.append(", doctorOrder").append(doctorOrder);
         msg.append(", hospitalId=").append(hospitalId);
         msg.append(", hospitalOrder").append(hospitalOrder);
         msg.append(", departmentId=").append(departmentId);
