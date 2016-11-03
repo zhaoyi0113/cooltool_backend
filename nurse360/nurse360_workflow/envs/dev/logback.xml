@@ -24,7 +24,10 @@
     </appender>
 
     <!-- com.cooltoo为java中的包 -->
-    <logger name="com.cooltoo" level="DEBUG" additivity="true"/>
+    <logger name="com.cooltoo" additivity="true">
+        <level>DEBUG</level>
+        <level>INFO</level>
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
