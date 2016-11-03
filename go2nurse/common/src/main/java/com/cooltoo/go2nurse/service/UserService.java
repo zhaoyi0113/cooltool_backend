@@ -158,6 +158,8 @@ public class UserService {
                         openAppRepository.save(wechatusers.get(0));
                         return beanConverter.convert(currentUser);
                     }
+                }else{
+                    logger.error("not able to find wechat user "+openid);
                 }
         }
         throw new BadRequestException(ErrorCode.DATA_ERROR);

@@ -153,6 +153,7 @@ public class WeChatService {
                                 url = addParameterOnUrl(url, "redirect", redirectPath);
                                 url = addParameterOnUrl(url, "departmentId", departmentId);
                                 url = addParameterOnUrl(url, "appid", appid);
+                                url = addParameterOnUrl(url, "openid", openid);
                                 return new URI(url);
                             } catch (URISyntaxException e) {
                                 logger.error(e.getMessage(), e);
