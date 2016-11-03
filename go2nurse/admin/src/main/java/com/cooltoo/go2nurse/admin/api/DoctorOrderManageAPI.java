@@ -101,7 +101,6 @@ public class DoctorOrderManageAPI {
                                      @FormParam("department_id") @DefaultValue("0") int departmentId,
                                      @FormParam("department_order") @DefaultValue("-1") int departmentOrder
     ) {
-        doctorOrderService.deleteOrder(orderId);
         DoctorOrderBean order = doctorOrderService.setDoctorOrder(
                 orderId,
                 doctorId, doctorOrder,
