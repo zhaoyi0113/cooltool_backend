@@ -2,16 +2,14 @@ package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.ReadingStatus;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by zhaolisong on 2016/11/4.
  */
 @Entity
+@Table(name = "go2nurse_nurse_push_course")
 public class NursePushCourseEntity {
 
     private long id;
