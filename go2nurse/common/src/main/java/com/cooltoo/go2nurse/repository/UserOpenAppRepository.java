@@ -17,4 +17,5 @@ public interface UserOpenAppRepository extends JpaRepository<UserOpenAppEntity, 
     List<UserOpenAppEntity> findByOpenid(String openId);
     List<UserOpenAppEntity> findByUserId(long userId);
     UserOpenAppEntity findFirstByUserId(long userId);
+    UserOpenAppEntity findFirstByOpenid(String openId);
 }

@@ -2,7 +2,7 @@ package com.cooltoo.go2nurse.patient.api.wechat;
 
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.WeChatAccountBean;
-import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.filters.WeChatAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatAccountService;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
@@ -33,13 +33,14 @@ public class WeChatPayAPI {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
+    @WeChatAuthentication
     public Response payByWeChat(@Context HttpServletRequest request,
                                 @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         String openId = weChatService.getOpenIdByUserId(userId);
         String appId = weChatService.getAppIdByUserId(userId);
+
         WeChatAccountBean weChatAccount = weChatAccountService.getWeChatAccountByAppId(appId);
 
         String remoteIP;

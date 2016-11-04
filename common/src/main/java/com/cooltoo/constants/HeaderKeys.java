@@ -6,4 +6,5 @@ package com.cooltoo.constants;
 public class HeaderKeys {
 
     public static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+    public static final String OPEN_ID = "OPEN_ID";
 }

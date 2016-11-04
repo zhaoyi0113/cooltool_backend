@@ -32,11 +32,11 @@ public enum ErrorCode {
     USER_NOT_EXISTED(221, Response.Status.BAD_REQUEST, "用户不存在", "user doesn't exist"),
     NOT_LOGIN(222, Response.Status.BAD_REQUEST, "未登陆", "Not Login"),
     BADGE_NOT_EXIST(223, Response.Status.BAD_REQUEST, "徽章不存在", "Badge not exist"),
-    ORDER_NOT_EXIST(224, Response.Status.BAD_REQUEST,  "订单不存在", "Order not exist"),
-    RECORD_NOT_EXIST(226, Response.Status.BAD_REQUEST,  "记录不存在", "Record not exist"),
-    HOSPITAL_NOT_EXIST(227, Response.Status.BAD_REQUEST,  "医院不存在", "Hospital not exist"),
-    HOSPITAL_DEPARTMENT_NOT_EXIST(228, Response.Status.BAD_REQUEST,  "科室不存在", "Hospital department not exist"),
-    NO_SUCH_OCCUPATION(229, Response.Status.BAD_REQUEST, "职业不存在" , "No such occupation"),
+    ORDER_NOT_EXIST(224, Response.Status.BAD_REQUEST, "订单不存在", "Order not exist"),
+    RECORD_NOT_EXIST(226, Response.Status.BAD_REQUEST, "记录不存在", "Record not exist"),
+    HOSPITAL_NOT_EXIST(227, Response.Status.BAD_REQUEST, "医院不存在", "Hospital not exist"),
+    HOSPITAL_DEPARTMENT_NOT_EXIST(228, Response.Status.BAD_REQUEST, "科室不存在", "Hospital department not exist"),
+    NO_SUCH_OCCUPATION(229, Response.Status.BAD_REQUEST, "职业不存在", "No such occupation"),
     SKILL_NOT_EXIST(230, Response.Status.BAD_REQUEST, "技能不存在", "Skill not exist"),
     SPEAK_CONTENT_IS_EMPTY(231, Response.Status.BAD_REQUEST, "发言为空", "Speak content is empty"),
     SPEAK_CONTENT_NOT_EXIST(232, Response.Status.BAD_REQUEST, "发言不存在", "Speak content not exist"),
@@ -67,7 +67,8 @@ public enum ErrorCode {
     PATIENT_HAS_APPOINT_DOCTOR_TODAY(257, Response.Status.BAD_REQUEST, "患者已预约过", "the patient has appointment with doctor today"),
     CLINIC_DATE_NOT_ALLOWED(258, Response.Status.BAD_REQUEST, "预约日期无效", "cannot appoint at this clinic date"),
     SERVICE_ORDER_BEEN_FETCHED(259, Response.Status.BAD_REQUEST, "订单已被抢", "service order has been fetched"),
-    PAY_FAILED(260, Response.Status.BAD_REQUEST , "支付失败" ,"Payment failed" );
+    PAY_FAILED(260, Response.Status.BAD_REQUEST, "支付失败", "Payment failed"),
+    OPENID_INVALID(261, Response.Status.BAD_GATEWAY, "Openid 不存在", "Openid Invalid");
 
     private final int code;
 
