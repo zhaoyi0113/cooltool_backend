@@ -26,12 +26,6 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.*;
 
-import com.google.common.io.CharStreams;
-import com.pingplusplus.model.Event;
-import javax.servlet.ServletInputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 /**
  * Created by hp on 2016/7/15.
  */
@@ -152,9 +146,16 @@ public class UserServiceOrderAPI {
     }
 
     @Path("/pingpp/webhooks")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response pingPpWebhooksProtocolGet(@Context HttpServletRequest request) {
+        return pingPpWebhooksProtocolPost(request);
+    }
+
+    @Path("/pingpp/webhooks")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response pingPpWebhooks(@Context HttpServletRequest request) {
+    public Response pingPpWebhooksProtocolPost(@Context HttpServletRequest request) {
 //        logger.info("receive web hooks");
 //        try {
 //            ServletInputStream inputStream = request.getInputStream();
