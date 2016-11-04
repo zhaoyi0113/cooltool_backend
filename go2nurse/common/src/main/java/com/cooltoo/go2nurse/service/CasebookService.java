@@ -2,18 +2,12 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.ReadingStatus;
-import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
-import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.converter.CasebookBeanConverter;
 import com.cooltoo.go2nurse.entities.CasebookEntity;
-import com.cooltoo.go2nurse.entities.UserConsultationEntity;
 import com.cooltoo.go2nurse.repository.CasebookRepository;
-import com.cooltoo.go2nurse.service.notification.MessageBean;
-import com.cooltoo.go2nurse.service.notification.MessageType;
 import com.cooltoo.go2nurse.service.notification.Notifier;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -300,8 +294,7 @@ public class CasebookService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (!patientService.existPatient(patientId)) {
-            logger.info("patientId not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            patientId = 0;
         }
         if (VerifyUtil.isStringEmpty(name)) {
             logger.info("case book name is empty");
