@@ -4,6 +4,7 @@ import com.cooltoo.go2nurse.admin.api.*;
 import com.cooltoo.go2nurse.filters.BadRequestExceptionMapper;
 import com.cooltoo.go2nurse.filters.CORSResponseFilter;
 import com.cooltoo.go2nurse.filters.UserLoginAuthenticationFilter;
+import com.cooltoo.go2nurse.filters.WeChatOpenIdAuthenticationFilter;
 import com.cooltoo.go2nurse.patient.api.*;
 import com.cooltoo.go2nurse.patient.api.wechat.WeChatHospitalDepartmentAPI;
 import com.cooltoo.go2nurse.patient.api.wechat.WeChatPayAPI;
@@ -32,6 +33,7 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
 
     public Go2NurseJerseyConfiguration() {
         register(UserLoginAuthenticationFilter.class);
+        register(WeChatOpenIdAuthenticationFilter.class);
         register(MultiPartFeature.class);
         register(CourseAPI.class);
         register(CourseManageAPI.class);
