@@ -20,6 +20,7 @@ public class CORSResponseFilter implements ContainerResponseFilter {
         addResponseHeaders(headers, "Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
         headers.add("Access-Control-Allow-Headers", "access_token");
         headers.add("Access-Control-Allow-Headers", "ACCESS_TOKEN");
+        headers.add("Access-Control-Allow-Headers", "OPEN_ID");
     }
 
     private void addResponseHeaders(MultivaluedMap<String, Object> headers, String key, String value){
