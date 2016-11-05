@@ -1,15 +1,16 @@
 package com.cooltoo.go2nurse.patient.api.wechat;
 
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.go2nurse.beans.CoursesGroupBean;
 import com.cooltoo.go2nurse.beans.WeChatAccountBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatAccountService;
 import com.cooltoo.go2nurse.openapp.WeChatService;
-import com.cooltoo.go2nurse.beans.CoursesGroupBean;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import com.cooltoo.go2nurse.service.UserCourseRelationService;
-import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import java.util.List;
 @Path("/wechat/courses")
 public class WechatCourseAPI {
 
+    private static final Logger logger = LoggerFactory.getLogger(WechatCourseAPI.class);
 
     @Autowired private CourseRelationManageService courseManageService;
     @Autowired private UserCourseRelationService userCourseService;
@@ -42,6 +44,20 @@ public class WechatCourseAPI {
         String hospitalUniqueId   = hospitalDepartmentUniqueId.length()>=6 ? hospitalDepartmentUniqueId.substring(0, 6) : "";
         String departmentUniqueId = hospitalDepartmentUniqueId.length()>=12? hospitalDepartmentUniqueId.substring(6, 12) : "";
         Integer[] hospitalDepartmentId = courseManageService.getHospitalDepartmentId(hospitalUniqueId, departmentUniqueId);
+
+        List<CoursesGroupBean> diagnosticGroup = courseManageService.getHospitalCoursesGroupByDiagnostic(null, hospitalDepartmentId[0], hospitalDepartmentId[1]);
+        return Response.ok(diagnosticGroup).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCoursesInDepartment(@Context HttpServletRequest request
+
+    ) {
+        String depUniqueId = (String) request.getAttribute(ContextKeys.DEPARTMENT_UNIQUE_ID);
+        String hosUniqueId = (String) request.getAttribute(ContextKeys.HOSPITAL_UNIQUE_ID);
+        logger.debug("get hospital/department id "+hosUniqueId+"/"+depUniqueId);
+        Integer[] hospitalDepartmentId = courseManageService.getHospitalDepartmentId(hosUniqueId, depUniqueId);
 
         List<CoursesGroupBean> diagnosticGroup = courseManageService.getHospitalCoursesGroupByDiagnostic(null, hospitalDepartmentId[0], hospitalDepartmentId[1]);
         return Response.ok(diagnosticGroup).build();

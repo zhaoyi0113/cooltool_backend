@@ -4,7 +4,9 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.HeaderKeys;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.beans.WeChatAccountBean;
 import com.cooltoo.go2nurse.converter.UserOpenAppEntity;
+import com.cooltoo.go2nurse.openapp.WeChatAccountService;
 import com.cooltoo.go2nurse.repository.UserOpenAppRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -34,6 +36,9 @@ public class WeChatOpenIdAuthenticationFilter implements ContainerRequestFilter 
     @Context
     private ResourceInfo resourceInfo;
 
+    @Autowired
+    private WeChatAccountService accountService;
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         WeChatAuthentication annotation = getAnnotationFromResourceClass();
@@ -50,8 +55,16 @@ public class WeChatOpenIdAuthenticationFilter implements ContainerRequestFilter 
         if (appEntity == null) {
             throw new BadRequestException(ErrorCode.OPENID_INVALID);
         }
+
+        setHospitalDeparmentUniqueId(appEntity.getAppId(), requestContext);
         requestContext.setProperty(ContextKeys.USER_LOGIN_USER_ID, appEntity.getUserId());
         requestContext.setProperty(ContextKeys.WECHAT_OPEN_ID, appEntity.getOpenid());
+    }
+
+    private void setHospitalDeparmentUniqueId(String appid, ContainerRequestContext requestContext){
+        WeChatAccountBean account = accountService.getWeChatAccountByAppId(appid);
+        requestContext.setProperty(ContextKeys.DEPARTMENT_UNIQUE_ID, account.getDepartment().getUniqueId());
+        requestContext.setProperty(ContextKeys.HOSPITAL_UNIQUE_ID, account.getHospital().getUniqueId());
     }
 
     private WeChatAuthentication getAnnotationFromResourceClass() {
