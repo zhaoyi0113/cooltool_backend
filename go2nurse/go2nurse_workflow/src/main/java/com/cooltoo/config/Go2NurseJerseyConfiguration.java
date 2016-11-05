@@ -32,8 +32,8 @@ import javax.ws.rs.ApplicationPath;
 public class Go2NurseJerseyConfiguration extends ResourceConfig {
 
     public Go2NurseJerseyConfiguration() {
-        register(UserLoginAuthenticationFilter.class);
-        register(WeChatOpenIdAuthenticationFilter.class);
+        register(UserLoginAuthenticationFilter.class, 1);
+        register(WeChatOpenIdAuthenticationFilter.class, 2);
         register(MultiPartFeature.class);
         register(CourseAPI.class);
         register(CourseManageAPI.class);
