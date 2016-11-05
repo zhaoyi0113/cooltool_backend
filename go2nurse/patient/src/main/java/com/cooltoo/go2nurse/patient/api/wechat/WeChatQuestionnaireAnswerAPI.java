@@ -36,7 +36,7 @@ public class WeChatQuestionnaireAnswerAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @WeChatAuthentication
     public Response getQuestionnaireOfHospital(@Context HttpServletRequest request) {
-        long hosId = Long.parseLong((String) request.getAttribute(ContextKeys.HOSPITAL_ID));
+        int hosId = Integer.parseInt((String) request.getAttribute(ContextKeys.HOSPITAL_ID));
         List<QuestionnaireCategoryBean> categories = questionnaireService.getCategoryWithQuestionnaireByHospitalId(hosId);
         return Response.ok(categories).build();
     }
