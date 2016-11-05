@@ -10,4 +10,5 @@ public class ContextKeys {
     public static final String ADMIN_USER_TOKEN = "login_admin_user_token";
     public static final String USER_LOGIN_USER_ID = "user_login_user_name";
     public static final String USER_ACCESS_TOKEN = "USER_ACCESS_TOKEN";
+    public static final String WECHAT_OPEN_ID = "WECHAT_OPEN_ID";
 }

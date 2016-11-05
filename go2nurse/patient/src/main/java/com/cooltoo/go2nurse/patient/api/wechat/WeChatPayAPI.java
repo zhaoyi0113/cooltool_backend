@@ -38,7 +38,7 @@ public class WeChatPayAPI {
                                 @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        String openId = weChatService.getOpenIdByUserId(userId);
+        String openId = (String) request.getAttribute(ContextKeys.WECHAT_OPEN_ID);
         String appId = weChatService.getAppIdByUserId(userId);
 
         WeChatAccountBean weChatAccount = weChatAccountService.getWeChatAccountByAppId(appId);

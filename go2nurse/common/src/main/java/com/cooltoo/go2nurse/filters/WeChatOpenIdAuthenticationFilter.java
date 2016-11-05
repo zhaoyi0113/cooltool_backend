@@ -51,6 +51,7 @@ public class WeChatOpenIdAuthenticationFilter implements ContainerRequestFilter 
             throw new BadRequestException(ErrorCode.OPENID_INVALID);
         }
         requestContext.setProperty(ContextKeys.USER_LOGIN_USER_ID, appEntity.getUserId());
+        requestContext.setProperty(ContextKeys.WECHAT_OPEN_ID, appEntity.getOpenid());
     }
 
     private WeChatAuthentication getAnnotationFromResourceClass() {
