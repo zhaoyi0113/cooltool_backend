@@ -64,6 +64,7 @@ public class WeChatOpenIdAuthenticationFilter implements ContainerRequestFilter 
     private void setHospitalDeparmentUniqueId(String appid, ContainerRequestContext requestContext){
         WeChatAccountBean account = accountService.getWeChatAccountByAppId(appid);
         requestContext.setProperty(ContextKeys.DEPARTMENT_UNIQUE_ID, account.getDepartment().getUniqueId());
+        requestContext.setProperty(ContextKeys.HOSPITAL_ID, account.getHospital().getId());
         requestContext.setProperty(ContextKeys.HOSPITAL_UNIQUE_ID, account.getHospital().getUniqueId());
     }
 

@@ -4,6 +4,7 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.CoursesGroupBean;
 import com.cooltoo.go2nurse.beans.WeChatAccountBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.filters.WeChatAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatAccountService;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
@@ -51,6 +52,7 @@ public class WechatCourseAPI {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @WeChatAuthentication
     public Response getCoursesInDepartment(@Context HttpServletRequest request
 
     ) {

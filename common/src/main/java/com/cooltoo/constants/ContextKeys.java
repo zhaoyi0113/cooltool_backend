@@ -13,4 +13,5 @@ public class ContextKeys {
     public static final String WECHAT_OPEN_ID = "WECHAT_OPEN_ID";
     public static final String DEPARTMENT_UNIQUE_ID = "DEPARTMENT_UNIQUE_ID";
     public static final String HOSPITAL_UNIQUE_ID = "HOSPITAL_UNIQUE_ID";
+    public static final String HOSPITAL_ID = "HOSPITAL_ID";
 }
