@@ -26,12 +26,12 @@ import java.util.List;
  * Created by zhaoyi0113 on 05/11/2016.
  */
 @Provider
-public class WeChatOpenIdAuthenticationFilter implements ContainerRequestFilter {
+public class WeChatAuthenticationFilter implements ContainerRequestFilter {
 
     @Autowired
     private UserOpenAppRepository openAppRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(WeChatOpenIdAuthenticationFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(WeChatAuthenticationFilter.class);
 
     @Context
     private ResourceInfo resourceInfo;
