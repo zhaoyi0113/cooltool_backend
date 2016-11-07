@@ -47,7 +47,7 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     //==================================================================
     @Query("SELECT n FROM NurseEntity n LEFT JOIN n.extensions ne LEFT JOIN n.hospitalRelation nhr" +
             " WHERE (?1 IS NULL OR n.authority=?1)" +
-            " AND   (?2 IS NULL OR n.name LIKE %?2)" +
+            " AND   (?2 IS NULL OR n.name LIKE %?2 OR n.realName LIKE %?2)" +
             " AND   (?3 IS NULL OR ne.answerNursingQuestion=?3)" +
             " AND   (?4 IS NULL OR nhr.hospitalId=?4)" +
             " AND   (?5 IS NULL OR nhr.departmentId=?5)" +
@@ -56,7 +56,7 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     Page<NurseEntity> findByAuthority(UserAuthority authority, String fuzzyName, YesNoEnum answerNursingQuestion, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, YesNoEnum seeAllOrder, Pageable page);
     @Query("SELECT count(n.id) FROM NurseEntity n LEFT JOIN n.extensions ne LEFT JOIN n.hospitalRelation nhr" +
             " WHERE (?1 IS NULL OR n.authority=?1)" +
-            " AND   (?2 IS NULL OR n.name LIKE %?2)" +
+            " AND   (?2 IS NULL OR n.name LIKE %?2 OR n.realName LIKE %?2)" +
             " AND   (?3 IS NULL OR ne.answerNursingQuestion=?3)" +
             " AND   (?4 IS NULL OR nhr.hospitalId=?4)" +
             " AND   (?5 IS NULL OR nhr.departmentId=?5)" +

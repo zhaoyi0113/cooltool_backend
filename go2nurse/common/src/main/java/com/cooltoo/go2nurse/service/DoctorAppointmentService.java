@@ -13,7 +13,7 @@ import com.cooltoo.go2nurse.repository.DoctorAppointmentRepository;
 import com.cooltoo.go2nurse.service.notification.MessageBean;
 import com.cooltoo.go2nurse.service.notification.MessageType;
 import com.cooltoo.go2nurse.service.notification.Notifier;
-import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.util.JSONUtil;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -40,8 +40,6 @@ public class DoctorAppointmentService {
             new Sort.Order(Sort.Direction.DESC, "clinicDate"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
-    private static final long hour4PMToMidnightMilliSecond = 8 * 60 * 60 * 1000;
-    private static final Go2NurseUtility utility = new Go2NurseUtility();
 
     @Autowired private DoctorAppointmentRepository repository;
     @Autowired private DoctorAppointmentBeanConverter beanConverter;
@@ -305,18 +303,19 @@ public class DoctorAppointmentService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
+        JSONUtil jsonUtil = JSONUtil.newInstance();
         // 下单
         entity.setStatus(CommonStatus.ENABLED);
         entity.setHospitalId(doctorBean.getHospitalId());
         if (null!=doctorBean.getHospital()) {
-            entity.setHospitalJson(utility.toJsonString(doctorBean.getHospital()));
+            entity.setHospitalJson(jsonUtil.toJsonString(doctorBean.getHospital()));
         }
         entity.setDepartmentId(doctorBean.getDepartmentId());
         if (null!=doctorBean.getDepartment()) {
-            entity.setDepartmentJson(utility.toJsonString(doctorBean.getDepartment()));
+            entity.setDepartmentJson(jsonUtil.toJsonString(doctorBean.getDepartment()));
         }
         entity.setDoctorId(doctorBean.getId());
-        entity.setDoctorJson(utility.toJsonString(doctorBean));
+        entity.setDoctorJson(jsonUtil.toJsonString(doctorBean));
         entity.setClinicDateId(clinicDateBean.getId());
         entity.setClinicDate(clinicDateBean.getClinicDate());
         entity.setClinicHoursId(newClinicHoursId);
@@ -324,7 +323,7 @@ public class DoctorAppointmentService {
         entity.setClinicHoursEnd(clinicHoursBean.getClinicHourEnd());
         entity.setUserId(userId);
         entity.setPatientId(patientId);
-        entity.setPatientJson(utility.toJsonString(patientBean));
+        entity.setPatientJson(jsonUtil.toJsonString(patientBean));
         entity.setOrderStatus(OrderStatus.TO_SERVICE);
         entity = repository.save(entity);
 
@@ -369,6 +368,7 @@ public class DoctorAppointmentService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
+        JSONUtil jsonUtil = JSONUtil.newInstance();
         // 下单
         DoctorAppointmentEntity entity = new DoctorAppointmentEntity();
         entity.setTime(new java.util.Date());
@@ -376,14 +376,14 @@ public class DoctorAppointmentService {
         entity.setOrderNo(NumberUtil.getUniqueString());
         entity.setHospitalId(doctorBean.getHospitalId());
         if (null!=doctorBean.getHospital()) {
-            entity.setHospitalJson(utility.toJsonString(doctorBean.getHospital()));
+            entity.setHospitalJson(jsonUtil.toJsonString(doctorBean.getHospital()));
         }
         entity.setDepartmentId(doctorBean.getDepartmentId());
         if (null!=doctorBean.getDepartment()) {
-            entity.setDepartmentJson(utility.toJsonString(doctorBean.getDepartment()));
+            entity.setDepartmentJson(jsonUtil.toJsonString(doctorBean.getDepartment()));
         }
         entity.setDoctorId(doctorBean.getId());
-        entity.setDoctorJson(utility.toJsonString(doctorBean));
+        entity.setDoctorJson(jsonUtil.toJsonString(doctorBean));
         entity.setClinicDateId(clinicDateBean.getId());
         entity.setClinicDate(clinicDateBean.getClinicDate());
         entity.setClinicHoursId(clinicHoursId);
@@ -391,7 +391,7 @@ public class DoctorAppointmentService {
         entity.setClinicHoursEnd(clinicHoursBean.getClinicHourEnd());
         entity.setUserId(userId);
         entity.setPatientId(patientId);
-        entity.setPatientJson(utility.toJsonString(patientBean));
+        entity.setPatientJson(jsonUtil.toJsonString(patientBean));
         entity.setOrderStatus(OrderStatus.TO_SERVICE);
         entity = repository.save(entity);
 

@@ -1,7 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.go2nurse.openapp.WeChatPayService;
-import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.util.JSONUtil;
 import com.google.common.io.CharStreams;
 import com.google.gson.JsonSyntaxException;
 import com.pingplusplus.model.Charge;
@@ -35,8 +35,8 @@ public class ChargeWebHookService {
     private static final Logger logger = LoggerFactory.getLogger(ChargeWebHookService.class);
 
     @Autowired private ServiceOrderService orderService;
-    @Autowired private Go2NurseUtility utility;
     @Autowired private WeChatPayService weChatPayService;
+    private JSONUtil jsonUtil = JSONUtil.newInstance();
 
     @Value("${wechat_go2nurse_appsecret}")
     private String srvAppSecret;
@@ -117,7 +117,7 @@ public class ChargeWebHookService {
             }
 
             String outTradeNo = keyValue.get("out_trade_no").toString();
-            orderService.orderChargeWebhooks(outTradeNo, outTradeNo, utility.toJsonString(keyValue));
+            orderService.orderChargeWebhooks(outTradeNo, outTradeNo, jsonUtil.toJsonString(keyValue));
             return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
         }
         else {

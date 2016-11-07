@@ -140,10 +140,14 @@ public class NursePushCourseService {
     }
 
     @Transactional
-    public boolean deletePushCourseReadStatus(long coursePushedId) {
+    public boolean deletePushCourseReadStatus(Long nurseId, long coursePushedId) {
         boolean success = false;
         NursePushCourseEntity one = repository.findOne(coursePushedId);
         if (null!=one) {
+            if (null!=nurseId && nurseId!=one.getNurseId()) {
+                logger.error("this record={} not belong to this nurse={}", coursePushedId, nurseId);
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
             repository.delete(one);
             success = true;
         }

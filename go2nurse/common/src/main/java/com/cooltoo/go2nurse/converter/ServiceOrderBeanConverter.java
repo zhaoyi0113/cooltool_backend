@@ -5,6 +5,7 @@ import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.util.JSONUtil;
 import org.hibernate.type.SerializableToBlobType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
@@ -18,7 +19,7 @@ import java.util.Date;
 @Component
 public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, ServiceOrderBean> {
 
-    @Autowired private Go2NurseUtility go2NurseUtility;
+    private JSONUtil jsonUtil = JSONUtil.newInstance();
 
     @Override
     public ServiceOrderBean convert(ServiceOrderEntity source) {
@@ -29,7 +30,7 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
 
         bean.setServiceItemId(source.getServiceItemId());
         if (null!=source.getServiceItem()) {
-            ServiceItemBean serviceItem = go2NurseUtility.parseJsonBean(source.getServiceItem(), ServiceItemBean.class);
+            ServiceItemBean serviceItem = jsonUtil.parseJsonBean(source.getServiceItem(), ServiceItemBean.class);
             bean.setServiceItem(serviceItem);
         }
 
@@ -37,24 +38,24 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
         bean.setVendorId(source.getVendorId());
         if (null!=source.getVendor()) {
             if (ServiceVendorType.HOSPITAL.equals(bean.getVendorType())) {
-                HospitalBean vendorHospital = go2NurseUtility.parseJsonBean(source.getVendor(), HospitalBean.class);
+                HospitalBean vendorHospital = jsonUtil.parseJsonBean(source.getVendor(), HospitalBean.class);
                 bean.setVendorHospital(vendorHospital);
             }
             else if (ServiceVendorType.COMPANY.equals(bean.getVendorType())) {
-                ServiceVendorBean vendor = go2NurseUtility.parseJsonBean(source.getVendor(), ServiceVendorBean.class);
+                ServiceVendorBean vendor = jsonUtil.parseJsonBean(source.getVendor(), ServiceVendorBean.class);
                 bean.setVendor(vendor);
             }
         }
 
         bean.setCategoryId(source.getCategoryId());
         if(null!=source.getCategory()) {
-            ServiceCategoryBean serviceCategory = go2NurseUtility.parseJsonBean(source.getCategory(), ServiceCategoryBean.class);
+            ServiceCategoryBean serviceCategory = jsonUtil.parseJsonBean(source.getCategory(), ServiceCategoryBean.class);
             bean.setCategory(serviceCategory);
         }
 
         bean.setTopCategoryId(source.getTopCategoryId());
         if (null!=source.getTopCategory()) {
-            ServiceCategoryBean serviceTopCategory = go2NurseUtility.parseJsonBean(source.getTopCategory(), ServiceCategoryBean.class);
+            ServiceCategoryBean serviceTopCategory = jsonUtil.parseJsonBean(source.getTopCategory(), ServiceCategoryBean.class);
             bean.setTopCategory(serviceTopCategory);
         }
 
@@ -62,13 +63,13 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
 
         bean.setPatientId(source.getPatientId());
         if (null!=source.getPatient()) {
-            PatientBean patient = go2NurseUtility.parseJsonBean(source.getPatient(), PatientBean.class);
+            PatientBean patient = jsonUtil.parseJsonBean(source.getPatient(), PatientBean.class);
             bean.setPatient(patient);
         }
 
         bean.setAddressId(source.getAddressId());
         if (null!=source.getAddress()) {
-            UserAddressBean address = go2NurseUtility.parseJsonBean(source.getAddress(), UserAddressBean.class);
+            UserAddressBean address = jsonUtil.parseJsonBean(source.getAddress(), UserAddressBean.class);
             bean.setAddress(address);
         }
 

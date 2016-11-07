@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.service.notification;
 
 import com.cooltoo.constants.DeviceType;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.util.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class LeanCloudNotifier {
     @Value("${leancloud_key}")
     private String leanCloudKey;
 
-    @Autowired private Go2NurseUtility utility;
+    private JSONUtil jsonUtil = JSONUtil.newInstance();
 
     public void publishToDevice(String token, String[] channel, MessageBean customJson) {
         logger.info("token={} receive channel={} customJson={}", token, channel, customJson);
@@ -60,7 +61,7 @@ public class LeanCloudNotifier {
             LeanCloudMessageBean msg = new LeanCloudMessageBean();
             msg.setDeviceTypeAndToken(deviceType, token);
             msg.setChannels(channel);
-            msg.setData(utility.toJsonString(customJson));
+            msg.setData(jsonUtil.toJsonString(customJson));
 
             OutputStream outputStream = httpConnection.getOutputStream();
             outputStream.write(msg.getJson().getBytes());

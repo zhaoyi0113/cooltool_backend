@@ -15,8 +15,10 @@ import com.cooltoo.go2nurse.repository.UserQuestionnaireAnswerRepository;
 import com.cooltoo.go2nurse.repository.UserRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.util.JSONUtil;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
+import com.qiniu.util.Json;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,6 +144,7 @@ public class UserQuestionnaireAnswerService {
         logger.info("answer count={}", VerifyUtil.isListEmpty(allAnswers) ? 0 : allAnswers.size());
         StringBuilder oneQuestionnaireAnswer = new StringBuilder();
         File statisticsFile = userFileStorage.createFileInBaseStorage("statistics", ".csv");
+        JSONUtil jsonUtil = JSONUtil.newInstance();
         // write title
         oneQuestionnaireAnswer.append("\"").append("序号").append("\"\t,");
         oneQuestionnaireAnswer.append("\"").append("医院").append("\"\t,");
@@ -173,7 +176,7 @@ public class UserQuestionnaireAnswerService {
                 String userAnswer = answer.getAnswer();
                 boolean single = userAnswer.indexOf('{')==userAnswer.lastIndexOf('{');
                 if (single) {
-                    QuestionOptionBean userOption = go2NurseUtility.parseJsonBean(userAnswer, QuestionOptionBean.class);
+                    QuestionOptionBean userOption = jsonUtil.parseJsonBean(userAnswer, QuestionOptionBean.class);
                     if (null==userAnswer) {
                         oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
                         oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
@@ -185,7 +188,7 @@ public class UserQuestionnaireAnswerService {
 
                 }
                 else {
-                    List<QuestionOptionBean> userOptions = go2NurseUtility.parseJsonList(userAnswer, QuestionOptionBean.class);
+                    List<QuestionOptionBean> userOptions = jsonUtil.parseJsonList(userAnswer, QuestionOptionBean.class);
                     StringBuilder items = new StringBuilder();
                     StringBuilder scores = new StringBuilder();
                     for (QuestionOptionBean userOption : userOptions) {
@@ -201,7 +204,7 @@ public class UserQuestionnaireAnswerService {
                         oneQuestionnaireAnswer.append("\"").append(scores.substring(0, scores.length() - 1)).append("\"\t,");
                     }
                 }
-                QuestionnaireConclusionBean conclusion = go2NurseUtility.parseJsonBean(answer.getQuestionnaireConclusion(), QuestionnaireConclusionBean.class);
+                QuestionnaireConclusionBean conclusion = jsonUtil.parseJsonBean(answer.getQuestionnaireConclusion(), QuestionnaireConclusionBean.class);
                 if (null==conclusion) {
                     oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
                     oneQuestionnaireAnswer.append("\"").append(" ").append("\"\t,");
@@ -246,8 +249,9 @@ public class UserQuestionnaireAnswerService {
         QuestionnaireStatisticsBean statistics = new QuestionnaireStatisticsBean();
         int questionNumber = VerifyUtil.isListEmpty(questionnaire.getQuestions()) ? 0 : questionnaire.getQuestions().size();
 
+        JSONUtil jsonUtil = JSONUtil.newInstance();
         // construct statistics conclusion
-        List<QuestionnaireConclusionBean> conclusions = go2NurseUtility.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
+        List<QuestionnaireConclusionBean> conclusions = jsonUtil.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
         List<QuestionnaireStatisticsBean.ConclusionBean> statisticsConclusions = new ArrayList<>();
         for (QuestionnaireConclusionBean conclusion : conclusions) {
             QuestionnaireStatisticsBean.ConclusionBean sc = new QuestionnaireStatisticsBean.ConclusionBean();
@@ -384,8 +388,9 @@ public class UserQuestionnaireAnswerService {
         }
 
         // fill answer to question bean
+        JSONUtil jsonUtil = JSONUtil.newInstance();
         for (QuestionnaireBean questionnaire : returnValue) {
-            List<QuestionnaireConclusionBean> conclusions = go2NurseUtility.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
+            List<QuestionnaireConclusionBean> conclusions = jsonUtil.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
             boolean set = false;
             for (QuestionnaireConclusionBean conclusion : conclusions) {
                 if (conclusion.isThisConclusion(questionnaire.getUserScore())) {
@@ -446,15 +451,16 @@ public class UserQuestionnaireAnswerService {
         }
 
         // calculate  score
+        JSONUtil jsonUtil = JSONUtil.newInstance();
         boolean single = answer.indexOf('{')==answer.lastIndexOf('{');
         if (single) {
-            QuestionOptionBean userOption = go2NurseUtility.parseJsonBean(answer, QuestionOptionBean.class);
+            QuestionOptionBean userOption = jsonUtil.parseJsonBean(answer, QuestionOptionBean.class);
             if (null != userOption) {
                 userScore += userOption.getScore();
             }
         }
         else {
-            List<QuestionOptionBean> userOptions = go2NurseUtility.parseJsonList(answer, QuestionOptionBean.class);
+            List<QuestionOptionBean> userOptions = jsonUtil.parseJsonList(answer, QuestionOptionBean.class);
             for (QuestionOptionBean userOption : userOptions) {
                 userScore += userOption.getScore();
             }

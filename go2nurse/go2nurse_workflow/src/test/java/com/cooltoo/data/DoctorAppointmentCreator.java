@@ -7,9 +7,9 @@ import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.entities.*;
 import com.cooltoo.go2nurse.repository.*;
-import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.repository.HospitalDepartmentRepository;
 import com.cooltoo.repository.HospitalRepository;
+import com.cooltoo.util.JSONUtil;
 import com.cooltoo.util.NumberUtil;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import org.junit.Ignore;
@@ -56,11 +56,11 @@ public class DoctorAppointmentCreator {
     @Autowired private DoctorClinicHoursRepository clinicHoursRepository;
     @Autowired private UserPatientRelationRepository userPatientRelationRepository;
     @Autowired private PatientRepository patientRepository;
-    @Autowired private Go2NurseUtility utility;
 
 
     @Test
     public void createDoctorAppointment() {
+        JSONUtil jsonUtil = JSONUtil.newInstance();
         Sort sort = new Sort(
                 new Sort.Order(Sort.Direction.ASC, "id")
         );
@@ -124,11 +124,11 @@ public class DoctorAppointmentCreator {
             newOne.setStatus(CommonStatus.ENABLED);
             newOne.setOrderNo(NumberUtil.getUniqueString());
             newOne.setHospitalId(hospital.getId());
-            newOne.setHospitalJson(utility.toJsonString(hospital));
+            newOne.setHospitalJson(jsonUtil.toJsonString(hospital));
             newOne.setDepartmentId(department.getId());
-            newOne.setDepartmentJson(utility.toJsonString(department));
+            newOne.setDepartmentJson(jsonUtil.toJsonString(department));
             newOne.setDoctorId(doctor.getId());
-            newOne.setDoctorJson(utility.toJsonString(doctor));
+            newOne.setDoctorJson(jsonUtil.toJsonString(doctor));
             newOne.setClinicDateId(clinicDate.getId());
             newOne.setClinicDate(clinicDate.getClinicDate());
             newOne.setClinicHoursId(clinicHour.getId());
@@ -136,7 +136,7 @@ public class DoctorAppointmentCreator {
             newOne.setClinicHoursEnd(clinicHour.getClinicHourEnd());
             newOne.setUserId(userPatientRelation.getUserId());
             newOne.setPatientId(patient.getId());
-            newOne.setPatientJson(utility.toJsonString(patient));
+            newOne.setPatientJson(jsonUtil.toJsonString(patient));
             newOne.setOrderStatus(orderStatuses.get(patientIndex%orderStatuses.size()));
             appointments.add(newOne);
 

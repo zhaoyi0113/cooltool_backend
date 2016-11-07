@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.service.notification;
 
 import com.cooltoo.go2nurse.features.GoToNurseFeatures;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.util.JSONUtil;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
 import com.notnoop.apns.PayloadBuilder;
@@ -32,7 +33,7 @@ public class AppleNotifier {
     @Value("${apple_push_notification_certificates}")
     private String P12_CER_FILE;
 
-    @Autowired private Go2NurseUtility utility;
+    private JSONUtil jsonUtil = JSONUtil.newInstance();
 
     public void publishToDevice(String deviceToken, MessageBean customJson, AppleNotificationType type) {
         logger.info("deviceToken={} receive customJson={} notificationType={}", deviceToken, customJson, type);
@@ -90,13 +91,13 @@ public class AppleNotifier {
 
     private String createAlertPayload(MessageBean customJson) {
         PayloadBuilder payloadBuilder = APNS.newPayload().alertBody(customJson.getAlertBody()).sound("default");
-        payloadBuilder.customField(CUSTOM_MESSAGE_JSON, utility.toJsonString(customJson));
+        payloadBuilder.customField(CUSTOM_MESSAGE_JSON, jsonUtil.toJsonString(customJson));
         return payloadBuilder.build();
     }
 
     private String createSilentPayload(MessageBean customJson) {
         PayloadBuilder payloadBuilder = APNS.newPayload().instantDeliveryOrSilentNotification();
-        payloadBuilder.customField(CUSTOM_MESSAGE_JSON, utility.toJsonString(customJson));
+        payloadBuilder.customField(CUSTOM_MESSAGE_JSON, jsonUtil.toJsonString(customJson));
         return payloadBuilder.build();
     }
 

@@ -1,9 +1,7 @@
 package com.cooltoo.config;
 
 
-import com.cooltoo.nurse360.admin.api.CourseCategoryManageAPI;
-import com.cooltoo.nurse360.admin.api.CourseManageAPI;
-import com.cooltoo.nurse360.admin.api.NotificationManageAPI;
+import com.cooltoo.nurse360.admin.api.*;
 import com.cooltoo.nurse360.filters.Nurse360BadRequestExceptionMapper;
 import com.cooltoo.nurse360.filters.Nurse360CORSResponseFilter;
 import com.cooltoo.nurse360.filters.Nurse360NurseLoginAuthenticationFilter;
@@ -51,6 +49,9 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(CasebookAPI.class);
         register(NurseSuggestionAPI.class);
         register(NursePushCourseToUserAPI.class);
+        register(NurseVisitPatientAPI.class);
+        register(NurseVisitPatientManageAPI.class);
+        register(NurseVisitPatientServiceItemManageAPI.class);
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
     }

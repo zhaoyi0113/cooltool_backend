@@ -9,6 +9,7 @@ import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
 import com.cooltoo.go2nurse.service.notification.MessageBean;
 import com.cooltoo.go2nurse.service.notification.MessageType;
 import com.cooltoo.go2nurse.service.notification.Notifier;
+import com.cooltoo.util.JSONUtil;
 import com.pingplusplus.model.Charge;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
@@ -286,11 +287,12 @@ public class ServiceOrderService {
             logger.info("the order is in status={}, can not be modified", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+        JSONUtil jsonUtil = JSONUtil.newInstance();
 
         boolean changed = false;
         if (patientId != null && patientService.existPatient(patientId)) {
             PatientBean patient = patientService.getOneById(patientId);
-            String patientJson = go2NurseUtility.toJsonString(patient);
+            String patientJson = jsonUtil.toJsonString(patient);
             entity.setPatientId(patientId);
             entity.setPatient(patientJson);
             changed = true;
@@ -298,7 +300,7 @@ public class ServiceOrderService {
 
         if (addressId != null && addressService.existAddress(addressId)) {
             UserAddressBean address = addressService.getOneById(addressId);
-            String addressJson = go2NurseUtility.toJsonString(address);
+            String addressJson = jsonUtil.toJsonString(address);
             entity.setAddressId(addressId);
             entity.setAddress(addressJson);
             changed = true;
@@ -721,10 +723,11 @@ public class ServiceOrderService {
             logger.error("create orderNo failed!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+        JSONUtil jsonUtil = JSONUtil.newInstance();
 
         // get service item
         ServiceItemBean serviceItem = serviceCategoryItemService.getItemById(serviceItemId);
-        String serviceItemJson = go2NurseUtility.toJsonString(serviceItem);
+        String serviceItemJson = jsonUtil.toJsonString(serviceItem);
 
         // get vendor
         ServiceVendorType vendorType = serviceItem.getVendorType();
@@ -732,9 +735,9 @@ public class ServiceOrderService {
         HospitalBean vendorHospital = serviceItem.getHospital();
         String vendorJson = null;
         if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
-            vendorJson = go2NurseUtility.toJsonString(vendorHospital);
+            vendorJson = jsonUtil.toJsonString(vendorHospital);
         } else if (ServiceVendorType.COMPANY.equals(vendorType)) {
-            vendorJson = go2NurseUtility.toJsonString(vendor);
+            vendorJson = jsonUtil.toJsonString(vendor);
         }
         logger.info("hospital ========= {}", serviceItem.getHospital());
         logger.info("vendor ========= {}", serviceItem.getVendor());
@@ -756,20 +759,20 @@ public class ServiceOrderService {
                 }
             }
             if (null != serviceCategory) {
-                serviceCategoryJson = go2NurseUtility.toJsonString(serviceCategory);
+                serviceCategoryJson = jsonUtil.toJsonString(serviceCategory);
             }
             if (null != serviceTopCategory) {
-                serviceTopCategoryJson = go2NurseUtility.toJsonString(serviceTopCategory);
+                serviceTopCategoryJson = jsonUtil.toJsonString(serviceTopCategory);
             }
         }
 
         // get patient
         PatientBean patient = patientService.getOneById(patientId);
-        String patientJson = go2NurseUtility.toJsonString(patient);
+        String patientJson = jsonUtil.toJsonString(patient);
 
         // get address
         UserAddressBean address = addressService.getOneById(addressId);
-        String addressJson = go2NurseUtility.toJsonString(address);
+        String addressJson = jsonUtil.toJsonString(address);
 
 
         //===========================================

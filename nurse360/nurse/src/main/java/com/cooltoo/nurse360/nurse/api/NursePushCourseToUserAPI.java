@@ -62,6 +62,27 @@ public class NursePushCourseToUserAPI {
         return Response.ok(coursesPushed).build();
     }
 
+    @Path("/all")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response deleteAllHistory(@Context HttpServletRequest request) {
+        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<Long> pushedRecordIds = pushCourseService.deletePushedCourseReadStatus(nurseId, null, null);
+        return Response.ok(pushedRecordIds).build();
+    }
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response deleteHistory(@Context HttpServletRequest request,
+                                  @FormParam("push_record_id") @DefaultValue("0") long recordId
+    ) {
+        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        boolean success = pushCourseService.deletePushCourseReadStatus(nurseId, recordId);
+        return Response.ok(success ? "ok" : "failed").build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
