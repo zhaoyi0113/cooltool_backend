@@ -56,6 +56,30 @@ public class CaseService {
         return beanConverter.convert(_case);
     }
 
+    public Map<Long, Long> getCaseSizeInCasebooks(List<Long> casebookIds) {
+        Map<Long, Long> casebookIdAndCaseSize = new HashMap<>();
+        if (VerifyUtil.isListEmpty(casebookIds)) {
+            return casebookIdAndCaseSize;
+        }
+        List<Object[]> casebookIdAndCaseId = repository.countByStatusNotAndCasebookId(CommonStatus.DELETED, casebookIds);
+        if (!VerifyUtil.isListEmpty(casebookIdAndCaseId)) {
+            for (int i = 0; i < casebookIdAndCaseId.size(); i++) {
+                Object[] tmp = casebookIdAndCaseId.get(i);
+                if (null==tmp || tmp.length==0) {
+                    continue;
+                }
+                if (tmp[0] instanceof Long) {
+                    if (!casebookIdAndCaseSize.containsKey(tmp[0])) {
+                        casebookIdAndCaseSize.put((Long)tmp[0], 0L);
+                    }
+                    Long count = casebookIdAndCaseSize.get((Long)tmp[0]);
+                    casebookIdAndCaseSize.put((Long)tmp[0], count + 1);
+                }
+            }
+        }
+        return casebookIdAndCaseSize;
+    }
+
     public List<CaseBean> getCaseByCasebookId(long casebookId) {
         logger.info("get case by casebookId={}.", casebookId);
         List<Long> casebookIds = new ArrayList<>();

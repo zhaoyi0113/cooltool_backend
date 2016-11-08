@@ -1,6 +1,7 @@
 package com.cooltoo.nurse360.nurse.api;
 
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.go2nurse.beans.CaseBean;
 import com.cooltoo.go2nurse.beans.CasebookBean;
 import com.cooltoo.go2nurse.service.CasebookService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
@@ -106,6 +107,16 @@ public class CasebookAPI {
     //=================================================================================================================
     //                                           case service
     //=================================================================================================================
+    @Path("/case")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getCase(@Context HttpServletRequest request,
+                            @QueryParam("case_id") @DefaultValue("0") long caseId
+    ) {
+        CaseBean _case = casebookService.getCaseById(caseId);
+        return Response.ok(_case).build();
+    }
 
     @Path("/case")
     @DELETE

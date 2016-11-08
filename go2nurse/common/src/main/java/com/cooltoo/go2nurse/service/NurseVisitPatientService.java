@@ -290,7 +290,7 @@ public class NurseVisitPatientService {
     @Transactional
     public long addVisitRecord(long nurseId, long userId, long patientId, long orderId, String visitRecord, String serviceItem) {
         logger.info("add visit record with nurseId={} userId={} patientId={} visitRecord={} serviceItem={}",
-                nurseId, userId, patientId, visitRecord, (null!=serviceItem));
+                nurseId, userId, patientId, visitRecord, serviceItem);
         if (nurseId>0 && !nurseService.existsNurse(nurseId)) {
             logger.info("nurse not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -306,7 +306,7 @@ public class NurseVisitPatientService {
             orderId = 0;
         }
         if (VerifyUtil.isStringEmpty(serviceItem)) {
-            logger.info("service itme of visit is empty");
+            logger.info("service item of visit is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         visitRecord = VerifyUtil.isStringEmpty(visitRecord) ? "" : visitRecord.trim();

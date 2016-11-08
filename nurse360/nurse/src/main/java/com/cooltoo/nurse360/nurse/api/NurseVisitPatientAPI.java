@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Created by zhaolisong on 2016/11/7.
@@ -114,8 +115,12 @@ public class NurseVisitPatientAPI {
         if (!VerifyUtil.isListEmpty(serviceItems)) {
             serviceItemsJson = jsonUtil.toJsonString(serviceItems);
         }
+
         long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItemsJson);
-        return Response.ok(visitId).build();
+
+        Map<String, Long> map = new HashMap<>();
+        map.put("id", visitId);
+        return Response.ok(map).build();
     }
 
     @Path("/image")

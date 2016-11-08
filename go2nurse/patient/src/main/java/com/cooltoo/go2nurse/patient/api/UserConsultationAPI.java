@@ -5,6 +5,8 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.ConsultationCategoryBean;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
+import com.cooltoo.go2nurse.constants.ConsultationCreator;
+import com.cooltoo.go2nurse.constants.ConsultationReason;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatService;
@@ -69,7 +71,7 @@ public class UserConsultationAPI {
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, null, null, content, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, null, null, content, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
         return Response.ok(consultations).build();
     }
 
@@ -83,7 +85,7 @@ public class UserConsultationAPI {
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
         return Response.ok(consultations).build();
     }
 
@@ -121,7 +123,12 @@ public class UserConsultationAPI {
                                     @FormParam("clinical_history") @DefaultValue("") String clinicalHistory
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        long consultationId = userConsultationService.addConsultation(categoryId, nurseId, userId, patientId, diseaseDescription, clinicalHistory);
+        long consultationId = userConsultationService.addConsultation(
+                categoryId, nurseId, userId, patientId,
+                diseaseDescription, clinicalHistory,
+                ConsultationCreator.USER,
+                ConsultationReason.CONSULTATION
+        );
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", consultationId);
         return Response.ok(retValue).build();
@@ -138,7 +145,7 @@ public class UserConsultationAPI {
                                          @FormDataParam("image") InputStream image
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, consultationId, imageName, image);
+        Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, 0, consultationId, imageName, image);
         return Response.ok(imageIdToUrl).build();
     }
 
@@ -154,7 +161,7 @@ public class UserConsultationAPI {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         String accessToken = (String) request.getAttribute(ContextKeys.USER_ACCESS_TOKEN);
         InputStream inputStream = weChatService.downloadImageFromWX(accessToken, mediaId);
-        Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, consultationId, "", inputStream);
+        Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(userId, 0, consultationId, "", inputStream);
         return Response.ok(imageIdToUrl).build();
     }
 

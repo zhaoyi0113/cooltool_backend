@@ -71,6 +71,9 @@ public class QuestionnaireService {
     //=================================================================
     //         getter
     //=================================================================
+    public boolean existsQuestionnaire(long questionnaireId) {
+        return questionnaireRep.exists(questionnaireId);
+    }
 
     public long getQuestionCount() {
         long count = questionRep.count();

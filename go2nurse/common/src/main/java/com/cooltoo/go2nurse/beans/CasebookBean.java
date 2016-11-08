@@ -25,6 +25,7 @@ public class CasebookBean {
     private long nurseId;
     private NurseBean nurse;
     private List<CaseBean> cases;
+    private long caseSize;
 
     public long getId() {
         return id;
@@ -122,6 +123,14 @@ public class CasebookBean {
         this.nurse = nurse;
     }
 
+    public long getCaseSize() {
+        return caseSize;
+    }
+
+    public void setCaseSize(long caseSize) {
+        this.caseSize = caseSize;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -131,6 +140,7 @@ public class CasebookBean {
         msg.append(", nurseId=").append(nurseId);
         msg.append(", name=").append(name);
         msg.append(", description=").append(description);
+        msg.append(", caseSize=").append(caseSize);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

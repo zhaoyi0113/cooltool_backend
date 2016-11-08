@@ -51,9 +51,17 @@ public class NursePatientAPI {
 
         List<Long> userIds = nursePatientService.getUserByNurseId(nurseId, CommonStatus.ENABLED.name());
         List<UserBean> users = userService.getUser(userIds, UserAuthority.AGREE_ALL);
+        Map<Long, UserBean> userIdToBean = new HashMap<>();
+        for (UserBean tmp : users) {
+            userIdToBean.put(tmp.getId(), tmp);
+        }
 
         List<UserBean> returnVal = new ArrayList<>();
-        for (UserBean tmp : users) {
+        for (Long tmpId : userIds) {
+            UserBean tmp = userIdToBean.get(tmpId);
+            if (null==tmp) {
+                continue;
+            }
             UserHospitalizedStatus status = UserHospitalizedStatus.IN_HOSPITAL.equals(tmp.getHasDecide())
                     ? UserHospitalizedStatus.IN_HOSPITAL
                     : UserHospitalizedStatus.IN_HOME;

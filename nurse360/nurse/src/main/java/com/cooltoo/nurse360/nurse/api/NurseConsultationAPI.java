@@ -5,6 +5,8 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.ConsultationCategoryBean;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
+import com.cooltoo.go2nurse.constants.ConsultationCreator;
+import com.cooltoo.go2nurse.constants.ConsultationReason;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.service.ConsultationCategoryService;
 import com.cooltoo.go2nurse.service.UserConsultationService;
@@ -68,7 +70,7 @@ public class NurseConsultationAPI {
         nurseId = YesNoEnum.YES.equals(allConsultation) ? null : nurseId;
         Long categoryId = 0==lCategoryId ? null : new Long(lCategoryId);
 
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultationByCondition(null, null, nurseId, categoryId, content, pageIndex, sizePerPage);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(null, nurseId, categoryId, content, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.NURSE_SPEAK);
         return Response.ok(consultations).build();
     }
 
@@ -84,7 +86,7 @@ public class NurseConsultationAPI {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         Long userId = VerifyUtil.isIds(strUserId) ? VerifyUtil.parseLongIds(strUserId).get(0) : null;
 
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, pageIndex, sizePerPage, ConsultationTalkStatus.NURSE_SPEAK);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.NURSE_SPEAK);
         return Response.ok(consultations).build();
     }
 
@@ -111,6 +113,46 @@ public class NurseConsultationAPI {
         YesNoEnum completed = YesNoEnum.parseString(strCompleted);
         UserConsultationBean bean = userConsultationService.updateConsultationStatus(null, consultationId, categoryId, null, null, completed);
         return Response.ok(bean).build();
+    }
+
+
+    //===================================================================================================
+    //                         patient follow-up consultation
+    //===================================================================================================
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response addConsultation(@Context HttpServletRequest request,
+                                    @FormParam("user_id") @DefaultValue("0") long userId,
+                                    @FormParam("patient_id") @DefaultValue("0") long patientId,
+                                    @FormParam("follow_up_description") @DefaultValue("") String diseaseDescription
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        long consultationId = userConsultationService.addConsultation(
+                0, nurseId, userId, patientId,
+                diseaseDescription, "",
+                ConsultationCreator.NURSE,
+                ConsultationReason.PATIENT_FOLLOW_UP
+        );
+        Map<String, Long> retValue = new HashMap<>();
+        retValue.put("id", consultationId);
+        return Response.ok(retValue).build();
+    }
+
+    @Path("/add_image")
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response addConsultationImage(@Context HttpServletRequest request,
+                                         @FormDataParam("consultation_id") @DefaultValue("0") long consultationId,
+                                         @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                         @FormDataParam("image") InputStream image
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(0, nurseId, consultationId, imageName, image);
+        return Response.ok(imageIdToUrl).build();
     }
 
 

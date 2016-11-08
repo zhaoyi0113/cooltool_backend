@@ -24,6 +24,8 @@ public class UserConsultationBeanConverter implements Converter<UserConsultation
         bean.setNurseId(source.getNurseId());
         bean.setCompleted(source.getCompleted());
         bean.setScore(source.getScore());
+        bean.setCreator(source.getCreator());
+        bean.setReason(source.getReason());
         return bean;
     }
 }

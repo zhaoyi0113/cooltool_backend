@@ -174,6 +174,7 @@ public class CasebookService {
         Map<Long, UserBean> userIdToBean = userService.getUserIdToBean(userIds);
         Map<Long, PatientBean> patientIdToBean = patientService.getPatientIdToBean(patientIds);
         Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
+        Map<Long, Long> casebookAndCaseSize = caseService.getCaseSizeInCasebooks(casebookIds);
 
         // fill properties
         for (CasebookBean tmp : beans) {
@@ -183,6 +184,8 @@ public class CasebookService {
             tmp.setPatient(patient);
             NurseBean nurse = nurseIdToBean.get(tmp.getNurseId());
             tmp.setNurse(nurse);
+            Long caseSize = casebookAndCaseSize.get(tmp.getId());
+            tmp.setCaseSize(null==caseSize ? 0 : caseSize);
         }
     }
 
@@ -194,18 +197,21 @@ public class CasebookService {
         Long userId = casebook.getUserId();
         Long patientId = casebook.getPatientId();
         long nurseId = casebook.getNurseId();
-//        Long casebookId = casebook.getId();
+        Long casebookId = casebook.getId();
 
         UserBean user = userService.getUser(userId);
         PatientBean patient = patientService.getOneById(patientId);
         NurseBean nurse = nurseId<=0 ? null : nurseService.getNurseById(nurseId);
 //        List<CaseBean> cases = caseService.getCaseByCasebookId(casebookId);
+        Map<Long, Long> casebookAndCaseSize = caseService.getCaseSizeInCasebooks(Arrays.asList(new Long[]{casebookId}));
 
         // fill properties
         casebook.setUser(user);
         casebook.setPatient(patient);
         casebook.setNurse(nurse);
 //        casebook.setCases(cases);
+        Long caseSize = casebookAndCaseSize.get(casebookId);
+        casebook.setCaseSize(null==caseSize ? 0 : caseSize);
     }
 
 
@@ -317,7 +323,7 @@ public class CasebookService {
 
     //=================================================================================================================
     //*****************************************************************************************************************
-    //                                          Talk Service
+    //                                          Case Service
     //*****************************************************************************************************************
     //=================================================================================================================
 
@@ -327,16 +333,16 @@ public class CasebookService {
     public CaseBean getCaseById(Long caseId) {
         CaseBean caseBean = caseService.getCaseWithoutInfoById(caseId);
         if (null!=caseBean) {
-            List<CaseBean> talkBeans = Arrays.asList(new CaseBean[]{caseBean});
-            fillOtherPropertiesForCase(caseBean.getCasebookId(), talkBeans);
+            List<CaseBean> caseBeans = Arrays.asList(new CaseBean[]{caseBean});
+            fillOtherPropertiesForCase(caseBean.getCasebookId(), caseBeans);
         }
         return caseBean;
     }
 
     private List<CaseBean> getCaseByCasebookId(Long casebookId) {
-        List<CaseBean> talksBean = caseService.getCaseByCasebookId(casebookId);
-        fillOtherPropertiesForCase(casebookId, talksBean);
-        return talksBean;
+        List<CaseBean> caseBeans = caseService.getCaseByCasebookId(casebookId);
+        fillOtherPropertiesForCase(casebookId, caseBeans);
+        return caseBeans;
     }
 
     private void fillOtherPropertiesForCase(Long casebookId, List<CaseBean> beans) {

@@ -2,6 +2,8 @@ package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.go2nurse.constants.ConsultationCreator;
+import com.cooltoo.go2nurse.constants.ConsultationReason;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -24,6 +26,8 @@ public class UserConsultationEntity {
     private long nurseId;
     private YesNoEnum completed;
     private float score;
+    private ConsultationCreator creator;
+    private ConsultationReason reason;
 
     @Id
     @GeneratedValue
@@ -84,6 +88,16 @@ public class UserConsultationEntity {
         return score;
     }
 
+    @Column(name = "creator")
+    public ConsultationCreator getCreator() {
+        return creator;
+    }
+
+    @Column(name = "reason")
+    public ConsultationReason getReason() {
+        return reason;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -128,6 +142,14 @@ public class UserConsultationEntity {
         this.score = score;
     }
 
+    public void setCreator(ConsultationCreator creator) {
+        this.creator = creator;
+    }
+
+    public void setReason(ConsultationReason reason) {
+        this.reason = reason;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -140,6 +162,8 @@ public class UserConsultationEntity {
         msg.append(", diseaseDescription=").append(diseaseDescription);
         msg.append(", completed=").append(completed);
         msg.append(", score=").append(score);
+        msg.append(", creator=").append(creator);
+        msg.append(", reason=").append(reason);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

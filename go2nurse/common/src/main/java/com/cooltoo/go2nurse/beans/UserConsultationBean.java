@@ -3,6 +3,8 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.go2nurse.constants.ConsultationCreator;
+import com.cooltoo.go2nurse.constants.ConsultationReason;
 import com.cooltoo.util.VerifyUtil;
 
 import java.util.Date;
@@ -31,6 +33,8 @@ public class UserConsultationBean {
     private YesNoEnum completed;
     private float score;
     private boolean hasUnreadTalk;
+    private ConsultationCreator creator;
+    private ConsultationReason reason;
 
     public long getId() {
         return id;
@@ -80,6 +84,14 @@ public class UserConsultationBean {
         return score;
     }
 
+    public ConsultationCreator getCreator() {
+        return creator;
+    }
+
+    public ConsultationReason getReason() {
+        return reason;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -126,6 +138,14 @@ public class UserConsultationBean {
 
     public void setScore(float score) {
         this.score = score;
+    }
+
+    public void setCreator(ConsultationCreator creator) {
+        this.creator = creator;
+    }
+
+    public void setReason(ConsultationReason reason) {
+        this.reason = reason;
     }
 
     public List<String> getImagesUrl() {
@@ -190,6 +210,8 @@ public class UserConsultationBean {
         msg.append(", diseaseDescription=").append(diseaseDescription);
         msg.append(", imagesUrl=").append(VerifyUtil.isListEmpty(imagesUrl) ? 0 : imagesUrl.size());
         msg.append(", score=").append(score);
+        msg.append(", creator=").append(creator);
+        msg.append(", reason=").append(reason);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

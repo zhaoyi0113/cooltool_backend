@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.entities.CaseEntity;
 import com.cooltoo.go2nurse.entities.UserConsultationTalkEntity;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -15,6 +16,10 @@ import java.util.List;
  */
 public interface CaseRepository extends JpaRepository<CaseEntity, Long>{
 
-    List<CaseEntity> findByStatusNotAndCasebookIdIn(CommonStatus status, List<Long> casebookIds, Sort sort);
-    List<CaseEntity> findByStatusNotAndIdIn(CommonStatus status, List<Long> caseIds);
+    @Query("SELECT ce.casebookId, ce.id FROM CaseEntity ce" +
+            " WHERE (?1 IS NULL OR ce.status<>?1)" +
+            "   AND (ce.casebookId IN (?2))")
+    List<Object[]> countByStatusNotAndCasebookId(CommonStatus statusNot, List<Long> casebookIds);
+    List<CaseEntity> findByStatusNotAndCasebookIdIn(CommonStatus statusNot, List<Long> casebookIds, Sort sort);
+    List<CaseEntity> findByStatusNotAndIdIn(CommonStatus statusNot, List<Long> caseIds);
 }

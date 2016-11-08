@@ -8,6 +8,8 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
+import com.cooltoo.go2nurse.constants.ConsultationCreator;
+import com.cooltoo.go2nurse.constants.ConsultationReason;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.constants.ReasonType;
 import com.cooltoo.go2nurse.converter.UserConsultationBeanConverter;
@@ -84,7 +86,7 @@ public class UserConsultationService {
     //             get ----  patient using
     //===============================================================
 
-    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, Long categoryId, String contentLike, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
+    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, Long categoryId, String contentLike, ConsultationReason reason, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
         logger.info("user={} nusre={} get consultation (contentLike={}) categoryId={} at page={} sizePerPage={}",
                 userId, nurseId, contentLike, categoryId, pageIndex, sizePerPage);
         List<UserConsultationBean> beans;
@@ -94,7 +96,7 @@ public class UserConsultationService {
         else {
             contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
             PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-            Page<UserConsultationEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, nurseId, categoryId, CommonStatus.DELETED, contentLike, request);
+            Page<UserConsultationEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, nurseId, categoryId, CommonStatus.DELETED, contentLike, reason, request);
             beans = entitiesToBeansForConsultation(resultSet);
             fillOtherPropertiesForConsultation(beans, talkStatus);
         }
@@ -102,11 +104,11 @@ public class UserConsultationService {
         return beans;
     }
 
-    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
+    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, ConsultationReason reason, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
         logger.info("user={} get consultation nurseId={} at page={} sizePerPage={}", userId, nurseId, pageIndex, sizePerPage);
         List<UserConsultationBean> beans;
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<UserConsultationEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, CommonStatus.DELETED, nurseId, request);
+        Page<UserConsultationEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, CommonStatus.DELETED, nurseId, reason, request);
         beans = entitiesToBeansForConsultation(resultSet);
         fillOtherPropertiesForConsultation(beans, talkStatus);
         logger.warn("speak count={}", beans.size());
@@ -128,11 +130,26 @@ public class UserConsultationService {
         return userConsultation.get(0);
     }
 
+    public Map<Long, UserConsultationBean> getUserConsultationIdToBean(List<Long> consultationIds, ConsultationTalkStatus talkStatusNotMatch) {
+        Map<Long, UserConsultationBean> map = new HashMap<>();
+        if (!VerifyUtil.isListEmpty(consultationIds)) {
+            List<UserConsultationEntity> entities = repository.findAll(consultationIds);
+            List<UserConsultationBean> beans = entitiesToBeansForConsultation(entities);
+            fillOtherPropertiesForConsultation(beans, talkStatusNotMatch);
+            for (UserConsultationBean tmp : beans) {
+                map.put(tmp.getId(), tmp);
+            }
+        }
+        return map;
+    }
+
     public UserConsultationBean getUserConsultationWithTalk(Long consultationId, ConsultationTalkStatus talkStatus) {
         logger.info("get consultation={} with talks", consultationId);
         UserConsultationBean consultation = getUserConsultation(consultationId, talkStatus);
-        List<UserConsultationTalkBean> talks = getTalkByConsultationId(consultationId);
-        consultation.setTalks(talks);
+        if (null!=consultation) {
+            List<UserConsultationTalkBean> talks = getTalkByConsultationId(consultationId);
+            consultation.setTalks(talks);
+        }
         return consultation;
     }
 
@@ -366,9 +383,13 @@ public class UserConsultationService {
     //             add
     //===============================================================
     @Transactional
-    public long addConsultation(long categoryId, long nurseId, long userId, long patientId, String diseaseDescription, String clinicalHistory) {
-        logger.info("add consultation categoryId={} nurseId={} userId={} patientId={} diseaseDescription={} clinicalHistory={}",
-                categoryId, nurseId, userId, patientId, diseaseDescription, (null!=clinicalHistory));
+    public long addConsultation(long categoryId, long nurseId, long userId, long patientId,
+                                String diseaseDescription, String clinicalHistory,
+                                ConsultationCreator creator,
+                                ConsultationReason reason
+    ) {
+        logger.info("add consultation categoryId={} nurseId={} userId={} patientId={} diseaseDescription={} clinicalHistory={} creator={} reason={}",
+                categoryId, nurseId, userId, patientId, diseaseDescription, (null!=clinicalHistory), creator, reason);
         if (categoryId>0 && !categoryService.existCategory(categoryId)) {
             logger.info("category not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -381,7 +402,7 @@ public class UserConsultationService {
             logger.info("userId not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (!patientService.existPatient(patientId)) {
+        if (patientId>0 && !patientService.existPatient(patientId)) {
             logger.info("patientId not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
@@ -389,6 +410,9 @@ public class UserConsultationService {
             logger.info("disease description empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+        categoryId = categoryId<0 ? 0 : categoryId;
+        patientId  = patientId<0  ? 0 : patientId;
+        nurseId    = nurseId<0    ? 0 : nurseId;
         clinicalHistory = VerifyUtil.isStringEmpty(clinicalHistory) ? "" : clinicalHistory.trim();
 
         UserConsultationEntity entity = new UserConsultationEntity();
@@ -399,6 +423,8 @@ public class UserConsultationService {
         entity.setDiseaseDescription(diseaseDescription.trim());
         entity.setClinicalHistory(clinicalHistory);
         entity.setCompleted(YesNoEnum.NO);
+        entity.setCreator(creator);
+        entity.setReason(reason);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = repository.save(entity);
@@ -407,7 +433,7 @@ public class UserConsultationService {
     }
 
     @Transactional
-    public Map<String, String> addConsultationImage(long userId, long consultationId, String imageName, InputStream image) {
+    public Map<String, String> addConsultationImage(long userId, long nurseId, long consultationId, String imageName, InputStream image) {
         logger.info("user={} add image to consultation={} name={} image={}", userId, consultationId, imageName, (null!=image));
 
         // check speak
@@ -416,8 +442,14 @@ public class UserConsultationService {
             logger.error("consultation is not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (userId!=speakEntity.getUserId()) {
+        if (ConsultationCreator.USER.equals(speakEntity.getCreator())
+                && userId!=speakEntity.getUserId()) {
             logger.error("user can not modify other's consultation");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (ConsultationCreator.NURSE.equals(speakEntity.getCreator())
+                && nurseId!=speakEntity.getNurseId()) {
+            logger.error("nurse can not modify other's consultation");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
