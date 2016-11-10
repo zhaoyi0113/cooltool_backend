@@ -11,6 +11,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 2016/11/10.
@@ -30,7 +32,9 @@ public class HospitalAdminLoginAPI {
         HospitalAdminAccessTokenBean token = adminAccessTokenService.addToken(userName, password);
         HttpSession session = request.getSession();
         session.setAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID, token.getAdminId());
-        return Response.ok(token.getToken()).build();
+        Map<String, String> retVal = new HashMap<>();
+        retVal.put("token", token.getToken());
+        return Response.ok(retVal).build();
     }
 
     @Path("/logout")
@@ -48,6 +52,8 @@ public class HospitalAdminLoginAPI {
     public Response isLogin(@Context HttpServletRequest request) {
         String token = (String) request.getAttribute(ContextKeys.ADMIN_USER_TOKEN);
         boolean login = adminAccessTokenService.isTokenEnable(token);
-        return Response.ok(login).build();
+        Map<String, Boolean> retVal = new HashMap<>();
+        retVal.put("isLogin", login);
+        return Response.ok(retVal).build();
     }
 }

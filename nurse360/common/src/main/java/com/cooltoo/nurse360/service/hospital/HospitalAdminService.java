@@ -106,6 +106,10 @@ public class HospitalAdminService {
     //==================================================================
     //                   getter
     //==================================================================
+    public boolean isSuperAdmin(long adminId) {
+        return adminId==1;
+    }
+
     public List<HospitalAdminBean> getAdminUserWithoutInfo(String name, String password) {
         logger.info("get hospital admin user by name={} password={}", name, password);
         List<HospitalAdminEntity> users = repository.findAdminByNameAndPassword(name, password);
