@@ -60,27 +60,25 @@ public class NursePushCourseToUserAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response getCourseCategory(@Context HttpServletRequest request,
-                                      @PathParam("category_id") @DefaultValue("0") long categoryId
+    public Response getCategoryCourses(@Context HttpServletRequest request,
+                                       @PathParam("category_id") @DefaultValue("0") long categoryId
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseBean nurse = nurseService.getNurseById(nurseId);
         NurseHospitalRelationBean hospitalDepartment = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
 
-        CoursesGroupBean group = null;
-        if (null==hospitalDepartment) {
-        }
-        else {
+        Object courses = new ArrayList<>();
+        if (null!=hospitalDepartment) {
             List<CoursesGroupBean> groups = courseRelationManageService.getHospitalCoursesGroupByCategory(
-                    null, hospitalDepartment.getHospitalId(), hospitalDepartment.getDepartmentId(), Arrays.asList(new Long[]{categoryId})
+                    null, hospitalDepartment.getHospitalId(), hospitalDepartment.getDepartmentId()
             );
             for (CoursesGroupBean tmp : groups) {
                 if (tmp.getId() == categoryId) {
-                    group = tmp;
+                    courses = tmp.getCourses();
                 }
             }
         }
-        return Response.ok(group).build();
+        return Response.ok(courses).build();
     }
 
     @Path("/category/course/{course_id}")
