@@ -3,12 +3,15 @@ package com.cooltoo.nurse360.nurse.api;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.go2nurse.beans.CourseBean;
 import com.cooltoo.go2nurse.beans.CoursesGroupBean;
 import com.cooltoo.go2nurse.beans.NursePushCourseBean;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
+import com.cooltoo.go2nurse.service.CourseService;
 import com.cooltoo.go2nurse.service.NursePushCourseService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NurseServiceForNurse360;
+import com.cooltoo.nurse360.util.Nurse360Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,6 +32,8 @@ public class NursePushCourseToUserAPI {
     @Autowired private NursePushCourseService pushCourseService;
     @Autowired private CourseRelationManageService courseRelationManageService;
     @Autowired private NurseServiceForNurse360 nurseService;
+    @Autowired private CourseService go2nurseCourseService;
+    @Autowired private Nurse360Utility utility;
 
     @Path("/category")
     @GET
@@ -49,6 +55,45 @@ public class NursePushCourseToUserAPI {
         }
         return Response.ok(group).build();
     }
+
+    @Path("/category/{category_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getCourseCategory(@Context HttpServletRequest request,
+                                      @PathParam("category_id") @DefaultValue("0") long categoryId
+    ) {
+        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean nurse = nurseService.getNurseById(nurseId);
+        NurseHospitalRelationBean hospitalDepartment = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
+
+        CoursesGroupBean group = null;
+        if (null==hospitalDepartment) {
+        }
+        else {
+            List<CoursesGroupBean> groups = courseRelationManageService.getHospitalCoursesGroupByCategory(
+                    null, hospitalDepartment.getHospitalId(), hospitalDepartment.getDepartmentId(), Arrays.asList(new Long[]{categoryId})
+            );
+            for (CoursesGroupBean tmp : groups) {
+                if (tmp.getId() == categoryId) {
+                    group = tmp;
+                }
+            }
+        }
+        return Response.ok(group).build();
+    }
+
+    @Path("/category/course/{course_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getCourseDetail(@Context HttpServletRequest request,
+                                    @PathParam("course_id") @DefaultValue("0") long courseId
+    ) {
+        CourseBean course = go2nurseCourseService.getCourseById(courseId, utility.getHttpPrefix());
+        return Response.ok(course).build();
+    }
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

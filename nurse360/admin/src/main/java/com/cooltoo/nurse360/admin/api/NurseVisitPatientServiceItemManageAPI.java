@@ -1,13 +1,23 @@
 package com.cooltoo.nurse360.admin.api;
 
-import com.cooltoo.go2nurse.beans.NurseVisitPatientBean;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.NurseVisitPatientServiceItemBean;
-import com.cooltoo.go2nurse.service.NurseVisitPatientService;
 import com.cooltoo.go2nurse.service.NurseVisitPatientServiceItemService;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -49,6 +59,19 @@ public class NurseVisitPatientServiceItemManageAPI {
                 0>departmentId ? null : departmentId,
                 pageIndex, sizePerPage);
         return Response.ok(items).build();
+    }
+
+    @Path("/{item_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getVisitPatientServiceItem(@Context HttpServletRequest request,
+                                               @PathParam("item_id") @DefaultValue("-1") int itemId
+    ) {
+        List<NurseVisitPatientServiceItemBean> items = nurseVisitPatientServiceItem.getVisitPatientServiceItem(itemId+"");
+        if (VerifyUtil.isListEmpty(items)) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        return Response.ok(items.get(0)).build();
     }
 
     @DELETE

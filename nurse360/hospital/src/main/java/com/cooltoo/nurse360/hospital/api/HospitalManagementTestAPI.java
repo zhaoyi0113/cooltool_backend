@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.hospital.api;
 
+import com.cooltoo.constants.ContextKeys;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ public class HospitalManagementTestAPI {
     public Response testPost1(@Context HttpServletRequest request,
                               @FormDataParam("p1") @DefaultValue("") InputStream p1
     ) throws IOException {
+        long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         BufferedReader reader = new BufferedReader(new InputStreamReader(p1));
         String line = reader.readLine();
         logger.info("test_post1 param={}", line);

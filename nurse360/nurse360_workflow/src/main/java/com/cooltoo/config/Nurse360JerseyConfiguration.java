@@ -2,9 +2,13 @@ package com.cooltoo.config;
 
 
 import com.cooltoo.nurse360.admin.api.*;
+import com.cooltoo.nurse360.admin.api.hospital.HospitalAdminManageAPI;
+import com.cooltoo.nurse360.admin.api.hospital.HospitalManagementUrlManageAPI;
 import com.cooltoo.nurse360.filters.Nurse360BadRequestExceptionMapper;
 import com.cooltoo.nurse360.filters.Nurse360CORSResponseFilter;
 import com.cooltoo.nurse360.filters.Nurse360NurseLoginAuthenticationFilter;
+import com.cooltoo.nurse360.hospital.api.HospitalAdminAPI;
+import com.cooltoo.nurse360.hospital.api.HospitalAdminLoginAPI;
 import com.cooltoo.nurse360.hospital.api.HospitalManagementTestAPI;
 import com.cooltoo.nurse360.nurse.api.*;
 import io.swagger.annotations.Api;
@@ -44,7 +48,6 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(NotificationManageAPI.class);
         register(NurseExtensionAPI.class);
         register(NurseQualificationAPIForNurse360.class);
-        register(HospitalManagementTestAPI.class);
         register(NurseConsultationAPI.class);
         register(CasebookAPI.class);
         register(NurseSuggestionAPI.class);
@@ -52,6 +55,14 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(NurseVisitPatientAPI.class);
         register(NurseVisitPatientManageAPI.class);
         register(NurseVisitPatientServiceItemManageAPI.class);
+
+        register(HospitalAdminManageAPI.class);
+        register(HospitalManagementUrlManageAPI.class);
+
+        register(HospitalManagementTestAPI.class);
+        register(HospitalAdminLoginAPI.class);
+        register(HospitalAdminAPI.class);
+
 
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
     }
