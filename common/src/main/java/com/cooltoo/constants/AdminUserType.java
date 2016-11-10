@@ -8,7 +8,7 @@ public enum AdminUserType {
 
 
     public static AdminUserType parseString(String userType) {
-        AdminUserType retVal = NORMAL;
+        AdminUserType retVal = null;
         if (ADMINISTRATOR.name().equalsIgnoreCase(userType)) {
             retVal = ADMINISTRATOR;
         }
@@ -19,7 +19,7 @@ public enum AdminUserType {
     }
 
     public static AdminUserType parseInt(int userType) {
-        AdminUserType retVal = NORMAL;
+        AdminUserType retVal = null;
         if (ADMINISTRATOR.ordinal() == userType) {
             retVal = ADMINISTRATOR;
         }

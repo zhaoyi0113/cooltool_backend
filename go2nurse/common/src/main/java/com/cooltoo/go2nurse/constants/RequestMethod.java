@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by zhaolisong on 2016/11/9.
  */
-public enum HttpRequestType {
+public enum RequestMethod {
       GET
     , POST
     , PUT
@@ -15,8 +15,8 @@ public enum HttpRequestType {
     , OPTIONS
     ;
 
-    public static HttpRequestType parseString(String type) {
-        HttpRequestType ret = null;
+    public static RequestMethod parseString(String type) {
+        RequestMethod ret = null;
         if (GET.name().equalsIgnoreCase(type)) {
             ret = GET;
         }
@@ -38,8 +38,8 @@ public enum HttpRequestType {
         return ret;
     }
 
-    public static HttpRequestType parseInt(int type) {
-        HttpRequestType ret = null;
+    public static RequestMethod parseInt(int type) {
+        RequestMethod ret = null;
         if (GET.ordinal() == type) {
             ret = GET;
         }
@@ -61,14 +61,14 @@ public enum HttpRequestType {
         return ret;
     }
 
-    public static List<HttpRequestType> getAll() {
-        List<HttpRequestType> all = new ArrayList<>();
-        all.add(HttpRequestType.GET);
-        all.add(HttpRequestType.POST);
-        all.add(HttpRequestType.PUT);
-        all.add(HttpRequestType.DELETE);
-        all.add(HttpRequestType.HEAD);
-        all.add(HttpRequestType.OPTIONS);
+    public static List<RequestMethod> getAll() {
+        List<RequestMethod> all = new ArrayList<>();
+        all.add(RequestMethod.GET);
+        all.add(RequestMethod.POST);
+        all.add(RequestMethod.PUT);
+        all.add(RequestMethod.DELETE);
+        all.add(RequestMethod.HEAD);
+        all.add(RequestMethod.OPTIONS);
         return all;
     }
 }

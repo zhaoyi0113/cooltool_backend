@@ -29,8 +29,8 @@ public class CaseService {
     private static final Logger logger = LoggerFactory.getLogger(CaseService.class);
 
     private static final Sort sort = new Sort(
-            new Sort.Order(Sort.Direction.ASC, "time"),
-            new Sort.Order(Sort.Direction.ASC, "id")
+            new Sort.Order(Sort.Direction.DESC, "time"),
+            new Sort.Order(Sort.Direction.DESC, "id")
     );
 
     @Autowired private CaseRepository repository;
