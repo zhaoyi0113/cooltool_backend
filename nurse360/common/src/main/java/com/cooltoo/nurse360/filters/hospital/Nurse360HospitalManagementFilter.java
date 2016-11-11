@@ -49,6 +49,9 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
             String httpRootUrl = httpRequest.getRequestURI();
             // get http type
             RequestMethod httpType = RequestMethod.parseString(httpRequest.getMethod());
+            if("OPTIONS".equals(httpType)){
+                return;
+            }
 
             // check http url valid
             if (null==httpType || null==httpRootUrl || !httpUrl.startsWith("/hospital_management") || !httpRootUrl.equals("/nurse360"+httpUrl)) {
