@@ -64,11 +64,11 @@ public class NursePatientRelationServiceForNurse360 {
                 strStatus, nurseId, userId, patientId);
         CommonStatus status = CommonStatus.parseString(strStatus);
         if (null==status) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
         }
         List<NursePatientRelationEntity> relations = repository.findByNurseIdAndUserIdAndPatientId(nurseId, userId, patientId, sort);
         if (VerifyUtil.isListEmpty(relations)) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         NursePatientRelationEntity entity = relations.get(0);
         relations.remove(entity);

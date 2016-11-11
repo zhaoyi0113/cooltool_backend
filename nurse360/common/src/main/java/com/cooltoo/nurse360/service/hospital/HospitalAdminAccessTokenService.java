@@ -1,12 +1,12 @@
 package com.cooltoo.nurse360.service.hospital;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
 import com.cooltoo.nurse360.converters.HospitalAdminAccessTokenBeanConverter;
 import com.cooltoo.nurse360.entities.HospitalAdminAccessTokenEntity;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.repository.HospitalAdminAccessTokenRepository;
 import com.cooltoo.util.AccessTokenGenerator;
 import com.cooltoo.util.VerifyUtil;
@@ -37,7 +37,7 @@ public class HospitalAdminAccessTokenService {
     public HospitalAdminAccessTokenBean addToken(String name, String password) {
         List<HospitalAdminBean> adminUsers = adminService.getAdminUserWithoutInfo(name, password);
         if(VerifyUtil.isListEmpty(adminUsers)) {
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_NOT_EXISTED);
+            throw new BadRequestException(ErrorCode.NURSE360_USER_NOT_FOUND);
         }
 
         String token = accessTokenGenerator.generateAccessToken(name, password);
@@ -60,8 +60,9 @@ public class HospitalAdminAccessTokenService {
     @Transactional
     public void setTokenDisable(String token){
         List<HospitalAdminAccessTokenEntity> tokenEntities = repository.findTokenByToken(token);
+        // user not login
         if (tokenEntities.isEmpty()) {
-            throw new BadRequestException(ErrorCode.NOT_LOGIN);
+            return;
         }
         for (HospitalAdminAccessTokenEntity tmp : tokenEntities) {
             tmp.setStatus(CommonStatus.DISABLED);

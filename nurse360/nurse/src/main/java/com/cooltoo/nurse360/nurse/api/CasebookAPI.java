@@ -180,7 +180,6 @@ public class CasebookAPI {
     @Path("/case/image")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response addCaseImage(@Context HttpServletRequest request,
                                  @FormParam("casebook_id") @DefaultValue("0") long casebookId,

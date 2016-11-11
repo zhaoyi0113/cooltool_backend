@@ -12,7 +12,6 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -81,7 +80,7 @@ public class NotificationServiceForNurse360 {
         logger.info("get notification by notificationId={}", notificationId);
         Nurse360NotificationEntity notification = repository.findOne(notificationId);
         if (null==notification) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         List<Nurse360NotificationBean> beans = entitiesToBeans(Arrays.asList(new Nurse360NotificationEntity[]{notification}), true);
         fillOtherProperties(beans);
@@ -191,7 +190,7 @@ public class NotificationServiceForNurse360 {
                 notificationId, title, introduction, content, strSignificance, strStatus);
         Nurse360NotificationEntity entity = repository.findOne(notificationId);
         if (null==entity) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         if (!VerifyUtil.isStringEmpty(title)) {
@@ -250,11 +249,11 @@ public class NotificationServiceForNurse360 {
         String imageUrl = null;
         if (VerifyUtil.isStringEmpty(title)) {
             logger.error("add notification : name is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
         else if (repository.countByTitle(title)>0) {
             logger.error("add tag : name is exist");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_EXISTS_ALREADY);
         }
 
         Nurse360NotificationEntity entity = new Nurse360NotificationEntity();

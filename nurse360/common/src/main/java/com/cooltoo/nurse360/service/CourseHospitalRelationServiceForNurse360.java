@@ -134,7 +134,7 @@ public class CourseHospitalRelationServiceForNurse360 {
         }
         if (VerifyUtil.isListEmpty(departmentIds)) {
             logger.error("departmentIds is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
 
         boolean hasCooltoo = departmentIds.contains(Integer.valueOf(-1));
@@ -143,7 +143,7 @@ public class CourseHospitalRelationServiceForNurse360 {
         List<HospitalDepartmentEntity> departments = departmentRepository.findByIdIn(departmentIds, new Sort(new Sort.Order(Sort.Direction.ASC, "id")));
         if (VerifyUtil.isListEmpty(departments) && !hasCooltoo) {
             logger.error("department not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         if (hasCooltoo) {

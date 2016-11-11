@@ -64,7 +64,7 @@ public class HospitalAdminAPI {
             retVal.put("isLogin", adminId);
             return Response.ok(retVal).build();
         }
-        throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
 }

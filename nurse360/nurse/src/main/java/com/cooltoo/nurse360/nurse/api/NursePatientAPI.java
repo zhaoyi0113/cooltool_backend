@@ -82,10 +82,10 @@ public class NursePatientAPI {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<UserBean> users = userService.getUserByUniqueId(userUniqueId);
         if (VerifyUtil.isListEmpty(users)) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         if (users.size()>1) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_RESULT_NOT_EXPECTED);
         }
         nursePatientService.addUserPatientToNurse(nurseId, 0, users.get(0).getId());
         return Response.ok(userUniqueId).build();

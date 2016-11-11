@@ -73,7 +73,7 @@ public class NursePatientFollowUpRecordAPI {
             if (null!=followUp) {
                 if (followUp.getNurseId()!=nurseId) {
                     logger.error("this follow-up={} record={} not belong to you={}", followUp.getId(), followUpRecordId, nurseId);
-                    throw new BadRequestException(ErrorCode.DATA_ERROR);
+                    throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
                 }
             }
         }
@@ -107,7 +107,7 @@ public class NursePatientFollowUpRecordAPI {
 
         if (null!=followUp && followUp.getNurseId()!=nurseId) {
             logger.error("this follow-up={} not belong to you={}", followUpId, nurseId);
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
         }
 
         long followUpRecordId = patientFollowUpRecordService.addPatientFollowUpRecord(

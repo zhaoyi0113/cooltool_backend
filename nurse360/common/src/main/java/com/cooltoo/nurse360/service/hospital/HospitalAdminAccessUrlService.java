@@ -1,13 +1,13 @@
 package com.cooltoo.nurse360.service.hospital;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessUrlBean;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
 import com.cooltoo.nurse360.beans.HospitalManagementUrlBean;
 import com.cooltoo.nurse360.converters.HospitalAdminAccessUrlBeanConverter;
 import com.cooltoo.nurse360.entities.HospitalAdminAccessUrlEntity;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.repository.HospitalAdminAccessUrlRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -201,11 +201,11 @@ public class HospitalAdminAccessUrlService {
 
         if (!adminService.existsAdminUser(adminId)) {
             logger.error("admin not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         if (!managementUrlService.existsHospitalMngUrl(httpUrlId)) {
             logger.error("httpUrlId not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         HospitalAdminAccessUrlEntity entity = null;

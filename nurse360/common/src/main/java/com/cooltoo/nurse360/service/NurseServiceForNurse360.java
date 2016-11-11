@@ -63,14 +63,14 @@ public class NurseServiceForNurse360 {
             return nurseBeanConverter.convert(nurseE);
         }
         logger.error("Get nurse by mobile is error, result is {}.", nurses);
-        throw new BadRequestException(ErrorCode.DATA_ERROR);
+        throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
     }
 
     public NurseBean getNurseById(long nurseId) {
         logger.info("get nurse by nurseId={}", nurseId);
         NurseEntity nurse = commonNurseService.getNurseById(nurseId);
         if (null==nurse) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         NurseBean bean = nurseBeanConverter.convert(nurse);
         String profilePath = nursegoFileStorage.getFilePath(bean.getProfilePhotoId());
@@ -222,7 +222,7 @@ public class NurseServiceForNurse360 {
         }
         catch (BadRequestException ex) {
             logger.info("Delete file has exception throwing " + ex);
-            if (ex.getErrorCode().equals(ErrorCode.FILE_DELETE_FAILED)) {
+            if (ex.getErrorCode().equals(ErrorCode.NURSE360_FILE_OPERATION_FAILED)) {
                 throw ex;
             }
         }
@@ -241,7 +241,7 @@ public class NurseServiceForNurse360 {
         }
         catch (BadRequestException ex) {
             logger.info("Delete file has exception throwing " + ex);
-            if (ex.getErrorCode().equals(ErrorCode.FILE_DELETE_FAILED)) {
+            if (ex.getErrorCode().equals(ErrorCode.NURSE360_FILE_OPERATION_FAILED)) {
                 throw ex;
             }
         }
@@ -256,7 +256,7 @@ public class NurseServiceForNurse360 {
         logger.info("modify nurse={}'s mobile={} smsCode={}", nurseId, mobile, smsCode);
         if (!commonNurseService.existNurse(nurseId)) {
             logger.error("nurse not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         leanCloudService.verifySmsCode(smsCode, mobile);
 
@@ -274,22 +274,22 @@ public class NurseServiceForNurse360 {
         logger.info("modify nurse={}'s password={} newPassword={}", nurseId, password, newPassword);
         if (!commonNurseService.existNurse(nurseId)) {
             logger.error("nurse not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         NurseBean nurse = nurseBeanConverter.convert(commonNurseService.getNurseById(nurseId));
 
         if (VerifyUtil.isStringEmpty(password)) {
-            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
         if (VerifyUtil.isStringEmpty(newPassword)) {
-            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
         if (!password.equals(nurse.getPassword())) {
-            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
         }
         if (newPassword.equals(password)) {
             logger.info("the new password is same with old password.");
-            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
         }
 
         commonNurseService.updateBasicInfo(nurseId, null, -1, null, null, newPassword.trim(), null, null, null, null);
@@ -304,12 +304,12 @@ public class NurseServiceForNurse360 {
         List<NurseEntity> nurses= commonNurseService.getNurseByMobile(mobile);
         if (VerifyUtil.isListEmpty(nurses) || nurses.size()!=1) {
             logger.error("nurse not exist or mobile has more people--{}", nurses);
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         leanCloudService.verifySmsCode(smsCode, mobile);
 
         if (VerifyUtil.isStringEmpty(newPassword)) {
-            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
 
         NurseBean nurse = nurseBeanConverter.convert(nurses.get(0));
@@ -336,14 +336,14 @@ public class NurseServiceForNurse360 {
         leanCloudService.verifySmsCode(smsCode, mobile);
 
         if (VerifyUtil.isStringEmpty(mobile) || VerifyUtil.isStringEmpty(password)){
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
 
         mobile = mobile.trim();
         password = password.trim();
         List<NurseEntity> nurses = commonNurseService.getNurseByMobile(mobile);
         if(!nurses.isEmpty()){
-            throw new BadRequestException(ErrorCode.NURSE_ALREADY_EXISTED);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_EXISTS_ALREADY);
         }
 
         NurseEntity entity = new NurseEntity();

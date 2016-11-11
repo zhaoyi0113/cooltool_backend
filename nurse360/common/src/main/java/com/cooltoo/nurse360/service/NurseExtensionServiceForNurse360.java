@@ -228,7 +228,7 @@ public class NurseExtensionServiceForNurse360 {
         logger.info("nurse={} read course={}");
         if (!courseService.existCourse(courseId)) {
             logger.error("course not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         NurseCourseRelationEntity nurseReadCourse = null;
@@ -258,7 +258,7 @@ public class NurseExtensionServiceForNurse360 {
         logger.info("nurse={} read notification={}");
         if (!notificationService.existsNotification(notificationId)) {
             logger.error("notification not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         NurseNotificationRelationEntity nurseReadNotification;
         List<NurseNotificationRelationEntity> relations = nurseNotificationRelationRepository.findByNurseIdAndNotificationId(nurseId, notificationId);

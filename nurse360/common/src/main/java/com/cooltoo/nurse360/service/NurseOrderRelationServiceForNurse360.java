@@ -154,11 +154,11 @@ public class NurseOrderRelationServiceForNurse360 {
                 strStatus, nurseId, orderId);
         CommonStatus status = CommonStatus.parseString(strStatus);
         if (null==status) {
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
         }
         List<NurseOrderRelationEntity> relations = repository.findByNurseIdAndOrderId(nurseId, orderId, sort);
         if (VerifyUtil.isListEmpty(relations)) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         NurseOrderRelationEntity entity = relations.get(0);
         relations.remove(entity);
@@ -180,7 +180,7 @@ public class NurseOrderRelationServiceForNurse360 {
         logger.info("nurse={} complete order={}", nurseId, orderId);
         if (!orderService.existOrder(orderId)) {
             logger.info("order not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
@@ -198,7 +198,7 @@ public class NurseOrderRelationServiceForNurse360 {
         }
         if (!orderBelongToNurse) {
             logger.info("order not belong this nurse");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
         }
 
         // complete order
@@ -216,7 +216,7 @@ public class NurseOrderRelationServiceForNurse360 {
         logger.info("nurse={} fetches order={}", orderId, nurseId);
         if (!orderService.existOrder(orderId)) {
             logger.info("order not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         NurseOrderRelationEntity entity = null;
         Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
@@ -244,7 +244,7 @@ public class NurseOrderRelationServiceForNurse360 {
 
         if (nurseId!=entity.getNurseId()) {
             logger.info("order has been fetched");
-            throw new BadRequestException(ErrorCode.SERVICE_ORDER_BEEN_FETCHED);
+            throw new BadRequestException(ErrorCode.NURSE360_SERVICE_ORDER_BEEN_FETCHED);
         }
 
         // update order status
@@ -263,7 +263,7 @@ public class NurseOrderRelationServiceForNurse360 {
         logger.info("nurse={} give up order={}", nurseId, orderId);
         if (!orderService.existOrder(orderId)) {
             logger.info("order not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
@@ -281,7 +281,7 @@ public class NurseOrderRelationServiceForNurse360 {
         }
         if (!orderBelongToNurse) {
             logger.info("order not belong this nurse");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_SERVICE_ORDER_NOT_YOURS);
         }
 
         repository.delete(relations);

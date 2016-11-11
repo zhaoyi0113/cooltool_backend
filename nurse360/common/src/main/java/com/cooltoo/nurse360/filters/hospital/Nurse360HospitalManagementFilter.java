@@ -3,11 +3,11 @@ package com.cooltoo.nurse360.filters.hospital;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.constants.RequestMethod;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
 import com.cooltoo.nurse360.beans.HospitalManagementUrlBean;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessTokenService;
 import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessUrlService;
 import com.cooltoo.nurse360.service.hospital.HospitalAdminService;
@@ -63,7 +63,10 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
 
             HospitalManagementUrlBean mngUrl = urlService.getHospitalMngUrl(httpType, httpUrl);
             if (null==mngUrl) {
-                throw new ServletException(new BadRequestException(ErrorCode.AUTHENTICATION_INVALIDATE));
+                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_NOT_ACCEPTABLE));
+            }
+            if (!CommonStatus.ENABLED.equals(mngUrl.getStatus())) {
+                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED));
             }
 
             // need not check token
@@ -78,17 +81,20 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
             HospitalAdminAccessTokenBean token = tokenService.getToken(hospitalAdminToken);
             // token invalid
             if (null==token) {
-                throw new ServletException(new BadRequestException(ErrorCode.AUTHENTICATION_INVALIDATE));
+                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND));
+            }
+            if (!CommonStatus.ENABLED.equals(token.getStatus())) {
+                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_EXPIRED));
             }
 
             // admin invalid
             if (!adminService.existsAdminUser(token.getAdminId(), CommonStatus.ENABLED)) {
-                throw new ServletException(new BadRequestException(ErrorCode.AUTHENTICATION_INVALIDATE));
+                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_USER_NOT_FOUND));
             }
 
             // admin can access url
             if (!accessUrlService.hasAdminMngUrl(token.getAdminId(), mngUrl.getId())) {
-                throw new ServletException(new BadRequestException(ErrorCode.AUTHENTICATION_INVALIDATE));
+                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_UNAUTHORIZED));
             }
 
             // save token and adminId

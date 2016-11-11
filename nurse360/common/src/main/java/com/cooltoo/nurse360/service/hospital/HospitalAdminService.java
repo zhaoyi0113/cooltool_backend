@@ -4,13 +4,11 @@ import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
-import com.cooltoo.nurse360.beans.HospitalManagementUrlBean;
 import com.cooltoo.nurse360.converters.HospitalAdminBeanConverter;
 import com.cooltoo.nurse360.entities.HospitalAdminEntity;
-import com.cooltoo.nurse360.entities.HospitalManagementUrlEntity;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.repository.HospitalAdminRepository;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonDepartmentService;
@@ -207,7 +205,7 @@ public class HospitalAdminService {
         HospitalAdminEntity entity = repository.findOne(adminId);
         if (null==entity) {
             logger.error("record is empty");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
 
@@ -217,7 +215,7 @@ public class HospitalAdminService {
                 entity.setName(name);
             }
             else {
-                throw new BadRequestException(ErrorCode.RECORD_ALREADY_EXIST);
+                throw new BadRequestException(ErrorCode.NURSE360_RECORD_EXISTS_ALREADY);
             }
         }
         if (!VerifyUtil.isStringEmpty(password)) {
@@ -262,33 +260,33 @@ public class HospitalAdminService {
                 name, password, telephone, email, hospitalId, departmentId);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
         if (VerifyUtil.isStringEmpty(password)) {
             logger.error("password is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
 
         if (hospitalId>0 && !hospitalService.existHospital(hospitalId)) {
             logger.error("hospital not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         if (departmentId>0 && !departmentService.existsDepartment(departmentId)) {
             logger.error("department not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         if (departmentId>0) {
             HospitalDepartmentBean department = departmentService.getById(departmentId, null);
             if (department.getHospitalId()!=hospitalId) {
                 logger.error("department={} is not belong to hospital={}", departmentId, hospitalId);
-                throw new BadRequestException(ErrorCode.DATA_ERROR);
+                throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
             }
         }
 
         long count = repository.countByConditions(name, null, null, null, null, null, null);
         if (count > 0) {
             logger.error("name has exist");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_EXISTS_ALREADY);
         }
 
 

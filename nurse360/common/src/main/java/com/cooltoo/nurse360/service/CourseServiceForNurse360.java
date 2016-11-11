@@ -293,13 +293,13 @@ public class CourseServiceForNurse360 {
                 name, introduction, link, keyword, categoryId);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("the name is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
 //// stop check the title is exist or not
 //        long count = repository.countByName(name);
 //        if (count>0) {
 //            logger.error("the name is exist already");
-//            throw new BadRequestException(ErrorCode.DATA_ERROR);
+//            throw new BadRequestException(ErrorCode.NURSE360_RECORD_EXISTS_ALREADY);
 //        }
 
         Nurse360CourseEntity entity = new Nurse360CourseEntity();
@@ -327,7 +327,7 @@ public class CourseServiceForNurse360 {
         }
         if (VerifyUtil.isStringEmpty(uniqueId)) {
             logger.info("unique id generated failed");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_UNIQUE_ID_INVALID);
         }
         entity.setUniqueId(uniqueId);
 
@@ -362,7 +362,7 @@ public class CourseServiceForNurse360 {
         Nurse360CourseEntity entity = repository.findOne(courseId);
         if (null==entity) {
             logger.error("the course is not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         boolean changed = false;
@@ -429,7 +429,7 @@ public class CourseServiceForNurse360 {
         Nurse360CourseEntity entity = repository.findOne(courseId);
         if (null==entity) {
             logger.error("the course is not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         boolean changed = false;
@@ -437,11 +437,11 @@ public class CourseServiceForNurse360 {
         if (null!=status) {
             if (CourseStatus.EDITING.equals(entity.getStatus())) {
                 logger.error("the course is editing");
-                throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+                throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
             }
             if (CourseStatus.EDITING.equals(status)) {
                 logger.error("can not set course to editing");
-                throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+                throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
             }
             entity.setStatus(status);
             changed = true;
@@ -467,12 +467,12 @@ public class CourseServiceForNurse360 {
         Nurse360CourseEntity entity = repository.findOne(courseId);
         if (null==entity) {
             logger.error("the course is not exist (and clean token cache)");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         if (!CourseStatus.EDITING.equals(entity.getStatus())) {
             logger.error("the course is not editing");
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
 
         if (VerifyUtil.isStringEmpty(content)) {
@@ -511,11 +511,11 @@ public class CourseServiceForNurse360 {
         Nurse360CourseEntity entity = repository.findOne(courseId);
         if (null==entity) {
             logger.info("the course do not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         if (CourseStatus.EDITING.equals(entity.getStatus())) {
             logger.error("the course is editing");
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
 
         // has content need to move to temporary
@@ -592,11 +592,11 @@ public class CourseServiceForNurse360 {
         Nurse360CourseEntity entity = repository.findOne(courseId);
         if (null==entity) {
             logger.info("the course do not exist");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         if (!CourseStatus.EDITING.equals(entity.getStatus())) {
             logger.error("the course is not editing");
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
         String relativePath = tempStorage.addFile(imageName, image);
         return relativePath;

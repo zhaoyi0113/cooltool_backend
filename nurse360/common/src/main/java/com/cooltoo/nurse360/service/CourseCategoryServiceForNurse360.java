@@ -51,7 +51,7 @@ public class CourseCategoryServiceForNurse360 {
         logger.info("get course category by categoryId={}", categoryId);
         Nurse360CourseCategoryEntity category = repository.findOne(categoryId);
         if (null==category) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         List<Nurse360CourseCategoryBean> beans = entitiesToBeans(Arrays.asList(new Nurse360CourseCategoryEntity[]{category}));
         fillOtherProperties(beans);
@@ -156,7 +156,7 @@ public class CourseCategoryServiceForNurse360 {
                 categoryId, name, introduction, strStatus, imageName, null!=image);
         Nurse360CourseCategoryEntity entity = repository.findOne(categoryId);
         if (null==entity) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
         if (!VerifyUtil.isStringEmpty(name)) {
@@ -214,11 +214,11 @@ public class CourseCategoryServiceForNurse360 {
         String imageUrl = null;
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("add category : name is empty");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
         else if (repository.countByName(name)>0) {
             logger.error("add tag : name is exist");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_EXISTS_ALREADY);
         }
 
         Nurse360CourseCategoryEntity entity = new Nurse360CourseCategoryEntity();

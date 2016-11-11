@@ -2,12 +2,12 @@ package com.cooltoo.nurse360.service.hospital;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.constants.RequestMethod;
 import com.cooltoo.nurse360.beans.HospitalManagementUrlBean;
 import com.cooltoo.nurse360.converters.HospitalManagementUrlBeanConverter;
 import com.cooltoo.nurse360.entities.HospitalManagementUrlEntity;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.repository.HospitalManagementUrlRepository;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -154,7 +154,7 @@ public class HospitalManagementUrlService {
 
         if (VerifyUtil.isStringEmpty(httpUrl) || null==httpType) {
             logger.error("url is empty, or httpType is null");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
         }
         HospitalManagementUrlEntity entity = null;
         List<HospitalManagementUrlEntity> entities = repository.findByConditions(httpType, httpUrl, null, sort);

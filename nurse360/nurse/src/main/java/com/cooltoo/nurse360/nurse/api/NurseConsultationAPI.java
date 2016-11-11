@@ -114,7 +114,7 @@ public class NurseConsultationAPI {
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         if (!nurseCanAnswerConsultation(nurseId, 0)) {
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_FORBIDDEN);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
 
         Long categoryId = VerifyUtil.isIds(strCategoryId) ? VerifyUtil.parseLongIds(strCategoryId).get(0) : null;
@@ -139,7 +139,7 @@ public class NurseConsultationAPI {
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         if (!nurseCanAnswerConsultation(nurseId, 0)) {
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_FORBIDDEN);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
 
         long consultationId = userConsultationService.addConsultation(
@@ -165,7 +165,7 @@ public class NurseConsultationAPI {
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         if (!nurseCanAnswerConsultation(nurseId, consultationId)) {
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_FORBIDDEN);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
 
         Map<String, String> imageIdToUrl = userConsultationService.addConsultationImage(0, nurseId, consultationId, imageName, image);
@@ -187,7 +187,7 @@ public class NurseConsultationAPI {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         UserConsultationTalkBean talk = userConsultationService.getTalkById(talkId);
         if (!nurseCanAnswerConsultation(nurseId, talk.getConsultationId())) {
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_FORBIDDEN);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
 
         List<Long> allIds = new ArrayList<>();
@@ -206,7 +206,7 @@ public class NurseConsultationAPI {
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         if (!nurseCanAnswerConsultation(nurseId, consultationId)) {
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_FORBIDDEN);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
 
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.NURSE_SPEAK;
@@ -229,7 +229,7 @@ public class NurseConsultationAPI {
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         if (!nurseCanAnswerConsultation(nurseId, consultationId)) {
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_FORBIDDEN);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
 
         Map<String, String> imageIdToUrl = userConsultationService.addTalkImage(0, consultationId, talkId, imageName, image);
@@ -245,7 +245,7 @@ public class NurseConsultationAPI {
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         if (!nurseCanAnswerConsultation(nurseId, consultationId)) {
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_FORBIDDEN);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
         }
 
         consultationId = userConsultationService.updateConsultationUnreadTalkStatusToRead(consultationId, ConsultationTalkStatus.NURSE_SPEAK);

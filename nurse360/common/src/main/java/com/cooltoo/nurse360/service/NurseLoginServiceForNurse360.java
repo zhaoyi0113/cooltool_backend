@@ -36,14 +36,14 @@ public class NurseLoginServiceForNurse360 {
         logger.info("login "+ mobile +", password:"+password);
         List<NurseEntity> nurses = nurseRepository.findByMobile(mobile);
         if(nurses == null || nurses.isEmpty()){
-            throw new BadRequestException(ErrorCode.USER_NOT_EXISTED);
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
         NurseEntity nurseEntity = nurses.get(0);
         if(nurseEntity.getPassword()!=null && !nurseEntity.getPassword().equals(password)){
-            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+            throw new BadRequestException(ErrorCode.NURSE360_WRONG_PASSWORD);
         }
         if(UserAuthority.DENY_ALL.equals(nurseEntity.getAuthority())) {
-            throw new BadRequestException(ErrorCode.USER_AUTHORITY_DENY_ALL);
+            throw new BadRequestException(ErrorCode.NURSE360_UNAUTHORIZED);
         }
         NurseTokenAccessEntity entity = new NurseTokenAccessEntity();
         entity.setUserId(nurseEntity.getId());
@@ -59,7 +59,7 @@ public class NurseLoginServiceForNurse360 {
     public void logout(long nurseId){
         List<NurseTokenAccessEntity> tokenEntities = tokenAccessRepository.findTokenAccessByUserId(nurseId);
         if(tokenEntities.isEmpty()){
-            throw new BadRequestException(ErrorCode.NOT_LOGIN);
+            throw new BadRequestException(ErrorCode.NURSE360_NOT_LOGIN);
         }
         long id = 0;
         NurseTokenAccessEntity entity = null;

@@ -75,7 +75,7 @@ public class NursePatientQuestionnaireAPI {
             }
             return Response.ok().build();
         }
-        throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
     }
 
 }
