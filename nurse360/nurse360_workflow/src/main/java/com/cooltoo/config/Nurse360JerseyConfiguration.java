@@ -37,7 +37,6 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(MultiPartFeature.class);
         register(Nurse360BadRequestExceptionMapper.class);
         register(Nurse360CORSResponseFilter.class);
-        register(Nurse360HospitalManagementFilter.class);
         register(Nurse360NurseLoginAuthenticationFilter.class);
         register(HospitalDepartmentAPI.class);
         register(NurseAPIForNurse360.class);

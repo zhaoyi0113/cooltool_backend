@@ -3,11 +3,11 @@ package com.cooltoo.nurse360.filters.hospital;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.constants.RequestMethod;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
 import com.cooltoo.nurse360.beans.HospitalManagementUrlBean;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessTokenService;
 import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessUrlService;
 import com.cooltoo.nurse360.service.hospital.HospitalAdminService;
@@ -23,14 +23,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
 /**
  * Created by zhaolisong on 2016/10/20.
  */
 //@Component
-@Provider
 public class Nurse360HospitalManagementFilter extends GenericFilterBean {
 
     private static final Logger logger = LoggerFactory.getLogger(Nurse360HospitalManagementFilter.class);
