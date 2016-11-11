@@ -50,7 +50,7 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
             // get http type
             RequestMethod httpType = RequestMethod.parseString(httpRequest.getMethod());
             logger.debug("get http type "+httpType);
-            if("OPTIONS".equals(httpType)){
+            if("OPTIONS".equals(httpType.name())){
                 logger.debug(("this is options http type."));
                 return;
             }
