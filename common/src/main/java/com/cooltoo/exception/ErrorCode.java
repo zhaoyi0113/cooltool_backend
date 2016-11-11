@@ -4,6 +4,11 @@ import javax.ws.rs.core.Response;
 
 public enum ErrorCode {
 
+    //========================================================================
+    //
+    //              Error Code start from 201
+    //
+    //========================================================================
     // * 201 ~ 210, system error
     UNKNOWN(201, Response.Status.BAD_REQUEST, "系统未知错误", "System unknown error."),
     SYSTEM_ERROR(202, Response.Status.INTERNAL_SERVER_ERROR, "系统错误", "System error."),
@@ -68,7 +73,41 @@ public enum ErrorCode {
     CLINIC_DATE_NOT_ALLOWED(258, Response.Status.BAD_REQUEST, "预约日期无效", "cannot appoint at this clinic date"),
     SERVICE_ORDER_BEEN_FETCHED(259, Response.Status.BAD_REQUEST, "订单已被抢", "service order has been fetched"),
     PAY_FAILED(260, Response.Status.BAD_REQUEST, "支付失败", "Payment failed"),
-    OPENID_INVALID(261, Response.Status.BAD_GATEWAY, "Openid 不存在", "Openid Invalid");
+    OPENID_INVALID(261, Response.Status.BAD_GATEWAY, "Openid 不存在", "Openid Invalid"),
+
+
+
+
+
+    //========================================================================
+    //
+    //              Nurse360 Error Code start from 3000
+    //
+    //========================================================================
+
+    // * 3001 ~ 3030, system error
+    NURSE360_UNKNOWN(3001, Response.Status.BAD_REQUEST, "系统未知错误", "System unknown error."),
+    NURSE360_ACCOUNT_TOKEN_NOT_FOUND(3002, Response.Status.NOT_FOUND, "account token 不存在", "account token not found!"),
+    NURSE360_ACCOUNT_TOKEN_EXPIRED(3003, Response.Status.NOT_ACCEPTABLE, "account token已过期", "account token has been expired!"),
+    NURSE360_NOT_ACCEPTABLE(3004, Response.Status.NOT_ACCEPTABLE, "资源不存在", "Resource not found"),
+    NURSE360_NOT_PERMITTED(3005, Response.Status.FORBIDDEN, "请求不被允许", "Request not permitted"),
+    NURSE360_UNAUTHORIZED(3006, Response.Status.NOT_ACCEPTABLE, "未授权的访问", "Request Unauthorized"),
+    NURSE360_NOT_LOGIN(3007, Response.Status.NOT_ACCEPTABLE, "未登录", "Not login"),
+
+
+    // * 3031 ~ 3299, business related generic error
+    NURSE360_USER_NOT_FOUND(3051, Response.Status.NOT_FOUND, "用户不存在", "User not found"),
+    NURSE360_RECORD_NOT_FOUND(3052, Response.Status.NOT_FOUND, "数据记录不存在", "Record not found"),
+    NURSE360_RECORD_EXISTS_ALREADY(3053, Response.Status.EXPECTATION_FAILED, "数据记录已存在", "Record exist already"),
+    NURSE360_PARAMETER_IS_EMPTY(3054, Response.Status.EXPECTATION_FAILED, "参数为空", "Parameter is empty or null"),
+    NURSE360_PARAMETER_NOT_EXPECTED(3055, Response.Status.EXPECTATION_FAILED, "参数为不匹配", "Parameter is not match"),
+    NURSE360_UNIQUE_ID_INVALID(3056, Response.Status.EXPECTATION_FAILED, "UniqueId 无效", "UniqueId is not match"),
+    NURSE360_WRONG_PASSWORD(3057, Response.Status.EXPECTATION_FAILED, "密码错误", "密码错误"),
+    NURSE360_SERVICE_ORDER_BEEN_FETCHED(3058, Response.Status.BAD_REQUEST, "订单已被抢", "Service order has been fetched"),
+    NURSE360_SERVICE_ORDER_NOT_YOURS(3059, Response.Status.BAD_REQUEST, "订单不属于你", "Service order not belong to you"),
+    NURSE360_FILE_OPERATION_FAILED(3060, Response.Status.BAD_REQUEST, "文件操作失败", "File operation failed"),
+    NURSE360_RESULT_NOT_EXPECTED(3061, Response.Status.BAD_REQUEST, "结果错误", "Result not expected"),
+    ;
 
     private final int code;
 
