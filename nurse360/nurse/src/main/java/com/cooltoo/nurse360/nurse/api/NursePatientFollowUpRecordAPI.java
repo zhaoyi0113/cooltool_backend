@@ -1,5 +1,7 @@
 package com.cooltoo.nurse360.nurse.api;
 
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
@@ -12,6 +14,7 @@ import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpRecordService;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
+import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,7 @@ public class NursePatientFollowUpRecordAPI {
 
     @Autowired private NursePatientFollowUpRecordService patientFollowUpRecordService;
     @Autowired private NursePatientFollowUpService patientFollowUpService;
+    @Autowired private NurseServiceForNurse360 nurse360Service;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -99,7 +103,7 @@ public class NursePatientFollowUpRecordAPI {
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response addPatientFollowUp(@Context HttpServletRequest request,
                                        @FormParam("follow_up_id") @DefaultValue("0") long followUpId,
-                                       @FormParam("follow_up_type") @DefaultValue("") String followUpType, /* Consultation(提问), Questionnaire(发问卷) */
+                                       @FormParam("follow_up_type") @DefaultValue("") String strFollowUpType, /* Consultation(提问), Questionnaire(发问卷) */
                                        @FormParam("consultation_id") @DefaultValue("0") long consultationId,
                                        @FormParam("questionnaire_id") @DefaultValue("0") long questionnaireId
     ) {
@@ -110,10 +114,21 @@ public class NursePatientFollowUpRecordAPI {
             logger.error("this follow-up={} not belong to you={}", followUpId, nurseId);
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+        PatientFollowUpType followUpType = PatientFollowUpType.parseString(strFollowUpType);
+        if (PatientFollowUpType.CONSULTATION.equals(followUpType)) {
+            NurseBean nurse = nurse360Service.getNurseById(nurseId);
+            if (null==nurse || null==nurse.getProperty(NurseBean.INFO_EXTENSION)) {
+                throw new BadRequestException(ErrorCode.USER_AUTHORITY_DENY_ALL);
+            }
+            NurseExtensionBean extension = (NurseExtensionBean) nurse.getProperty(NurseBean.INFO_EXTENSION);
+            if (!YesNoEnum.YES.equals(extension.getAnswerNursingQuestion())) {
+                throw new BadRequestException(ErrorCode.USER_AUTHORITY_DENY_ALL);
+            }
+        }
 
         long followUpRecordId = patientFollowUpRecordService.addPatientFollowUpRecord(
                 followUpId,
-                PatientFollowUpType.parseString(followUpType),
+                followUpType,
                 consultationId,
                 questionnaireId);
 
