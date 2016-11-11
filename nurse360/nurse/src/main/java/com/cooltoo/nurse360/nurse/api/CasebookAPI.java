@@ -176,4 +176,21 @@ public class CasebookAPI {
         Map<String, String> imageIdToUrl = casebookService.addCaseImage(nurseId, casebookId, caseId, imageName, image);
         return Response.ok(imageIdToUrl).build();
     }
+
+    @Path("/case/image")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response addCaseImage(@Context HttpServletRequest request,
+                                 @FormParam("casebook_id") @DefaultValue("0") long casebookId,
+                                 @FormParam("case_id") @DefaultValue("0") long caseId
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        casebookService.deleteCaseImage(nurseId, casebookId, caseId);
+        Map<String, Boolean> retVal = new HashMap<>();
+        retVal.put("deleted", Boolean.TRUE);
+        return Response.ok(retVal).build();
+    }
+
 }

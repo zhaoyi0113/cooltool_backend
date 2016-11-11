@@ -15,6 +15,7 @@ import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -42,7 +43,7 @@ public class NursePatientFollowUpRecordAPI {
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getPatientFollowUp(@Context HttpServletRequest request,
                                        @QueryParam("follow_up_id") @DefaultValue("-1") long followUpId,
-                                       @QueryParam("follow_up_type") @DefaultValue("") String followUpType,
+                                       @QueryParam("follow_up_type") @DefaultValue("") String followUpType, /* Consultation(提问), Questionnaire(发问卷) */
                                        @QueryParam("patient_replied") @DefaultValue("") String patientReplied, /* YES/NO */
                                        @QueryParam("nurse_read") @DefaultValue("") String nurseRead, /* YES/NO */
                                        @QueryParam("index") @DefaultValue("0") int pageIndex,
@@ -81,12 +82,24 @@ public class NursePatientFollowUpRecordAPI {
         return Response.ok(updateIds).build();
     }
 
+    @Path("/read")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response updatePatientFollowUp(@Context HttpServletRequest request,
+                                          @FormParam("follow_up_record_id") @DefaultValue("0") long followUpRecordId
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        long followUpRecord = patientFollowUpRecordService.updatePatientFollowUpRecordById(followUpRecordId, null, YesNoEnum.YES, null);
+        return Response.ok(followUpRecord).build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response addPatientFollowUp(@Context HttpServletRequest request,
                                        @FormParam("follow_up_id") @DefaultValue("0") long followUpId,
-                                       @FormParam("follow_up_type") @DefaultValue("") String followUpType,
+                                       @FormParam("follow_up_type") @DefaultValue("") String followUpType, /* Consultation(提问), Questionnaire(发问卷) */
                                        @FormParam("consultation_id") @DefaultValue("0") long consultationId,
                                        @FormParam("questionnaire_id") @DefaultValue("0") long questionnaireId
     ) {

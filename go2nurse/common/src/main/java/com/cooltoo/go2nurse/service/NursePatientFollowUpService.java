@@ -76,6 +76,21 @@ public class NursePatientFollowUpService {
     //==================================================================
     //                   getter for nurse/patient
     //==================================================================
+    public List<NursePatientFollowUpBean> getPatientFollowUp(Long userId, Long patientId, Long nurseId) {
+        logger.info("get patient follow-up by nurseId={} user={} patientId={}",
+                nurseId, userId, patientId);
+        List<NursePatientFollowUpBean> beans;
+        if (null==nurseId && null==userId) {
+            beans = new ArrayList<>();
+        }
+        else {
+            List<NursePatientFollowUpEntity> resultSet = repository.findByConditionsAndStatusNot(null, null, nurseId, userId, patientId, CommonStatus.ENABLED, sort);
+            beans = entitiesToBeans(resultSet);
+            fillOtherProperties(beans);
+        }
+        logger.warn("patient follow-up count={}", beans.size());
+        return beans;
+    }
 
     public List<NursePatientFollowUpBean> getPatientFollowUp(Long userId, Long patientId, Long nurseId, int pageIndex, int sizePerPage) {
         logger.info("get patient follow-up by nurseId={} user={} patientId={} at page={} sizePerPage={}",
@@ -224,7 +239,15 @@ public class NursePatientFollowUpService {
         hospitalId   = hospitalId<0 ? 0 : hospitalId;
         departmentId = departmentId<0 ? 0 : departmentId;
 
-        NursePatientFollowUpEntity entity = new NursePatientFollowUpEntity();
+        NursePatientFollowUpEntity entity;
+        List<NursePatientFollowUpEntity> set = repository.findByConditions(null, null, nurseId, userId, null, sort);
+        if (VerifyUtil.isListEmpty(set)) {
+            entity = new NursePatientFollowUpEntity();
+        }
+        else {
+            entity = set.get(0);
+        }
+
         entity.setHospitalId(hospitalId);
         entity.setDepartmentId(departmentId);
         entity.setNurseId(nurseId);
@@ -233,6 +256,18 @@ public class NursePatientFollowUpService {
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = repository.save(entity);
+
+        set = repository.findByConditions(null, null, nurseId, userId, null, sort);
+        for (int i = 0; i < set.size(); i ++) {
+            NursePatientFollowUpEntity tmp = set.get(i);
+            if (tmp.getId()==entity.getId()) {
+                set.remove(i);
+                break;
+            }
+        }
+        if (!VerifyUtil.isListEmpty(set)) {
+            repository.delete(set);
+        }
 
         return entity.getId();
     }

@@ -108,6 +108,10 @@ public class UserConsultationTalkService {
             if (talkStatusNotMatch.equals(talk.getTalkStatus())) {
                 continue;
             }
+            if (null==talkStatusNotMatch) {
+                consultationIdToUnreadTalkSize.put(talk.getConsultationId(), 0L);
+                continue;
+            }
             if (consultationIdToUnreadTalkSize.containsKey(talk.getConsultationId())) {
                 Long tmpTalkSize = consultationIdToUnreadTalkSize.get(talk.getConsultationId());
                 consultationIdToUnreadTalkSize.put(talk.getConsultationId(), tmpTalkSize++);

@@ -409,8 +409,8 @@ public class CasebookService {
     }
 
     @Transactional
-    public Map<String, String> addCaseImage(long userId, long casebookId, long caseId, String imageName, InputStream image) {
-        logger.info("user={} add image to casebookId={} caseId={} name={} image={}", userId, casebookId, caseId, imageName, (null!=image));
+    public Map<String, String> addCaseImage(Long nurseId, long casebookId, long caseId, String imageName, InputStream image) {
+        logger.info("nurseId={} add image to casebookId={} caseId={} name={} image={}", nurseId, casebookId, caseId, imageName, (null!=image));
 
         CasebookEntity casebook = repository.findOne(casebookId);
         if (null==casebook) {
@@ -426,6 +426,10 @@ public class CasebookService {
             logger.error("case is not belong to consultation");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+        if (null==nurseId && nurseId!=_case.getNurseId()) {
+            logger.error("case is not belong to nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
 
         long count = imageService.countImage(casebookId, caseId);
         if (count>=9) {
@@ -435,5 +439,30 @@ public class CasebookService {
 
         Map<String, String> idAndUrl = imageService.addImage(casebookId, caseId, imageName, image);
         return idAndUrl;
+    }
+
+    @Transactional
+    public List<Long> deleteCaseImage(Long nurseId, long casebookId, long caseId) {
+        CasebookEntity casebook = repository.findOne(casebookId);
+        if (null==casebook) {
+            logger.error("casebook is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        CaseBean _case = caseService.getCaseWithoutInfoById(caseId);
+        if (null==_case) {
+            logger.error("case is not exist");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (_case.getCasebookId() != casebookId) {
+            logger.error("case is not belong to consultation");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (null==nurseId && nurseId!=_case.getNurseId()) {
+            logger.error("case is not belong to nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        List<Long> imageIds = imageService.deleteByCaseIds(Arrays.asList(new Long[]{caseId}));
+        return imageIds;
     }
 }

@@ -59,6 +59,22 @@ public class NursePatientFollowUpRecordService {
         return beanConverter.convert(one);
     }
 
+    public long countPatientFollowUpRecordByFollowUpIds(CommonStatus status,
+                                                        PatientFollowUpType followUpType,
+                                                        YesNoEnum patientRelpied,
+                                                        YesNoEnum nurseRead,
+                                                        List<Long> followUpIds,
+                                                        ConsultationTalkStatus talkStatusNotMatch)
+    {
+        long count = 0;
+        if (!VerifyUtil.isListEmpty(followUpIds)) {
+            count = repository.countByConditionsByFollowUpIds(status, followUpType, patientRelpied, nurseRead, followUpIds);
+        }
+        logger.info("count patient follow-up record by statusNot={} followUpType={} patientRelpied={} nurseRead={} followUpIds={}, count={}",
+                status, followUpType, patientRelpied, nurseRead, followUpIds, count);
+        return count;
+    }
+
     public List<NursePatientFollowUpRecordBean> getPatientFollowUpRecordByFollowUpIds(CommonStatus statusNot,
                                                                                       PatientFollowUpType followUpType,
                                                                                       YesNoEnum patientRelpied,
@@ -67,8 +83,8 @@ public class NursePatientFollowUpRecordService {
                                                                                       ConsultationTalkStatus talkStatusNotMatch,
                                                                                       int pageIndex, int sizePerPage, boolean noPage)
     {
-        logger.info("get patient follow-up record by statusNot={} followUpType={} patientRelpied={} nurseRead={} followUpIds={} at page={} sizePerPage={}",
-                statusNot, followUpType, patientRelpied, nurseRead, followUpIds, pageIndex, sizePerPage);
+        logger.info("get patient follow-up record by statusNot={} followUpType={} patientRelpied={} nurseRead={} followUpIds={} at page={} sizePerPage={} noPage={}",
+                statusNot, followUpType, patientRelpied, nurseRead, followUpIds, pageIndex, sizePerPage, noPage);
         List<NursePatientFollowUpRecordBean> beans = new ArrayList<>();
         if (!VerifyUtil.isListEmpty(followUpIds)) {
             Iterable<NursePatientFollowUpRecordEntity> resultSet;
@@ -113,10 +129,24 @@ public class NursePatientFollowUpRecordService {
         return beans;
     }
 
+
+    public List<NursePatientFollowUpRecordBean> getPatientFollowUpRecord(CommonStatus status,
+                                                                         PatientFollowUpType followUpType,
+                                                                         Long relativeConsultationId
+    ) {
+        logger.info("get patient follow-up record by status={} followUpType={} relativeConsultationId={}",
+                status, followUpType, relativeConsultationId);
+        Iterable<NursePatientFollowUpRecordEntity> resultSet = repository.findByStatusAndFollowUpTypeAndRelativeConsultationId(status, followUpType, relativeConsultationId);
+        List<NursePatientFollowUpRecordBean>beans = entitiesToBeans(resultSet);
+        logger.warn("patient follow-up count={}", beans.size());
+        return beans;
+    }
+
     private List<NursePatientFollowUpRecordBean> entitiesToBeans(Iterable<NursePatientFollowUpRecordEntity> entities) {
         if (null==entities) {
             return new ArrayList<>();
         }
+
 
         List<NursePatientFollowUpRecordBean> beans = new ArrayList<>();
         for(NursePatientFollowUpRecordEntity tmp : entities) {
@@ -195,6 +225,33 @@ public class NursePatientFollowUpRecordService {
 
         return retValue;
     }
+    @Transactional
+    public Long updatePatientFollowUpRecordById(long patientFollowUpRecordId,
+                                                YesNoEnum patientReplied,
+                                                YesNoEnum nurseRead,
+                                                Long questionnaireAnsweredGroupId
+    ) {
+        logger.info("update patient follow-up record by patientFollowUpRecordId={}.", patientFollowUpRecordId);
+        NursePatientFollowUpRecordEntity patientFollowUp = repository.findOne(patientFollowUpRecordId);
+        if (null==patientFollowUp) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        if (null!=patientReplied && !patientReplied.equals(patientFollowUp.getPatientReplied())) {
+            patientFollowUp.setPatientReplied(patientReplied);
+        }
+        if (null!=nurseRead && !nurseRead.equals(patientFollowUp.getNurseRead())) {
+            patientFollowUp.setNurseRead(nurseRead);
+        }
+        if (null!=questionnaireAnsweredGroupId
+                && questionnaireAnsweredGroupId>0
+                && questionnaireAnsweredGroupId!=patientFollowUp.getRelativeQuestionnaireAnswerGroupId()) {
+            patientFollowUp.setRelativeQuestionnaireAnswerGroupId(questionnaireAnsweredGroupId);
+        }
+
+
+        return patientFollowUpRecordId;
+    }
 
 
     //===============================================================
@@ -231,6 +288,8 @@ public class NursePatientFollowUpRecordService {
         entity.setRelativeConsultationId(consultationId);
         entity.setRelativeQuestionnaireId(questionnaireId);
         entity.setRelativeQuestionnaireAnswerGroupId(0);
+        entity.setNurseRead(YesNoEnum.NO);
+        entity.setPatientReplied(YesNoEnum.NO);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = repository.save(entity);

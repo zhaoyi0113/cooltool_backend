@@ -54,6 +54,7 @@ public class NursePatientQuestionnaireAPI {
     }
 
     @Path("/answered")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getQuestionnaireAnswered(@Context HttpServletRequest request,
@@ -72,6 +73,7 @@ public class NursePatientQuestionnaireAPI {
                     return Response.ok(questionnaire).build();
                 }
             }
+            return Response.ok().build();
         }
         throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
     }

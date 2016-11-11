@@ -3,11 +3,15 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.constants.CommonStatus;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 2016/11/7.
  */
 public class NursePatientFollowUpBean {
+
+    public static final String RECORDS = "follow_up_records";
 
     private long id;
     private Date time;
@@ -19,6 +23,7 @@ public class NursePatientFollowUpBean {
     private UserBean user;
     private long patientId;
     private PatientBean patient;
+    private Map<String, Object> properties = new HashMap<>();
 
     public long getId() {
         return id;
@@ -98,6 +103,21 @@ public class NursePatientFollowUpBean {
 
     public void setPatient(PatientBean patient) {
         this.patient = patient;
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
+    }
+
+    public void setProperties(String key, Object value) {
+        if (null==properties) {
+            properties = new HashMap<>();
+        }
+        properties.put(key, value);
     }
 
     @Override

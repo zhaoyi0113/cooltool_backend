@@ -4,13 +4,16 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.ConsultationCategoryBean;
+import com.cooltoo.go2nurse.beans.NursePatientFollowUpRecordBean;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
 import com.cooltoo.go2nurse.constants.ConsultationCreator;
 import com.cooltoo.go2nurse.constants.ConsultationReason;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
+import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.service.ConsultationCategoryService;
+import com.cooltoo.go2nurse.service.NursePatientFollowUpRecordService;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -43,6 +46,8 @@ public class UserConsultationAPI {
     private ConsultationCategoryService categoryService;
     @Autowired
     private WeChatService weChatService;
+    @Autowired
+    private NursePatientFollowUpRecordService patientFollowRecordService;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -226,6 +231,13 @@ public class UserConsultationAPI {
                                         @FormParam("talk_content") @DefaultValue("") String talkContent
     ) {
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.parseString(strTalkStatus);
+        UserConsultationBean consultation = userConsultationService.getUserConsultation(consultationId, null);
+        if (ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
+            List<NursePatientFollowUpRecordBean> followUpRecords = patientFollowRecordService.getPatientFollowUpRecord(CommonStatus.ENABLED, PatientFollowUpType.CONSULTATION, consultationId);
+            for (NursePatientFollowUpRecordBean tmp : followUpRecords) {
+                patientFollowRecordService.updatePatientFollowUpRecordById(tmp.getId(), YesNoEnum.YES, YesNoEnum.NO, null);
+            }
+        }
         long talkId = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
         Map<String, Long> returnValue = new HashMap<>();
         returnValue.put("talk_id", talkId);

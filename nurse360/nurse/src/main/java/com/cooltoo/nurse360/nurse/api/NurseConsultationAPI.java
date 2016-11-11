@@ -120,6 +120,7 @@ public class NurseConsultationAPI {
     //                         patient follow-up consultation
     //===================================================================================================
 
+    @Path("/follow-up")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
@@ -140,7 +141,7 @@ public class NurseConsultationAPI {
         return Response.ok(retValue).build();
     }
 
-    @Path("/add_image")
+    @Path("/follow-up/image")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
