@@ -15,6 +15,7 @@ import com.cooltoo.nurse360.service.hospital.HospitalManagementUrlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -28,7 +29,7 @@ import java.io.IOException;
 /**
  * Created by zhaolisong on 2016/10/20.
  */
-//@Component
+@Component
 public class Nurse360HospitalManagementFilter extends GenericFilterBean {
 
     private static final Logger logger = LoggerFactory.getLogger(Nurse360HospitalManagementFilter.class);
