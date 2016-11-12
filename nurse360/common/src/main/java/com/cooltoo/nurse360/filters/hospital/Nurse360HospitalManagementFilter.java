@@ -15,8 +15,6 @@ import com.cooltoo.nurse360.service.hospital.HospitalManagementUrlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -24,48 +22,53 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
 /**
  * Created by zhaolisong on 2016/10/20.
  */
-@Component
-public class Nurse360HospitalManagementFilter extends GenericFilterBean {
+@Provider
+public class Nurse360HospitalManagementFilter implements ContainerResponseFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(Nurse360HospitalManagementFilter.class);
 
-    @Autowired private HospitalManagementUrlService    urlService;
-    @Autowired private HospitalAdminService            adminService;
-    @Autowired private HospitalAdminAccessTokenService tokenService;
-    @Autowired private HospitalAdminAccessUrlService   accessUrlService;
+    @Autowired
+    private HospitalManagementUrlService urlService;
+    @Autowired
+    private HospitalAdminService adminService;
+    @Autowired
+    private HospitalAdminAccessTokenService tokenService;
+    @Autowired
+    private HospitalAdminAccessUrlService accessUrlService;
 
-    public Nurse360HospitalManagementFilter() {
-        this.setBeanName(Nurse360HospitalManagementFilter.class.getName());
-    }
 
-    @Override
+    //    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-            HttpServletRequest httpRequest = (HttpServletRequest)request;
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
             // get http url
             String httpUrl = httpRequest.getPathInfo();
             String httpRootUrl = httpRequest.getRequestURI();
             // get http type
             RequestMethod httpType = RequestMethod.parseString(httpRequest.getMethod());
-            logger.debug("get http type "+httpType);
-            if("OPTIONS".equals(httpType.name())){
+            logger.debug("get http type " + httpType);
+            if ("OPTIONS".equals(httpType.name())) {
                 logger.debug(("this is options http type."));
                 return;
             }
 
             // check http url valid
-            if (null==httpType || null==httpRootUrl || !httpUrl.startsWith("/hospital_management") || !httpRootUrl.equals("/nurse360"+httpUrl)) {
+            if (null == httpType || null == httpRootUrl || !httpUrl.startsWith("/hospital_management") || !httpRootUrl.equals("/nurse360" + httpUrl)) {
                 chain.doFilter(request, response);
                 return;
             }
 
             HospitalManagementUrlBean mngUrl = urlService.getHospitalMngUrl(httpType, httpUrl);
-            if (null==mngUrl) {
+            if (null == mngUrl) {
                 throw new ServletException(new BadRequestException(ErrorCode.NURSE360_NOT_ACCEPTABLE));
             }
             if (!CommonStatus.ENABLED.equals(mngUrl.getStatus())) {
@@ -83,7 +86,7 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
             // get admin by token
             HospitalAdminAccessTokenBean token = tokenService.getToken(hospitalAdminToken);
             // token invalid
-            if (null==token) {
+            if (null == token) {
                 throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND));
             }
             if (!CommonStatus.ENABLED.equals(token.getStatus())) {
@@ -105,6 +108,68 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
             request.setAttribute(ContextKeys.ADMIN_USER_TOKEN, token.getToken());
 
             chain.doFilter(request, response);
+        }
+    }
+
+    @Override
+    public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
+        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
+            // get http url
+            String httpUrl = httpRequest.getPathInfo();
+            String httpRootUrl = httpRequest.getRequestURI();
+            // get http type
+            RequestMethod httpType = RequestMethod.parseString(httpRequest.getMethod());
+            logger.debug("get http type " + httpType);
+            if ("OPTIONS".equals(httpType.name())) {
+                logger.debug(("this is options http type."));
+                return;
+            }
+
+            // check http url valid
+            if (null == httpType || null == httpRootUrl || !httpUrl.startsWith("/hospital_management") || !httpRootUrl.equals("/nurse360" + httpUrl)) {
+                return;
+            }
+
+            HospitalManagementUrlBean mngUrl = urlService.getHospitalMngUrl(httpType, httpUrl);
+            if (null == mngUrl) {
+                throw new BadRequestException(ErrorCode.NURSE360_NOT_ACCEPTABLE);
+            }
+            if (!CommonStatus.ENABLED.equals(mngUrl.getStatus())) {
+                throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+            }
+
+            // need not check token
+            if (!YesNoEnum.YES.equals(mngUrl.getNeedToken())) {
+                return;
+            }
+
+            // get token
+            String hospitalAdminToken = httpRequest.getHeader("ACCESS_TOKEN");
+            // get admin by token
+            HospitalAdminAccessTokenBean token = tokenService.getToken(hospitalAdminToken);
+            // token invalid
+            if (null == token) {
+                throw new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND);
+            }
+            if (!CommonStatus.ENABLED.equals(token.getStatus())) {
+                throw new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_EXPIRED);
+            }
+
+            // admin invalid
+            if (!adminService.existsAdminUser(token.getAdminId(), CommonStatus.ENABLED)) {
+                throw new BadRequestException(ErrorCode.NURSE360_USER_NOT_FOUND);
+            }
+
+            // admin can access url
+            if (!accessUrlService.hasAdminMngUrl(token.getAdminId(), mngUrl.getId())) {
+                throw new BadRequestException(ErrorCode.NURSE360_UNAUTHORIZED);
+            }
+
+            // save token and adminId
+            request.setProperty(ContextKeys.ADMIN_USER_LOGIN_USER_ID, token.getAdminId());
+            request.setProperty(ContextKeys.ADMIN_USER_TOKEN, token.getToken());
+
         }
     }
 }
