@@ -36,11 +36,11 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
     @Autowired
     private ExceptionHandlerFilter exceptionHandlerFilter;
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        logger.info("configure wb security");
-        web.ignoring().antMatchers("/nurse360/admin/**");
-    }
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        logger.info("configure wb security");
+//        web.ignoring().antMatchers("/nurse360/admin/**");
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -48,7 +48,8 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
         //
         // add custom filter for user authentication to all hospital module url
         //
-        http.antMatcher("/nurse360/hospital_management/**")
+        http.csrf().ignoringAntMatchers("/nurse360/admin/**").and().
+        antMatcher("/nurse360/hospital_management/**")
                 .addFilterBefore(filter, BasicAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, Nurse360HospitalManagementFilter.class);
 
