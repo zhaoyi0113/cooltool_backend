@@ -7,7 +7,6 @@ import com.cooltoo.nurse360.admin.api.hospital.HospitalManagementUrlManageAPI;
 import com.cooltoo.nurse360.filters.Nurse360BadRequestExceptionMapper;
 import com.cooltoo.nurse360.filters.Nurse360CORSResponseFilter;
 import com.cooltoo.nurse360.filters.Nurse360NurseLoginAuthenticationFilter;
-import com.cooltoo.nurse360.filters.hospital.Nurse360HospitalManagementFilter;
 import com.cooltoo.nurse360.hospital.api.HospitalAdminAPI;
 import com.cooltoo.nurse360.hospital.api.HospitalAdminLoginAPI;
 import com.cooltoo.nurse360.hospital.api.HospitalManagementTestAPI;

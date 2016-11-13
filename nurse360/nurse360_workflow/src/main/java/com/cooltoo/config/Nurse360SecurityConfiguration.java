@@ -8,10 +8,8 @@ import com.cooltoo.nurse360.filters.hospital.ExceptionHandlerFilter;
 import com.cooltoo.nurse360.filters.hospital.Nurse360HospitalManagementFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -30,17 +28,9 @@ import java.util.List;
 public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(Nurse360SecurityConfiguration.class);
 
-    @Autowired
-    private Nurse360HospitalManagementFilter filter;
+    private Nurse360HospitalManagementFilter filter = new Nurse360HospitalManagementFilter();
 
-    @Autowired
-    private ExceptionHandlerFilter exceptionHandlerFilter;
-
-//    @Override
-//    public void configure(WebSecurity web) throws Exception {
-//        logger.info("configure wb security");
-//        web.ignoring().antMatchers("/nurse360/admin/**");
-//    }
+    private ExceptionHandlerFilter exceptionHandlerFilter = new ExceptionHandlerFilter();
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -48,8 +38,8 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
         //
         // add custom filter for user authentication to all hospital module url
         //
-        http.csrf().ignoringAntMatchers("/nurse360/admin/**").and().
-        antMatcher("/nurse360/hospital_management/**")
+
+        http.antMatcher("/nurse360/hospital_management/**")
                 .addFilterBefore(filter, BasicAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, Nurse360HospitalManagementFilter.class);
 

@@ -4,7 +4,6 @@ import com.cooltoo.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -16,13 +15,13 @@ import java.io.IOException;
 /**
  * Created by zhaoyi0113 on 13/11/2016.
  */
-@Component
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(ExceptionHandlerFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        logger.debug("exception handler filter");
         try {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
@@ -40,7 +39,6 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
                 errorCode = badRequestException.getErrorCode().getCode();
             }
             response.setStatus(errorCode);
-//            response.getWriter().write(convertObjectToJson(errorResponse));
         }
     }
 }
