@@ -17,7 +17,9 @@ import java.util.List;
 public interface HospitalAdminRepository extends JpaRepository<HospitalAdminEntity, Long> {
 
     List<HospitalAdminEntity> findAdminByNameAndPassword(String name, String password);
+    HospitalAdminEntity findFirstByNameAndStatus(String name, CommonStatus status);
     long countAdminByIdAndStatus(long adminId, CommonStatus status);
+    HospitalAdminEntity findById(long id);
 
     @Query("SELECT count(ha.id) FROM HospitalAdminEntity ha" +
             " WHERE (?1 IS NULL OR ha.name      LIKE %?1)" +

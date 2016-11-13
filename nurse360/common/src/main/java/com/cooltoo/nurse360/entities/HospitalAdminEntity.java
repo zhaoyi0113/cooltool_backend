@@ -2,16 +2,23 @@ package com.cooltoo.nurse360.entities;
 
 import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.CommonStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by zhaolisong on 2016/11/9.
  */
 @Entity
 @Table(name = "nurse360_hospital_administrator")
-public class HospitalAdminEntity {
+public class HospitalAdminEntity implements UserDetails{
 
     private long id;
     private Date time;
@@ -23,6 +30,7 @@ public class HospitalAdminEntity {
     private String email="";
     private int hospitalId;
     private int departmentId;
+
 
     @Id
     @GeneratedValue
@@ -69,15 +77,19 @@ public class HospitalAdminEntity {
         return name;
     }
 
+    @JsonProperty
     public void setName(String name) {
         this.name = name;
     }
+
+
 
     @Column(name = "password")
     public String getPassword() {
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }
@@ -135,4 +147,42 @@ public class HospitalAdminEntity {
         return msg.toString();
     }
 
+    @Override
+    @Transient
+    public String getUsername() {
+        return name;
+    }
+
+    @Override
+    @Transient
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    @Transient
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    @Transient
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    @Transient
+    public boolean isEnabled() {
+        return CommonStatus.ENABLED.equals(status);
+    }
+
+    @Override
+    @Transient
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        //TODO: read role from database
+        Set<GrantedAuthority> authorites = new HashSet<>();
+        authorites.add(new SimpleGrantedAuthority("ADMIN"));
+        return authorites;
+    }
 }

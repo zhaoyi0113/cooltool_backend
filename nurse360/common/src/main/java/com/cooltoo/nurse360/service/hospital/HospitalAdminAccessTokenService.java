@@ -41,10 +41,10 @@ public class HospitalAdminAccessTokenService {
         }
 
         String token = accessTokenGenerator.generateAccessToken(name, password);
-        List<HospitalAdminAccessTokenEntity> tokensExists = repository.findTokenByToken(token);
+        List<HospitalAdminAccessTokenEntity> tokensExists = repository.findByToken(token);
         while (!VerifyUtil.isListEmpty(tokensExists)) {
             token = accessTokenGenerator.generateAccessToken(name, password);
-            tokensExists = repository.findTokenByToken(token);
+            tokensExists = repository.findByToken(token);
         }
 
         HospitalAdminBean admin = adminUsers.get(0);
@@ -59,7 +59,7 @@ public class HospitalAdminAccessTokenService {
 
     @Transactional
     public void setTokenDisable(String token){
-        List<HospitalAdminAccessTokenEntity> tokenEntities = repository.findTokenByToken(token);
+        List<HospitalAdminAccessTokenEntity> tokenEntities = repository.findByToken(token);
         // user not login
         if (tokenEntities.isEmpty()) {
             return;
@@ -72,7 +72,7 @@ public class HospitalAdminAccessTokenService {
     }
 
     public boolean isTokenEnable(String token){
-        List<HospitalAdminAccessTokenEntity> tokenEntities = repository.findTokenByToken(token);
+        List<HospitalAdminAccessTokenEntity> tokenEntities = repository.findByToken(token);
         if (tokenEntities.isEmpty()) {
             return false;
         }
@@ -81,7 +81,7 @@ public class HospitalAdminAccessTokenService {
     }
 
     public HospitalAdminAccessTokenBean getToken(String token) {
-        List<HospitalAdminAccessTokenEntity> tokenEntities = repository.findTokenByToken(token);
+        List<HospitalAdminAccessTokenEntity> tokenEntities = repository.findByToken(token);
         if (tokenEntities.isEmpty()) {
             return null;
         }

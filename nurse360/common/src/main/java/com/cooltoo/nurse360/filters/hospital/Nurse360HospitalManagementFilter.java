@@ -2,18 +2,14 @@ package com.cooltoo.nurse360.filters.hospital;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.exception.BadRequestException;
-import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.constants.RequestMethod;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
-import com.cooltoo.nurse360.beans.HospitalManagementUrlBean;
+import com.cooltoo.nurse360.entities.HospitalAdminEntity;
+import com.cooltoo.nurse360.repository.HospitalAdminRepository;
 import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessTokenService;
-import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessUrlService;
 import com.cooltoo.nurse360.service.hospital.HospitalAdminService;
-import com.cooltoo.nurse360.service.hospital.HospitalManagementUrlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.GenericFilterBean;
@@ -33,92 +29,66 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
 
     private static final Logger logger = LoggerFactory.getLogger(Nurse360HospitalManagementFilter.class);
 
-    private HospitalManagementUrlService urlService;
     private HospitalAdminService adminService;
     private HospitalAdminAccessTokenService tokenService;
-    private HospitalAdminAccessUrlService accessUrlService;
+    private HospitalAdminRepository adminRepository;
 
-
-    private void setServices(ServletRequest request){
+    private void setServices(ServletRequest request) {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
-        if(urlService == null){
-            urlService = webApplicationContext.getBean(HospitalManagementUrlService.class);
-        }
-        if(adminService == null){
+        if (adminService == null) {
             adminService = webApplicationContext.getBean(HospitalAdminService.class);
         }
-        if(tokenService == null){
+        if (tokenService == null) {
             tokenService = webApplicationContext.getBean(HospitalAdminAccessTokenService.class);
         }
-        if(accessUrlService == null){
-            accessUrlService = webApplicationContext.getBean(HospitalAdminAccessUrlService.class);
+        if (adminRepository == null) {
+            adminRepository = webApplicationContext.getBean(HospitalAdminRepository.class);
         }
     }
 
-        @Override
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         setServices(request);
         if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
-            // get http url
-            String httpUrl = httpRequest.getPathInfo();
-            String httpRootUrl = httpRequest.getRequestURI();
-            // get http type
-            RequestMethod httpType = RequestMethod.parseString(httpRequest.getMethod());
-            logger.debug("get http type " + httpType);
-            if ("OPTIONS".equals(httpType.name())) {
-                logger.debug(("this is options http type."));
-                return;
-            }
+            HospitalAdminAccessTokenBean token = getHospitalAdminAccessTokenBean(httpRequest);
 
-            // check http url valid
-            if (null == httpType || null == httpRootUrl || !httpUrl.startsWith("/hospital_management") || !httpRootUrl.equals("/nurse360" + httpUrl)) {
-                chain.doFilter(request, response);
-                return;
-            }
+            if(token != null) {
+                // save token and adminId
+                request.setAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID, token.getAdminId());
+                request.setAttribute(ContextKeys.ADMIN_USER_TOKEN, token.getToken());
 
-            HospitalManagementUrlBean mngUrl = urlService.getHospitalMngUrl(httpType, httpUrl);
-            if (null == mngUrl) {
-                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_NOT_ACCEPTABLE));
+                HospitalAdminEntity adminEntity = adminRepository.findById(token.getAdminId());
+                HospitalUserAuthentication authentication = new HospitalUserAuthentication(adminEntity);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-            if (!CommonStatus.ENABLED.equals(mngUrl.getStatus())) {
-                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED));
-            }
-
-            // need not check token
-            if (!YesNoEnum.YES.equals(mngUrl.getNeedToken())) {
-                chain.doFilter(request, response);
-                return;
-            }
-
-            // get token
-            String hospitalAdminToken = httpRequest.getHeader("ACCESS_TOKEN");
-            // get admin by token
-            HospitalAdminAccessTokenBean token = tokenService.getToken(hospitalAdminToken);
-            // token invalid
-            if (null == token) {
-                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND));
-            }
-            if (!CommonStatus.ENABLED.equals(token.getStatus())) {
-                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_EXPIRED));
-            }
-
-            // admin invalid
-            if (!adminService.existsAdminUser(token.getAdminId(), CommonStatus.ENABLED)) {
-                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_USER_NOT_FOUND));
-            }
-
-            // admin can access url
-            if (!accessUrlService.hasAdminMngUrl(token.getAdminId(), mngUrl.getId())) {
-                throw new ServletException(new BadRequestException(ErrorCode.NURSE360_UNAUTHORIZED));
-            }
-
-            // save token and adminId
-            request.setAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID, token.getAdminId());
-            request.setAttribute(ContextKeys.ADMIN_USER_TOKEN, token.getToken());
-
-            chain.doFilter(request, response);
         }
+        chain.doFilter(request, response);
+    }
+
+    private HospitalAdminAccessTokenBean getHospitalAdminAccessTokenBean(HttpServletRequest httpRequest) throws ServletException {
+        // get token
+        String hospitalAdminToken = httpRequest.getHeader("ACCESS_TOKEN");
+        logger.debug("get access token "+hospitalAdminToken);
+        // get admin by token
+        HospitalAdminAccessTokenBean token = tokenService.getToken(hospitalAdminToken);
+        logger.debug("get token bean "+token);
+        // token invalid
+        if (null == token) {
+//            throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND));
+            return null;
+        }
+        if (!CommonStatus.ENABLED.equals(token.getStatus())) {
+//            throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_EXPIRED));
+            return null;
+        }
+
+        // admin invalid
+        if (!adminService.existsAdminUser(token.getAdminId(), CommonStatus.ENABLED)) {
+//            throw new ServletException(new BadRequestException(ErrorCode.NURSE360_USER_NOT_FOUND));
+            return null;
+        }
+        return token;
     }
 
 }

@@ -1,7 +1,6 @@
 package com.cooltoo;
 
 import com.cooltoo.nurse360.features.Nurse360Features;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +21,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 
 @SpringBootApplication
@@ -63,13 +61,6 @@ public class Application {
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(Application.class, args);
 
-        logger.info("Let's inspect the beans provided by Spring Boot:");
-
-        String[] beanNames = ctx.getBeanDefinitionNames();
-        Arrays.sort(beanNames);
-        for (String beanName : beanNames) {
-            logger.info(beanName);
-        }
     }
 
 }

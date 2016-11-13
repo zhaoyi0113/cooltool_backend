@@ -10,5 +10,5 @@ import java.util.List;
  */
 public interface HospitalAdminAccessTokenRepository extends CrudRepository<HospitalAdminAccessTokenEntity, Long> {
     List<HospitalAdminAccessTokenEntity> findTokenByAdminId(long adminId);
-    List<HospitalAdminAccessTokenEntity> findTokenByToken(String token);
+    List<HospitalAdminAccessTokenEntity> findByToken(String token);
 }
