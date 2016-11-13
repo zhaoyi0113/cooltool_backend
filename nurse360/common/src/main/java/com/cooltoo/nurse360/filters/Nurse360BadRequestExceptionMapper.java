@@ -19,7 +19,8 @@ public class Nurse360BadRequestExceptionMapper implements ExceptionMapper<BadReq
 
     @Override
     public Response toResponse(BadRequestException exception) {
-        logger.info("get exception "+exception.getMessage()+","+exception.getErrorCode().getCode());
+        logger.error("get exception "+exception.getMessage()+","+exception.getErrorCode().getCode());
+        logger.error(exception.getMessage(), exception);
         logger.trace(Marker.ANY_MARKER, exception.getMessage(), exception);
         return Response.status(exception.getErrorCode().getCode())
                 .header("Access-Control-Allow-Origin", "*")
