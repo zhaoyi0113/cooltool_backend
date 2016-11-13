@@ -39,7 +39,7 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
     @Override
     public void configure(WebSecurity web) throws Exception {
         logger.info("configure wb security");
-        web.ignoring().regexMatchers("!hospital_management");
+        web.ignoring().antMatchers("/nurse360/admin");
     }
 
     @Override
