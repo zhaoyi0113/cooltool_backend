@@ -2,7 +2,7 @@ package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
-import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessTokenService;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;

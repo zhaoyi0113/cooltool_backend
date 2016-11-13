@@ -1,4 +1,4 @@
-package com.cooltoo.nurse360.filters.hospital;
+package com.cooltoo.nurse360.hospital.filters;
 
 import com.cooltoo.exception.BadRequestException;
 import org.slf4j.Logger;

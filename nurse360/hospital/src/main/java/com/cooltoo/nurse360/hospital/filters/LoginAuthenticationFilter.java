@@ -1,9 +1,9 @@
-package com.cooltoo.nurse360.filters.hospital;
+package com.cooltoo.nurse360.hospital.filters;
 
 import com.cooltoo.constants.HeaderKeys;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
 import com.cooltoo.nurse360.entities.HospitalAdminEntity;
-import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessTokenService;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessTokenService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

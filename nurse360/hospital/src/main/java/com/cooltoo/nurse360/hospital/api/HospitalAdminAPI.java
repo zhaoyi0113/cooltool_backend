@@ -4,7 +4,7 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
-import com.cooltoo.nurse360.service.hospital.HospitalAdminService;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;

@@ -1,12 +1,12 @@
-package com.cooltoo.nurse360.admin.api.hospital;
+package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.RequestMethod;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessUrlBean;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
 import com.cooltoo.nurse360.beans.HospitalManagementUrlBean;
-import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessUrlService;
-import com.cooltoo.nurse360.service.hospital.HospitalManagementUrlService;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessUrlService;
+import com.cooltoo.nurse360.hospital.service.HospitalManagementUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;

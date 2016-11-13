@@ -2,8 +2,8 @@ package com.cooltoo.config;
 
 
 import com.cooltoo.nurse360.admin.api.*;
-import com.cooltoo.nurse360.admin.api.hospital.HospitalAdminManageAPI;
-import com.cooltoo.nurse360.admin.api.hospital.HospitalManagementUrlManageAPI;
+import com.cooltoo.nurse360.hospital.api.HospitalAdminManageAPI;
+import com.cooltoo.nurse360.hospital.api.HospitalManagementUrlManageAPI;
 import com.cooltoo.nurse360.filters.Nurse360BadRequestExceptionMapper;
 import com.cooltoo.nurse360.filters.Nurse360CORSResponseFilter;
 import com.cooltoo.nurse360.filters.Nurse360NurseLoginAuthenticationFilter;

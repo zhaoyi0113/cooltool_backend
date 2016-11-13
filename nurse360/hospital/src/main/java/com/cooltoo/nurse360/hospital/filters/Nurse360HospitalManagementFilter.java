@@ -1,12 +1,12 @@
-package com.cooltoo.nurse360.filters.hospital;
+package com.cooltoo.nurse360.hospital.filters;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
 import com.cooltoo.nurse360.entities.HospitalAdminEntity;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessTokenService;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminService;
 import com.cooltoo.nurse360.repository.HospitalAdminRepository;
-import com.cooltoo.nurse360.service.hospital.HospitalAdminAccessTokenService;
-import com.cooltoo.nurse360.service.hospital.HospitalAdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;

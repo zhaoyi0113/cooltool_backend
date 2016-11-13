@@ -1,4 +1,4 @@
-package com.cooltoo.nurse360.service.hospital;
+package com.cooltoo.nurse360.hospital.service;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessUrlBean;
