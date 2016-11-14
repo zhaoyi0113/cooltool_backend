@@ -9,6 +9,9 @@ import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.converter.NursePatientFollowUpBeanConverter;
 import com.cooltoo.go2nurse.entities.NursePatientFollowUpEntity;
 import com.cooltoo.go2nurse.repository.NursePatientFollowUpRepository;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.services.CommonDepartmentService;
+import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +47,9 @@ public class NursePatientFollowUpService {
     @Autowired private UserService userService;
     @Autowired private PatientService patientService;
     @Autowired private NurseServiceForGo2Nurse nurseService;
+    @Autowired private CommonHospitalService hospitalService;
+    @Autowired private CommonDepartmentService departmentService;
+    @Autowired private Go2NurseUtility utility;
 
     //=================================================================
     //                 getter for administrator
@@ -130,6 +136,11 @@ public class NursePatientFollowUpService {
 
         List<NursePatientFollowUpBean> beans = entitiesToBeans(entities);
         fillOtherProperties(beans);
+
+        NursePatientFollowUpBean bean = beans.get(0);
+        bean.setNurse(nurseService.getNurseById(bean.getNurseId()));
+        bean.setHospital(hospitalService.getHospital(bean.getHospitalId()));
+        bean.setDepartment(departmentService.getById(bean.getDepartmentId(), utility.getHttpPrefixForNurseGo()));
         return beans.get(0);
     }
 

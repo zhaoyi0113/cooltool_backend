@@ -1,5 +1,8 @@
 package com.cooltoo.go2nurse.beans;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 
 import java.util.Date;
@@ -17,8 +20,11 @@ public class NursePatientFollowUpBean {
     private Date time;
     private CommonStatus status;
     private int hospitalId;
+    private HospitalBean hospital;
     private int departmentId;
+    private HospitalDepartmentBean department;
     private long nurseId;
+    private NurseBean nurse;
     private long userId;
     private UserBean user;
     private long patientId;
@@ -103,6 +109,30 @@ public class NursePatientFollowUpBean {
 
     public void setPatient(PatientBean patient) {
         this.patient = patient;
+    }
+
+    public HospitalBean getHospital() {
+        return hospital;
+    }
+
+    public void setHospital(HospitalBean hospital) {
+        this.hospital = hospital;
+    }
+
+    public HospitalDepartmentBean getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(HospitalDepartmentBean department) {
+        this.department = department;
+    }
+
+    public NurseBean getNurse() {
+        return nurse;
+    }
+
+    public void setNurse(NurseBean nurse) {
+        this.nurse = nurse;
     }
 
     public Map<String, Object> getProperties() {
