@@ -2,10 +2,9 @@ package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.nurse360.beans.HospitalAdminAccessUrlBean;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
-import com.cooltoo.nurse360.beans.HospitalManagementUrlBean;
-import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessUrlService;
+import com.cooltoo.nurse360.constants.AdminRole;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminRolesService;
 import com.cooltoo.nurse360.hospital.service.HospitalAdminService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +23,7 @@ import java.util.List;
 public class HospitalAdminManageAPI {
 
     @Autowired private HospitalAdminService adminService;
-    @Autowired private HospitalAdminAccessUrlService accessUrlService;
+    @Autowired private HospitalAdminRolesService adminRolesService;
 
     @Path("/count")
     @GET
@@ -75,8 +73,6 @@ public class HospitalAdminManageAPI {
                                      @PathParam("admin_id") @DefaultValue("0") long adminId
     ) {
         HospitalAdminBean bean = adminService.getAdminUser(adminId);
-        List<HospitalAdminAccessUrlBean> accessUrls = accessUrlService.getAdminMngUrlByAdminId(adminId);
-        bean.setProperties(HospitalAdminBean.ACCESS_URLS, getUrls(accessUrls));
         return Response.ok(bean).build();
     }
 
@@ -121,36 +117,36 @@ public class HospitalAdminManageAPI {
     }
 
     //===================================================================================================================
-    //            URL Service
+    //            Role Service
     //===================================================================================================================
 
-    @Path("/url")
+    @Path("/role")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getManagementHttpUrl(@Context HttpServletRequest request) {
+        return Response.ok(AdminRole.getAll()).build();
+    }
+
+    @Path("/role")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManagementHttpUrl(@Context HttpServletRequest request,
-                                         @FormParam("admin_id") @DefaultValue("0") long adminId,
-                                         @FormParam("url_id") @DefaultValue("0") long urlId
+    public Response addAdminRole(@Context HttpServletRequest request,
+                                 @FormParam("admin_id") @DefaultValue("0") long adminId,
+                                 @FormParam("role") @DefaultValue("") String role
     ) {
-        long accessUrlId = accessUrlService.addAdminMngUrl(adminId, urlId);
+        long accessUrlId = adminRolesService.addAdminRole(adminId, AdminRole.parseString(role));
         return Response.ok(accessUrlId).build();
     }
 
-    @Path("/url")
+    @Path("/role")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteAdminAccessHttpUrlRelation(@Context HttpServletRequest request,
-                                                     @FormParam("admin_id") @DefaultValue("0") long adminId,
-                                                     @FormParam("url_id") @DefaultValue("0") long urlId
+    public Response deleteAdminRole(@Context HttpServletRequest request,
+                                    @FormParam("admin_id") @DefaultValue("0") long adminId,
+                                    @FormParam("role") @DefaultValue("") String role
     ) {
-        List<Long> accessUrlIds = accessUrlService.deleteAdminMngUrl(adminId, urlId);
+        List<Long> accessUrlIds = adminRolesService.deleteAdminRole(adminId, AdminRole.parseString(role));
         return Response.ok(accessUrlIds).build();
     }
 
-    public List getUrls(List<HospitalAdminAccessUrlBean> accessUrls) {
-        List<HospitalManagementUrlBean> admins = new ArrayList<>();
-        for (HospitalAdminAccessUrlBean tmp : accessUrls) {
-            admins.add(tmp.getUrl());
-        }
-        return admins;
-    }
 }

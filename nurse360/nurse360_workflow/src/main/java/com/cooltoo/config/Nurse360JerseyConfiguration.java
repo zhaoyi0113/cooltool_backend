@@ -3,7 +3,6 @@ package com.cooltoo.config;
 
 import com.cooltoo.nurse360.admin.api.*;
 import com.cooltoo.nurse360.hospital.api.HospitalAdminManageAPI;
-import com.cooltoo.nurse360.hospital.api.HospitalManagementUrlManageAPI;
 import com.cooltoo.nurse360.filters.Nurse360BadRequestExceptionMapper;
 import com.cooltoo.nurse360.filters.Nurse360CORSResponseFilter;
 import com.cooltoo.nurse360.filters.Nurse360NurseLoginAuthenticationFilter;
@@ -62,7 +61,6 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(NurseQueryAPI.class);
 
         register(HospitalAdminManageAPI.class);
-        register(HospitalManagementUrlManageAPI.class);
 
         register(HospitalManagementTestAPI.class);
         register(HospitalAdminLoginAPI.class);

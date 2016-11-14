@@ -1,26 +1,22 @@
-package com.cooltoo.nurse360.entities;
+package com.cooltoo.nurse360.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.nurse360.constants.AdminRole;
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by zhaolisong on 2016/11/10.
  */
-@Entity
-@Table(name = "nurse360_hospital_admin_access_url")
-public class HospitalAdminAccessUrlEntity {
+public class HospitalAdminRolesBean {
 
     private long id;
     private Date time;
     private CommonStatus status;
     private long adminId;
-    private long urlId;
+    private HospitalAdminBean admin;
+    private AdminRole role;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
     public long getId() {
         return id;
     }
@@ -29,7 +25,6 @@ public class HospitalAdminAccessUrlEntity {
         this.id = id;
     }
 
-    @Column(name = "time_created")
     public Date getTime() {
         return time;
     }
@@ -38,7 +33,6 @@ public class HospitalAdminAccessUrlEntity {
         this.time = time;
     }
 
-    @Column(name = "status")
     public CommonStatus getStatus() {
         return status;
     }
@@ -47,7 +41,6 @@ public class HospitalAdminAccessUrlEntity {
         this.status = status;
     }
 
-    @Column(name = "admin_id")
     public long getAdminId() {
         return adminId;
     }
@@ -56,13 +49,20 @@ public class HospitalAdminAccessUrlEntity {
         this.adminId = adminId;
     }
 
-    @Column(name = "url_id")
-    public long getUrlId() {
-        return urlId;
+    public HospitalAdminBean getAdmin() {
+        return admin;
     }
 
-    public void setUrlId(long urlId) {
-        this.urlId = urlId;
+    public void setAdmin(HospitalAdminBean admin) {
+        this.admin = admin;
+    }
+
+    public AdminRole getRole() {
+        return role;
+    }
+
+    public void setRole(AdminRole role) {
+        this.role = role;
     }
 
     public String toString() {
@@ -72,7 +72,8 @@ public class HospitalAdminAccessUrlEntity {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", adminId=").append(adminId);
-        msg.append(", urlId=").append(urlId);
+        msg.append(", admin=").append(admin);
+        msg.append(", role=").append(role);
         msg.append("]");
         return msg.toString();
     }

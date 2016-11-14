@@ -1,5 +1,8 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -169,6 +172,9 @@ public class NursePatientFollowUpService {
 
         List<Long> userIds = new ArrayList<>();
         List<Long> patientIds = new ArrayList<>();
+        List<Long> nurseIds = new ArrayList<>();
+        List<Integer> hospitalIds = new ArrayList<>();
+        List<Integer> departmentIds = new ArrayList<>();
         for (NursePatientFollowUpBean tmp : beans) {
             if (!userIds.contains(tmp.getUserId())) {
                 userIds.add(tmp.getUserId());
@@ -176,10 +182,22 @@ public class NursePatientFollowUpService {
             if (!patientIds.contains(tmp.getPatientId())) {
                 patientIds.add(tmp.getPatientId());
             }
+            if (!nurseIds.contains(tmp.getNurseId())) {
+                nurseIds.add(tmp.getNurseId());
+            }
+            if (!hospitalIds.contains(tmp.getHospitalId())) {
+                hospitalIds.add(tmp.getHospitalId());
+            }
+            if (!departmentIds.contains(tmp.getDepartmentId())) {
+                departmentIds.add(tmp.getDepartmentId());
+            }
         }
 
         Map<Long, UserBean> userIdToBean = userService.getUserIdToBean(userIds);
         Map<Long, PatientBean> patientIdToBean = patientService.getPatientIdToBean(patientIds);
+        Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
+        Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalIds);
+        Map<Integer, HospitalDepartmentBean> departmentIdToBean = departmentService.getDepartmentIdToBean(departmentIds, utility.getHttpPrefixForNurseGo());
 
         // fill properties
         for (NursePatientFollowUpBean tmp : beans) {
@@ -187,6 +205,12 @@ public class NursePatientFollowUpService {
             tmp.setUser(user);
             PatientBean patient = patientIdToBean.get(tmp.getPatientId());
             tmp.setPatient(patient);
+            NurseBean nurse = nurseIdToBean.get(tmp.getNurseId());
+            tmp.setNurse(nurse);
+            HospitalBean hospital = hospitalIdToBean.get(tmp.getHospitalId());
+            tmp.setHospital(hospital);
+            HospitalDepartmentBean department = departmentIdToBean.get(tmp.getDepartmentId());
+            tmp.setDepartment(department);
         }
     }
 

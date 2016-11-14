@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class HospitalAdminBean {
 
-    public static final String ACCESS_URLS = "accessUrls";
+    public static final String ROLE = "role";
 
     private long id;
     private Date time;

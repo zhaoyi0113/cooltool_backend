@@ -5,6 +5,7 @@ import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
+import com.cooltoo.nurse360.constants.AdminRole;
 import com.cooltoo.nurse360.converters.HospitalAdminBeanConverter;
 import com.cooltoo.nurse360.entities.HospitalAdminEntity;
 import com.cooltoo.exception.BadRequestException;
@@ -41,6 +42,8 @@ public class HospitalAdminService {
 
     @Autowired private HospitalAdminRepository repository;
     @Autowired private HospitalAdminBeanConverter beanConverter;
+
+    @Autowired private HospitalAdminRolesService adminRolesService;
 
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
@@ -171,9 +174,13 @@ public class HospitalAdminService {
             return;
         }
 
+        List<Long> adminId = new ArrayList<>();
         List<Integer> hospitalId = new ArrayList<>();
         List<Integer> departmentIds = new ArrayList<>();
         for (HospitalAdminBean tmp : beans) {
+            if (!adminId.contains(tmp.getId())) {
+                adminId.add(tmp.getId());
+            }
             if (!hospitalId.contains(tmp.getHospitalId())) {
                 hospitalId.add(tmp.getHospitalId());
             }
@@ -184,13 +191,17 @@ public class HospitalAdminService {
 
         Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalId);
         Map<Integer, HospitalDepartmentBean> departmentIdToBean = departmentService.getDepartmentIdToBean(departmentIds, utility.getHttpPrefixForNurseGo());
+        Map<Long, List<AdminRole>> adminIdToRole = adminRolesService.getAdminRoleByAdminIds(adminId);
 
         // fill properties
         for (HospitalAdminBean tmp : beans) {
+            List<AdminRole> roles = adminIdToRole.get(tmp.getId());
             HospitalBean hospital = hospitalIdToBean.get(tmp.getHospitalId());
             HospitalDepartmentBean department = departmentIdToBean.get(tmp.getDepartmentId());
+            tmp.setProperties(HospitalAdminBean.ROLE, roles);
             tmp.setHospital(hospital);
             tmp.setDepartment(department);
+
         }
     }
 
