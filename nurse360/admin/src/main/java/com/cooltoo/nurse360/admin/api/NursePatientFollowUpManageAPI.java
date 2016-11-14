@@ -40,9 +40,9 @@ public class NursePatientFollowUpManageAPI {
         long followUpCount = patientFollowUpService.countPatientFollowUp(
                 0>hospitalId ? null : hospitalId,
                 0>departmentId ? null : departmentId,
+                0>nurseId ? null : nurseId,
                 0>userId ? null : userId,
-                0>patientId ? null : patientId,
-                0>nurseId ? null : nurseId
+                0>patientId ? null : patientId
                 );
         return Response.ok(followUpCount).build();
     }
@@ -61,9 +61,9 @@ public class NursePatientFollowUpManageAPI {
         List<NursePatientFollowUpBean> followUps = patientFollowUpService.getPatientFollowUp(
                 0>hospitalId ? null : hospitalId,
                 0>departmentId ? null : departmentId,
+                0>nurseId ? null : nurseId,
                 0>userId ? null : userId,
                 0>patientId ? null : patientId,
-                0>nurseId ? null : nurseId,
                 pageIndex, sizePerPage);
         return Response.ok(followUps).build();
     }
