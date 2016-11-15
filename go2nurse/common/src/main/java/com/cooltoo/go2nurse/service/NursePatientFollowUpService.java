@@ -57,8 +57,11 @@ public class NursePatientFollowUpService {
     //=================================================================
     //                 getter for administrator
     //=================================================================
-    public long countPatientFollowUp(Integer hospitalId, Integer departmentId, Long nurseId, Long userId, Long patientId) {
-        long count = repository.countByConditions(hospitalId, departmentId, nurseId, userId, patientId);
+    public long countPatientFollowUp(Integer hospitalId, Integer departmentId, Long nurseId, Long userId, Long patientId, List<CommonStatus> statuses) {
+        long count = 0;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            count = repository.countByConditions(hospitalId, departmentId, nurseId, userId, patientId, statuses);
+        }
         logger.info("count patient follow-up by hospital={} department={} nurseId={} user={} patientId={}, count is {}",
                 hospitalId, departmentId, nurseId, userId, patientId, count);
         return count;
@@ -67,15 +70,18 @@ public class NursePatientFollowUpService {
     public List<NursePatientFollowUpBean> getPatientFollowUp(Integer hospitalId, Integer departmentId,
                                                              Long nurseId,
                                                              Long userId, Long patientId,
-                                                             int pageIndex, int sizePerPage)
+                                                             int pageIndex, int sizePerPage,
+                                                             List<CommonStatus> statuses)
     {
         logger.info("get patient follow-up by hospital={} department={} nurseId={} user={} patientId={} at page={} sizePerPage={}",
                 hospitalId, departmentId, nurseId, userId, patientId, pageIndex, sizePerPage);
-        List<NursePatientFollowUpBean> beans;
-        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<NursePatientFollowUpEntity> resultSet = repository.findByConditions(hospitalId, departmentId, nurseId, userId, patientId, request);
-        beans = entitiesToBeans(resultSet);
-        fillOtherProperties(beans);
+        List<NursePatientFollowUpBean> beans = new ArrayList<>();
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+            Page<NursePatientFollowUpEntity> resultSet = repository.findByConditions(hospitalId, departmentId, nurseId, userId, patientId, statuses, request);
+            beans = entitiesToBeans(resultSet);
+            fillOtherProperties(beans);
+        }
 
         logger.warn("patient follow-up count={}", beans.size());
         return beans;

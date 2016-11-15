@@ -21,8 +21,9 @@ public interface NursePatientFollowUpRepository extends JpaRepository<NursePatie
             "   AND (?2 IS NULL OR npfu.departmentId=?2)" +
             "   AND (?3 IS NULL OR npfu.nurseId=?3)" +
             "   AND (?4 IS NULL OR npfu.userId=?4)" +
-            "   AND (?5 IS NULL OR npfu.patientId=?5)")
-    long countByConditions(Integer hospitalId, Integer departmentId, Long nurseId, Long userId, Long patientId);
+            "   AND (?5 IS NULL OR npfu.patientId=?5)" +
+            "   AND (npfu.status IN (?6))")
+    long countByConditions(Integer hospitalId, Integer departmentId, Long nurseId, Long userId, Long patientId, List<CommonStatus> statuses);
 
 
     @Query("FROM NursePatientFollowUpEntity npfu" +
@@ -30,8 +31,9 @@ public interface NursePatientFollowUpRepository extends JpaRepository<NursePatie
             "   AND (?2 IS NULL OR npfu.departmentId=?2)" +
             "   AND (?3 IS NULL OR npfu.nurseId=?3)" +
             "   AND (?4 IS NULL OR npfu.userId=?4)" +
-            "   AND (?5 IS NULL OR npfu.patientId=?5)")
-    Page<NursePatientFollowUpEntity> findByConditions(Integer hospitalId, Integer departmentId, Long nurseId, Long userId, Long patientId, Pageable page);
+            "   AND (?5 IS NULL OR npfu.patientId=?5)" +
+            "   AND (npfu.status IN (?6))")
+    Page<NursePatientFollowUpEntity> findByConditions(Integer hospitalId, Integer departmentId, Long nurseId, Long userId, Long patientId, List<CommonStatus> statuses, Pageable page);
 
 
     @Query("FROM NursePatientFollowUpEntity npfu" +

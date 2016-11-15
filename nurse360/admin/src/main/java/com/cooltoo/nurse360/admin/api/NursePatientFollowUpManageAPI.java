@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.admin.api;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpBean;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpRecordBean;
@@ -36,13 +37,15 @@ public class NursePatientFollowUpManageAPI {
                                          @QueryParam("user_id") @DefaultValue("-1") long userId,
                                          @QueryParam("patient_id") @DefaultValue("-1") long patientId
     ) {
-
+        List<CommonStatus> notDeleted = CommonStatus.getAll();
+        notDeleted.remove(CommonStatus.DELETED);
         long followUpCount = patientFollowUpService.countPatientFollowUp(
                 0>hospitalId ? null : hospitalId,
                 0>departmentId ? null : departmentId,
                 0>nurseId ? null : nurseId,
                 0>userId ? null : userId,
-                0>patientId ? null : patientId
+                0>patientId ? null : patientId,
+                notDeleted
                 );
         return Response.ok(followUpCount).build();
     }
@@ -58,13 +61,17 @@ public class NursePatientFollowUpManageAPI {
                                        @QueryParam("index") @DefaultValue("0") int pageIndex,
                                        @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
+        List<CommonStatus> notDeleted = CommonStatus.getAll();
+        notDeleted.remove(CommonStatus.DELETED);
         List<NursePatientFollowUpBean> followUps = patientFollowUpService.getPatientFollowUp(
                 0>hospitalId ? null : hospitalId,
                 0>departmentId ? null : departmentId,
                 0>nurseId ? null : nurseId,
                 0>userId ? null : userId,
                 0>patientId ? null : patientId,
-                pageIndex, sizePerPage);
+                pageIndex, sizePerPage,
+                notDeleted
+        );
         return Response.ok(followUps).build();
     }
 
