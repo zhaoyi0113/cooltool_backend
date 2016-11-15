@@ -1,80 +1,97 @@
 package com.cooltoo.nurse360.hospital.api;
 
-import com.cooltoo.constants.ContextKeys;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
  * Created by zhaolisong on 2016/10/20.
  */
-@Path("/hospital_management")
+@RestController
+@RequestMapping("/nurse360_hospital/test")
 public class HospitalManagementTestAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(HospitalManagementTestAPI.class);
-
-    @Path("/test_get")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response testGet(@Context HttpServletRequest request,
-                            @QueryParam("p1") @DefaultValue("") String p1
-    ) {
-        logger.info("test_get param={}", p1);
-        return Response.ok(p1).build();
+    ///////////////////////////////////////////////////////////////////
+    //            supported
+    ///////////////////////////////////////////////////////////////////
+    @RequestMapping(path = "/get1",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON)
+    public Object testGet1(@RequestParam(name = "p1", required = false, defaultValue = "") String p1) {
+        String ret = "test_get1 param="+ p1;
+        return ret;
     }
 
-    @Path("/test_post1")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response testPost1(@Context HttpServletRequest request,
-                              @FormDataParam("p1") @DefaultValue("") InputStream p1
-    ) throws IOException {
-        long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p1));
+    ///////////////////////////////////////////////////////////////////
+    //            supported
+    ///////////////////////////////////////////////////////////////////
+    @RequestMapping(path = "/get2/{p2}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON)
+    public Object testGet2(@PathVariable String p2) {
+        String ret = "test_get2 param="+ p2;
+        return ret;
+    }
+
+    ///////////////////////////////////////////////////////////////////
+    //            supported
+    ///////////////////////////////////////////////////////////////////
+    @RequestMapping(path = "/post1",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.MULTIPART_FORM_DATA)
+    public Object testPost1(@RequestPart(name = "p1", required = false) MultipartFile p1) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p1.getInputStream()));
         String line = reader.readLine();
-        logger.info("test_post1 param={}", line);
-        return Response.ok(p1).build();
+        line = "test_post1 param="+line;
+        return line;
     }
 
-    @Path("/test_post2")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response testPost2(@Context HttpServletRequest request,
-                              @FormParam("p1") @DefaultValue("") String p1
-    ) {
-        logger.info("test_post2 param={}", p1);
-        return Response.ok(p1).build();
+    ///////////////////////////////////////////////////////////////////
+    //            supported
+    ///////////////////////////////////////////////////////////////////
+    @RequestMapping(path = "/post2",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON)
+    public Object testPost2(@RequestParam(name = "p1", required = false, defaultValue = "") String p1) {
+        String ret = "test_post2 param="+p1;
+        return ret;
     }
 
-    @Path("/test_put")
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response testPut(@Context HttpServletRequest request,
-                            @FormParam("p1") @DefaultValue("") String p1
-    ) {
-        logger.info("test_put param={}", p1);
-        return Response.ok(p1).build();
+
+    ///////////////////////////////////////////////////////////////////
+    //            not supported
+    ///////////////////////////////////////////////////////////////////
+    @RequestMapping(path = "/put1",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.MULTIPART_FORM_DATA)
+    public Object testPut1(@RequestPart(name = "p1", required = false) MultipartFile p1) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+        String line = reader.readLine();
+        line = "test_put2 param="+line;
+        return line;
     }
 
-    @Path("/test_delete")
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response testDelete(@Context HttpServletRequest request,
-                               @QueryParam("p1") @DefaultValue("") String p1
-    ) {
-        logger.info("test_delete param={}", p1);
-        return Response.ok(p1).build();
+    @RequestMapping(path = "/put2",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON)
+    public Object testPut2(@RequestParam(name = "p1", required = false, defaultValue = "") String p1) {
+        String ret = "test_put1 param="+p1;
+        return ret;
+    }
+
+    @RequestMapping(path = "/delete",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON)
+    public Object testDelete(@RequestParam(name = "p1", required = false, defaultValue = "") String p1) {
+        String ret = "test_delete param="+p1;
+        return ret;
     }
 
 }
