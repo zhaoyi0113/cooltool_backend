@@ -9,6 +9,7 @@ import com.cooltoo.nurse360.hospital.filters.HospitalUserDetailService;
 import com.cooltoo.nurse360.hospital.filters.LoginAuthenticationFilter;
 import com.cooltoo.nurse360.hospital.filters.Nurse360HospitalManagementFilter;
 import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessTokenService;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminRolesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +40,9 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
 
     private ExceptionHandlerFilter exceptionHandlerFilter = new ExceptionHandlerFilter();
 
-    @Autowired
-    private HospitalUserDetailService userDetailService;
-
-    @Autowired
-    private HospitalAdminAccessTokenService adminAccessTokenService;
+    @Autowired private HospitalUserDetailService userDetailService;
+    @Autowired private HospitalAdminAccessTokenService adminAccessTokenService;
+    @Autowired private HospitalAdminRolesService userDetailRoleService;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -58,15 +57,22 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
         //
         http.csrf().disable().authorizeRequests()
                 .antMatchers("/nurse360_hospital/login").permitAll()
+                .antMatchers("/nurse360_hospital/logout").permitAll()
+                .antMatchers("/nurse360_hospital/logined").permitAll()
+                .antMatchers("/nurse360_hospital/information").permitAll()
                 .antMatchers("/nurse360_hospital/admin/**").hasRole("ADMIN")
-                .antMatchers("/nurse360_hospital/user/**").hasRole("USER")
-                .anyRequest().hasRole("USER")
+                .antMatchers("/nurse360_hospital/manager/**").hasRole("MANAGER")
+                .antMatchers("/nurse360_hospital/nurse/**").hasRole("NURSE")
+                .anyRequest().hasRole("NURSE")
                 .and()
-                .addFilterBefore(new LoginAuthenticationFilter(
-                        "/nurse360_hospital/login",
-                        userDetailService, authenticationManager(),adminAccessTokenService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, Nurse360HospitalManagementFilter.class)
+                .addFilterBefore(new LoginAuthenticationFilter(
+                        "/nurse360_hospital/login",
+                        authenticationManager(),
+                        userDetailService,
+                        userDetailRoleService,
+                        adminAccessTokenService), UsernamePasswordAuthenticationFilter.class)
 
         ;
 

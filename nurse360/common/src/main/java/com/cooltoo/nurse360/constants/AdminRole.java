@@ -8,7 +8,8 @@ import java.util.List;
  */
 public enum AdminRole {
     ADMIN,
-    USER
+    MANAGER,
+    NURSE
     ;
 
     public static AdminRole parseString(String type) {
@@ -16,8 +17,11 @@ public enum AdminRole {
         if (ADMIN.name().equalsIgnoreCase(type)) {
             ret = ADMIN;
         }
-        else if (USER.name().equalsIgnoreCase(type)) {
-            ret = USER;
+        else if (MANAGER.name().equalsIgnoreCase(type)) {
+            ret = MANAGER;
+        }
+        else if (NURSE.name().equalsIgnoreCase(type)) {
+            ret = NURSE;
         }
         return ret;
     }
@@ -27,8 +31,11 @@ public enum AdminRole {
         if (ADMIN.ordinal() == type) {
             ret = ADMIN;
         }
-        else if (USER.ordinal() == type) {
-            ret = USER;
+        else if (MANAGER.ordinal() == type) {
+            ret = MANAGER;
+        }
+        else if (NURSE.ordinal() == type) {
+            ret = NURSE;
         }
         return ret;
     }
@@ -36,7 +43,8 @@ public enum AdminRole {
     public static List<AdminRole> getAll() {
         List<AdminRole> roles = new ArrayList<>();
         roles.add(ADMIN);
-        roles.add(USER);
+        roles.add(MANAGER);
+        roles.add(NURSE);
         return roles;
     }
 }

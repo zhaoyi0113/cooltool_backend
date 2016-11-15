@@ -2,151 +2,230 @@ package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.nurse360.beans.HospitalAdminAuthentication;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
 import com.cooltoo.nurse360.constants.AdminRole;
 import com.cooltoo.nurse360.hospital.service.HospitalAdminRolesService;
 import com.cooltoo.nurse360.hospital.service.HospitalAdminService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 2016/11/10.
  */
-@Path("/admin/hospital_management/user")
+@RestController
+@RequestMapping("/nurse360_hospital")
 public class HospitalAdminManageAPI {
 
     @Autowired private HospitalAdminService adminService;
     @Autowired private HospitalAdminRolesService adminRolesService;
 
-    @Path("/count")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response countHospitalAdmin(@Context HttpServletRequest request,
-                                       @QueryParam("name") @DefaultValue("") String name,
-                                       @QueryParam("telephone") @DefaultValue("") String telephone,
-                                       @QueryParam("email") @DefaultValue("") String email,
-                                       @QueryParam("hospitalId") @DefaultValue("") String strHospitalId,
-                                       @QueryParam("departmentId") @DefaultValue("") String strDepartmentId,
-                                       @QueryParam("adminType") @DefaultValue("") String strAdminType, /* administrator, normal */
-                                       @QueryParam("status") @DefaultValue("") String strStatus /* enabled, disabled */
+
+    //=============================================================
+    //            Authentication of ADMINISTRATOR Role
+    //=============================================================
+    @RequestMapping(path = "/admin/users/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public long countHospitalAdmin(@RequestParam(required = false, defaultValue = "", name = "name") String name,
+                                       @RequestParam(required = false, defaultValue = "", name = "telephone") String telephone,
+                                       @RequestParam(required = false, defaultValue = "", name = "email") String email,
+                                       @RequestParam(required = false, defaultValue = "", name = "hospitalId") String strHospitalId,
+                                       @RequestParam(required = false, defaultValue = "", name = "departmentId") String strDepartmentId,
+                                       @RequestParam(required = false, defaultValue = "", name = "adminType") String strAdminType, /* administrator, normal */
+                                       @RequestParam(required = false, defaultValue = "", name = "status") String strStatus /* enabled, disabled */
     ) {
         Integer hospitalId   = VerifyUtil.isIds(strHospitalId)   ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         AdminUserType adminType = AdminUserType.parseString(strAdminType);
         CommonStatus status = CommonStatus.parseString(strStatus);
         long count = adminService.countAdminUser(name, telephone, email, hospitalId, departmentId, adminType, status);
-        return Response.ok(count).build();
+        return count;
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response countHospitalAdmin(@Context HttpServletRequest request,
-                                       @QueryParam("name") @DefaultValue("") String name,
-                                       @QueryParam("telephone") @DefaultValue("") String telephone,
-                                       @QueryParam("email") @DefaultValue("") String email,
-                                       @QueryParam("hospitalId") @DefaultValue("") String strHospitalId,
-                                       @QueryParam("departmentId") @DefaultValue("") String strDepartmentId,
-                                       @QueryParam("adminType") @DefaultValue("") String strAdminType, /* administrator, normal */
-                                       @QueryParam("status") @DefaultValue("") String strStatus, /* enabled, disabled */
-                                       @QueryParam("index") @DefaultValue("0") int pageIndex,
-                                       @QueryParam("number") @DefaultValue("0") int sizePerPage
+    @RequestMapping(path = "/admin/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<HospitalAdminBean> getHospitalAdmin(@RequestParam(required = false, defaultValue = "", name = "name") String name,
+                                                    @RequestParam(required = false, defaultValue = "", name = "telephone") String telephone,
+                                                    @RequestParam(required = false, defaultValue = "", name = "email") String email,
+                                                    @RequestParam(required = false, defaultValue = "", name = "hospitalId") String strHospitalId,
+                                                    @RequestParam(required = false, defaultValue = "", name = "departmentId") String strDepartmentId,
+                                                    @RequestParam(required = false, defaultValue = "", name = "adminType") String strAdminType, /* administrator, normal */
+                                                    @RequestParam(required = false, defaultValue = "", name = "status") String strStatus, /* enabled, disabled */
+                                                    @RequestParam(defaultValue = "0", name = "index") int pageIndex,
+                                                    @RequestParam(defaultValue = "10", name = "number") int sizePerPage
     ) {
         Integer hospitalId   = VerifyUtil.isIds(strHospitalId)   ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
         Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
         AdminUserType adminType = AdminUserType.parseString(strAdminType);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<HospitalAdminBean> adminUsers = adminService.getAdminUser(name, telephone, email, hospitalId, departmentId, adminType, status, pageIndex, sizePerPage);
-        return Response.ok(adminUsers).build();
+        return adminUsers;
     }
 
-    @Path("/{admin_id}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getHospitalAdmin(@Context HttpServletRequest request,
-                                     @PathParam("admin_id") @DefaultValue("0") long adminId
-    ) {
-        HospitalAdminBean bean = adminService.getAdminUser(adminId);
-        return Response.ok(bean).build();
+    @RequestMapping(path = "/admin/users/{admin_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public HospitalAdminBean getHospitalAdmin(@PathVariable long admin_id) {
+        HospitalAdminBean bean = adminService.getAdminUser(admin_id);
+        return bean;
     }
 
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateHospitalAdmin(@Context HttpServletRequest request,
-                                        @FormParam("admin_id") @DefaultValue("0") long adminId,
-                                        @FormParam("name") @DefaultValue("") String name,
-                                        @FormParam("password") @DefaultValue("") String password,
-                                        @FormParam("telephone") @DefaultValue("") String telephone,
-                                        @FormParam("email") @DefaultValue("") String email,
-                                        @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                        @FormParam("department_id") @DefaultValue("-1") int departmentId
+    @RequestMapping(path = "/admin/users", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public HospitalAdminBean updateHospitalAdmin(@RequestParam(required = false, defaultValue = "0",  name = "admin_id") long adminId,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "name") String name,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "password") String password,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "telephone") String telephone,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "email") String email,
+                                                 @RequestParam(required = false, defaultValue = "-1", name = "hospital_id") int hospitalId,
+                                                 @RequestParam(required = false, defaultValue = "-1", name = "department_id") int departmentId
     ) {
         HospitalAdminBean bean = adminService.updateAdminUser(adminId, name, password, telephone, email, hospitalId, departmentId, null);
-        return Response.ok(bean).build();
+        return bean;
     }
 
-    @Path("/status")
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateHospitalAdmin(@Context HttpServletRequest request,
-                                        @FormParam("admin_id") @DefaultValue("0") long adminId,
-                                        @FormParam("status") @DefaultValue("") String strStatus /* enabled, disabled */
+    @RequestMapping(path = "/admin/users/status", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public HospitalAdminBean updateHospitalAdmin(@RequestParam(name = "admin_id") long adminId,
+                                                 @RequestParam(name = "status") String strStatus /* enabled, disabled */
     ) {
+        if (adminId==1/*1 is super administrator*/) { // mus be ENABLED
+            strStatus = CommonStatus.ENABLED.name();
+        }
         HospitalAdminBean bean = adminService.updateAdminUser(adminId, null, null, null, null, -1, -1, CommonStatus.parseString(strStatus));
-        return Response.ok(bean).build();
+        return bean;
     }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createHospitalAdmin(@Context HttpServletRequest request,
-                                        @FormParam("name") @DefaultValue("") String name,
-                                        @FormParam("password") @DefaultValue("") String password,
-                                        @FormParam("telephone") @DefaultValue("") String telephone,
-                                        @FormParam("email") @DefaultValue("") String email,
-                                        @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                        @FormParam("department_id") @DefaultValue("-1") int departmentId
+    @RequestMapping(path = "/admin/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Long> createHospitalAdmin(@RequestParam(required = false, defaultValue = "",   name = "name")       String name,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "password")   String password,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "telephone")  String telephone,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "email")      String email,
+                                                 @RequestParam(name = "hospital_id")   int hospitalId,
+                                                 @RequestParam(name = "department_id") int departmentId,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "admin_type") String adminType /* administrator, manager, nurse */
     ) {
-        long adminId = adminService.addAdminUser(name, password, telephone, email, hospitalId, departmentId);
-        return Response.ok(adminId).build();
+        AdminUserType adminUserType = AdminUserType.parseString(adminType);
+        adminUserType = null==adminUserType ? AdminUserType.NORMAL : adminUserType;
+        long adminId = adminService.addAdminUser(name, password, telephone, email, hospitalId, departmentId, adminUserType);
+
+        Map<String, Long> ret = new HashMap<>();
+        ret.put("adminId", adminId);
+        return ret;
     }
+
+    //=============================================================
+    //            Authentication of MANAGER Role
+    //=============================================================
+    @RequestMapping(path = "/manager/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Long> createHospitalAdmin(HttpServletRequest request,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "name")      String name,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "password")  String password,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "telephone") String telephone,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "email")     String email,
+                                                 @RequestParam(name = "hospital_id")  int hospitalId,
+                                                 @RequestParam(name = "department_id")int departmentId
+    ) {
+        Long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+        if (adminService.isSuperAdmin(adminId)) {
+            adminId = adminService.addAdminUser(name, password, telephone, email, hospitalId, departmentId, AdminUserType.NORMAL);
+
+            Map<String, Long> retVal = new HashMap<>();
+            retVal.put("adminId", adminId);
+            return retVal;
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+    }
+
 
     //===================================================================================================================
     //            Role Service
     //===================================================================================================================
 
-    @Path("/role")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getManagementHttpUrl(@Context HttpServletRequest request) {
-        return Response.ok(AdminRole.getAll()).build();
+    @RequestMapping(path = "/users/role", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<AdminRole> getAdminAuthentication() {
+        return AdminRole.getAll();
     }
 
-    @Path("/role")
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response addAdminRole(@Context HttpServletRequest request,
-                                 @FormParam("admin_id") @DefaultValue("0") long adminId,
-                                 @FormParam("role") @DefaultValue("") String role
+    //=============================================================
+    //            Authentication of ADMINISTRATOR Role
+    //=============================================================
+
+    @RequestMapping(path = "/admin/users/role", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Long> addAdminRole(@RequestParam(name = "admin_id") long adminId,
+                                          @RequestParam(name = "role") String role
     ) {
-        long accessUrlId = adminRolesService.addAdminRole(adminId, AdminRole.parseString(role));
-        return Response.ok(accessUrlId).build();
+        long adminRoleRelationId = adminRolesService.addAdminRole(adminId, AdminRole.parseString(role));
+
+        Map<String, Long> ret = new HashMap<>();
+        ret.put("adminRoleRelationId", adminRoleRelationId);
+        return ret;
     }
 
-    @Path("/role")
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteAdminRole(@Context HttpServletRequest request,
-                                    @FormParam("admin_id") @DefaultValue("0") long adminId,
-                                    @FormParam("role") @DefaultValue("") String role
+    @RequestMapping(path = "/admin/users/role", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public Map<String, List<Long>> deleteAdminRole(@RequestParam(required = true,  defaultValue = "0", name = "admin_id") long adminId,
+                                                   @RequestParam(required = false, defaultValue = "",  name = "role") String role
     ) {
-        List<Long> accessUrlIds = adminRolesService.deleteAdminRole(adminId, AdminRole.parseString(role));
-        return Response.ok(accessUrlIds).build();
+        List<Long> adminRoleRelationIds = adminRolesService.deleteAdminRole(adminId, AdminRole.parseString(role));
+
+        Map<String, List<Long>> ret = new HashMap<>();
+        ret.put("adminRoleRelationId", adminRoleRelationIds);
+        return ret;
     }
 
+    //=============================================================
+    //            Authentication of MANAGER Role
+    //=============================================================
+    @RequestMapping(path = "/manager/users/role", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Long> addNurseAdminRole(HttpServletRequest request,
+                                               @RequestParam(name = "admin_id") long adminId,
+                                               @RequestParam(name = "role") String role
+    ) {
+        HospitalAdminAuthentication authentication = (HospitalAdminAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        HospitalAdminBean admin = (HospitalAdminBean) authentication.getDetails();
+        HospitalAdminBean modifyAdmin = adminService.getAdminUserWithoutInfo(adminId);
+
+        if (admin.getHospitalId()>0 && admin.getDepartmentId()>0
+                && admin.getHospitalId()==modifyAdmin.getHospitalId()
+                && admin.getDepartmentId()==modifyAdmin.getDepartmentId()
+                && AdminUserType.NORMAL.equals(modifyAdmin.getAdminType()))
+        {
+            long adminRoleRelationId = adminRolesService.addAdminRole(adminId, AdminRole.parseString(role));
+
+            Map<String, Long> ret = new HashMap<>();
+            ret.put("adminRoleRelationId", adminRoleRelationId);
+            return ret;
+        }
+
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+    }
+
+    @RequestMapping(path = "/manager/users/role", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public Map<String, List<Long>> deleteNurseAdminRole(HttpServletRequest request,
+                                                        @RequestParam(required = true,  defaultValue = "0", name = "admin_id") long adminId,
+                                                        @RequestParam(required = false, defaultValue = "",  name = "role") String role
+    ) {
+        HospitalAdminAuthentication authentication = (HospitalAdminAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        HospitalAdminBean admin = (HospitalAdminBean) authentication.getDetails();
+        HospitalAdminBean modifyAdmin = adminService.getAdminUserWithoutInfo(adminId);
+
+        if (admin.getHospitalId()>0 && admin.getDepartmentId()>0
+                && admin.getHospitalId()==modifyAdmin.getHospitalId()
+                && admin.getDepartmentId()==modifyAdmin.getDepartmentId()
+                && AdminUserType.NORMAL.equals(modifyAdmin.getAdminType()))
+        {
+            List<Long> adminRoleRelationIds = adminRolesService.deleteAdminRole(adminId, AdminRole.parseString(role));
+
+            Map<String, List<Long>> ret = new HashMap<>();
+            ret.put("adminRoleRelationId", adminRoleRelationIds);
+            return ret;
+        }
+
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+    }
 }

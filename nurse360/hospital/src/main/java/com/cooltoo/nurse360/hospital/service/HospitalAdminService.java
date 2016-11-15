@@ -146,6 +146,15 @@ public class HospitalAdminService {
         return beans.get(0);
     }
 
+    public HospitalAdminBean getAdminUserWithoutInfo(String userName, CommonStatus status) {
+        HospitalAdminEntity one = repository.findFirstByNameAndStatus(userName, status);
+        if (null==one) {
+            logger.info("there is no record");
+            return null;
+        }
+        return beanConverter.convert(one);
+    }
+
     public boolean existsAdminUser(long adminUserId) {
         return repository.exists(adminUserId);
     }
@@ -198,7 +207,7 @@ public class HospitalAdminService {
             List<AdminRole> roles = adminIdToRole.get(tmp.getId());
             HospitalBean hospital = hospitalIdToBean.get(tmp.getHospitalId());
             HospitalDepartmentBean department = departmentIdToBean.get(tmp.getDepartmentId());
-            tmp.setProperties(HospitalAdminBean.ROLE, roles);
+            tmp.setProperty(HospitalAdminBean.ROLE, roles);
             tmp.setHospital(hospital);
             tmp.setDepartment(department);
 
@@ -266,7 +275,7 @@ public class HospitalAdminService {
     //             add
     //===============================================================
     @Transactional
-    public long addAdminUser(String name, String password, String telephone, String email, int hospitalId, int departmentId) {
+    public long addAdminUser(String name, String password, String telephone, String email, int hospitalId, int departmentId, AdminUserType adminType) {
         logger.info("add hospital admin user with name={} password={} telephone={} email={} hospitalId={} departmentId={}",
                 name, password, telephone, email, hospitalId, departmentId);
         if (VerifyUtil.isStringEmpty(name)) {
@@ -315,7 +324,7 @@ public class HospitalAdminService {
         entity.setDepartmentId(departmentId);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
-        entity.setAdminType(AdminUserType.NORMAL);
+        entity.setAdminType(adminType);
         entity = repository.save(entity);
 
         return entity.getId();

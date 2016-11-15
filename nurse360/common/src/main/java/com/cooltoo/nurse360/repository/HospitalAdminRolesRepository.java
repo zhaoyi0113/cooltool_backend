@@ -38,7 +38,7 @@ public interface HospitalAdminRolesRepository extends JpaRepository<HospitalAdmi
     List<HospitalAdminRolesEntity> findByConditions(Long adminId, AdminRole role, CommonStatus status, Sort sort);
 
     @Query("FROM HospitalAdminRolesEntity haau" +
-            " WHERE (haau.adminId IN ?1)" +
+            " WHERE (haau.adminId IN (?1))" +
             "   AND (?2 IS NULL OR haau.role=?2)" +
             "   AND (?3 IS NULL OR haau.status=?3)")
     List<HospitalAdminRolesEntity> findByConditions(List<Long> adminId, AdminRole role, CommonStatus status, Sort sort);

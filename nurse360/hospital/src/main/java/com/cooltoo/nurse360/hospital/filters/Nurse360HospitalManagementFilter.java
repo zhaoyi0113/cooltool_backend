@@ -3,10 +3,12 @@ package com.cooltoo.nurse360.hospital.filters;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
-import com.cooltoo.nurse360.entities.HospitalAdminEntity;
+import com.cooltoo.nurse360.beans.HospitalAdminAuthentication;
+import com.cooltoo.nurse360.beans.HospitalAdminBean;
+import com.cooltoo.nurse360.constants.AdminRole;
 import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessTokenService;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminRolesService;
 import com.cooltoo.nurse360.hospital.service.HospitalAdminService;
-import com.cooltoo.nurse360.repository.HospitalAdminRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +23,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by zhaolisong on 2016/10/20.
@@ -31,7 +34,7 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
 
     private HospitalAdminService adminService;
     private HospitalAdminAccessTokenService tokenService;
-    private HospitalAdminRepository adminRepository;
+    private HospitalAdminRolesService adminRolesService;
 
     private void setServices(ServletRequest request) {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
@@ -41,8 +44,8 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
         if (tokenService == null) {
             tokenService = webApplicationContext.getBean(HospitalAdminAccessTokenService.class);
         }
-        if (adminRepository == null) {
-            adminRepository = webApplicationContext.getBean(HospitalAdminRepository.class);
+        if (adminRolesService == null) {
+            adminRolesService = webApplicationContext.getBean(HospitalAdminRolesService.class);
         }
     }
 
@@ -58,8 +61,11 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
                 request.setAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID, token.getAdminId());
                 request.setAttribute(ContextKeys.ADMIN_USER_TOKEN, token.getToken());
 
-                HospitalAdminEntity adminEntity = adminRepository.findById(token.getAdminId());
-                HospitalUserAuthentication authentication = new HospitalUserAuthentication(adminEntity);
+                HospitalAdminBean admin = adminService.getAdminUserWithoutInfo(token.getAdminId());
+                List<AdminRole> adminRoles = adminRolesService.getAdminRoleByAdminId(token.getAdminId());
+                admin.setProperty(HospitalAdminBean.ROLE, adminRoles);
+
+                HospitalAdminAuthentication authentication = new HospitalAdminAuthentication(admin);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
@@ -75,17 +81,17 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
         logger.debug("get token bean "+token);
         // token invalid
         if (null == token) {
-//            throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND));
+            //throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND));
             return null;
         }
         if (!CommonStatus.ENABLED.equals(token.getStatus())) {
-//            throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_EXPIRED));
+            //throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_EXPIRED));
             return null;
         }
 
         // admin invalid
         if (!adminService.existsAdminUser(token.getAdminId(), CommonStatus.ENABLED)) {
-//            throw new ServletException(new BadRequestException(ErrorCode.NURSE360_USER_NOT_FOUND));
+            //throw new ServletException(new BadRequestException(ErrorCode.NURSE360_USER_NOT_FOUND));
             return null;
         }
         return token;

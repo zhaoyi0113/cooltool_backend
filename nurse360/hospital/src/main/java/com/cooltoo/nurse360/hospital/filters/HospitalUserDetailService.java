@@ -1,8 +1,8 @@
 package com.cooltoo.nurse360.hospital.filters;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.nurse360.entities.HospitalAdminEntity;
-import com.cooltoo.nurse360.repository.HospitalAdminRepository;
+import com.cooltoo.nurse360.beans.HospitalAdminBean;
+import com.cooltoo.nurse360.hospital.service.HospitalAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,14 +16,14 @@ import org.springframework.stereotype.Component;
 public class HospitalUserDetailService implements UserDetailsService {
 
     @Autowired
-    private HospitalAdminRepository adminRepository;
+    private HospitalAdminService adminService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        HospitalAdminEntity entity = adminRepository.findFirstByNameAndStatus(username, CommonStatus.ENABLED);
-        if (entity == null) {
+        HospitalAdminBean one = adminService.getAdminUserWithoutInfo(username, CommonStatus.ENABLED);
+        if (one == null) {
             throw new UsernameNotFoundException(username + " not found");
         }
-        return entity;
+        return one;
     }
 }

@@ -4,15 +4,17 @@ import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.nurse360.constants.AdminRole;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 2016/11/9.
  */
-public class HospitalAdminBean {
+public class HospitalAdminBean implements UserDetails {
 
     public static final String ROLE = "role";
 
@@ -68,10 +70,6 @@ public class HospitalAdminBean {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {
@@ -130,11 +128,16 @@ public class HospitalAdminBean {
         return properties;
     }
 
-    public void setProperties(Map<String, Object> properties) {
-        this.properties = properties;
+    public Object getProperty(String key) {
+        // get super administrator's role
+        if (ROLE.equalsIgnoreCase(key) && 1==id/* 1 is super admin */) {
+            return AdminRole.getAll();
+        }
+
+        return null==properties ? null : properties.get(key);
     }
 
-    public void setProperties(String key, Object value) {
+    public void setProperty(String key, Object value) {
         if (null==properties) {
             properties = new HashMap<>();
         }
@@ -160,4 +163,69 @@ public class HospitalAdminBean {
         return msg.toString();
     }
 
+
+
+
+    //================================================================
+    //           UserDetails
+    //================================================================
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        Object tmpRoles = getProperty(HospitalAdminBean.ROLE);
+        if (null==tmpRoles) {
+            return authorities;
+        }
+
+        List<AdminRole> roles = (List<AdminRole>) tmpRoles;
+        for (AdminRole tmp : roles) {
+            authorities.add(new SimpleGrantedAuthority(tmp.name()));
+        }
+        return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return name;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return CommonStatus.ENABLED.equals(status);
+    }
+
+    // ==========================================================================
+    //  Authentication
+    // ==========================================================================
+
+    private boolean isAuthenticated = true;
+
+    public boolean isAuthenticated() {
+        return isAuthenticated;
+    }
+
+    public void setAuthenticated(boolean isAuthenticated) {
+        this.isAuthenticated = isAuthenticated;
+    }
 }
