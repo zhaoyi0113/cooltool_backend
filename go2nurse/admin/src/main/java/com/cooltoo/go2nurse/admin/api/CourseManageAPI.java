@@ -203,7 +203,7 @@ public class CourseManageAPI {
 
     // 课程为 editing 时, 向课程中添加图片，图片缓存在临时文件夹
     @Path("/edit/content/add_image")
-    @PUT
+    @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addImage2Temporary(@Context HttpServletRequest request,
