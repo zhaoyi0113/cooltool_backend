@@ -70,6 +70,18 @@ public class NurseVisitPatientAPI {
         return Response.ok(visits).build();
     }
 
+    @Path("/{visit_record_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getVisitPatientRecord(@Context HttpServletRequest request,
+                                          @PathParam("visit_record_id") @DefaultValue("0") long visitRecordId
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseVisitPatientBean visits = visitPatientService.getVisitRecord(visitRecordId);
+        return Response.ok(visits).build();
+    }
+
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
@@ -133,8 +145,23 @@ public class NurseVisitPatientAPI {
                                                @FormDataParam("image") InputStream image,
                                                @FormDataParam("image")FormDataContentDisposition imageDis
     ) {
-        Map<String, String> visitImageIdUrl = visitPatientService.addVisitRecorImage(visitRecordId, imageName, image);
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        Map<String, String> visitImageIdUrl = visitPatientService.addVisitRecordImage(nurseId, visitRecordId, imageName, image);
         return Response.ok(visitImageIdUrl).build();
+    }
+
+    @Path("/image")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response addCaseImage(@Context HttpServletRequest request,
+                                 @FormParam("visit_record_id") @DefaultValue("0") long visitRecordId
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        visitPatientService.deleteVisitRecordImage(nurseId, visitRecordId);
+        Map<String, Boolean> retVal = new HashMap<>();
+        retVal.put("deleted", Boolean.TRUE);
+        return Response.ok(retVal).build();
     }
 
     @Path("/sign")

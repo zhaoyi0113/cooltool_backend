@@ -236,7 +236,7 @@ public class CasebookService {
             if (tmp.getNurseId()==nurseId) {
                 continue;
             }
-            logger.warn("can not delete consultation that not making by yourself={}", tmp);
+            logger.warn("can not delete casebook that not making by yourself={}", tmp);
             return retValue;
         }
 
@@ -256,12 +256,12 @@ public class CasebookService {
                 casebookId, name, description, nurseId);
         CasebookEntity entity = repository.findOne(casebookId);
         if (null==entity) {
-            logger.error("consultation is not exist");
+            logger.error("casebook is not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
         if (null!=nurseId && nurseId>0 && entity.getNurseId()!=nurseId) {
-            logger.info("consultation not belong to nurse");
+            logger.info("casebook not belong to nurse");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
@@ -386,11 +386,11 @@ public class CasebookService {
                 casebookId, nurseId, caseRecord);
         CasebookEntity casebook = repository.findOne(casebookId);
         if (null==casebook) {
-            logger.error("consultation is not exist");
+            logger.error("casebook is not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (nurseId>0 && 0!=casebook.getNurseId() && nurseId!=casebook.getNurseId()) {
-            logger.error("consultation not belong this nurse");
+            logger.error("casebook not belong this nurse");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
@@ -423,7 +423,7 @@ public class CasebookService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if (_case.getCasebookId() != casebookId) {
-            logger.error("case is not belong to consultation");
+            logger.error("case is not belong to casebook");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if (null==nurseId && nurseId!=_case.getNurseId()) {
@@ -454,7 +454,7 @@ public class CasebookService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if (_case.getCasebookId() != casebookId) {
-            logger.error("case is not belong to consultation");
+            logger.error("case is not belong to casebook");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if (null==nurseId && nurseId!=_case.getNurseId()) {

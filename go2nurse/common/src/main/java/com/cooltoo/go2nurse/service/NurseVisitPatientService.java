@@ -326,13 +326,17 @@ public class NurseVisitPatientService {
     }
 
     @Transactional
-    public Map<String, String> addVisitRecorImage(long visitRecordId, String imageName, InputStream image) {
-        logger.info("add image to visitRecordId={} name={} image={}", visitRecordId, imageName, (null!=image));
+    public Map<String, String> addVisitRecordImage(long nurseId, long visitRecordId, String imageName, InputStream image) {
+        logger.info("add image to visitRecordId={} name={} image={} by nurseId={}", visitRecordId, imageName, (null!=image), nurseId);
 
         NurseVisitPatientEntity visitRecord = repository.findOne(visitRecordId);
         if (null==visitRecord) {
             logger.error("visit record is not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (nurseId>0 && nurseId!=visitRecord.getNurseId()) {
+            logger.error("visit record is not belong to nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
         long count = imageService.countImage(visitRecordId);
@@ -372,4 +376,27 @@ public class NurseVisitPatientService {
 
         throw new BadRequestException(ErrorCode.DATA_ERROR);
     }
+
+
+    //===============================================================
+    //             add
+    //===============================================================
+    @Transactional
+    public List<Long> deleteVisitRecordImage(long nurseId, long visitRecordId) {
+        logger.info("delete image to visitRecordId={} by nurseId={}", visitRecordId, nurseId);
+
+        NurseVisitPatientEntity visitRecord = repository.findOne(visitRecordId);
+        if (null==visitRecord) {
+            logger.error("visit record is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (nurseId>0 && nurseId!=visitRecord.getNurseId()) {
+            logger.error("visit record is not belong to nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        List<Long> imageIds = imageService.deleteByNurseVisitPatientId(visitRecordId);
+        return imageIds;
+    }
+
 }
