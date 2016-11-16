@@ -90,7 +90,7 @@ public class UserConsultationService {
         logger.info("user={} nusre={} get consultation (contentLike={}) categoryId={} at page={} sizePerPage={}",
                 userId, nurseId, contentLike, categoryId, pageIndex, sizePerPage);
         List<UserConsultationBean> beans;
-        if (null==userId && VerifyUtil.isStringEmpty(contentLike)) {
+        if (null==nurseId && null==userId && VerifyUtil.isStringEmpty(contentLike)) {
             beans = new ArrayList<>();
         }
         else {
