@@ -6,9 +6,6 @@ import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
 import com.cooltoo.go2nurse.openapp.WeChatPayService;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
-import com.cooltoo.go2nurse.service.notification.MessageBean;
-import com.cooltoo.go2nurse.service.notification.MessageType;
-import com.cooltoo.go2nurse.service.notification.Notifier;
 import com.cooltoo.util.JSONUtil;
 import com.pingplusplus.model.Charge;
 import com.cooltoo.beans.HospitalBean;
@@ -21,7 +18,6 @@ import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.converter.ServiceOrderBeanConverter;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
 import com.cooltoo.go2nurse.repository.ServiceOrderRepository;
-import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -48,33 +44,18 @@ public class ServiceOrderService {
             new Sort.Order(Sort.Direction.DESC, "id")
     );
 
-    @Autowired
-    private ServiceOrderRepository repository;
-    @Autowired
-    private ServiceOrderBeanConverter beanConverter;
+    @Autowired private ServiceOrderRepository repository;
+    @Autowired private ServiceOrderBeanConverter beanConverter;
 
-    @Autowired
-    private ServiceVendorCategoryAndItemService serviceCategoryItemService;
-    @Autowired
-    private PatientService patientService;
-    @Autowired
-    private UserAddressService addressService;
-    @Autowired
-    private Go2NurseUtility go2NurseUtility;
-    @Autowired
-    private ServiceOrderChargePingPPService orderPingPPService;
-    @Autowired
-    private PingPPService pingPPService;
-    @Autowired
-    private WeChatService weChatService;
-    @Autowired
-    private WeChatPayService weChatPayService;
+    @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
+    @Autowired private PatientService patientService;
+    @Autowired private UserAddressService addressService;
+    @Autowired private ServiceOrderChargePingPPService orderPingPPService;
+    @Autowired private PingPPService pingPPService;
+    @Autowired private WeChatService weChatService;
+    @Autowired private WeChatPayService weChatPayService;
 
-    @Autowired
-    private Notifier notifier;
-
-    @Autowired
-    private NurseOrderRelationRepository nurseOrderRelationRepository;
+    @Autowired private NurseOrderRelationRepository nurseOrderRelationRepository;
 
     //=====================================================================
     //                   getting
@@ -372,15 +353,6 @@ public class ServiceOrderService {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
             logger.info("create charge object failed ");
-
-            MessageBean message = new MessageBean();
-            message.setAlertBody("订单状态有更新");
-            message.setType(MessageType.ORDER.name());
-            message.setStatus(entity.getOrderStatus().name());
-            message.setRelativeId(entity.getId());
-            message.setDescription("Ping++ make charge failed!");
-            notifier.notifyUserPatient(entity.getUserId(), message);
-
             return charge;
         }
 
@@ -426,15 +398,7 @@ public class ServiceOrderService {
                 || !"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("result_code"))) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
-            logger.info("wechat make order failed ");
-
-            MessageBean message = new MessageBean();
-            message.setAlertBody("订单状态有更新");
-            message.setType(MessageType.ORDER.name());
-            message.setStatus(entity.getOrderStatus().name());
-            message.setRelativeId(entity.getId());
-            message.setDescription("WeChat make order failed!");
-            notifier.notifyUserPatient(entity.getUserId(), message);
+            logger.error("WeChat make order failed!");
             throw new BadRequestException(ErrorCode.PAY_FAILED);
         }
 
@@ -446,15 +410,7 @@ public class ServiceOrderService {
         if (!sign2.equalsIgnoreCase(sign1)) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
-            logger.info("wechat sign not match");
-
-            MessageBean message = new MessageBean();
-            message.setAlertBody("订单状态有更新");
-            message.setType(MessageType.ORDER.name());
-            message.setStatus(entity.getOrderStatus().name());
-            message.setRelativeId(entity.getId());
-            message.setDescription("WeChat sign error!");
-            notifier.notifyUserPatient(entity.getUserId(), message);
+            logger.error("WeChat sign not match!");
             throw new BadRequestException(ErrorCode.PAY_FAILED);
         }
 
@@ -506,13 +462,6 @@ public class ServiceOrderService {
         order = repository.save(order);
         logger.info("order charged is {}", order);
 
-        MessageBean message = new MessageBean();
-        message.setAlertBody("订单状态有更新");
-        message.setType(MessageType.ORDER.name());
-        message.setStatus(order.getOrderStatus().name());
-        message.setRelativeId(order.getId());
-        message.setDescription("waiting for dispatch order!");
-        notifier.notifyUserPatient(order.getUserId(), message);
 
         return beanConverter.convert(order);
     }
@@ -532,14 +481,6 @@ public class ServiceOrderService {
         entity = repository.save(entity);
         logger.info("order fetched is {}", entity);
 
-        MessageBean message = new MessageBean();
-        message.setAlertBody("订单状态有更新");
-        message.setType(MessageType.ORDER.name());
-        message.setStatus(entity.getOrderStatus().name());
-        message.setRelativeId(entity.getId());
-        message.setDescription("order fetched!");
-        notifier.notifyUserPatient(entity.getUserId(), message);
-
         return beanConverter.convert(entity);
     }
 
@@ -557,14 +498,6 @@ public class ServiceOrderService {
         entity.setOrderStatus(OrderStatus.TO_DISPATCH);
         entity = repository.save(entity);
         logger.info("order fetched is {}", entity);
-
-        MessageBean message = new MessageBean();
-        message.setAlertBody("订单状态有更新");
-        message.setType(MessageType.ORDER.name());
-        message.setStatus(entity.getOrderStatus().name());
-        message.setRelativeId(entity.getId());
-        message.setDescription("order be given up!");
-        notifier.notifyUserPatient(entity.getUserId(), message);
 
         return beanConverter.convert(entity);
     }
@@ -591,14 +524,6 @@ public class ServiceOrderService {
         entity = repository.save(entity);
         logger.info("order cancelled is {}", entity);
 
-        MessageBean message = new MessageBean();
-        message.setAlertBody("订单状态有更新");
-        message.setType(MessageType.ORDER.name());
-        message.setStatus(entity.getOrderStatus().name());
-        message.setRelativeId(entity.getId());
-        message.setDescription("order cancelled!");
-        notifier.notifyUserPatient(entity.getUserId(), message);
-
         return beanConverter.convert(entity);
     }
 
@@ -622,15 +547,7 @@ public class ServiceOrderService {
         entity.setOrderStatus(OrderStatus.COMPLETED);
         entity.setCompletedTime(new Date());
         entity = repository.save(entity);
-        logger.info("order cancelled is {}", entity);
-
-        MessageBean message = new MessageBean();
-        message.setAlertBody("订单状态有更新");
-        message.setType(MessageType.ORDER.name());
-        message.setStatus(entity.getOrderStatus().name());
-        message.setRelativeId(entity.getId());
-        message.setDescription("order completed!");
-        notifier.notifyUserPatient(entity.getUserId(), message);
+        logger.info("order completed is {}", entity);
 
         return beanConverter.convert(entity);
     }
@@ -655,14 +572,6 @@ public class ServiceOrderService {
         entity.setOrderStatus(OrderStatus.IN_PROCESS);
         entity = repository.save(entity);
         logger.info("order in_process is {}", entity);
-
-        MessageBean message = new MessageBean();
-        message.setAlertBody("订单状态有更新");
-        message.setType(MessageType.ORDER.name());
-        message.setStatus(entity.getOrderStatus().name());
-        message.setRelativeId(entity.getId());
-        message.setDescription("order is in_process!");
-        notifier.notifyUserPatient(entity.getUserId(), message);
 
         return beanConverter.convert(entity);
     }

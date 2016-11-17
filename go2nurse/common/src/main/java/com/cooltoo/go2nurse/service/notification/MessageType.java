@@ -6,6 +6,9 @@ package com.cooltoo.go2nurse.service.notification;
 public enum  MessageType {
     ORDER,
     CONSULTATION_TALK,
-    APPOINTMENT
+    APPOINTMENT,
+    FOLLOW_UP_CONSULTATION,
+    FOLLOW_UP_QUESTIONNAIRE,
+    PUSH_COURSE,
     ;
 }

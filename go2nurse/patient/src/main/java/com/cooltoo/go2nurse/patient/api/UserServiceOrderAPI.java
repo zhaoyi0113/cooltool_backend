@@ -3,6 +3,9 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
 import com.cooltoo.go2nurse.service.ChargeWebHookService;
 import com.cooltoo.go2nurse.service.DoctorAppointmentService;
+import com.cooltoo.go2nurse.service.ServiceOrderService;
+import com.cooltoo.go2nurse.service.notification.NotifierServiceForGo2NurseAndNurse360;
+import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
@@ -10,8 +13,6 @@ import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
-import com.cooltoo.go2nurse.service.ServiceOrderService;
-import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.util.VerifyUtil;
 import com.pingplusplus.model.Charge;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ public class UserServiceOrderAPI {
     @Autowired private ServiceOrderService orderService;
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
     @Autowired private ChargeWebHookService chargeWebHookService;
+    @Autowired private NotifierServiceForGo2NurseAndNurse360 orderNotifierService;
 
     @Path("/category/top")
     @GET
@@ -173,11 +175,18 @@ public class UserServiceOrderAPI {
 //        return Response.ok().build();
 
 
-        String returnValue = (String)chargeWebHookService.webHookBody(request);
-        if (VerifyUtil.isStringEmpty(returnValue)) {
+        Map<String, Object> returnValue = chargeWebHookService.webHookBody(request);
+
+        Object order = returnValue.get(ChargeWebHookService.ORDER);
+        Object message = returnValue.get(ChargeWebHookService.MESSAGE);
+        if (VerifyUtil.isStringEmpty((String)message)) {
             return Response.ok().build();
         }
         else {
+            if (null!=order) {
+                ServiceOrderBean orderBean = (ServiceOrderBean)order;
+                orderNotifierService.orderAlertToPatient(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
+            }
             return Response.ok(returnValue).build();
         }
     }
@@ -210,6 +219,7 @@ public class UserServiceOrderAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.cancelOrder(true, userId, orderId);
+        orderNotifierService.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
         return Response.ok(order).build();
     }
 
@@ -222,6 +232,7 @@ public class UserServiceOrderAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.completedOrder(true, userId, orderId);
+        orderNotifierService.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
         return Response.ok(order).build();
     }
 

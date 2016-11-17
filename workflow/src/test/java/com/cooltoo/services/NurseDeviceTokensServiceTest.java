@@ -2,6 +2,7 @@ package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
 import com.cooltoo.beans.NurseDeviceTokensBean;
+import com.cooltoo.constants.DeviceType;
 import com.cooltoo.entities.NurseDeviceTokensEntity;
 import com.cooltoo.repository.NurseDeviceTokensRepository;
 import com.cooltoo.constants.CommonStatus;
@@ -30,13 +31,13 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
     public void testRegisterAnonymousDeviceToken() {
         String token = String.valueOf(System.currentTimeMillis());
-        long id = deviceTokensService.registerAnonymousDeviceToken(token);
+        long id = deviceTokensService.registerAnonymousDeviceToken(token, DeviceType.iOS);
         NurseDeviceTokensEntity entity = repository.findOne(id);
         Assert.assertNotNull(entity);
         Assert.assertEquals(token, entity.getDeviceToken());
         Assert.assertEquals(-1, entity.getUserId());
 
-        deviceTokensService.registerUserDeviceToken(1, token);
+        deviceTokensService.registerUserDeviceToken(1, token, DeviceType.iOS);
         entity = repository.findOne(id);
         Assert.assertNotNull(entity);
         Assert.assertEquals(token, entity.getDeviceToken());
@@ -47,11 +48,12 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
     @Test
     public void testRegisterUserDeviceToken() {
         String token = String.valueOf(System.currentTimeMillis());
-        long id = deviceTokensService.registerUserDeviceToken(1, token);
+        long id = deviceTokensService.registerUserDeviceToken(1, token, DeviceType.iOS);
         NurseDeviceTokensEntity entity = repository.findOne(id);
         Assert.assertNotNull(entity);
         Assert.assertEquals(token, entity.getDeviceToken());
         Assert.assertEquals(1, entity.getUserId());
+        Assert.assertEquals(DeviceType.iOS, entity.getDeviceType());
     }
 
     @Test
@@ -60,7 +62,7 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
         long userId = System.currentTimeMillis();
         Exception exception = null;
         try {
-            deviceTokensService.registerUserDeviceToken(userId, token);
+            deviceTokensService.registerUserDeviceToken(userId, token, DeviceType.iOS);
         } catch (BadRequestException ex) {
             exception = ex;
         }
@@ -70,14 +72,14 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
     public void testRegisterExistedUserToken() {
-        long id = deviceTokensService.registerUserDeviceToken(1, "aaa");
+        long id = deviceTokensService.registerUserDeviceToken(1, "aaa", DeviceType.iOS);
         Assert.assertEquals(1000, id);
     }
 
     @Test
     @DatabaseSetup(value = "classpath:/com/cooltoo/services/nurse_device_token_data.xml")
     public void testRegisterTokenForDifferentUser() {
-        long id = deviceTokensService.registerUserDeviceToken(2, "aaa");
+        long id = deviceTokensService.registerUserDeviceToken(2, "aaa", DeviceType.iOS);
         Assert.assertNotEquals(1000, id);
         List<NurseDeviceTokensBean> tokens = deviceTokensService.getNurseDeviceTokens(1);
         for (NurseDeviceTokensBean bean : tokens) {
@@ -95,7 +97,7 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
         for (NurseDeviceTokensBean bean : beans) {
             Assert.assertEquals(-1, bean.getUserId());
         }
-        deviceTokensService.registerUserDeviceToken(1, "aaa");
+        deviceTokensService.registerUserDeviceToken(1, "aaa", DeviceType.iOS);
         beans = deviceTokensService.getNurseDeviceTokens(1);
         Assert.assertTrue(beans.size() > 0);
         Assert.assertEquals(CommonStatus.ENABLED, beans.get(0).getStatus());
@@ -110,7 +112,7 @@ public class NurseDeviceTokensServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(1, tokens.size());
         Assert.assertEquals(CommonStatus.DISABLED, tokens.get(0).getStatus());
 
-        deviceTokensService.registerUserDeviceToken(2, "bbb");
+        deviceTokensService.registerUserDeviceToken(2, "bbb", DeviceType.iOS);
         tokens = repository.findByUserId(2);
         Assert.assertEquals(1, tokens.size());
         Assert.assertEquals(CommonStatus.ENABLED, tokens.get(0).getStatus());

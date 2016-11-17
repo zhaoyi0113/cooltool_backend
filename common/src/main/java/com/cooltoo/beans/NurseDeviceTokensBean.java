@@ -1,6 +1,7 @@
 package com.cooltoo.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.DeviceType;
 
 import java.util.Date;
 
@@ -10,14 +11,11 @@ import java.util.Date;
 public class NurseDeviceTokensBean {
 
     private long id;
-
     private long userId;
-
     private String deviceToken;
-
     private CommonStatus status;
-
     private Date timeCreated;
+    private DeviceType deviceType;
 
     public long getId() {
         return id;
@@ -57,5 +55,13 @@ public class NurseDeviceTokensBean {
 
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    public DeviceType getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(DeviceType deviceType) {
+        this.deviceType = deviceType;
     }
 }

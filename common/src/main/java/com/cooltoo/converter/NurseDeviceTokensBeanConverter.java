@@ -18,6 +18,7 @@ public class NurseDeviceTokensBeanConverter implements Converter<NurseDeviceToke
         bean.setTimeCreated(source.getTimeCreated());
         bean.setDeviceToken(source.getDeviceToken());
         bean.setId(source.getId());
+        bean.setDeviceToken(source.getDeviceToken());
         return bean;
     }
 }

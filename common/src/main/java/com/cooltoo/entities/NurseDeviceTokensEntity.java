@@ -1,6 +1,7 @@
 package com.cooltoo.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.DeviceType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,14 +14,11 @@ import java.util.Date;
 public class NurseDeviceTokensEntity {
 
     private long id;
-
     private long userId;
-
     private String deviceToken;
-
     private CommonStatus status;
-
     private Date timeCreated;
+    private DeviceType deviceType;
 
     @GeneratedValue
     @Id
@@ -68,5 +66,14 @@ public class NurseDeviceTokensEntity {
 
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    @Column(name = "device_type")
+    public DeviceType getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(DeviceType deviceType) {
+        this.deviceType = deviceType;
     }
 }

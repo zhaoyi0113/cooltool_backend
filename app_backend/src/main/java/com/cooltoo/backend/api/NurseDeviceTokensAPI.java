@@ -1,6 +1,7 @@
 package com.cooltoo.backend.api;
 
 import com.cooltoo.backend.filter.LoginAuthentication;
+import com.cooltoo.constants.DeviceType;
 import com.cooltoo.services.NurseDeviceTokensService;
 import com.cooltoo.constants.ContextKeys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class NurseDeviceTokensAPI {
     @POST
     @Path("{token}")
     public Response registerAnonymousDeviceToken(@PathParam("token") String token){
-        deviceTokensService.registerAnonymousDeviceToken(token);
+        deviceTokensService.registerAnonymousDeviceToken(token, DeviceType.iOS);
         return Response.ok().build();
     }
 
@@ -34,7 +35,7 @@ public class NurseDeviceTokensAPI {
     public Response registerUserDeviceToken(@Context HttpServletRequest request,
                                             @PathParam("token") String token){
         long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        deviceTokensService.registerUserDeviceToken(userId, token);
+        deviceTokensService.registerUserDeviceToken(userId, token, DeviceType.iOS);
         return Response.ok().build();
     }
 

@@ -13,6 +13,7 @@ import com.cooltoo.go2nurse.constants.ConsultationCreator;
 import com.cooltoo.go2nurse.constants.ConsultationReason;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.service.ConsultationCategoryService;
+import com.cooltoo.go2nurse.service.notification.NotifierServiceForGo2NurseAndNurse360;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.services.NurseExtensionService;
@@ -40,6 +41,7 @@ public class NurseConsultationAPI {
     @Autowired private ConsultationCategoryService categoryService;
     @Autowired private UserConsultationService userConsultationService;
     @Autowired private NurseExtensionService nurseExtensionService;
+    @Autowired private NotifierServiceForGo2NurseAndNurse360 orderNotifierService;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -210,8 +212,13 @@ public class NurseConsultationAPI {
         }
 
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.NURSE_SPEAK;
-        long talkId = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
+        Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
+
+        Long userId = talkReturn.get(UserConsultationService.USER_ID);
+        orderNotifierService.consultationAlertToPatient(userId, consultationId, talkStatus, talkContent);
+
         Map<String, Long> returnValue = new HashMap<>();
+        Long talkId = talkReturn.get(UserConsultationService.TALK_ID);
         returnValue.put("talk_id", talkId);
         return Response.ok(returnValue).build();
     }

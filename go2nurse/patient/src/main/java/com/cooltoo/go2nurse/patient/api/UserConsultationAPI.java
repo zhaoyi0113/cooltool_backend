@@ -14,6 +14,7 @@ import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.service.ConsultationCategoryService;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpRecordService;
+import com.cooltoo.go2nurse.service.notification.NotifierServiceForGo2NurseAndNurse360;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -40,14 +41,11 @@ public class UserConsultationAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(UserConsultationAPI.class);
 
-    @Autowired
-    private UserConsultationService userConsultationService;
-    @Autowired
-    private ConsultationCategoryService categoryService;
-    @Autowired
-    private WeChatService weChatService;
-    @Autowired
-    private NursePatientFollowUpRecordService patientFollowRecordService;
+    @Autowired private UserConsultationService userConsultationService;
+    @Autowired private ConsultationCategoryService categoryService;
+    @Autowired private WeChatService weChatService;
+    @Autowired private NursePatientFollowUpRecordService patientFollowRecordService;
+    @Autowired private NotifierServiceForGo2NurseAndNurse360 orderNotifierService;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -238,8 +236,17 @@ public class UserConsultationAPI {
                 patientFollowRecordService.updatePatientFollowUpRecordById(tmp.getId(), YesNoEnum.YES, YesNoEnum.NO, null);
             }
         }
-        long talkId = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
+        Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
+
+
+        Long consultationNurseId = talkReturn.get(UserConsultationService.NURSE_ID);
+        if (consultationNurseId>0) {
+            orderNotifierService.consultationAlertToNurse(consultationNurseId, consultationId, talkStatus, talkContent);
+        }
+
+
         Map<String, Long> returnValue = new HashMap<>();
+        Long talkId = talkReturn.get(UserConsultationService.TALK_ID);
         returnValue.put("talk_id", talkId);
         return Response.ok(returnValue).build();
     }

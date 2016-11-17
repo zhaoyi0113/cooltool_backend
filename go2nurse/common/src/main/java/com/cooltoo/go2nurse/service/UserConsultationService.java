@@ -15,7 +15,6 @@ import com.cooltoo.go2nurse.constants.ReasonType;
 import com.cooltoo.go2nurse.converter.UserConsultationBeanConverter;
 import com.cooltoo.go2nurse.entities.UserConsultationEntity;
 import com.cooltoo.go2nurse.repository.UserConsultationRepository;
-import com.cooltoo.go2nurse.service.notification.*;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +36,11 @@ public class UserConsultationService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserConsultationService.class);
 
+    public static final String CONSULTATION_ID = "consultation_id";
+    public static final String TALK_ID = "talk_id";
+    public static final String USER_ID = "user_id";
+    public static final String NURSE_ID = "nurse_id";
+
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "time"),
             new Sort.Order(Sort.Direction.DESC, "id")
@@ -52,7 +56,6 @@ public class UserConsultationService {
     @Autowired private ConsultationCategoryService categoryService;
     @Autowired private NurseServiceForGo2Nurse nurseService;
 
-    @Autowired private Notifier notifier;
     @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
 
     //===============================================================
@@ -523,7 +526,7 @@ public class UserConsultationService {
     //           adding
     //=======================================
     @Transactional
-    public long addTalk(long consultationId, long nurseId, ConsultationTalkStatus talkStatus, String talkContent) {
+    public Map<String, Long> addTalk(long consultationId, long nurseId, ConsultationTalkStatus talkStatus, String talkContent) {
         logger.info("add consultation talk, consultationId={} nurseId={} talkStatus={} talkContent={}.",
                 consultationId, nurseId, talkStatus, talkContent);
         UserConsultationEntity consultation = repository.findOne(consultationId);
@@ -540,16 +543,14 @@ public class UserConsultationService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         long talkId = talkService.addConsultationTalk(consultationId, nurseId, talkStatus, talkContent);
-        if (!ConsultationTalkStatus.USER_SPEAK.equals(talkStatus)) {
-            MessageBean message = new MessageBean();
-            message.setAlertBody("你有一条回复");
-            message.setType(MessageType.CONSULTATION_TALK.name());
-            message.setStatus(talkStatus.name());
-            message.setRelativeId(consultationId);
-            message.setDescription(talkContent);
-            notifier.notifyUserPatient(consultation.getUserId(), message);
-        }
-        return talkId;
+
+
+        Map<String, Long> returnValue = new HashMap<>();
+        returnValue.put(CONSULTATION_ID, consultationId);
+        returnValue.put(TALK_ID, talkId);
+        returnValue.put(NURSE_ID, nurseId);
+        returnValue.put(USER_ID, consultation.getUserId());
+        return returnValue;
     }
 
     //=======================================

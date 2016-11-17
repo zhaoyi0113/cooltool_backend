@@ -1,8 +1,11 @@
 package com.cooltoo.services;
 
 import com.cooltoo.beans.NurseDeviceTokensBean;
+import com.cooltoo.constants.DeviceType;
 import com.cooltoo.converter.NurseDeviceTokensBeanConverter;
 import com.cooltoo.entities.NurseDeviceTokensEntity;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.NurseDeviceTokensRepository;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.util.VerifyUtil;
@@ -30,14 +33,14 @@ public class NurseDeviceTokensService {
     @Autowired private NurseDeviceTokensBeanConverter beanConverter;
 
     @Transactional
-    public long registerAnonymousDeviceToken(String token) {
-        return saveDeviceToken(ANONYMOUS_USER_ID, token);
+    public long registerAnonymousDeviceToken(String token, DeviceType deviceType) {
+        return saveDeviceToken(ANONYMOUS_USER_ID, token, deviceType);
     }
 
     @Transactional
-    public long registerUserDeviceToken(long userId, String token) {
-        logger.info("register user device token, userId={} deviceToken={}", userId, token);
-        return saveDeviceToken(userId, token);
+    public long registerUserDeviceToken(long userId, String token, DeviceType deviceType) {
+        logger.info("register user device token, userId={} deviceToken={} deviceType={}", userId, token, deviceType);
+        return saveDeviceToken(userId, token, deviceType);
     }
 
     @Transactional
@@ -76,7 +79,11 @@ public class NurseDeviceTokensService {
     }
 
     @Transactional
-    private long saveDeviceToken(long userId, String token) {
+    private long saveDeviceToken(long userId, String token, DeviceType deviceType) {
+        if (null==deviceType) {
+            logger.info("device type is empty");
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
+        }
         //make sure one device token only one on activity status
         //make sure one device token only belongs to one user
         List<NurseDeviceTokensEntity> anonymousDeviceTokens = new ArrayList<>();
@@ -107,6 +114,7 @@ public class NurseDeviceTokensService {
             if (nurseDeviceToken.getUserId()!=userId) {
                 nurseDeviceToken.setUserId(userId);
             }
+            nurseDeviceToken.setDeviceType(deviceType);
             nurseDeviceToken.setStatus(CommonStatus.ENABLED);
             nurseDeviceToken.setTimeCreated(new Date());
 
@@ -122,11 +130,11 @@ public class NurseDeviceTokensService {
             }
         }
 
-        return registerNewDeviceToken(userId, token);
+        return registerNewDeviceToken(userId, token, deviceType);
     }
 
     @Transactional
-    private long registerNewDeviceToken(long userId, String token) {
+    private long registerNewDeviceToken(long userId, String token, DeviceType deviceType) {
         List<NurseDeviceTokensEntity> existed = deviceTokensRepository.findByUserIdAndDeviceTokenAndStatus(userId, token, CommonStatus.ENABLED);
         if (existed != null && !existed.isEmpty()){
             return existed.get(0).getUserId();
@@ -135,6 +143,7 @@ public class NurseDeviceTokensService {
 
         entity.setUserId(userId);
         entity.setDeviceToken(token);
+        entity.setDeviceType(deviceType);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTimeCreated(Calendar.getInstance().getTime());
 

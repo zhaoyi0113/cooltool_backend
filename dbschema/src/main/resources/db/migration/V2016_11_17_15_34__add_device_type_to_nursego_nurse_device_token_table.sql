@@ -1,0 +1,1 @@
+ALTER TABLE `nursego_nurse_device_tokens` ADD COLUMN `device_type` INT(11) NULL DEFAULT 0;

@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.openapp.WeChatPayService;
 import com.cooltoo.util.JSONUtil;
 import com.google.common.io.CharStreams;
@@ -34,6 +35,9 @@ public class ChargeWebHookService {
 
     private static final Logger logger = LoggerFactory.getLogger(ChargeWebHookService.class);
 
+    public static final String ORDER = "order";
+    public static final String MESSAGE = "message";
+
     @Autowired private ServiceOrderService orderService;
     @Autowired private WeChatPayService weChatPayService;
     private JSONUtil jsonUtil = JSONUtil.newInstance();
@@ -41,8 +45,9 @@ public class ChargeWebHookService {
     @Value("${wechat_go2nurse_appsecret}")
     private String srvAppSecret;
 
-    public Object webHookBody(HttpServletRequest request) {
+    public Map<String, Object> webHookBody(HttpServletRequest request) {
         logger.info("receive web hooks");
+        ServiceOrderBean order = null;
         if (null==request) {
             logger.warn("http servlet request is null");
             return null;
@@ -71,8 +76,12 @@ public class ChargeWebHookService {
         if (null!=event) {
             logger.info("this is ping++ charge");
             Charge charge = (Charge)event.getData().getObject();
-            orderService.orderChargeWebhooks(charge.getId(), event.getId(), body);
-            return event;
+            order = orderService.orderChargeWebhooks(charge.getId(), event.getId(), body);
+
+            Map<String, Object> returnValue = new HashMap<>();
+            returnValue.put(ORDER, order);
+            returnValue.put(MESSAGE, event);
+            return returnValue;
         }
 
         // weixin charge
@@ -89,7 +98,11 @@ public class ChargeWebHookService {
         return null;
     }
 
-    private String weixinCharge(Document document) {
+    private Map<String, Object> weixinCharge(Document document) {
+        ServiceOrderBean order = null;
+        String weixinResponse = null;
+        Map<String, Object> returnValue = new HashMap<>();
+
         Map<String,Object> keyValue = new HashMap<>();
         Map<String,Object> forSign = new HashMap<>();
         try {
@@ -103,7 +116,10 @@ public class ChargeWebHookService {
             }
         }
         catch (Exception ex) {
-            return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[notification message format error]]></return_msg></xml>";
+            weixinResponse = "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[notification message format error]]></return_msg></xml>";
+            returnValue.put(ORDER, order);
+            returnValue.put(MESSAGE, weixinResponse);
+            return returnValue;
         }
 
         Object returnCode = keyValue.get("return_code");
@@ -113,16 +129,26 @@ public class ChargeWebHookService {
             keyValue.remove("sign");
             String checkSign = weChatPayService.createSign(weChatPayService.getApiKey(), "UTF-8", new TreeMap<>(forSign));
             if (!checkSign.equalsIgnoreCase(originSign)) {
-                return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[checksum sign is wrong]]></return_msg></xml>";
+                weixinResponse = "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[checksum sign is wrong]]></return_msg></xml>";
+                returnValue.put(ORDER, order);
+                returnValue.put(MESSAGE, weixinResponse);
+                return returnValue;
             }
 
             String outTradeNo = keyValue.get("out_trade_no").toString();
-            orderService.orderChargeWebhooks(outTradeNo, outTradeNo, jsonUtil.toJsonString(keyValue));
-            return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+            order = orderService.orderChargeWebhooks(outTradeNo, outTradeNo, jsonUtil.toJsonString(keyValue));
+
+            weixinResponse = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+            returnValue.put(ORDER, order);
+            returnValue.put(MESSAGE, weixinResponse);
+            return returnValue;
         }
         else {
             logger.info("payment fail for WeiXin, message={}");
-            return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[notification message is 'FAIL']]></return_msg></xml>";
+            weixinResponse = "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[notification message is 'FAIL']]></return_msg></xml>";
+            returnValue.put(ORDER, order);
+            returnValue.put(MESSAGE, weixinResponse);
+            return returnValue;
         }
     }
 }
