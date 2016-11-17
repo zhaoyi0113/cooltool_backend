@@ -140,10 +140,10 @@ public class DoctorService {
         return beans;
     }
 
-    public long countDoctor(boolean orderByHospital, Integer hospitalId, Integer departmentId, List<CommonStatus> statuses) {
+    public long countDoctor(Integer hospitalId, Integer departmentId, List<CommonStatus> statuses) {
         long count = 0;
         if (!VerifyUtil.isListEmpty(statuses)) {
-            List<Long> doctorIdsInHospital = doctorOrderService.getDoctorOrderedList(orderByHospital, hospitalId, departmentId);
+            List<Long> doctorIdsInHospital = doctorOrderService.getDoctorOrderedList(hospitalId, departmentId);
             if (!VerifyUtil.isListEmpty(doctorIdsInHospital)) {
                 count = repository.countByIdInAndStatusIn(doctorIdsInHospital, statuses);
             }
@@ -153,12 +153,12 @@ public class DoctorService {
         return count;
     }
 
-    public List<DoctorBean> getDoctor(boolean orderByHospital, Integer hospitalId, Integer departmentId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+    public List<DoctorBean> getDoctor(Integer hospitalId, Integer departmentId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
         logger.info("get doctor by hospital={} department={} and status={} at page={} size={}",
                 hospitalId, departmentId, statuses, pageIndex, sizePerPage);
         List<DoctorBean> beans = new ArrayList<>();
         if (!VerifyUtil.isListEmpty(statuses)) {
-            List<Long> doctorIdsInHospital = doctorOrderService.getDoctorOrderedList(orderByHospital, hospitalId, departmentId);
+            List<Long> doctorIdsInHospital = doctorOrderService.getDoctorOrderedList(hospitalId, departmentId);
             if (!VerifyUtil.isListEmpty(doctorIdsInHospital)) {
                 List<DoctorEntity> doctorsReturn = repository.findEntityByIdInAndStatusIn(doctorIdsInHospital, statuses);
                 List<DoctorEntity> doctorsSorted = new ArrayList<>();

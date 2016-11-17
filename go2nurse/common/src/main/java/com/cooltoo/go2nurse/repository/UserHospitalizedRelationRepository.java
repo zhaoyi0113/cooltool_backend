@@ -33,8 +33,13 @@ public interface UserHospitalizedRelationRepository extends JpaRepository<UserHo
     @Query("FROM UserHospitalizedRelationEntity relation" +
             " WHERE relation.userId=?1" +
             " AND relation.groupId=?2" +
-            " AND (?2 IS NULL OR relation.status=?3)")
+            " AND (?3 IS NULL OR relation.status=?3)")
     List<UserHospitalizedRelationEntity> findByUserIdAndGroupIdAndStatus(Long userId, Long groupId, CommonStatus status, Sort sort);
 
-    List<UserHospitalizedRelationEntity> findByStatusAndUserIdAndHospitalIdAndDepartmentId(CommonStatus status, Long userId, Integer hospitalId, Integer departmentid);
+    @Query("SELECT relation.userId FROM UserHospitalizedRelationEntity relation" +
+            " WHERE (?1 IS NULL OR ?1=relation.status)" +
+            " AND   (?2 IS NULL OR ?2=relation.userId)" +
+            " AND   (?3 IS NULL OR ?3=relation.hospitalId)" +
+            " AND   (?4 IS NULL OR ?4=relation.departmentId)")
+    List<Long> findByStatusAndUserIdAndHospitalIdAndDepartmentId(CommonStatus status, Long userId, Integer hospitalId, Integer departmentId, Sort sort);
 }

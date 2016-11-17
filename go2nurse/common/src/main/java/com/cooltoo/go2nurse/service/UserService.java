@@ -224,8 +224,41 @@ public class UserService {
         return beanConverter.convert(user);
     }
 
+    public long countUserByUserIds(List<Long> userIds, UserAuthority authority) {
+        long count = 0;
+        if (!VerifyUtil.isListEmpty(userIds)) {
+            count = repository.countByAuthorityAndIdIn(authority, userIds);
+        }
+        logger.info("count user by authority={} and userIds size={}, count={}", authority, null==userIds ? 0 : userIds.size(), count);
+        return count;
+    }
+
+    public List<UserBean> getUserByUserIds(List<Long> userIds, UserAuthority authority) {
+        logger.info("get user by authority={} and userIds size={}", authority, null==userIds ? 0 : userIds.size());
+        List<UserBean> users = new ArrayList<>();
+        if (!VerifyUtil.isListEmpty(userIds)) {
+            List<UserEntity> resultSet = repository.findByAuthorityAndIdIn(authority, userIds, sort);
+            List<UserBean> originalUsers = entities2Beans(resultSet);
+            fillOtherProperties(originalUsers);
+
+            Map<Long, UserBean> userMap = new HashMap<>();
+            for (UserBean tmp : originalUsers) {
+                userMap.put(tmp.getId(), tmp);
+            }
+
+            for (Long tmp : userIds) {
+                UserBean user = userMap.get(tmp);
+                if (null!=user) {
+                    users.add(user);
+                }
+            }
+        }
+        logger.info("count is {}", users.size());
+        return users;
+    }
+
     public List<UserBean> getUser(List<Long> userIds, UserAuthority authority) {
-        logger.info("get user by authority={} and userIds={}", authority, userIds);
+        logger.info("get user by authority={} and userIds size={}", authority, null==userIds ? 0 : userIds.size());
         List<UserBean> users = new ArrayList<>();
         if (!VerifyUtil.isListEmpty(userIds)) {
             Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));

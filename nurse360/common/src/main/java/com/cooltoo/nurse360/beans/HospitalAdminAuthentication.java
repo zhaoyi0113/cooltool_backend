@@ -43,7 +43,7 @@ public class HospitalAdminAuthentication implements Authentication {
 
     @Override
     public Object getDetails() {
-        return this;
+        return admin;
     }
 
     @Override

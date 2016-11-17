@@ -33,6 +33,31 @@ public class HospitalAdminManageAPI {
 
 
     //=============================================================
+    //            Information For ALL
+    //=============================================================
+    @RequestMapping(path = "/information", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public HospitalAdminBean getHospitalAdmin(HttpServletRequest request) {
+        Long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+        HospitalAdminBean admin = adminService.getAdminUser(adminId);
+        return admin;
+    }
+
+    @RequestMapping(path = "/information", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public HospitalAdminBean updateHospitalAdmin(HttpServletRequest request,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "name")      String name,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "password")  String password,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "telephone") String telephone,
+                                                 @RequestParam(required = false, defaultValue = "",   name = "email")     String email,
+                                                 @RequestParam(required = false, defaultValue = "-1", name = "hospital_id")  int hospitalId,
+                                                 @RequestParam(required = false, defaultValue = "-1", name = "department_id")int departmentId
+    ) {
+        Long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
+        HospitalAdminBean bean = adminService.updateAdminUser(adminId, name, password, telephone, email, hospitalId, departmentId, null);
+        return bean;
+    }
+
+
+    //=============================================================
     //            Authentication of ADMINISTRATOR Role
     //=============================================================
     @RequestMapping(path = "/admin/users/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)

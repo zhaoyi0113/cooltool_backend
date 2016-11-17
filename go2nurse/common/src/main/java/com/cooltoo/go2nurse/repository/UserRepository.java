@@ -28,8 +28,12 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             " AND   (user.name LIKE %?2 OR ?2 IS NULL)")
     long countByAuthorityAndName(UserAuthority authority, String fuzzyName);
 
+    @Query("SELECT count(user.id) FROM UserEntity user" +
+            " WHERE (user.authority=?1 OR ?1 IS NULL)" +
+            " AND   (user.id IN (?2))")
+    long countByAuthorityAndIdIn(UserAuthority authority, List<Long> userIds);
     @Query("FROM UserEntity user" +
-            " WHERE (user.authority=?1  OR ?1 IS NULL)" +
+            " WHERE (user.authority=?1 OR ?1 IS NULL)" +
             " AND   (user.id IN (?2))")
     List<UserEntity> findByAuthorityAndIdIn(UserAuthority authority, List<Long> userIds, Sort sort);
     long countByUniqueId(String uniqueId);

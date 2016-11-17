@@ -2,6 +2,8 @@ package com.cooltoo.nurse360.hospital.filters;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
 import com.cooltoo.nurse360.beans.HospitalAdminAuthentication;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
@@ -81,18 +83,15 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
         logger.debug("get token bean "+token);
         // token invalid
         if (null == token) {
-            //throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND));
-            return null;
+            throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND));
         }
         if (!CommonStatus.ENABLED.equals(token.getStatus())) {
-            //throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_EXPIRED));
-            return null;
+            throw new ServletException(new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_EXPIRED));
         }
 
         // admin invalid
         if (!adminService.existsAdminUser(token.getAdminId(), CommonStatus.ENABLED)) {
-            //throw new ServletException(new BadRequestException(ErrorCode.NURSE360_USER_NOT_FOUND));
-            return null;
+            throw new ServletException(new BadRequestException(ErrorCode.NURSE360_USER_NOT_FOUND));
         }
         return token;
     }

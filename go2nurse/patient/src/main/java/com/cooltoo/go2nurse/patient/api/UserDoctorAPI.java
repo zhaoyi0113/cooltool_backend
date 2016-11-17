@@ -46,7 +46,7 @@ public class UserDoctorAPI {
         statuses.add(CommonStatus.ENABLED);
         Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
         Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
-        List<DoctorBean> doctors = doctorService.getDoctor(null==departmentId||0==departmentId, hospitalId, departmentId, statuses, pageIndex, sizePerPage);
+        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, pageIndex, sizePerPage);
         return Response.ok(doctors).build();
     }
 
@@ -160,8 +160,8 @@ public class UserDoctorAPI {
         Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
         Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
 
-        int countDoctor = (int) doctorService.countDoctor(null==departmentId||0==departmentId, hospitalId, departmentId, statuses);
-        List<DoctorBean> doctors = doctorService.getDoctor(null==departmentId||0==departmentId, hospitalId, departmentId, statuses, 0, countDoctor);
+        int countDoctor = (int) doctorService.countDoctor(hospitalId, departmentId, statuses);
+        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, 0, countDoctor);
         return Response.ok(doctors).build();
     }
 }

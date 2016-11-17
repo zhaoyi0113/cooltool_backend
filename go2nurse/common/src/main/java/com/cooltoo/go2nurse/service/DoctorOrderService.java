@@ -79,16 +79,32 @@ public class DoctorOrderService {
         return beans;
     }
 
-    public List<Long> getDoctorOrderedList(boolean orderByHospital, Integer hospitalId, Integer departmentId) {
-        logger.info("get doctorId ordered by hospitalId={} departmentId={}, use {}", hospitalId, departmentId,
-                orderByHospital ? "hospitalId" : "departmentId");
-
+    public List<Long> getDoctorOrderedList(Integer hospitalId, Integer departmentId) {
         List<Long> doctorIds = new ArrayList<>();
-        if (orderByHospital && hospitalRepository.existHospital(hospitalId)) {
-            doctorIds = orderRepository.findDoctorIdByHospitalId(hospitalId, hospitalSort);
+
+        logger.info("get doctorId ordered by hospitalId={} departmentId={}", hospitalId, departmentId);
+        departmentId = null==departmentId ? 0 : (departmentId<0) ? 0 : departmentId;
+        hospitalId   = null==hospitalId   ? 0 : (hospitalId<-1)  ? 0 : hospitalId;
+        if (!departmentRepository.existsDepartment(departmentId)) {
+            departmentId = null;
         }
-        else if (!orderByHospital && departmentRepository.existsDepartment(departmentId)) {
+        if (-1!=hospitalId && !hospitalRepository.existHospital(hospitalId)) {
+            hospitalId = null;
+        }
+        if (null==hospitalId && null==departmentId) {
+            return doctorIds;
+        }
+
+        boolean orderByDepartment = (null!=departmentId);
+
+        logger.info("get doctorId ordered by hospitalId={} departmentId={}, order by {}", hospitalId, departmentId,
+                orderByDepartment ? "departmentId" : "hospitalId");
+
+        if (orderByDepartment) {
             doctorIds = orderRepository.findDoctorIdByHospitalIdAndDepartmentId(hospitalId, departmentId, departmentSort);
+        }
+        else {
+            doctorIds = orderRepository.findDoctorIdByHospitalId(hospitalId, hospitalSort);
         }
 
         logger.info("get doctorId ordered={}", doctorIds);

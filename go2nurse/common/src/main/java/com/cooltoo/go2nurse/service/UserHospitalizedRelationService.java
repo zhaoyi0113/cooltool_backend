@@ -82,6 +82,41 @@ public class UserHospitalizedRelationService {
     //===================================================
     //               getting for admin user
     //===================================================
+    public List<Long> getUserInHospital(Integer hospitalId, Integer departmentId, CommonStatus status) {
+        List<Long> userIds = new ArrayList<>();
+
+        logger.info("get userId by hospitalId={} departmentId={} status={}", hospitalId, departmentId, status);
+        departmentId = null==departmentId ? 0 : (departmentId<0) ? 0 : departmentId;
+        hospitalId   = null==hospitalId   ? 0 : (hospitalId<-1)  ? 0 : hospitalId;
+        if (!departmentRepository.exists(departmentId)) {
+            departmentId = null;
+        }
+        if (-1!=hospitalId && !hospitalRepository.exists(hospitalId)) {
+            hospitalId = null;
+        }
+        if (null==hospitalId && null==departmentId) {
+            return userIds;
+        }
+
+        boolean orderByDepartment = (null!=departmentId);
+
+        logger.info("get userId by hospitalId={} departmentId={} status={}, order by {}", hospitalId, departmentId, status,
+                orderByDepartment ? "departmentId" : "hospitalId");
+
+        List<Long> originalUserIds = repository.findByStatusAndUserIdAndHospitalIdAndDepartmentId(status, null, hospitalId, departmentId, sort);
+        if (!VerifyUtil.isListEmpty(originalUserIds)) {
+            for (Long tmp : originalUserIds) {
+                if (userIds.contains(tmp)) {
+                    continue;
+                }
+                userIds.add(tmp);
+            }
+        }
+
+        logger.info("get userId size={}", userIds.size());
+        return userIds;
+    }
+
     public long countByUserAndStatus(long userId, String strStatus) {
         logger.info("count the hospitalized with user={} status={}",
                 userId, strStatus);
@@ -243,7 +278,7 @@ public class UserHospitalizedRelationService {
         long relationId = entity.getId();
 
         List<UserHospitalizedRelationEntity> entities;
-        entities = repository.findByUserIdAndHospitalIdAndDepartmentIdAndGroupId(userId, hospitalId, departmentId, groupId, sort);
+        entities = repository.findByUserIdAndStatus(userId, CommonStatus.ENABLED, sort);
         boolean changed = false;
         for (int i = 0, count = entities.size(); i < count; i ++) {
             UserHospitalizedRelationEntity tmp = entities.get(i);

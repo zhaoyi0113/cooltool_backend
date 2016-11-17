@@ -2,13 +2,9 @@ package com.cooltoo.config;
 
 
 import com.cooltoo.nurse360.admin.api.*;
-import com.cooltoo.nurse360.hospital.api.HospitalAdminManageAPI;
 import com.cooltoo.nurse360.filters.Nurse360BadRequestExceptionMapper;
 import com.cooltoo.nurse360.filters.Nurse360CORSResponseFilter;
 import com.cooltoo.nurse360.filters.Nurse360NurseLoginAuthenticationFilter;
-import com.cooltoo.nurse360.hospital.api.HospitalAdminAPI;
-import com.cooltoo.nurse360.hospital.api.HospitalAdminLoginAPI;
-import com.cooltoo.nurse360.hospital.api.HospitalManagementTestAPI;
 import com.cooltoo.nurse360.nurse.api.*;
 import io.swagger.annotations.Api;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
