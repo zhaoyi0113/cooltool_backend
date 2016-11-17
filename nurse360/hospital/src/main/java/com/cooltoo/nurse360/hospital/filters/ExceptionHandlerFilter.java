@@ -38,6 +38,9 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             if (badRequestException != null) {
                 errorCode = badRequestException.getErrorCode().getCode();
             }
+            response.getWriter().write(e.getMessage());
+            response.getWriter().flush();
+            response.getWriter().close();
             response.setStatus(errorCode);
         }
     }
