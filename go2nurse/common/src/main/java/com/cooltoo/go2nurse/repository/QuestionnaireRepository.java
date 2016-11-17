@@ -20,4 +20,5 @@ public interface QuestionnaireRepository extends JpaRepository<QuestionnaireEnti
     Page<QuestionnaireEntity> findByHospitalId(Integer hospitalId, Pageable page);
 
     List<QuestionnaireEntity> findByCategoryIdIn(List<Long> categoryIds, Sort sort);
+    Page<QuestionnaireEntity> findByCategoryIdIn(List<Long> categoryIds, Pageable page);
 }

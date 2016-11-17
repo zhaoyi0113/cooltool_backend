@@ -32,11 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 16/4/6.
@@ -216,6 +212,28 @@ public class QuestionnaireService {
         return beans;
     }
 
+    public List<QuestionnaireBean> getQuestionnaireByCategoryId(long categoryId, int pageIndex, int sizePerPage) {
+        logger.info("get questionnaire by categoryId={} at page={} sizePerPage={}", categoryId, pageIndex, sizePerPage);
+        PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, questionnaireSort);
+        Page<QuestionnaireEntity> entities = questionnaireRep.findByCategoryIdIn(Arrays.asList(new Long[]{categoryId}), pageRequest);
+        List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(entities);
+        logger.info("get questionnaire count is {}", beans.size());
+        return beans;
+    }
+
+    private List<Long> getCategoryIdByHospitalId(int hospitalId) {
+        logger.info("get category by hospitalId={}", hospitalId);
+        List<QuestionnaireEntity> resultSet = questionnaireRep.findByHospitalId(hospitalId, questionnaireSort);
+        List<Long> categoryId = new ArrayList<>();
+        for (QuestionnaireEntity tmp : resultSet) {
+            if (!categoryId.contains(tmp.getCategoryId())) {
+                categoryId.add(tmp.getCategoryId());
+            }
+        }
+        logger.info("count is {}", categoryId.size());
+        return categoryId;
+    }
+
     public QuestionnaireBean getQuestionnaireWithQuestions(long questionnaireId) {
         logger.info("get questionnaire with question by id={}", questionnaireId);
         List<QuestionnaireBean> questionnaire = getQuestionnaireWithQuestionsByIds(questionnaireId+"");
@@ -391,6 +409,15 @@ public class QuestionnaireService {
             category.setQuestionnaires(beans);
         }
 
+        logger.info("count is {}",categories.size());
+        return categories;
+    }
+
+    public List<QuestionnaireCategoryBean> getCategoryByHospitalId(int hospitalId) {
+        logger.info("get questionnaire category by hospitalId={}", hospitalId);
+        List<Long> categoryIds = getCategoryIdByHospitalId(hospitalId);
+
+        List<QuestionnaireCategoryBean> categories = getCategoryByIds(categoryIds);
         logger.info("count is {}",categories.size());
         return categories;
     }

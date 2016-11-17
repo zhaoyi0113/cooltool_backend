@@ -8,12 +8,14 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpBean;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpRecordBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
+import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpRecordService;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpService;
 import com.cooltoo.go2nurse.service.QuestionnaireService;
 import com.cooltoo.go2nurse.service.UserQuestionnaireAnswerService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
+import com.cooltoo.util.SetUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,16 +42,41 @@ public class NursePatientQuestionnaireAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response getQuestionnaire(@Context HttpServletRequest request,
-                                     @QueryParam("index") @DefaultValue("0") int pageIndex,
-                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
+    public Response getQuestionnaireCategory(@Context HttpServletRequest request,
+                                             @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                             @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseHospitalRelationBean nurseHospital = nurseHospitalRelation.getRelationByNurseId(nurseId, null);
-        List<QuestionnaireBean> returnValue = new ArrayList<>();
+        List<QuestionnaireCategoryBean> returnValue = new ArrayList<>();
         if (null != nurseHospital) {
-            returnValue = questionnaireService.getQuestionnaireByHospitalId(nurseHospital.getHospitalId(), pageIndex, sizePerPage);
+            returnValue = questionnaireService.getCategoryByHospitalId(nurseHospital.getHospitalId());
+            returnValue = SetUtil.newInstance().getSetByPage(returnValue, pageIndex, sizePerPage, null);
         }
+        return Response.ok(returnValue).build();
+    }
+
+    @Path("/category")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getQuestionnaire(@Context HttpServletRequest request,
+                                     @QueryParam("category_id") @DefaultValue("0") long categoryId,
+                                     @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
+    ) {
+        List<QuestionnaireBean> returnValue = questionnaireService.getQuestionnaireByCategoryId(categoryId, pageIndex, sizePerPage);
+        return Response.ok(returnValue).build();
+    }
+
+    @Path("/{questionnaire_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getQuestionnaireWithQuestions(@Context HttpServletRequest request,
+                                                  @PathParam("questionnaire_id") @DefaultValue("0") long questionnaireId
+    ) {
+        QuestionnaireBean returnValue = questionnaireService.getQuestionnaireWithQuestions(questionnaireId);
         return Response.ok(returnValue).build();
     }
 
