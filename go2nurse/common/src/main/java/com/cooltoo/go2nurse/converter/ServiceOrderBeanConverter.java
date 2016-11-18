@@ -4,10 +4,7 @@ import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
-import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.JSONUtil;
-import org.hibernate.type.SerializableToBlobType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

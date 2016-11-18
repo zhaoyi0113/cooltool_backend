@@ -29,7 +29,7 @@ public class UserDeviceTokensAPI {
                                             @PathParam("token") String token,
                                             @PathParam("type") String strType
     ) {
-        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         DeviceType type = DeviceType.parseString(strType);
         deviceTokensService.registerUserDeviceToken(userId, type, token);
         return Response.ok().build();
@@ -42,7 +42,7 @@ public class UserDeviceTokensAPI {
                                             @PathParam("token") String token,
                                             @PathParam("type") String strType
     ) {
-        long userId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         DeviceType type = DeviceType.parseString(strType);
         deviceTokensService.inactiveUserDeviceToken(userId, type, token);
         return Response.ok().build();
