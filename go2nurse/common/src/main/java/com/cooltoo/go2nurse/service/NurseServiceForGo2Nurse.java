@@ -94,6 +94,17 @@ public class NurseServiceForGo2Nurse {
         return beans;
     }
 
+    public List<NurseBean> getNurseByCanAnswerQuestion(String name, String strCanAnswerQuestion, String strCanSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
+        logger.info("get nurse can answer questions");
+        YesNoEnum canAnswerQuestion = YesNoEnum.parseString(strCanAnswerQuestion);
+        YesNoEnum canSeeAllOrder = YesNoEnum.parseString(strCanSeeAllOrder);
+        Iterable<NurseEntity> nurses = commonNurseService.getNurseByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL, name, canAnswerQuestion, canSeeAllOrder, hospitalId, departmentId, registerFrom);
+        List<NurseBean> beans = entitiesToBeans(nurses);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     public List<NurseBean> getNurseByQueryString(String strCanAnswerQuestion, String name, int pageIndex, int sizePerPage) {
         logger.info("get nurse can answer questions at pageIndex={} sizePerPage={}", pageIndex, sizePerPage);
         YesNoEnum canAnswerQuestion = YesNoEnum.parseString(strCanAnswerQuestion);

@@ -19,6 +19,7 @@ import java.util.List;
 @Service("NotifierForAllModule")
 public class NotifierForAllModule {
 
+    public static final String NEW_ORDER_ALERT_BODY = "有新订单，快来抢！";
     public static final String ORDER_ALERT_BODY = "订单状态有更新";
     public static final String APPOINTMENT_ALERT_BODY = "预约状态有更新";
     public static final String CONSULTATION_ALERT_BODY = "你有一条回复";
@@ -37,7 +38,7 @@ public class NotifierForAllModule {
     //
     //========================================================================================
     public void orderAlertToNurse(long orderId, OrderStatus orderStatus, String description) {
-        Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
         List<NurseOrderRelationEntity> nurses = nurseOrderRelation.findByOrderId(orderId, sort);
         if (!VerifyUtil.isListEmpty(nurses)) {
             MessageBean messageBean = notifier.createMessage(
@@ -51,7 +52,32 @@ public class NotifierForAllModule {
                 notifier.notifyNurse(tmp.getNurseId(), messageBean);
             }
         }
+    }
 
+    public void orderAlertToNurse(long nurseId, long orderId, OrderStatus orderStatus, String description) {
+        MessageBean messageBean = notifier.createMessage(
+                MessageType.ORDER,
+                ORDER_ALERT_BODY,
+                orderId,
+                orderStatus.name(),
+                VerifyUtil.isStringEmpty(description) ? ("order " + orderStatus.name().toLowerCase() + "!") : description
+        );
+        notifier.notifyNurse(nurseId, messageBean);
+    }
+
+    public void newOrderAlertToNurse(List<Long> nurseIds, long orderId, OrderStatus orderStatus, String description) {
+        if (null!=nurseIds && !nurseIds.isEmpty()) {
+            for (Long tmpId : nurseIds) {
+                MessageBean messageBean = notifier.createMessage(
+                        MessageType.ORDER,
+                        NEW_ORDER_ALERT_BODY,
+                        orderId,
+                        orderStatus.name(),
+                        VerifyUtil.isStringEmpty(description) ? ("order " + orderStatus.name().toLowerCase() + "!") : description
+                );
+                notifier.notifyNurse(tmpId, messageBean);
+            }
+        }
     }
 
     public void orderAlertToPatient(long userId, long orderId, OrderStatus orderStatus, String description) {

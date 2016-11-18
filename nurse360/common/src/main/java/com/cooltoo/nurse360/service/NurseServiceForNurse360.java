@@ -11,6 +11,7 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
+import com.cooltoo.go2nurse.service.NurseOrderRelationService;
 import com.cooltoo.leancloud.LeanCloudService;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
@@ -46,7 +47,7 @@ public class NurseServiceForNurse360 {
     @Autowired private UserFileStorageService nursegoFileStorage;
     @Autowired private Nurse360Utility utility;
     @Autowired private LeanCloudService leanCloudService;
-    @Autowired private NurseOrderRelationServiceForNurse360 nurseOrderService;
+    @Autowired private NurseOrderRelationService nurseOrderService;
     @Autowired private NurseQualificationService nurseQualificationService;
 
     //===================================================================

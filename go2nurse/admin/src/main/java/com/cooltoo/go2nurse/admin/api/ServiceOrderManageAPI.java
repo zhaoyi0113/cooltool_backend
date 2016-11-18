@@ -1,8 +1,14 @@
 package com.cooltoo.go2nurse.admin.api;
 
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.constants.RegisterFrom;
+import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.go2nurse.beans.NurseOrderRelationBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.go2nurse.service.NurseOrderRelationService;
+import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.util.VerifyUtil;
@@ -13,6 +19,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +29,8 @@ import java.util.List;
 public class ServiceOrderManageAPI {
 
     @Autowired private ServiceOrderService orderService;
+    @Autowired private NurseServiceForGo2Nurse nurseService;
+    @Autowired private NurseOrderRelationService nurseOrderRelation;
     @Autowired private NotifierForAllModule notifierForAllModule;
 
     @Path("/all_order_status")
@@ -163,5 +172,76 @@ public class ServiceOrderManageAPI {
         notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
         notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
         return Response.ok(order).build();
+    }
+
+    @Path("/dispatch/nurse")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response orderDispatchToNurse(@Context HttpServletRequest request,
+                                         @FormParam("order_id") @DefaultValue("0") long orderId,
+                                         @FormParam("nurse_id") @DefaultValue("0") long nurseId
+    ) {
+        //dispatch or replace order's nurse
+        NurseOrderRelationBean nurseOrder = nurseOrderRelation.dispatchToNurse(nurseId, orderId);
+        return Response.ok(nurseOrder).build();
+    }
+
+    @Path("/modify")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response modifyTimeAddressMessage(@Context HttpServletRequest request,
+                                             @FormParam("order_id") @DefaultValue("0") long orderId,
+                                             @FormParam("address") @DefaultValue("0") long addressId,
+                                             @FormParam("start_time") @DefaultValue("") String startTime,
+                                             @FormParam("message_left") @DefaultValue("") String messageLeft
+    ) {
+        //modify start_time, address, message left, score
+        ServiceOrderBean order = orderService.updateOrder(orderId, null, addressId, startTime, null, messageLeft, 0);
+        return Response.ok(order).build();
+    }
+
+    @Path("/notify/department")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response notifyNurseInDepartment(@Context HttpServletRequest request,
+                                            @FormParam("order_id") @DefaultValue("0") long orderId,
+                                            @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                            @FormParam("department_id") @DefaultValue("0") int departmentId,
+                                            @FormParam("register_from") @DefaultValue("") String registerFrom/* cooltoo, go2nurse */
+    ) {
+        //TODO -- notify nurse in department to fetch order
+        List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
+        if (null!=orders && !orders.isEmpty()) {
+            ServiceOrderBean order = orders.get(0);
+            List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(null, YesNoEnum.YES.name(), null, hospitalId, departmentId, RegisterFrom.parseString(registerFrom));
+            List<Long> nursesId = getNurseIds(nurses);
+            notifierForAllModule.newOrderAlertToNurse(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
+        }
+        return null;
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createOrder(@Context HttpServletRequest request,
+                                @FormParam("service_item_id") @DefaultValue("0") long serviceItemId,
+                                @FormParam("user_id")    @DefaultValue("0") long userId,
+                                @FormParam("patient_id") @DefaultValue("0") long patientId,
+                                @FormParam("address_id") @DefaultValue("0") long addressId,
+                                @FormParam("start_time") @DefaultValue("") String startTime,
+                                @FormParam("count") @DefaultValue("0") int count,
+                                @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage
+    ) {
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage, 0);
+        return Response.ok(order).build();
+    }
+
+    private List<Long> getNurseIds(List<NurseBean> nurses) {
+        List<Long> nurseId = new ArrayList<>();
+        for (NurseBean tmp : nurses) {
+            if (!nurseId.contains(tmp.getId())) {
+                nurseId.add(tmp.getId());
+            }
+        }
+        return nurseId;
     }
 }

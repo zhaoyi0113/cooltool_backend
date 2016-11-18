@@ -1,4 +1,4 @@
-package com.cooltoo.nurse360.service;
+package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.CommonStatus;
@@ -14,7 +14,6 @@ import com.cooltoo.go2nurse.converter.NurseOrderRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
 import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
-import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.repository.NurseHospitalRelationRepository;
 import com.cooltoo.services.NurseExtensionService;
 import com.cooltoo.util.VerifyUtil;
@@ -31,9 +30,9 @@ import java.util.*;
  * Created by zhaolisong on 16/9/28.
  */
 @Service("NurseOrderRelationServiceForNurse360")
-public class NurseOrderRelationServiceForNurse360 {
+public class NurseOrderRelationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NurseOrderRelationServiceForNurse360.class);
+    private static final Logger logger = LoggerFactory.getLogger(NurseOrderRelationService.class);
 
     private static final Sort nurseHospitalRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
     private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
@@ -45,6 +44,7 @@ public class NurseOrderRelationServiceForNurse360 {
     @Autowired private NurseOrderRelationRepository repository;
     @Autowired private NurseOrderRelationBeanConverter beanConverter;
     @Autowired private ServiceOrderService orderService;
+    @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private NotifierForAllModule notifierForAllModule;
 
     //============================================================================
@@ -150,6 +150,67 @@ public class NurseOrderRelationServiceForNurse360 {
     //============================================================================
     //                 update
     //============================================================================
+    //=================================
+    //         administrator usage
+    //=================================
+    @Transactional
+    public NurseOrderRelationBean dispatchToNurse(long nurseId, long orderId) {
+        logger.info("dispatch order={} to nurse={}", orderId, nurseId);
+        if (!orderService.existOrder(orderId)) {
+            logger.info("order not exist");
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+        }
+        if (!nurseService.existsNurse(nurseId)) {
+            logger.info("nurse not exist");
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+        }
+        NurseOrderRelationBean original = null;
+        NurseOrderRelationEntity entity = null;
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+        List<NurseOrderRelationEntity> relations = repository.findByOrderId(orderId, sort);
+        if (!VerifyUtil.isListEmpty(relations)) {
+            entity = relations.get(0);
+            original = beanConverter.convert(entity);
+            relations.remove(entity);
+        }
+        else {
+            entity = new NurseOrderRelationEntity();
+        }
+        entity.setNurseId(nurseId);
+        entity.setOrderId(orderId);
+        entity.setTime(new Date());
+        entity.setStatus(CommonStatus.ENABLED);
+        repository.save(entity);
+
+        relations = repository.findByOrderId(orderId, sort);
+        entity = relations.get(0);
+        relations.remove(0);
+        if (!VerifyUtil.isListEmpty(relations)) {
+            repository.delete(relations);
+        }
+
+        if (nurseId!=entity.getNurseId()) {
+            logger.info("order dispatch to nurse failed!");
+            throw new BadRequestException(ErrorCode.NURSE360_SERVICE_ORDER_BEEN_FETCHED);
+        }
+
+        // update order status
+        ServiceOrderBean order = orderService.nurseFetchOrder(orderId);
+        notifierForAllModule.orderAlertToPatient(order.getUserId(), order.getId(), order.getOrderStatus(), "order dispatched by manager!");
+        notifierForAllModule.orderAlertToNurse(entity.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to you!");
+        if (null!=original && original.getNurseId()!=nurseId) {
+            notifierForAllModule.orderAlertToNurse(original.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to other!");
+        }
+
+        NurseOrderRelationBean bean = beanConverter.convert(entity);
+        logger.info("add relation={}", bean);
+        return bean;
+    }
+
+
+    //=================================
+    //         nurse usage
+    //=================================
     @Transactional
     public NurseOrderRelationBean updateStatus(long nurseId, long orderId, String strStatus) {
         logger.info("update relation status to={} between nurse={} order={}",

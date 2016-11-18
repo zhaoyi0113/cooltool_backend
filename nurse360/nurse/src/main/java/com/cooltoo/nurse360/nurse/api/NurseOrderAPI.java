@@ -4,7 +4,7 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
-import com.cooltoo.nurse360.service.NurseOrderRelationServiceForNurse360;
+import com.cooltoo.go2nurse.service.NurseOrderRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +20,7 @@ import java.util.List;
 @Path("/nurse/order")
 public class NurseOrderAPI {
 
-    @Autowired private NurseOrderRelationServiceForNurse360 nurseOrderService;
+    @Autowired private NurseOrderRelationService nurseOrderService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
