@@ -2,6 +2,7 @@ package com.cooltoo.nurse360.nurse.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.*;
 import com.cooltoo.exception.BadRequestException;
@@ -11,6 +12,7 @@ import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpRecordService;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpService;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,7 @@ public class NursePatientFollowUpRecordAPI {
 
     @Autowired private NursePatientFollowUpRecordService patientFollowUpRecordService;
     @Autowired private NursePatientFollowUpService patientFollowUpService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -110,11 +113,21 @@ public class NursePatientFollowUpRecordAPI {
             throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
         }
 
+        PatientFollowUpType patientFollowUpType = PatientFollowUpType.parseString(followUpType);
         long followUpRecordId = patientFollowUpRecordService.addPatientFollowUpRecord(
                 followUpId,
-                PatientFollowUpType.parseString(followUpType),
+                patientFollowUpType,
                 consultationId,
                 questionnaireId);
+        if (PatientFollowUpType.QUESTIONNAIRE.equals(patientFollowUpType)) {
+            notifierForAllModule.followUpAlertToPatient(
+                    patientFollowUpType,
+                    followUp.getUserId(),
+                    questionnaireId,
+                    ReadingStatus.UNREAD.name(),
+                    "nurse make questionnaire follow-up!"
+            );
+        }
 
         Map<String, Long> map = new HashMap<>();
         map.put("id", followUpRecordId);

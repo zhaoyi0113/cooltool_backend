@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.service.notification;
 import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.constants.OrderStatus;
+import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
 import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
 import com.cooltoo.util.VerifyUtil;
@@ -15,13 +16,15 @@ import java.util.List;
 /**
  * Created by zhaolisong on 2016/11/17.
  */
-@Service("ServiceOrderNotifierService")
-public class NotifierServiceForGo2NurseAndNurse360 {
+@Service("NotifierForAllModule")
+public class NotifierForAllModule {
 
     public static final String ORDER_ALERT_BODY = "订单状态有更新";
     public static final String APPOINTMENT_ALERT_BODY = "预约状态有更新";
     public static final String CONSULTATION_ALERT_BODY = "你有一条回复";
     public static final String PUSH_COURSE_ALERT_BODY = "你有一条定制推送";
+    public static final String FOLLOW_UP_ALERT_BODY = "你有一条随访记录";
+    public static final String FOLLOW_UP_REPLY_ALERT_BODY = "你有一条随访回复";
 
 
     @Autowired private Notifier notifier;
@@ -128,5 +131,40 @@ public class NotifierServiceForGo2NurseAndNurse360 {
         );
 
         notifier.notifyUserPatient(userId, messageBean);
+    }
+
+
+    //========================================================================================
+    //
+    //                                 Follow-up Message Pushing
+    //
+    //========================================================================================
+
+    public void followUpAlertToPatient(PatientFollowUpType followUpType, long userId, long relativeId, String status, String description) {
+        MessageBean messageBean = notifier.createMessage(
+                PatientFollowUpType.CONSULTATION.equals(followUpType)
+                        ? MessageType.FOLLOW_UP_CONSULTATION
+                        : MessageType.FOLLOW_UP_QUESTIONNAIRE,
+                FOLLOW_UP_ALERT_BODY,
+                relativeId,
+                status,
+                VerifyUtil.isStringEmpty(description) ? ("follow-up " + followUpType.name().toLowerCase() + "!") : description
+        );
+
+        notifier.notifyUserPatient(userId, messageBean);
+    }
+
+    public void followUpAlertToNurse(PatientFollowUpType followUpType, long nurseId, long relativeId, String status, String description) {
+        MessageBean messageBean = notifier.createMessage(
+                PatientFollowUpType.CONSULTATION.equals(followUpType)
+                        ? MessageType.FOLLOW_UP_CONSULTATION
+                        : MessageType.FOLLOW_UP_QUESTIONNAIRE,
+                FOLLOW_UP_REPLY_ALERT_BODY,
+                relativeId,
+                status,
+                VerifyUtil.isStringEmpty(description) ? ("follow-up " + followUpType.name().toLowerCase() + " replied!") : description
+        );
+
+        notifier.notifyNurse(nurseId, messageBean);
     }
 }

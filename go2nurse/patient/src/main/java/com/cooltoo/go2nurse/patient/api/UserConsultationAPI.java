@@ -14,7 +14,7 @@ import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.service.ConsultationCategoryService;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpRecordService;
-import com.cooltoo.go2nurse.service.notification.NotifierServiceForGo2NurseAndNurse360;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -45,7 +45,7 @@ public class UserConsultationAPI {
     @Autowired private ConsultationCategoryService categoryService;
     @Autowired private WeChatService weChatService;
     @Autowired private NursePatientFollowUpRecordService patientFollowRecordService;
-    @Autowired private NotifierServiceForGo2NurseAndNurse360 orderNotifierService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -230,10 +230,12 @@ public class UserConsultationAPI {
     ) {
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.parseString(strTalkStatus);
         UserConsultationBean consultation = userConsultationService.getUserConsultation(consultationId, null);
+        long followUpRecordId = 0;
         if (ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
             List<NursePatientFollowUpRecordBean> followUpRecords = patientFollowRecordService.getPatientFollowUpRecord(CommonStatus.ENABLED, PatientFollowUpType.CONSULTATION, consultationId);
             for (NursePatientFollowUpRecordBean tmp : followUpRecords) {
                 patientFollowRecordService.updatePatientFollowUpRecordById(tmp.getId(), YesNoEnum.YES, YesNoEnum.NO, null);
+                followUpRecordId = tmp.getId();
             }
         }
         Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
@@ -241,7 +243,17 @@ public class UserConsultationAPI {
 
         Long consultationNurseId = talkReturn.get(UserConsultationService.NURSE_ID);
         if (consultationNurseId>0) {
-            orderNotifierService.consultationAlertToNurse(consultationNurseId, consultationId, talkStatus, talkContent);
+            if (!ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
+                notifierForAllModule.followUpAlertToNurse(
+                        PatientFollowUpType.CONSULTATION,
+                        consultationNurseId,
+                        followUpRecordId,
+                        talkStatus.toString(),
+                        talkContent);
+            }
+            else {
+                notifierForAllModule.consultationAlertToNurse(consultationNurseId, consultationId, talkStatus, talkContent);
+            }
         }
 
 

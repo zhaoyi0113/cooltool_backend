@@ -3,7 +3,7 @@ package com.cooltoo.go2nurse.admin.api;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
-import com.cooltoo.go2nurse.service.notification.NotifierServiceForGo2NurseAndNurse360;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ServiceOrderManageAPI {
 
     @Autowired private ServiceOrderService orderService;
-    @Autowired private NotifierServiceForGo2NurseAndNurse360 orderNotifierService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     @Path("/all_order_status")
     @GET
@@ -136,8 +136,8 @@ public class ServiceOrderManageAPI {
                                 @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.cancelOrder(false, -1, orderId);
-        orderNotifierService.orderAlertToNurse(orderId, order.getOrderStatus(), "order canceled!");
-        orderNotifierService.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order canceled!");
+        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order canceled!");
+        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order canceled!");
         return Response.ok(order).build();
     }
 
@@ -148,8 +148,8 @@ public class ServiceOrderManageAPI {
                                    @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.orderInProcess(false, -1, orderId);
-        orderNotifierService.orderAlertToNurse(orderId, order.getOrderStatus(), "order is in_process!");
-        orderNotifierService.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order is in_process!");
+        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order is in_process!");
+        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order is in_process!");
         return Response.ok(order).build();
     }
 
@@ -160,8 +160,8 @@ public class ServiceOrderManageAPI {
                                    @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.completedOrder(false, -1, orderId);
-        orderNotifierService.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
-        orderNotifierService.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
         return Response.ok(order).build();
     }
 }

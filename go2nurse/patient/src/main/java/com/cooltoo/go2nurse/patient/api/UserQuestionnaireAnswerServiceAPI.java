@@ -9,6 +9,7 @@ import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.*;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -251,6 +252,7 @@ public class UserQuestionnaireAnswerServiceAPI {
     //================================================================================
     @Autowired private NursePatientFollowUpService patientFollowUpService;
     @Autowired private NursePatientFollowUpRecordService patientFollowRecordService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     @Path("/nurse/follow-up")
     @GET
@@ -292,6 +294,17 @@ public class UserQuestionnaireAnswerServiceAPI {
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         followUpRecordId = patientFollowRecordService.updatePatientFollowUpRecordById(followUpRecordId, YesNoEnum.YES, YesNoEnum.NO, groupId);
+        NursePatientFollowUpRecordBean followUpRecordBean = patientFollowRecordService.getPatientFollowUpRecordById(followUpRecordId);
+        NursePatientFollowUpBean followUpBean = patientFollowUpService.getPatientFollowUp(followUpRecordBean.getFollowUpId());
+
+        if (followUpRecordId>0) {
+            notifierForAllModule.followUpAlertToNurse(
+                    PatientFollowUpType.QUESTIONNAIRE,
+                    followUpBean.getNurseId(),
+                    followUpRecordId,
+                    "UNREAD",
+                    "user replay questionnaire follow-up!");
+        }
         return Response.ok(followUpRecordId).build();
     }
 }

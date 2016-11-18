@@ -4,7 +4,7 @@ import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
 import com.cooltoo.go2nurse.service.ChargeWebHookService;
 import com.cooltoo.go2nurse.service.DoctorAppointmentService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
-import com.cooltoo.go2nurse.service.notification.NotifierServiceForGo2NurseAndNurse360;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.constants.CommonStatus;
@@ -39,7 +39,7 @@ public class UserServiceOrderAPI {
     @Autowired private ServiceOrderService orderService;
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
     @Autowired private ChargeWebHookService chargeWebHookService;
-    @Autowired private NotifierServiceForGo2NurseAndNurse360 orderNotifierService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     @Path("/category/top")
     @GET
@@ -185,7 +185,7 @@ public class UserServiceOrderAPI {
         else {
             if (null!=order) {
                 ServiceOrderBean orderBean = (ServiceOrderBean)order;
-                orderNotifierService.orderAlertToPatient(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
+                notifierForAllModule.orderAlertToPatient(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
             }
             return Response.ok(returnValue).build();
         }
@@ -219,7 +219,7 @@ public class UserServiceOrderAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.cancelOrder(true, userId, orderId);
-        orderNotifierService.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
         return Response.ok(order).build();
     }
 
@@ -232,7 +232,7 @@ public class UserServiceOrderAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.completedOrder(true, userId, orderId);
-        orderNotifierService.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
         return Response.ok(order).build();
     }
 

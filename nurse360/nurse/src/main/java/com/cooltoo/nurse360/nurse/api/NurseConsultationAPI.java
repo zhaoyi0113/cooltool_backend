@@ -12,8 +12,9 @@ import com.cooltoo.go2nurse.beans.UserConsultationTalkBean;
 import com.cooltoo.go2nurse.constants.ConsultationCreator;
 import com.cooltoo.go2nurse.constants.ConsultationReason;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
+import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.service.ConsultationCategoryService;
-import com.cooltoo.go2nurse.service.notification.NotifierServiceForGo2NurseAndNurse360;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.services.NurseExtensionService;
@@ -41,7 +42,7 @@ public class NurseConsultationAPI {
     @Autowired private ConsultationCategoryService categoryService;
     @Autowired private UserConsultationService userConsultationService;
     @Autowired private NurseExtensionService nurseExtensionService;
-    @Autowired private NotifierServiceForGo2NurseAndNurse360 orderNotifierService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -150,6 +151,17 @@ public class NurseConsultationAPI {
                 ConsultationCreator.NURSE,
                 ConsultationReason.PATIENT_FOLLOW_UP
         );
+
+
+        notifierForAllModule.followUpAlertToPatient(
+                PatientFollowUpType.CONSULTATION,
+                userId,
+                consultationId,
+                ConsultationCreator.NURSE.name(),
+                diseaseDescription
+        );
+
+
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", consultationId);
         return Response.ok(retValue).build();
@@ -215,7 +227,7 @@ public class NurseConsultationAPI {
         Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
 
         Long userId = talkReturn.get(UserConsultationService.USER_ID);
-        orderNotifierService.consultationAlertToPatient(userId, consultationId, talkStatus, talkContent);
+        notifierForAllModule.consultationAlertToPatient(userId, consultationId, talkStatus, talkContent);
 
         Map<String, Long> returnValue = new HashMap<>();
         Long talkId = talkReturn.get(UserConsultationService.TALK_ID);

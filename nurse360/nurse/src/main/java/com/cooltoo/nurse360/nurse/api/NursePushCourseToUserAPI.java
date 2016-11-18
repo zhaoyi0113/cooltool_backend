@@ -9,9 +9,8 @@ import com.cooltoo.go2nurse.beans.NursePushCourseBean;
 import com.cooltoo.go2nurse.service.CourseRelationManageService;
 import com.cooltoo.go2nurse.service.CourseService;
 import com.cooltoo.go2nurse.service.NursePushCourseService;
-import com.cooltoo.go2nurse.service.notification.NotifierServiceForGo2NurseAndNurse360;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
-import com.cooltoo.nurse360.service.NotificationServiceForNurse360;
 import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ public class NursePushCourseToUserAPI {
     @Autowired private NurseServiceForNurse360 nurseService;
     @Autowired private CourseService go2nurseCourseService;
     @Autowired private Nurse360Utility utility;
-    @Autowired private NotifierServiceForGo2NurseAndNurse360 deviceAlertPusher;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     @Path("/category")
     @GET
@@ -139,7 +138,7 @@ public class NursePushCourseToUserAPI {
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NursePushCourseBean push = pushCourseService.pushCourseToUser(nurseId, userId, patientId, courseId);
-        deviceAlertPusher.pushCourseAlertToPatient(userId, courseId, push.getRead(), "course is pushed to patient");
+        notifierForAllModule.pushCourseAlertToPatient(userId, courseId, push.getRead(), "course is pushed to patient");
         return Response.ok(push).build();
     }
 

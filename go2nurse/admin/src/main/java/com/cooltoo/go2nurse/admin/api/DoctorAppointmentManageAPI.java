@@ -2,7 +2,7 @@ package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
 import com.cooltoo.go2nurse.service.DoctorAppointmentService;
-import com.cooltoo.go2nurse.service.notification.NotifierServiceForGo2NurseAndNurse360;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.util.List;
 public class DoctorAppointmentManageAPI {
 
     @Autowired private DoctorAppointmentService doctorAppointmentService;
-    @Autowired private NotifierServiceForGo2NurseAndNurse360 orderNotifierService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     @Path("/by_id")
     @GET
@@ -92,7 +92,7 @@ public class DoctorAppointmentManageAPI {
                                       @FormParam("appointment_id") @DefaultValue("0") long appointmentId
     ) {
         DoctorAppointmentBean appointment = doctorAppointmentService.cancelAppointment(0, 0, appointmentId);
-        orderNotifierService.appointmentAlertToPatient(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment cancelled!");
+        notifierForAllModule.appointmentAlertToPatient(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment cancelled!");
         return Response.ok(appointment).build();
     }
 
@@ -103,7 +103,7 @@ public class DoctorAppointmentManageAPI {
                                         @FormParam("appointment_id") @DefaultValue("0") long appointmentId
     ) {
         DoctorAppointmentBean appointment = doctorAppointmentService.completeAppointment(0, 0, appointmentId);
-        orderNotifierService.appointmentAlertToPatient(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment completed!");
+        notifierForAllModule.appointmentAlertToPatient(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment completed!");
         return Response.ok(appointment).build();
     }
 }
