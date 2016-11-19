@@ -46,7 +46,8 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/nurse360/**");
+        web.ignoring().antMatchers("/nurse360/**", "/v2/api-docs", "/configuration/ui",
+                "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**");
     }
 
     @Override
