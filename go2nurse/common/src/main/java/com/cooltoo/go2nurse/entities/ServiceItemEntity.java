@@ -19,6 +19,7 @@ public class ServiceItemEntity {
     private Date time;
     private CommonStatus status;
     private long vendorId;
+    private long vendorDepartId;
     private ServiceVendorType vendorType;
     private long categoryId;
     private String name;
@@ -52,6 +53,11 @@ public class ServiceItemEntity {
     @Column(name = "vendor_id")
     public long getVendorId() {
         return vendorId;
+    }
+
+    @Column(name = "vendor_department_id")
+    public long getVendorDepartId() {
+        return vendorDepartId;
     }
 
     @Column(name = "vendor_type")
@@ -127,6 +133,10 @@ public class ServiceItemEntity {
         this.vendorId = vendorId;
     }
 
+    public void setVendorDepartId(long vendorDepartId) {
+        this.vendorDepartId = vendorDepartId;
+    }
+
     public void setVendorType(ServiceVendorType vendorType) {
         this.vendorType = vendorType;
     }
@@ -179,6 +189,7 @@ public class ServiceItemEntity {
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
         msg.append(", vendorId=").append(vendorId);
+        msg.append(", vendorDepartId=").append(vendorDepartId);
         msg.append(", vendorType=").append(vendorType);
         msg.append(", categoryId=").append(categoryId);
         msg.append(", name=").append(name);

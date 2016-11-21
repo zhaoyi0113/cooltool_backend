@@ -24,6 +24,8 @@ public class ServiceOrderEntity {
     private ServiceVendorType vendorType;
     private long vendorId;
     private String vendor;
+    private long vendorDepartId;
+    private String vendorDepart;
     private long categoryId;
     private String category;
     private long topCategoryId;
@@ -87,6 +89,16 @@ public class ServiceOrderEntity {
     @Column(name = "item_vendor")
     public String getVendor() {
         return vendor;
+    }
+
+    @Column(name = "item_vendor_department_id")
+    public long getVendorDepartId() {
+        return vendorDepartId;
+    }
+
+    @Column(name = "item_vendor_department")
+    public String getVendorDepart() {
+        return vendorDepart;
     }
 
     @Column(name = "item_category_id")
@@ -226,6 +238,14 @@ public class ServiceOrderEntity {
 
     public void setVendor(String vendor) {
         this.vendor = vendor;
+    }
+
+    public void setVendorDepartId(long vendorDepartId) {
+        this.vendorDepartId = vendorDepartId;
+    }
+
+    public void setVendorDepart(String vendorDepart) {
+        this.vendorDepart = vendorDepart;
     }
 
     public void setCategoryId(long categoryId) {

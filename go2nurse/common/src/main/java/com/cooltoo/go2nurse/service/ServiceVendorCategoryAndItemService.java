@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -20,6 +21,8 @@ import com.cooltoo.go2nurse.repository.ServiceCategoryRepository;
 import com.cooltoo.go2nurse.repository.ServiceItemRepository;
 import com.cooltoo.go2nurse.repository.ServiceVendorRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -65,6 +68,9 @@ public class ServiceVendorCategoryAndItemService {
     @Autowired private ServiceVendorRepository vendorRep;
     @Autowired private ServiceVendorBeanConverter vendorBeanConverter;
     @Autowired private CommonHospitalService hospitalService;
+    @Autowired private CommonDepartmentService departmentService;
+
+    @Autowired private Go2NurseUtility utility;
 
     //=====================================================================
     //                   getting
@@ -456,6 +462,7 @@ public class ServiceVendorCategoryAndItemService {
         List<Long> imagesId = new ArrayList<>();
         List<Long> companyId = new ArrayList<>();
         List<Integer> hospitalsId = new ArrayList<>();
+        List<Integer> hospitalDepartmentsId = new ArrayList<>();
         List<Long> categoryIds = new ArrayList<>();
         for (ServiceItemBean item : items) {
             if (!categoryIds.contains(item.getCategoryId())) {
@@ -470,14 +477,21 @@ public class ServiceVendorCategoryAndItemService {
             if (ServiceVendorType.COMPANY.equals(item.getVendorType()) && !companyId.contains(item.getVendorId())) {
                 companyId.add(item.getVendorId());
             }
-            if (ServiceVendorType.HOSPITAL.equals(item.getVendorType()) && !hospitalsId.contains(item.getVendorId())) {
-                hospitalsId.add((int)item.getVendorId());
+            if (ServiceVendorType.HOSPITAL.equals(item.getVendorType())) {
+                if (!hospitalsId.contains(item.getVendorId())) {
+                    hospitalsId.add((int) item.getVendorId());
+                }
+                if (!hospitalDepartmentsId.contains(item.getVendorDepartId())) {
+                    hospitalDepartmentsId.add((int) item.getVendorDepartId());
+                }
             }
+
         }
 
         Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
         Map<Long, ServiceVendorBean> vendorIdToBean = getVendorIdToBeanMapByIds(companyId);
         Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalsId);
+        Map<Integer, HospitalDepartmentBean> departmentIdToBean = departmentService.getDepartmentIdToBean(hospitalDepartmentsId, utility.getHttpPrefixForNurseGo());
         Map<Long, Long> subCategoryIdToTopId = getSubCategoryIdToTopCategoryId(categoryIds);
         for (ServiceItemBean item : items) {
             String imageUrl = imageIdToUrl.get(item.getImageId());
@@ -502,6 +516,10 @@ public class ServiceVendorCategoryAndItemService {
                 HospitalBean hospital = hospitalIdToBean.get((int)item.getVendorId());
                 if (null!=hospital) {
                     item.setHospital(hospital);
+                }
+                HospitalDepartmentBean department = departmentIdToBean.get((int)item.getVendorDepartId());
+                if (null!=department) {
+                    item.setHospitalDepartment(department);
                 }
             }
         }
@@ -789,10 +807,10 @@ public class ServiceVendorCategoryAndItemService {
     @Transactional
     public ServiceItemBean updateItem(long itemId, String name, String clazz, String description,
                                       String price, Integer timeDuration, String timeUnit,
-                                      Integer grade, Long categoryId, Long vendorId, String strVendorType,
+                                      Integer grade, Long categoryId, Long vendorId, String strVendorType, Long vendorDepartId,
                                       String strStatus) {
-        logger.info("update service item={} by name={} clazz={} description={} price={} timeDuration={} timeUnit={} grade={} categoryId={} vendorId={} vendorType={} status={}",
-                itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, strVendorType, strStatus);
+        logger.info("update service item={} by name={} clazz={} description={} price={} timeDuration={} timeUnit={} grade={} categoryId={} vendorId={} vendorType={} vendorDepartId={} status={}",
+                itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, strVendorType, vendorDepartId, strStatus);
 
         ServiceItemEntity entity = itemRep.findOne(itemId);
         if (null==entity) {
@@ -837,6 +855,10 @@ public class ServiceVendorCategoryAndItemService {
         }
         if (null!=vendorId && vendorId!=entity.getVendorId()) {
             entity.setVendorId(vendorId);
+            changed = true;
+        }
+        if (null!=vendorDepartId && vendorDepartId!=entity.getVendorDepartId()) {
+            entity.setVendorDepartId(vendorDepartId);
             changed = true;
         }
         ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
@@ -966,9 +988,9 @@ public class ServiceVendorCategoryAndItemService {
     }
 
     @Transactional
-    public ServiceItemBean addItem(String name, String clazz, String description, String price, int timeDuration, String timeUnit, int grade, long categoryId, long vendorId, String strVendorType) {
-        logger.info("add service item by name={} clazz={} description={} price={} timeDuration={} timeUnit={} grade={} categoryId={} vendorId={} vendorType={}",
-                name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, strVendorType);
+    public ServiceItemBean addItem(String name, String clazz, String description, String price, int timeDuration, String timeUnit, int grade, long categoryId, long vendorId, String strVendorType, long vendorDepartId) {
+        logger.info("add service item by name={} clazz={} description={} price={} timeDuration={} timeUnit={} grade={} categoryId={} vendorId={} vendorType={} vendorDepartId={}",
+                name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, strVendorType, vendorDepartId);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -991,6 +1013,7 @@ public class ServiceVendorCategoryAndItemService {
         entity.setGrade(grade<0 ? 0 : grade);
         entity.setCategoryId(categoryId<0 ? 0 : categoryId);
         entity.setVendorId(vendorId<0 ? 0 : vendorId);
+        entity.setVendorDepartId(vendorDepartId<0 ? 0 : vendorDepartId);
         entity.setVendorType(null==vendorType ? ServiceVendorType.NONE : vendorType);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());

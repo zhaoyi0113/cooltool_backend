@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.converter;
 
 import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
@@ -41,6 +42,13 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
             else if (ServiceVendorType.COMPANY.equals(bean.getVendorType())) {
                 ServiceVendorBean vendor = jsonUtil.parseJsonBean(source.getVendor(), ServiceVendorBean.class);
                 bean.setVendor(vendor);
+            }
+        }
+        bean.setVendorDepartId(source.getVendorDepartId());
+        if (null!=source.getVendorDepart()) {
+            if (ServiceVendorType.HOSPITAL.equals(bean.getVendorType())) {
+                HospitalDepartmentBean vendorDepart = jsonUtil.parseJsonBean(source.getVendorDepart(), HospitalDepartmentBean.class);
+                bean.setVendorHospitalDepart(vendorDepart);
             }
         }
 

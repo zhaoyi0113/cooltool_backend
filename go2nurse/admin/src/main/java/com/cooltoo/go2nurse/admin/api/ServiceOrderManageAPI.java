@@ -209,7 +209,7 @@ public class ServiceOrderManageAPI {
                                             @FormParam("department_id") @DefaultValue("0") int departmentId,
                                             @FormParam("register_from") @DefaultValue("") String registerFrom/* cooltoo, go2nurse */
     ) {
-        //TODO -- notify nurse in department to fetch order
+        //notify nurse in department to fetch order
         List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
         if (null!=orders && !orders.isEmpty()) {
             ServiceOrderBean order = orders.get(0);

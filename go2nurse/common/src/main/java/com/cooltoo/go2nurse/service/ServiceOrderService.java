@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.go2nurse.constants.AppType;
 import com.cooltoo.go2nurse.constants.ChargeType;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
@@ -47,6 +48,7 @@ public class ServiceOrderService {
     @Autowired private ServiceOrderRepository repository;
     @Autowired private ServiceOrderBeanConverter beanConverter;
 
+    @Autowired private UserService userService;
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
     @Autowired private PatientService patientService;
     @Autowired private UserAddressService addressService;
@@ -610,11 +612,15 @@ public class ServiceOrderService {
             logger.error("service item not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
+        if (!userService.existUser(userId)) {
+            logger.error("user not exists");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
         if (patientId != 0 && !patientService.existPatient(patientId)) {
             logger.error("patient not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (!addressService.existAddress(addressId)) {
+        if (addressId != 0 && !addressService.existAddress(addressId)) {
             logger.error("address not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
@@ -642,9 +648,15 @@ public class ServiceOrderService {
         ServiceVendorType vendorType = serviceItem.getVendorType();
         ServiceVendorBean vendor = serviceItem.getVendor();
         HospitalBean vendorHospital = serviceItem.getHospital();
+        HospitalDepartmentBean vendorHospitalDepart = serviceItem.getHospitalDepartment();
         String vendorJson = null;
+        String vendorDepartJson = null;
         if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
             vendorJson = jsonUtil.toJsonString(vendorHospital);
+            if (null!=vendorHospitalDepart) {
+                vendorDepartJson= jsonUtil.toJsonString(vendorHospitalDepart);
+            }
+
         } else if (ServiceVendorType.COMPANY.equals(vendorType)) {
             vendorJson = jsonUtil.toJsonString(vendor);
         }
@@ -692,8 +704,10 @@ public class ServiceOrderService {
         entity.setServiceItem(serviceItemJson);
 
         entity.setVendorId(serviceItem.getVendorId());
+        entity.setVendorDepartId(serviceItem.getVendorDepartId());
         entity.setVendorType(serviceItem.getVendorType());
         entity.setVendor(vendorJson);
+        entity.setVendorDepart(vendorDepartJson);
 
         entity.setCategoryId(0L);
         if (null != serviceCategory) {

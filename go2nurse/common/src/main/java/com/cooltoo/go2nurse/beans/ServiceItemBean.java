@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.ServiceClass;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
@@ -17,9 +18,11 @@ public class ServiceItemBean {
     private Date time;
     private CommonStatus status;
     private long vendorId;
+    private long vendorDepartId;
     private ServiceVendorType vendorType;
     private ServiceVendorBean vendor;
     private HospitalBean hospital;
+    private HospitalDepartmentBean hospitalDepartment;
     private long topCategoryId;
     private long categoryId;
     private String name;
@@ -51,6 +54,10 @@ public class ServiceItemBean {
         return vendorId;
     }
 
+    public long getVendorDepartId() {
+        return vendorDepartId;
+    }
+
     public ServiceVendorType getVendorType() {
         return vendorType;
     }
@@ -61,6 +68,10 @@ public class ServiceItemBean {
 
     public HospitalBean getHospital() {
         return hospital;
+    }
+
+    public HospitalDepartmentBean getHospitalDepartment() {
+        return hospitalDepartment;
     }
 
     public long getTopCategoryId() {
@@ -127,6 +138,10 @@ public class ServiceItemBean {
         this.vendorId = vendorId;
     }
 
+    public void setVendorDepartId(long vendorDepartId) {
+        this.vendorDepartId = vendorDepartId;
+    }
+
     public void setVendorType(ServiceVendorType vendorType) {
         this.vendorType = vendorType;
     }
@@ -137,6 +152,10 @@ public class ServiceItemBean {
 
     public void setHospital(HospitalBean hospital) {
         this.hospital = hospital;
+    }
+
+    public void setHospitalDepartment(HospitalDepartmentBean department) {
+        this.hospitalDepartment = department;
     }
 
     public void setTopCategoryId(long topCategoryId) {

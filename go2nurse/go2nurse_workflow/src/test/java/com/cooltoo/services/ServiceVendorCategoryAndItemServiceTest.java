@@ -288,7 +288,7 @@ public class ServiceVendorCategoryAndItemServiceTest extends AbstractCooltooTest
         long vendorId = 30;
         ServiceVendorType vendorType = ServiceVendorType.COMPANY;
         CommonStatus status = CommonStatus.DELETED;
-        ServiceItemBean item = vendorCategoryAndItemService.updateItem(itemId, name, clazz.name(), description, price+"", timeDuration, timeUnit.name(), grade, categoryId, vendorId, vendorType.name(), status.name());
+        ServiceItemBean item = vendorCategoryAndItemService.updateItem(itemId, name, clazz.name(), description, price+"", timeDuration, timeUnit.name(), grade, categoryId, vendorId, vendorType.name(), 0L, status.name());
         Assert.assertEquals(itemId, item.getId());
         Assert.assertEquals(name, item.getName());
         Assert.assertEquals(clazz, item.getClazz());
@@ -339,7 +339,7 @@ public class ServiceVendorCategoryAndItemServiceTest extends AbstractCooltooTest
         long categoryId = 130;
         long vendorId = 30;
         ServiceVendorType vendorType = ServiceVendorType.COMPANY;
-        ServiceItemBean item = vendorCategoryAndItemService.addItem(name, clazz.name(), description, price+"", timeDuration, timeUnit.name(), grade, categoryId, vendorId, vendorType.name());
+        ServiceItemBean item = vendorCategoryAndItemService.addItem(name, clazz.name(), description, price+"", timeDuration, timeUnit.name(), grade, categoryId, vendorId, vendorType.name(), 0);
         Assert.assertTrue(item.getId()>0);
         Assert.assertEquals(name, item.getName());
         Assert.assertEquals(clazz, item.getClazz());

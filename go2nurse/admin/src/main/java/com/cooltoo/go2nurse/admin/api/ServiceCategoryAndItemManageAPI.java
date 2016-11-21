@@ -302,10 +302,11 @@ public class ServiceCategoryAndItemManageAPI {
                                    @FormParam("time_unit") @DefaultValue("") String timeUnit,
                                    @FormParam("grade") @DefaultValue("0") int grade,
                                    @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                   @FormParam("vendor_type") @DefaultValue("") String vendorType,
                                    @FormParam("vendor_id") @DefaultValue("0") long vendorId,
-                                   @FormParam("vendor_type") @DefaultValue("") String vendorType
+                                   @FormParam("vendor_depart_id") @DefaultValue("0") long vendorDepartId
     ) {
-        ServiceItemBean serviceItem = vendorCategoryAndItemService.addItem(name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, vendorType);
+        ServiceItemBean serviceItem = vendorCategoryAndItemService.addItem(name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, vendorType, vendorDepartId);
         return Response.ok(serviceItem).build();
     }
 
@@ -382,15 +383,17 @@ public class ServiceCategoryAndItemManageAPI {
                                     @FormParam("time_unit") @DefaultValue("") String timeUnit,
                                     @FormParam("grade") @DefaultValue("") String strGrade,
                                     @FormParam("category_id") @DefaultValue("") String strCategoryId,
-                                    @FormParam("vendor_id") @DefaultValue("") String strVendorId,
                                     @FormParam("vendor_type") @DefaultValue("") String vendorType,
+                                    @FormParam("vendor_id") @DefaultValue("") String strVendorId,
+                                    @FormParam("vendor_depart_id") @DefaultValue("") String strVendorDepartId,
                                     @FormParam("status") @DefaultValue("") String status
     ) {
         Integer timeDuration = !VerifyUtil.isIds(strTimeDuration) ? null : VerifyUtil.parseIntIds(strTimeDuration).get(0);
         Integer grade = !VerifyUtil.isIds(strGrade) ? null : VerifyUtil.parseIntIds(strGrade).get(0);
         Long categoryId = !VerifyUtil.isIds(strCategoryId) ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
         Long vendorId = !VerifyUtil.isIds(strVendorId) ? null : VerifyUtil.parseLongIds(strVendorId).get(0);
-        ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItem(itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, vendorType, status);
+        Long vendorDepartId = !VerifyUtil.isIds(strVendorDepartId) ? null : VerifyUtil.parseLongIds(strVendorDepartId).get(0);
+        ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItem(itemId, name, clazz, description, price, timeDuration, timeUnit, grade, categoryId, vendorId, vendorType, vendorDepartId, status);
         return Response.ok(serviceItem).build();
     }
 

@@ -28,6 +28,7 @@ public class ServiceItemBeanConverter implements Converter<ServiceItemEntity, Se
         bean.setServiceTimeDuration(source.getServiceTimeDuration());
         bean.setServiceTimeUnit(source.getServiceTimeUnit());
         bean.setGrade(source.getGrade());
+        bean.setVendorDepartId(source.getVendorDepartId());
         return bean;
     }
 }

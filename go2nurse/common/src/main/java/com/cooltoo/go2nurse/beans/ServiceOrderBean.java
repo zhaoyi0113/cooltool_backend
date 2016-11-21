@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.OrderStatus;
@@ -29,6 +30,8 @@ public class ServiceOrderBean {
     private long vendorId;
     private ServiceVendorBean vendor;
     private HospitalBean vendorHospital;
+    private long vendorDepartId;
+    private HospitalDepartmentBean vendorHospitalDepart;
     private long categoryId;
     private ServiceCategoryBean category;
     private long topCategoryId;
@@ -93,6 +96,14 @@ public class ServiceOrderBean {
 
     public HospitalBean getVendorHospital() {
         return vendorHospital;
+    }
+
+    public long getVendorDepartId() {
+        return vendorDepartId;
+    }
+
+    public HospitalDepartmentBean getVendorHospitalDepart() {
+        return vendorHospitalDepart;
     }
 
     public long getCategoryId() {
@@ -233,6 +244,14 @@ public class ServiceOrderBean {
 
     public void setVendorHospital(HospitalBean vendorHospital) {
         this.vendorHospital = vendorHospital;
+    }
+
+    public void setVendorDepartId(long vendorDepartId) {
+        this.vendorDepartId = vendorDepartId;
+    }
+
+    public void setVendorHospitalDepart(HospitalDepartmentBean department) {
+        this.vendorHospitalDepart = department;
     }
 
     public void setCategoryId(long categoryId) {
