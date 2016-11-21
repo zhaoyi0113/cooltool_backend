@@ -217,7 +217,7 @@ public class ServiceOrderManageAPI {
             List<Long> nursesId = getNurseIds(nurses);
             notifierForAllModule.newOrderAlertToNurse(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
         }
-        return null;
+        return Response.ok().build();
     }
 
     @POST
