@@ -1,11 +1,19 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.CourseBean;
+import com.cooltoo.go2nurse.beans.NursePatientFollowUpBean;
+import com.cooltoo.go2nurse.beans.NursePatientFollowUpRecordBean;
 import com.cooltoo.go2nurse.beans.NursePushCourseBean;
+import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
+import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.service.NursePatientFollowUpRecordService;
+import com.cooltoo.go2nurse.service.NursePatientFollowUpService;
 import com.cooltoo.go2nurse.service.NursePushCourseService;
 import com.cooltoo.go2nurse.service.UserCourseRelationService;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,12 +28,14 @@ import java.util.List;
  * Created by zhaolisong on 2016/11/21.
  */
 @Path("/user")
-public class NursePushCourseAPI {
+public class NurseFollowUpAPI {
 
+    @Autowired private NursePatientFollowUpService nursePatientFollowUpService;
+    @Autowired private NursePatientFollowUpRecordService nursePatientFollowUpRecordService;
     @Autowired private NursePushCourseService nursePushCourseService;
     @Autowired private UserCourseRelationService userCourseRelationService;
 
-    @Path("/course/pushed")
+    @Path("/nurse/course/pushed")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
@@ -44,38 +54,55 @@ public class NursePushCourseAPI {
         return Response.ok(coursesPushed).build();
     }
 
-    @Path("/all")
-    @DELETE
+    @Path("/nurse/follow-up/consultation")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response deleteAllHistory(@Context HttpServletRequest request) {
-        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<Long> pushedRecordIds = nursePushCourseService.deletePushedCourseReadStatus(nurseId, null, null);
-        return Response.ok(pushedRecordIds).build();
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getNurseFollowUpConsultation(@Context HttpServletRequest request,
+                                                 @QueryParam("nurse_id") @DefaultValue("0") long nurseId,
+                                                 @QueryParam("index")    @DefaultValue("0") int pageIndex,
+                                                 @QueryParam("number")   @DefaultValue("0") int sizePerPage
+
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<NursePatientFollowUpRecordBean> visits = getPatientFollowUpRecord(userId, nurseId, PatientFollowUpType.CONSULTATION, pageIndex, sizePerPage);
+        return Response.ok(visits).build();
     }
 
-    @DELETE
+    @Path("/nurse/follow-up/questionnaire")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response deleteHistory(@Context HttpServletRequest request,
-                                  @FormParam("push_record_id") @DefaultValue("0") long recordId
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getNurseFollowUpQuestionnaire(@Context HttpServletRequest request,
+                                                  @QueryParam("nurse_id") @DefaultValue("0") long nurseId,
+                                                  @QueryParam("index")    @DefaultValue("0") int pageIndex,
+                                                  @QueryParam("number")   @DefaultValue("0") int sizePerPage
+
     ) {
-        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        boolean success = nursePushCourseService.deletePushCourseReadStatus(nurseId, recordId);
-        return Response.ok(success ? "ok" : "failed").build();
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<NursePatientFollowUpRecordBean> visits = getPatientFollowUpRecord(userId, nurseId, PatientFollowUpType.QUESTIONNAIRE, pageIndex, sizePerPage);
+        return Response.ok(visits).build();
     }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response pushCourseToUser(@Context HttpServletRequest request,
-                                     @FormParam("user_id") @DefaultValue("0") long userId,
-                                     @FormParam("patient_id") @DefaultValue("0") long patientId,
-                                     @FormParam("course_id") @DefaultValue("0") long courseId
-    ) {
-        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        NursePushCourseBean push = nursePushCourseService.pushCourseToUser(nurseId, userId, patientId, courseId);
-        notifierForAllModule.pushCourseAlertToPatient(userId, courseId, push.getRead(), "course is pushed to patient");
-        return Response.ok(push).build();
+    private List<NursePatientFollowUpRecordBean> getPatientFollowUpRecord(long userId, long nurseId, PatientFollowUpType followUpType, int pageIndex, int sizePerPage) {
+        List<NursePatientFollowUpBean> followUpBeans = nursePatientFollowUpService.getPatientFollowUp(userId, null, nurseId);
+        List<Long> followUpIds = new ArrayList<>();
+        for (NursePatientFollowUpBean tmp : followUpBeans) {
+            followUpIds.add(tmp.getUserId());
+        }
+        if (VerifyUtil.isListEmpty(followUpIds)) {
+            return new ArrayList<>();
+        }
+        else {
+            List<NursePatientFollowUpRecordBean> visits = nursePatientFollowUpRecordService.getPatientFollowUpRecordByFollowUpIds(
+                    CommonStatus.DELETED,
+                    followUpType,
+                    null,
+                    null,
+                    followUpIds,
+                    ConsultationTalkStatus.USER_SPEAK,
+                    pageIndex, sizePerPage, false);
+            return visits;
+        }
     }
 }
