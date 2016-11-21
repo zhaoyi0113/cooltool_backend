@@ -89,11 +89,11 @@ public class UserConsultationService {
     //             get ----  patient using
     //===============================================================
 
-    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, Long categoryId, String contentLike, ConsultationReason reason, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
+    public List<UserConsultationBean> getUserConsultation(boolean getAll, Long userId, Long nurseId, Long categoryId, String contentLike, ConsultationReason reason, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
         logger.info("user={} nusre={} get consultation (contentLike={}) categoryId={} at page={} sizePerPage={}",
                 userId, nurseId, contentLike, categoryId, pageIndex, sizePerPage);
         List<UserConsultationBean> beans;
-        if (null==nurseId && null==userId && VerifyUtil.isStringEmpty(contentLike)) {
+        if (!getAll && null==nurseId && null==userId && VerifyUtil.isStringEmpty(contentLike)) {
             beans = new ArrayList<>();
         }
         else {

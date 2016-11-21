@@ -77,7 +77,15 @@ public class NurseConsultationAPI {
         nurseId = YesNoEnum.YES.equals(allConsultation) ? null : nurseId;
         Long categoryId = 0==lCategoryId ? null : new Long(lCategoryId);
 
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(null, nurseId, categoryId, content, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.NURSE_SPEAK);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(
+                YesNoEnum.YES.equals(allConsultation),
+                null,
+                nurseId,
+                categoryId,
+                content,
+                ConsultationReason.CONSULTATION,
+                pageIndex, sizePerPage,
+                ConsultationTalkStatus.NURSE_SPEAK);
         return Response.ok(consultations).build();
     }
 
