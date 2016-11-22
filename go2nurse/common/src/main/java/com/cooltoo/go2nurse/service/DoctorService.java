@@ -470,10 +470,10 @@ public class DoctorService {
             String httpPrefixUrl = "";
             // replace all temp http prefix url
             httpPrefixUrl = utility.getHttpPrefix()+tempStorage.getNginxRelativePath();
-            htmlContent.replace(httpPrefixUrl, "");
+            htmlContent = htmlContent.replace(httpPrefixUrl, "");
             // replace all user http prefix url
             httpPrefixUrl = utility.getHttpPrefix()+userStorage.getNginxRelativePath();
-            htmlContent.replace(httpPrefixUrl, "");
+            htmlContent = htmlContent.replace(httpPrefixUrl, "");
 
             //
             // move temporary file to official path
