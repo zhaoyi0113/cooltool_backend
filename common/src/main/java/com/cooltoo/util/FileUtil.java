@@ -319,8 +319,14 @@ public class FileUtil {
         String currentMoving = "currentMoving";
         Map<String, String> filePath2StoragePath = new Hashtable<>();
         Map<String, String> successMoved         = new Hashtable<>();
+        File fileExist;
         try {
             for (String srcFilePath : srcFileAbsolutePath) {
+                fileExist = new File(srcFilePath);
+                if (!fileExist.exists()) {
+                    logger.warn("file not exist. file is ={}", srcFilePath);
+                    continue;
+                }
                 currentMoving = srcFilePath;
                 String[] baseurlDirSha1 = decodeFilePath(srcFilePath);
                 // relative_file_path_in_temporary--->dir/sha1

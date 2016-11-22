@@ -519,47 +519,39 @@ public class CourseService {
             // images need to download
             if (!VerifyUtil.isListEmpty(srcUrls)) {
 
-                // is url not matched cooltoo file storage system
-                for (int i=0; i<srcUrls.size(); i++) {
-                    String tmp = srcUrls.get(i);
-                    if (!tmp.matches(FileUtil.CooltooFileFormatter)) {
-                        continue;
-                    }
-                    srcUrls.remove(i);
-                    i--;
-                }
-
+                //
                 // download all image needed download
                 // move them to temporary file storage path
                 // replace the image tag src url to temporary file storage relative path
-                if (!VerifyUtil.isListEmpty(srcUrls)) {
-                    // download the image tags src to /temp path
-                    Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
+                //
 
-                    // move image to cooltoo file storage system
-                    // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path
-                    Map<String, String> fileInTempBaseToRelativeTempPath = new HashMap<>();
-                    Map<String, String> srcUrlsToRelativeUrl = new HashMap<>();
-                    Set<String> fetchUrls = srcUrlToFileInTempBasePath.keySet();
-                    for (String url : fetchUrls) {
-                        try {
-                            String[] relativePath = fileUtil.encodeFilePath(fileUtil.getFileName(url));
-                            String fileInTempBase = srcUrlToFileInTempBasePath.get(url);
+                // download the image tags src to /temp path
+                Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
 
-                            srcUrlsToRelativeUrl.put(url, relativePath[0] + File.separator + relativePath[1]);
-                            fileInTempBaseToRelativeTempPath.put(fileInTempBase, tempStorage.getStoragePath() + relativePath[0] + File.separator + relativePath[1]);
-                        }
-                        catch (Exception ex) {
-                            logger.error("move temp files to directory failed!");
-                            throw new BadRequestException(ErrorCode.DATA_ERROR);
-                        }
+                // move image to cooltoo file storage system
+                // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path
+                Map<String, String> fileInTempBaseToRelativeTempPath = new HashMap<>();
+                Map<String, String> srcUrlsToRelativeUrl = new HashMap<>();
+                Set<String> fetchUrls = srcUrlToFileInTempBasePath.keySet();
+                for (String url : fetchUrls) {
+                    try {
+                        String[] relativePath = fileUtil.encodeFilePath(fileUtil.getFileName(url));
+                        String fileInTempBase = srcUrlToFileInTempBasePath.get(url);
+
+                        srcUrlsToRelativeUrl.put(url, relativePath[0] + File.separator + relativePath[1]);
+                        fileInTempBaseToRelativeTempPath.put(fileInTempBase, tempStorage.getStoragePath() + relativePath[0] + File.separator + relativePath[1]);
                     }
-                    fileUtil.moveFiles(fileInTempBaseToRelativeTempPath);
-
-                    // change image url to cooltoo file storage system path
-                    Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(htmlContent);
-                    htmlContent = htmlParser.replaceImgTagSrcUrl(htmlContent, imgTag2SrcValue, srcUrlsToRelativeUrl);
+                    catch (Exception ex) {
+                        logger.error("move temp files to directory failed!");
+                        throw new BadRequestException(ErrorCode.DATA_ERROR);
+                    }
                 }
+                fileUtil.moveFiles(fileInTempBaseToRelativeTempPath);
+
+                // change image url to cooltoo file storage system path
+                Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(htmlContent);
+                htmlContent = htmlParser.replaceImgTagSrcUrl(htmlContent, imgTag2SrcValue, srcUrlsToRelativeUrl);
+
 
                 // move temporary file to official path
                 srcUrls = htmlParser.getSrcUrls(htmlContent);

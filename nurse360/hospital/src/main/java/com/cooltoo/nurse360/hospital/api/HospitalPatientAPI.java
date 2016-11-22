@@ -2,12 +2,16 @@ package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.UserAuthority;
+import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
+import com.cooltoo.go2nurse.service.PatientService;
 import com.cooltoo.go2nurse.service.UserHospitalizedRelationService;
+import com.cooltoo.go2nurse.service.UserPatientRelationService;
 import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.nurse360.beans.HospitalAdminAuthentication;
 import com.cooltoo.nurse360.beans.HospitalAdminBean;
 import com.cooltoo.util.SetUtil;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.core.MediaType;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 2016/11/17.
@@ -27,6 +31,28 @@ public class HospitalPatientAPI {
 
     @Autowired private UserHospitalizedRelationService userHospitalizedService;
     @Autowired private UserService userService;
+    @Autowired private UserPatientRelationService userPatientRelation;
+    @Autowired private PatientService patientService;
+
+    //=============================================================
+    //            Permit ALL Role
+    //=============================================================
+    @RequestMapping(path = "/patient/information", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Object> getPatient(@RequestParam(defaultValue = "0", name = "user_id")    long userId,
+                                          @RequestParam(defaultValue = "0", name = "patient_id") long patientId
+    ) {
+        Map<String, Object> returnValue = new HashMap<>();
+        UserBean user = userService.getUser(userId);
+        returnValue.put("user", user);
+
+        PatientBean patient = patientService.getOneById(patientId);
+        List<Long> relativeUserIds = userPatientRelation.getUserIdByPatient(Arrays.asList(new Long[]{patientId}), CommonStatus.ENABLED.name());
+        if (!VerifyUtil.isListEmpty(relativeUserIds) && relativeUserIds.contains(userId)) {
+            returnValue.put("patient", patient);
+        }
+
+        return returnValue;
+    }
 
 
     //=============================================================

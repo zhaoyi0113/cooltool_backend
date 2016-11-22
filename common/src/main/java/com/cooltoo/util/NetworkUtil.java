@@ -61,7 +61,14 @@ public final class NetworkUtil {
                     continue;
                 }
 
-                URL url = new URL(tmpUrl);
+
+                URL url = null;
+                try { url = new URL(tmpUrl); }
+                catch (IOException ex) {}
+                if (null==url) {
+                    continue;
+                }
+
                 URLConnection conn = url.openConnection();
                 long contentLength = conn.getContentLengthLong();
 
@@ -75,7 +82,9 @@ public final class NetworkUtil {
                 File file = new File(directory, fileName);
 
                 if (!error) {
-                    is = conn.getInputStream();
+                    try { is = conn.getInputStream(); }
+                    catch (IOException io) { continue; }
+
                     os = new FileOutputStream(file);
                     int read = 0;
                     while ((read = is.read(buffer, 0, buffer.length)) > 0) {
