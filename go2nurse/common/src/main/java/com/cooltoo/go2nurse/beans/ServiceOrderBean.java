@@ -20,6 +20,7 @@ import java.util.Map;
 public class ServiceOrderBean {
 
     public static final String FLAG = "FLAG";
+    public static final String WAIT_STAFF = "WaitStaff";
 
     private long id;
     private Date time;

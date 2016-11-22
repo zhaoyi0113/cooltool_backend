@@ -28,8 +28,9 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrderEntity
             " AND (?4 IS NULL OR order1.topCategoryId=?4)" +
             " AND (?5 IS NULL OR order1.vendorType=?5)" +
             " AND (?6 IS NULL OR order1.vendorId=?6)" +
-            " AND (?7 IS NULL OR order1.orderStatus=?7)")
-    long countByConditions(Long itemId, Long userId, Long categoryId, Long topCategoryId, ServiceVendorType vendorType, Long vendorId, OrderStatus orderStatus);
+            " AND (?7 IS NULL OR order1.orderStatus=?7)" +
+            " AND (?8 IS NULL OR order1.vendorDepartId=?8)")
+    long countByConditions(Long itemId, Long userId, Long categoryId, Long topCategoryId, ServiceVendorType vendorType, Long vendorId, OrderStatus orderStatus, Long vendorDepartId);
 
     @Query("FROM ServiceOrderEntity order1" +
             " WHERE (?1 IS NULL OR order1.serviceItemId=?1)" +
@@ -38,8 +39,9 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrderEntity
             " AND (?4 IS NULL OR order1.topCategoryId=?4)" +
             " AND (?5 IS NULL OR order1.vendorType=?5)" +
             " AND (?6 IS NULL OR order1.vendorId=?6)" +
-            " AND (?7 IS NULL OR order1.orderStatus=?7)")
-    Page<ServiceOrderEntity> findByConditions(Long itemId, Long userId, Long categoryId, Long topCategoryId, ServiceVendorType vendorType, Long vendorId, OrderStatus orderStatus, Pageable page);
+            " AND (?7 IS NULL OR order1.orderStatus=?7)" +
+            " AND (?8 IS NULL OR order1.vendorDepartId=?8)")
+    Page<ServiceOrderEntity> findByConditions(Long itemId, Long userId, Long categoryId, Long topCategoryId, ServiceVendorType vendorType, Long vendorId, OrderStatus orderStatus, Long vendorDepartId, Pageable page);
 
 
     @Query("FROM ServiceOrderEntity order1" +

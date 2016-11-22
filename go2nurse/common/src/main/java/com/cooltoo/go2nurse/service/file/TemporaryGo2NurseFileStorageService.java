@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.service.file;
 
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.services.file.AbstractFileStorageService;
 import com.cooltoo.services.file.InterfaceFileStorageDB;
 import com.cooltoo.util.VerifyUtil;
@@ -32,6 +33,9 @@ public class TemporaryGo2NurseFileStorageService extends AbstractFileStorageServ
     @Autowired
     @Qualifier("Go2NurseFileStorageService")
     private InterfaceFileStorageDB dbService;
+
+    @Autowired
+    private Go2NurseUtility utility;
 
     @Override
     public InterfaceFileStorageDB getDbService() {
@@ -68,6 +72,11 @@ public class TemporaryGo2NurseFileStorageService extends AbstractFileStorageServ
         return fileUtil.moveFilesToDest(srcFileAbsolutePath, this, false);
     }
 
+    @Override
+    public Map<Long, String> getFileUrl(List<Long> fileIds, String httpPrefix) {
+        return super.getFileUrl(fileIds, utility.getHttpPrefix());
+    }
+
     @Deprecated @Override public long addFile(long oldFileId, String fileName, InputStream file) {
         throw new UnsupportedOperationException();
     }
@@ -78,9 +87,6 @@ public class TemporaryGo2NurseFileStorageService extends AbstractFileStorageServ
         throw new UnsupportedOperationException();
     }
     @Deprecated @Override public String getFilePath(long fileId) {
-        throw new UnsupportedOperationException();
-    }
-    @Deprecated @Override public Map<Long, String> getFileUrl(List<Long> fileIds, String httpPrefix) {
         throw new UnsupportedOperationException();
     }
     @Deprecated @Override public boolean fileExist(long fileId) {

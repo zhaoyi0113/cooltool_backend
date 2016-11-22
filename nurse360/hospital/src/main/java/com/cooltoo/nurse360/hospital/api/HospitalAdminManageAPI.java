@@ -66,7 +66,7 @@ public class HospitalAdminManageAPI {
                                        @RequestParam(required = false, defaultValue = "", name = "email") String email,
                                        @RequestParam(required = false, defaultValue = "", name = "hospitalId") String strHospitalId,
                                        @RequestParam(required = false, defaultValue = "", name = "departmentId") String strDepartmentId,
-                                       @RequestParam(required = false, defaultValue = "", name = "adminType") String strAdminType, /* administrator, normal */
+                                       @RequestParam(required = false, defaultValue = "", name = "adminType") String strAdminType, /* administrator, normal, manager */
                                        @RequestParam(required = false, defaultValue = "", name = "status") String strStatus /* enabled, disabled */
     ) {
         Integer hospitalId   = VerifyUtil.isIds(strHospitalId)   ? VerifyUtil.parseIntIds(strHospitalId).get(0) : null;
@@ -83,7 +83,7 @@ public class HospitalAdminManageAPI {
                                                     @RequestParam(required = false, defaultValue = "", name = "email") String email,
                                                     @RequestParam(required = false, defaultValue = "", name = "hospitalId") String strHospitalId,
                                                     @RequestParam(required = false, defaultValue = "", name = "departmentId") String strDepartmentId,
-                                                    @RequestParam(required = false, defaultValue = "", name = "adminType") String strAdminType, /* administrator, normal */
+                                                    @RequestParam(required = false, defaultValue = "", name = "adminType") String strAdminType, /* administrator, normal, manager */
                                                     @RequestParam(required = false, defaultValue = "", name = "status") String strStatus, /* enabled, disabled */
                                                     @RequestParam(defaultValue = "0", name = "index") int pageIndex,
                                                     @RequestParam(defaultValue = "10", name = "number") int sizePerPage
@@ -133,7 +133,7 @@ public class HospitalAdminManageAPI {
                                                  @RequestParam(required = false, defaultValue = "",   name = "email")      String email,
                                                  @RequestParam(name = "hospital_id")   int hospitalId,
                                                  @RequestParam(name = "department_id") int departmentId,
-                                                 @RequestParam(required = false, defaultValue = "",   name = "admin_type") String adminType /* administrator, manager, nurse */
+                                                 @RequestParam(required = false, defaultValue = "",   name = "admin_type") String adminType /* administrator, manager, normal */
     ) {
         AdminUserType adminUserType = AdminUserType.parseString(adminType);
         adminUserType = null==adminUserType ? AdminUserType.NORMAL : adminUserType;

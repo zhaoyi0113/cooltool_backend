@@ -83,6 +83,15 @@ public class NurseServiceForGo2Nurse {
         return nurseIdToBean;
     }
 
+    public long countNurseByCanAnswerQuestion(String name, String strCanAnswerQuestion, String strCanSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
+        logger.info("count nurse can answer questions");
+        YesNoEnum canAnswerQuestion = YesNoEnum.parseString(strCanAnswerQuestion);
+        YesNoEnum canSeeAllOrder = YesNoEnum.parseString(strCanSeeAllOrder);
+        long count = commonNurseService.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL, name, canAnswerQuestion, canSeeAllOrder, hospitalId, departmentId, registerFrom);
+        logger.info("count is {}", count);
+        return count;
+    }
+
     public List<NurseBean> getNurseByCanAnswerQuestion(String name, String strCanAnswerQuestion, String strCanSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, int pageIndex, int sizePerPage) {
         logger.info("get nurse can answer questions at pageIndex={} sizePerPage={}", pageIndex, sizePerPage);
         YesNoEnum canAnswerQuestion = YesNoEnum.parseString(strCanAnswerQuestion);

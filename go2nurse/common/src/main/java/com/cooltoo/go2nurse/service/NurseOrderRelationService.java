@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
@@ -102,6 +103,29 @@ public class NurseOrderRelationService {
 
         logger.info("count is {}", orders.size());
         return orders;
+    }
+
+    public Map<Long, Long> getOrdersWaitStaffId(List<Long> orderIds) {
+        Map<Long, Long> orderIdToNurseId = new HashMap<>();
+        if (VerifyUtil.isListEmpty(orderIds)) {
+            return orderIdToNurseId;
+        }
+        List<NurseOrderRelationEntity> nurseOrderRelations = repository.findByOrderIdInAndStatus(orderIds, CommonStatus.ENABLED, sort);
+        if (!VerifyUtil.isListEmpty(nurseOrderRelations)) {
+            for (NurseOrderRelationEntity tmp : nurseOrderRelations) {
+                orderIdToNurseId.put(tmp.getOrderId(), tmp.getNurseId());
+            }
+        }
+        return orderIdToNurseId;
+    }
+
+    public long countOrderByNurseIdAndOrderStatus(long nurseId, String strStatus, OrderStatus orderStatus) {
+        logger.info("count orders by nurseId={} with status={} and orderStatus={}", nurseId, strStatus, orderStatus);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Long> resultSet = repository.findByNurseIdAndStatus(nurseId, status, sort);
+        List<Long> orderIdExisted = orderService.isOrderIdExisted(resultSet, orderStatus);
+
+        return VerifyUtil.isListEmpty(orderIdExisted) ? 0 : orderIdExisted.size();
     }
 
     public List<ServiceOrderBean> getOrderByNurseIdAndOrderStatus(long nurseId, String strStatus, OrderStatus orderStatus, int pageIndex, int sizePerPage) {

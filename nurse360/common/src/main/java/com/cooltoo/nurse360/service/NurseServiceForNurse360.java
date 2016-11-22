@@ -57,15 +57,6 @@ public class NurseServiceForNurse360 {
         return commonNurseService.existNurse(nurseId);
     }
 
-    public NurseBean getNurse(String mobile) {
-        List<NurseEntity> nurses = commonNurseService.getNurseByMobile(mobile);
-        if (null!=nurses && !nurses.isEmpty() && nurses.size()==1) {
-            NurseEntity nurseE = nurses.get(0);
-            return nurseBeanConverter.convert(nurseE);
-        }
-        logger.error("Get nurse by mobile is error, result is {}.", nurses);
-        throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
-    }
 
     public NurseBean getNurseById(long nurseId) {
         logger.info("get nurse by nurseId={}", nurseId);
@@ -93,51 +84,6 @@ public class NurseServiceForNurse360 {
             bean.setProperty(NurseBean.QUALIFICATION, qualification.get(0));
         }
         return bean;
-    }
-
-    public Map<Long, NurseBean> getNurseIdToBean(List<Long> nurseIds) {
-        logger.info("get nurse by nurseId={}", nurseIds);
-        List<NurseEntity> nurses = commonNurseService.getNurseByIds(nurseIds);
-        List<NurseBean> beans = entitiesToBeans(nurses);
-        fillOtherProperties(beans);
-        logger.info("count is {}", beans.size());
-        Map<Long, NurseBean> nurseIdToBean = new HashMap<>();
-        for (NurseBean tmp : beans) {
-            nurseIdToBean.put(tmp.getId(), tmp);
-        }
-        return nurseIdToBean;
-    }
-
-    public List<NurseBean> getNurseByCanAnswerQuestion(String name, String strCanAnswerQuestion, String strCanSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom, int pageIndex, int sizePerPage) {
-        logger.info("get nurse can answer questions at pageIndex={} sizePerPage={}", pageIndex, sizePerPage);
-        YesNoEnum canAnswerQuestion = YesNoEnum.parseString(strCanAnswerQuestion);
-        YesNoEnum canSeeAllOrder = YesNoEnum.parseString(strCanSeeAllOrder);
-        Iterable<NurseEntity> nurses = commonNurseService.getNurseByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL, name, canAnswerQuestion, canSeeAllOrder, hospitalId, departmentId, registerFrom, pageIndex, sizePerPage);
-        List<NurseBean> beans = entitiesToBeans(nurses);
-        fillOtherProperties(beans);
-        logger.info("count is {}", beans.size());
-        return beans;
-    }
-
-    public List<NurseBean> getNurseByCanAnswerQuestion(String name, String strCanAnswerQuestion, String strCanSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
-        logger.info("get nurse can answer questions");
-        YesNoEnum canAnswerQuestion = YesNoEnum.parseString(strCanAnswerQuestion);
-        YesNoEnum canSeeAllOrder = YesNoEnum.parseString(strCanSeeAllOrder);
-        Iterable<NurseEntity> nurses = commonNurseService.getNurseByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL, name, canAnswerQuestion, canSeeAllOrder, hospitalId, departmentId, registerFrom);
-        List<NurseBean> beans = entitiesToBeans(nurses);
-        fillOtherProperties(beans);
-        logger.info("count is {}", beans.size());
-        return beans;
-    }
-
-    public List<NurseBean> getNurseByQueryString(String strCanAnswerQuestion, String name, int pageIndex, int sizePerPage) {
-        logger.info("get nurse can answer questions at pageIndex={} sizePerPage={}", pageIndex, sizePerPage);
-        YesNoEnum canAnswerQuestion = YesNoEnum.parseString(strCanAnswerQuestion);
-        Iterable<NurseEntity> nurses = commonNurseService.getNurseByQueryString(UserAuthority.AGREE_ALL, canAnswerQuestion, name, name, name, pageIndex, sizePerPage);
-        List<NurseBean> beans = entitiesToBeans(nurses);
-        fillOtherProperties(beans);
-        logger.info("count is {}", beans.size());
-        return beans;
     }
 
     private List<NurseBean> entitiesToBeans(Iterable<NurseEntity> entities) {

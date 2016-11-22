@@ -9,6 +9,7 @@ import com.cooltoo.go2nurse.entities.CourseEntity;
 import com.cooltoo.go2nurse.repository.CourseRepository;
 import com.cooltoo.go2nurse.service.file.TemporaryGo2NurseFileStorageService;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.FileUtil;
 import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.util.HtmlParser;
@@ -53,6 +54,8 @@ public class CourseService {
     @Autowired private CourseRelationManageService relationManageService;
 
     private FileUtil fileUtil = FileUtil.getInstance();
+
+    @Autowired private Go2NurseUtility utility;
 
     //===========================================================
     //                    get
@@ -456,7 +459,6 @@ public class CourseService {
         }
         if (CourseStatus.EDITING.equals(entity.getStatus())) {
             logger.error("the course is editing");
-            throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
         }
 
         // has content need to move to temporary
@@ -551,6 +553,14 @@ public class CourseService {
                 // change image url to cooltoo file storage system path
                 Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(htmlContent);
                 htmlContent = htmlParser.replaceImgTagSrcUrl(htmlContent, imgTag2SrcValue, srcUrlsToRelativeUrl);
+
+                String httpPrefixUrl = "";
+                // replace all temp http prefix url
+                httpPrefixUrl = utility.getHttpPrefix()+tempStorage.getNginxRelativePath();
+                htmlContent.replace(httpPrefixUrl, "");
+                // replace all user http prefix url
+                httpPrefixUrl = utility.getHttpPrefix()+userStorage.getNginxRelativePath();
+                htmlContent.replace(httpPrefixUrl, "");
 
 
                 // move temporary file to official path
