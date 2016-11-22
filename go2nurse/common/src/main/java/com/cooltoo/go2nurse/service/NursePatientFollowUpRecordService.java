@@ -225,6 +225,7 @@ public class NursePatientFollowUpRecordService {
 
         return retValue;
     }
+
     @Transactional
     public Long updatePatientFollowUpRecordById(long patientFollowUpRecordId,
                                                 YesNoEnum patientReplied,
@@ -258,7 +259,7 @@ public class NursePatientFollowUpRecordService {
     //             add
     //===============================================================
     @Transactional
-    public long addPatientFollowUpRecord(long followUpId, PatientFollowUpType followUpType, long consultationId, long questionnaireId) {
+    public long addPatientFollowUpRecord(long followUpId, PatientFollowUpType followUpType, long consultationId, long questionnaireId, YesNoEnum nurseRead) {
         logger.info("add patient follow-up record with followUpId={} followUpType={} consultationId={} questionnaireId={}",
                 followUpId, followUpType, consultationId, questionnaireId);
         if (!followUpService.existsPatientFollowUp(followUpId)) {
@@ -288,7 +289,7 @@ public class NursePatientFollowUpRecordService {
         entity.setRelativeConsultationId(consultationId);
         entity.setRelativeQuestionnaireId(questionnaireId);
         entity.setRelativeQuestionnaireAnswerGroupId(0);
-        entity.setNurseRead(YesNoEnum.NO);
+        entity.setNurseRead(nurseRead);
         entity.setPatientReplied(YesNoEnum.NO);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
