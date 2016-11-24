@@ -47,8 +47,17 @@ public class NurseFollowUpAPI {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Long nurseId = VerifyUtil.isIds(strNurseId) ? VerifyUtil.parseLongIds(strNurseId).get(0) : null;
         List<NursePushCourseBean> coursesPushed = nursePushCourseService.getCoursePushed(nurseId, userId, null, pageIndex, sizePerPage, true);
+        for (int i=0; i<coursesPushed.size(); i++) {
+            NursePushCourseBean tmp = coursesPushed.get(i);
+            if (null!=tmp.getCourse()) {
+                continue;
+            }
+            coursesPushed.remove(i);
+            i--;
+        }
         List<CourseBean> allCourse = new ArrayList<>();
-        for (NursePushCourseBean tmp : coursesPushed) {
+        for (int i=0; i<coursesPushed.size(); i++) {
+            NursePushCourseBean tmp = coursesPushed.get(i);
             allCourse.add(tmp.getCourse());
         }
         userCourseRelationService.setCourseReadStatus(userId, allCourse);
