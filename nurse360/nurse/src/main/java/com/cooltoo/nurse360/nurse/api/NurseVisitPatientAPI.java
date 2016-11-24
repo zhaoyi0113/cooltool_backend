@@ -4,8 +4,11 @@ import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.NurseVisitPatientBean;
 import com.cooltoo.go2nurse.beans.NurseVisitPatientServiceItemBean;
+import com.cooltoo.go2nurse.beans.ServiceOrderBean;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.NurseVisitPatientService;
 import com.cooltoo.go2nurse.service.NurseVisitPatientServiceItemService;
+import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.JSONUtil;
@@ -32,6 +35,7 @@ import java.util.HashMap;
 @Path("/nurse/visit/patient")
 public class NurseVisitPatientAPI {
 
+    @Autowired private ServiceOrderService orderService;
     @Autowired private CommonNurseHospitalRelationService nurseHospitalRelation;
     @Autowired private NurseVisitPatientServiceItemService visitPatientServiceItem;
     @Autowired private NurseVisitPatientService visitPatientService;
@@ -47,6 +51,24 @@ public class NurseVisitPatientAPI {
         List<NurseVisitPatientServiceItemBean> items = new ArrayList<>();
         if (null!=nurseHospital) {
             items = visitPatientServiceItem.getVisitPatientServiceItem(nurseHospital.getHospitalId(), nurseHospital.getDepartmentId());
+        }
+        return Response.ok(items).build();
+    }
+
+    @Path("/service/item/{order_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getVisitPatientServiceItemsByOrderId(@Context HttpServletRequest request,
+                                                         @PathParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
+        List<NurseVisitPatientServiceItemBean> items = new ArrayList<>();
+        if (null!=orders && !orders.isEmpty()) {
+            ServiceOrderBean order = orders.get(0);
+            if (ServiceVendorType.HOSPITAL.equals(order.getVendorType())) {
+                items = visitPatientServiceItem.getVisitPatientServiceItem((int)order.getVendorId(), (int)order.getVendorDepartId());
+            }
         }
         return Response.ok(items).build();
     }
@@ -117,18 +139,13 @@ public class NurseVisitPatientAPI {
     public Response addVisitPatientRecord(@Context HttpServletRequest request,
                                           @FormParam("user_id") @DefaultValue("0") long userId,
                                           @FormParam("patient_id") @DefaultValue("0") long patientId,
-                                          @FormParam("service_item_ids") @DefaultValue("") String serviceItemIds,
+                                          @FormParam("service_item_ids") @DefaultValue("") String serviceItemId,
                                           @FormParam("visit_record") @DefaultValue("") String visitRecord,
                                           @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItem.getVisitPatientServiceItem(serviceItemIds);
-        String serviceItemsJson = "";
-        if (!VerifyUtil.isListEmpty(serviceItems)) {
-            serviceItemsJson = jsonUtil.toJsonString(serviceItems);
-        }
-
-        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItemsJson);
+        List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItem.getVisitPatientServiceItem(serviceItemId);
+        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems);
 
         Map<String, Long> map = new HashMap<>();
         map.put("id", visitId);

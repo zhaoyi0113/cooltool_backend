@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -22,6 +23,9 @@ public class NurseVisitPatientEntity {
     private String serviceItem;
     private String visitRecord;
     private long patientSign;
+    private ServiceVendorType vendorType;
+    private long vendorId;
+    private long vendorDepartId;
 
     @Id
     @GeneratedValue
@@ -76,6 +80,21 @@ public class NurseVisitPatientEntity {
         return nurseId;
     }
 
+    @Column(name = "vendor_type")
+    public ServiceVendorType getVendorType() {
+        return vendorType;
+    }
+
+    @Column(name = "vendor_id")
+    public long getVendorId() {
+        return vendorId;
+    }
+
+    @Column(name = "vendor_depart_id")
+    public long getVendorDepartId() {
+        return vendorDepartId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -116,6 +135,18 @@ public class NurseVisitPatientEntity {
         this.nurseId = nurseId;
     }
 
+    public void setVendorType(ServiceVendorType vendorType) {
+        this.vendorType = vendorType;
+    }
+
+    public void setVendorId(long vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public void setVendorDepartId(long vendorDepartId) {
+        this.vendorDepartId = vendorDepartId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -126,6 +157,9 @@ public class NurseVisitPatientEntity {
         msg.append(", serviceItem=").append(serviceItem);
         msg.append(", visitRecord=").append(visitRecord);
         msg.append(", patientSign=").append(patientSign);
+        msg.append(", vendorType=").append(vendorType);
+        msg.append(", vendorId=").append(vendorId);
+        msg.append(", vendorDepartId=").append(vendorDepartId);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 
 import java.util.Date;
 import java.util.List;
@@ -28,6 +29,9 @@ public class NurseVisitPatientBean {
     private String patientSignUrl;
     private long orderId;
     private ServiceOrderBean order;
+    private ServiceVendorType vendorType;
+    private long vendorId;
+    private long vendorDepartId;
 
     public long getId() {
         return id;
@@ -65,6 +69,18 @@ public class NurseVisitPatientBean {
         return nurseId;
     }
 
+    public ServiceVendorType getVendorType() {
+        return vendorType;
+    }
+
+    public long getVendorId() {
+        return vendorId;
+    }
+
+    public long getVendorDepartId() {
+        return vendorDepartId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -99,6 +115,18 @@ public class NurseVisitPatientBean {
 
     public void setNurseId(long nurseId) {
         this.nurseId = nurseId;
+    }
+
+    public void setVendorType(ServiceVendorType vendorType) {
+        this.vendorType = vendorType;
+    }
+
+    public void setVendorId(long vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public void setVendorDepartId(long vendorDepartId) {
+        this.vendorDepartId = vendorDepartId;
     }
 
     public NurseBean getNurse() {
@@ -175,6 +203,9 @@ public class NurseVisitPatientBean {
         msg.append(", serviceItem=").append(serviceItem);
         msg.append(", visitRecord=").append(visitRecord);
         msg.append(", patientSign=").append(patientSign);
+        msg.append(", vendorType=").append(vendorType);
+        msg.append(", vendorId=").append(vendorId);
+        msg.append(", vendorDepartId=").append(vendorDepartId);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

@@ -1,10 +1,12 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.converter.NurseVisitPatientBeanConverter;
 import com.cooltoo.go2nurse.entities.NurseVisitPatientEntity;
 import com.cooltoo.go2nurse.repository.NurseVisitPatientRepository;
@@ -60,7 +62,7 @@ public class NurseVisitPatientService {
 
     public long countVisitRecordByCondition(Long userId, Long patientId, Long nurseId, String contentLike) {
         contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
-        long count = repository.countByConditions(userId, patientId, nurseId, contentLike);
+        long count = repository.countByConditions(userId, patientId, nurseId, contentLike, null, null, null);
         logger.info("count visit record user={} patientId={} nurseId={} contentLike={}, count is {}",
                 userId, patientId, nurseId, contentLike, count);
         return count;
@@ -72,11 +74,41 @@ public class NurseVisitPatientService {
         List<NurseVisitPatientBean> beans;
         contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<NurseVisitPatientEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, request);
+        Page<NurseVisitPatientEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, null, null, null, request);
         beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
 
         logger.warn("visit record count={}", beans.size());
+        return beans;
+    }
+
+    public long countVisitRecordByCondition(Long userId, Long patientId, Long nurseId, String contentLike, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId) {
+        contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
+        long count = repository.countByConditions(userId, patientId, nurseId, contentLike, vendorType, vendorId, vendorDepartId);
+        logger.info("count visit record user={} patientId={} nurseId={} contentLike={}, count is {}",
+                userId, patientId, nurseId, contentLike, count);
+        return count;
+    }
+
+    public List<NurseVisitPatientBean> getVisitRecordByCondition(Long userId, Long patientId, Long nurseId, String contentLike, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, int pageIndex, int sizePerPage) {
+        logger.info("get visit record user={} patientId={} nurseId={} contentLike={} at page={} sizePerPage={}",
+                userId, patientId, nurseId, contentLike, pageIndex, sizePerPage);
+        List<NurseVisitPatientBean> beans;
+        contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
+        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<NurseVisitPatientEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, vendorType, vendorId, vendorDepartId, request);
+        beans = entitiesToBeans(resultSet);
+        fillOtherProperties(beans);
+
+        logger.warn("visit record count={}", beans.size());
+        return beans;
+    }
+
+    public List<NurseVisitPatientBean> getVisitRecordNot(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, int pageIndex, int sizePerPage) {
+        List<NurseVisitPatientBean> beans;
+        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<NurseVisitPatientEntity> resultSet = repository.findByConditions(null, null, null, null, vendorType, vendorId, vendorDepartId, request);
+        beans = entitiesToBeans(resultSet);
         return beans;
     }
 
@@ -288,9 +320,9 @@ public class NurseVisitPatientService {
     //             add
     //===============================================================
     @Transactional
-    public long addVisitRecord(long nurseId, long userId, long patientId, long orderId, String visitRecord, String serviceItem) {
+    public long addVisitRecord(long nurseId, long userId, long patientId, long orderId, String visitRecord, List<NurseVisitPatientServiceItemBean> serviceItems) {
         logger.info("add visit record with nurseId={} userId={} patientId={} visitRecord={} serviceItem={}",
-                nurseId, userId, patientId, visitRecord, serviceItem);
+                nurseId, userId, patientId, visitRecord, serviceItems);
         if (nurseId>0 && !nurseService.existsNurse(nurseId)) {
             logger.info("nurse not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -302,10 +334,45 @@ public class NurseVisitPatientService {
         if (!patientService.existPatient(patientId)) {
             patientId = 0;
         }
-        if (orderId>0 && !orderService.existOrder(orderId)) {
-            orderId = 0;
+
+        ServiceVendorType vendorType = null;
+        long vendorId = 0;
+        long vendorDepartId = 0;
+        if (orderId>0) {
+            if (!orderService.existOrder(orderId)) {
+                orderId = 0;
+            }
+            else {
+                List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
+                vendorType = orders.get(0).getVendorType();
+                vendorId = orders.get(0).getVendorId();
+                vendorDepartId = orders.get(0).getVendorId();
+            }
         }
-        if (VerifyUtil.isStringEmpty(serviceItem)) {
+        if (null==vendorType) {
+            NurseBean nurse = nurseService.getNurseById(nurseId);
+            NurseHospitalRelationBean nurseHospitalDepartment =
+                    null==nurse
+                            ? null
+                            : (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
+            if (null!=nurse && null!=nurseHospitalDepartment) {
+                vendorType = ServiceVendorType.HOSPITAL;
+                vendorId = nurseHospitalDepartment.getHospitalId();
+                vendorDepartId = nurseHospitalDepartment.getDepartmentId();
+            }
+            else {
+                vendorType = ServiceVendorType.NONE;
+                vendorId = 0;
+                vendorDepartId = 0;
+            }
+        }
+
+
+        String serviceItemsJson = "";
+        if (!VerifyUtil.isListEmpty(serviceItems)) {
+            serviceItemsJson = jsonUtil.toJsonString(serviceItems);
+        }
+        if (VerifyUtil.isStringEmpty(serviceItemsJson)) {
             logger.info("service item of visit is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -317,7 +384,10 @@ public class NurseVisitPatientService {
         entity.setPatientId(patientId);
         entity.setOrderId(orderId);
         entity.setVisitRecord(visitRecord.trim());
-        entity.setServiceItem(serviceItem);
+        entity.setServiceItem(serviceItemsJson);
+        entity.setVendorType(vendorType);
+        entity.setVendorId(vendorId);
+        entity.setVendorDepartId(vendorDepartId);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = repository.save(entity);
