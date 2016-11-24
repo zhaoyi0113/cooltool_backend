@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Created by zhaolisong on 2016/11/21.
  */
-@Path("/user")
+@Path("/user/nurse")
 public class NurseFollowUpAPI {
 
     @Autowired private NursePatientFollowUpService nursePatientFollowUpService;
@@ -35,7 +35,7 @@ public class NurseFollowUpAPI {
     @Autowired private NursePushCourseService nursePushCourseService;
     @Autowired private UserCourseRelationService userCourseRelationService;
 
-    @Path("/nurse/course/pushed")
+    @Path("/course/pushed")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
@@ -54,38 +54,46 @@ public class NurseFollowUpAPI {
         return Response.ok(coursesPushed).build();
     }
 
-    @Path("/nurse/follow-up/consultation")
+    @Path("/follow-up")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public Response getNurseFollowUpConsultation(@Context HttpServletRequest request,
-                                                 @QueryParam("nurse_id") @DefaultValue("0") long nurseId,
-                                                 @QueryParam("index")    @DefaultValue("0") int pageIndex,
-                                                 @QueryParam("number")   @DefaultValue("0") int sizePerPage
-
+    public Response getNurseFollowUp(@Context HttpServletRequest request,
+                                     @QueryParam("nurse_id") @DefaultValue("0") long nurseId,
+                                     @QueryParam("follow_up_type") @DefaultValue("") String followUpType, /* Consultation(提问), Questionnaire(发问卷) */
+                                     @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<NursePatientFollowUpRecordBean> visits = getPatientFollowUpRecord(userId, nurseId, PatientFollowUpType.CONSULTATION, pageIndex, sizePerPage);
+        PatientFollowUpType patientFollowUpType = PatientFollowUpType.parseString(followUpType);
+        List<NursePatientFollowUpRecordBean> visits = getPatientFollowUpRecord(userId, nurseId, false, patientFollowUpType, pageIndex, sizePerPage);
         return Response.ok(visits).build();
     }
 
-    @Path("/nurse/follow-up/questionnaire")
+    @Path("/follow-up/all")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public Response getNurseFollowUpQuestionnaire(@Context HttpServletRequest request,
-                                                  @QueryParam("nurse_id") @DefaultValue("0") long nurseId,
-                                                  @QueryParam("index")    @DefaultValue("0") int pageIndex,
-                                                  @QueryParam("number")   @DefaultValue("0") int sizePerPage
-
+    public Response getNurseFollowUp(@Context HttpServletRequest request,
+                                     @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<NursePatientFollowUpRecordBean> visits = getPatientFollowUpRecord(userId, nurseId, PatientFollowUpType.QUESTIONNAIRE, pageIndex, sizePerPage);
+        List<NursePatientFollowUpRecordBean> visits = getPatientFollowUpRecord(userId, 0, true, null, pageIndex, sizePerPage);
         return Response.ok(visits).build();
     }
 
-    private List<NursePatientFollowUpRecordBean> getPatientFollowUpRecord(long userId, long nurseId, PatientFollowUpType followUpType, int pageIndex, int sizePerPage) {
-        List<NursePatientFollowUpBean> followUpBeans = nursePatientFollowUpService.getPatientFollowUp(userId, null, nurseId);
+    //==============================================================
+    //            Common Method
+    //==============================================================
+    private List<NursePatientFollowUpRecordBean> getPatientFollowUpRecord(long userId, long nurseId, boolean allFollowUp, PatientFollowUpType followUpType, int pageIndex, int sizePerPage) {
+        List<NursePatientFollowUpBean> followUpBeans;
+        if (allFollowUp) {
+            followUpBeans = nursePatientFollowUpService.getPatientFollowUp(userId, null, null);
+        }
+        else {
+            followUpBeans = nursePatientFollowUpService.getPatientFollowUp(userId, null, nurseId);
+        }
         List<Long> followUpIds = new ArrayList<>();
         for (NursePatientFollowUpBean tmp : followUpBeans) {
             followUpIds.add(tmp.getUserId());
@@ -101,6 +109,7 @@ public class NurseFollowUpAPI {
                     null,
                     followUpIds,
                     ConsultationTalkStatus.USER_SPEAK,
+                    NursePatientFollowUpRecordService.ORDER_BY_PATIENT_REPLIED,
                     pageIndex, sizePerPage, false);
             return visits;
         }

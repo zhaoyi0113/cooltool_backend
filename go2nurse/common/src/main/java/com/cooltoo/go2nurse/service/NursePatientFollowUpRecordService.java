@@ -32,6 +32,10 @@ import java.util.Map;
 @Service("NursePatientFollowUpRecordService")
 public class NursePatientFollowUpRecordService {
 
+    public static final int ORDER_BY_NONE = 0;
+    public static final int ORDER_BY_PATIENT_REPLIED = 1;
+    public static final int ORDER_BY_NURSE_READ = 2;
+
     private static final Logger logger = LoggerFactory.getLogger(NursePatientFollowUpRecordService.class);
 
     private static final Sort sort = new Sort(
@@ -81,18 +85,34 @@ public class NursePatientFollowUpRecordService {
                                                                                       YesNoEnum nurseRead,
                                                                                       List<Long> followUpIds,
                                                                                       ConsultationTalkStatus talkStatusNotMatch,
+                                                                                      int orderBy,
                                                                                       int pageIndex, int sizePerPage, boolean noPage)
     {
         logger.info("get patient follow-up record by statusNot={} followUpType={} patientRelpied={} nurseRead={} followUpIds={} at page={} sizePerPage={} noPage={}",
                 statusNot, followUpType, patientRelpied, nurseRead, followUpIds, pageIndex, sizePerPage, noPage);
         List<NursePatientFollowUpRecordBean> beans = new ArrayList<>();
+        Sort tmpSort = this.sort;
+        if (ORDER_BY_PATIENT_REPLIED==orderBy) {
+            tmpSort = new Sort(
+                    new Sort.Order(Sort.Direction.ASC, "patientReplied"),
+                    new Sort.Order(Sort.Direction.DESC, "timeUpdated"),
+                    new Sort.Order(Sort.Direction.DESC, "id")
+            );
+        }
+        else if (ORDER_BY_NURSE_READ==orderBy) {
+            tmpSort = new Sort(
+                    new Sort.Order(Sort.Direction.ASC, "nurseRead"),
+                    new Sort.Order(Sort.Direction.DESC, "timeUpdated"),
+                    new Sort.Order(Sort.Direction.DESC, "id")
+            );
+        }
         if (!VerifyUtil.isListEmpty(followUpIds)) {
             Iterable<NursePatientFollowUpRecordEntity> resultSet;
             if (noPage) {
-                resultSet = repository.findByConditionsByFollowUpIds(statusNot, followUpType, patientRelpied, nurseRead, followUpIds, sort);
+                resultSet = repository.findByConditionsByFollowUpIds(statusNot, followUpType, patientRelpied, nurseRead, followUpIds, tmpSort);
             }
             else {
-                PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+                PageRequest request = new PageRequest(pageIndex, sizePerPage, tmpSort);
                 resultSet = repository.findByConditionsByFollowUpIds(statusNot, followUpType, patientRelpied, nurseRead, followUpIds, request);
             }
             beans = entitiesToBeans(resultSet);
@@ -250,6 +270,7 @@ public class NursePatientFollowUpRecordService {
             patientFollowUp.setRelativeQuestionnaireAnswerGroupId(questionnaireAnsweredGroupId);
         }
 
+        patientFollowUp.setTimeUpdated(new Date());
 
         return patientFollowUpRecordId;
     }
@@ -293,6 +314,7 @@ public class NursePatientFollowUpRecordService {
         entity.setPatientReplied(YesNoEnum.NO);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
+        entity.setTimeUpdated(new Date());
         entity = repository.save(entity);
 
         return entity.getId();

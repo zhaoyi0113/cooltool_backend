@@ -255,36 +255,6 @@ public class UserQuestionnaireAnswerServiceAPI {
     @Autowired private NotifierForAllModule notifierForAllModule;
 
     @Path("/nurse/follow-up")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
-    public Response getPatientFollowUp(@Context HttpServletRequest request,
-                                       @QueryParam("patient_id") @DefaultValue("-1") long patientId,
-                                       @QueryParam("nurse_id") @DefaultValue("-1") long nurseId,
-                                       @QueryParam("index") @DefaultValue("0") int pageIndex,
-                                       @QueryParam("number") @DefaultValue("0") int sizePerPage
-    ) {
-        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<NursePatientFollowUpBean> followUps = patientFollowUpService.getPatientFollowUp(
-                userId,
-                0>patientId ? null : patientId,
-                0>nurseId ? null : nurseId);
-        List<Long> followUpIds = new ArrayList<>();
-        for (NursePatientFollowUpBean tmp : followUps) {
-            followUpIds.add(tmp.getId());
-        }
-        List<NursePatientFollowUpRecordBean> followUpRecords = patientFollowRecordService.getPatientFollowUpRecordByFollowUpIds(
-                CommonStatus.DELETED,
-                PatientFollowUpType.QUESTIONNAIRE,
-                YesNoEnum.NO,
-                null,
-                followUpIds,
-                ConsultationTalkStatus.USER_SPEAK,
-                pageIndex, sizePerPage, false);
-        return Response.ok(followUpRecords).build();
-    }
-
-    @Path("/nurse/follow-up")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)

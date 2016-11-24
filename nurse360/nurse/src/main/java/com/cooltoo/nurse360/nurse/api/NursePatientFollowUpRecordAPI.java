@@ -59,6 +59,7 @@ public class NursePatientFollowUpRecordAPI {
                 YesNoEnum.parseString(nurseRead),
                 Arrays.asList(new Long[]{followUpId}),
                 ConsultationTalkStatus.NURSE_SPEAK,
+                NursePatientFollowUpRecordService.ORDER_BY_NURSE_READ,
                 pageIndex, sizePerPage, false);
         return Response.ok(visits).build();
     }

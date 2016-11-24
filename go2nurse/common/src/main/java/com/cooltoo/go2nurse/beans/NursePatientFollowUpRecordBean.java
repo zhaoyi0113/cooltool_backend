@@ -22,6 +22,7 @@ public class NursePatientFollowUpRecordBean {
     private long relativeQuestionnaireAnswerGroupId; /* 病人回答问卷结果 */
     private YesNoEnum patientReplied; /* 病人是否回答了 */
     private YesNoEnum nurseRead; /* 护士是否已读 */
+    private Date timeUpdated; /* 随访记录更新时间 */
 
     public long getId() {
         return id;
@@ -111,6 +112,14 @@ public class NursePatientFollowUpRecordBean {
         this.nurseRead = nurseRead;
     }
 
+    public Date getTimeUpdated() {
+        return timeUpdated;
+    }
+
+    public void setTimeUpdated(Date timeUpdated) {
+        this.timeUpdated = timeUpdated;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -118,6 +127,7 @@ public class NursePatientFollowUpRecordBean {
         msg.append("id=").append(id);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
+        msg.append(", timeUpdated=").append(timeUpdated);
         msg.append(", followUpId=").append(followUpId);
         msg.append(", followUpType=").append(followUpType);
         msg.append(", patientReplied=").append(patientReplied);

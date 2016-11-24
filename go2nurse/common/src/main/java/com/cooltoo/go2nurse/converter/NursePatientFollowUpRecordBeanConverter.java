@@ -24,6 +24,7 @@ public class NursePatientFollowUpRecordBeanConverter implements Converter<NurseP
         bean.setRelativeQuestionnaireAnswerGroupId(source.getRelativeQuestionnaireAnswerGroupId());
         bean.setPatientReplied(source.getPatientReplied());
         bean.setNurseRead(source.getNurseRead());
+        bean.setTimeUpdated(source.getTimeUpdated());
         return bean;
     }
 }

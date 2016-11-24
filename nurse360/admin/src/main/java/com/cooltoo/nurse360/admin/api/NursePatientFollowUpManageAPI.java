@@ -82,7 +82,7 @@ public class NursePatientFollowUpManageAPI {
                                        @PathParam("follow_up_id") @DefaultValue("-1") long followUpId
     ) {
         NursePatientFollowUpBean followUp = patientFollowUpService.getPatientFollowUp(followUpId);
-        List<NursePatientFollowUpRecordBean> records = patientFollowUpRecordService.getPatientFollowUpRecordByFollowUpIds(null, null, null, null, Arrays.asList(new Long[]{followUpId}), ConsultationTalkStatus.NONE, 0, 0, true);
+        List<NursePatientFollowUpRecordBean> records = patientFollowUpRecordService.getPatientFollowUpRecordByFollowUpIds(null, null, null, null, Arrays.asList(new Long[]{followUpId}), ConsultationTalkStatus.NONE, 0, 0, 0, true);
         followUp.setProperties(NursePatientFollowUpBean.RECORDS, records);
         return Response.ok(followUp).build();
     }
@@ -137,6 +137,7 @@ public class NursePatientFollowUpManageAPI {
                 YesNoEnum.parseString(nurseRead),
                 Arrays.asList(new Long[]{followUpId}),
                 ConsultationTalkStatus.NONE,
+                0,
                 pageIndex, sizePerPage, false);
         return Response.ok(followUpRecord).build();
     }
