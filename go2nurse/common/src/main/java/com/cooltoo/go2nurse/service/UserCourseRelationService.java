@@ -59,7 +59,7 @@ public class UserCourseRelationService {
         }
 
         List<Long> readCourseIds = getRelationCourseId(userId, "read", CommonStatus.ENABLED.name());
-        if (VerifyUtil.isListEmpty(readCourseIds) && null==readCourseIds) {
+        if (VerifyUtil.isListEmpty(readCourseIds) || null==readCourseIds) {
             return;
         }
 
