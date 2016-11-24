@@ -410,6 +410,7 @@ public class CourseRelationManageService {
             Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(courses);
             List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
             CoursesGroupBean.sortCourseArrays(categoryGroup);
+            removeEmptyContentCourseFromCategoryGroup(categoryGroup);
             theOneFound.setCourses(categoryGroup);
         }
 
@@ -424,6 +425,8 @@ public class CourseRelationManageService {
         List<CoursesGroupBean> categoryGroup = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
         CoursesGroupBean.sortCourseArrays(categoryGroup);
 
+        removeEmptyContentCourseFromCategoryGroup(categoryGroup);
+
         return categoryGroup;
     }
 
@@ -437,6 +440,7 @@ public class CourseRelationManageService {
 
         Map<CourseCategoryBean, List<CourseBean>> categoryToCourses = categoryToCourses(courses);
         List<CoursesGroupBean> categoryGroups = CoursesGroupBean.parseObjectToBean(categoryToCourses, false);
+        removeEmptyContentCourseFromCategoryGroup(categoryGroups);
 
         Map<CategoryCoursesOrderGroup, List<Long>> orderGroups = null;
         if (null!=hospital && null!=department && !VerifyUtil.isListEmpty(categoryIds)) {
@@ -509,7 +513,27 @@ public class CourseRelationManageService {
         courseGroup.setCourses(courseSorted);
     }
 
-
+    private void removeEmptyContentCourseFromCategoryGroup(List<CoursesGroupBean> categoryGroup) {
+        if (null==categoryGroup) {
+            return;
+        }
+        for (int i = 0; i < categoryGroup.size(); i++) {
+            CoursesGroupBean tmp = categoryGroup.get(i);
+            Object categoryCourses = tmp.getCourses();
+            if (categoryCourses instanceof List) {
+                List tmpList = (List) categoryCourses;
+                for (int j = 0; j < tmpList.size(); j++) {
+                    Object tmpCourse = tmpList.get(j);
+                    if ((tmpCourse instanceof CourseBean)
+                            && VerifyUtil.isStringEmpty(((CourseBean) tmpCourse).getIntroduction())
+                            && VerifyUtil.isStringEmpty(((CourseBean) tmpCourse).getContent())) {
+                        tmpList.remove(j);
+                        j--;
+                    }
+                }
+            }
+        }
+    }
 
     //================================================================================
     //                    get course relation information
