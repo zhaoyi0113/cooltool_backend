@@ -6,8 +6,10 @@ import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.*;
 import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.go2nurse.beans.NursePatientFollowUpBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
+import com.cooltoo.go2nurse.service.NursePatientFollowUpService;
 import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
@@ -33,6 +35,7 @@ public class NursePatientAPI {
 
     @Autowired private NursePatientRelationServiceForNurse360 nursePatientService;
     @Autowired private UserService userService;
+    @Autowired private NursePatientFollowUpService nursePatientFollowUpService;
     private static final SetUtil setUtil = SetUtil.newInstance();
 
     @GET
@@ -51,9 +54,14 @@ public class NursePatientAPI {
 
         List<Long> userIds = nursePatientService.getUserByNurseId(nurseId, CommonStatus.ENABLED.name());
         List<UserBean> users = userService.getUser(userIds, UserAuthority.AGREE_ALL);
+        List<NursePatientFollowUpBean> nursePatientFollowUps = nursePatientFollowUpService.getPatientFollowUp(null, null, nurseId);
         Map<Long, UserBean> userIdToBean = new HashMap<>();
+        Map<Long, Long> userIdToFollowUpId = new HashMap<>();
         for (UserBean tmp : users) {
             userIdToBean.put(tmp.getId(), tmp);
+        }
+        for (NursePatientFollowUpBean tmp : nursePatientFollowUps) {
+            userIdToFollowUpId.put(tmp.getUserId(), tmp.getId());
         }
 
         List<UserBean> returnVal = new ArrayList<>();
@@ -62,6 +70,8 @@ public class NursePatientAPI {
             if (null==tmp) {
                 continue;
             }
+            Long followUpId = userIdToFollowUpId.get(tmpId);
+            tmp.setProperties(UserBean.FOLLOW_UP_ID, null==followUpId ? 0 : followUpId);
             UserHospitalizedStatus status = UserHospitalizedStatus.IN_HOSPITAL.equals(tmp.getHasDecide())
                     ? UserHospitalizedStatus.IN_HOSPITAL
                     : UserHospitalizedStatus.IN_HOME;

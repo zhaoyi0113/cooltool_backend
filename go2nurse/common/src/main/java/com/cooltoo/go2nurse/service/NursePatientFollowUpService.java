@@ -99,7 +99,7 @@ public class NursePatientFollowUpService {
             beans = new ArrayList<>();
         }
         else {
-            List<NursePatientFollowUpEntity> resultSet = repository.findByConditionsAndStatusNot(null, null, nurseId, userId, patientId, CommonStatus.ENABLED, sort);
+            List<NursePatientFollowUpEntity> resultSet = repository.findByConditionsAndStatusNot(null, null, nurseId, userId, patientId, CommonStatus.DELETED, sort);
             beans = entitiesToBeans(resultSet);
             fillOtherProperties(beans);
         }

@@ -7,11 +7,15 @@ import com.cooltoo.constants.UserType;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/6/13.
  */
 public class UserBean {
+
+    public static final String FOLLOW_UP_ID = "follow-up_id";
 
     private long id;
     private Date time;
@@ -30,6 +34,7 @@ public class UserBean {
     private String address;
     private UserHospitalizedStatus hasDecide;
     private int channel;
+    private Map<String, Object> properties = new HashMap<>();
 
     public long getId() {
         return id;
@@ -165,6 +170,17 @@ public class UserBean {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(String key, Object value) {
+        if(null==properties) {
+            properties = new HashMap<>();
+        }
+        properties.put(key, value);
     }
 
     public String toString() {

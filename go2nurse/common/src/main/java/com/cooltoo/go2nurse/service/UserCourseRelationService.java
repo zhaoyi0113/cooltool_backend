@@ -64,6 +64,9 @@ public class UserCourseRelationService {
         }
 
         for (CourseBean course : courses) {
+            if (null==course) {
+                continue;
+            }
             course.setReading(readCourseIds.contains(course.getId()) ? ReadingStatus.READ : ReadingStatus.UNREAD);
         }
     }
