@@ -40,11 +40,12 @@ public class NurseFollowUpAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getCoursesPushed(@Context HttpServletRequest request,
-                                     @QueryParam("nurse_id") @DefaultValue("0") long nurseId,
+                                     @QueryParam("nurse_id") @DefaultValue("") String strNurseId,
                                      @QueryParam("index")    @DefaultValue("0") int pageIndex,
                                      @QueryParam("number")   @DefaultValue("0") int sizePerPage
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        Long nurseId = VerifyUtil.isIds(strNurseId) ? VerifyUtil.parseLongIds(strNurseId).get(0) : null;
         List<NursePushCourseBean> coursesPushed = nursePushCourseService.getCoursePushed(nurseId, userId, null, pageIndex, sizePerPage, true);
         List<CourseBean> allCourse = new ArrayList<>();
         for (NursePushCourseBean tmp : coursesPushed) {
