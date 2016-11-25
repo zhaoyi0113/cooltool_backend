@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -9,6 +10,8 @@ import com.cooltoo.go2nurse.converter.CasebookBeanConverter;
 import com.cooltoo.go2nurse.entities.CasebookEntity;
 import com.cooltoo.go2nurse.repository.CasebookRepository;
 import com.cooltoo.go2nurse.service.notification.Notifier;
+import com.cooltoo.services.CommonDepartmentService;
+import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,8 @@ public class CasebookService {
     @Autowired private UserService userService;
     @Autowired private PatientService patientService;
     @Autowired private NurseServiceForGo2Nurse nurseService;
+    @Autowired private CommonHospitalService hospitalService;
+    @Autowired private CommonDepartmentService departmentService;
 
     @Autowired private Notifier notifier;
 
@@ -50,21 +55,24 @@ public class CasebookService {
     //             get ----  admin using
     //===============================================================
 
-    public long countCasebookByCondition(Long userId, Long patientId, Long nurseId, String contentLike) {
+    public long countCasebookByCondition(Long userId, Long patientId, Long nurseId, String contentLike,
+                                         Integer hospitalId, Integer departmentId) {
         contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
-        long count = repository.countByConditions(userId, patientId, nurseId, contentLike);
-        logger.info("count casebook user={} patientId={} nurseId={} contentLike={}, count is {}",
-                userId, patientId, nurseId, contentLike, count);
+        long count = repository.countByConditions(userId, patientId, nurseId, contentLike, hospitalId, departmentId);
+        logger.info("count casebook user={} patientId={} nurseId={} contentLike={} hospitalId={} departmentId={}, count is {}",
+                userId, patientId, nurseId, contentLike, hospitalId, departmentId, count);
         return count;
     }
 
-    public List<CasebookBean> getCasebookByCondition(Long userId, Long patientId, Long nurseId, String contentLike, int pageIndex, int sizePerPage) {
-        logger.info("get casebook user={} patientId={} nurseId={} contentLike={} at page={} sizePerPage={}",
-                userId, patientId, nurseId, contentLike, pageIndex, sizePerPage);
+    public List<CasebookBean> getCasebookByCondition(Long userId, Long patientId, Long nurseId, String contentLike,
+                                                     Integer hospitalId, Integer departmentId,
+                                                     int pageIndex, int sizePerPage) {
+        logger.info("get casebook user={} patientId={} nurseId={} contentLike={} hospitalId={} departmentId={} at page={} sizePerPage={}",
+                userId, patientId, nurseId, contentLike, hospitalId, departmentId, pageIndex, sizePerPage);
         List<CasebookBean> beans;
         contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<CasebookEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, request);
+        Page<CasebookEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, hospitalId, departmentId, request);
         beans = entitiesToBeansForCasebook(resultSet);
         fillOtherPropertiesForCasebook(beans);
 
@@ -288,12 +296,32 @@ public class CasebookService {
     //             add
     //===============================================================
     @Transactional
-    public long addCasebook(long nurseId, long userId, long patientId, String description, String name) {
+    public long addCasebook(int hospitalId, int departmentId, long nurseId, long userId, long patientId, String description, String name) {
         logger.info("add casebook with nurseId={} userId={} patientId={} description={} name={}",
                 nurseId, userId, patientId, description, (null!=name));
-        if (nurseId>0 && !nurseService.existsNurse(nurseId)) {
-            logger.info("nurse not exist");
+
+        boolean hospitalExisted = hospitalService.existHospital(hospitalId);
+        boolean departmentExisted = departmentService.existsDepartment(departmentId);
+        boolean nurseExisted = nurseService.existsNurse(nurseId);
+        if (!nurseExisted && (!hospitalExisted || !departmentExisted)) {
+            logger.info("hospital department nurse all not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        else if (!hospitalExisted || !departmentExisted) {
+            NurseBean nurse = nurseService.getNurseById(nurseId);
+            NurseHospitalRelationBean hospitalRelation = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
+            if (null==hospitalRelation) {
+                logger.info("nurse do not set hospital department properties");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+            hospitalId = hospitalRelation.getHospitalId();
+            departmentId = hospitalRelation.getDepartmentId();
+            hospitalExisted = hospitalService.existHospital(hospitalId);
+            departmentExisted = departmentService.existsDepartment(departmentId);
+            if (!hospitalExisted || !departmentExisted) {
+                logger.info("nurse setting hospital department not existed");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
         }
         if (!userService.existUser(userId)) {
             logger.info("userId not exist");
@@ -309,6 +337,8 @@ public class CasebookService {
         description = VerifyUtil.isStringEmpty(description) ? "" : description.trim();
 
         CasebookEntity entity = new CasebookEntity();
+        entity.setHospitalId(hospitalId);
+        entity.setDepartmentId(departmentId);
         entity.setNurseId(nurseId<0 ? 0 : nurseId);
         entity.setUserId(userId);
         entity.setPatientId(patientId);

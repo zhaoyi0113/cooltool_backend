@@ -26,6 +26,8 @@ public class CasebookBean {
     private NurseBean nurse;
     private List<CaseBean> cases;
     private long caseSize;
+    private int hospitalId;
+    private int departmentId;
 
     public long getId() {
         return id;
@@ -131,10 +133,28 @@ public class CasebookBean {
         this.caseSize = caseSize;
     }
 
+    public int getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(int hospitalId) {
+        this.hospitalId = hospitalId;
+    }
+
+    public int getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", hospitalId=").append(hospitalId);
+        msg.append(", departmentId=").append(departmentId);
         msg.append(", userId=").append(userId);
         msg.append(", patientId=").append(patientId);
         msg.append(", nurseId=").append(nurseId);

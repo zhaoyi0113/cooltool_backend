@@ -17,16 +17,20 @@ public interface CasebookRepository extends JpaRepository<CasebookEntity, Long>{
             " WHERE (?1 IS NULL OR uc.userId=?1)" +
             " AND (?2 IS NULL OR uc.patientId=?2)" +
             " AND (?3 IS NULL OR uc.nurseId=?3)" +
-            " AND ((?4 IS NULL) OR (uc.description LIKE %?4) OR (uc.name LIKE %?4))")
-    long countByConditions(Long userId, Long patientId, Long nurseId, String contentLike);
+            " AND ((?4 IS NULL) OR (uc.description LIKE %?4) OR (uc.name LIKE %?4))" +
+            " AND (?5 IS NULL OR ?5=uc.hospitalId)" +
+            " AND (?6 IS NULL OR ?6=uc.departmentId)")
+    long countByConditions(Long userId, Long patientId, Long nurseId, String contentLike, Integer hospitalId, Integer departmentId);
 
 
     @Query("FROM CasebookEntity uc" +
             " WHERE (?1 IS NULL OR uc.userId=?1)" +
             " AND (?2 IS NULL OR uc.patientId=?2)" +
             " AND (?3 IS NULL OR uc.nurseId=?3)" +
-            " AND ((?4 IS NULL) OR (uc.description LIKE %?4) OR (uc.name LIKE %?4))")
-    Page<CasebookEntity> findByConditions(Long userId, Long patientId, Long nurseId, String contentLike, Pageable page);
+            " AND ((?4 IS NULL) OR (uc.description LIKE %?4) OR (uc.name LIKE %?4))" +
+            " AND (?5 IS NULL OR ?5=uc.hospitalId)" +
+            " AND (?6 IS NULL OR ?6=uc.departmentId)")
+    Page<CasebookEntity> findByConditions(Long userId, Long patientId, Long nurseId, String contentLike, Integer hospitalId, Integer departmentId, Pageable page);
 
 
     @Query("FROM CasebookEntity uc" +

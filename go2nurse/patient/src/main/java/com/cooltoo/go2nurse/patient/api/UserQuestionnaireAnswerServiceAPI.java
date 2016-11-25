@@ -259,8 +259,8 @@ public class UserQuestionnaireAnswerServiceAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response replyPatientFollowUp(@Context HttpServletRequest request,
-                                         @QueryParam("follow_up_record_id") @DefaultValue("-1") long followUpRecordId,
-                                         @QueryParam("answered_group_id") @DefaultValue("-1") long groupId
+                                         @FormParam("follow_up_record_id") @DefaultValue("-1") long followUpRecordId,
+                                         @FormParam("answered_group_id") @DefaultValue("-1") long groupId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         followUpRecordId = patientFollowRecordService.updatePatientFollowUpRecordById(followUpRecordId, YesNoEnum.YES, YesNoEnum.NO, groupId);

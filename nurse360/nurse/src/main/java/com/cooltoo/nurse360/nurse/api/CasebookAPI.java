@@ -84,7 +84,7 @@ public class CasebookAPI {
                                 @FormParam("name") @DefaultValue("") String name
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        long casebookId = casebookService.addCasebook(nurseId, userId, patientId, description, name);
+        long casebookId = casebookService.addCasebook(0, 0, nurseId, userId, patientId, description, name);
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", casebookId);
         return Response.ok(retValue).build();

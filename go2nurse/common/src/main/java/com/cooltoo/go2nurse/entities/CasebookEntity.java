@@ -21,6 +21,8 @@ public class CasebookEntity {
     private long nurseId;
     private String name;
     private String description;
+    private int hospitalId;
+    private int departmentId;
 
     @Id
     @GeneratedValue
@@ -65,6 +67,16 @@ public class CasebookEntity {
         return nurseId;
     }
 
+    @Column(name = "hospital_id")
+    public int getHospitalId() {
+        return hospitalId;
+    }
+
+    @Column(name = "department_id")
+    public int getDepartmentId() {
+        return departmentId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -97,10 +109,20 @@ public class CasebookEntity {
         this.nurseId = nurseId;
     }
 
+    public void setHospitalId(int hospitalId) {
+        this.hospitalId = hospitalId;
+    }
+
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
         msg.append("id=").append(id);
+        msg.append(", hospitalId=").append(hospitalId);
+        msg.append(", departmentId=").append(departmentId);
         msg.append(", userId=").append(userId);
         msg.append(", patientId=").append(patientId);
         msg.append(", nurseId=").append(nurseId);
