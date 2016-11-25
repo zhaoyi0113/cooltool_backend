@@ -106,7 +106,7 @@ public class NurseFollowUpAPI {
         }
         List<Long> followUpIds = new ArrayList<>();
         for (NursePatientFollowUpBean tmp : followUpBeans) {
-            followUpIds.add(tmp.getUserId());
+            followUpIds.add(tmp.getId());
         }
         if (VerifyUtil.isListEmpty(followUpIds)) {
             return new ArrayList<>();
