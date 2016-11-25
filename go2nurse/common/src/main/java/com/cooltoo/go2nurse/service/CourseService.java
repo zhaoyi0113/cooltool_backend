@@ -52,6 +52,9 @@ public class CourseService {
     @Autowired private UserGo2NurseFileStorageService userStorage;
     @Autowired private TemporaryGo2NurseFileStorageService tempStorage;
     @Autowired private CourseRelationManageService relationManageService;
+    @Autowired private UserCourseRelationService userCourseRelationService;
+    @Autowired private NursePushCourseService nursePushCourseService;
+    @Autowired private CategoryCourseOrderService categoryCourseOrderService;
 
     private FileUtil fileUtil = FileUtil.getInstance();
 
@@ -670,6 +673,21 @@ public class CourseService {
         // remove the course relation with department, diagnostic, category  permanently
         //
         relationManageService.deleteRelationsByCourseId(lIds);
+
+        //
+        // remove the courses of user read
+        //
+        userCourseRelationService.deleteUserCourseRelationByCourseId(lIds);
+
+        //
+        // remove the course nurse pushed
+        //
+        nursePushCourseService.deletePushedCourseRecordByCourseId(lIds);
+
+        //
+        // remove the category course order
+        //
+        categoryCourseOrderService.deleteOrderByCourseId(lIds);
 
         return lIds;
     }

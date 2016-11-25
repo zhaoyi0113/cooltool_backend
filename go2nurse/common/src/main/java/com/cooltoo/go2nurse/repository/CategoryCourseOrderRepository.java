@@ -35,4 +35,6 @@ public interface CategoryCourseOrderRepository extends JpaRepository<CategoryCou
     Page<CategoryCourseOrderEntity> findOrderByConditions(Integer hospitalId, Integer departmentId,
                                                           Long categoryId,
                                                           Pageable page);
+
+    List<CategoryCourseOrderEntity> findOrderByCourseIdIn(List<Long> courseIds);
 }

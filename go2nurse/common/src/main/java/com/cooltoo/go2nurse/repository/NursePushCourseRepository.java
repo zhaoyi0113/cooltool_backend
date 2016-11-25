@@ -34,4 +34,6 @@ public interface NursePushCourseRepository extends JpaRepository<NursePushCourse
             " AND   (?3 IS NULL OR npc.patientId=?3)" +
             " AND   (?4 IS NULL OR npc.read=?4)")
     List<NursePushCourseEntity> findPushCourseByNurseIdAndUserIdAndRead(Long nurseId, Long userId, Long patientId, ReadingStatus read, Sort sort);
+
+    List<NursePushCourseEntity> findPushCourseByCourseIdIn(List<Long> courseIds);
 }

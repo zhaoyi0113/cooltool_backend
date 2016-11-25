@@ -37,4 +37,5 @@ public interface UserCourseRelationRepository extends JpaRepository<UserCourseRe
     Page<UserCourseRelationEntity> findByUserIdAndReadStatusAndStatus(Long userId, List<ReadingStatus> readingStatus, CommonStatus status, Pageable page);
 
     List<UserCourseRelationEntity> findByUserIdAndCourseId(Long userId, Long courseId, Sort sort);
+    List<UserCourseRelationEntity> findByCourseIdIn(List<Long> courseIds);
 }

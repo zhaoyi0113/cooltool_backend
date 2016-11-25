@@ -221,6 +221,30 @@ public class UserCourseRelationService {
         return beans;
     }
 
+    //===================================================
+    //               delete
+    //===================================================
+    @Transactional
+    public List<Long> deleteUserCourseRelationByCourseId(List<Long> courseIds) {
+        logger.info("delete course that all user read by courseId={}", courseIds);
+
+        List<Long> deleteCourseIds = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return deleteCourseIds;
+        }
+        List<UserCourseRelationEntity> courseRelations = repository.findByCourseIdIn(courseIds);
+        if (!VerifyUtil.isListEmpty(courseRelations)) {
+            for (UserCourseRelationEntity tmp : courseRelations) {
+                if (!deleteCourseIds.contains(tmp.getCourseId())) {
+                    deleteCourseIds.add(tmp.getCourseId());
+                }
+            }
+            repository.delete(courseRelations);
+        }
+        logger.info("delete course that all user read, courseId={}", deleteCourseIds);
+        return deleteCourseIds;
+    }
+
 
     //===================================================
     //               add

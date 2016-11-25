@@ -269,6 +269,28 @@ public class CategoryCourseOrderService {
         return;
     }
 
+    @Transactional
+    public List<Long> deleteOrderByCourseId(List<Long> courseIds) {
+        logger.info("delete courses order by courseId={}", courseIds);
+
+        List<Long> deleteCourseIds = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return deleteCourseIds;
+        }
+        List<CategoryCourseOrderEntity> coursesOrder = repository.findOrderByCourseIdIn(courseIds);
+        if (!VerifyUtil.isListEmpty(coursesOrder)) {
+            for (CategoryCourseOrderEntity tmp : coursesOrder) {
+                if (!deleteCourseIds.contains(tmp.getCourseId())) {
+                    deleteCourseIds.add(tmp.getCourseId());
+                }
+            }
+            repository.delete(coursesOrder);
+        }
+        logger.info("delete courses order, deleteCourseIds={}", deleteCourseIds);
+        return deleteCourseIds;
+
+    }
+
     //==========================================================
     //               update
     //==========================================================

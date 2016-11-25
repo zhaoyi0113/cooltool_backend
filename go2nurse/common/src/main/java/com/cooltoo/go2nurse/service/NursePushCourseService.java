@@ -122,6 +122,28 @@ public class NursePushCourseService {
     //              delete
     //==========================================================================
     @Transactional
+    public List<Long> deletePushedCourseRecordByCourseId(List<Long> courseIds) {
+        logger.info("delete courses nurse pushed by courseId={}", courseIds);
+
+        List<Long> deleteCourseIds = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(courseIds)) {
+            return deleteCourseIds;
+        }
+        List<NursePushCourseEntity> coursesPushed = repository.findPushCourseByCourseIdIn(courseIds);
+        if (!VerifyUtil.isListEmpty(coursesPushed)) {
+            for (NursePushCourseEntity tmp : coursesPushed) {
+                if (!deleteCourseIds.contains(tmp.getCourseId())) {
+                    deleteCourseIds.add(tmp.getCourseId());
+                }
+            }
+            repository.delete(coursesPushed);
+        }
+        logger.info("delete courses nurse pushed, deleteCourseIds={}", deleteCourseIds);
+        return deleteCourseIds;
+
+    }
+
+    @Transactional
     public List<Long> deletePushedCourseReadStatus(Long nurseId, Long userId, Long patientId) {
         List<Long> count = new ArrayList<>();
         if (null==nurseId && null==userId && null==patientId) {
