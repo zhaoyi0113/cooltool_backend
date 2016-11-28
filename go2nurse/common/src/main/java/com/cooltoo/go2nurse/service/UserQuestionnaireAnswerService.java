@@ -314,11 +314,11 @@ public class UserQuestionnaireAnswerService {
                         delta = (obj1.getQuestionId() - obj2.getQuestionId());
                         return delta>0 ? 1 : (delta==0) ? 0 : -1;
                     }
-                    delta = (obj2.getGroupId() - obj1.getGroupId())
+                    delta = (obj2.getGroupId() - obj1.getGroupId());
                     return delta>0 ? 1 : (delta==0) ? 0 : -1;// 倒序
                 }
                 delta = (obj1.getUserId() - obj2.getUserId());
-                return delta>0 ? 1 : (delta==0) ? 0 : -1;;
+                return delta>0 ? 1 : (delta==0) ? 0 : -1;
             }
         };
         Collections.sort(allAnswers, sorter);
