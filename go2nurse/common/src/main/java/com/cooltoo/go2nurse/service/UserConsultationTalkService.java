@@ -105,11 +105,11 @@ public class UserConsultationTalkService {
         List<UserConsultationTalkEntity> talks = repository.findByStatusNotAndReadingStatusAndConsultationIdIn(CommonStatus.DELETED, ReadingStatus.UNREAD, consultationIds, sort);
         Map<Long, Long> consultationIdToUnreadTalkSize = new HashMap<>();
         for (UserConsultationTalkEntity talk : talks) {
-            if (talkStatusNotMatch.equals(talk.getTalkStatus())) {
-                continue;
-            }
             if (null==talkStatusNotMatch) {
                 consultationIdToUnreadTalkSize.put(talk.getConsultationId(), 0L);
+                continue;
+            }
+            if (talkStatusNotMatch.equals(talk.getTalkStatus())) {
                 continue;
             }
             if (consultationIdToUnreadTalkSize.containsKey(talk.getConsultationId())) {
