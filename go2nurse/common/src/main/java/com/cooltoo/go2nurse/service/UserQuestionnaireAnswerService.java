@@ -308,13 +308,17 @@ public class UserQuestionnaireAnswerService {
         Comparator sorter = new Comparator<UserQuestionnaireAnswerBean>() {
             @Override
             public int compare(UserQuestionnaireAnswerBean obj1, UserQuestionnaireAnswerBean obj2) {
+                long delta = 0;
                 if (obj1.getUserId() == obj2.getUserId()) {
                     if (obj1.getGroupId()==obj2.getGroupId()) {
-                        return (int)(obj1.getQuestionId() - obj2.getQuestionId());
+                        delta = (obj1.getQuestionId() - obj2.getQuestionId());
+                        return delta>0 ? 1 : (delta==0) ? 0 : -1;
                     }
-                    return (int) (obj2.getGroupId() - obj1.getGroupId());// 倒序
+                    delta = (obj2.getGroupId() - obj1.getGroupId())
+                    return delta>0 ? 1 : (delta==0) ? 0 : -1;// 倒序
                 }
-                return (int) (obj1.getUserId() - obj2.getUserId());
+                delta = (obj1.getUserId() - obj2.getUserId());
+                return delta>0 ? 1 : (delta==0) ? 0 : -1;;
             }
         };
         Collections.sort(allAnswers, sorter);
