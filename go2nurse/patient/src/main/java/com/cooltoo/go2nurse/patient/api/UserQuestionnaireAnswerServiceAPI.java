@@ -10,10 +10,12 @@ import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
+import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -153,9 +155,17 @@ public class UserQuestionnaireAnswerServiceAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
-    public Response getUsersAllQuestionnaire(@Context HttpServletRequest request) {
+    public Response getUsersAllQuestionnaire(@Context HttpServletRequest request,
+                                             @QueryParam("index") @DefaultValue("0") int pageIndex,
+                                             @QueryParam("number") @DefaultValue("0") int sizePerPage
+    ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<QuestionnaireBean> usersQuestionnaires = userAnswerService.getUserQuestionnaire(userId);
+        if (pageIndex<=0 && sizePerPage<=0) {
+        }
+        else {
+            usersQuestionnaires = SetUtil.newInstance().getSetByPage(usersQuestionnaires, pageIndex, sizePerPage, null);
+        }
         return Response.ok(usersQuestionnaires).build();
     }
 
