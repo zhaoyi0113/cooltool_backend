@@ -60,6 +60,15 @@ public class CommonNurseService {
         return nurses;
     }
 
+    public NurseEntity getNurseByMobileAndPassword(String mobile, String password) {
+        logger.info("get nurse by mobile={} and password", mobile);
+        if (VerifyUtil.isStringEmpty(mobile) || VerifyUtil.isStringEmpty(password) || !VerifyUtil.isIds(mobile)) {
+            return null;
+        }
+        NurseEntity nurses = nurseRepository.findByMobileAndPassword(mobile, password);
+        return nurses;
+    }
+
     public NurseEntity getNurseById(long nurseId) {
         logger.info("get nurse by nurseId={}", nurseId);
         NurseEntity entity = nurseRepository.findOne(nurseId);

@@ -1,18 +1,18 @@
-package com.cooltoo.admin.beans;
+package com.cooltoo.beans;
 
-import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.UserType;
 
+import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Created by zhaolisong on 16/3/22.
+ * Created by yzzhao on 3/2/16.
  */
-public class AdminUserTokenAccessBean {
-
+public class NurseTokenAccessBean {
     private long id;
     private long userId;
-    private AdminUserType userType;
+    private UserType type;
     private Date timeCreated;
     private String token;
     private CommonStatus status;
@@ -33,12 +33,12 @@ public class AdminUserTokenAccessBean {
         this.userId = userId;
     }
 
-    public AdminUserType getUserType() {
-        return userType;
+    public UserType getType() {
+        return type;
     }
 
-    public void setUserType(AdminUserType userType) {
-        this.userType = userType;
+    public void setType(UserType type) {
+        this.type = type;
     }
 
     public Date getTimeCreated() {
@@ -63,18 +63,5 @@ public class AdminUserTokenAccessBean {
 
     public void setStatus(CommonStatus status) {
         this.status = status;
-    }
-
-    public String toString() {
-        StringBuilder msg = new StringBuilder();
-        msg.append(getClass()).append("@").append(hashCode()).append("[");
-        msg.append("id=").append(id).append(" ,");
-        msg.append("userId=").append(userId).append(" ,");
-        msg.append("userType=").append(userType).append(" ,");
-        msg.append("timeCreated=").append(timeCreated).append(" ,");
-        msg.append("token=").append(token).append(" ,");
-        msg.append("status=").append(status);
-        msg.append("]");
-        return msg.toString();
     }
 }

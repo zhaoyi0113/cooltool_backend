@@ -1,9 +1,9 @@
-package com.cooltoo.admin.services;
+package com.cooltoo.services;
 
-import com.cooltoo.admin.beans.AdminUserBean;
-import com.cooltoo.admin.converter.AdminUserBeanConverter;
-import com.cooltoo.admin.entities.AdminUserEntity;
-import com.cooltoo.admin.repository.AdminUserRepository;
+import com.cooltoo.beans.AdminUserBean;
+import com.cooltoo.converter.AdminUserBeanConverter;
+import com.cooltoo.entities.AdminUserEntity;
+import com.cooltoo.repository.AdminUserRepository;
 import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -130,6 +130,14 @@ public class AdminUserService {
         return beans;
     }
 
+    public AdminUserBean getUser(long adminUserId) {
+        AdminUserEntity entity = adminUserRepository.findOne(adminUserId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.AUTHENTICATION_NOT_EXISTED);
+        }
+        return beanConverter.convert(entity);
+    }
+
     public AdminUserBean getUserByAdmin(long adminUserId, long userId) {
         if (!isAdmin(adminUserId)) {
             throw new BadRequestException(ErrorCode.AUTHENTICATION_AUTHORITY_DENIED);
@@ -164,5 +172,25 @@ public class AdminUserService {
 
         entity = adminUserRepository.save(entity);
         return beanConverter.convert(entity);
+    }
+
+    public AdminUserBean getUser(String userName) {
+        AdminUserEntity userEntity = adminUserRepository.findAdminUserByUserName(userName);
+        if (null==userEntity) {
+            return null;
+        }
+        return beanConverter.convert(userEntity);
+    }
+
+    public AdminUserBean getUser(String userName, String password) {
+        AdminUserEntity userEntity = adminUserRepository.findAdminUserByUserNameAndPassword(userName, password);
+        if (null==userEntity) {
+            return null;
+        }
+        return beanConverter.convert(userEntity);
+    }
+
+    public boolean existUser(long adminUserId) {
+        return adminUserRepository.exists(adminUserId);
     }
 }

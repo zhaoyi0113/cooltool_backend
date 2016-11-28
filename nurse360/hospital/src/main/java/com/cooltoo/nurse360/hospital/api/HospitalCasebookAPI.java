@@ -1,14 +1,14 @@
 package com.cooltoo.nurse360.hospital.api;
 
-import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.CaseBean;
 import com.cooltoo.go2nurse.beans.CasebookBean;
 import com.cooltoo.go2nurse.service.CasebookService;
-import com.cooltoo.nurse360.beans.HospitalAdminBean;
-import com.cooltoo.nurse360.hospital.service.HospitalAdminService;
+import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
+import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,11 +25,10 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(path = "/nurse360_hospital")
-public class HospitalCasebooAPI {
+public class HospitalCasebookAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(HospitalCasebooAPI.class);
+    private static final Logger logger = LoggerFactory.getLogger(HospitalCasebookAPI.class);
 
-    @Autowired private HospitalAdminService adminService;
     @Autowired private CasebookService casebookService;
 
     //==================================================================
@@ -37,32 +36,48 @@ public class HospitalCasebooAPI {
     //==================================================================
     @RequestMapping(path = "/admin/casebook/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countCasebook(HttpServletRequest request,
-                              @RequestParam(defaultValue = "0",  name = "hospital_id") int hospitalId,
-                              @RequestParam(defaultValue = "0",  name = "department_id") int departmentId
+                              @RequestParam(defaultValue = "0",  name = "hospital_id")   String strHospitalId,
+                              @RequestParam(defaultValue = "0",  name = "department_id") String strDepartmentId
     ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment(strHospitalId, strDepartmentId, userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
         long count = casebookService.countCasebookByCondition(null, null, null, null, hospitalId, departmentId);
         return count;
     }
 
     @RequestMapping(path = "/admin/casebook", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<CasebookBean> getCasebook(HttpServletRequest request,
-                                          @RequestParam(defaultValue = "0",  name = "hospital_id") int hospitalId,
-                                          @RequestParam(defaultValue = "0",  name = "department_id") int departmentId,
+                                          @RequestParam(defaultValue = "0",  name = "hospital_id")   String strHospitalId,
+                                          @RequestParam(defaultValue = "0",  name = "department_id") String strDepartmentId,
                                           @RequestParam(defaultValue = "0",  name = "index") int pageIndex,
                                           @RequestParam(defaultValue = "10", name = "number") int sizePerPage
     ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment(strHospitalId, strDepartmentId, userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
         List<CasebookBean> casebook = casebookService.getCasebookByCondition(null, null, null, null, hospitalId, departmentId, pageIndex, sizePerPage);
         return casebook;
     }
 
-    //==================================================================
-    //            Authentication of NURSE Role
-    //==================================================================
+    //=================================================================================
+    //
+    //                     Authentication of NURSE/MANAGER Role
+    //
+    //=================================================================================
+
+    //==========================================
+    //           Casebook Service
+    //==========================================
     @RequestMapping(path = "/casebook/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countCasebook(HttpServletRequest request) {
-        long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        HospitalAdminBean admin = adminService.getAdminUser(adminId);
-        long count = casebookService.countCasebookByCondition(null, null, null, null, admin.getHospitalId(), admin.getDepartmentId());
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
+        long count = casebookService.countCasebookByCondition(null, null, null, null, hospitalId, departmentId);
         return count;
     }
 
@@ -71,9 +86,11 @@ public class HospitalCasebooAPI {
                                           @RequestParam(defaultValue = "0",  name = "index") int pageIndex,
                                           @RequestParam(defaultValue = "10", name = "number") int sizePerPage
     ) {
-        long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        HospitalAdminBean admin = adminService.getAdminUser(adminId);
-        List<CasebookBean> casebook = casebookService.getCasebookByCondition(null, null, null, null, admin.getHospitalId(), admin.getDepartmentId(), pageIndex, sizePerPage);
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
+        List<CasebookBean> casebook = casebookService.getCasebookByCondition(null, null, null, null, hospitalId, departmentId, pageIndex, sizePerPage);
         return casebook;
     }
 
@@ -89,7 +106,6 @@ public class HospitalCasebooAPI {
     public List<Long> deleteCasebook(HttpServletRequest request,
                                      @RequestParam(defaultValue = "0", name = "casebook_id") long casebookId
     ) {
-        long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
         List<Long> allIds = new ArrayList<>();
         allIds.add(casebookId);
         allIds = casebookService.deleteCasebookByIds(null, allIds);
@@ -103,9 +119,15 @@ public class HospitalCasebooAPI {
                                          @RequestParam(defaultValue = "",  name = "description") String description,
                                          @RequestParam(defaultValue = "",  name = "name")        String name
     ) {
-        long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        HospitalAdminBean admin = adminService.getAdminUser(adminId);
-        long casebookId = casebookService.addCasebook(admin.getHospitalId(), admin.getDepartmentId(), 0, userId, patientId, description, name);
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
+        Long nurseId = 0L;
+        if (userDetails.isNurse() || userDetails.isNurseManager()) {
+            nurseId = userDetails.getId();
+        }
+        long casebookId = casebookService.addCasebook(hospitalId, departmentId, nurseId, userId, patientId, description, name);
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", casebookId);
         return retValue;
@@ -117,15 +139,14 @@ public class HospitalCasebooAPI {
                                      @RequestParam(defaultValue = "",  name = "name")        String name,
                                      @RequestParam(defaultValue = "",  name = "description") String description
     ) {
-        long adminId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         CasebookBean casebook = casebookService.updateCasebook(null, casebookId, name, description);
         return casebook;
     }
 
 
-    //=================================================================================================================
-    //                                           case service
-    //=================================================================================================================
+    //==========================================
+    //           Case Service
+    //==========================================
     @RequestMapping(path = "/casebook/case/{case_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public CaseBean getCase(@PathVariable long case_id) {
         CaseBean _case = casebookService.getCaseById(case_id);
@@ -145,8 +166,12 @@ public class HospitalCasebooAPI {
                                      @RequestParam(defaultValue = "0", name = "casebook_id") long casebookId,
                                      @RequestParam(defaultValue = "",  name = "case_record") String caseRecord
     ) {
-        long adminId = (Long) request.getAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID);
-        long caseId = casebookService.addCase(casebookId, 0, caseRecord);
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = 0L;
+        if (userDetails.isNurse() || userDetails.isNurseManager()) {
+            nurseId = userDetails.getId();
+        }
+        long caseId = casebookService.addCase(casebookId, nurseId, caseRecord);
         Map<String, Long> returnValue = new HashMap<>();
         returnValue.put("case_id", caseId);
         return returnValue;
@@ -170,8 +195,12 @@ public class HospitalCasebooAPI {
                                             @RequestParam(defaultValue = "",  name = "image_name") String imageName,
                                             @RequestPart(name = "image", required = true)   MultipartFile image
     ) throws IOException {
-        long adminId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        Map<String, String> imageIdToUrl = casebookService.addCaseImage(0L, casebookId, caseId, imageName, image.getInputStream());
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = 0L;
+        if (userDetails.isNurse() || userDetails.isNurseManager()) {
+            nurseId = userDetails.getId();
+        }
+        Map<String, String> imageIdToUrl = casebookService.addCaseImage(nurseId, casebookId, caseId, imageName, image.getInputStream());
         return imageIdToUrl;
     }
 

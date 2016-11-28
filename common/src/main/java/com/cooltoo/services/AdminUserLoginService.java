@@ -1,11 +1,11 @@
-package com.cooltoo.admin.services;
+package com.cooltoo.services;
 
-import com.cooltoo.admin.beans.AdminUserTokenAccessBean;
-import com.cooltoo.admin.converter.AdminUserTokenAccessBeanConverter;
-import com.cooltoo.admin.entities.AdminUserEntity;
-import com.cooltoo.admin.entities.AdminUserTokenAccessEntity;
-import com.cooltoo.admin.repository.AdminUserRepository;
-import com.cooltoo.admin.repository.AdminUserTokenAccessRepository;
+import com.cooltoo.beans.AdminUserTokenAccessBean;
+import com.cooltoo.converter.AdminUserTokenAccessBeanConverter;
+import com.cooltoo.entities.AdminUserEntity;
+import com.cooltoo.entities.AdminUserTokenAccessEntity;
+import com.cooltoo.repository.AdminUserRepository;
+import com.cooltoo.repository.AdminUserTokenAccessRepository;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;

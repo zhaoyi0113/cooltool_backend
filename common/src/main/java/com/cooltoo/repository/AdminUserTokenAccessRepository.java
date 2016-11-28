@@ -1,6 +1,6 @@
-package com.cooltoo.admin.repository;
+package com.cooltoo.repository;
 
-import com.cooltoo.admin.entities.AdminUserTokenAccessEntity;
+import com.cooltoo.entities.AdminUserTokenAccessEntity;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

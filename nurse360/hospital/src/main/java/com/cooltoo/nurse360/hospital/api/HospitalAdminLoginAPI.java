@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.hospital.api;
 
+import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,8 @@ public class HospitalAdminLoginAPI {
     public Map<String, Boolean> logout(HttpServletRequest request) {
 
         String adminToken = (String) request.getAttribute(ContextKeys.ADMIN_USER_TOKEN);
-        adminAccessTokenService.setTokenDisable(adminToken);
+        AdminUserType adminType = (AdminUserType) request.getAttribute(ContextKeys.ADMIN_USER_TYPE);
+        adminAccessTokenService.setTokenDisable(adminType, adminToken);
 
         Map<String, Boolean> ret = new HashMap<>();
         ret.put("result", Boolean.TRUE);
@@ -38,7 +40,8 @@ public class HospitalAdminLoginAPI {
     public Map<String, Boolean> isLogin(HttpServletRequest request) {
 
         String token = (String) request.getAttribute(ContextKeys.ADMIN_USER_TOKEN);
-        boolean login = adminAccessTokenService.isTokenEnable(token);
+        AdminUserType adminType = (AdminUserType) request.getAttribute(ContextKeys.ADMIN_USER_TYPE);
+        boolean login = adminAccessTokenService.isTokenEnable(adminType, token);
 
         Map<String, Boolean> retVal = new HashMap<>();
         retVal.put("logined", login);

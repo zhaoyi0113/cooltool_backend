@@ -1,7 +1,7 @@
 package com.cooltoo.admin.filter;
 
-import com.cooltoo.admin.entities.AdminUserTokenAccessEntity;
-import com.cooltoo.admin.repository.AdminUserTokenAccessRepository;
+import com.cooltoo.entities.AdminUserTokenAccessEntity;
+import com.cooltoo.repository.AdminUserTokenAccessRepository;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.HeaderKeys;
 import com.cooltoo.exception.BadRequestException;

@@ -1,8 +1,8 @@
 package com.cooltoo.admin.api;
 
-import com.cooltoo.admin.beans.AdminUserBean;
+import com.cooltoo.beans.AdminUserBean;
 import com.cooltoo.admin.filter.AdminUserLoginAuthentication;
-import com.cooltoo.admin.services.AdminUserService;
+import com.cooltoo.services.AdminUserService;
 import com.cooltoo.constants.ContextKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 

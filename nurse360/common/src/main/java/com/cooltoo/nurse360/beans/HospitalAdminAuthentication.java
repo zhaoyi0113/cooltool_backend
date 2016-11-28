@@ -14,9 +14,9 @@ import java.util.List;
  */
 public class HospitalAdminAuthentication implements Authentication {
 
-    HospitalAdminBean admin;
+    HospitalAdminUserDetails admin;
 
-    public HospitalAdminAuthentication(HospitalAdminBean bean) {
+    public HospitalAdminAuthentication(HospitalAdminUserDetails bean) {
         this.admin = bean;
     }
 
@@ -24,15 +24,11 @@ public class HospitalAdminAuthentication implements Authentication {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        Object tmpRoles = admin.getProperty(HospitalAdminBean.ROLE);
-        if (null==tmpRoles) {
-            return authorities;
-        }
-
-        List<AdminRole> roles = (List<AdminRole>) tmpRoles;
+        List<AdminRole> roles = admin.getAdminRole();
         for (AdminRole tmp : roles) {
             authorities.add(new SimpleGrantedAuthority("ROLE_"+tmp.name()));
         }
+
         return authorities;
     }
 
@@ -48,7 +44,7 @@ public class HospitalAdminAuthentication implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return admin.getName();
+        return admin.getUsername();
     }
 
     @Override
@@ -63,6 +59,6 @@ public class HospitalAdminAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        return admin.getName();
+        return admin.getUsername();
     }
 }

@@ -1,7 +1,7 @@
-package com.cooltoo.admin.converter;
+package com.cooltoo.converter;
 
-import com.cooltoo.admin.beans.AdminUserBean;
-import com.cooltoo.admin.entities.AdminUserEntity;
+import com.cooltoo.beans.AdminUserBean;
+import com.cooltoo.entities.AdminUserEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package com.cooltoo.admin.beans;
+package com.cooltoo.beans;
 
 import com.cooltoo.constants.AdminUserType;
 

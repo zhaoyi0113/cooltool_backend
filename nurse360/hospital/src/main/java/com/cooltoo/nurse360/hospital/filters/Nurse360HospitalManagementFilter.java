@@ -1,14 +1,11 @@
 package com.cooltoo.nurse360.hospital.filters;
 
-import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.nurse360.beans.HospitalAdminAccessTokenBean;
 import com.cooltoo.nurse360.beans.HospitalAdminAuthentication;
-import com.cooltoo.nurse360.beans.HospitalAdminBean;
-import com.cooltoo.nurse360.constants.AdminRole;
+import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessTokenService;
-import com.cooltoo.nurse360.hospital.service.HospitalAdminRolesService;
-import com.cooltoo.nurse360.hospital.service.HospitalAdminService;
+import com.cooltoo.nurse360.hospital.util.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +20,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by zhaolisong on 2016/10/20.
@@ -32,20 +28,16 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
 
     private static final Logger logger = LoggerFactory.getLogger(Nurse360HospitalManagementFilter.class);
 
-    private HospitalAdminService adminService;
-    private HospitalAdminAccessTokenService tokenService;
-    private HospitalAdminRolesService adminRolesService;
+    private HospitalUserDetailService userDetailService;
+    private HospitalAdminAccessTokenService hospitalAdminAccessTokenService;
 
     private void setServices(ServletRequest request) {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
-        if (adminService == null) {
-            adminService = webApplicationContext.getBean(HospitalAdminService.class);
+        if (userDetailService == null) {
+            userDetailService = webApplicationContext.getBean(HospitalUserDetailService.class);
         }
-        if (tokenService == null) {
-            tokenService = webApplicationContext.getBean(HospitalAdminAccessTokenService.class);
-        }
-        if (adminRolesService == null) {
-            adminRolesService = webApplicationContext.getBean(HospitalAdminRolesService.class);
+        if (hospitalAdminAccessTokenService == null) {
+            hospitalAdminAccessTokenService = webApplicationContext.getBean(HospitalAdminAccessTokenService.class);
         }
     }
 
@@ -62,44 +54,22 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
                 return;
             }
 
-            HospitalAdminAccessTokenBean token = getHospitalAdminAccessTokenBean(httpRequest);
+            String hospitalAdminToken = httpRequest.getHeader("ACCESS_TOKEN");
+            String token = TokenUtil.newInstance().getToken(hospitalAdminToken);
+            AdminUserType userType = TokenUtil.newInstance().getAdminType(hospitalAdminToken);
+            Long userId = hospitalAdminAccessTokenService.getUserIdByToken(userType, token);
 
-            if(token != null) {
+            if(null!=userId) {
                 // save token and adminId
-                request.setAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID, token.getAdminId());
-                request.setAttribute(ContextKeys.ADMIN_USER_TOKEN, token.getToken());
+                request.setAttribute(ContextKeys.ADMIN_USER_LOGIN_USER_ID, userId);
+                request.setAttribute(ContextKeys.ADMIN_USER_TOKEN, token);
+                request.setAttribute(ContextKeys.ADMIN_USER_TYPE, userType);
 
-                HospitalAdminBean admin = adminService.getAdminUserWithoutInfo(token.getAdminId());
-                List<AdminRole> adminRoles = adminRolesService.getAdminRoleByAdminId(token.getAdminId());
-                admin.setProperty(HospitalAdminBean.ROLE, adminRoles);
-
-                HospitalAdminAuthentication authentication = new HospitalAdminAuthentication(admin);
+                HospitalAdminUserDetails userDetails = userDetailService.getUser(userType, userId);
+                HospitalAdminAuthentication authentication = new HospitalAdminAuthentication(userDetails);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
         chain.doFilter(request, response);
     }
-
-    private HospitalAdminAccessTokenBean getHospitalAdminAccessTokenBean(HttpServletRequest httpRequest) throws ServletException {
-        // get token
-        String hospitalAdminToken = httpRequest.getHeader("ACCESS_TOKEN");
-        logger.debug("get access token "+hospitalAdminToken);
-        // get admin by token
-        HospitalAdminAccessTokenBean token = tokenService.getToken(hospitalAdminToken);
-        logger.debug("get token bean "+token);
-        // token invalid
-        if (null == token) {
-            return null;
-        }
-        if (!CommonStatus.ENABLED.equals(token.getStatus())) {
-            return null;
-        }
-
-        // admin invalid
-        if (!adminService.existsAdminUser(token.getAdminId(), CommonStatus.ENABLED)) {
-            return null;
-        }
-        return token;
-    }
-
 }

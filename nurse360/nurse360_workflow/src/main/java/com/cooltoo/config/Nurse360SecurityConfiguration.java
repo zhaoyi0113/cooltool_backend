@@ -9,7 +9,6 @@ import com.cooltoo.nurse360.hospital.filters.HospitalUserDetailService;
 import com.cooltoo.nurse360.hospital.filters.LoginAuthenticationFilter;
 import com.cooltoo.nurse360.hospital.filters.Nurse360HospitalManagementFilter;
 import com.cooltoo.nurse360.hospital.service.HospitalAdminAccessTokenService;
-import com.cooltoo.nurse360.hospital.service.HospitalAdminRolesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +40,7 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
     private ExceptionHandlerFilter exceptionHandlerFilter = new ExceptionHandlerFilter();
 
     @Autowired private HospitalUserDetailService userDetailService;
-    @Autowired private HospitalAdminAccessTokenService adminAccessTokenService;
-    @Autowired private HospitalAdminRolesService userDetailRoleService;
+    @Autowired private HospitalAdminAccessTokenService hospitalAdminAccessTokenService;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -72,8 +70,7 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
                         "/nurse360_hospital/login",
                         authenticationManager(),
                         userDetailService,
-                        userDetailRoleService,
-                        adminAccessTokenService), UsernamePasswordAuthenticationFilter.class)
+                        hospitalAdminAccessTokenService), UsernamePasswordAuthenticationFilter.class)
 
         ;
 

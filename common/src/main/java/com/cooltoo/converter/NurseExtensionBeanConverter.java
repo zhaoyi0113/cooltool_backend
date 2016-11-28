@@ -23,6 +23,7 @@ public class NurseExtensionBeanConverter implements Converter<NurseExtensionEnti
         bean.setAnswerNursingQuestion(source.getAnswerNursingQuestion());
         bean.setIsExpert(YesNoEnum.YES.equals(source.getIsExpert()) ? YesNoEnum.YES : YesNoEnum.NO);
         bean.setCanSeeAllOrder(YesNoEnum.YES.equals(source.getSeeAllOrder()) ? YesNoEnum.YES : YesNoEnum.NO);
+        bean.setIsManager(YesNoEnum.YES.equals(source.getIsManager()) ? YesNoEnum.YES : YesNoEnum.NO);
         return bean;
     }
 }

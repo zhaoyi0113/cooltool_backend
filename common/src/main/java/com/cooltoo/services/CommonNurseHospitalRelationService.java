@@ -58,6 +58,19 @@ public class CommonNurseHospitalRelationService {
         return beanConverter.convert(entity);
     }
 
+    public NurseHospitalRelationBean getRelationWithoutOtherInfoByNurseId(Long nurseId) {
+        logger.info("get one nurse hospital department information without other information by nurseId={}", nurseId);
+
+        List<NurseHospitalRelationEntity> resultSet = repository.findByNurseId(nurseId, sort);
+        if (null==resultSet || resultSet.isEmpty()) {
+            return null;
+        }
+        if (resultSet.size()>1) {
+            return null;
+        }
+        return beanConverter.convert(resultSet.get(0));
+    }
+
     public NurseHospitalRelationBean getRelationByNurseId(Long nurseId, String nginxPrefix) {
         logger.info("get one nurse hospital department information by nurseId={}", nurseId);
 

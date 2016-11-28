@@ -1,9 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
-import com.cooltoo.admin.beans.AdminUserTokenAccessBean;
-import com.cooltoo.admin.converter.AdminUserTokenAccessBeanConverter;
-import com.cooltoo.admin.services.AdminUserLoginService;
+import com.cooltoo.beans.AdminUserTokenAccessBean;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Assert;
 import org.junit.Test;

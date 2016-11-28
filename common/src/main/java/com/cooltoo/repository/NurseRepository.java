@@ -18,6 +18,7 @@ import java.util.List;
 public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     Page<NurseEntity> findAll(Pageable page);
     List<NurseEntity> findByMobile(String mobile);
+    NurseEntity findByMobileAndPassword(String mobile, String password);
     List<NurseEntity> findByNameContaining(String name);
 
     @Query("SELECT n.id FROM NurseEntity n WHERE n.authority=?1")

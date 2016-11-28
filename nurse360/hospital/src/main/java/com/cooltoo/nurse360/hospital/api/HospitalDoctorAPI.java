@@ -1,11 +1,10 @@
 package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.DoctorBean;
 import com.cooltoo.go2nurse.service.DoctorService;
-import com.cooltoo.nurse360.beans.HospitalAdminAuthentication;
-import com.cooltoo.nurse360.beans.HospitalAdminBean;
+import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
+import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,32 +52,16 @@ public class HospitalDoctorAPI {
 
 
     //=============================================================
-    //            Authentication of MANAGER Role
+    //            Authentication of NURSE/MANAGER Role
     //=============================================================
-    @RequestMapping(path = "/manager/doctor/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public long countDoctorByManager() {
+    @RequestMapping(path = "/doctor/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public long countDoctor() {
         return countDoctorByAdmin();
     }
 
-    @RequestMapping(path = "/manager/doctor", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public List<DoctorBean> getDoctorByManger(@RequestParam(defaultValue = "0",  name = "index")  int index,
-                                              @RequestParam(defaultValue = "10", name = "number") int number
-    ) {
-        return getDoctorByAdmin(index, number);
-    }
-
-
-    //=============================================================
-    //            Authentication of NURSE Role
-    //=============================================================
-    @RequestMapping(path = "/nurse/doctor/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public long countDoctorByNurse() {
-        return countDoctorByAdmin();
-    }
-
-    @RequestMapping(path = "/nurse/doctor", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public List<DoctorBean> getDoctorByNurse(@RequestParam(defaultValue = "0",  name = "index")  int index,
-                                             @RequestParam(defaultValue = "10", name = "number") int number
+    @RequestMapping(path = "/doctor", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<DoctorBean> getDoctor(@RequestParam(defaultValue = "0",  name = "index")  int index,
+                                      @RequestParam(defaultValue = "10", name = "number") int number
     ) {
         return getDoctorByAdmin(index, number);
     }
@@ -90,22 +73,26 @@ public class HospitalDoctorAPI {
     //            Common Method
     //=============================================================
     private long countDoctorByAdmin() {
-        HospitalAdminAuthentication authentication = (HospitalAdminAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        HospitalAdminBean adminBean = (HospitalAdminBean) authentication.getDetails();
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
 
         List<CommonStatus> statuses = CommonStatus.getAll();
         statuses.remove(CommonStatus.DELETED);
-        long count = doctorService.countDoctor(adminBean.getHospitalId(), adminBean.getDepartmentId(), statuses);
+        long count = doctorService.countDoctor(hospitalId, departmentId, statuses);
         return count;
     }
 
     private List<DoctorBean> getDoctorByAdmin(int index, int number) {
-        HospitalAdminAuthentication authentication = (HospitalAdminAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        HospitalAdminBean adminBean = (HospitalAdminBean) authentication.getDetails();
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
 
         List<CommonStatus> statuses = CommonStatus.getAll();
         statuses.remove(CommonStatus.DELETED);
-        List<DoctorBean> doctors = doctorService.getDoctor(adminBean.getHospitalId(), adminBean.getDepartmentId(), statuses, index, number);
+        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, index, number);
         return doctors;
     }
 }

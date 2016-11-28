@@ -1,4 +1,4 @@
-package com.cooltoo.admin.entities;
+package com.cooltoo.entities;
 
 import com.cooltoo.constants.AdminUserType;
 import com.cooltoo.constants.CommonStatus;
