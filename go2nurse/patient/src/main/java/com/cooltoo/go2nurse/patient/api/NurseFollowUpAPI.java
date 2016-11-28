@@ -85,11 +85,13 @@ public class NurseFollowUpAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getNurseFollowUp(@Context HttpServletRequest request,
+                                     @QueryParam("follow_up_type") @DefaultValue("") String followUpType, /* Consultation(提问), Questionnaire(发问卷) */
                                      @QueryParam("index") @DefaultValue("0") int pageIndex,
                                      @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<NursePatientFollowUpRecordBean> visits = getPatientFollowUpRecord(userId, 0, true, null, pageIndex, sizePerPage);
+        PatientFollowUpType patientFollowUpType = PatientFollowUpType.parseString(followUpType);
+        List<NursePatientFollowUpRecordBean> visits = getPatientFollowUpRecord(userId, 0, true, patientFollowUpType, pageIndex, sizePerPage);
         return Response.ok(visits).build();
     }
 
