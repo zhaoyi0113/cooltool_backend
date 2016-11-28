@@ -52,8 +52,16 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         setServices(request);
+
         if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
+
             HttpServletRequest httpRequest = (HttpServletRequest) request;
+            if (httpRequest.getMethod().equals("OPTIONS")) {
+                response.getWriter().print("OK");
+                response.getWriter().flush();
+                return;
+            }
+
             HospitalAdminAccessTokenBean token = getHospitalAdminAccessTokenBean(httpRequest);
 
             if(token != null) {
