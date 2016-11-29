@@ -531,7 +531,7 @@ public class CourseService {
                 //
 
                 // download the image tags src to /temp path
-                Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
+                Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.newInstance().fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
 
                 // move image to cooltoo file storage system
                 // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path

@@ -427,7 +427,7 @@ public class DoctorService {
                 //
                 // download the image tags src to /temp path
                 //
-                Map<String, String> srcTagUrlToTempBasePath = NetworkUtil.fetchAllWebFile(imageNeedDownload, tempStorage.getStoragePath());
+                Map<String, String> srcTagUrlToTempBasePath = NetworkUtil.newInstance().fetchAllWebFile(imageNeedDownload, tempStorage.getStoragePath());
                 if (!imageNeedDownload.isEmpty() && srcTagUrlToTempBasePath.isEmpty()) {
                     logger.error("failed downloading image from web!");
                     throw new BadRequestException(ErrorCode.DATA_ERROR);

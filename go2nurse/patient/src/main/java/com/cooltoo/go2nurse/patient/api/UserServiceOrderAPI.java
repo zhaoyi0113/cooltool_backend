@@ -140,7 +140,7 @@ public class UserServiceOrderAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         String remoteIP;
-        try { remoteIP = NetworkUtil.getIpAddress(request); }
+        try { remoteIP = NetworkUtil.newInstance().getIpAddress(request); }
         catch (IOException ex) { remoteIP = "127.0.0.1"; }
         Charge charge = orderService.payForService(userId, orderId, channel, remoteIP);
         logger.debug("pay success with charge "+charge);
@@ -185,7 +185,7 @@ public class UserServiceOrderAPI {
         else {
             if (null!=order) {
                 ServiceOrderBean orderBean = (ServiceOrderBean)order;
-                notifierForAllModule.orderAlertToPatient(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
+                notifierForAllModule.orderAlertToGo2nurseUser(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
             }
             return Response.ok(returnValue).build();
         }
@@ -219,7 +219,7 @@ public class UserServiceOrderAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.cancelOrder(true, userId, orderId);
-        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
         return Response.ok(order).build();
     }
 
@@ -232,7 +232,7 @@ public class UserServiceOrderAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.completedOrder(true, userId, orderId);
-        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
         return Response.ok(order).build();
     }
 

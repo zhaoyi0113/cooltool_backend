@@ -92,7 +92,7 @@ public class DoctorAppointmentManageAPI {
                                       @FormParam("appointment_id") @DefaultValue("0") long appointmentId
     ) {
         DoctorAppointmentBean appointment = doctorAppointmentService.cancelAppointment(0, 0, appointmentId);
-        notifierForAllModule.appointmentAlertToPatient(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment cancelled!");
+        notifierForAllModule.appointmentAlertToGo2nurseUser(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment cancelled!");
         return Response.ok(appointment).build();
     }
 
@@ -103,7 +103,7 @@ public class DoctorAppointmentManageAPI {
                                         @FormParam("appointment_id") @DefaultValue("0") long appointmentId
     ) {
         DoctorAppointmentBean appointment = doctorAppointmentService.completeAppointment(0, 0, appointmentId);
-        notifierForAllModule.appointmentAlertToPatient(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment completed!");
+        notifierForAllModule.appointmentAlertToGo2nurseUser(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment completed!");
         return Response.ok(appointment).build();
     }
 }

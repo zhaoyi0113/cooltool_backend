@@ -14,6 +14,6 @@ public interface UserDeviceTokensRepository extends JpaRepository<UserDeviceToke
 
     List<UserDeviceTokensEntity> findByUserIdAndDeviceTypeAndDeviceTokenAndStatus(long userId, DeviceType type, String token, CommonStatus status);
     List<UserDeviceTokensEntity> findByUserIdAndDeviceTokenAndStatus(long userId, String token, CommonStatus status);
-    List<UserDeviceTokensEntity> findByUserIdAndStatus(long userId, CommonStatus status);
+    List<UserDeviceTokensEntity> findByUserIdInAndStatus(List<Long> userId, CommonStatus status);
     List<UserDeviceTokensEntity> findByDeviceTypeAndDeviceToken(DeviceType type, String token);
 }

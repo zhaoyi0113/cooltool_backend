@@ -9,7 +9,6 @@ import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.converter.CasebookBeanConverter;
 import com.cooltoo.go2nurse.entities.CasebookEntity;
 import com.cooltoo.go2nurse.repository.CasebookRepository;
-import com.cooltoo.go2nurse.service.notification.Notifier;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
@@ -48,8 +47,6 @@ public class CasebookService {
     @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
-
-    @Autowired private Notifier notifier;
 
     //===============================================================
     //             get ----  admin using

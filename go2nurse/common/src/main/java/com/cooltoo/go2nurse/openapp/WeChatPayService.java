@@ -148,7 +148,7 @@ public class WeChatPayService {
 
         String xmlWeChatOrder = VerifyUtil.getRequestXml(new TreeMap<>(keyParam));
         logger.info("create sign xml "+xmlWeChatOrder);
-        String response = NetworkUtil.httpsRequest(UNIFIED_ORDER_URL, "POST", xmlWeChatOrder, null);
+        String response = NetworkUtil.newInstance().httpsRequest(UNIFIED_ORDER_URL, "POST", xmlWeChatOrder, null);
         keyParam = VerifyUtil.parseResponseXml(response);
         return keyParam;
     }

@@ -44,7 +44,7 @@ public class WeChatPayAPI {
         WeChatAccountBean weChatAccount = weChatAccountService.getWeChatAccountByAppId(appId);
 
         String remoteIP;
-        try { remoteIP = NetworkUtil.getIpAddress(request); }
+        try { remoteIP = NetworkUtil.newInstance().getIpAddress(request); }
         catch (IOException ex) { remoteIP = "127.0.0.1"; }
         Map<String, String> charge = orderService.payForServiceByWeChat(userId, orderId, openId, remoteIP, weChatAccount);
         logger.debug("pay success with wechat="+charge);

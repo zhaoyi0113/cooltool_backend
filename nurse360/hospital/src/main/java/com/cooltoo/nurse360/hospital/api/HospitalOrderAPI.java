@@ -98,8 +98,8 @@ public class HospitalOrderAPI {
                                         @RequestParam(defaultValue = "0", name = "order_id") long orderId
     ) {
         ServiceOrderBean order = orderService.cancelOrder(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order canceled!");
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order canceled!");
+        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order canceled!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order canceled!");
         return order;
     }
 
@@ -108,8 +108,8 @@ public class HospitalOrderAPI {
                                            @RequestParam(defaultValue = "0", name = "order_id") long orderId
     ) {
         ServiceOrderBean order = orderService.orderInProcess(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order is in_process!");
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order is in_process!");
+        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order is in_process!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order is in_process!");
         return order;
     }
 
@@ -118,8 +118,8 @@ public class HospitalOrderAPI {
                                            @RequestParam(defaultValue = "0", name = "order_id") long orderId
     ) {
         ServiceOrderBean order = orderService.completedOrder(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
         return order;
     }
 
@@ -163,7 +163,7 @@ public class HospitalOrderAPI {
                     nursesId.add(tmp.getId());
                 }
             }
-            notifierForAllModule.newOrderAlertToNurse(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
+            notifierForAllModule.newOrderAlertToNurse360(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
         }
         return;
     }

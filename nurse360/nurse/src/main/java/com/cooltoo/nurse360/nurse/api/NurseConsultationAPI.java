@@ -161,7 +161,7 @@ public class NurseConsultationAPI {
         );
 
 
-        notifierForAllModule.followUpAlertToPatient(
+        notifierForAllModule.followUpAlertToGo2nurseUser(
                 PatientFollowUpType.CONSULTATION,
                 userId,
                 consultationId,
@@ -235,7 +235,7 @@ public class NurseConsultationAPI {
         Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
 
         Long userId = talkReturn.get(UserConsultationService.USER_ID);
-        notifierForAllModule.consultationAlertToPatient(userId, consultationId, talkStatus, talkContent);
+        notifierForAllModule.consultationAlertToGo2nurseUser(userId, consultationId, talkStatus, talkContent);
 
         Map<String, Long> returnValue = new HashMap<>();
         Long talkId = talkReturn.get(UserConsultationService.TALK_ID);

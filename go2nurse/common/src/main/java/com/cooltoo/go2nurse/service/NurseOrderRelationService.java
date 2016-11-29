@@ -1,6 +1,5 @@
 package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
@@ -220,10 +219,10 @@ public class NurseOrderRelationService {
 
         // update order status
         ServiceOrderBean order = orderService.nurseFetchOrder(orderId);
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), order.getId(), order.getOrderStatus(), "order dispatched by manager!");
-        notifierForAllModule.orderAlertToNurse(entity.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to you!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order dispatched by manager!");
+        notifierForAllModule.orderAlertToNurse360(entity.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to you!");
         if (null!=original && original.getNurseId()!=nurseId) {
-            notifierForAllModule.orderAlertToNurse(original.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to other!");
+            notifierForAllModule.orderAlertToNurse360(original.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to other!");
         }
 
         NurseOrderRelationBean bean = beanConverter.convert(entity);
@@ -290,7 +289,7 @@ public class NurseOrderRelationService {
 
         // complete order
         ServiceOrderBean order = orderService.completedOrder(false, 0, orderId);
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), order.getId(), order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order completed!");
 
 
         logger.info("complete order={}", order);
@@ -338,7 +337,7 @@ public class NurseOrderRelationService {
 
         // update order status
         ServiceOrderBean order = orderService.nurseFetchOrder(orderId);
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), order.getId(), order.getOrderStatus(), "order fetched!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order fetched!");
 
         NurseOrderRelationBean bean = beanConverter.convert(entity);
         logger.info("add relation={}", bean);
@@ -378,7 +377,7 @@ public class NurseOrderRelationService {
 
         // update order status
         ServiceOrderBean order = orderService.nurseGiveUpOrder(orderId);
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), order.getId(), order.getOrderStatus(), "order be given up!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order be given up!");
 
         return nurseId;
     }

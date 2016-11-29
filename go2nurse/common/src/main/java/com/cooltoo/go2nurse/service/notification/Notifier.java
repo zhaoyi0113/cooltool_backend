@@ -1,10 +1,8 @@
 package com.cooltoo.go2nurse.service.notification;
 
-import com.cooltoo.beans.NurseDeviceTokensBean;
 import com.cooltoo.constants.DeviceType;
+import com.cooltoo.go2nurse.beans.Nurse360DeviceTokensBean;
 import com.cooltoo.go2nurse.beans.UserDeviceTokensBean;
-import com.cooltoo.go2nurse.service.UserDeviceTokensService;
-import com.cooltoo.services.NurseDeviceTokensService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,18 +23,16 @@ public class Notifier {
 
     @Autowired private AppleNotifier appleNotifier;
     @Autowired private LeanCloudNotifier leanCloudNotifier;
-    @Autowired private UserDeviceTokensService userDeviceTokensService;
-    @Autowired private NurseDeviceTokensService nurseDeviceTokensService;
 
-    public void notifyUserPatient(long userId, MessageBean message) {
-        if (null==message) {
+
+    public void notifyNurse360Nurse(List<Nurse360DeviceTokensBean> tokens, MessageBean message) {
+        if (null==message || VerifyUtil.isListEmpty(tokens)) {
             return;
         }
-        List<UserDeviceTokensBean> tokens = userDeviceTokensService.getUserDeviceTokens(userId);
         if (!VerifyUtil.isListEmpty(tokens)) {
             List<String> iosTokens = new ArrayList<>();
             List<String> androidTokens = new ArrayList<>();
-            for (UserDeviceTokensBean tmp : tokens) {
+            for (Nurse360DeviceTokensBean tmp : tokens) {
                 if (DeviceType.Android.equals(tmp.getDeviceType())) {
                     androidTokens.add(tmp.getDeviceToken());
                 }
@@ -48,24 +44,21 @@ public class Notifier {
         }
     }
 
-    public void notifyNurse(long nurseId, MessageBean message) {
-        if (null==message) {
+    public void notifyUserPatient(List<UserDeviceTokensBean> tokens, MessageBean message) {
+        if (null==message || VerifyUtil.isListEmpty(tokens)) {
             return;
         }
-        List<NurseDeviceTokensBean> tokens = nurseDeviceTokensService.getNurseDeviceTokens(nurseId);
-        if (!VerifyUtil.isListEmpty(tokens)) {
-            List<String> iosTokens = new ArrayList<>();
-            List<String> androidTokens = new ArrayList<>();
-            for (NurseDeviceTokensBean tmp : tokens) {
-                if (DeviceType.Android.equals(tmp.getDeviceType())) {
-                    androidTokens.add(tmp.getDeviceToken());
-                }
-                if (DeviceType.iOS.equals(tmp.getDeviceType())) {
-                    iosTokens.add(tmp.getDeviceToken());
-                }
+        List<String> iosTokens = new ArrayList<>();
+        List<String> androidTokens = new ArrayList<>();
+        for (UserDeviceTokensBean tmp : tokens) {
+            if (DeviceType.Android.equals(tmp.getDeviceType())) {
+                androidTokens.add(tmp.getDeviceToken());
             }
-            notifyDevice(androidTokens, iosTokens, message);
+            if (DeviceType.iOS.equals(tmp.getDeviceType())) {
+                iosTokens.add(tmp.getDeviceToken());
+            }
         }
+        notifyDevice(androidTokens, iosTokens, message);
     }
 
     public void notifyDevice(String token, DeviceType deviceType, MessageBean message) {
@@ -77,22 +70,23 @@ public class Notifier {
             leanCloudNotifier.publishToDevices(tokens, null, message);
         }
         if (DeviceType.iOS.equals(deviceType)) {
-            appleNotifier.publishToDevices(tokens, message, AppleNotifier.AppleNotificationType.ALERT);
+            appleNotifier.publishToDevices(tokens, message, AppleNotificationType.ALERT);
         }
     }
 
-    private void notifyDevice(List<String> androidTokens, List<String> iosTokens, MessageBean message) {
+    public void notifyDevice(List<String> androidTokens, List<String> iosTokens, MessageBean message) {
         if (null==message) {
             return;
         }
 
         logger.debug("notify android message={} tokens={}", message, androidTokens);
         logger.debug("notify   iOS   message={} tokens={}", message, iosTokens);
+
         if (!VerifyUtil.isListEmpty(androidTokens)) {
             leanCloudNotifier.publishToDevices(androidTokens, null, message);
         }
         if (!VerifyUtil.isListEmpty(iosTokens)) {
-            appleNotifier.publishToDevices(iosTokens, message, AppleNotifier.AppleNotificationType.ALERT);
+            appleNotifier.publishToDevices(iosTokens, message, AppleNotificationType.ALERT);
         }
     }
 

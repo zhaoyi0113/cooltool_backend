@@ -138,7 +138,7 @@ public class NursePushCourseToUserAPI {
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NursePushCourseBean push = pushCourseService.pushCourseToUser(nurseId, userId, patientId, courseId);
-        notifierForAllModule.pushCourseAlertToPatient(userId, courseId, push.getRead(), "course is pushed to patient");
+        notifierForAllModule.pushCourseAlertToGo2nurseUser(userId, courseId, push.getRead(), "course is pushed to patient");
         return Response.ok(push).build();
     }
 

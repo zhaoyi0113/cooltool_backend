@@ -120,7 +120,7 @@ public class WeChatPayDemo {
 
         String xmlWeChatOrder = VerifyUtil.getRequestXml(keyParam);
         System.out.println("create sign xml "+xmlWeChatOrder);
-        String response = NetworkUtil.httpsRequest(UNIFIED_ORDER_URL, "POST", xmlWeChatOrder, null);
+        String response = NetworkUtil.newInstance().httpsRequest(UNIFIED_ORDER_URL, "POST", xmlWeChatOrder, null);
         keyParam = VerifyUtil.parseResponseXml(response);
         System.out.println(keyParam);
     }

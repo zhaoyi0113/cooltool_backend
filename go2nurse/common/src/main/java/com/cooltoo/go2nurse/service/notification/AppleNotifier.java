@@ -78,13 +78,11 @@ public class AppleNotifier {
 
     private String createPayload(MessageBean customJson, AppleNotificationType type) {
         String payload = null;
-        switch (type){
-            case ALERT:
-                payload = createAlertPayload(customJson);
-                break;
-            case SILENT:
-                payload = createSilentPayload(customJson);
-                break;
+        if (AppleNotificationType.ALERT.equals(type)) {
+            payload = createAlertPayload(customJson);
+        }
+        else if (AppleNotificationType.SILENT.equals(type)) {
+            payload = createSilentPayload(customJson);
         }
         return payload;
     }
@@ -99,9 +97,5 @@ public class AppleNotifier {
         PayloadBuilder payloadBuilder = APNS.newPayload().instantDeliveryOrSilentNotification();
         payloadBuilder.customField(CUSTOM_MESSAGE_JSON, jsonUtil.toJsonString(customJson));
         return payloadBuilder.build();
-    }
-
-    public static enum AppleNotificationType {
-        ALERT, SILENT
     }
 }

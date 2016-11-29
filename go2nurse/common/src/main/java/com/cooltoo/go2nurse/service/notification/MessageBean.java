@@ -51,6 +51,16 @@ public class MessageBean {
         this.description = description;
     }
 
+    public StringBuilder toHtmlParam() {
+        StringBuilder msg = new StringBuilder();
+        msg.append("alert=").append(alertBody);
+        msg.append("&description=").append(description);
+        msg.append("&message_type=").append(type);
+        msg.append("&relative_id=").append(relativeId);
+        msg.append("&status=").append(status);
+        return msg;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");

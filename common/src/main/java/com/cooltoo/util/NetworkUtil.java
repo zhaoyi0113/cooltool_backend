@@ -2,15 +2,22 @@ package com.cooltoo.util;
 
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.PUT;
 import java.io.*;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -19,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by hp on 2016/8/10.
+ * Created by zhaolisong on 2016/8/10.
  */
 public final class NetworkUtil {
 
@@ -27,13 +34,19 @@ public final class NetworkUtil {
 
     public static final long _2M = 2 * 1024 * 1024;
 
+    public static NetworkUtil newInstance() {
+        return new NetworkUtil();
+    }
+
+    private NetworkUtil() {}
+
     /**
      * 抓取网络文件落地到本地；如果有一个抓取失败，则全部删掉。
      * @param urls 网络文件路径
      * @param localStoragePath 本地存储路径
      * @return 网络文件路径对保存在本地的文件路径的映射关系
      */
-    public final static Map<String, String> fetchAllWebFile(List<String> urls, String localStoragePath) {
+    public final Map<String, String> fetchAllWebFile(List<String> urls, String localStoragePath) {
         if (VerifyUtil.isListEmpty(urls)) {
             return new HashMap<>();
         }
@@ -130,7 +143,7 @@ public final class NetworkUtil {
     /**
      * 获取请求主机IP地址,如果通过代理进来，则透过防火墙获取真实IP地址;
      */
-    public final static String getIpAddress(HttpServletRequest request) throws IOException {
+    public final String getIpAddress(HttpServletRequest request) throws IOException {
         // 获取请求主机IP地址,如果通过代理进来，则透过防火墙获取真实IP地址
 
         String ip = request.getHeader("X-Forwarded-For");
@@ -189,7 +202,7 @@ public final class NetworkUtil {
      * @param outputStr 提交的数据
      * @return 返回微信服务器响应的信息
      */
-    public final static String httpsRequest(String requestUrl, String requestMethod, String outputStr, TrustManager[] tm) {
+    public final String httpsRequest(String requestUrl, String requestMethod, String outputStr, TrustManager[] tm) {
         try {
             // 创建SSLContext对象，并使用我们指定的信任管理器初始化
             if (null==tm || tm.length==0) {
@@ -205,7 +218,7 @@ public final class NetworkUtil {
             conn.setDoOutput(true);
             conn.setDoInput(true);
             conn.setUseCaches(false);
-            // 设置请求方式（GET/POST）
+            // 设置请求方式（GET/POST/PUT）
             conn.setRequestMethod(requestMethod);
             conn.setRequestProperty("content-type", "application/x-www-form-urlencoded");
             // 当outputStr不为null时向输出流写数据
@@ -245,5 +258,52 @@ public final class NetworkUtil {
         @Override public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException { }
         @Override public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException { }
         @Override public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+    }
+
+
+
+
+    /**
+     * 发送https请求
+     * @param requestUrl 请求地址
+     * @param requestMethod 请求方式（GET、POST）
+     * @param outputStr 提交的数据
+     * @return 返回微信服务器响应的信息
+     */
+    public final String httpsRequest(String requestUrl, String requestMethod, String outputStr) {
+        String resStr = null;
+        HttpClient htpClient = new HttpClient();
+        HttpMethod htpMethod = null;
+        try{
+            if ("PUT".equalsIgnoreCase(requestMethod)) {
+                htpMethod = new PutMethod(requestUrl);
+                ((PutMethod)htpMethod).setRequestEntity(new StringRequestEntity(outputStr, "application/x-www-form-urlencoded", "UTF-8"));
+            }
+            else if ("GET".equalsIgnoreCase(requestMethod)) {
+                htpMethod = new GetMethod(requestUrl);
+                ((GetMethod)htpMethod).setQueryString(outputStr);
+            }
+            else if ("POST".equalsIgnoreCase(requestMethod)) {
+                htpMethod = new PostMethod(requestUrl);
+                ((PostMethod)htpMethod).setRequestEntity(new StringRequestEntity(outputStr, "application/x-www-form-urlencoded", "UTF-8"));
+            }
+            htpMethod.addRequestHeader("content-type", "application/x-www-form-urlencoded");
+
+            int statusCode = htpClient.executeMethod(htpMethod);
+            logger.info("request status={}", statusCode);
+            if(statusCode != HttpStatus.SC_OK){
+                logger.error("Method failed: "+htpMethod.getStatusLine());
+                return null;
+            }
+            byte[] responseBody = htpMethod.getResponseBody();
+            resStr = new String(responseBody, Charset.forName("UTF-8"));
+        } catch (UnsupportedEncodingException uee) {
+            logger.error("参数编码异常：{}", uee);
+        } catch(Exception e) {
+            logger.error("https请求异常：{}", e);
+        } finally {
+            htpMethod.releaseConnection();
+        }
+        return resStr;
     }
 }

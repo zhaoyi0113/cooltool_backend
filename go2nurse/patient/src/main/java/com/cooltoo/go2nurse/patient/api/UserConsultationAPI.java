@@ -252,7 +252,7 @@ public class UserConsultationAPI {
                         talkContent);
             }
             else {
-                notifierForAllModule.consultationAlertToNurse(consultationNurseId, consultationId, talkStatus, talkContent);
+                notifierForAllModule.consultationAlertToNurse360(consultationNurseId, consultationId, talkStatus, talkContent);
             }
         }
 

@@ -122,7 +122,7 @@ public class NursePatientFollowUpRecordAPI {
                 questionnaireId,
                 YesNoEnum.YES);
         if (PatientFollowUpType.QUESTIONNAIRE.equals(patientFollowUpType)) {
-            notifierForAllModule.followUpAlertToPatient(
+            notifierForAllModule.followUpAlertToGo2nurseUser(
                     patientFollowUpType,
                     followUp.getUserId(),
                     questionnaireId,

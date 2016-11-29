@@ -149,8 +149,8 @@ public class ServiceOrderManageAPI {
                                 @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.cancelOrder(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order canceled!");
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order canceled!");
+        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order canceled!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order canceled!");
         return Response.ok(order).build();
     }
 
@@ -161,8 +161,8 @@ public class ServiceOrderManageAPI {
                                    @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.orderInProcess(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order is in_process!");
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order is in_process!");
+        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order is in_process!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order is in_process!");
         return Response.ok(order).build();
     }
 
@@ -173,8 +173,8 @@ public class ServiceOrderManageAPI {
                                    @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.completedOrder(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
-        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
         return Response.ok(order).build();
     }
 
@@ -219,7 +219,7 @@ public class ServiceOrderManageAPI {
             ServiceOrderBean order = orders.get(0);
             List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(null, YesNoEnum.YES.name(), null, hospitalId, departmentId, RegisterFrom.parseString(registerFrom));
             List<Long> nursesId = getNurseIds(nurses);
-            notifierForAllModule.newOrderAlertToNurse(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
+            notifierForAllModule.newOrderAlertToNurse360(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
         }
         return Response.ok().build();
     }
