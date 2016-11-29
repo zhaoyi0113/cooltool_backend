@@ -6,10 +6,13 @@ import com.cooltoo.go2nurse.beans.UserDeviceTokensBean;
 import com.cooltoo.go2nurse.service.UserDeviceTokensService;
 import com.cooltoo.services.NurseDeviceTokensService;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,6 +20,8 @@ import java.util.List;
  */
 @Component
 public class Notifier {
+
+    private static final Logger logger = LoggerFactory.getLogger(Notifier.class);
 
     @Autowired private AppleNotifier appleNotifier;
     @Autowired private LeanCloudNotifier leanCloudNotifier;
@@ -63,10 +68,26 @@ public class Notifier {
         }
     }
 
+    public void notifyDevice(String token, DeviceType deviceType, MessageBean message) {
+        if (null==message || VerifyUtil.isStringEmpty(token)) {
+            return;
+        }
+        List<String> tokens = Arrays.asList(new String[]{token});
+        if (DeviceType.Android.equals(deviceType)) {
+            leanCloudNotifier.publishToDevices(tokens, null, message);
+        }
+        if (DeviceType.iOS.equals(deviceType)) {
+            appleNotifier.publishToDevices(tokens, message, AppleNotifier.AppleNotificationType.ALERT);
+        }
+    }
+
     private void notifyDevice(List<String> androidTokens, List<String> iosTokens, MessageBean message) {
         if (null==message) {
             return;
         }
+
+        logger.debug("notify android message={} tokens={}", message, androidTokens);
+        logger.debug("notify   iOS   message={} tokens={}", message, iosTokens);
         if (!VerifyUtil.isListEmpty(androidTokens)) {
             leanCloudNotifier.publishToDevices(androidTokens, null, message);
         }
