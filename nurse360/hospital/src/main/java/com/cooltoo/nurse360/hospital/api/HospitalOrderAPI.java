@@ -2,12 +2,16 @@ package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.RegisterFrom;
+import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.go2nurse.beans.NurseOrderRelationBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.NurseOrderRelationService;
 import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.util.SetUtil;
@@ -35,6 +39,7 @@ public class HospitalOrderAPI {
     @Autowired private ServiceOrderService orderService;
     @Autowired private NurseOrderRelationService nurseOrderRelation;
     @Autowired private NurseServiceForGo2Nurse nurseService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
 
     //=============================================================
@@ -48,7 +53,7 @@ public class HospitalOrderAPI {
                            @RequestParam(defaultValue = "",  name = "order_status") String strOrderStatus /* CANCELLED, TO_PAY, TO_DISPATCH, TO_SERVICE, IN_PROCESS, COMPLETED, CREATE_CHARGE_FAILED*/
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId(strVendorId, strDepartId, userDetails);
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
         long count = orderService.countOrderByConditions(
@@ -70,7 +75,7 @@ public class HospitalOrderAPI {
                                            @RequestParam(defaultValue = "10", name = "number") int number
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId(strVendorId, strDepartId, userDetails);
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
         List<ServiceOrderBean> orders = orderService.getOrderByConditions(
@@ -82,6 +87,99 @@ public class HospitalOrderAPI {
                 index, number);
         setOrderWaitStaff(orders);
         return orders;
+    }
+
+
+    //=============================================================
+    //            Authentication of MANAGER Role
+    //=============================================================
+    @RequestMapping(path = "/manager/order/cancel", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public ServiceOrderBean cancelOrder(HttpServletRequest request,
+                                        @RequestParam(defaultValue = "0", name = "order_id") long orderId
+    ) {
+        ServiceOrderBean order = orderService.cancelOrder(false, -1, orderId);
+        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order canceled!");
+        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order canceled!");
+        return order;
+    }
+
+    @RequestMapping(path = "/manager/order/in_process", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public ServiceOrderBean orderInProcess(HttpServletRequest request,
+                                           @RequestParam(defaultValue = "0", name = "order_id") long orderId
+    ) {
+        ServiceOrderBean order = orderService.orderInProcess(false, -1, orderId);
+        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order is in_process!");
+        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order is in_process!");
+        return order;
+    }
+
+    @RequestMapping(path = "/manager/order/completed", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public ServiceOrderBean orderCompleted(HttpServletRequest request,
+                                           @RequestParam(defaultValue = "0", name = "order_id") long orderId
+    ) {
+        ServiceOrderBean order = orderService.completedOrder(false, -1, orderId);
+        notifierForAllModule.orderAlertToNurse(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToPatient(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
+        return order;
+    }
+
+    @RequestMapping(path = "/manager/order/dispatch", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public NurseOrderRelationBean orderDispatchToNurse(HttpServletRequest request,
+                                                       @RequestParam(defaultValue = "0", name = "order_id") long orderId,
+                                                       @RequestParam(defaultValue = "0", name = "nurse_id") long nurseId
+    ) {
+        //dispatch or replace order's nurse
+        NurseOrderRelationBean nurseOrder = nurseOrderRelation.dispatchToNurse(nurseId, orderId);
+        return nurseOrder;
+    }
+
+    @RequestMapping(path = "/manager/order/modify", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public ServiceOrderBean modifyTimeAddressMessage(HttpServletRequest request,
+                                                     @RequestParam(defaultValue = "0", name = "order_id") long orderId,
+                                                     @RequestParam(defaultValue = "0", name = "address")  long addressId,
+                                                     @RequestParam(defaultValue = "",  name = "start_time")   String startTime,
+                                                     @RequestParam(defaultValue = "",  name = "message_left") String messageLeft
+    ) {
+        //modify start_time, address, message left, score
+        ServiceOrderBean order = orderService.updateOrder(orderId, null, addressId, startTime, null, messageLeft, 0);
+        return order;
+    }
+
+    @RequestMapping(path = "/manager/order/notify/department", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public void notifyNurseInDepartment(HttpServletRequest request,
+                                        @RequestParam(defaultValue = "0", name = "order_id") long orderId,
+                                        @RequestParam(defaultValue = "0", name = "hospital_id") int hospitalId,
+                                        @RequestParam(defaultValue = "0", name = "department_id") int departmentId,
+                                        @RequestParam(defaultValue = "",  name = "register_from") String registerFrom/* cooltoo, go2nurse */
+    ) {
+        //notify nurse in department to fetch order
+        List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
+        if (null!=orders && !orders.isEmpty()) {
+            ServiceOrderBean order = orders.get(0);
+            List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(null, YesNoEnum.YES.name(), null, hospitalId, departmentId, RegisterFrom.parseString(registerFrom));
+            List<Long> nursesId = new ArrayList<>();
+            for (NurseBean tmp : nurses) {
+                if (!nursesId.contains(tmp.getId())) {
+                    nursesId.add(tmp.getId());
+                }
+            }
+            notifierForAllModule.newOrderAlertToNurse(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
+        }
+        return;
+    }
+
+    @RequestMapping(path = "/manager/order/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    public ServiceOrderBean createOrder(HttpServletRequest request,
+                                        @RequestParam(defaultValue = "0", name = "service_item_id")   long serviceItemId,
+                                        @RequestParam(defaultValue = "0", name = "user_id")           long userId,
+                                        @RequestParam(defaultValue = "0", name = "patient_id")        long patientId,
+                                        @RequestParam(defaultValue = "0", name = "address_id")        long addressId,
+                                        @RequestParam(defaultValue = "0", name = "start_time")      String startTime,
+                                        @RequestParam(defaultValue = "0", name = "count")              int count,
+                                        @RequestParam(defaultValue = "",  name = "leave_a_message") String leaveAMessage
+    ) {
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage, 0);
+        return order;
     }
 
 
