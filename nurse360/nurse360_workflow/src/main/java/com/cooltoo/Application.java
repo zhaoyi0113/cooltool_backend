@@ -45,21 +45,9 @@ public class Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Application.class.getName());
 
-    @Value("${togglz_property}")
-    private String togglzFilePath;
-
     @Bean
     public FeatureProvider featureProvider() {
         return  new EnumBasedFeatureProvider(Nurse360Features.class);
-    }
-
-    @Bean
-    public StateRepository stateRepository() throws IOException {
-        File file = null;
-        logger.info("get property uri " + togglzFilePath);
-        file = new File(togglzFilePath);
-        logger.info(file.getAbsolutePath());
-        return new FileBasedStateRepository(file);
     }
 
     @Bean
