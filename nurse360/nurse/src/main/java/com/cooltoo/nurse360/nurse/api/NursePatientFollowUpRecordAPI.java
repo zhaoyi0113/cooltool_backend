@@ -8,10 +8,13 @@ import com.cooltoo.exception.*;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpBean;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpRecordBean;
+import com.cooltoo.go2nurse.beans.UserConsultationBean;
+import com.cooltoo.go2nurse.constants.ConsultationCreator;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpRecordService;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpService;
+import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import org.slf4j.Logger;
@@ -39,6 +42,7 @@ public class NursePatientFollowUpRecordAPI {
     @Autowired private NursePatientFollowUpRecordService patientFollowUpRecordService;
     @Autowired private NursePatientFollowUpService patientFollowUpService;
     @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private UserConsultationService userConsultationService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -128,6 +132,16 @@ public class NursePatientFollowUpRecordAPI {
                     questionnaireId,
                     ReadingStatus.UNREAD.name(),
                     "nurse make questionnaire follow-up!"
+            );
+        }
+        else if (PatientFollowUpType.CONSULTATION.equals(patientFollowUpType)) {
+            UserConsultationBean consultation = userConsultationService.getUserConsultationNoProperties(consultationId);
+            notifierForAllModule.followUpAlertToGo2nurseUser(
+                    PatientFollowUpType.CONSULTATION,
+                    followUp.getUserId(),
+                    consultationId,
+                    ConsultationCreator.NURSE.name(),
+                    consultation.getDiseaseDescription()
             );
         }
 

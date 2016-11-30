@@ -161,15 +161,6 @@ public class NurseConsultationAPI {
         );
 
 
-        notifierForAllModule.followUpAlertToGo2nurseUser(
-                PatientFollowUpType.CONSULTATION,
-                userId,
-                consultationId,
-                ConsultationCreator.NURSE.name(),
-                diseaseDescription
-        );
-
-
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", consultationId);
         return Response.ok(retValue).build();

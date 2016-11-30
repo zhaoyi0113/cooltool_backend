@@ -118,6 +118,19 @@ public class UserConsultationService {
         return beans;
     }
 
+    public UserConsultationBean getUserConsultationNoProperties(long consultationId) {
+        logger.info("get consultationId={} no properties", consultationId);
+        UserConsultationEntity resultSet = repository.findOne(consultationId);
+        if (null==resultSet) {
+            logger.info("there is no record");
+            return null;
+        }
+        List<UserConsultationEntity> entities = new ArrayList<>();
+        entities.add(resultSet);
+        List<UserConsultationBean> userConsultation = entitiesToBeansForConsultation(entities);
+        return userConsultation.get(0);
+    }
+
     public UserConsultationBean getUserConsultation(long consultationId, ConsultationTalkStatus talkStatus) {
         logger.info("get consultationId={}", consultationId);
         UserConsultationEntity resultSet = repository.findOne(consultationId);
