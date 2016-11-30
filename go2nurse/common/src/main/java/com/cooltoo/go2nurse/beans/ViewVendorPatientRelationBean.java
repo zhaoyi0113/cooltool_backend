@@ -1,5 +1,8 @@
 package com.cooltoo.go2nurse.beans;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by zhaolisong on 2016/11/24.
  */
@@ -8,6 +11,7 @@ public class ViewVendorPatientRelationBean {
     private long patientId;
     private UserBean user;
     private PatientBean patient;
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
     public long getUserId() {
         return userId;
@@ -39,5 +43,16 @@ public class ViewVendorPatientRelationBean {
 
     public void setPatient(PatientBean patient) {
         this.patient = patient;
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(String key, Object value) {
+        if (null==key || key.trim().length()==0 || null==value) {
+            return;
+        }
+        properties.put(key.trim(), value);
     }
 }

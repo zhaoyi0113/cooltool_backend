@@ -1,6 +1,5 @@
 package com.cooltoo.go2nurse.service.notification;
 
-import com.cooltoo.go2nurse.constants.ProcessStatus;
 
 /**
  * Created by hp on 2016/9/14.
@@ -10,6 +9,7 @@ public enum  MessageType {
     CONSULTATION_TALK,
     APPOINTMENT,
     FOLLOW_UP_CONSULTATION,
+    FOLLOW_UP_CONSULTATION_TALK,
     FOLLOW_UP_QUESTIONNAIRE,
     PUSH_COURSE,
     ;
@@ -29,6 +29,9 @@ public enum  MessageType {
         }
         else if (FOLLOW_UP_CONSULTATION.name().equalsIgnoreCase(type)) {
             enumeration = FOLLOW_UP_CONSULTATION;
+        }
+        else if (FOLLOW_UP_CONSULTATION_TALK.name().equalsIgnoreCase(type)) {
+            enumeration = FOLLOW_UP_CONSULTATION_TALK;
         }
         else if (FOLLOW_UP_QUESTIONNAIRE.name().equalsIgnoreCase(type)) {
             enumeration = FOLLOW_UP_QUESTIONNAIRE;
@@ -52,6 +55,9 @@ public enum  MessageType {
         }
         else if (FOLLOW_UP_CONSULTATION.ordinal() == type) {
             enumeration = FOLLOW_UP_CONSULTATION;
+        }
+        else if (FOLLOW_UP_CONSULTATION_TALK.ordinal() == type) {
+            enumeration = FOLLOW_UP_CONSULTATION_TALK;
         }
         else if (FOLLOW_UP_QUESTIONNAIRE.ordinal() == type) {
             enumeration = FOLLOW_UP_QUESTIONNAIRE;

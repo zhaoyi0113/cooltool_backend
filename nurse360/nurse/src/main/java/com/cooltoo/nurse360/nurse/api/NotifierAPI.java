@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,15 +30,23 @@ public class NotifierAPI {
     public void notifier(@FormParam("device_type") String deviceType,
                          @FormParam("token") String token,
                          @FormParam("alert") String alert,
-                         @FormParam("descr") String description
+                         @FormParam("descr") String description,
+                         @FormParam("type")  String type,
+                         @FormParam("status")String status,
+                         @FormParam("relativeId") long relativeId
     ) {
         MessageBean message = new MessageBean();
         message.setAlertBody(alert);
         message.setDescription(description);
-        message.setType("TEST_nurse360");
-        message.setStatus("TEST Status_nurse360");
-        message.setRelativeId(0);
-        notifier.notifyDevice(token, DeviceType.parseString(deviceType), message);
+        message.setType(type);
+        message.setStatus(status);
+        message.setRelativeId(relativeId);
+
+        Nurse360DeviceTokensBean deviceToken = new Nurse360DeviceTokensBean();
+        deviceToken.setDeviceType(DeviceType.parseString(deviceType));
+        deviceToken.setDeviceToken(token);
+        deviceToken.setUserId(0L);
+        notifier.notifyNurse360Nurse(Arrays.asList(new Nurse360DeviceTokensBean[]{deviceToken}), message);
     }
 
     @PUT

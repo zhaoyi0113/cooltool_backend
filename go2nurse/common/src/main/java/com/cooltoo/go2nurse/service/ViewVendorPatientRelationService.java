@@ -1,10 +1,15 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.HospitalBean;
+import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.beans.ViewVendorPatientRelationBean;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.repository.ViewVendorPatientRelationRepository;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
+import com.cooltoo.services.CommonDepartmentService;
+import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +31,9 @@ import java.util.Map;
 public class ViewVendorPatientRelationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ViewVendorPatientRelationService.class);
+    private static final String PROP_ORDER_NUMBER   = "order_number";
+    private static final String PROP_HOSPITAL   = "hospital";
+    private static final String PROP_DEPARTMENT = "department";
 
     public static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "time"),
@@ -35,7 +43,10 @@ public class ViewVendorPatientRelationService {
     @Autowired private ViewVendorPatientRelationRepository repository;
     @Autowired private UserService userService;
     @Autowired private PatientService patientService;
+    @Autowired private CommonHospitalService hospitalService;
+    @Autowired private CommonDepartmentService departmentService;
 
+    @Autowired private Go2NurseUtility utility;
 
 
     //===============================================================
@@ -58,11 +69,43 @@ public class ViewVendorPatientRelationService {
         Page<Object[]> resultSet = repository.findByConditions(vendorType, vendorId, vendorDepartId, request);
         beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
+        if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
+            fillPropertyHospitalDepartment(beans,
+                    null!=vendorId       ? vendorId.intValue()       : 0,
+                    null!=vendorDepartId ? vendorDepartId.intValue() : 0);
+        }
 
         logger.warn("visit record count={}", beans.size());
         return beans;
     }
 
+    //===============================================================
+    //             get ----  nurse/manager using
+    //===============================================================
+
+    public long countHospitalPatientByCondition(Long hospitalId, Long departmentId) {
+        List<Object[]> set = repository.findByConditions(ServiceVendorType.HOSPITAL, hospitalId, departmentId);
+        long count = VerifyUtil.isListEmpty(set) ? 0 : set.size();
+        logger.info("count hospital's patient by hospitalId={} departmentId={}, count is {}",
+                hospitalId, departmentId, count);
+        return count;
+    }
+
+    public List<ViewVendorPatientRelationBean> getHospitalPatientByCondition(Long hospitalId, Long departmentId, int pageIndex, int sizePerPage) {
+        logger.info("get hospital's patient by hospitalId={} departmentId={} at page={} sizePerPage={}",
+                hospitalId, departmentId, pageIndex, sizePerPage);
+        List<ViewVendorPatientRelationBean> beans;
+        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<Object[]> resultSet = repository.findByConditions(ServiceVendorType.HOSPITAL, hospitalId, departmentId, request);
+        beans = entitiesToBeans(resultSet);
+        fillOtherProperties(beans);
+        fillPropertyHospitalDepartment(beans,
+                null!=hospitalId   ? hospitalId.intValue()   : 0,
+                null!=departmentId ? departmentId.intValue() : 0);
+
+        logger.warn("visit record count={}", beans.size());
+        return beans;
+    }
 
     private List<ViewVendorPatientRelationBean> entitiesToBeans(Iterable<Object[]> entities) {
         List<ViewVendorPatientRelationBean> beans = new ArrayList<>();
@@ -119,4 +162,14 @@ public class ViewVendorPatientRelationService {
         }
     }
 
+    private void fillPropertyHospitalDepartment(List<ViewVendorPatientRelationBean> beans, Integer hospitalId, Integer departmentId) {
+        HospitalBean hospital = hospitalService.getHospital(hospitalId);
+        HospitalDepartmentBean department = departmentService.getById(departmentId, utility.getHttpPrefixForNurseGo());
+
+        // fill properties
+        for (ViewVendorPatientRelationBean tmp : beans) {
+            tmp.setProperties(PROP_HOSPITAL, hospital);
+            tmp.setProperties(PROP_DEPARTMENT, department);
+        }
+    }
 }

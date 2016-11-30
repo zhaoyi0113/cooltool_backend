@@ -92,10 +92,10 @@ public class HospitalPatientAPI {
     @RequestMapping(path = "/patient/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countPatient(HttpServletRequest request) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("0", "0", userDetails);
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
-        long count = vendorPatientRelationService.countVendorsPatientByCondition(ServiceVendorType.HOSPITAL, hospitalId, departmentId);
+        long count = vendorPatientRelationService.countHospitalPatientByCondition(hospitalId, departmentId);
         return count;
     }
 
@@ -105,10 +105,10 @@ public class HospitalPatientAPI {
                                                           @RequestParam(defaultValue = "10", name = "number") int number
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("0", "0", userDetails);
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
-        List<ViewVendorPatientRelationBean> vendorsPatient = vendorPatientRelationService.getVendorsPatientByCondition(ServiceVendorType.HOSPITAL, hospitalId, departmentId, index, number);
+        List<ViewVendorPatientRelationBean> vendorsPatient = vendorPatientRelationService.getHospitalPatientByCondition(hospitalId, departmentId, index, number);
         return vendorsPatient;
     }
 }

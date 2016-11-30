@@ -226,7 +226,14 @@ public class NurseConsultationAPI {
         Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
 
         Long userId = talkReturn.get(UserConsultationService.USER_ID);
-        notifierForAllModule.consultationAlertToGo2nurseUser(userId, consultationId, talkStatus, talkContent);
+        UserConsultationBean consultation = userConsultationService.getUserConsultationNoProperties(consultationId);
+
+        if (ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
+            notifierForAllModule.followUpTalkAlertToGo2nurseUser(consultation.getNurseId(), consultationId, talkStatus.name(), talkContent);
+        }
+        else {
+            notifierForAllModule.consultationAlertToGo2nurseUser(userId, consultationId, talkStatus, talkContent);
+        }
 
         Map<String, Long> returnValue = new HashMap<>();
         Long talkId = talkReturn.get(UserConsultationService.TALK_ID);

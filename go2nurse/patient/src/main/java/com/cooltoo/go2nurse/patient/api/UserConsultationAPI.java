@@ -243,8 +243,7 @@ public class UserConsultationAPI {
 
         if (consultationNurseId>0) {
             if (!ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
-                notifierForAllModule.followUpAlertToNurse360(
-                        PatientFollowUpType.CONSULTATION,
+                notifierForAllModule.followUpTalkAlertToNurse360(
                         consultationNurseId,
                         followUpRecordId,
                         talkStatus.toString(),

@@ -18,7 +18,6 @@ import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.JSONUtil;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
-import com.qiniu.util.Json;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,6 @@ public class UserQuestionnaireAnswerService {
     @Autowired private UserQuestionnaireAnswerRepository repository;
     @Autowired private UserQuestionnaireAnswerBeanConverter beanConverter;
 
-    @Autowired private Go2NurseUtility go2NurseUtility;
     @Autowired private UserRepository userRepository;
     @Autowired private QuestionRepository questionRepository;
     @Autowired private QuestionnaireService questionnaireService;

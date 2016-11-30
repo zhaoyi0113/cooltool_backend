@@ -227,4 +227,31 @@ public class NotifierForAllModule {
         NetworkUtil.newInstance().httpsRequest(nurse360NotifierUrl, "PUT", msg.toString());
     }
 
+    public void followUpTalkAlertToGo2nurseUser(long userId, long relativeId, String status, String description) {
+        MessageBean messageBean = notifier.createMessage(
+                MessageType.FOLLOW_UP_CONSULTATION_TALK,
+                FOLLOW_UP_ALERT_BODY,
+                relativeId,
+                status,
+                VerifyUtil.isStringEmpty(description) ? ("follow-up consultation talk!") : description
+        );
+
+        StringBuilder msg = messageBean.toHtmlParam();
+        msg.append("&user_id=").append(userId);
+        NetworkUtil.newInstance().httpsRequest(go2nurseNotifierUrl, "PUT", msg.toString());
+    }
+
+    public void followUpTalkAlertToNurse360(long nurseId, long relativeId, String status, String description) {
+        MessageBean messageBean = notifier.createMessage(
+                MessageType.FOLLOW_UP_CONSULTATION_TALK,
+                FOLLOW_UP_REPLY_ALERT_BODY,
+                relativeId,
+                status,
+                VerifyUtil.isStringEmpty(description) ? ("follow-up consultation talk replied!") : description
+        );
+
+        StringBuilder msg = messageBean.toHtmlParam();
+        msg.append("&nurse_id=").append(nurseId);
+        NetworkUtil.newInstance().httpsRequest(nurse360NotifierUrl, "PUT", msg.toString());
+    }
 }
