@@ -12,7 +12,6 @@ import com.cooltoo.go2nurse.beans.UserConsultationTalkBean;
 import com.cooltoo.go2nurse.constants.ConsultationCreator;
 import com.cooltoo.go2nurse.constants.ConsultationReason;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
-import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.service.ConsultationCategoryService;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.go2nurse.service.UserConsultationService;
@@ -229,7 +228,7 @@ public class NurseConsultationAPI {
         UserConsultationBean consultation = userConsultationService.getUserConsultationNoProperties(consultationId);
 
         if (ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
-            notifierForAllModule.followUpTalkAlertToGo2nurseUser(consultation.getNurseId(), consultationId, talkStatus.name(), talkContent);
+            notifierForAllModule.followUpTalkAlertToGo2nurseUser(consultation.getUserId(), consultationId, talkStatus.name(), talkContent);
         }
         else {
             notifierForAllModule.consultationAlertToGo2nurseUser(userId, consultationId, talkStatus, talkContent);
