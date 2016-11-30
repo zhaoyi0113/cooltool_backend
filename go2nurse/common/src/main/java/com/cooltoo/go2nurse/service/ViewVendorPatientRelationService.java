@@ -19,10 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 2016/11/24.
@@ -73,6 +70,10 @@ public class ViewVendorPatientRelationService {
             fillPropertyHospitalDepartment(beans,
                     null!=vendorId       ? vendorId.intValue()       : 0,
                     null!=vendorDepartId ? vendorDepartId.intValue() : 0);
+            fillPropertyOrderNumber(beans,
+                    vendorType,
+                    null!=vendorId       ? vendorId       : 0,
+                    null!=vendorDepartId ? vendorDepartId : 0);
         }
 
         logger.warn("visit record count={}", beans.size());
@@ -102,6 +103,10 @@ public class ViewVendorPatientRelationService {
         fillPropertyHospitalDepartment(beans,
                 null!=hospitalId   ? hospitalId.intValue()   : 0,
                 null!=departmentId ? departmentId.intValue() : 0);
+        fillPropertyOrderNumber(beans,
+                ServiceVendorType.HOSPITAL,
+                null!=hospitalId   ? hospitalId   : 0,
+                null!=departmentId ? departmentId : 0);
 
         logger.warn("visit record count={}", beans.size());
         return beans;
@@ -171,5 +176,33 @@ public class ViewVendorPatientRelationService {
             tmp.setProperties(PROP_HOSPITAL, hospital);
             tmp.setProperties(PROP_DEPARTMENT, department);
         }
+    }
+
+    private void fillPropertyOrderNumber(List<ViewVendorPatientRelationBean> beans, ServiceVendorType vendorType, Long vendorId, Long departId) {
+        List<Object[]> orders = repository.findRecordByConditions(vendorType, vendorId, departId, "order");
+        if (VerifyUtil.isListEmpty(orders)) {
+            return;
+        }
+        Map<String, Long> patientOrderNumber = new HashMap<>();
+        for (Object[] tmp : orders) {
+            Object userId    = tmp[0];
+            Object patientId = tmp[1];
+            String key = userId+"_"+patientId;
+            Long size = patientOrderNumber.get(key);
+            if (null==size) {
+                patientOrderNumber.put(key, 1L);
+            }
+            else {
+                patientOrderNumber.put(key, size+1);
+            }
+        }
+
+        // fill properties
+        for (ViewVendorPatientRelationBean tmp : beans) {
+            String key = tmp.getUserId()+"_"+tmp.getPatientId();
+            Long size = patientOrderNumber.get(key);
+            tmp.setProperties(PROP_ORDER_NUMBER, null==size ? 0L : size);
+        }
+
     }
 }
