@@ -498,8 +498,12 @@ public class UserConsultationService {
         List<Long> nurseIds = new ArrayList<>();
         List<Long> consultationIds = new ArrayList<>();
         for (UserConsultationTalkBean tmp : beans) {
-            nurseIds.add(tmp.getNurseId());
-            consultationIds.add(tmp.getConsultationId());
+            if (!nurseIds.contains(tmp.getNurseId())) {
+                nurseIds.add(tmp.getNurseId());
+            }
+            if (!consultationIds.contains(tmp.getConsultationId())) {
+                consultationIds.add(tmp.getConsultationId());
+            }
         }
 
         Map<Long, NurseBean> userIdToBean = nurseService.getNurseIdToBean(nurseIds);

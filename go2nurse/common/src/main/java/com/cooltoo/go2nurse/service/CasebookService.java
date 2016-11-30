@@ -380,8 +380,12 @@ public class CasebookService {
         List<Long> nurseIds = new ArrayList<>();
         List<Long> casebookIds = new ArrayList<>();
         for (CaseBean tmp : beans) {
-            nurseIds.add(tmp.getNurseId());
-            casebookIds.add(tmp.getCasebookId());
+            if (!nurseIds.contains(tmp.getNurseId())) {
+                nurseIds.add(tmp.getNurseId());
+            }
+            if (!casebookIds.contains(tmp.getCasebookId())) {
+                casebookIds.add(tmp.getCasebookId());
+            }
         }
 
         Map<Long, NurseBean> userIdToBean = nurseService.getNurseIdToBean(nurseIds);
