@@ -211,7 +211,7 @@ public class NotifierForAllModule {
         NetworkUtil.newInstance().httpsRequest(go2nurseNotifierUrl, "PUT", msg.toString());
     }
 
-    public void followUpAlertToNurse(PatientFollowUpType followUpType, long nurseId, long relativeId, String status, String description) {
+    public void followUpAlertToNurse360(PatientFollowUpType followUpType, long nurseId, long relativeId, String status, String description) {
         MessageBean messageBean = notifier.createMessage(
                 PatientFollowUpType.CONSULTATION.equals(followUpType)
                         ? MessageType.FOLLOW_UP_CONSULTATION

@@ -230,6 +230,7 @@ public class UserConsultationAPI {
     ) {
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.parseString(strTalkStatus);
         UserConsultationBean consultation = userConsultationService.getUserConsultation(consultationId, null);
+        long consultationNurseId = consultation.getNurseId();
         long followUpRecordId = 0;
         if (ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
             List<NursePatientFollowUpRecordBean> followUpRecords = patientFollowRecordService.getPatientFollowUpRecord(CommonStatus.ENABLED, PatientFollowUpType.CONSULTATION, consultationId);
@@ -240,11 +241,9 @@ public class UserConsultationAPI {
         }
         Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
 
-
-        Long consultationNurseId = talkReturn.get(UserConsultationService.NURSE_ID);
         if (consultationNurseId>0) {
             if (!ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
-                notifierForAllModule.followUpAlertToNurse(
+                notifierForAllModule.followUpAlertToNurse360(
                         PatientFollowUpType.CONSULTATION,
                         consultationNurseId,
                         followUpRecordId,

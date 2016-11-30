@@ -1,6 +1,5 @@
 package com.cooltoo;
 
-import com.cooltoo.go2nurse.features.GoToNurseFeatures;
 import com.cooltoo.nurse360.features.Nurse360Features;
 import com.google.common.base.Predicate;
 import org.slf4j.Logger;

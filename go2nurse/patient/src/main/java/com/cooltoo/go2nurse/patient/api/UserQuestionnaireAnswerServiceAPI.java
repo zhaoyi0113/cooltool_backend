@@ -1,10 +1,8 @@
 package com.cooltoo.go2nurse.patient.api;
 
-import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.*;
-import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
@@ -15,7 +13,6 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -278,7 +275,7 @@ public class UserQuestionnaireAnswerServiceAPI {
         NursePatientFollowUpBean followUpBean = patientFollowUpService.getPatientFollowUp(followUpRecordBean.getFollowUpId());
 
         if (followUpRecordId>0) {
-            notifierForAllModule.followUpAlertToNurse(
+            notifierForAllModule.followUpAlertToNurse360(
                     PatientFollowUpType.QUESTIONNAIRE,
                     followUpBean.getNurseId(),
                     followUpRecordId,
