@@ -55,8 +55,14 @@ public class CourseHospitalRelationServiceForNurse360 {
         logger.info("get hospitalId by course id={} and status={}", courseId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Integer> hospitalIds = repository.findHospitalIdByCourseIdAndStatus(courseId, status, sort);
-        logger.info("hospitalId is {}", hospitalIds);
-        return hospitalIds;
+        List<Integer> validIds = new ArrayList<>();
+        for (Integer tmp : hospitalIds) {
+            if (null!=tmp && !validIds.contains(tmp)) {
+                validIds.add(tmp);
+            }
+        }
+        logger.info("hospitalId is {}", validIds);
+        return validIds;
     }
 
     public List<HospitalBean> getHospitalByCourseId(long courseId, String strStatus) {
@@ -72,8 +78,14 @@ public class CourseHospitalRelationServiceForNurse360 {
         logger.info("get departmentId by course id={} and status={}", courseId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Integer> departmentIds = repository.findDepartmentIdByCourseIdAndStatus(courseId, status, sort);
-        logger.info("departmentId is {}", departmentIds);
-        return departmentIds;
+        List<Integer> validIds = new ArrayList<>();
+        for (Integer tmp : departmentIds) {
+            if (null!=tmp && !validIds.contains(tmp)) {
+                validIds.add(tmp);
+            }
+        }
+        logger.info("departmentId is {}", validIds);
+        return validIds;
     }
 
     public List<HospitalDepartmentBean> getDepartmentByCourseId(long courseId, String strStatus) {

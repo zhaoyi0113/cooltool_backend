@@ -53,8 +53,14 @@ public class NotificationHospitalRelationServiceForNurse360 {
         logger.info("get hospitalId by notification id={} and status={}", notificationId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Integer> hospitalIds = repository.findHospitalIdByNotificationIdAndStatus(notificationId, status, sort);
-        logger.info("hospital is {}", hospitalIds);
-        return hospitalIds;
+        List<Integer> validIds = new ArrayList<>();
+        for (Integer tmp : hospitalIds) {
+            if (null!=tmp && !validIds.contains(tmp)) {
+                validIds.add(tmp);
+            }
+        }
+        logger.info("hospital is {}", validIds);
+        return validIds;
     }
 
     public List<HospitalBean> getHospitalByNotificationId(long notificationId, String strStatus) {
@@ -70,8 +76,14 @@ public class NotificationHospitalRelationServiceForNurse360 {
         logger.info("get departmentId by notification id={} and status={}", notificationId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Integer> departmentIds = repository.findDepartmentIdByNotificationIdAndStatus(notificationId, status, sort);
-        logger.info("department is {}", departmentIds);
-        return departmentIds;
+        List<Integer> validIds = new ArrayList<>();
+        for (Integer tmp : departmentIds) {
+            if (null!=tmp && !validIds.contains(tmp)) {
+                validIds.add(tmp);
+            }
+        }
+        logger.info("department is {}", validIds);
+        return validIds;
     }
 
     public List<HospitalDepartmentBean> getDepartmentByNotificationId(long notificationId, String strStatus) {

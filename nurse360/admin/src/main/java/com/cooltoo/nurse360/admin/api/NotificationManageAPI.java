@@ -54,7 +54,7 @@ public class NotificationManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getNotificationById(@Context HttpServletRequest request,
-                                          @PathParam("notification_id") @DefaultValue("0") long notificationId
+                                        @PathParam("notification_id") @DefaultValue("0") long notificationId
     ) {
         logger.info("get notification by notification id");
         Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
