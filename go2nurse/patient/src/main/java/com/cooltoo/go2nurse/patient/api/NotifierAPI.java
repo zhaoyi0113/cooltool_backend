@@ -7,6 +7,8 @@ import com.cooltoo.go2nurse.service.notification.MessageBean;
 import com.cooltoo.go2nurse.service.notification.MessageType;
 import com.cooltoo.go2nurse.service.notification.Notifier;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
@@ -21,6 +23,8 @@ import java.util.Map;
  */
 @Path("/notifier")
 public class NotifierAPI {
+
+    public static final Logger logger = LoggerFactory.getLogger(NotifierAPI.class);
 
     @Autowired private Notifier notifier;
     @Autowired private UserDeviceTokensService deviceTokensService;
@@ -62,6 +66,8 @@ public class NotifierAPI {
                                   @DefaultValue("")  @FormParam("properties")  String propertiesJson
 
     ) {
+        logger.debug("user_id={} alert={} description={} messageType={} relativeId={} status={} prop={}",
+                strUserIds, alert, description, messageType, relativeId, status, propertiesJson);
         List<Long> userIds = VerifyUtil.isIds(strUserIds) ? VerifyUtil.parseLongIds(strUserIds) : null;
         MessageType msgType = MessageType.parseString(messageType);
         MessageBean msg = new MessageBean();

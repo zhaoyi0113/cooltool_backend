@@ -7,6 +7,8 @@ import com.cooltoo.go2nurse.service.notification.MessageBean;
 import com.cooltoo.go2nurse.service.notification.MessageType;
 import com.cooltoo.go2nurse.service.notification.Notifier;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
@@ -20,6 +22,8 @@ import java.util.List;
  */
 @Path("/notifier")
 public class NotifierAPI {
+
+    public static final Logger logger = LoggerFactory.getLogger(NotifierAPI.class);
 
     @Autowired private Notifier notifier;
     @Autowired private Nurse360DeviceTokensService deviceTokensService;
@@ -60,6 +64,8 @@ public class NotifierAPI {
                                   @DefaultValue("")  @FormParam("properties")  String propertiesJson
 
     ) {
+        logger.debug("nurserId={} alert={} description={} messageType={} relativeId={} status={} prop={}",
+                strNurseIds, alert, description, messageType, relativeId, status, propertiesJson);
         List<Long> nurseIds = VerifyUtil.isIds(strNurseIds) ? VerifyUtil.parseLongIds(strNurseIds) : null;
         MessageType msgType = MessageType.parseString(messageType);
         MessageBean msg = new MessageBean();
@@ -69,6 +75,9 @@ public class NotifierAPI {
         msg.setDescription(description);
         msg.setRelativeId(relativeId);
         msg.setProperties(propertiesJson);
+
+
+
 
         if (null!=msgType && 0!=relativeId && !nurseIds.isEmpty()) {
             List<Nurse360DeviceTokensBean> tokens = deviceTokensService.getUserDeviceToknes(nurseIds);

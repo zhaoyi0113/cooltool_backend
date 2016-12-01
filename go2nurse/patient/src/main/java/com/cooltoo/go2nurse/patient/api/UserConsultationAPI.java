@@ -242,7 +242,7 @@ public class UserConsultationAPI {
         Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
 
         if (consultationNurseId>0) {
-            if (!ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
+            if (ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
                 notifierForAllModule.followUpTalkAlertToNurse360(
                         consultationNurseId,
                         followUpRecordId,
