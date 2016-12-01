@@ -1,5 +1,8 @@
 package com.cooltoo.go2nurse.service.notification;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by hp on 2016/9/14.
  */
@@ -10,6 +13,7 @@ public class MessageBean {
     private String status;
     private long relativeId;
     private String description;
+    private Map<String, Object> properties = new HashMap<>();
 
     public String getAlertBody() {
         return alertBody;
@@ -49,6 +53,17 @@ public class MessageBean {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(String key, Object value) {
+        if (null==key || key.trim().length()==0 || null==value) {
+            return;
+        }
+        properties.put(key, value);
     }
 
     public StringBuilder toHtmlParam() {

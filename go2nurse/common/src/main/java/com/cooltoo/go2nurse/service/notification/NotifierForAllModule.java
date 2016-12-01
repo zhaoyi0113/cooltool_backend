@@ -195,7 +195,7 @@ public class NotifierForAllModule {
     //
     //========================================================================================
 
-    public void followUpAlertToGo2nurseUser(PatientFollowUpType followUpType, long userId, long relativeId, String status, String description) {
+    public void followUpAlertToGo2nurseUser(PatientFollowUpType followUpType, long userId, long followUpRecordId, long relativeId, String status, String description) {
         MessageBean messageBean = notifier.createMessage(
                 PatientFollowUpType.CONSULTATION.equals(followUpType)
                         ? MessageType.FOLLOW_UP_CONSULTATION
@@ -205,6 +205,7 @@ public class NotifierForAllModule {
                 status,
                 VerifyUtil.isStringEmpty(description) ? ("follow-up " + followUpType.name().toLowerCase() + "!") : description
         );
+        messageBean.setProperties("followUpRecordId", followUpRecordId);
 
         StringBuilder msg = messageBean.toHtmlParam();
         msg.append("&user_id=").append(userId);

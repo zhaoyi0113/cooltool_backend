@@ -129,6 +129,7 @@ public class NursePatientFollowUpRecordAPI {
             notifierForAllModule.followUpAlertToGo2nurseUser(
                     patientFollowUpType,
                     followUp.getUserId(),
+                    followUpRecordId,
                     questionnaireId,
                     ReadingStatus.UNREAD.name(),
                     "nurse make questionnaire follow-up!"
@@ -139,6 +140,7 @@ public class NursePatientFollowUpRecordAPI {
             notifierForAllModule.followUpAlertToGo2nurseUser(
                     PatientFollowUpType.CONSULTATION,
                     followUp.getUserId(),
+                    followUpRecordId,
                     consultationId,
                     ConsultationCreator.NURSE.name(),
                     consultation.getDiseaseDescription()
