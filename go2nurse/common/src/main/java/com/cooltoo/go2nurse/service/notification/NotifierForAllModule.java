@@ -22,6 +22,7 @@ import java.util.List;
 @Service("NotifierForAllModule")
 public class NotifierForAllModule {
 
+    public static final String NEW_NOTIFICATION_ALERT_BODY = "你有一条通知！";
     public static final String NEW_ORDER_ALERT_BODY = "有新订单，快来抢！";
     public static final String ORDER_ALERT_BODY = "订单状态有更新";
     public static final String APPOINTMENT_ALERT_BODY = "预约状态有更新";
@@ -212,7 +213,7 @@ public class NotifierForAllModule {
         NetworkUtil.newInstance().httpsRequest(go2nurseNotifierUrl, "PUT", msg.toString());
     }
 
-    public void followUpAlertToNurse360(PatientFollowUpType followUpType, long nurseId, long relativeId, String status, String description) {
+    public void followUpAlertToNurse360(PatientFollowUpType followUpType, long nurseId, long followUpRecordId, long relativeId, String status, String description) {
         MessageBean messageBean = notifier.createMessage(
                 PatientFollowUpType.CONSULTATION.equals(followUpType)
                         ? MessageType.FOLLOW_UP_CONSULTATION
@@ -222,6 +223,7 @@ public class NotifierForAllModule {
                 status,
                 VerifyUtil.isStringEmpty(description) ? ("follow-up " + followUpType.name().toLowerCase() + " replied!") : description
         );
+        messageBean.setProperties("followUpRecordId", followUpRecordId);
 
         StringBuilder msg = messageBean.toHtmlParam();
         msg.append("&nurse_id=").append(nurseId);
@@ -242,7 +244,7 @@ public class NotifierForAllModule {
         NetworkUtil.newInstance().httpsRequest(go2nurseNotifierUrl, "PUT", msg.toString());
     }
 
-    public void followUpTalkAlertToNurse360(long nurseId, long relativeId, String status, String description) {
+    public void followUpTalkAlertToNurse360(long nurseId, long followUpRecordId, long relativeId, String status, String description) {
         MessageBean messageBean = notifier.createMessage(
                 MessageType.FOLLOW_UP_CONSULTATION_TALK,
                 FOLLOW_UP_REPLY_ALERT_BODY,
@@ -250,9 +252,35 @@ public class NotifierForAllModule {
                 status,
                 VerifyUtil.isStringEmpty(description) ? ("follow-up consultation talk replied!") : description
         );
+        messageBean.setProperties("followUpRecordId", followUpRecordId);
 
         StringBuilder msg = messageBean.toHtmlParam();
         msg.append("&nurse_id=").append(nurseId);
         NetworkUtil.newInstance().httpsRequest(nurse360NotifierUrl, "PUT", msg.toString());
+    }
+
+
+    //========================================================================================
+    //
+    //                          Push notification Message to Nurse
+    //
+    //========================================================================================
+    public void newNotificationAlertToNurse360(List<Long> nurseIds, long notificationId, String status, String description) {
+        if (null!=nurseIds && !nurseIds.isEmpty()) {
+            MessageBean messageBean = notifier.createMessage(
+                    MessageType.NURSE_NOTIFICATION,
+                    NEW_NOTIFICATION_ALERT_BODY,
+                    notificationId,
+                    status,
+                    VerifyUtil.isStringEmpty(description) ? ("new notification !") : description
+            );
+
+            StringBuilder msg = messageBean.toHtmlParam();
+            msg.append("&nurse_id=0");
+            for (Long tmpId : nurseIds) {
+                msg.append(",").append(tmpId);
+            }
+            NetworkUtil.newInstance().httpsRequest(nurse360NotifierUrl, "PUT", msg.toString());
+        }
     }
 }

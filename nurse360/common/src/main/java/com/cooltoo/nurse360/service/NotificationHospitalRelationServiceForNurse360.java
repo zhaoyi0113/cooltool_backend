@@ -49,6 +49,14 @@ public class NotificationHospitalRelationServiceForNurse360 {
     //============================================================================
     //                 get
     //============================================================================
+    public List<Integer> getHospitalIdByNotificationId(long notificationId, String strStatus) {
+        logger.info("get hospitalId by notification id={} and status={}", notificationId, strStatus);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Integer> hospitalIds = repository.findHospitalIdByNotificationIdAndStatus(notificationId, status, sort);
+        logger.info("hospital is {}", hospitalIds);
+        return hospitalIds;
+    }
+
     public List<HospitalBean> getHospitalByNotificationId(long notificationId, String strStatus) {
         logger.info("get hospital by notification id={} and status={}", notificationId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
@@ -56,6 +64,14 @@ public class NotificationHospitalRelationServiceForNurse360 {
         List<HospitalBean> hospitals = hospitalService.getHospitalByIds(hospitalIds);
         logger.info("hospital is {}", hospitals);
         return hospitals;
+    }
+
+    public List<Integer> getDepartmentIdByNotificationId(long notificationId, String strStatus) {
+        logger.info("get departmentId by notification id={} and status={}", notificationId, strStatus);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Integer> departmentIds = repository.findDepartmentIdByNotificationIdAndStatus(notificationId, status, sort);
+        logger.info("department is {}", departmentIds);
+        return departmentIds;
     }
 
     public List<HospitalDepartmentBean> getDepartmentByNotificationId(long notificationId, String strStatus) {

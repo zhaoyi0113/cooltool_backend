@@ -51,6 +51,14 @@ public class CourseHospitalRelationServiceForNurse360 {
     //============================================================================
     //                 get
     //============================================================================
+    public List<Integer> getHospitalIdByCourseId(long courseId, String strStatus) {
+        logger.info("get hospitalId by course id={} and status={}", courseId, strStatus);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Integer> hospitalIds = repository.findHospitalIdByCourseIdAndStatus(courseId, status, sort);
+        logger.info("hospitalId is {}", hospitalIds);
+        return hospitalIds;
+    }
+
     public List<HospitalBean> getHospitalByCourseId(long courseId, String strStatus) {
         logger.info("get hospital by course id={} and status={}", courseId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
@@ -58,6 +66,14 @@ public class CourseHospitalRelationServiceForNurse360 {
         List<HospitalBean> hospitals = hospitalService.getHospitalByIds(hospitalIds);
         logger.info("hospital is {}", hospitals);
         return hospitals;
+    }
+
+    public List<Integer> getDepartmentIdByCourseId(long courseId, String strStatus) {
+        logger.info("get departmentId by course id={} and status={}", courseId, strStatus);
+        CommonStatus status = CommonStatus.parseString(strStatus);
+        List<Integer> departmentIds = repository.findDepartmentIdByCourseIdAndStatus(courseId, status, sort);
+        logger.info("departmentId is {}", departmentIds);
+        return departmentIds;
     }
 
     public List<HospitalDepartmentBean> getDepartmentByCourseId(long courseId, String strStatus) {

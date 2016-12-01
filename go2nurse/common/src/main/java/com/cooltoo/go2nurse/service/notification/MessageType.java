@@ -12,6 +12,8 @@ public enum  MessageType {
     FOLLOW_UP_CONSULTATION_TALK,
     FOLLOW_UP_QUESTIONNAIRE,
     PUSH_COURSE,
+    NURSE_COURSE_LEARN,
+    NURSE_NOTIFICATION
     ;
 
 
@@ -39,6 +41,12 @@ public enum  MessageType {
         else if (PUSH_COURSE.name().equalsIgnoreCase(type)) {
             enumeration = PUSH_COURSE;
         }
+        else if (NURSE_COURSE_LEARN.name().equalsIgnoreCase(type)) {
+            enumeration = NURSE_COURSE_LEARN;
+        }
+        else if (NURSE_NOTIFICATION.name().equalsIgnoreCase(type)) {
+            enumeration = NURSE_NOTIFICATION;
+        }
         return enumeration;
     }
 
@@ -64,6 +72,12 @@ public enum  MessageType {
         }
         else if (PUSH_COURSE.ordinal() == type) {
             enumeration = PUSH_COURSE;
+        }
+        else if (NURSE_COURSE_LEARN.ordinal() == type) {
+            enumeration = NURSE_COURSE_LEARN;
+        }
+        else if (NURSE_NOTIFICATION.ordinal() == type) {
+            enumeration = NURSE_NOTIFICATION;
         }
         return enumeration;
     }

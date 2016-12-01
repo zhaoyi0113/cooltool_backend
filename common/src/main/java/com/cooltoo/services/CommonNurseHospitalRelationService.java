@@ -123,6 +123,26 @@ public class CommonNurseHospitalRelationService {
         return relations;
     }
 
+    public List<Long> getNurseIdByHospitalAndDepartIds(int hospitalId, List<Integer> departIds) {
+        logger.info("get nurseIds by hospital={} department={}", hospitalId, departIds);
+        List<NurseHospitalRelationEntity> resultSet = null;
+        if (VerifyUtil.isListEmpty(departIds)) {
+            resultSet = repository.findByHospitalIdIn(Arrays.asList(new Integer[hospitalId]));
+        }
+        else {
+            resultSet = repository.findByHospitalIdInAndDepartmentIdIn(Arrays.asList(new Integer[hospitalId]), departIds);
+        }
+        List<Long> nurseIds = new ArrayList<>();
+        if (!VerifyUtil.isListEmpty(resultSet)) {
+            for (NurseHospitalRelationEntity tmp : resultSet) {
+                nurseIds.add(tmp.getNurseId());
+            }
+        }
+
+        logger.info("count={}", nurseIds.size());
+        return nurseIds;
+    }
+
     private void fillOtherProperties(List<NurseHospitalRelationBean> relationBeans, String nginxPrefix) {
         if (VerifyUtil.isListEmpty(relationBeans)) {
             return;

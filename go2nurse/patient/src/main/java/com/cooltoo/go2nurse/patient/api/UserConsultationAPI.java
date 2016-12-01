@@ -246,6 +246,7 @@ public class UserConsultationAPI {
                 notifierForAllModule.followUpTalkAlertToNurse360(
                         consultationNurseId,
                         followUpRecordId,
+                        consultationId,
                         talkStatus.toString(),
                         talkContent);
             }

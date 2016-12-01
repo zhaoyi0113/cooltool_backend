@@ -17,7 +17,7 @@ public interface NurseHospitalRelationRepository extends CrudRepository<NurseHos
     List<NurseHospitalRelationEntity> findByNurseIdIn(List<Long> userIds);
     List<NurseHospitalRelationEntity> findByHospitalIdIn(List<Integer> hospitalIds);
     List<NurseHospitalRelationEntity> findByDepartmentIdIn(List<Integer> departmentIds);
-    List<NurseHospitalRelationEntity> findByHospitalIdInOrDepartmentIdIn(List<Integer> hospitalIds, List<Integer> departmentIds);
+    List<NurseHospitalRelationEntity> findByHospitalIdInAndDepartmentIdIn(List<Integer> hospitalIds, List<Integer> departmentIds);
     @Query("select hospital from HospitalEntity hospital, NurseHospitalRelationEntity relation where relation.nurseId = :userId and relation.hospitalId = hospital.id")
     List<HospitalEntity> getNurseHospitals(@Param("userId") long userId);
     void deleteByDepartmentIdIn(List<Integer> departIds);

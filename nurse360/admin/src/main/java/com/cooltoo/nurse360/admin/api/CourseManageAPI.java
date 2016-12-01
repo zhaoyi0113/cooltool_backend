@@ -3,12 +3,15 @@ package com.cooltoo.nurse360.admin.api;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.beans.Nurse360CourseBean;
 import com.cooltoo.nurse360.beans.Nurse360CourseCategoryBean;
+import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.service.CourseCategoryServiceForNurse360;
 import com.cooltoo.nurse360.service.CourseHospitalRelationServiceForNurse360;
 import com.cooltoo.nurse360.service.CourseServiceForNurse360;
 import com.cooltoo.nurse360.util.Nurse360Utility;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -36,6 +39,26 @@ public class CourseManageAPI {
     @Autowired private CourseCategoryServiceForNurse360 categoryService;
     @Autowired private CourseServiceForNurse360 courseService;
     @Autowired private Nurse360Utility utility;
+    @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
+
+    @Path("/alert/{course_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response pushNotification(@Context HttpServletRequest request,
+                                     @PathParam("course_id") @DefaultValue("0") long courseId
+    ) {
+        Nurse360CourseBean course = courseService.getCourseById(courseId, utility.getHttpPrefix());
+        if (null!=course) {
+            List<Integer> hospitals = courseHospitalRelationService.getHospitalIdByCourseId(courseId, CommonStatus.ENABLED.name());
+            List<Integer> departments = courseHospitalRelationService.getDepartmentIdByCourseId(courseId, CommonStatus.ENABLED.name());
+            if (!VerifyUtil.isListEmpty(hospitals)) {
+                List<Long> nurseIds = nurseHospitalRelationService.getNurseIdByHospitalAndDepartIds(hospitals.get(0), departments);
+                notifierForAllModule.newNotificationAlertToNurse360(nurseIds, courseId, "new", course.getName());
+            }
+        }
+        return Response.ok().build();
+    }
 
     // status ==> all/enable/disable/editing
     @Path("/count/{status}")

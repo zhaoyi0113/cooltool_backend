@@ -279,6 +279,7 @@ public class UserQuestionnaireAnswerServiceAPI {
                     PatientFollowUpType.QUESTIONNAIRE,
                     followUpBean.getNurseId(),
                     followUpRecordId,
+                    followUpRecordBean.getRelativeQuestionnaireId(),
                     "UNREAD",
                     "user replay questionnaire follow-up!");
         }

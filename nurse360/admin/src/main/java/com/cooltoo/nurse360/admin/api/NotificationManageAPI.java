@@ -3,9 +3,11 @@ package com.cooltoo.nurse360.admin.api;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.service.NotificationHospitalRelationServiceForNurse360;
 import com.cooltoo.nurse360.service.NotificationServiceForNurse360;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,26 @@ public class NotificationManageAPI {
 
     @Autowired private NotificationServiceForNurse360 notificationService;
     @Autowired private NotificationHospitalRelationServiceForNurse360 notificationHospitalRelationService;
+    @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
+    @Path("/alert/{notification_id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response pushNotification(@Context HttpServletRequest request,
+                                     @PathParam("notification_id") @DefaultValue("0") long notificationId
+    ) {
+        Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
+        if (null!=notification) {
+            List<Integer> hospitals = notificationHospitalRelationService.getHospitalIdByNotificationId(notificationId, CommonStatus.ENABLED.name());
+            List<Integer> departments = notificationHospitalRelationService.getDepartmentIdByNotificationId(notificationId, CommonStatus.ENABLED.name());
+            if (!VerifyUtil.isListEmpty(hospitals)) {
+                List<Long> nurseIds = nurseHospitalRelationService.getNurseIdByHospitalAndDepartIds(hospitals.get(0), departments);
+                notifierForAllModule.newNotificationAlertToNurse360(nurseIds, notificationId, "new", notification.getTitle());
+            }
+        }
+        return Response.ok().build();
+    }
 
     @Path("/{notification_id}")
     @GET
@@ -92,9 +113,9 @@ public class NotificationManageAPI {
         logger.info("new notification");
         Nurse360NotificationBean notification = notificationService.addNotification(title, introduction, strSignificance);
         logger.info("notification is {}", notification);
+        List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
         if (null!=notification) {
             long notificationId = notification.getId();
-            List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
             notificationHospitalRelationService.setNotificationToHospital(notificationId, hospitalId, departmentIds);
         }
         if (null!=notification) {
@@ -105,6 +126,7 @@ public class NotificationManageAPI {
             retVal.put("notification", notification);
             retVal.put("hospital", hospitals);
             retVal.put("department", departments);
+
             return Response.ok(retVal).build();
         }
         return Response.ok(notification).build();
