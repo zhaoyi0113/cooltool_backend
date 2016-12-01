@@ -130,7 +130,7 @@ public class CommonNurseHospitalRelationService {
             resultSet = repository.findByHospitalIdIn(Arrays.asList(new Integer[hospitalId]));
         }
         else {
-            resultSet = repository.findByHospitalIdInAndDepartmentIdIn(Arrays.asList(new Integer[hospitalId]), departIds);
+            resultSet = repository.findByHospitalIdInAndDepartmentIdIn(Arrays.asList(new Integer[]{hospitalId}), departIds);
         }
         List<Long> nurseIds = new ArrayList<>();
         if (!VerifyUtil.isListEmpty(resultSet)) {
