@@ -2,6 +2,7 @@ package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.PatientBean;
+import com.cooltoo.go2nurse.beans.ServiceVendorAuthorizationBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.beans.ViewVendorPatientRelationBean;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
@@ -28,6 +29,7 @@ import java.util.*;
 public class HospitalPatientAPI {
 
     @Autowired private ViewVendorPatientRelationService vendorPatientRelationService;
+    @Autowired private ServiceVendorAuthorizationService vendorAuthorizationService;
     @Autowired private UserService userService;
     @Autowired private UserPatientRelationService userPatientRelation;
     @Autowired private PatientService patientService;
@@ -110,5 +112,19 @@ public class HospitalPatientAPI {
         Long departmentId = tmp[1];
         List<ViewVendorPatientRelationBean> vendorsPatient = vendorPatientRelationService.getHospitalPatientByCondition(hospitalId, departmentId, index, number);
         return vendorsPatient;
+    }
+
+    @RequestMapping(path = "/patient/forbid", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public void forbidPatient(HttpServletRequest request,
+                              @RequestParam(defaultValue = "0",     name = "user_id")      long userId,
+                              @RequestParam(defaultValue = "false", name = "forbidden") boolean forbidden
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("0", "0", userDetails);
+        Long hospitalId   = tmp[0];
+        Long departmentId = tmp[1];
+        CommonStatus forbiddenStatus = forbidden ? CommonStatus.ENABLED : CommonStatus.DISABLED;
+        vendorAuthorizationService.forbidUser(userId, ServiceVendorType.HOSPITAL, hospitalId, departmentId, forbiddenStatus);
+        return;
     }
 }

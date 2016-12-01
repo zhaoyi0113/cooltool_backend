@@ -74,6 +74,7 @@ public enum ErrorCode {
     SERVICE_ORDER_BEEN_FETCHED(259, Response.Status.BAD_REQUEST, "订单已被抢", "service order has been fetched"),
     PAY_FAILED(260, Response.Status.BAD_REQUEST, "支付失败", "Payment failed"),
     OPENID_INVALID(261, Response.Status.BAD_GATEWAY, "Openid 不存在", "Openid Invalid"),
+    USER_FORBIDDEN_BY_VENDOR(262, Response.Status.BAD_REQUEST, "服务商屏蔽了用户", "User is forbidden by vendor"),
 
 
 
