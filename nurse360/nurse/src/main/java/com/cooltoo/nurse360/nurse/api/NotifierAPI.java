@@ -56,7 +56,8 @@ public class NotifierAPI {
                                   @DefaultValue("")  @FormParam("description") String description,
                                   @DefaultValue("")  @FormParam("message_type")String messageType,
                                   @DefaultValue("0") @FormParam("relative_id")   long relativeId,
-                                  @DefaultValue("")  @FormParam("status")      String status
+                                  @DefaultValue("")  @FormParam("status")      String status,
+                                  @DefaultValue("")  @FormParam("properties")  String propertiesJson
 
     ) {
         List<Long> nurseIds = VerifyUtil.isIds(strNurseIds) ? VerifyUtil.parseLongIds(strNurseIds) : null;
@@ -67,6 +68,7 @@ public class NotifierAPI {
         msg.setStatus(status);
         msg.setDescription(description);
         msg.setRelativeId(relativeId);
+        msg.setProperties(propertiesJson);
 
         if (null!=msgType && 0!=relativeId && !nurseIds.isEmpty()) {
             List<Nurse360DeviceTokensBean> tokens = deviceTokensService.getUserDeviceToknes(nurseIds);

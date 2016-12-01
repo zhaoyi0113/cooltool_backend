@@ -1,5 +1,7 @@
 package com.cooltoo.go2nurse.service.notification;
 
+import com.cooltoo.util.JSONUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,6 +68,13 @@ public class MessageBean {
         properties.put(key, value);
     }
 
+    public void setProperties(String json) {
+        Map<String, Object> map = (HashMap<String, Object>)JSONUtil.newInstance().parseJsonBean(json, HashMap.class);
+        if (null!=map) {
+            properties = map;
+        }
+    }
+
     public StringBuilder toHtmlParam() {
         StringBuilder msg = new StringBuilder();
         msg.append("alert=").append(alertBody);
@@ -73,6 +82,7 @@ public class MessageBean {
         msg.append("&message_type=").append(type);
         msg.append("&relative_id=").append(relativeId);
         msg.append("&status=").append(status);
+        msg.append("&properties=").append(JSONUtil.newInstance().toJsonString(properties));
         return msg;
     }
 
@@ -84,6 +94,7 @@ public class MessageBean {
         msg.append(", status=").append(status);
         msg.append(", relativeId=").append(relativeId);
         msg.append(", description=").append(description);
+        msg.append(", properties=").append(properties);
         msg.append("]");
         return msg.toString();
     }

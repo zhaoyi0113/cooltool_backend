@@ -14,12 +14,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 2016/11/29.
  */
 @Path("/notifier")
-public class NotiferAPI {
+public class NotifierAPI {
 
     @Autowired private Notifier notifier;
     @Autowired private UserDeviceTokensService deviceTokensService;
@@ -57,7 +58,8 @@ public class NotiferAPI {
                                   @DefaultValue("")  @FormParam("description") String description,
                                   @DefaultValue("")  @FormParam("message_type")String messageType,
                                   @DefaultValue("0") @FormParam("relative_id")   long relativeId,
-                                  @DefaultValue("")  @FormParam("status")      String status
+                                  @DefaultValue("")  @FormParam("status")      String status,
+                                  @DefaultValue("")  @FormParam("properties")  String propertiesJson
 
     ) {
         List<Long> userIds = VerifyUtil.isIds(strUserIds) ? VerifyUtil.parseLongIds(strUserIds) : null;
@@ -68,6 +70,7 @@ public class NotiferAPI {
         msg.setStatus(status);
         msg.setDescription(description);
         msg.setRelativeId(relativeId);
+        msg.setProperties(propertiesJson);
 
         if (null!=msgType && 0!=relativeId && !userIds.isEmpty()) {
             List<UserDeviceTokensBean> tokens = deviceTokensService.getUserDeviceTokens(userIds);
