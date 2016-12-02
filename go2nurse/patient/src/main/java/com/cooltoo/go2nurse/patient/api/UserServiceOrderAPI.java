@@ -100,7 +100,7 @@ public class UserServiceOrderAPI {
                                           @QueryParam("order_id") @DefaultValue("0") long orderId
     ) {
         List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
-        return Response.ok(orders.get(0)).build();
+        return Response.ok(orders).build();
     }
 
     @GET
