@@ -294,7 +294,7 @@ public class NotifierForAllModule {
     public void newCourseAlertToNurse360(List<Long> nurseIds, long courseId, String status, String description) {
         if (null!=nurseIds && !nurseIds.isEmpty()) {
             MessageBean messageBean = notifier.createMessage(
-                    MessageType.NURSE_NOTIFICATION,
+                    MessageType.NURSE_COURSE_LEARN,
                     NEW_COURSE_ALERT_BODY,
                     courseId,
                     status,
