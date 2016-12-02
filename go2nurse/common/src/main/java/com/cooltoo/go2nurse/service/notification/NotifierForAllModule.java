@@ -22,7 +22,8 @@ import java.util.List;
 @Service("NotifierForAllModule")
 public class NotifierForAllModule {
 
-    public static final String NEW_NOTIFICATION_ALERT_BODY = "你有一条通知！";
+    public static final String NEW_COURSE_ALERT_BODY = "你有一个新课程！";
+    public static final String NEW_NOTIFICATION_ALERT_BODY = "你有一条新通知！";
     public static final String NEW_ORDER_ALERT_BODY = "有新订单，快来抢！";
     public static final String ORDER_ALERT_BODY = "订单状态有更新";
     public static final String APPOINTMENT_ALERT_BODY = "预约状态有更新";
@@ -273,6 +274,31 @@ public class NotifierForAllModule {
                     notificationId,
                     status,
                     VerifyUtil.isStringEmpty(description) ? ("new notification !") : description
+            );
+
+            StringBuilder msg = messageBean.toHtmlParam();
+            msg.append("&nurse_id=0");
+            for (Long tmpId : nurseIds) {
+                msg.append(",").append(tmpId);
+            }
+            NetworkUtil.newInstance().httpsRequest(nurse360NotifierUrl, "PUT", msg.toString());
+        }
+    }
+
+
+    //========================================================================================
+    //
+    //                          Push Course Message to Nurse
+    //
+    //========================================================================================
+    public void newCourseAlertToNurse360(List<Long> nurseIds, long courseId, String status, String description) {
+        if (null!=nurseIds && !nurseIds.isEmpty()) {
+            MessageBean messageBean = notifier.createMessage(
+                    MessageType.NURSE_NOTIFICATION,
+                    NEW_COURSE_ALERT_BODY,
+                    courseId,
+                    status,
+                    VerifyUtil.isStringEmpty(description) ? ("new course !") : description
             );
 
             StringBuilder msg = messageBean.toHtmlParam();

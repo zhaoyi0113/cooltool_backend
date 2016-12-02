@@ -54,7 +54,7 @@ public class CourseManageAPI {
             List<Integer> departments = courseHospitalRelationService.getDepartmentIdByCourseId(courseId, CommonStatus.ENABLED.name());
             if (!VerifyUtil.isListEmpty(hospitals)) {
                 List<Long> nurseIds = nurseHospitalRelationService.getNurseIdByHospitalAndDepartIds(hospitals.get(0), departments);
-                notifierForAllModule.newNotificationAlertToNurse360(nurseIds, courseId, "new", course.getName());
+                notifierForAllModule.newCourseAlertToNurse360(nurseIds, courseId, "new", course.getName());
             }
         }
         return Response.ok().build();
