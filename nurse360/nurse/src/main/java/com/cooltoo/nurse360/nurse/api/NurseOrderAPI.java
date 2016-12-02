@@ -46,15 +46,27 @@ public class NurseOrderAPI {
         return Response.ok(orders).build();
     }
 
-    @Path("/{order_no}")
+    @Path("/order_no")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response getOrderByNo(@Context HttpServletRequest request,
+                                 @QueryParam("order_no") @DefaultValue("0") String orderNo
+    ) {
+        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<ServiceOrderBean> orders = nurseOrderService.getOrderByOrderNo(nurseId, orderNo);
+        return Response.ok(orders).build();
+    }
+
+    @Path("/{order_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getOrder(@Context HttpServletRequest request,
-                             @PathParam("order_no") @DefaultValue("0") String orderNo
+                             @PathParam("order_id") @DefaultValue("0") long orderId
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<ServiceOrderBean> orders = nurseOrderService.getOrderByOrderNo(nurseId, orderNo);
+        List<ServiceOrderBean> orders = nurseOrderService.getOrderByOrderId(nurseId, orderId);
         return Response.ok(orders).build();
     }
 
