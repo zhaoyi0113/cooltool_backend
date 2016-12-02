@@ -15,9 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 16/9/28.
@@ -52,6 +50,32 @@ public class NursePatientRelationServiceForNurse360 {
         }
         logger.info("count is {}", userIds.size());
         return userIds;
+    }
+
+    public Map<Long, Long> getNursePatientNumber(List<Long> nursesId, CommonStatus status) {
+        int size = null==nursesId ? 0 : nursesId.size();
+        Map<Long, Long> nurseIdToPatientNumber = new HashMap<>();
+        logger.info("get nurse patient number by nursesId size={} and status={}", size, status);
+
+        if (size>0 && null!=status) {
+            List<String> nurseUserPatient = new ArrayList<>();
+            List<NursePatientRelationEntity> resultSet = repository.findByNurseIdInAndStatus(nursesId, status);
+            if (!VerifyUtil.isListEmpty(resultSet)) {
+                for (NursePatientRelationEntity tmp : resultSet) {
+                    String key = tmp.getNurseId()+"_"+tmp.getUserId()+"_"+tmp.getPatientId();
+                    if (nurseUserPatient.contains(key)) {
+                        continue;
+                    }
+                    nurseUserPatient.add(key);
+                    Long count = nurseIdToPatientNumber.get(tmp.getNurseId());
+                    count = null==count ? 1L : (count+1);
+                    nurseIdToPatientNumber.put(tmp.getNurseId(), count);
+                }
+            }
+            logger.info("count is {}", nurseIdToPatientNumber.size());
+        }
+
+        return nurseIdToPatientNumber;
     }
 
 

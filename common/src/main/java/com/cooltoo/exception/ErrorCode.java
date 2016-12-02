@@ -103,7 +103,7 @@ public enum ErrorCode {
     NURSE360_PARAMETER_IS_EMPTY(3054, Response.Status.EXPECTATION_FAILED, "参数为空", "Parameter is empty or null"),
     NURSE360_PARAMETER_NOT_EXPECTED(3055, Response.Status.EXPECTATION_FAILED, "参数为不匹配", "Parameter is not match"),
     NURSE360_UNIQUE_ID_INVALID(3056, Response.Status.EXPECTATION_FAILED, "UniqueId 无效", "UniqueId is not match"),
-    NURSE360_WRONG_PASSWORD(3057, Response.Status.EXPECTATION_FAILED, "密码错误", "密码错误"),
+    NURSE360_WRONG_PASSWORD(3057, Response.Status.EXPECTATION_FAILED, "密码错误", "Password wrong"),
     NURSE360_SERVICE_ORDER_BEEN_FETCHED(3058, Response.Status.BAD_REQUEST, "订单已被抢", "Service order has been fetched"),
     NURSE360_SERVICE_ORDER_NOT_YOURS(3059, Response.Status.BAD_REQUEST, "订单不属于你", "Service order not belong to you"),
     NURSE360_FILE_OPERATION_FAILED(3060, Response.Status.BAD_REQUEST, "文件操作失败", "File operation failed"),

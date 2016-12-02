@@ -14,4 +14,6 @@ public interface NursePatientRelationRepository extends JpaRepository<NursePatie
 
     List<NursePatientRelationEntity> findByNurseIdAndStatus(long nurseId, CommonStatus status, Sort sort);
     List<NursePatientRelationEntity> findByNurseIdAndUserIdAndPatientId(long nurseId, long userId, long patientId, Sort sort);
+
+    List<NursePatientRelationEntity> findByNurseIdInAndStatus(List<Long> nursesId, CommonStatus status);
 }

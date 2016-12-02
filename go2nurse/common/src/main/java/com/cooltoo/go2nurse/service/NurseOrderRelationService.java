@@ -169,6 +169,41 @@ public class NurseOrderRelationService {
         return beanSorted;
     }
 
+    public Map<Long, Long> getNurseCompletedOrderNumber(List<Long> nursesId, CommonStatus status) {
+        int size = null==nursesId ? 0 : nursesId.size();
+        Map<Long, Long> nurseIdToOrderCompletedNumber = new HashMap<>();
+        logger.info("get nurse completed order number by nursesId size={} and status={}", size, status);
+
+        if (size>0 && null!=status) {
+            List<Long> completedOrderIds = new ArrayList<>();
+            List<String> nurseOrder = new ArrayList<>();
+            List<NurseOrderRelationEntity> resultSet = repository.findByNurseIdInAndStatus(nursesId, status);
+            if (!VerifyUtil.isListEmpty(resultSet)) {
+                for (NurseOrderRelationEntity tmp : resultSet) {
+                    if (!completedOrderIds.contains(tmp.getOrderId())) {
+                        completedOrderIds.add(tmp.getOrderId());
+                    }
+                }
+                completedOrderIds = orderService.isOrderIdExisted(completedOrderIds, OrderStatus.COMPLETED);
+                for (NurseOrderRelationEntity tmp : resultSet) {
+                    String key = tmp.getNurseId()+"_"+tmp.getOrderId();
+                    if (nurseOrder.contains(key)) {
+                        continue;
+                    }
+                    if (!completedOrderIds.contains(tmp.getOrderId())) {
+                        continue;
+                    }
+                    nurseOrder.add(key);
+                    Long count = nurseIdToOrderCompletedNumber.get(tmp.getNurseId());
+                    count = null==count ? 1L : (count+1);
+                    nurseIdToOrderCompletedNumber.put(tmp.getNurseId(), count);
+                }
+            }
+            logger.info("count is {}", nurseIdToOrderCompletedNumber.size());
+        }
+
+        return nurseIdToOrderCompletedNumber;
+    }
 
     //============================================================================
     //                 update

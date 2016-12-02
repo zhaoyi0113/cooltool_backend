@@ -21,4 +21,5 @@ public interface NurseOrderRelationRepository extends JpaRepository<NurseOrderRe
     List<NurseOrderRelationEntity> findByOrderIdInAndStatus(List<Long> orderIds, CommonStatus status, Sort sort);
     @Query("SELECT nor.orderId FROM NurseOrderRelationEntity nor WHERE nor.nurseId=?1")
     List<Long> findOrderIdByNurseId(long nurseId);
+    List<NurseOrderRelationEntity> findByNurseIdInAndStatus(List<Long> nursesId, CommonStatus status);
 }
