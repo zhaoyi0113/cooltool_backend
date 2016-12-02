@@ -16,9 +16,7 @@ public interface NurseQualificationRepository extends JpaRepository<NurseQualifi
 
     Page<NurseQualificationEntity> findByStatus(VetStatus status, Pageable page);
     List<NurseQualificationEntity> findNurseQualificationByUserId(long userId, Sort sort);
-    List<NurseQualificationEntity> findNurseQualificationByName(String name, Sort sort);
-    List<NurseQualificationEntity> findNurseQualificationByUserIdAndName(long userId, String name, Sort sort);
     List<NurseQualificationEntity> findByIdIn(List<Long> ids);
-    void deleteByIdIn(List<Long> ids);
+    List<NurseQualificationEntity> findByUserIdIn(List<Long> usersId);
     long countByStatus(VetStatus status);
 }

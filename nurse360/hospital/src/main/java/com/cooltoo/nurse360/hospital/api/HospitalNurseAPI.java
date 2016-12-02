@@ -1,6 +1,7 @@
 package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseQualificationFileBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.go2nurse.service.NurseDoctorScoreService;
@@ -9,6 +10,7 @@ import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
+import com.cooltoo.services.NurseQualificationService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +36,7 @@ public class HospitalNurseAPI {
     @Autowired private NursePatientRelationServiceForNurse360 nursePatientRelation;
     @Autowired private NurseOrderRelationService nurseOrderRelationService;
     @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
+    @Autowired private NurseQualificationService nurseQualificationService;
 
     //=============================================================
     //            Authentication of ADMINISTRATOR Role
@@ -92,6 +95,7 @@ public class HospitalNurseAPI {
         Map<Long, Long> nursePatientNumber = nursePatientRelation.getNursePatientNumber(nurseIds, CommonStatus.ENABLED);
         Map<Long, Long> nurseOrderCompleted= nurseOrderRelationService.getNurseCompletedOrderNumber(nurseIds, CommonStatus.ENABLED);
         Map<Long, Float> nurseScore = nurseDoctorScoreService.getScoreByReceiverTypeAndIds(UserType.NURSE, nurseIds);
+        Map<Long, List<NurseQualificationFileBean>> nurseQualificationFiles = nurseQualificationService.getAllNurseQualificationFiles(nurseIds, "");
         for (NurseBean tmp : nurses) {
             Long patientNumber = nursePatientNumber.get(tmp.getId());
             Long orderNumber = nurseOrderCompleted.get(tmp.getId());
@@ -99,6 +103,7 @@ public class HospitalNurseAPI {
             tmp.setProperty(NurseBean.SCORE, null==score ? 0.0 : score);
             tmp.setProperty(NurseBean.COMPLETED_ORDER_COUNT, null==orderNumber ? 0 : orderNumber);
             tmp.setProperty(NurseBean.PATIENT_COUNT, null==patientNumber ? 0 : patientNumber);
+            tmp.setProperty(NurseBean.QUALIFICATION, nurseQualificationFiles);
         }
     }
 }

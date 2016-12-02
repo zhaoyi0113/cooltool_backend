@@ -203,6 +203,50 @@ public class NurseQualificationService {
         return qualifications;
     }
 
+    public Map<Long, List<NurseQualificationFileBean>> getAllNurseQualificationFiles(List<Long> nurseIds, String nginx) {
+        Map<Long, List<NurseQualificationFileBean>> nurseToQualificationFile = new HashMap<>();
+        if (VerifyUtil.isListEmpty(nurseIds)) {
+            return nurseToQualificationFile;
+        }
+        List<NurseQualificationEntity> qualifications = repository.findByUserIdIn(nurseIds);
+        if (VerifyUtil.isListEmpty(qualifications)) {
+            return nurseToQualificationFile;
+        }
+        Map<Long, Long> qualificationIdToUserId = new HashMap<>();
+        List<Long> qualificationIds = new ArrayList<>();
+        for (NurseQualificationEntity tmp : qualifications) {
+            qualificationIdToUserId.put(tmp.getId(), tmp.getUserId());
+            if (!qualificationIds.contains(tmp.getId())) {
+                qualificationIds.add(tmp.getId());
+            }
+        }
+        Map<Long, List<NurseQualificationFileBean>> qualificationIdToFile = qualificationFileService.getAllFileByQualificationId(qualificationIds, nginx);
+
+        for (Long tmpId : qualificationIds) {
+            Long userId = qualificationIdToUserId.get(tmpId);
+            List<NurseQualificationFileBean> files = qualificationIdToFile.get(tmpId);
+
+            if (VerifyUtil.isListEmpty(files)) {
+                continue;
+            }
+
+            List<NurseQualificationFileBean> filesExisted = nurseToQualificationFile.get(userId);
+            if (null==filesExisted) {
+                filesExisted = files;
+                nurseToQualificationFile.put(userId, filesExisted);
+            }
+            else {
+                for (NurseQualificationFileBean tmp : files) {
+                    if (!filesExisted.contains(tmp)) {
+                        filesExisted.add(tmp);
+                    }
+                }
+            }
+        }
+
+        return qualificationIdToFile;
+    }
+
     public List<NurseQualificationBean> getAllQualifications(String status, int pageIndex, int number, String nginxPrefix) {
         logger.info("get qualification by status {} at page {} numberOfPage {}", status, pageIndex, number);
         VetStatus   vetStatus   = VetStatus.parseString(status);
