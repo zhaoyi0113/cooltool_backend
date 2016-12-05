@@ -186,6 +186,33 @@ public class HospitalOrderAPI {
     //=============================================================
     //            Authentication of NURSE/MANAGER Role
     //=============================================================
+    @RequestMapping(path = "/order/nurse/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public long countNurseOrder(HttpServletRequest request,
+                                @RequestParam(defaultValue = "0", name = "nurse_id")        long nurseId,
+                                @RequestParam(defaultValue = "",  name = "order_status") String strOrderStatus
+    ) {
+        long count = nurseOrderRelation.countOrderByNurseIdAndOrderStatus(
+                nurseId,
+                CommonStatus.ENABLED.name(),
+                OrderStatus.parseString(strOrderStatus));
+        return count;
+    }
+    @RequestMapping(path = "/order/nurse", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<ServiceOrderBean> getNurseOrder(HttpServletRequest request,
+                                                @RequestParam(defaultValue = "0",  name = "nurse_id")       long nurseId,
+                                                @RequestParam(defaultValue = "",   name = "order_status") String strOrderStatus,
+                                                @RequestParam(defaultValue = "0",  name = "index")  int index,
+                                                @RequestParam(defaultValue = "10", name = "number") int number
+    ) {
+        List<ServiceOrderBean> orders = nurseOrderRelation.getOrderByNurseIdAndOrderStatus(
+                nurseId,
+                CommonStatus.ENABLED.name(),
+                OrderStatus.parseString(strOrderStatus),
+                index, number);
+        setOrderWaitStaff(orders);
+        return orders;
+    }
+
     @RequestMapping(path = "/order/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countOrder(HttpServletRequest request,
                            @RequestParam(defaultValue = "",  name = "order_status") String strOrderStatus

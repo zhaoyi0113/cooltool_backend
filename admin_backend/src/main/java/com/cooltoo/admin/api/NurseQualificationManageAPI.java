@@ -106,7 +106,7 @@ public class NurseQualificationManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateNurseQualification(@Context HttpServletRequest request,
-                                             @FormDataParam("qualification_file_id") int fileId,
+                                             @FormDataParam("qualification_file_id") long fileId,
                                              @FormDataParam("type") String workfileType,
                                              @FormDataParam("expiry") String expiry,
                                              @FormDataParam("file_name") String fileName,

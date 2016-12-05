@@ -373,7 +373,7 @@ public class NurseQualificationService {
     }
 
     @Transactional
-    public NurseQualificationFileBean updateQualificationFile(int qualificationFileId, String workfileType, String fileName, InputStream file, Date expiryTime, String nginxPrefix) {
+    public NurseQualificationFileBean updateQualificationFile(long qualificationFileId, String workfileType, String fileName, InputStream file, Date expiryTime, String nginxPrefix) {
         WorkFileTypeBean workfileTypeB = getWorkFileTypeBean(workfileType);
         NurseQualificationFileBean bean = qualificationFileService.updateQualificationFile(qualificationFileId, workfileTypeB, fileName, file, expiryTime, nginxPrefix);
         return bean;

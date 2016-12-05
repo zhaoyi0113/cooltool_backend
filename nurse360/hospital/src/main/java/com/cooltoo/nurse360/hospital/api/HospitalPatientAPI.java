@@ -1,14 +1,12 @@
 package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.go2nurse.beans.PatientBean;
-import com.cooltoo.go2nurse.beans.ServiceVendorAuthorizationBean;
-import com.cooltoo.go2nurse.beans.UserBean;
-import com.cooltoo.go2nurse.beans.ViewVendorPatientRelationBean;
+import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
+import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +31,7 @@ public class HospitalPatientAPI {
     @Autowired private UserService userService;
     @Autowired private UserPatientRelationService userPatientRelation;
     @Autowired private PatientService patientService;
+    @Autowired private NursePatientRelationServiceForNurse360 nursePatientRelationService;
 
     //=============================================================
     //            Permit ALL Role
@@ -88,9 +87,37 @@ public class HospitalPatientAPI {
 
 
 
-    //=============================================================
-    //            Authentication of NURSE/MANAGER Role
-    //=============================================================
+    //===============================================================================
+    //                    Authentication of NURSE/MANAGER Role
+    //===============================================================================
+    //============================================
+    //         Nurse Patient Relation
+    //============================================
+    @RequestMapping(path = "/nurse/patient/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public long countPatient(HttpServletRequest request,
+                             @RequestParam(defaultValue = "0", name = "nurse_id") long nurseId
+    ) {
+        Map<Long, Long> nursePatientCount = nursePatientRelationService.getNursePatientNumber(Arrays.asList(new Long[]{nurseId}), CommonStatus.ENABLED);
+        Long count = null==nursePatientCount ? 0L : nursePatientCount.get(nurseId);
+        count = null==count ? 0L : count;
+        return count;
+    }
+
+    @RequestMapping(path = "/nurse/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<NursePatientRelationBean> getPatient(HttpServletRequest request,
+                                                          @RequestParam(defaultValue = "0", name = "nurse_id") long nurseId,
+                                                          @RequestParam(defaultValue = "0",  name = "index")  int index,
+                                                          @RequestParam(defaultValue = "10", name = "number") int number
+    ) {
+
+        List<NursePatientRelationBean> vendorsPatient = nursePatientRelationService.getRelationByNurseId(nurseId, CommonStatus.ENABLED, index, number);
+        return vendorsPatient;
+    }
+
+
+    //============================================
+    //         Vendor Patient Relation
+    //============================================
     @RequestMapping(path = "/patient/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countPatient(HttpServletRequest request) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());

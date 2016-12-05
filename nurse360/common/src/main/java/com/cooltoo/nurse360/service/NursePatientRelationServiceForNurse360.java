@@ -1,16 +1,23 @@
 package com.cooltoo.nurse360.service;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.NursePatientRelationBean;
+import com.cooltoo.go2nurse.beans.PatientBean;
+import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.converter.NursePatientRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.NursePatientRelationEntity;
 import com.cooltoo.go2nurse.repository.NursePatientRelationRepository;
+import com.cooltoo.go2nurse.service.PatientService;
+import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +38,8 @@ public class NursePatientRelationServiceForNurse360 {
 
     @Autowired private NursePatientRelationRepository repository;
     @Autowired private NursePatientRelationBeanConverter beanConverter;
+    @Autowired private UserService userService;
+    @Autowired private PatientService patientService;
 
     //============================================================================
     //                 get
@@ -76,6 +85,67 @@ public class NursePatientRelationServiceForNurse360 {
         }
 
         return nurseIdToPatientNumber;
+    }
+
+    public List<NursePatientRelationBean> getRelationByNurseId(long nurseId, CommonStatus status, int pageIndex, int sizePerPage) {
+        logger.info("get nurse patient by nursesId={} and status={}", nurseId, status);
+        if (null==status) {
+            logger.error("status is null");
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
+        }
+        PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<NursePatientRelationEntity> entities = repository.findByNurseIdInAndStatus(Arrays.asList(new Long[]{nurseId}), status, page);
+        List<NursePatientRelationBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
+
+        logger.info("get nurse patient by nursesId, count={}", beans.size());
+        return beans;
+    }
+
+    private List<NursePatientRelationBean> entitiesToBeans(Iterable<NursePatientRelationEntity> entities) {
+        List<NursePatientRelationBean> beans = new ArrayList<>();
+        if (null==entities) {
+            return beans;
+        }
+        for (NursePatientRelationEntity tmp : entities) {
+            NursePatientRelationBean tmpBean = beanConverter.convert(tmp);
+            beans.add(tmpBean);
+        }
+        return beans;
+    }
+
+    private void fillOtherProperties(List<NursePatientRelationBean> beans) {
+        if (VerifyUtil.isListEmpty(beans)) {
+            return;
+        }
+        List<Long> userIds = new ArrayList<>();
+        List<Long> patientIds = new ArrayList<>();
+        for (NursePatientRelationBean bean :beans) {
+            long userId = bean.getUserId();
+            if (!patientIds.contains(userId)) {
+                patientIds.add(userId);
+            }
+            long patientId = bean.getPatientId();
+            if (!userIds.contains(patientId)) {
+                userIds.add(patientId);
+            }
+        }
+
+        Map<Long, UserBean> userIdToBean = userService.getUserIdToBean(userIds);
+        Map<Long, PatientBean> patientIdToBean = patientService.getPatientIdToBean(patientIds);
+        for (NursePatientRelationBean bean : beans) {
+            long patientId = bean.getPatientId();
+            PatientBean patientBean = patientIdToBean.get(patientId);
+            if (null!=patientBean) {
+                bean.setPatient(patientBean);
+            }
+
+            long userId = bean.getUserId();
+            UserBean userBean = userIdToBean.get(userId);
+            if (null!=userBean) {
+                bean.setUser(userBean);
+            }
+        }
     }
 
 
