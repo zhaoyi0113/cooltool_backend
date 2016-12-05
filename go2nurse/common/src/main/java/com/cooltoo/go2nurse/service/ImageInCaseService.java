@@ -118,6 +118,23 @@ public class ImageInCaseService {
         return imageIds;
     }
 
+    @Transactional
+    public List<Long> deleteByImageIds(List<Long> imageIds) {
+        if (null==imageIds || imageIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<ImageInCaseEntity> images = repository.findByImageIdIn(imageIds);
+        if (null==images || images.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        userStorage.deleteFiles(imageIds);
+        repository.delete(images);
+
+        return imageIds;
+    }
+
     //====================================================
     //                   adding
     //====================================================

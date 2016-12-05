@@ -205,11 +205,22 @@ public class HospitalCasebookAPI {
     }
 
     @RequestMapping(path = "/casebook/case/image", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
-    public Map<String, Boolean> addCaseImage(HttpServletRequest request,
-                                             @RequestParam(defaultValue = "0", name = "casebook_id") long casebookId,
-                                             @RequestParam(defaultValue = "0", name = "case_id")     long caseId
+    public Map<String, Boolean> deleteCaseImage(HttpServletRequest request,
+                                                @RequestParam(defaultValue = "0", name = "casebook_id") long casebookId,
+                                                @RequestParam(defaultValue = "0", name = "case_id")     long caseId
     ) {
         casebookService.deleteCaseImage(null, casebookId, caseId);
+        Map<String, Boolean> retVal = new HashMap<>();
+        retVal.put("deleted", Boolean.TRUE);
+        return retVal;
+    }
+
+    @RequestMapping(path = "/casebook/case/image/{image_id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Boolean> deleteCaseImage(HttpServletRequest request,
+                                                @PathVariable long imageId
+
+    ) {
+        casebookService.deleteCaseImage(imageId);
         Map<String, Boolean> retVal = new HashMap<>();
         retVal.put("deleted", Boolean.TRUE);
         return retVal;

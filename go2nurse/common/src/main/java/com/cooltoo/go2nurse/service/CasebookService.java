@@ -496,4 +496,10 @@ public class CasebookService {
         List<Long> imageIds = imageService.deleteByCaseIds(Arrays.asList(new Long[]{caseId}));
         return imageIds;
     }
+
+    @Transactional
+    public List<Long> deleteCaseImage(long imageId) {
+        List<Long> imageIds = imageService.deleteByImageIds(Arrays.asList(new Long[]{imageId}));
+        return imageIds;
+    }
 }

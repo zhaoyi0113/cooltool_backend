@@ -21,4 +21,5 @@ public interface ImageInCaseRepository extends JpaRepository<ImageInCaseEntity, 
     List<ImageInCaseEntity> findByCasebookId(Long casebookId, Sort sort);
     List<ImageInCaseEntity> findByCaseIdIn(List<Long> talkIds);
     List<ImageInCaseEntity> findByCasebookId(Long consultationId);
+    List<ImageInCaseEntity> findByImageIdIn(List<Long> imageIds);
 }

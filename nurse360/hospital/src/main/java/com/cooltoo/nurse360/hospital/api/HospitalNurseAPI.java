@@ -21,10 +21,7 @@ import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +54,13 @@ public class HospitalNurseAPI {
     //=============================================================
     //            Authentication of NURSE/MANAGER Role
     //=============================================================
+    @RequestMapping(path = "/nurse/{nurse_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public NurseBean getNurse(HttpServletRequest request,
+                              @PathVariable long nurseId
+    ) {
+        return nurseService.getNurseById(nurseId);
+    }
+
     @RequestMapping(path = "/nurse/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countNurse(HttpServletRequest request,
                            @RequestParam(defaultValue = "",  name = "fuzzy_name") String fuzzyName,
