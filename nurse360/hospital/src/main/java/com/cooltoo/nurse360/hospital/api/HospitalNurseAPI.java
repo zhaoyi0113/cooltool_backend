@@ -56,9 +56,9 @@ public class HospitalNurseAPI {
     //=============================================================
     @RequestMapping(path = "/nurse/{nurse_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public NurseBean getNurse(HttpServletRequest request,
-                              @PathVariable long nurseId
+                              @PathVariable long nurse_id
     ) {
-        return nurseService.getNurseById(nurseId);
+        return nurseService.getNurseById(nurse_id);
     }
 
     @RequestMapping(path = "/nurse/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
