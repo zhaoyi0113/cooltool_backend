@@ -85,6 +85,7 @@ public class Go2NurseJerseyConfiguration extends ResourceConfig {
         register(WeChatHospitalDepartmentAPI.class);
         register(CategoryCourseOrderManageAPI.class);
         register(NurseFollowUpAPI.class);
+        register(UserCurrentVisitAPI.class);
 
         register(NotifierAPI.class);
 
