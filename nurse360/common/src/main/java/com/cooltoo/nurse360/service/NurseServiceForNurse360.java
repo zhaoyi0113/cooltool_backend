@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +83,29 @@ public class NurseServiceForNurse360 {
             bean.setProperty(NurseBean.QUALIFICATION, qualification.get(0));
         }
         return bean;
+    }
+
+    public List<String> getManagerMobiles(Integer hospitalId, Integer departmentId) {
+        logger.info("get nurse manager mobiles by hospital={} department={}", hospitalId, departmentId);
+        Iterable<NurseEntity> nurses = commonNurseService.getNurseByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL, null, null, null, hospitalId, departmentId, null);
+        List<NurseBean> beans = entitiesToBeans(nurses);
+        fillOtherProperties(beans);
+        List<String> managersMobile = new ArrayList<>();
+        for (NurseBean tmp : beans) {
+            NurseExtensionBean extension = (NurseExtensionBean) tmp.getProperty(NurseBean.INFO_EXTENSION);
+            if (null==extension) {
+                continue;
+            }
+            String mobile = tmp.getMobile();
+            if (VerifyUtil.isStringEmpty(mobile)) {
+                continue;
+            }
+            if (YesNoEnum.YES.equals(extension.getIsManager())) {
+                managersMobile.add(tmp.getMobile());
+            }
+        }
+        logger.info("count is {}", managersMobile.size());
+        return managersMobile;
     }
 
     private List<NurseBean> entitiesToBeans(Iterable<NurseEntity> entities) {

@@ -83,6 +83,25 @@ public class NurseServiceForGo2Nurse {
         return nurseIdToBean;
     }
 
+    public List<String> getManagerMobiles(int hospitalId, int departmentId) {
+        List<NurseBean> nursesInDepart = getNurseByCanAnswerQuestion(null, null, null, hospitalId, departmentId, null);
+        List<String> managersMobile = new ArrayList<>();
+        for (NurseBean tmp : nursesInDepart) {
+            String mobile = tmp.getMobile();
+            if (VerifyUtil.isStringEmpty(mobile)) {
+                continue;
+            }
+            NurseExtensionBean extension = (NurseExtensionBean) tmp.getProperty(NurseBean.INFO_EXTENSION);
+            if (null==extension) {
+                continue;
+            }
+            if (YesNoEnum.YES.equals(extension.getIsManager())) {
+                managersMobile.add(tmp.getMobile());
+            }
+        }
+        return managersMobile;
+    }
+
     public long countNurseByCanAnswerQuestion(String name, String strCanAnswerQuestion, String strCanSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {
         logger.info("count nurse can answer questions");
         YesNoEnum canAnswerQuestion = YesNoEnum.parseString(strCanAnswerQuestion);

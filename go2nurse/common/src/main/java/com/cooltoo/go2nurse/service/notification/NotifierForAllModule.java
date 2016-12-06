@@ -6,7 +6,6 @@ import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
 import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
-import com.cooltoo.go2nurse.util.HttpUtils;
 import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +39,20 @@ public class NotifierForAllModule {
 
     @Autowired private Notifier notifier;
     @Autowired private NurseOrderRelationRepository nurseOrderRelation;
+
+
+    //========================================================================================
+    //
+    //                              LeanCloud Request SMS Code
+    //
+    //========================================================================================
+    public void leanCloudRequestSmsCodeNewOrder(List<String> mobiles, String orderNo) {
+        notifier.leanCloudRequestSmsCode(mobiles, MessageBean.LEANCLOUD_MSG_TEMPLATE_QSHL_NEW_ORDER, orderNo);
+    }
+
+    public void leanCloudRequestSmsCodeRedispatch(List<String> mobiles, String orderNo) {
+        notifier.leanCloudRequestSmsCode(mobiles, MessageBean.LEANCLOUD_MSG_TEMPLATE_QSHL_REDISPATCH, orderNo);
+    }
 
 
     //========================================================================================

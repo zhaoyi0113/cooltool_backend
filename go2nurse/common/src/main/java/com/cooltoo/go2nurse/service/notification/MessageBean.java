@@ -10,6 +10,10 @@ import java.util.Map;
  */
 public class MessageBean {
 
+    public static final String LEANCLOUD_MSG_TEMPLATE_QSHL_NEW_ORDER  = "qshl_new_order";
+    public static final String LEANCLOUD_MSG_TEMPLATE_QSHL_REDISPATCH = "qshl_redispatch";
+
+
     private String alertBody;
     private String type;
     private String status;

@@ -24,6 +24,9 @@ public class Notifier {
     @Autowired private AppleNotifier appleNotifier;
     @Autowired private LeanCloudNotifier leanCloudNotifier;
 
+    public void leanCloudRequestSmsCode(List<String> mobiles, String template, String orderNo) {
+        leanCloudNotifier.sendOrderMessage(mobiles, template, orderNo);
+    }
 
     public void notifyNurse360Nurse(List<Nurse360DeviceTokensBean> tokens, MessageBean message) {
         if (null==message || VerifyUtil.isListEmpty(tokens)) {

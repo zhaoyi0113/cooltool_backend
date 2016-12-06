@@ -142,6 +142,8 @@ public class HospitalOrderAPI {
                                         @RequestParam(defaultValue = "0", name = "department_id") int departmentId,
                                         @RequestParam(defaultValue = "",  name = "register_from") String registerFrom/* cooltoo, go2nurse */
     ) {
+        //change order status to TO_SERVICE (提醒抢单，等待护士抢单)
+        orderService.alertNurseToFetchOrder(orderId);
         //notify nurse in department to fetch order
         List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
         if (null!=orders && !orders.isEmpty()) {

@@ -2,12 +2,10 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
+import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
-import com.cooltoo.go2nurse.service.ChargeWebHookService;
-import com.cooltoo.go2nurse.service.DoctorAppointmentService;
-import com.cooltoo.go2nurse.service.ServiceOrderService;
+import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
-import com.cooltoo.go2nurse.service.ServiceVendorCategoryAndItemService;
 import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
@@ -42,6 +40,7 @@ public class UserServiceOrderAPI {
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
     @Autowired private ChargeWebHookService chargeWebHookService;
     @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private NurseServiceForGo2Nurse nurseService;
 
     //=========================================================================================
     //                                    Category Service
@@ -202,10 +201,17 @@ public class UserServiceOrderAPI {
             return Response.ok().build();
         }
         else {
-            if (null!=order) {
+            if (null!=order && (order instanceof ServiceOrderBean) && OrderStatus.TO_DISPATCH.equals(((ServiceOrderBean)order).getOrderStatus())) {
                 ServiceOrderBean orderBean = (ServiceOrderBean)order;
                 notifierForAllModule.orderAlertToGo2nurseUser(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
-                // TODO: 2016/12/6 need send message to Manager
+                // need send message to Manager
+                ServiceVendorType vendorType = orderBean.getVendorType();
+                long vendorId = orderBean.getVendorId();
+                long departId = orderBean.getVendorDepartId();
+                if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
+                    List<String> managerMobile = nurseService.getManagerMobiles((int)vendorId, (int)departId);
+                    notifierForAllModule.leanCloudRequestSmsCodeNewOrder(managerMobile, orderBean.getOrderNo());
+                }
             }
             return Response.ok(returnValue).build();
         }

@@ -1,11 +1,10 @@
 package com.cooltoo.go2nurse.service.notification;
 
 import com.cooltoo.constants.DeviceType;
-import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.JSONUtil;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/9/13.
@@ -32,6 +33,17 @@ public class LeanCloudNotifier {
     private String leanCloudId;
     @Value("${leancloud_key}")
     private String leanCloudKey;
+
+
+    @Value("${leancloud_url}")
+    private String leanCloudUrl;
+    @Value("${leancloud_version}")
+    private String leanCloudVersion;
+    @Value("${leancloud_verify_sms_code}")
+    private String leanCloudVerifySmsPath;
+    @Value("${leancloud_request_sms_code}")
+    private String leanCloudRequestSmsPath;
+
 
     private JSONUtil jsonUtil = JSONUtil.newInstance();
 
@@ -67,22 +79,74 @@ public class LeanCloudNotifier {
             outputStream.write(msg.getJson().getBytes());
             outputStream.flush();
 
-            logger.info("http code:{}", httpConnection.getResponseCode());
+            logger.debug("http code:{}", httpConnection.getResponseCode());
             String output;
             StringBuilder outputMessage = new StringBuilder();
             BufferedReader responseBuffer = new BufferedReader(new InputStreamReader((httpConnection.getInputStream())));
             while ((output = responseBuffer.readLine()) != null) {
                 outputMessage.append(output);
             }
-            logger.info("http message from server:{}", outputMessage.toString());
+            logger.debug("http message from server:{}", outputMessage.toString());
 
             httpConnection.disconnect();
         } catch (MalformedURLException e) {
-            logger.info("leancloud push message error:{}", e.getMessage());
+            logger.error("leancloud push message - url - error:{}", e.getMessage());
         } catch (IOException e) {
-            logger.info("leancloud push message error:{}", e.getMessage());
+            logger.error("leancloud push message - io - error:{}", e.getMessage());
         }
 
+    }
+
+    public void sendOrderMessage(List<String> mobiles, String template, String orderNo) {
+        if (VerifyUtil.isListEmpty(mobiles)) {
+            return;
+        }
+        Map<String, Object> customJson = new HashMap<>();
+        customJson.put("template", template);
+        customJson.put("orderNo", orderNo);
+        for (String mobile : mobiles) {
+            if (VerifyUtil.isStringEmpty(mobile)) {
+                continue;
+            }
+            customJson.put("mobilePhoneNumber", mobile);
+            String messageSendingUrl = leanCloudUrl+"/"+leanCloudVersion+"/"+leanCloudRequestSmsPath;
+            sendOrderMessage(messageSendingUrl, jsonUtil.toJsonString(customJson));
+        }
+    }
+
+    private void sendOrderMessage(String leanCloudAPIUrl, String custumJson) {
+        if (VerifyUtil.isStringEmpty(custumJson)) {
+            return;
+        }
+        try {
+            URL targetUrl = new URL(leanCloudAPIUrl);
+            HttpURLConnection httpConnection = (HttpURLConnection) targetUrl.openConnection();
+            httpConnection.setDoOutput(true);
+            httpConnection.setRequestMethod("POST");
+            httpConnection.setRequestProperty("X-LC-Id", leanCloudId);
+            httpConnection.setRequestProperty("X-LC-Key", leanCloudKey);
+            httpConnection.setRequestProperty("Content-Type", "application/json");
+
+            OutputStream outputStream = httpConnection.getOutputStream();
+            outputStream.write(custumJson.getBytes());
+            outputStream.flush();
+
+            logger.debug("http request:{}", custumJson);
+            logger.debug("http code:{}", httpConnection.getResponseCode());
+            String output;
+            StringBuilder outputMessage = new StringBuilder();
+            BufferedReader responseBuffer = new BufferedReader(new InputStreamReader((httpConnection.getInputStream())));
+            while ((output = responseBuffer.readLine()) != null) {
+                outputMessage.append(output);
+            }
+            logger.debug("http message from server:{}", outputMessage.toString());
+
+            httpConnection.disconnect();
+        } catch (MalformedURLException e) {
+            logger.error("leancloud send short message - url - error:{}", e.getMessage());
+        } catch (IOException e) {
+            logger.error("leancloud send short message - io - error:{}", e.getMessage());
+        }
     }
 
     public static class LeanCloudMessageBean {

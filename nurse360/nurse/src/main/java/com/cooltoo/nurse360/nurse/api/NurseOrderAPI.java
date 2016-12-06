@@ -3,8 +3,11 @@ package com.cooltoo.nurse360.nurse.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.go2nurse.service.NurseOrderRelationService;
+import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +24,8 @@ import java.util.List;
 public class NurseOrderAPI {
 
     @Autowired private NurseOrderRelationService nurseOrderService;
+    @Autowired private NurseServiceForNurse360 nurseService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -91,7 +96,21 @@ public class NurseOrderAPI {
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         nurseOrderService.giveUpOrder(nurseId, orderId);
-        // TODO: 2016/12/6 need to send message to Manager 
+        // need to send message to Manager
+        List<ServiceOrderBean> orders = nurseOrderService.getOrderByOrderId(nurseId, orderId);
+        for (ServiceOrderBean tmp : orders) {
+            if (null==tmp) { continue; }
+
+            ServiceVendorType vendorType = tmp.getVendorType();
+            long vendorId = tmp.getVendorId();
+            long departId = tmp.getVendorDepartId();
+
+            if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
+                List<String> managerMobile = nurseService.getManagerMobiles((int)vendorId, (int)departId);
+                notifierForAllModule.leanCloudRequestSmsCodeRedispatch(managerMobile, tmp.getOrderNo());
+            }
+        }
+
         return Response.ok().build();
     }
 
