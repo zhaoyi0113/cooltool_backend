@@ -229,7 +229,9 @@ public class ServiceItemBean {
     public int getServiceDiscountCent() {
         return serviceDiscountCent;
     }
-
+    public String getServiceDiscount() {
+        return serviceDiscount;
+    }
     public void setServiceDiscountCent(int serviceDiscountCent) {
         this.serviceDiscountCent = serviceDiscountCent;
         this.serviceDiscount = VerifyUtil.parsePrice(serviceDiscountCent);
@@ -238,7 +240,9 @@ public class ServiceItemBean {
     public int getServerIncomeCent() {
         return serverIncomeCent;
     }
-
+    public String getServerIncome() {
+        return serverIncome;
+    }
     public void setServerIncomeCent(int serverIncomeCent) {
         this.serverIncomeCent = serverIncomeCent;
         this.serverIncome = VerifyUtil.parsePrice(serverIncomeCent);
@@ -247,7 +251,6 @@ public class ServiceItemBean {
     public YesNoEnum getNeedVisitPatientRecord() {
         return needVisitPatientRecord;
     }
-
     public void setNeedVisitPatientRecord(YesNoEnum needVisitPatientRecord) {
         this.needVisitPatientRecord = needVisitPatientRecord;
     }
@@ -255,7 +258,6 @@ public class ServiceItemBean {
     public YesNoEnum getManagerApproved() {
         return managerApproved;
     }
-
     public void setManagerApproved(YesNoEnum managerApproved) {
         this.managerApproved = managerApproved;
     }
