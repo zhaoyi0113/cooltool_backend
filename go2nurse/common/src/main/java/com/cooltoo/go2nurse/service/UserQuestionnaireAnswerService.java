@@ -646,7 +646,7 @@ public class UserQuestionnaireAnswerService {
         }
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
-        // TODO -- department information reversed
+        // TODO -- department information reserved
         entity.setDepartmentId(0);
         entity.setDepartmentName(null);
 

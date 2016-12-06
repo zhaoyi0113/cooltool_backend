@@ -143,34 +143,32 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         long lStartTime = NumberUtil.getTime(startTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         int count = 15;
         String leaveMessage = "message test";
-        int preferentialCent = 1000;
-        ServiceOrderBean order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+        ServiceOrderBean order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage);
         Assert.assertEquals(orderId, order.getId());
         Assert.assertEquals(patientId, order.getPatientId());
         Assert.assertEquals(addressId, order.getAddressId());
         Assert.assertEquals(lStartTime, order.getServiceStartTime().getTime());
         Assert.assertEquals(count, order.getItemCount());
         Assert.assertEquals(leaveMessage, order.getLeaveAMessage());
-        Assert.assertEquals(preferentialCent, order.getPreferentialCent());
 
         orderId = 279;
         Throwable th = null;
         try {
-            order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+            order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage);
         } catch (Exception ex) { th = ex; }
         Assert.assertNotNull(th);
 
         orderId = 280;
         th = null;
         try {
-            order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+            order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage);
         } catch (Exception ex) { th = ex; }
         Assert.assertNotNull(th);
 
         orderId = 282;
         th = null;
         try {
-            order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+            order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveMessage);
         } catch (Exception ex) { th = ex; }
         Assert.assertNotNull(th);
 
@@ -256,8 +254,7 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         long lStartTime = NumberUtil.getTime(startTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         int count = 15;
         String leaveMessage = "message test";
-        int preferentialCent = 1000;
-        ServiceOrderBean order = orderService.addOrder(itemId, userId, patientId, addressId, startTime, count, leaveMessage, preferentialCent);
+        ServiceOrderBean order = orderService.addOrder(itemId, userId, patientId, addressId, startTime, count, leaveMessage);
         Assert.assertTrue(order.getId()>0);
         Assert.assertEquals(userId, order.getUserId());
         Assert.assertEquals(patientId, order.getPatientId());
@@ -265,6 +262,5 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(lStartTime, order.getServiceStartTime().getTime());
         Assert.assertEquals(count, order.getItemCount());
         Assert.assertEquals(leaveMessage, order.getLeaveAMessage());
-        Assert.assertEquals(preferentialCent, order.getPreferentialCent());
     }
 }

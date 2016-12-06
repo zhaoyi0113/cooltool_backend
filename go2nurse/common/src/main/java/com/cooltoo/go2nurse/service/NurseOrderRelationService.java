@@ -37,7 +37,7 @@ public class NurseOrderRelationService {
     private static final Sort nurseHospitalRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
     private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
-    private static final List<OrderStatus> orderStatuses = Arrays.asList(new OrderStatus[]{OrderStatus.TO_DISPATCH, OrderStatus.TO_SERVICE});
+    private static final List<OrderStatus> orderStatuses = Arrays.asList(new OrderStatus[]{OrderStatus.TO_SERVICE});
 
     @Autowired private NurseExtensionService nurseExtensionService;
     @Autowired private NurseHospitalRelationRepository nurseHospitalRelationRepository;
@@ -267,7 +267,7 @@ public class NurseOrderRelationService {
         }
 
         // update order status
-        ServiceOrderBean order = orderService.nurseFetchOrder(orderId);
+        ServiceOrderBean order = orderService.nurseFetchOrder(orderId, true);
         notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order dispatched by manager!");
         notifierForAllModule.orderAlertToNurse360(entity.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to you!");
         if (null!=original && original.getNurseId()!=nurseId) {
@@ -283,67 +283,67 @@ public class NurseOrderRelationService {
     //=================================
     //         nurse usage
     //=================================
-    @Transactional
-    public NurseOrderRelationBean updateStatus(long nurseId, long orderId, String strStatus) {
-        logger.info("update relation status to={} between nurse={} order={}",
-                strStatus, nurseId, orderId);
-        CommonStatus status = CommonStatus.parseString(strStatus);
-        if (null==status) {
-            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
-        }
-        List<NurseOrderRelationEntity> relations = repository.findByNurseIdAndOrderId(nurseId, orderId, sort);
-        if (VerifyUtil.isListEmpty(relations)) {
-            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
-        }
-        NurseOrderRelationEntity entity = relations.get(0);
-        relations.remove(entity);
-
-        entity.setStatus(status);
-        entity = repository.save(entity);
-
-        if (!VerifyUtil.isListEmpty(relations)) {
-            repository.delete(relations);
-        }
-
-        NurseOrderRelationBean bean = beanConverter.convert(entity);
-        logger.info("update relation={}", bean);
-        return bean;
-    }
-
-    @Transactional
-    public long completedOrder(long nurseId, long orderId) {
-        logger.info("nurse={} complete order={}", nurseId, orderId);
-        if (!orderService.existOrder(orderId)) {
-            logger.info("order not exist");
-            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
-        }
-
-        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
-        List<NurseOrderRelationEntity> relations = repository.findByOrderId(orderId, sort);
-        boolean orderBelongToNurse = true;
-        if (VerifyUtil.isListEmpty(relations)) {
-            orderBelongToNurse = false;
-        }
-        else {
-            for (NurseOrderRelationEntity tmp : relations) {
-                if (tmp.getNurseId()!=nurseId) {
-                    orderBelongToNurse = false;
-                }
-            }
-        }
-        if (!orderBelongToNurse) {
-            logger.info("order not belong this nurse");
-            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
-        }
-
-        // complete order
-        ServiceOrderBean order = orderService.completedOrder(false, 0, orderId);
-        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order completed!");
-
-
-        logger.info("complete order={}", order);
-        return orderId;
-    }
+//    @Transactional
+//    public NurseOrderRelationBean updateStatus(long nurseId, long orderId, String strStatus) {
+//        logger.info("update relation status to={} between nurse={} order={}",
+//                strStatus, nurseId, orderId);
+//        CommonStatus status = CommonStatus.parseString(strStatus);
+//        if (null==status) {
+//            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
+//        }
+//        List<NurseOrderRelationEntity> relations = repository.findByNurseIdAndOrderId(nurseId, orderId, sort);
+//        if (VerifyUtil.isListEmpty(relations)) {
+//            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+//        }
+//        NurseOrderRelationEntity entity = relations.get(0);
+//        relations.remove(entity);
+//
+//        entity.setStatus(status);
+//        entity = repository.save(entity);
+//
+//        if (!VerifyUtil.isListEmpty(relations)) {
+//            repository.delete(relations);
+//        }
+//
+//        NurseOrderRelationBean bean = beanConverter.convert(entity);
+//        logger.info("update relation={}", bean);
+//        return bean;
+//    }
+//
+//    @Transactional
+//    public long completedOrder(long nurseId, long orderId) {
+//        logger.info("nurse={} complete order={}", nurseId, orderId);
+//        if (!orderService.existOrder(orderId)) {
+//            logger.info("order not exist");
+//            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+//        }
+//
+//        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
+//        List<NurseOrderRelationEntity> relations = repository.findByOrderId(orderId, sort);
+//        boolean orderBelongToNurse = true;
+//        if (VerifyUtil.isListEmpty(relations)) {
+//            orderBelongToNurse = false;
+//        }
+//        else {
+//            for (NurseOrderRelationEntity tmp : relations) {
+//                if (tmp.getNurseId()!=nurseId) {
+//                    orderBelongToNurse = false;
+//                }
+//            }
+//        }
+//        if (!orderBelongToNurse) {
+//            logger.info("order not belong this nurse");
+//            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
+//        }
+//
+//        // complete order
+//        ServiceOrderBean order = orderService.completedOrder(false, 0, orderId);
+//        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order completed!");
+//
+//
+//        logger.info("complete order={}", order);
+//        return orderId;
+//    }
 
     //============================================================================
     //                 add
@@ -385,7 +385,7 @@ public class NurseOrderRelationService {
         }
 
         // update order status
-        ServiceOrderBean order = orderService.nurseFetchOrder(orderId);
+        ServiceOrderBean order = orderService.nurseFetchOrder(orderId, false);
         notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order fetched!");
 
         NurseOrderRelationBean bean = beanConverter.convert(entity);

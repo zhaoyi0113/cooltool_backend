@@ -1,6 +1,8 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.ChargeWebHookService;
 import com.cooltoo.go2nurse.service.DoctorAppointmentService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
@@ -41,6 +43,9 @@ public class UserServiceOrderAPI {
     @Autowired private ChargeWebHookService chargeWebHookService;
     @Autowired private NotifierForAllModule notifierForAllModule;
 
+    //=========================================================================================
+    //                                    Category Service
+    //=========================================================================================
     @Path("/category/top")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -65,6 +70,10 @@ public class UserServiceOrderAPI {
         return Response.ok(subCategories).build();
     }
 
+
+    //=========================================================================================
+    //                                    Item Service
+    //=========================================================================================
     @Path("/category/item")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -74,7 +83,7 @@ public class UserServiceOrderAPI {
     ) {
         List<CommonStatus> statuses = new ArrayList<>();
         statuses.add(CommonStatus.ENABLED);
-        List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByCategoryId(categoryId, statuses);
+        List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByCategoryId(null, null, null, categoryId, null, YesNoEnum.YES, statuses);
         return Response.ok(serviceItems).build();
     }
 
@@ -83,26 +92,21 @@ public class UserServiceOrderAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getServiceItemByVendor(@Context HttpServletRequest request,
-                                           @QueryParam("vendor_id") @DefaultValue("0") int vendorId,
-                                           @QueryParam("vendor_type") @DefaultValue("0") String vendorType /* company, hospital*/
+                                           @QueryParam("vendor_type") @DefaultValue("0") String strVendorType, /* company, hospital*/
+                                           @QueryParam("vendor_id") @DefaultValue("0") long vendorId
     ) {
         List<CommonStatus> statuses = new ArrayList<>();
         statuses.add(CommonStatus.ENABLED);
-        List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByVendorId(vendorId, vendorType, statuses);
+        ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
+        List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByCategoryId(vendorType, vendorId, null, null, null, YesNoEnum.YES, statuses);
         return Response.ok(serviceItems).build();
     }
 
-    @Path("/by_order_id")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @LoginAuthentication(requireUserLogin = true)
-    public Response getUserOrderByOrderId(@Context HttpServletRequest request,
-                                          @QueryParam("order_id") @DefaultValue("0") long orderId
-    ) {
-        List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
-        return Response.ok(orders).build();
-    }
 
+
+    //=========================================================================================
+    //                                    Doctor Appointment Service
+    //=========================================================================================
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
@@ -112,6 +116,21 @@ public class UserServiceOrderAPI {
         List<DoctorAppointmentBean> doctorAppointments = doctorAppointmentService.getDoctorAppointment(userId, "CANCELLED,TO_SERVICE,COMPLETED");
         List<Object> retVal = sortOrderAndAppointment(userOrders, doctorAppointments);
         return Response.ok(retVal).build();
+    }
+
+
+    //=========================================================================================
+    //                                    Order Service
+    //=========================================================================================
+    @Path("/by_order_id")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getUserOrderByOrderId(@Context HttpServletRequest request,
+                                          @QueryParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
+        return Response.ok(orders).build();
     }
 
     @POST
@@ -126,7 +145,7 @@ public class UserServiceOrderAPI {
                                  @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage
                                  ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage, 0);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage);
         return Response.ok(order).build();
     }
 
@@ -186,6 +205,7 @@ public class UserServiceOrderAPI {
             if (null!=order) {
                 ServiceOrderBean orderBean = (ServiceOrderBean)order;
                 notifierForAllModule.orderAlertToGo2nurseUser(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
+                // TODO: 2016/12/6 need send message to Manager
             }
             return Response.ok(returnValue).build();
         }
@@ -206,7 +226,7 @@ public class UserServiceOrderAPI {
         Long patientId = !VerifyUtil.isIds(strPatientId) ? null : VerifyUtil.parseLongIds(strPatientId).get(0);
         Long addressId = !VerifyUtil.isIds(strAddressId) ? null : VerifyUtil.parseLongIds(strAddressId).get(0);
         Integer count = !VerifyUtil.isIds(strCount) ? null : VerifyUtil.parseIntIds(strCount).get(0);
-        ServiceOrderBean order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveAMessage, 0);
+        ServiceOrderBean order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveAMessage);
         return Response.ok(order).build();
     }
 

@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.repository;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.entities.ServiceItemEntity;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
 
     List<ServiceItemEntity> findByIdIn(List<Long> ids, Sort sort);
 
+
     @Modifying
     @Query("UPDATE ServiceItemEntity item SET item.categoryId=0" +
             " WHERE item.categoryId IN ?1 ")
@@ -38,6 +40,71 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
     @Query("UPDATE ServiceItemEntity item SET item.vendorId=0, item.vendorType=0" +
             " WHERE item.vendorId IN ?1 ")
     int setVendorIdToNone(List<Long> vendorId);
+
+
+    //========================================================================
+    //                   get by conditions 1
+    //========================================================================
+    @Query("SELECT count(item.id) FROM ServiceItemEntity item" +
+            " WHERE (?1 IS NULL OR ?1=item.vendorType)" +
+            "   AND (?2 IS NULL OR ?2=item.vendorId)" +
+            "   AND (?3 IS NULL OR ?3=item.vendorDepartId)" +
+            "   AND (?4 IS NULL OR ?4=item.categoryId)" +
+            "   AND (?5 IS NULL OR ?5=item.needVisitPatientRecord)" +
+            "   AND (?6 IS NULL OR ?6=item.managerApproved)" +
+            "   AND (item.status IN (?7))")
+    long countByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, Long categoryId, YesNoEnum needVisitPatientRecord, YesNoEnum managerApproved, List<CommonStatus> statuses);
+    @Query("FROM ServiceItemEntity item" +
+            " WHERE (?1 IS NULL OR ?1=item.vendorType)" +
+            "   AND (?2 IS NULL OR ?2=item.vendorId)" +
+            "   AND (?3 IS NULL OR ?3=item.vendorDepartId)" +
+            "   AND (?4 IS NULL OR ?4=item.categoryId)" +
+            "   AND (?5 IS NULL OR ?5=item.needVisitPatientRecord)" +
+            "   AND (?6 IS NULL OR ?6=item.managerApproved)" +
+            "   AND (item.status IN (?7))")
+    List<ServiceItemEntity> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, Long categoryId, YesNoEnum needVisitPatientRecord, YesNoEnum managerApproved, List<CommonStatus> statuses, Sort sort);
+    @Query("FROM ServiceItemEntity item" +
+            " WHERE (?1 IS NULL OR ?1=item.vendorType)" +
+            "   AND (?2 IS NULL OR ?2=item.vendorId)" +
+            "   AND (?3 IS NULL OR ?3=item.vendorDepartId)" +
+            "   AND (?4 IS NULL OR ?4=item.categoryId)" +
+            "   AND (?5 IS NULL OR ?5=item.needVisitPatientRecord)" +
+            "   AND (?6 IS NULL OR ?6=item.managerApproved)" +
+            "   AND (item.status IN (?7))")
+    Page<ServiceItemEntity> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, Long categoryId, YesNoEnum needVisitPatientRecord, YesNoEnum managerApproved, List<CommonStatus> statuses, Pageable page);
+
+    //========================================================================
+    //                   get by conditions 2
+    //========================================================================
+    @Query("SELECT count(item.id) FROM ServiceItemEntity item" +
+            " WHERE (?1 IS NULL OR ?1=item.vendorType)" +
+            "   AND (?2 IS NULL OR ?2=item.vendorId)" +
+            "   AND (?3 IS NULL OR ?3=item.vendorDepartId)" +
+            "   AND (item.categoryId IN (?4))" +
+            "   AND (?5 IS NULL OR ?5=item.needVisitPatientRecord)" +
+            "   AND (?6 IS NULL OR ?6=item.managerApproved)" +
+            "   AND (item.status IN (?7))")
+    long countByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, List<Long> categoryId, YesNoEnum needVisitPatientRecord, YesNoEnum managerApproved, List<CommonStatus> statuses);
+    @Query("FROM ServiceItemEntity item" +
+            " WHERE (?1 IS NULL OR ?1=item.vendorType)" +
+            "   AND (?2 IS NULL OR ?2=item.vendorId)" +
+            "   AND (?3 IS NULL OR ?3=item.vendorDepartId)" +
+            "   AND (item.categoryId IN (?4))" +
+            "   AND (?5 IS NULL OR ?5=item.needVisitPatientRecord)" +
+            "   AND (?6 IS NULL OR ?6=item.managerApproved)" +
+            "   AND (item.status IN (?7))")
+    List<ServiceItemEntity> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, List<Long> categoryId, YesNoEnum needVisitPatientRecord, YesNoEnum managerApproved, List<CommonStatus> statuses, Sort sort);
+    @Query("FROM ServiceItemEntity item" +
+            " WHERE (?1 IS NULL OR ?1=item.vendorType)" +
+            "   AND (?2 IS NULL OR ?2=item.vendorId)" +
+            "   AND (?3 IS NULL OR ?3=item.vendorDepartId)" +
+            "   AND (item.categoryId IN (?4))" +
+            "   AND (?5 IS NULL OR ?5=item.needVisitPatientRecord)" +
+            "   AND (?6 IS NULL OR ?6=item.managerApproved)" +
+            "   AND (item.status IN (?7))")
+    Page<ServiceItemEntity> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, List<Long> categoryId, YesNoEnum needVisitPatientRecord, YesNoEnum managerApproved, List<CommonStatus> statuses, Pageable page);
+
+
 
 
 

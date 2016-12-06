@@ -29,6 +29,10 @@ public class ServiceItemBeanConverter implements Converter<ServiceItemEntity, Se
         bean.setServiceTimeUnit(source.getServiceTimeUnit());
         bean.setGrade(source.getGrade());
         bean.setVendorDepartId(source.getVendorDepartId());
+        bean.setServiceDiscountCent(source.getServiceDiscountCent());
+        bean.setServerIncomeCent(source.getServerIncomeCent());
+        bean.setNeedVisitPatientRecord(source.getNeedVisitPatientRecord());
+        bean.setManagerApproved(source.getManagerApproved());
         return bean;
     }
 }

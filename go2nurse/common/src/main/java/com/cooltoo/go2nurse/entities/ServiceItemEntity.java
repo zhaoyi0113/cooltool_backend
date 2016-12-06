@@ -1,12 +1,12 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.ServiceClass;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -31,6 +31,10 @@ public class ServiceItemEntity {
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
     private int grade;
+    private int serviceDiscountCent;
+    private int serverIncomeCent;
+    private YesNoEnum needVisitPatientRecord;
+    private YesNoEnum managerApproved;
 
     @Id
     @GeneratedValue
@@ -117,6 +121,26 @@ public class ServiceItemEntity {
         return grade;
     }
 
+    @Column(name = "service_discount_cent")
+    public int getServiceDiscountCent() {
+        return serviceDiscountCent;
+    }
+
+    @Column(name = "server_income_cent")
+    public int getServerIncomeCent() {
+        return serverIncomeCent;
+    }
+
+    @Column(name = "need_visit_patient_record")
+    public YesNoEnum getNeedVisitPatientRecord() {
+        return needVisitPatientRecord;
+    }
+
+    @Column(name = "manager_approved")
+    public YesNoEnum getManagerApproved() {
+        return managerApproved;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -181,6 +205,22 @@ public class ServiceItemEntity {
         this.grade = grade;
     }
 
+    public void setServiceDiscountCent(int serviceDiscountCent) {
+        this.serviceDiscountCent = serviceDiscountCent;
+    }
+
+    public void setServerIncomeCent(int serverIncomeCent) {
+        this.serverIncomeCent = serverIncomeCent;
+    }
+
+    public void setNeedVisitPatientRecord(YesNoEnum needVisitPatientRecord) {
+        this.needVisitPatientRecord = needVisitPatientRecord;
+    }
+
+    public void setManagerApproved(YesNoEnum managerApproved) {
+        this.managerApproved = managerApproved;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -197,9 +237,13 @@ public class ServiceItemEntity {
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
         msg.append(", detailImageId=").append(detailImageId);
-        msg.append(", servicePriceCent=").append(servicePriceCent);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);
+        msg.append(", servicePriceCent=").append(servicePriceCent);
+        msg.append(", serviceDiscountCent=").append(serviceDiscountCent);
+        msg.append(", serverIncomeCent=").append(serverIncomeCent);
+        msg.append(", needVisitPatientRecord=").append(needVisitPatientRecord);
+        msg.append(", managerApproved=").append(managerApproved);
         msg.append(", grade=").append(grade);
         msg.append("]");
         return msg.toString();

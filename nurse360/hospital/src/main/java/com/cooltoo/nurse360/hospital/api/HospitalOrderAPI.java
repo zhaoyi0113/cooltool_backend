@@ -103,16 +103,6 @@ public class HospitalOrderAPI {
         return order;
     }
 
-    @RequestMapping(path = "/manager/order/in_process", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
-    public ServiceOrderBean orderInProcess(HttpServletRequest request,
-                                           @RequestParam(defaultValue = "0", name = "order_id") long orderId
-    ) {
-        ServiceOrderBean order = orderService.orderInProcess(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order is in_process!");
-        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order is in_process!");
-        return order;
-    }
-
     @RequestMapping(path = "/manager/order/completed", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public ServiceOrderBean orderCompleted(HttpServletRequest request,
                                            @RequestParam(defaultValue = "0", name = "order_id") long orderId
@@ -141,7 +131,7 @@ public class HospitalOrderAPI {
                                                      @RequestParam(defaultValue = "",  name = "message_left") String messageLeft
     ) {
         //modify start_time, address, message left, score
-        ServiceOrderBean order = orderService.updateOrder(orderId, null, addressId, startTime, null, messageLeft, 0);
+        ServiceOrderBean order = orderService.updateOrder(orderId, null, addressId, startTime, null, messageLeft);
         return order;
     }
 
@@ -178,7 +168,7 @@ public class HospitalOrderAPI {
                                         @RequestParam(defaultValue = "0", name = "count")              int count,
                                         @RequestParam(defaultValue = "",  name = "leave_a_message") String leaveAMessage
     ) {
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage, 0);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage);
         return order;
     }
 

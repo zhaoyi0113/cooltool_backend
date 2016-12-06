@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.AppType;
 import com.cooltoo.go2nurse.constants.ChargeType;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
@@ -57,6 +58,7 @@ public class ServiceOrderService {
     @Autowired private WeChatService weChatService;
     @Autowired private WeChatPayService weChatPayService;
     @Autowired private ServiceVendorAuthorizationService vendorAuthorizationService;
+    @Autowired private NurseVisitPatientService nurseVisitPatientService;
 
     @Autowired private NurseOrderRelationRepository nurseOrderRelationRepository;
 
@@ -199,9 +201,16 @@ public class ServiceOrderService {
         if (null == entities) {
             return new ArrayList<>();
         }
+        // check order need completed
+        List<Long> ordersCompleted = checkOrderNeedComplete();
+
         List<ServiceOrderBean> beans = new ArrayList<>();
         for (ServiceOrderEntity entity : entities) {
+            if (null==entities) { continue; }
             ServiceOrderBean bean = beanConverter.convert(entity);
+            if (null!=ordersCompleted && ordersCompleted.contains(bean.getId())) {
+                bean.setOrderStatus(OrderStatus.COMPLETED);
+            }
             bean.setProperty(ServiceOrderBean.FLAG, "order");
             beans.add(bean);
         }
@@ -253,14 +262,14 @@ public class ServiceOrderService {
     //                   deleting
     //=====================================================================
 
-    //=====================================================================
-    //                   updating
-    //=====================================================================
+    //==================================================================================================
+    //                                        updating
+    //==================================================================================================
     @Transactional
     public ServiceOrderBean updateOrder(long orderId, Long patientId, Long addressId,
-                                        String strStartTime, Integer count, String leaveAMessage, int preferentialCent) {
-        logger.info("update service order={} by patientId={} addressId={} strStartTime={} count={} leaveAMessage={} preferentialCent={}",
-                orderId, patientId, addressId, strStartTime, count, leaveAMessage, preferentialCent);
+                                        String strStartTime, Integer count, String leaveAMessage) {
+        logger.info("update service order={} by patientId={} addressId={} strStartTime={} count={} leaveAMessage={}",
+                orderId, patientId, addressId, strStartTime, count, leaveAMessage);
 
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
@@ -300,17 +309,15 @@ public class ServiceOrderService {
             ServiceOrderBean bean = beanConverter.convert(entity);
             ServiceItemBean item = bean.getServiceItem();
             entity.setServiceTimeDuration(item.getServiceTimeDuration() * count);
-            entity.setTotalConsumptionCent(item.getServicePriceCent() * count);
+            entity.setTotalPriceCent(item.getServicePriceCent() * count);
+            entity.setTotalDiscountCent(item.getServiceDiscountCent() * count);
+            entity.setTotalIncomeCent(item.getServerIncomeCent() * count);
+            entity.setItemCount(count);
             changed = true;
         }
 
         if (!VerifyUtil.isStringEmpty(leaveAMessage)) {
             entity.setLeaveAMessage(leaveAMessage);
-            changed = true;
-        }
-
-        if (preferentialCent > 0 && preferentialCent != entity.getPreferentialCent()) {
-            entity.setPreferentialCent(preferentialCent);
             changed = true;
         }
 
@@ -350,8 +357,15 @@ public class ServiceOrderService {
             String openId = weChatService.getOpenIdByUserId(userId);
             extra.put("open_id", openId);
         }
-        Charge charge = pingPPService.createCharge(orderNo, channel, order.getTotalConsumptionCent(), clientIP,
+
+        /* create PingPP charge for payment */
+        Charge charge = pingPPService.createCharge(
+                orderNo, channel,
+                order.getTotalConsumptionCent()-order.getPreferentialCent(),
+                clientIP,
                 order.getServiceItem().getName(), order.getServiceItem().getDescription(), order.getLeaveAMessage(), extra);
+
+        /* invoke PingPP SDK failed! */
         if (null == charge) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
@@ -359,6 +373,7 @@ public class ServiceOrderService {
             return charge;
         }
 
+        /* record PingPP charge instance, and wait for callback! */
         orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, channel, ChargeType.CHARGE, charge.getId(), charge.toString());
 
         return charge;
@@ -366,7 +381,7 @@ public class ServiceOrderService {
 
     @Transactional
     public Map<String, String> payForServiceByWeChat(Long userId, Long orderId, String openId, String clientIP, WeChatAccountBean weChatAccount) {
-        logger.info("create charge object for order={} openId={} clientIp={} weChatAccount={}", orderId, openId, clientIP, weChatAccount);
+        logger.debug("create charge object for order={} openId={} clientIp={} weChatAccount={}", orderId, openId, clientIP, weChatAccount);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -388,28 +403,33 @@ public class ServiceOrderService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
+        /* record PingPP charge instance, and wait for callback! */
         ServiceOrderBean order = beanConverter.convert(entity);
         String orderNo = order.getOrderNo();
         String wechatNo = NumberUtil.createNoncestr(31);
+
+        /* Invoke WeChat payment! */
         Map<String, String> weChatResponse = weChatPayService.payByWeChat(openId, "WEB", clientIP,
                 weChatAccount.getAppId(), weChatAccount.getMchId(), weChatPayService.getApiKey(),
                 wechatNo, "JSAPI", "订单=" + orderNo + " 描述=" + order.getServiceItem().getName(),
                 "CNY", order.getTotalConsumptionCent(), weChatPayService.getNotifyUrl());
         logger.debug("get wei chat pay response "+weChatResponse);
-        // check response value
+
+        /* WeChat payment failed! */
         if (!"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("return_code"))
-                || !"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("result_code"))) {
+         || !"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("result_code"))) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
             logger.error("WeChat make order failed!");
             throw new BadRequestException(ErrorCode.PAY_FAILED);
         }
 
-        // check sign
+        /* WeChat payment success! then check the sign */
         String sign1 = (String) weChatResponse.get("sign");
         weChatResponse.remove("sign");
-        String sign2 = weChatPayService.createSign(weChatPayService.getApiKey(), "UTF-8",
-                new TreeMap<>(weChatResponse));
+        String sign2 = weChatPayService.createSign(weChatPayService.getApiKey(), "UTF-8", new TreeMap<>(weChatResponse));
+
+        /* The sign is not right */
         if (!sign2.equalsIgnoreCase(sign1)) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
@@ -417,9 +437,11 @@ public class ServiceOrderService {
             throw new BadRequestException(ErrorCode.PAY_FAILED);
         }
 
+        /* WeChat payment success!  record WeChat payment information, and wait for callback! */
         orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, "wx", ChargeType.CHARGE, wechatNo, weChatResponse.toString());
         weChatResponse.remove("mch_id");
         weChatResponse.remove("device_info");
+
         return signWeChatResponse(weChatAccount.getAppId(), weChatResponse.get("prepay_id"),  weChatResponse.get("nonce_str"));
     }
 
@@ -470,7 +492,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    public ServiceOrderBean nurseFetchOrder(long orderId) {
+    public ServiceOrderBean alertNurseToFetchOrder(long orderId) {
         logger.info("nurse fetch order={}", orderId);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
@@ -488,13 +510,35 @@ public class ServiceOrderService {
     }
 
     @Transactional
+    public ServiceOrderBean nurseFetchOrder(long orderId, boolean isAdminDispatch) {
+        logger.info("nurse fetch order={}", orderId);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null == entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (isAdminDispatch && !OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, can not be dispatch by administrator", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        else if (!OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, can not be fetched", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        entity.setOrderStatus(OrderStatus.IN_PROCESS);
+        entity = repository.save(entity);
+        logger.info("order fetched is {}", entity);
+
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
     public ServiceOrderBean nurseGiveUpOrder(long orderId) {
         logger.info("nurse fetch order={}", orderId);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (!OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
+        if (!OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be given_up", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -519,7 +563,7 @@ public class ServiceOrderService {
             }
         }
         if (OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
-                || OrderStatus.COMPLETED.equals(entity.getOrderStatus())) {
+         || OrderStatus.COMPLETED.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be cancelled", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -547,34 +591,17 @@ public class ServiceOrderService {
             logger.info("the order is in status={}, can not be completed", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
+        // check needVisitPatientRecord
+        if (YesNoEnum.YES.equals(entity.getNeedVisitPatientRecord())
+        && !nurseVisitPatientService.isRecordForOrder(orderId)) {
+            logger.error("order need record visit patient record and patient sign!");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
         entity.setOrderStatus(OrderStatus.COMPLETED);
         entity.setCompletedTime(new Date());
         entity = repository.save(entity);
         logger.info("order completed is {}", entity);
-
-        return beanConverter.convert(entity);
-    }
-
-    @Transactional
-    public ServiceOrderBean orderInProcess(boolean checkUser, long userId, long orderId) {
-        logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
-        ServiceOrderEntity entity = repository.findOne(orderId);
-        if (null == entity) {
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
-        }
-        if (checkUser) {
-            if (entity.getUserId() != userId) {
-                logger.error("order not belong to user");
-                throw new BadRequestException(ErrorCode.DATA_ERROR);
-            }
-        }
-        if (!OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
-            logger.info("the order is in status={}, can not be in_process", entity.getOrderStatus());
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
-        entity.setOrderStatus(OrderStatus.IN_PROCESS);
-        entity = repository.save(entity);
-        logger.info("order in_process is {}", entity);
 
         return beanConverter.convert(entity);
     }
@@ -601,14 +628,88 @@ public class ServiceOrderService {
         return beanConverter.convert(entity);
     }
 
-    //=====================================================================
-    //                   adding
-    //=====================================================================
+    @Transactional
+    private List<Long> checkOrderNeedComplete() {
+        // get all orders in IN_PROCESS status
+        List<ServiceOrderEntity> entities = repository.findByOrderStatus(OrderStatus.IN_PROCESS);
+        List<ServiceOrderBean> beans = new ArrayList<>();
+        if (!VerifyUtil.isListEmpty(entities)) {
+            for (ServiceOrderEntity entity : entities) {
+                if (null==entities) { continue; }
+                ServiceOrderBean bean = beanConverter.convert(entity);
+                beans.add(bean);
+            }
+        }
+        entities = null;
+        if (VerifyUtil.isListEmpty(beans)) { return null; }
+
+
+        // get order that has record patient visitation
+        List<Long> orderIds = new ArrayList<>();
+        for (ServiceOrderBean tmp : beans) {
+            if (null==tmp) {continue;}
+            orderIds.add(tmp.getId());
+        }
+        if (VerifyUtil.isListEmpty(orderIds)) { return null; }
+        Map<Long, Boolean> orderRecordedVisitPatient = nurseVisitPatientService.isRecordForOrder(orderIds);
+
+        // get the time 7 days ago
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -7);
+        Date _7DaysAgo = calendar.getTime();
+        long _7DaysAgoMilliSecond = _7DaysAgo.getTime();
+
+        // get all order can be completed
+        orderIds.clear();
+        for (ServiceOrderBean tmp : beans) {
+            if (null==tmp) {continue;}
+            Boolean hasRecordPatientVisitation = orderRecordedVisitPatient.get(tmp.getId());
+            long serviceEndTime = tmp.calculateServiceEndTime();
+            if (_7DaysAgoMilliSecond > serviceEndTime && Boolean.TRUE.equals(hasRecordPatientVisitation)) {
+                orderIds.add(tmp.getId());
+            }
+        }
+
+        // set all order can be completed to COMPLETED
+        return autoCompletedOrders(orderIds);
+    }
+
+    @Transactional
+    private List<Long> autoCompletedOrders(List<Long> orderIds) {
+        int size = null==orderIds ? 0 : orderIds.size();
+        logger.info("auto complete orders, size={}", size);
+        if (0==size) {
+            return null;
+        }
+        List<ServiceOrderEntity> entities = repository.findAll(orderIds);
+        if (VerifyUtil.isListEmpty(entities)) {
+            return null;
+        }
+
+        long updateCount = 0;
+        orderIds = new ArrayList<>();
+        for (ServiceOrderEntity tmp : entities) {
+            if (null==tmp) { continue; }
+            if (!OrderStatus.IN_PROCESS.equals(tmp.getOrderStatus())) {continue;}
+            tmp.setOrderStatus(OrderStatus.COMPLETED);
+            updateCount ++;
+            orderIds.add(tmp.getId());
+        }
+        repository.save(entities);
+        logger.info("order completed count={}", updateCount);
+
+        return orderIds;
+    }
+
+
+    //============================================================================================
+    //                                       Adding
+    //============================================================================================
     @Transactional
     public ServiceOrderBean addOrder(long serviceItemId, long userId, long patientId, long addressId,
-                                     String strStartTime, int count, String leaveAMessage, int preferentialCent) {
-        logger.info("add service order by serviceItemId={} userId={} patientId={} addressId={} strStartTime={} count={} leaveAMessage={} preferentialCent={}",
-                serviceItemId, userId, patientId, addressId, strStartTime, count, leaveAMessage, preferentialCent);
+                                     String strStartTime, int count, String leaveAMessage) {
+        logger.debug("add service order by serviceItemId={} userId={} patientId={} addressId={} strStartTime={} count={} leaveAMessage={}",
+                serviceItemId, userId, patientId, addressId, strStartTime, count, leaveAMessage);
         if (!serviceCategoryItemService.existItem(serviceItemId)) {
             logger.error("service item not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -643,6 +744,11 @@ public class ServiceOrderService {
 
         // get service item
         ServiceItemBean serviceItem = serviceCategoryItemService.getItemById(serviceItemId);
+        if (!YesNoEnum.YES.equals(serviceItem.getManagerApproved())) {
+            logger.error("service item not approved by administrator!");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
         String serviceItemJson = jsonUtil.toJsonString(serviceItem);
         vendorAuthorizationService.throwUserForbiddenException(userId,
                 serviceItem.getVendorType(), serviceItem.getVendorId(), serviceItem.getVendorDepartId());
@@ -654,17 +760,21 @@ public class ServiceOrderService {
         HospitalDepartmentBean vendorHospitalDepart = serviceItem.getHospitalDepartment();
         String vendorJson = null;
         String vendorDepartJson = null;
+        /* vendor is hospital */
         if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
             vendorJson = jsonUtil.toJsonString(vendorHospital);
             if (null!=vendorHospitalDepart) {
                 vendorDepartJson= jsonUtil.toJsonString(vendorHospitalDepart);
             }
 
-        } else if (ServiceVendorType.COMPANY.equals(vendorType)) {
+        }
+        /* vendor is company */
+        else if (ServiceVendorType.COMPANY.equals(vendorType)) {
             vendorJson = jsonUtil.toJsonString(vendor);
         }
-        logger.info("hospital ========= {}", serviceItem.getHospital());
-        logger.info("vendor ========= {}", serviceItem.getVendor());
+
+        logger.debug("hospital ========= {}", serviceItem.getHospital());
+        logger.debug("vendor ========= {}", serviceItem.getVendor());
 
         // get service category and parent category
         List<ServiceCategoryBean> serviceCategoryAndParent = serviceCategoryItemService.getCategoryAndParentById(serviceItem.getCategoryId());
@@ -738,12 +848,15 @@ public class ServiceOrderService {
         entity.setServiceStartTime(new Date(lStartTime));
         entity.setServiceTimeDuration(serviceItem.getServiceTimeDuration() * count);
         entity.setServiceTimeUnit(serviceItem.getServiceTimeUnit());
-        entity.setTotalConsumptionCent(serviceItem.getServicePriceCent() * count);
-        entity.setPreferentialCent(preferentialCent);
+        entity.setTotalPriceCent(serviceItem.getServicePriceCent() * count);
+        entity.setTotalDiscountCent(serviceItem.getServiceDiscountCent() * count);
+        entity.setTotalIncomeCent(serviceItem.getServerIncomeCent() * count);
+        entity.setItemCount(count);
+        entity.setNeedVisitPatientRecord(serviceItem.getNeedVisitPatientRecord());
         entity.setOrderNo(orderNo);
         entity.setLeaveAMessage(leaveAMessage);
 
-        if (entity.getTotalConsumptionCent() - entity.getPreferentialCent() > 0) {
+        if (entity.getTotalPriceCent()-entity.getTotalDiscountCent() > 0) {
             entity.setOrderStatus(OrderStatus.TO_PAY);
         } else {
             entity.setOrderStatus(OrderStatus.TO_DISPATCH);

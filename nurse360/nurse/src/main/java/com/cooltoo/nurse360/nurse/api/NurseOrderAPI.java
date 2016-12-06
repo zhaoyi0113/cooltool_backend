@@ -91,18 +91,19 @@ public class NurseOrderAPI {
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         nurseOrderService.giveUpOrder(nurseId, orderId);
+        // TODO: 2016/12/6 need to send message to Manager 
         return Response.ok().build();
     }
 
-    @Path("/completed")
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response orderCompleted(@Context HttpServletRequest request,
-                                   @FormParam("order_id") @DefaultValue("0") long orderId
-    ) {
-        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        orderId = nurseOrderService.completedOrder(nurseId, orderId);
-        return Response.ok(orderId).build();
-    }
+//    @Path("/completed")
+//    @PUT
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Nurse360LoginAuthentication(requireNurseLogin = true)
+//    public Response orderCompleted(@Context HttpServletRequest request,
+//                                   @FormParam("order_id") @DefaultValue("0") long orderId
+//    ) {
+//        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+//        orderId = nurseOrderService.completedOrder(nurseId, orderId);
+//        return Response.ok(orderId).build();
+//    }
 }

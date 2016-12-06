@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
@@ -38,8 +39,10 @@ public class ServiceOrderEntity {
     private Date serviceStartTime;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
-    private int totalConsumptionCent;
-    private int preferentialCent;
+    private int totalPriceCent;
+    private int totalDiscountCent;
+    private int totalIncomeCent;
+    private int itemCount;
     private String orderNo;
     private OrderStatus orderStatus;
     private Date payTime;
@@ -47,6 +50,7 @@ public class ServiceOrderEntity {
     private String leaveAMessage;
     private float score;
     private Date completedTime;
+    private YesNoEnum needVisitPatientRecord;
 
     @Id
     @GeneratedValue
@@ -162,14 +166,30 @@ public class ServiceOrderEntity {
         return serviceTimeUnit;
     }
 
-    @Column(name = "total_consumption_cent")
-    public int getTotalConsumptionCent() {
-        return totalConsumptionCent;
+    @Column(name = "total_price_cent")
+    public int getTotalPriceCent() {
+        return totalPriceCent;
     }
 
-    @Column(name = "preferential_cent")
-    public int getPreferentialCent() {
-        return preferentialCent;
+    @Column(name = "total_discount_cent")
+    public int getTotalDiscountCent() {
+        return totalDiscountCent;
+    }
+
+    @Column(name = "total_income_cent")
+    public int getTotalIncomeCent() {
+        return totalIncomeCent;
+    }
+
+    @Column(name = "service_item_count")
+    public int getItemCount() {
+        return itemCount;
+    }
+
+    @Column(name = "need_visit_patient_record")
+    @Enumerated
+    public YesNoEnum getNeedVisitPatientRecord() {
+        return needVisitPatientRecord;
     }
 
     @Column(name = "order_no")
@@ -296,12 +316,24 @@ public class ServiceOrderEntity {
         this.serviceTimeUnit = serviceTimeUnit;
     }
 
-    public void setTotalConsumptionCent(int totalConsumptionCent) {
-        this.totalConsumptionCent = totalConsumptionCent;
+    public void setTotalPriceCent(int totalPriceCent) {
+        this.totalPriceCent = totalPriceCent;
     }
 
-    public void setPreferentialCent(int preferentialCent) {
-        this.preferentialCent = preferentialCent;
+    public void setTotalDiscountCent(int totalDiscountCent) {
+        this.totalDiscountCent = totalDiscountCent;
+    }
+
+    public void setTotalIncomeCent(int totalIncomeCent) {
+        this.totalIncomeCent = totalIncomeCent;
+    }
+
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
+    }
+
+    public void setNeedVisitPatientRecord(YesNoEnum needVisitPatientRecord) {
+        this.needVisitPatientRecord = needVisitPatientRecord;
     }
 
     public void setOrderNo(String orderNo) {
@@ -346,8 +378,11 @@ public class ServiceOrderEntity {
         msg.append(", serviceStartTime=").append(serviceStartTime);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);
-        msg.append(", totalConsumptionCent=").append(totalConsumptionCent);
-        msg.append(", preferentialCent=").append(preferentialCent);
+        msg.append(", totalPriceCent=").append(totalPriceCent);
+        msg.append(", totalDiscountCent=").append(totalDiscountCent);
+        msg.append(", totalIncomeCent=").append(totalIncomeCent);
+        msg.append(", itemCount=").append(itemCount);
+        msg.append(", needVisitPatientRecord=").append(needVisitPatientRecord);
         msg.append(", orderNo=").append(orderNo);
         msg.append(", orderStatus=").append(orderStatus);
         msg.append(", payTime=").append(payTime);

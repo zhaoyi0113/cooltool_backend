@@ -3,6 +3,8 @@ package com.cooltoo.go2nurse.admin.api;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.exception.*;
+import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.go2nurse.beans.NurseOrderRelationBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
@@ -12,6 +14,8 @@ import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.util.VerifyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +31,7 @@ import java.util.List;
  */
 @Path("/admin/service_order")
 public class ServiceOrderManageAPI {
+    private static final Logger logger = LoggerFactory.getLogger(ServiceOrderManageAPI.class);
 
     @Autowired private ServiceOrderService orderService;
     @Autowired private NurseServiceForGo2Nurse nurseService;
@@ -154,18 +159,6 @@ public class ServiceOrderManageAPI {
         return Response.ok(order).build();
     }
 
-    @Path("/in_process")
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response orderInProcess(@Context HttpServletRequest request,
-                                   @FormParam("order_id") @DefaultValue("0") long orderId
-    ) {
-        ServiceOrderBean order = orderService.orderInProcess(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order is in_process!");
-        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order is in_process!");
-        return Response.ok(order).build();
-    }
-
     @Path("/completed")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
@@ -200,7 +193,7 @@ public class ServiceOrderManageAPI {
                                              @FormParam("message_left") @DefaultValue("") String messageLeft
     ) {
         //modify start_time, address, message left, score
-        ServiceOrderBean order = orderService.updateOrder(orderId, null, addressId, startTime, null, messageLeft, 0);
+        ServiceOrderBean order = orderService.updateOrder(orderId, null, addressId, startTime, null, messageLeft);
         return Response.ok(order).build();
     }
 
@@ -213,13 +206,21 @@ public class ServiceOrderManageAPI {
                                             @FormParam("department_id") @DefaultValue("0") int departmentId,
                                             @FormParam("register_from") @DefaultValue("") String registerFrom/* cooltoo, go2nurse */
     ) {
+        //change order status to TO_SERVICE (提醒抢单，等待护士抢单)
+        orderService.alertNurseToFetchOrder(orderId);
         //notify nurse in department to fetch order
         List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
         if (null!=orders && !orders.isEmpty()) {
             ServiceOrderBean order = orders.get(0);
-            List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(null, YesNoEnum.YES.name(), null, hospitalId, departmentId, RegisterFrom.parseString(registerFrom));
-            List<Long> nursesId = getNurseIds(nurses);
-            notifierForAllModule.newOrderAlertToNurse360(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
+            if (OrderStatus.TO_SERVICE.equals(order.getOrderStatus())) {
+                List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(null, YesNoEnum.YES.name(), null, hospitalId, departmentId, RegisterFrom.parseString(registerFrom));
+                List<Long> nursesId = getNurseIds(nurses);
+                notifierForAllModule.newOrderAlertToNurse360(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
+            }
+            else {
+                logger.error("order status is {}, can not to fetch by nurse", order.getOrderStatus());
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
         }
         return Response.ok().build();
     }
@@ -235,7 +236,7 @@ public class ServiceOrderManageAPI {
                                 @FormParam("count") @DefaultValue("0") int count,
                                 @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage
     ) {
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage, 0);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage);
         return Response.ok(order).build();
     }
 

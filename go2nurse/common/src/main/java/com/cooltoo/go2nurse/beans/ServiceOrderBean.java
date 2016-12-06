@@ -18,6 +18,8 @@ import java.util.Map;
  * Created by hp on 2016/7/13.
  */
 public class ServiceOrderBean {
+    private static final long ONE_HOUR_MILLISECOND = 60*60*1000;
+    private static final long ONE_DAY_MILLISECOND = 24*ONE_HOUR_MILLISECOND;
 
     public static final String FLAG = "FLAG";
     public static final String WAIT_STAFF = "WaitStaff";
@@ -50,6 +52,9 @@ public class ServiceOrderBean {
     private int totalConsumptionCent;
     private String preferential;
     private int preferentialCent;
+    private String totalServerIncome;
+    private int totalServerIncomeCent;
+    private YesNoEnum needVisitPatientRecord;
     private String orderNo;
     private OrderStatus orderStatus;
     private Date payTime;
@@ -153,6 +158,23 @@ public class ServiceOrderBean {
 
     public TimeUnit getServiceTimeUnit() {
         return serviceTimeUnit;
+    }
+
+    public long calculateServiceEndTime() {
+        if (null==serviceStartTime) {
+            return 0;
+        }
+        if (null==serviceTimeUnit) {
+            return serviceStartTime.getTime();
+        }
+        long timeDuration = 0;
+        if (TimeUnit.HOUR.equals(serviceTimeUnit)) {
+            timeDuration = serviceTimeDuration * ONE_HOUR_MILLISECOND;
+        }
+        else if (TimeUnit.DAY.equals(serviceTimeUnit)) {
+            timeDuration = serviceTimeDuration * ONE_DAY_MILLISECOND;
+        }
+        return serviceStartTime.getTime()+timeDuration;
     }
 
     public int getItemCount() {
@@ -315,6 +337,15 @@ public class ServiceOrderBean {
     public void setPreferentialCent(int preferentialCent) {
         this.preferentialCent = preferentialCent;
         this.preferential = VerifyUtil.parsePrice(preferentialCent);
+    }
+
+    public void setTotalServerIncomeCent(int totalServerIncomeCent) {
+        this.totalServerIncomeCent = totalServerIncomeCent;
+        this.totalServerIncome = VerifyUtil.parsePrice(totalServerIncomeCent);
+    }
+
+    public void setNeedVisitPatientRecord(YesNoEnum needVisitPatientRecord) {
+        this.needVisitPatientRecord = needVisitPatientRecord;
     }
 
     public void setOrderNo(String orderNo) {

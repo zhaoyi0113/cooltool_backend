@@ -116,6 +116,35 @@ public class NurseVisitPatientService {
     //===============================================================
     //             get ----  patient using
     //===============================================================
+    public boolean isRecordForOrder(long orderId) {
+        Boolean recorded = false;
+        Map<Long, Boolean> orderRecorded = isRecordForOrder(Arrays.asList(new Long[]{orderId}));
+        recorded = orderRecorded.get(orderId);
+        recorded = null==recorded ? Boolean.FALSE : recorded;
+        logger.debug("the visit patient of order recorded? {}", recorded);
+        return recorded;
+    }
+
+    public Map<Long, Boolean> isRecordForOrder(List<Long> orderIds) {
+        Map<Long, Boolean> orderRecorded = new HashMap<>();
+        if (VerifyUtil.isListEmpty(orderIds)) {
+            return orderRecorded;
+        }
+        List<NurseVisitPatientEntity> entities = repository.findByOrderIdIn(orderIds, sort);
+        if (!VerifyUtil.isListEmpty(entities)) {
+            for (NurseVisitPatientEntity tmp : entities) {
+                if (null==tmp) { continue; }
+                Boolean recorded = orderRecorded.get(tmp.getOrderId());
+                // record already
+                if (null!=recorded && Boolean.TRUE.equals(recorded)) { continue; }
+                // judge record
+                recorded = tmp.getPatientSign()>0;
+                orderRecorded.put(tmp.getOrderId(), recorded);
+            }
+        }
+        logger.debug("the visit patient of order recorded. size={}", orderRecorded.size());
+        return orderRecorded;
+    }
 
     public List<NurseVisitPatientBean> getVisitRecord(Long userId, Long patientId, Long nurseId, String contentLike, int pageIndex, int sizePerPage) {
         logger.info("nurse={} get visit record (contentLike={}) of user={} patient={} at page={} sizePerPage={}",

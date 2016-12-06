@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.ServiceClass;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
@@ -37,6 +38,12 @@ public class ServiceItemBean {
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
     private int grade;
+    private int serviceDiscountCent;
+    private String serviceDiscount;
+    private int serverIncomeCent;
+    private String serverIncome;
+    private YesNoEnum needVisitPatientRecord;
+    private YesNoEnum managerApproved;
 
     public long getId() {
         return id;
@@ -217,6 +224,40 @@ public class ServiceItemBean {
 
     public void setDetailImageUrl(String detailImageUrl) {
         this.detailImageUrl = detailImageUrl;
+    }
+
+    public int getServiceDiscountCent() {
+        return serviceDiscountCent;
+    }
+
+    public void setServiceDiscountCent(int serviceDiscountCent) {
+        this.serviceDiscountCent = serviceDiscountCent;
+        this.serviceDiscount = VerifyUtil.parsePrice(serviceDiscountCent);
+    }
+
+    public int getServerIncomeCent() {
+        return serverIncomeCent;
+    }
+
+    public void setServerIncomeCent(int serverIncomeCent) {
+        this.serverIncomeCent = serverIncomeCent;
+        this.serverIncome = VerifyUtil.parsePrice(serverIncomeCent);
+    }
+
+    public YesNoEnum getNeedVisitPatientRecord() {
+        return needVisitPatientRecord;
+    }
+
+    public void setNeedVisitPatientRecord(YesNoEnum needVisitPatientRecord) {
+        this.needVisitPatientRecord = needVisitPatientRecord;
+    }
+
+    public YesNoEnum getManagerApproved() {
+        return managerApproved;
+    }
+
+    public void setManagerApproved(YesNoEnum managerApproved) {
+        this.managerApproved = managerApproved;
     }
 
     @Override
