@@ -24,4 +24,7 @@ public interface UserPatientRelationRepository extends JpaRepository<UserPatient
     List<Long> findUserIdByPatientIdAndStatus(List<Long> patientIds, CommonStatus status, Sort sort);
 
     List<UserPatientRelationEntity> findByPatientIdAndUserId(Long patientId, Long userId, Sort sort);
+
+    List<UserPatientRelationEntity> findByPatientIdInAndStatus(List<Long> patientId, CommonStatus status, Sort sort);
+    List<UserPatientRelationEntity> findByUserIdAndStatus(Long userId, CommonStatus status, Sort sort);
 }

@@ -13,7 +13,9 @@ public class UserPatientRelationBean {
     private Date time;
     private CommonStatus status;
     private long userId;
+    private UserBean user;
     private long patientId;
+    private PatientBean patient;
 
     public long getId() {
         return id;
@@ -53,6 +55,22 @@ public class UserPatientRelationBean {
 
     public void setPatientId(long patientId) {
         this.patientId = patientId;
+    }
+
+    public UserBean getUser() {
+        return user;
+    }
+
+    public void setUser(UserBean user) {
+        this.user = user;
+    }
+
+    public PatientBean getPatient() {
+        return patient;
+    }
+
+    public void setPatient(PatientBean patient) {
+        this.patient = patient;
     }
 
     public String toString() {

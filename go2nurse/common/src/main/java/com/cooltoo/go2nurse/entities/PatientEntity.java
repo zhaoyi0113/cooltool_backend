@@ -23,6 +23,7 @@ public class PatientEntity {
     private String identityCard;
     private String mobile;
     private YesNoEnum isDefault;
+    private long headImageId;
 
     @Id
     @Column(name = "id")
@@ -95,6 +96,14 @@ public class PatientEntity {
     }
     public void setStatus(CommonStatus status) {
         this.status = status;
+    }
+
+    @Column(name = "head_image_id")
+    public long getHeadImageId() {
+        return headImageId;
+    }
+    public void setHeadImageId(long headImageId) {
+        this.headImageId = headImageId;
     }
 
     public String toString() {

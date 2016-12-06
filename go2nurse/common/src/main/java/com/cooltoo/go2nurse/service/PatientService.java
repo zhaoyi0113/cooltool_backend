@@ -3,9 +3,6 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.go2nurse.beans.UserBean;
-import com.cooltoo.go2nurse.entities.UserEntity;
-import com.cooltoo.go2nurse.entities.UserPatientRelationEntity;
 import com.cooltoo.go2nurse.repository.PatientRepository;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.converter.PatientBeanConverter;
@@ -13,6 +10,8 @@ import com.cooltoo.go2nurse.entities.PatientEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.repository.UserPatientRelationRepository;
+import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -20,11 +19,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.io.InputStream;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +44,8 @@ public class PatientService {
     @Autowired private PatientRepository repository;
     @Autowired private PatientBeanConverter beanConverter;
     @Autowired private UserPatientRelationRepository userPatientRelationRep;
+    @Autowired private UserGo2NurseFileStorageService userStorage;
+    @Autowired private Go2NurseUtility utility;
 
     public boolean existPatient(long patientId) {
         return repository.exists(patientId);
@@ -80,11 +79,8 @@ public class PatientService {
 
         PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
         Iterable<PatientEntity> entities = repository.findByConditions(status, name, gender, identityCard, mobile, page);
-        List<PatientBean> beans = new ArrayList<PatientBean>();
-        for(PatientEntity entity: entities){
-            PatientBean bean = beanConverter.convert(entity);
-            beans.add(bean);
-        }
+        List<PatientBean> beans = entities2Beans(entities);
+        fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
         return beans;
     }
@@ -94,7 +90,10 @@ public class PatientService {
         if(entity == null){
             return null;
         }
-        return beanConverter.convert(entity);
+        PatientBean bean = beanConverter.convert(entity);
+        List<PatientBean> beans = Arrays.asList(new PatientBean[]{bean});
+        fillOtherProperties(beans);
+        return bean;
     }
 
     public Map<Long, PatientBean> getAllIdToBeanByStatusAndIds(List<Long> ids, CommonStatus status) {
@@ -107,7 +106,6 @@ public class PatientService {
     }
 
     public List<PatientBean> getAllByStatusAndIds(List<Long> ids, CommonStatus status) {
-        List<PatientBean> beans = new ArrayList<>();
         List<PatientEntity> entities;
         if (null==status) {
             entities = repository.findByIdIn(ids, sort);
@@ -115,13 +113,8 @@ public class PatientService {
         else {
             entities = repository.findByStatusAndIdIn(status, ids, sort);
         }
-        if (VerifyUtil.isListEmpty(entities)) {
-            return beans;
-        }
-        for (PatientEntity entity :entities) {
-            PatientBean bean = beanConverter.convert(entity);
-            beans.add(bean);
-        }
+        List<PatientBean> beans = entities2Beans(entities);
+        fillOtherProperties(beans);
         return beans;
     }
 
@@ -132,6 +125,7 @@ public class PatientService {
         }
         List<PatientEntity> resultSet = repository.findAll(patientIds);
         List<PatientBean> beans = entities2Beans(resultSet);
+        fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
         Map<Long, PatientBean> map = new HashMap<>();
         for (PatientBean tmp : beans) {
@@ -150,6 +144,27 @@ public class PatientService {
             beans.add(bean);
         }
         return beans;
+    }
+
+    private void fillOtherProperties(List<PatientBean> beans) {
+        if (VerifyUtil.isListEmpty(beans)) {
+            return;
+        }
+
+        List<Long> imageIds = new ArrayList<>();
+        for (PatientBean tmp : beans) {
+            if (!imageIds.contains(tmp.getHeadImageId())) {
+                imageIds.add(tmp.getHeadImageId());
+            }
+        }
+
+        Map<Long, String> imageIdToUrl = userStorage.getFileUrl(imageIds, utility.getHttpPrefix());
+
+        // fill properties
+        for (PatientBean tmp : beans) {
+            String imageUrl = imageIdToUrl.get(tmp.getHeadImageId());
+            tmp.setHeadImageUrl(imageUrl);
+        }
     }
 
     //====================================================================
@@ -271,5 +286,28 @@ public class PatientService {
         }
 
         repository.save(patients);
+    }
+
+    @Transactional
+    public PatientBean updateHeaderImage(long patientId, String headImageName, InputStream headImage) {
+        logger.info("update header image for patientId={}, imageName={}, image={}", patientId, headImageName, headImage);
+        PatientEntity entity = repository.findOne(patientId);
+        if (null == entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (VerifyUtil.isStringEmpty(headImageName)) {
+            headImageName = "patient_head_image_"+System.currentTimeMillis();
+        }
+        long imageId = 0;
+        String imageUrl = "";
+        imageId = userStorage.addFile(entity.getHeadImageId(), headImageName, headImage);
+        if (imageId > 0) {
+            entity.setHeadImageId(imageId);
+            imageUrl = userStorage.getFileURL(imageId);
+            entity = repository.save(entity);
+        }
+        PatientBean bean = beanConverter.convert(entity);
+        bean.setHeadImageUrl(imageUrl);
+        return bean;
     }
 }

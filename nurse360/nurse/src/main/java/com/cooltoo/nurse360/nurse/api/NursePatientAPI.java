@@ -7,9 +7,13 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.*;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpBean;
+import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
+import com.cooltoo.go2nurse.beans.UserPatientRelationBean;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpService;
+import com.cooltoo.go2nurse.service.PatientService;
+import com.cooltoo.go2nurse.service.UserPatientRelationService;
 import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
@@ -35,6 +39,8 @@ public class NursePatientAPI {
 
     @Autowired private NursePatientRelationServiceForNurse360 nursePatientService;
     @Autowired private UserService userService;
+    @Autowired private UserPatientRelationService userPatientRelationService;
+    @Autowired private PatientService patientService;
     @Autowired private NursePatientFollowUpService nursePatientFollowUpService;
     private static final SetUtil setUtil = SetUtil.newInstance();
 
@@ -83,13 +89,13 @@ public class NursePatientAPI {
         return Response.ok(returnVal).build();
     }
 
-    @POST
+    @Path("/code")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response addPatient(@Context HttpServletRequest request,
-                               @FormParam("user_code") @DefaultValue("0") String userUniqueId
+    public Response getPatientUnderGuardianship(@Context HttpServletRequest request,
+                                                @FormParam("user_code") @DefaultValue("0") String userUniqueId
     ) {
-        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<UserBean> users = userService.getUserByUniqueId(userUniqueId);
         if (VerifyUtil.isListEmpty(users)) {
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
@@ -97,7 +103,46 @@ public class NursePatientAPI {
         if (users.size()>1) {
             throw new BadRequestException(ErrorCode.NURSE360_RESULT_NOT_EXPECTED);
         }
-        nursePatientService.addUserPatientToNurse(nurseId, 0, users.get(0).getId());
-        return Response.ok(userUniqueId).build();
+        List<UserPatientRelationBean> relations = userPatientRelationService.getRelationByUserIdAndStatus(users.get(0).getId(), CommonStatus.ENABLED.name());
+
+        List<Long> patientIds = new ArrayList<>();
+        for (UserPatientRelationBean tmp : relations) {
+            if (null==tmp) { continue; }
+            patientIds.add(tmp.getPatientId());
+        }
+        List<PatientBean> patients = patientService.getAllByStatusAndIds(patientIds, CommonStatus.ENABLED);
+
+        List<UserPatientRelationBean> returnVal = new ArrayList<>();
+        for (PatientBean tmpP : patients) {
+            if (null==tmpP) { continue; }
+            for (UserPatientRelationBean tmpR : relations) {
+                if (null==tmpR) { continue; }
+                if (tmpR.getPatientId()==tmpP.getId()) {
+                    returnVal.add(tmpR);
+                    break;
+                }
+            }
+        }
+        return Response.ok(returnVal).build();
+
     }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response addPatient(@Context HttpServletRequest request,
+                               @FormParam("user_id") @DefaultValue("0") long userId,
+                               @FormParam("patient_id") @DefaultValue("0") String strPatientIds
+    ) {
+        long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<Long> patientIds = VerifyUtil.isIds(strPatientIds) ? VerifyUtil.parseLongIds(strPatientIds) : null;
+        if (VerifyUtil.isListEmpty(patientIds)) {
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
+        }
+        for (Long tmp : patientIds) {
+            nursePatientService.addUserPatientToNurse(nurseId, tmp, userId);
+        }
+        return Response.ok().build();
+    }
+
 }

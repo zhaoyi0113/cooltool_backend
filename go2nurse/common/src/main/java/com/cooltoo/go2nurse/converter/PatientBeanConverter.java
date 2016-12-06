@@ -6,7 +6,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by yzzhao on 2/29/16.
@@ -25,6 +24,7 @@ public class PatientBeanConverter implements Converter<PatientEntity, PatientBea
         bean.setMobile(source.getMobile());
         bean.setIsDefault(source.getIsDefault());
         bean.setBirthday(source.getBirthday());
+        bean.setHeadImageId(source.getHeadImageId());
         if (null==bean.getBirthday()) {
             bean.setAge(0);
         }

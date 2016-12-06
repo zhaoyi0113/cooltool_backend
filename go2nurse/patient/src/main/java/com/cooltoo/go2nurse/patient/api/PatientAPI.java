@@ -10,6 +10,8 @@ import com.cooltoo.go2nurse.service.PatientService;
 import com.cooltoo.go2nurse.service.UserPatientRelationService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -114,6 +117,23 @@ public class PatientAPI {
         YesNoEnum isDefault = YesNoEnum.parseString(strIsDefault);
         PatientBean one = service.update(userId, patientId, name, gender, birthday, identityCard, mobile, isDefault, status);
         return Response.ok(one).build();
+    }
+
+    @Path("/header_image")
+    @PUT
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response addHeadPhoto(@Context HttpServletRequest request,
+                                 @FormDataParam("patient_id") @DefaultValue("0")  long patientId,
+                                 @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                 @FormDataParam("file") InputStream image,
+                                 @FormDataParam("file") FormDataContentDisposition disposition
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        PatientBean patient = service.updateHeaderImage(patientId, imageName, image);
+        logger.info("upload successfully");
+        return Response.ok(patient).build();
     }
 
 }

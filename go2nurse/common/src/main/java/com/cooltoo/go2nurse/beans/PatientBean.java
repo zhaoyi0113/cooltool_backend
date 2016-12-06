@@ -21,6 +21,8 @@ public class PatientBean {
     private String identityCard;
     private String mobile;
     private YesNoEnum isDefault;
+    private long headImageId;
+    private String headImageUrl;
 
     public long getId() {
         return id;
@@ -87,6 +89,20 @@ public class PatientBean {
     }
     public void setStatus(CommonStatus status) {
         this.status = status;
+    }
+
+    public long getHeadImageId() {
+        return headImageId;
+    }
+    public void setHeadImageId(long headImageId) {
+        this.headImageId = headImageId;
+    }
+
+    public String getHeadImageUrl() {
+        return headImageUrl;
+    }
+    public void setHeadImageUrl(String headImageUrl) {
+        this.headImageUrl = headImageUrl;
     }
 
     public String toString() {
