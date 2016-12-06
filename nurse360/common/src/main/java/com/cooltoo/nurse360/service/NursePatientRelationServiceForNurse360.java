@@ -44,23 +44,6 @@ public class NursePatientRelationServiceForNurse360 {
     //============================================================================
     //                 get
     //============================================================================
-    public List<Long> getUserByNurseId(long nurseId, String strStatus) {
-        logger.info("get patients_user by nurseId={} with status={}", nurseId, strStatus);
-        CommonStatus status = CommonStatus.parseString(strStatus);
-        List<NursePatientRelationEntity> resultSet = repository.findByNurseIdAndStatus(nurseId, status, sort);
-        List<Long> userIds = new ArrayList<>();
-        if (!VerifyUtil.isListEmpty(resultSet)) {
-            for (NursePatientRelationEntity tmp : resultSet) {
-                if (userIds.contains(tmp.getUserId())) {
-                    continue;
-                }
-                userIds.add(tmp.getUserId());
-            }
-        }
-        logger.info("count is {}", userIds.size());
-        return userIds;
-    }
-
     public Map<Long, Long> getNursePatientNumber(List<Long> nursesId, CommonStatus status) {
         int size = null==nursesId ? 0 : nursesId.size();
         Map<Long, Long> nurseIdToPatientNumber = new HashMap<>();
@@ -131,12 +114,12 @@ public class NursePatientRelationServiceForNurse360 {
         List<Long> patientIds = new ArrayList<>();
         for (NursePatientRelationBean bean :beans) {
             long userId = bean.getUserId();
-            if (!patientIds.contains(userId)) {
-                patientIds.add(userId);
+            if (!userIds.contains(userId)) {
+                userIds.add(userId);
             }
             long patientId = bean.getPatientId();
-            if (!userIds.contains(patientId)) {
-                userIds.add(patientId);
+            if (!patientIds.contains(patientId)) {
+                patientIds.add(patientId);
             }
         }
 

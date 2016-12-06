@@ -62,7 +62,7 @@ public class NursePatientAPI {
         for (NursePatientFollowUpBean tmpF : nursePatientFollowUps) {
             for (NursePatientRelationBean tmpR : nursePatientRelations) {
                 if (tmpF.getUserId()==tmpR.getUserId() && tmpF.getPatientId()==tmpR.getPatientId()) {
-                    userIdToFollowUpId.put(tmpF.getId(), tmpR.getId());
+                    userIdToFollowUpId.put(tmpR.getId(), tmpF.getId());
                 }
             }
         }
