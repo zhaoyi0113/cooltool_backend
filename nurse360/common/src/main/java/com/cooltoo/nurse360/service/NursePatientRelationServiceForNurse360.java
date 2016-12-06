@@ -87,6 +87,15 @@ public class NursePatientRelationServiceForNurse360 {
         return nurseIdToPatientNumber;
     }
 
+    public List<NursePatientRelationBean> getRelationByNurseId(long nurseId, CommonStatus status) {
+        logger.info("get nurse patient by nurseId={} with status={}", nurseId, status);
+        List<NursePatientRelationEntity> resultSet = repository.findByNurseIdAndStatus(nurseId, status, sort);
+        List<NursePatientRelationBean> beans = entitiesToBeans(resultSet);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     public List<NursePatientRelationBean> getRelationByNurseId(long nurseId, CommonStatus status, int pageIndex, int sizePerPage) {
         logger.info("get nurse patient by nursesId={} and status={}", nurseId, status);
         if (null==status) {
