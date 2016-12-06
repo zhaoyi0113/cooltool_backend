@@ -34,16 +34,18 @@ public interface CasebookRepository extends JpaRepository<CasebookEntity, Long>{
 
 
     @Query("FROM CasebookEntity uc" +
-            " WHERE (?1 IS NULL OR uc.userId=?1)" +
-            " AND   (?2 IS NULL OR uc.nurseId=?2)" +
-            " AND   (?3 IS NULL OR uc.status<>?3)" +
-            " AND  ((?4 IS NULL) OR (uc.description LIKE %?4) OR (uc.name LIKE %?4))")
-    Page<CasebookEntity> findByUserNurseStatusNotAndContentLike(Long userId, Long nurseId, CommonStatus status, String contentLike, Pageable page);
+            " WHERE (?1 IS NULL OR ?1=uc.userId)" +
+            " AND   (?3 IS NULL OR ?2=uc.patientId)" +
+            " AND   (?3 IS NULL OR ?3=uc.nurseId)" +
+            " AND   (?4 IS NULL OR ?4<>uc.status)" +
+            " AND  ((?5 IS NULL) OR (uc.description LIKE %?5) OR (uc.name LIKE %?5))")
+    Page<CasebookEntity> findByUserNurseStatusNotAndContentLike(Long userId, Long patientId, Long nurseId, CommonStatus status, String contentLike, Pageable page);
 
 
     @Query("FROM CasebookEntity uc" +
-            " WHERE (?1 IS NULL OR uc.userId=?1)" +
-            " AND   (?2 IS NULL OR uc.status<>?2)" +
-            " AND   (?3 IS NULL OR uc.nurseId=?3)")
-    Page<CasebookEntity> findByUserIdAndStatusNotAndNurseId(Long userId, CommonStatus status, Long nurseId, Pageable page);
+            " WHERE (?1 IS NULL OR ?1=uc.userId)" +
+            " AND   (?2 IS NULL OR ?2=uc.patientId)" +
+            " AND   (?3 IS NULL OR ?3=uc.status)" +
+            " AND   (?4 IS NULL OR ?4=uc.nurseId)")
+    Page<CasebookEntity> findByUserIdAndStatusNotAndNurseId(Long userId, Long patientId, CommonStatus status, Long nurseId, Pageable page);
 }

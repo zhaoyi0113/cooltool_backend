@@ -40,13 +40,15 @@ public class CasebookAPI {
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getCasebook(@Context HttpServletRequest request,
                                 @QueryParam("user_id") @DefaultValue("") String strUserId,
+                                @QueryParam("patient_id") @DefaultValue("") String strPatientId,
                                 @QueryParam("content") @DefaultValue("") String content,
                                 @QueryParam("index") @DefaultValue("0") int pageIndex,
                                 @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         Long userId = !VerifyUtil.isIds(strUserId) ? null : VerifyUtil.parseLongIds(strUserId).get(0);
-        List<CasebookBean> casebook = casebookService.getUserCasebook(userId, null, content, pageIndex, sizePerPage);
+        Long patientId = !VerifyUtil.isIds(strPatientId) ? null : VerifyUtil.parseLongIds(strPatientId).get(0);
+        List<CasebookBean> casebook = casebookService.getUserCasebook(userId, patientId, null, content, pageIndex, sizePerPage);
         return Response.ok(casebook).build();
     }
 

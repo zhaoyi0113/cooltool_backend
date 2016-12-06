@@ -82,9 +82,9 @@ public class CasebookService {
     //             get ----  patient using
     //===============================================================
 
-    public List<CasebookBean> getUserCasebook(Long userId, Long nurseId, String contentLike, int pageIndex, int sizePerPage) {
-        logger.info("user={} nusre={} get casebook (contentLike={}) at page={} sizePerPage={}",
-                userId, nurseId, contentLike, pageIndex, sizePerPage);
+    public List<CasebookBean> getUserCasebook(Long userId, Long patientId, Long nurseId, String contentLike, int pageIndex, int sizePerPage) {
+        logger.info("user={} patient={} nurse={} get casebook (contentLike={}) at page={} sizePerPage={}",
+                userId, patientId, nurseId, contentLike, pageIndex, sizePerPage);
         List<CasebookBean> beans;
         if (null==userId && VerifyUtil.isStringEmpty(contentLike)) {
             beans = new ArrayList<>();
@@ -92,7 +92,7 @@ public class CasebookService {
         else {
             contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
             PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-            Page<CasebookEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, nurseId, CommonStatus.DELETED, contentLike, request);
+            Page<CasebookEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, patientId, nurseId, CommonStatus.DELETED, contentLike, request);
             beans = entitiesToBeansForCasebook(resultSet);
             fillOtherPropertiesForCasebook(beans);
         }
@@ -100,11 +100,11 @@ public class CasebookService {
         return beans;
     }
 
-    public List<CasebookBean> getUserCasebook(Long userId, Long nurseId, int pageIndex, int sizePerPage) {
-        logger.info("user={} get casebook nurseId={} at page={} sizePerPage={}", userId, nurseId, pageIndex, sizePerPage);
+    public List<CasebookBean> getUserCasebook(Long userId, Long patientId, Long nurseId, int pageIndex, int sizePerPage) {
+        logger.info("user={} patient={} get casebook nurseId={} at page={} sizePerPage={}", userId, patientId, nurseId, pageIndex, sizePerPage);
         List<CasebookBean> beans;
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<CasebookEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, CommonStatus.DELETED, nurseId, request);
+        Page<CasebookEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, patientId, CommonStatus.DELETED, nurseId, request);
         beans = entitiesToBeansForCasebook(resultSet);
         fillOtherPropertiesForCasebook(beans);
         logger.warn("casebook count={}", beans.size());
