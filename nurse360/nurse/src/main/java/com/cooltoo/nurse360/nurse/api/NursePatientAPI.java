@@ -94,7 +94,7 @@ public class NursePatientAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getPatientUnderGuardianship(@Context HttpServletRequest request,
-                                                @FormParam("user_code") @DefaultValue("0") String userUniqueId
+                                                @QueryParam("user_code") @DefaultValue("0") String userUniqueId
     ) {
         List<UserBean> users = userService.getUserByUniqueId(userUniqueId);
         if (VerifyUtil.isListEmpty(users)) {
