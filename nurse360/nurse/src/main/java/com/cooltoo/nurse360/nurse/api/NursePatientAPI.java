@@ -70,12 +70,12 @@ public class NursePatientAPI {
         List<NursePatientRelationBean> returnVal = new ArrayList<>();
         for (int i=0; i<nursePatientRelations.size(); i++) {
             NursePatientRelationBean tmp  = nursePatientRelations.get(i);
+            Long followUpId = userIdToFollowUpId.get(tmp.getId());
+            tmp.setFollowUpId(null==followUpId ? 0 : followUpId);
 
             UserBean user = tmp.getUser();
             if (null==user) { continue; }
 
-            Long followUpId = userIdToFollowUpId.get(tmp.getId());
-            user.setProperties(UserBean.FOLLOW_UP_ID, null==followUpId ? 0 : followUpId);
             UserHospitalizedStatus status = UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide())
                     ? UserHospitalizedStatus.IN_HOSPITAL
                     : UserHospitalizedStatus.IN_HOME;

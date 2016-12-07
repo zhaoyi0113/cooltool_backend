@@ -17,6 +17,7 @@ public class NursePatientRelationBean {
     private UserBean user;
     private long patientId;
     private PatientBean patient;
+    private long followUpId;
 
     public long getId() {
         return id;
@@ -82,6 +83,14 @@ public class NursePatientRelationBean {
         this.patient = patient;
     }
 
+    public long getFollowUpId() {
+        return followUpId;
+    }
+
+    public void setFollowUpId(long followUpId) {
+        this.followUpId = followUpId;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -89,6 +98,7 @@ public class NursePatientRelationBean {
         msg.append("id=").append(id);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
+        msg.append(", followUpId=").append(followUpId);
         msg.append(", nurseId=").append(nurseId);
         msg.append(", userId=").append(userId);
         msg.append(", patientId=").append(patientId);
