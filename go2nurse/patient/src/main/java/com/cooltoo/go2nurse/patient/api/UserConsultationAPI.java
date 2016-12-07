@@ -74,7 +74,7 @@ public class UserConsultationAPI {
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(false, userId, null, null, content, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(false, userId, null, null, null, content, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
         return Response.ok(consultations).build();
     }
 
@@ -88,7 +88,7 @@ public class UserConsultationAPI {
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, null, nurseId, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.USER_SPEAK);
         return Response.ok(consultations).build();
     }
 

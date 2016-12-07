@@ -79,6 +79,7 @@ public class NurseConsultationAPI {
         List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(
                 YesNoEnum.YES.equals(allConsultation),
                 null,
+                null,
                 nurseId,
                 categoryId,
                 content,
@@ -93,14 +94,16 @@ public class NurseConsultationAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getConsultation(@Context HttpServletRequest request,
-                                    @QueryParam("user_id") @DefaultValue("") String strUserId,
+                                    @QueryParam("user_id") @DefaultValue("0") String strUserId,
+                                    @QueryParam("patient_id") @DefaultValue("") String strPatientId,
                                     @QueryParam("index") @DefaultValue("0") int pageIndex,
                                     @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
-        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        Long userId = VerifyUtil.isIds(strUserId) ? VerifyUtil.parseLongIds(strUserId).get(0) : null;
+        long nurseId   = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        Long userId    = VerifyUtil.isIds(strUserId)    ? VerifyUtil.parseLongIds(strUserId).get(0)    : null;
+        Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
 
-        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, nurseId, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.NURSE_SPEAK);
+        List<UserConsultationBean> consultations = userConsultationService.getUserConsultation(userId, patientId, nurseId, ConsultationReason.CONSULTATION, pageIndex, sizePerPage, ConsultationTalkStatus.NURSE_SPEAK);
         return Response.ok(consultations).build();
     }
 

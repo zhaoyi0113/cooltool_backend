@@ -89,9 +89,9 @@ public class UserConsultationService {
     //             get ----  patient using
     //===============================================================
 
-    public List<UserConsultationBean> getUserConsultation(boolean getAll, Long userId, Long nurseId, Long categoryId, String contentLike, ConsultationReason reason, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
-        logger.info("user={} nusre={} get consultation (contentLike={}) categoryId={} at page={} sizePerPage={}",
-                userId, nurseId, contentLike, categoryId, pageIndex, sizePerPage);
+    public List<UserConsultationBean> getUserConsultation(boolean getAll, Long userId, Long patientId, Long nurseId, Long categoryId, String contentLike, ConsultationReason reason, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
+        logger.info("user={} patientId={} nusre={} get consultation (contentLike={}) categoryId={} at page={} sizePerPage={}",
+                userId, patientId, nurseId, contentLike, categoryId, pageIndex, sizePerPage);
         List<UserConsultationBean> beans;
         if (!getAll && null==nurseId && null==userId && VerifyUtil.isStringEmpty(contentLike)) {
             beans = new ArrayList<>();
@@ -99,7 +99,7 @@ public class UserConsultationService {
         else {
             contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
             PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-            Page<UserConsultationEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, nurseId, categoryId, CommonStatus.DELETED, contentLike, reason, request);
+            Page<UserConsultationEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, patientId, nurseId, categoryId, CommonStatus.DELETED, contentLike, reason, request);
             beans = entitiesToBeansForConsultation(resultSet);
             fillOtherPropertiesForConsultation(beans, talkStatus);
         }
@@ -107,11 +107,11 @@ public class UserConsultationService {
         return beans;
     }
 
-    public List<UserConsultationBean> getUserConsultation(Long userId, Long nurseId, ConsultationReason reason, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
-        logger.info("user={} get consultation nurseId={} at page={} sizePerPage={}", userId, nurseId, pageIndex, sizePerPage);
+    public List<UserConsultationBean> getUserConsultation(Long userId, Long patientId, Long nurseId, ConsultationReason reason, int pageIndex, int sizePerPage, ConsultationTalkStatus talkStatus) {
+        logger.info("user={} patient={} get consultation nurseId={} at page={} sizePerPage={}", userId, patientId, nurseId, pageIndex, sizePerPage);
         List<UserConsultationBean> beans;
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<UserConsultationEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, CommonStatus.DELETED, nurseId, reason, request);
+        Page<UserConsultationEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, patientId, CommonStatus.DELETED, nurseId, reason, request);
         beans = entitiesToBeansForConsultation(resultSet);
         fillOtherPropertiesForConsultation(beans, talkStatus);
         logger.warn("speak count={}", beans.size());

@@ -15,37 +15,39 @@ public interface UserConsultationRepository extends JpaRepository<UserConsultati
 
 
     @Query("SELECT count(uc.id) FROM UserConsultationEntity uc" +
-            " WHERE (?1 IS NULL OR uc.userId=?1)" +
-            " AND (?2 IS NULL OR uc.patientId=?2)" +
-            " AND (?3 IS NULL OR uc.nurseId=?3)" +
-            " AND (?4 IS NULL OR uc.categoryId=?4)" +
-            " AND ((?5 IS NULL) OR (uc.diseaseDescription LIKE %?5) OR (uc.clinicalHistory LIKE %?5))")
+            " WHERE (?1 IS NULL OR ?1=uc.userId)" +
+            " AND   (?2 IS NULL OR ?2=uc.patientId)" +
+            " AND   (?3 IS NULL OR ?3=uc.nurseId)" +
+            " AND   (?4 IS NULL OR ?4=uc.categoryId)" +
+            " AND  ((?5 IS NULL) OR (uc.diseaseDescription LIKE %?5%) OR (uc.clinicalHistory LIKE %?5%))")
     long countByConditions(Long userId, Long patientId, Long nurseId, Long categoryId, String contentLike);
 
 
     @Query("FROM UserConsultationEntity uc" +
-            " WHERE (?1 IS NULL OR uc.userId=?1)" +
-            " AND (?2 IS NULL OR uc.patientId=?2)" +
-            " AND (?3 IS NULL OR uc.nurseId=?3)" +
-            " AND (?4 IS NULL OR uc.categoryId=?4)" +
-            " AND ((?5 IS NULL) OR (uc.diseaseDescription LIKE %?5) OR (uc.clinicalHistory LIKE %?5))")
+            " WHERE (?1 IS NULL OR ?1=uc.userId)" +
+            " AND   (?2 IS NULL OR ?2=uc.patientId)" +
+            " AND   (?3 IS NULL OR ?3=uc.nurseId)" +
+            " AND   (?4 IS NULL OR ?4=uc.categoryId)" +
+            " AND  ((?5 IS NULL)OR (uc.diseaseDescription LIKE %?5%) OR (uc.clinicalHistory LIKE %?5%))")
     Page<UserConsultationEntity> findByConditions(Long userId, Long patientId, Long nurseId, Long categoryId, String contentLike, Pageable page);
 
 
     @Query("FROM UserConsultationEntity uc" +
-            " WHERE (?1 IS NULL OR uc.userId=?1)" +
-            " AND   (?2 IS NULL OR uc.nurseId=?2)" +
-            " AND   (?3 IS NULL OR uc.categoryId=?3)" +
-            " AND   (?4 IS NULL OR uc.status<>?4)" +
-            " AND  ((?5 IS NULL) OR (uc.diseaseDescription LIKE %?5) OR (uc.clinicalHistory LIKE %?5))" +
-            " AND   (?6 IS NULL OR uc.reason=?6)")
-    Page<UserConsultationEntity> findByUserNurseStatusNotAndContentLike(Long userId, Long nurseId, Long categoryId, CommonStatus status, String contentLike, ConsultationReason reason, Pageable page);
+            " WHERE (?1 IS NULL OR ?1=uc.userId)" +
+            " AND   (?2 IS NULL OR ?2=uc.patientId)" +
+            " AND   (?3 IS NULL OR ?3=uc.nurseId)" +
+            " AND   (?4 IS NULL OR ?4=uc.categoryId)" +
+            " AND   (?5 IS NULL OR ?5<>uc.status)" +
+            " AND  ((?6 IS NULL) OR (uc.diseaseDescription LIKE %?6%) OR (uc.clinicalHistory LIKE %?6%))" +
+            " AND   (?7 IS NULL OR ?7=uc.reason)")
+    Page<UserConsultationEntity> findByUserNurseStatusNotAndContentLike(Long userId, Long patientId, Long nurseId, Long categoryId, CommonStatus status, String contentLike, ConsultationReason reason, Pageable page);
 
 
     @Query("FROM UserConsultationEntity uc" +
-            " WHERE (?1 IS NULL OR uc.userId=?1)" +
-            " AND   (?2 IS NULL OR uc.status<>?2)" +
-            " AND   (?3 IS NULL OR uc.nurseId=?3)" +
-            " AND   (?4 IS NULL OR uc.reason=?4)")
-    Page<UserConsultationEntity> findByUserIdAndStatusNotAndNurseId(Long userId, CommonStatus status, Long nurseId, ConsultationReason reason, Pageable page);
+            " WHERE (?1 IS NULL OR ?1=uc.userId)" +
+            " AND   (?2 IS NULL OR ?2=uc.patientId)" +
+            " AND   (?3 IS NULL OR ?3<>uc.status)" +
+            " AND   (?4 IS NULL OR ?4=uc.nurseId)" +
+            " AND   (?5 IS NULL OR ?5=uc.reason)")
+    Page<UserConsultationEntity> findByUserIdAndStatusNotAndNurseId(Long userId, Long patientId, CommonStatus status, Long nurseId, ConsultationReason reason, Pageable page);
 }
