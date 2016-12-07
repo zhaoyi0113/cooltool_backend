@@ -26,11 +26,8 @@ public class UserCurrentVisitAPI {
     @LoginAuthentication(requireUserLogin = true)
     public Response getUserCurrentVisit(@Context HttpServletRequest request) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        if (userCurrentVisitService.existsCurrentVisit(userId)) {
-            UserCurrentVisitBean currentVisit = userCurrentVisitService.getCurrentVisit(userId);
-            return Response.ok(currentVisit).build();
-        }
-        return Response.ok().build();
+        UserCurrentVisitBean currentVisit = userCurrentVisitService.getCurrentVisit(userId);
+        return Response.ok(currentVisit).build();
     }
 
     @Path("/diagnostic")
