@@ -4,15 +4,30 @@ import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by lg380357 on 2016/3/2.
  */
 public class NumberUtil {
+
+
+
+    public static int getAge(Date birthday) {
+        if (null==birthday) {
+            return 0;
+        }
+        else {
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+
+            calendar.setTime(birthday);
+            int birth = calendar.get(Calendar.YEAR);
+
+            return ((year - birth < 0) ? 0 : (year - birth));
+        }
+    }
+
     /**
      * ChinaMobile:134,135,136,137,138,139,150,151,157(TD),158,159,187,188
      * ChinaUnicom:130,131,132,152,155,156,185,186

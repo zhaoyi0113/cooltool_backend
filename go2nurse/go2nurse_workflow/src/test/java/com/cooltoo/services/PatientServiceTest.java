@@ -35,8 +35,9 @@ public class PatientServiceTest extends AbstractCooltooTest {
         String identity = "13414321432143554321432";
         String mobile = "15811663430";
         YesNoEnum isDefault = YesNoEnum.YES;
+        YesNoEnum isSelf = YesNoEnum.YES;
 
-        PatientBean bean = service.create(name, gender, birthday, identity, mobile, isDefault);
+        PatientBean bean = service.create(name, gender, birthday, identity, mobile, isDefault, isSelf);
         Assert.assertTrue(bean.getId()>0);
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(gender, bean.getGender().ordinal());
@@ -44,6 +45,7 @@ public class PatientServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(mobile, bean.getMobile());
         Assert.assertEquals(CommonStatus.ENABLED, bean.getStatus());
         Assert.assertEquals(isDefault, bean.getIsDefault());
+        Assert.assertEquals(isSelf, bean.getIsSelf());
     }
 
     @Test
@@ -56,17 +58,19 @@ public class PatientServiceTest extends AbstractCooltooTest {
         String mobile = "15811663430";
         String status = CommonStatus.DISABLED.name();
         YesNoEnum isDefault = YesNoEnum.NO;
+        YesNoEnum isSelf = YesNoEnum.YES;
 
-        PatientBean bean = service.update(0, id, name, gender, birthday, identity, mobile, isDefault, status);
+        PatientBean bean = service.update(0, id, name, gender, birthday, identity, mobile, isDefault, isSelf, status);
         Assert.assertNotNull(bean);
-        Assert.assertEquals(id, bean.getId());
-        Assert.assertEquals(name, bean.getName());
-        Assert.assertEquals(gender, bean.getGender().ordinal());
-        Assert.assertEquals(birthday,  bean.getBirthday());
-        Assert.assertEquals(identity,  bean.getIdentityCard());
-        Assert.assertEquals(mobile,  bean.getMobile());
-        Assert.assertEquals(status,  bean.getStatus().name());
-        Assert.assertEquals(isDefault, bean.getIsDefault());
+        Assert.assertEquals(id,       bean.getId());
+        Assert.assertEquals(name,     bean.getName());
+        Assert.assertEquals(gender,   bean.getGender().ordinal());
+        Assert.assertEquals(birthday, bean.getBirthday());
+        Assert.assertEquals(identity, bean.getIdentityCard());
+        Assert.assertEquals(mobile,   bean.getMobile());
+        Assert.assertEquals(status,   bean.getStatus().name());
+        Assert.assertEquals(isDefault,bean.getIsDefault());
+        Assert.assertEquals(isSelf,   bean.getIsSelf());
     }
 
     @Test

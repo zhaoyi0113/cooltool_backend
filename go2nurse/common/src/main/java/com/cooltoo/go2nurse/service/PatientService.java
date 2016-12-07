@@ -171,9 +171,9 @@ public class PatientService {
     //                     add
     //====================================================================
     @Transactional
-    public PatientBean create(String name, int iGender, Date birthday, String identityCard, String mobile, YesNoEnum isDefault) {
-        logger.info("create patient with name={} gender={} birthday={} identityCard={} mobile={} isDefault={}",
-                name, iGender, birthday, identityCard, mobile, isDefault);
+    public PatientBean create(String name, int iGender, Date birthday, String identityCard, String mobile, YesNoEnum isDefault, YesNoEnum isSelf) {
+        logger.info("create patient with name={} gender={} birthday={} identityCard={} mobile={} isDefault={} isSelf={}",
+                name, iGender, birthday, identityCard, mobile, isDefault, isSelf);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.info("name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -206,6 +206,7 @@ public class PatientService {
         entity.setIdentityCard(identityCard);
         entity.setMobile(mobile);
         entity.setIsDefault(isDefault==null ? YesNoEnum.NO : isDefault);
+        entity.setIsSelf(isSelf==null ? YesNoEnum.NO : isSelf);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
 
@@ -219,9 +220,9 @@ public class PatientService {
     //                     update
     //====================================================================
     @Transactional
-    public PatientBean update(long userId, long patientId, String name, int iGender, Date birthday, String identityCard, String mobile, YesNoEnum isDefault, String strStatus) {
-        logger.info("update patient={} by userId={} name={} gender={} birthday={} identityCard={} mobile={} isDefault={} status={}",
-                patientId, userId, name, iGender, birthday, identityCard, mobile, isDefault, strStatus);
+    public PatientBean update(long userId, long patientId, String name, int iGender, Date birthday, String identityCard, String mobile, YesNoEnum isDefault, YesNoEnum isSelf, String strStatus) {
+        logger.info("update patient={} by userId={} name={} gender={} birthday={} identityCard={} mobile={} isDefault={} isSelf={} status={}",
+                patientId, userId, name, iGender, birthday, identityCard, mobile, isDefault, isSelf, strStatus);
         PatientEntity entity = repository.findOne(patientId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -254,6 +255,12 @@ public class PatientService {
             entity.setStatus(status);
             changed = true;
         }
+        boolean isSetSelf = false;
+        if (null!=isSelf && !isSelf.equals(entity.getIsSelf())) {
+            entity.setIsSelf(isSelf);
+            changed = true;
+            isSetSelf = true;
+        }
         boolean isSetDefault = false;
         if (null!=isDefault && !isDefault.equals(entity.getIsDefault())) {
             entity.setIsDefault(isDefault);
@@ -264,6 +271,9 @@ public class PatientService {
             entity = repository.save(entity);
             if (isSetDefault) {
                 setDefault(userId, entity.getId(), isDefault);
+            }
+            if (isSetSelf) {
+                setSelf(userId, entity.getId(), isSelf);
             }
         }
         logger.info("patient is {}", entity);
@@ -278,11 +288,29 @@ public class PatientService {
             return;
         }
         List<Long> patientsId = userPatientRelationRep.findPatientIdByUserIdAndStatus(
-                userId, CommonStatus.ENABLED, userPatientRelationSort);
+                userId, null, userPatientRelationSort);
         List<PatientEntity> patients = repository.findAll(patientsId);
 
         for (PatientEntity patient : patients) {
             patient.setIsDefault(patient.getId()!=patientId ? YesNoEnum.NO : YesNoEnum.YES);
+        }
+
+        repository.save(patients);
+    }
+
+    @Transactional
+    private void setSelf(long userId, long patientId, YesNoEnum isSelf) {
+        logger.info("update user={} 's patient={} by isSelf={}", userId, patientId, isSelf);
+        if (!YesNoEnum.YES.equals(isSelf)) {
+            logger.info("not set the self patient");
+            return;
+        }
+        List<Long> patientsId = userPatientRelationRep.findPatientIdByUserIdAndStatus(
+                userId, null, userPatientRelationSort);
+        List<PatientEntity> patients = repository.findAll(patientsId);
+
+        for (PatientEntity patient : patients) {
+            patient.setIsSelf(patient.getId()!=patientId ? YesNoEnum.NO : YesNoEnum.YES);
         }
 
         repository.save(patients);

@@ -23,6 +23,7 @@ public class PatientBean {
     private YesNoEnum isDefault;
     private long headImageId;
     private String headImageUrl;
+    private YesNoEnum isSelf;
 
     public long getId() {
         return id;
@@ -105,6 +106,13 @@ public class PatientBean {
         this.headImageUrl = headImageUrl;
     }
 
+    public YesNoEnum getIsSelf() {
+        return isSelf;
+    }
+    public void setIsSelf(YesNoEnum isSelf) {
+        this.isSelf = isSelf;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -117,6 +125,7 @@ public class PatientBean {
         msg.append(", identityCard=").append(identityCard);
         msg.append(", mobile=").append(mobile);
         msg.append(", isDefault=").append(isDefault);
+        msg.append(", isSelf=").append(isSelf);
         msg.append("]");
         return msg.toString();
     }

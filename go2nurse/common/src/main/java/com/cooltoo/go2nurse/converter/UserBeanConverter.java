@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.converter;
 
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.entities.UserEntity;
+import com.cooltoo.util.NumberUtil;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -29,20 +30,9 @@ public class UserBeanConverter implements Converter<UserEntity, UserBean> {
         bean.setUniqueId(source.getUniqueId());
         bean.setAddress(source.getAddress());
         bean.setHasDecide(source.getHasDecide());
+        bean.setAge(NumberUtil.getAge(bean.getBirthday()));
         if(source.getChannel() != null) {
             bean.setChannel(source.getChannel().ordinal());
-        }
-        if (null==bean.getBirthday()) {
-            bean.setAge(0);
-        }
-        else {
-            Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-
-            calendar.setTime(source.getBirthday());
-            int birth = calendar.get(Calendar.YEAR);
-
-            bean.setAge((year - birth < 0) ? 0 : (year - birth));
         }
         return bean;
     }

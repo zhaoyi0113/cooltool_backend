@@ -115,7 +115,7 @@ public class PatientManageAPI {
 //        if (time > 0) {
 //            birthday = new Date(time);
 //        }
-        PatientBean one = patientService.update(0, id, null, -1, null, null, null, null, status);
+        PatientBean one = patientService.update(0, id, null, -1, null, null, null, null, null, status);
         return Response.ok(one).build();
     }
 }

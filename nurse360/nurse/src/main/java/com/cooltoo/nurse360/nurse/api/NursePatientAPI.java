@@ -75,6 +75,7 @@ public class NursePatientAPI {
 
             UserBean user = tmp.getUser();
             if (null==user) { continue; }
+            user.setProperties(UserBean.FOLLOW_UP_ID, tmp.getFollowUpId());
 
             UserHospitalizedStatus status = UserHospitalizedStatus.IN_HOSPITAL.equals(user.getHasDecide())
                     ? UserHospitalizedStatus.IN_HOSPITAL

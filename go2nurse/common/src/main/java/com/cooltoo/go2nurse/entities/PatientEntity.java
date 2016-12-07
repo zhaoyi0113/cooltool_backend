@@ -24,6 +24,7 @@ public class PatientEntity {
     private String mobile;
     private YesNoEnum isDefault;
     private long headImageId;
+    private YesNoEnum isSelf;
 
     @Id
     @Column(name = "id")
@@ -106,6 +107,15 @@ public class PatientEntity {
         this.headImageId = headImageId;
     }
 
+    @Column(name = "is_self")
+    @Enumerated
+    public YesNoEnum getIsSelf() {
+        return isSelf;
+    }
+    public void setIsSelf(YesNoEnum isSelf) {
+        this.isSelf = isSelf;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -118,6 +128,7 @@ public class PatientEntity {
         msg.append(", identityCard=").append(identityCard);
         msg.append(", mobile=").append(mobile);
         msg.append(", isDefault=").append(isDefault);
+        msg.append(", isSelf=").append(isSelf);
         msg.append("]");
         return msg.toString();
     }

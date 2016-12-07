@@ -86,7 +86,7 @@ public class PatientAPI {
         }
 
         List<Long> usersPatient = userPatientRelation.getPatientByUser(userId, CommonStatus.ENABLED.name());
-        PatientBean patient = service.create(name, gender, date, identityCard, mobile, VerifyUtil.isListEmpty(usersPatient) ? YesNoEnum.YES : null);
+        PatientBean patient = service.create(name, gender, date, identityCard, mobile, VerifyUtil.isListEmpty(usersPatient) ? YesNoEnum.YES : null, null);
         if (null!=patient && patient.getId()>0) {
             UserPatientRelationBean relation = userPatientRelation.addPatientToUser(patient.getId(), userId);
             logger.info("user patient relation is {}", relation);
@@ -106,6 +106,7 @@ public class PatientAPI {
                            @FormParam("identityCard") @DefaultValue("") String identityCard,
                            @FormParam("mobile") @DefaultValue("") String mobile,
                            @FormParam("is_default") @DefaultValue("") String strIsDefault,
+                           @FormParam("is_self") @DefaultValue("") String strIsSelf,
                            @FormParam("status") @DefaultValue("") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
@@ -115,7 +116,8 @@ public class PatientAPI {
             birthday = new Date(time);
         }
         YesNoEnum isDefault = YesNoEnum.parseString(strIsDefault);
-        PatientBean one = service.update(userId, patientId, name, gender, birthday, identityCard, mobile, isDefault, status);
+        YesNoEnum isSelf = YesNoEnum.parseString(strIsSelf);
+        PatientBean one = service.update(userId, patientId, name, gender, birthday, identityCard, mobile, isDefault, isSelf, status);
         return Response.ok(one).build();
     }
 

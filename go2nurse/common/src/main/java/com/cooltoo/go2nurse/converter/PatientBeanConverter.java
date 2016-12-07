@@ -2,10 +2,12 @@ package com.cooltoo.go2nurse.converter;
 
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.entities.PatientEntity;
+import com.cooltoo.util.NumberUtil;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by yzzhao on 2/29/16.
@@ -25,18 +27,8 @@ public class PatientBeanConverter implements Converter<PatientEntity, PatientBea
         bean.setIsDefault(source.getIsDefault());
         bean.setBirthday(source.getBirthday());
         bean.setHeadImageId(source.getHeadImageId());
-        if (null==bean.getBirthday()) {
-            bean.setAge(0);
-        }
-        else {
-            Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-
-            calendar.setTime(source.getBirthday());
-            int birth = calendar.get(Calendar.YEAR);
-
-            bean.setAge((year - birth < 0) ? 0 : (year - birth));
-        }
+        bean.setIsSelf(source.getIsSelf());
+        bean.setAge(NumberUtil.getAge(bean.getBirthday()));
         return bean;
     }
 }

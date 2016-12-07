@@ -59,7 +59,7 @@ public class UserAPI {
         UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode, hasDecide, channel, channelid, openid);
 
         // add default patient
-        PatientBean patientBean = patientService.create(name, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES);
+        PatientBean patientBean = patientService.create(name, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES, YesNoEnum.YES);
         userPatientRelationService.addPatientToUser(patientBean.getId(), userBean.getId());
 
         // add HOSPITALIZED_DATE diagnostic point datetime when hasDecide is IN_HOSPITAL
