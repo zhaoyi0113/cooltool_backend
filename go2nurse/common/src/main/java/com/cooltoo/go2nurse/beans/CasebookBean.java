@@ -28,6 +28,7 @@ public class CasebookBean {
     private long caseSize;
     private int hospitalId;
     private int departmentId;
+    private Date recentRecordTime;
 
     public long getId() {
         return id;
@@ -104,7 +105,6 @@ public class CasebookBean {
     public List<CaseBean> getCases() {
         return cases;
     }
-
     public void setCases(List<CaseBean> cases) {
         this.cases = cases;
     }
@@ -112,7 +112,6 @@ public class CasebookBean {
     public long getNurseId() {
         return nurseId;
     }
-
     public void setNurseId(long nurseId) {
         this.nurseId = nurseId;
     }
@@ -120,7 +119,6 @@ public class CasebookBean {
     public NurseBean getNurse() {
         return nurse;
     }
-
     public void setNurse(NurseBean nurse) {
         this.nurse = nurse;
     }
@@ -128,7 +126,6 @@ public class CasebookBean {
     public long getCaseSize() {
         return caseSize;
     }
-
     public void setCaseSize(long caseSize) {
         this.caseSize = caseSize;
     }
@@ -136,7 +133,6 @@ public class CasebookBean {
     public int getHospitalId() {
         return hospitalId;
     }
-
     public void setHospitalId(int hospitalId) {
         this.hospitalId = hospitalId;
     }
@@ -144,9 +140,15 @@ public class CasebookBean {
     public int getDepartmentId() {
         return departmentId;
     }
-
     public void setDepartmentId(int departmentId) {
         this.departmentId = departmentId;
+    }
+
+    public Date getRecentRecordTime() {
+        return recentRecordTime;
+    }
+    public void setRecentRecordTime(Date recentRecordTime) {
+        this.recentRecordTime = recentRecordTime;
     }
 
     public String toString() {
@@ -161,6 +163,7 @@ public class CasebookBean {
         msg.append(", name=").append(name);
         msg.append(", description=").append(description);
         msg.append(", caseSize=").append(caseSize);
+        msg.append(", caseLastRecordTime=").append(recentRecordTime);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

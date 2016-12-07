@@ -1,6 +1,5 @@
 package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -61,7 +60,7 @@ public class CaseService {
         if (VerifyUtil.isListEmpty(casebookIds)) {
             return casebookIdAndCaseSize;
         }
-        List<Object[]> casebookIdAndCaseId = repository.countByStatusNotAndCasebookId(CommonStatus.DELETED, casebookIds);
+        List<Object[]> casebookIdAndCaseId = repository.findCasebookIdAndCaseId(CommonStatus.DELETED, casebookIds);
         if (!VerifyUtil.isListEmpty(casebookIdAndCaseId)) {
             for (int i = 0; i < casebookIdAndCaseId.size(); i++) {
                 Object[] tmp = casebookIdAndCaseId.get(i);
@@ -78,6 +77,34 @@ public class CaseService {
             }
         }
         return casebookIdAndCaseSize;
+    }
+
+    public Map<Long, Date> getCaseRecentTimeInCasebooks(List<Long> casebookIds) {
+        Map<Long, Date> casebookIdAndLastRecordTime = new HashMap<>();
+        if (VerifyUtil.isListEmpty(casebookIds)) {
+            return casebookIdAndLastRecordTime;
+        }
+        List<Object[]> casebookIdAndCaseRecordTime = repository.findCasebookIdAndCaseRecordTime(CommonStatus.DELETED, casebookIds);
+        if (!VerifyUtil.isListEmpty(casebookIdAndCaseRecordTime)) {
+            for (int i = 0; i < casebookIdAndCaseRecordTime.size(); i++) {
+                Object[] tmp = casebookIdAndCaseRecordTime.get(i);
+                if (null==tmp || tmp.length!=2 || !(tmp[0] instanceof Long) || !(tmp[1] instanceof Date)) {
+                    continue;
+                }
+                long casebookId = (long) tmp[0];
+                Date caseRecordTime = (Date) tmp[1];
+                if (!casebookIdAndLastRecordTime.containsKey(casebookId)) {
+                    casebookIdAndLastRecordTime.put(casebookId, caseRecordTime);
+                }
+                else {
+                    Date time = casebookIdAndLastRecordTime.get(casebookId);
+                    if (caseRecordTime.getTime()>time.getTime()) {
+                        casebookIdAndLastRecordTime.put(casebookId, caseRecordTime);
+                    }
+                }
+            }
+        }
+        return casebookIdAndLastRecordTime;
     }
 
     public List<CaseBean> getCaseByCasebookId(long casebookId) {

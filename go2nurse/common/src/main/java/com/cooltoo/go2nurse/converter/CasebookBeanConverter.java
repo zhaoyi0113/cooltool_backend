@@ -1,9 +1,7 @@
 package com.cooltoo.go2nurse.converter;
 
 import com.cooltoo.go2nurse.beans.CasebookBean;
-import com.cooltoo.go2nurse.beans.UserConsultationBean;
 import com.cooltoo.go2nurse.entities.CasebookEntity;
-import com.cooltoo.go2nurse.entities.UserConsultationEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

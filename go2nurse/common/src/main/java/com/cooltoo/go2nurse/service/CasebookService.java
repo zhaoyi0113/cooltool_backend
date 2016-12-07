@@ -180,6 +180,7 @@ public class CasebookService {
         Map<Long, PatientBean> patientIdToBean = patientService.getPatientIdToBean(patientIds);
         Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
         Map<Long, Long> casebookAndCaseSize = caseService.getCaseSizeInCasebooks(casebookIds);
+        Map<Long, Date> casebookAndCaseLastRecordTime = caseService.getCaseRecentTimeInCasebooks(casebookIds);
 
         // fill properties
         for (CasebookBean tmp : beans) {
@@ -191,6 +192,8 @@ public class CasebookService {
             tmp.setNurse(nurse);
             Long caseSize = casebookAndCaseSize.get(tmp.getId());
             tmp.setCaseSize(null==caseSize ? 0 : caseSize);
+            Date caseLastRecordTime = casebookAndCaseLastRecordTime.get(tmp.getId());
+            tmp.setRecentRecordTime(caseLastRecordTime);
         }
     }
 
@@ -209,6 +212,7 @@ public class CasebookService {
         NurseBean nurse = nurseId<=0 ? null : nurseService.getNurseById(nurseId);
 //        List<CaseBean> cases = caseService.getCaseByCasebookId(casebookId);
         Map<Long, Long> casebookAndCaseSize = caseService.getCaseSizeInCasebooks(Arrays.asList(new Long[]{casebookId}));
+        Map<Long, Date> casebookAndCaseLastRecordTime = caseService.getCaseRecentTimeInCasebooks(Arrays.asList(new Long[]{casebookId}));
 
         // fill properties
         casebook.setUser(user);
@@ -217,6 +221,8 @@ public class CasebookService {
 //        casebook.setCases(cases);
         Long caseSize = casebookAndCaseSize.get(casebookId);
         casebook.setCaseSize(null==caseSize ? 0 : caseSize);
+        Date caseLastRecordTime = casebookAndCaseLastRecordTime.get(casebookId);
+        casebook.setRecentRecordTime(caseLastRecordTime);
     }
 
 

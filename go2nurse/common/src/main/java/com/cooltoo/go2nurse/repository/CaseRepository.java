@@ -19,7 +19,11 @@ public interface CaseRepository extends JpaRepository<CaseEntity, Long>{
     @Query("SELECT ce.casebookId, ce.id FROM CaseEntity ce" +
             " WHERE (?1 IS NULL OR ce.status<>?1)" +
             "   AND (ce.casebookId IN (?2))")
-    List<Object[]> countByStatusNotAndCasebookId(CommonStatus statusNot, List<Long> casebookIds);
+    List<Object[]> findCasebookIdAndCaseId(CommonStatus statusNot, List<Long> casebookIds);
+    @Query("SELECT ce.casebookId, ce.time FROM CaseEntity ce" +
+            " WHERE (?1 IS NULL OR ce.status<>?1)" +
+            "   AND (ce.casebookId IN (?2))")
+    List<Object[]> findCasebookIdAndCaseRecordTime(CommonStatus statusNot, List<Long> casebookIds);
     List<CaseEntity> findByStatusNotAndCasebookIdIn(CommonStatus statusNot, List<Long> casebookIds, Sort sort);
     List<CaseEntity> findByStatusNotAndIdIn(CommonStatus statusNot, List<Long> caseIds);
 }
