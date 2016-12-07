@@ -5,11 +5,13 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
+import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
 import com.cooltoo.go2nurse.constants.DiagnosticEnumeration;
 import com.cooltoo.go2nurse.constants.ProcessStatus;
 import com.cooltoo.go2nurse.constants.UserHospitalizedStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.*;
+import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -39,6 +41,7 @@ public class UserAPI {
     @Autowired private PatientService patientService;
     @Autowired private UserDiagnosticPointRelationService diagnosticRelationService;
     @Autowired private UserReExaminationDateService reExaminationService;
+    @Autowired private UserHospitalizedRelationService userHospitalizedRelationService;
 
     @POST
     @Path("/register")
@@ -95,6 +98,13 @@ public class UserAPI {
             Long groupId = diagnosticRelationService.getUserCurrentGroupId(userId);
             List<UserDiagnosticPointRelationBean> relations = diagnosticRelationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.COMPLETED);
             reExaminationService.addReExaminationByDiagnosticDates(userId, relations);
+
+            List<UserHospitalizedRelationBean> hospitalizedRelations = userHospitalizedRelationService.getUserHospitalizedRelationByGroupId(userId, groupId);
+            if (!VerifyUtil.isListEmpty(hospitalizedRelations)) {
+                for (UserHospitalizedRelationBean tmp : hospitalizedRelations) {
+                    userHospitalizedRelationService.updateRelation(tmp.getId(), false, userId, YesNoEnum.YES.name(), null);
+                }
+            }
         }
         return Response.ok(user).build();
     }

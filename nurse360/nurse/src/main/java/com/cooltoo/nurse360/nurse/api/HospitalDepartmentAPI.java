@@ -2,8 +2,6 @@ package com.cooltoo.nurse360.nurse.api;
 
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.go2nurse.filters.LoginAuthentication;
-import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;

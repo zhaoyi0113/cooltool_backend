@@ -2,7 +2,6 @@ package com.cooltoo.nurse360.nurse.api;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.*;
 import com.cooltoo.exception.BadRequestException;

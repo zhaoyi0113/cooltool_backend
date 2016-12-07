@@ -2,13 +2,8 @@ package com.cooltoo.nurse360.nurse.api;
 
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.exception.*;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpBean;
-import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpService;
-import com.cooltoo.go2nurse.service.PatientService;
-import com.cooltoo.go2nurse.service.UserPatientRelationService;
-import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.VerifyUtil;
@@ -16,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -31,8 +25,6 @@ import java.util.Map;
 @Path("/nurse/follow-up/patient")
 public class NursePatientFollowUpAPI {
 
-    @Autowired private UserService userService;
-    @Autowired private UserPatientRelationService userPatientRelation;
     @Autowired private NursePatientFollowUpService patientFollowUpService;
     @Autowired private CommonNurseHospitalRelationService nurseHospitalRelation;
 
