@@ -303,7 +303,7 @@ public class NursePatientFollowUpService {
         entity.setTime(new Date());
         entity = repository.save(entity);
 
-        set = repository.findByConditions(null, null, nurseId, userId, null, sort);
+        set = repository.findByConditions(null, null, nurseId, userId, patientId, sort);
         for (int i = 0; i < set.size(); i ++) {
             NursePatientFollowUpEntity tmp = set.get(i);
             if (tmp.getId()==entity.getId()) {
