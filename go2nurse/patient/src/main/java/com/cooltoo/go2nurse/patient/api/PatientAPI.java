@@ -127,12 +127,13 @@ public class PatientAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addHeadPhoto(@Context HttpServletRequest request,
-                                 @FormDataParam("patient_id") @DefaultValue("0")  long patientId,
+                                 @FormDataParam("patient_id") @DefaultValue("0")  String strPatientId,
                                  @FormDataParam("image_name") @DefaultValue("") String imageName,
                                  @FormDataParam("file") InputStream image,
                                  @FormDataParam("file") FormDataContentDisposition disposition
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : 0L;
         PatientBean patient = service.updateHeaderImage(patientId, imageName, image);
         logger.info("upload successfully");
         return Response.ok(patient).build();
