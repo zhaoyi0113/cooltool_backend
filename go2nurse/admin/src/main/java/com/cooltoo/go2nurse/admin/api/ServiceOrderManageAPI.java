@@ -51,6 +51,7 @@ public class ServiceOrderManageAPI {
     public Response countOrderByConditions(@Context HttpServletRequest request,
                                            @QueryParam("service_item_id") @DefaultValue("") String strItemId,
                                            @QueryParam("user_id") @DefaultValue("") String strUserId,
+                                           @QueryParam("patient_id") @DefaultValue("") String strPatientId,
                                            @QueryParam("category_id") @DefaultValue("") String strCategoryId,
                                            @QueryParam("top_category_id") @DefaultValue("") String strTopCategoryId,
                                            @QueryParam("vendor_type") @DefaultValue("") String strVendorType,
@@ -60,6 +61,7 @@ public class ServiceOrderManageAPI {
     ) {
         Long itemId = !VerifyUtil.isIds(strItemId) ? null : VerifyUtil.parseLongIds(strItemId).get(0);
         Long userId = !VerifyUtil.isIds(strUserId) ? null : VerifyUtil.parseLongIds(strUserId).get(0);
+        Long patientId = !VerifyUtil.isIds(strPatientId) ? null : VerifyUtil.parseLongIds(strPatientId).get(0);
         Long categoryId = !VerifyUtil.isIds(strCategoryId) ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
         Long topCategoryId = !VerifyUtil.isIds(strTopCategoryId) ? null : VerifyUtil.parseLongIds(strTopCategoryId).get(0);
 
@@ -72,7 +74,7 @@ public class ServiceOrderManageAPI {
         }
 
         OrderStatus orderStatus = OrderStatus.parseString(strOrderStatus);
-        long count = orderService.countOrderByConditions(itemId, userId, categoryId, topCategoryId, vendorId, vendorType, vendorDepartId, orderStatus);
+        long count = orderService.countOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorId, vendorType, vendorDepartId, orderStatus);
         return Response.ok(count).build();
     }
 
@@ -82,6 +84,7 @@ public class ServiceOrderManageAPI {
     public Response getOrderByConditions(@Context HttpServletRequest request,
                                          @QueryParam("service_item_id") @DefaultValue("") String strItemId,
                                          @QueryParam("user_id") @DefaultValue("") String strUserId,
+                                         @QueryParam("patient_id") @DefaultValue("") String strPatientId,
                                          @QueryParam("category_id") @DefaultValue("") String strCategoryId,
                                          @QueryParam("top_category_id") @DefaultValue("") String strTopCategoryId,
                                          @QueryParam("vendor_type") @DefaultValue("") String strVendorType,
@@ -93,6 +96,7 @@ public class ServiceOrderManageAPI {
     ) {
         Long itemId = !VerifyUtil.isIds(strItemId) ? null : VerifyUtil.parseLongIds(strItemId).get(0);
         Long userId = !VerifyUtil.isIds(strUserId) ? null : VerifyUtil.parseLongIds(strUserId).get(0);
+        Long patientId = !VerifyUtil.isIds(strPatientId) ? null : VerifyUtil.parseLongIds(strPatientId).get(0);
         Long categoryId = !VerifyUtil.isIds(strCategoryId) ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
         Long topCategoryId = !VerifyUtil.isIds(strTopCategoryId) ? null : VerifyUtil.parseLongIds(strTopCategoryId).get(0);
 
@@ -105,7 +109,7 @@ public class ServiceOrderManageAPI {
         }
 
         OrderStatus orderStatus = OrderStatus.parseString(strOrderStatus);
-        List<ServiceOrderBean> orders = orderService.getOrderByConditions(itemId, userId, categoryId, topCategoryId, vendorId, vendorType, vendorDepartId, orderStatus, pageIndex, sizePerPage);
+        List<ServiceOrderBean> orders = orderService.getOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorId, vendorType, vendorDepartId, orderStatus, pageIndex, sizePerPage);
         return Response.ok(orders).build();
     }
 

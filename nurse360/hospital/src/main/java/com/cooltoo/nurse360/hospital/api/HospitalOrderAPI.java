@@ -57,7 +57,7 @@ public class HospitalOrderAPI {
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
         long count = orderService.countOrderByConditions(
-                null, null, null, null,
+                null, null, null, null, null,
                 hospitalId,
                 ServiceVendorType.parseString(strVendorType),
                 departmentId,
@@ -79,7 +79,7 @@ public class HospitalOrderAPI {
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
         List<ServiceOrderBean> orders = orderService.getOrderByConditions(
-                null, null, null, null,
+                null, null, null, null, null,
                 hospitalId,
                 ServiceVendorType.parseString(strVendorType),
                 departmentId,
@@ -178,6 +178,50 @@ public class HospitalOrderAPI {
     //=============================================================
     //            Authentication of NURSE/MANAGER Role
     //=============================================================
+    @RequestMapping(path = "/order/user/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public long countUserOrder(HttpServletRequest request,
+                               @RequestParam(defaultValue = "0",name = "user_id")       long userId,
+                               @RequestParam(defaultValue = "", name = "patient_id")  String strPatientId,
+                               @RequestParam(defaultValue = "", name = "order_status")String strOrderStatus
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+        Long hospitalId   = tmp[0];
+        Long departmentId = tmp[1];
+        Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
+        long count = orderService.countOrderByConditions(
+                null,
+                userId, patientId,
+                null, null,
+                hospitalId, ServiceVendorType.HOSPITAL, departmentId,
+                OrderStatus.parseString(strOrderStatus));
+        return count;
+    }
+
+    @RequestMapping(path = "/order/user", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<ServiceOrderBean> getUserOrder(HttpServletRequest request,
+                                               @RequestParam(defaultValue = "0",name = "user_id")        long userId,
+                                               @RequestParam(defaultValue = "", name = "patient_id")   String strPatientId,
+                                               @RequestParam(defaultValue = "", name = "order_status")String strOrderStatus,
+                                               @RequestParam(defaultValue = "0",  name = "index")  int index,
+                                               @RequestParam(defaultValue = "10", name = "number") int number
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+        Long hospitalId   = tmp[0];
+        Long departmentId = tmp[1];
+        Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
+        List<ServiceOrderBean> orders = orderService.getOrderByConditions(
+                null,
+                userId, patientId,
+                null, null,
+                hospitalId, ServiceVendorType.HOSPITAL, departmentId,
+                OrderStatus.parseString(strOrderStatus),
+                index, number);
+        setOrderWaitStaff(orders);
+        return orders;
+    }
+
     @RequestMapping(path = "/order/nurse/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countNurseOrder(HttpServletRequest request,
                                 @RequestParam(defaultValue = "0", name = "nurse_id")        long nurseId,
@@ -189,6 +233,7 @@ public class HospitalOrderAPI {
                 OrderStatus.parseString(strOrderStatus));
         return count;
     }
+
     @RequestMapping(path = "/order/nurse", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<ServiceOrderBean> getNurseOrder(HttpServletRequest request,
                                                 @RequestParam(defaultValue = "0",  name = "nurse_id")       long nurseId,
@@ -222,7 +267,7 @@ public class HospitalOrderAPI {
         }
         else if (userDetails.isNurseManager()) {
             long count = orderService.countOrderByConditions(
-                    null, null, null, null,
+                    null, null, null, null, null,
                     hospitalId,
                     ServiceVendorType.HOSPITAL,
                     departmentId,
@@ -254,7 +299,7 @@ public class HospitalOrderAPI {
         }
         else if (userDetails.isNurseManager()) {
             List<ServiceOrderBean> orders = orderService.getOrderByConditions(
-                    null, null, null, null,
+                    null, null, null, null, null,
                     hospitalId,
                     ServiceVendorType.HOSPITAL,
                     departmentId,

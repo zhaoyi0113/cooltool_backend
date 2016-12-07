@@ -116,4 +116,35 @@ public class HospitalVisitPatientAPI {
         return count;
     }
 
+    @RequestMapping(path = "/visit/patient/userid/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public long countVisitPatientByUser(HttpServletRequest request,
+                                        @RequestParam(defaultValue = "0",name = "user_id")     long userId,
+                                        @RequestParam(defaultValue = "", name = "patient_id")String strPatientId
+    ) {
+//        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+//        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+//        Long hospitalId   = tmp[0];
+//        Long departmentId = tmp[1];
+        long count = 0;
+        Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
+        count = visitPatientService.countVisitRecordByCondition(userId, patientId, null, null, null, null, null);
+        return count;
+}
+
+    @RequestMapping(path = "/visit/patient/userid", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<NurseVisitPatientBean> getVisitPatientByUser(HttpServletRequest request,
+                                                             @RequestParam(defaultValue = "0", name = "user_id")     long userId,
+                                                             @RequestParam(defaultValue = "",  name = "patient_id")String strPatientId,
+                                                             @RequestParam(defaultValue = "0", name = "index")  int pageIndex,
+                                                             @RequestParam(defaultValue = "10",name = "number") int sizePerPage
+    ) {
+//        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+//        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+//        Long hospitalId   = tmp[0];
+//        Long departmentId = tmp[1];
+        Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
+        List<NurseVisitPatientBean> count;
+        count = visitPatientService.getVisitRecordByCondition(userId, patientId, null, null, null, null, null, pageIndex, sizePerPage);
+        return count;
+    }
 }

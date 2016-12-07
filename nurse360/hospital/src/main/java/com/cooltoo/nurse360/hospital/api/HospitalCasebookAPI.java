@@ -5,6 +5,7 @@ import com.cooltoo.go2nurse.beans.CasebookBean;
 import com.cooltoo.go2nurse.service.CasebookService;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,36 @@ public class HospitalCasebookAPI {
     //==========================================
     //           Casebook Service
     //==========================================
+    @RequestMapping(path = "/casebook/user/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public long countCasebookByUser(HttpServletRequest request,
+                                    @RequestParam(defaultValue = "0",name = "user_id")     long userId,
+                                    @RequestParam(defaultValue = "", name = "patient_id")String strPatientId
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
+        Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
+        long count = casebookService.countCasebookByCondition(userId, patientId, null, null, hospitalId, departmentId);
+        return count;
+    }
+
+    @RequestMapping(path = "/casebook/user", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<CasebookBean> getCasebookByUser(HttpServletRequest request,
+                                                @RequestParam(defaultValue = "0",name = "user_id")     long userId,
+                                                @RequestParam(defaultValue = "", name = "patient_id")String strPatientId,
+                                                @RequestParam(defaultValue = "0",  name = "index") int pageIndex,
+                                                @RequestParam(defaultValue = "10", name = "number") int sizePerPage
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
+        Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
+        List<CasebookBean> casebook = casebookService.getCasebookByCondition(userId, patientId, null, null, hospitalId, departmentId, pageIndex, sizePerPage);
+        return casebook;
+    }
+
     @RequestMapping(path = "/casebook/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countCasebook(HttpServletRequest request) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
