@@ -278,7 +278,7 @@ public class NursePatientFollowUpService {
         if (!patientService.existPatient(patientId)) {
             patientId = 0;
         }
-        if (patientId>0 && userPatientRelation.existRelation(userId, patientId)) {
+        if (patientId>0 && !userPatientRelation.existRelation(userId, patientId)) {
             logger.info("userId -- patientId do not has relation");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
