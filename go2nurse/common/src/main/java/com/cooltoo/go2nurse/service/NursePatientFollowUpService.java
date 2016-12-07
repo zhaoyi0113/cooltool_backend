@@ -286,7 +286,7 @@ public class NursePatientFollowUpService {
         departmentId = departmentId<0 ? 0 : departmentId;
 
         NursePatientFollowUpEntity entity;
-        List<NursePatientFollowUpEntity> set = repository.findByConditions(null, null, nurseId, userId, null, sort);
+        List<NursePatientFollowUpEntity> set = repository.findByConditions(null, null, nurseId, userId, patientId, sort);
         if (VerifyUtil.isListEmpty(set)) {
             entity = new NursePatientFollowUpEntity();
         }
