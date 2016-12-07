@@ -49,6 +49,12 @@ public class UserCurrentVisitBean {
     public long getDiagnosticPoint() {
         return diagnosticPointId;
     }
+    public DiagnosticEnumeration getDiagnostic() {
+        return diagnostic;
+    }
+    public DiagnosticEnumerationBean getDiagnosticBean() {
+        return diagnosticBean;
+    }
     public void setDiagnosticPoint(long diagnosticPoint) {
         this.diagnosticPointId = diagnosticPoint;
         this.diagnostic = DiagnosticEnumeration.parseInt((int)diagnosticPointId);
