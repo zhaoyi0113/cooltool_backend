@@ -58,21 +58,23 @@ public class HospitalPatientAPI {
     //            Authentication of ADMINISTRATOR Role
     //=============================================================
     @RequestMapping(path = "/admin/patient/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public long countPatient(@RequestParam(defaultValue = "0", name = "vendor_type")   String strVendorType,
+    public long countPatient(@RequestParam(defaultValue = "0", name = "vendor_type") String strVendorType,
                              @RequestParam(defaultValue = "0", name = "vendor_id")   String strVendorId,
-                             @RequestParam(defaultValue = "0", name = "depart_id") String strDepartId
+                             @RequestParam(defaultValue = "0", name = "depart_id")   String strDepartId,
+                             @RequestParam(defaultValue = "",  name = "patient_name")String userOrPatientName
     ) {
         ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
         Long vendorId = VerifyUtil.isIds(strVendorId) ? VerifyUtil.parseLongIds(strVendorId).get(0) : 0L;
         Long departId = VerifyUtil.isIds(strDepartId) ? VerifyUtil.parseLongIds(strDepartId).get(0) : 0L;
-        long count = vendorPatientRelationService.countVendorsPatientByCondition(vendorType, vendorId, departId);
+        long count = vendorPatientRelationService.countVendorsPatientByCondition(vendorType, vendorId, departId, userOrPatientName);
         return count;
     }
 
     @RequestMapping(path = "/admin/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public List<ViewVendorPatientRelationBean> getPatient(@RequestParam(defaultValue = "0", name = "vendor_type")   String strVendorType,
+    public List<ViewVendorPatientRelationBean> getPatient(@RequestParam(defaultValue = "0", name = "vendor_type") String strVendorType,
                                                           @RequestParam(defaultValue = "0", name = "vendor_id")   String strVendorId,
-                                                          @RequestParam(defaultValue = "0", name = "depart_id") String strDepartId,
+                                                          @RequestParam(defaultValue = "0", name = "depart_id")   String strDepartId,
+                                                          @RequestParam(defaultValue = "",  name = "patient_name")String userOrPatientName,
                                                           @RequestParam(defaultValue = "0",  name = "index")  int index,
                                                           @RequestParam(defaultValue = "10", name = "number") int number
     ) {
@@ -80,7 +82,7 @@ public class HospitalPatientAPI {
         Long vendorId = VerifyUtil.isIds(strVendorId) ? VerifyUtil.parseLongIds(strVendorId).get(0) : 0L;
         Long departId = VerifyUtil.isIds(strDepartId) ? VerifyUtil.parseLongIds(strDepartId).get(0) : 0L;
         List<ViewVendorPatientRelationBean> vendorsPatient = vendorPatientRelationService.getVendorsPatientByCondition(
-                vendorType, vendorId, departId, index, number
+                vendorType, vendorId, departId, userOrPatientName, index, number
         );
         return vendorsPatient;
     }
@@ -105,9 +107,9 @@ public class HospitalPatientAPI {
 
     @RequestMapping(path = "/nurse/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<NursePatientRelationBean> getPatient(HttpServletRequest request,
-                                                          @RequestParam(defaultValue = "0", name = "nurse_id") long nurseId,
-                                                          @RequestParam(defaultValue = "0",  name = "index")  int index,
-                                                          @RequestParam(defaultValue = "10", name = "number") int number
+                                                     @RequestParam(defaultValue = "0", name = "nurse_id") long nurseId,
+                                                     @RequestParam(defaultValue = "0",  name = "index")  int index,
+                                                     @RequestParam(defaultValue = "10", name = "number") int number
     ) {
 
         List<NursePatientRelationBean> vendorsPatient = nursePatientRelationService.getRelationByNurseId(nurseId, CommonStatus.ENABLED, index, number);
@@ -119,17 +121,20 @@ public class HospitalPatientAPI {
     //         Vendor Patient Relation
     //============================================
     @RequestMapping(path = "/patient/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public long countPatient(HttpServletRequest request) {
+    public long countPatient(HttpServletRequest request,
+                             @RequestParam(defaultValue = "", name = "patient_name")String userOrPatientName
+    ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("0", "0", userDetails);
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
-        long count = vendorPatientRelationService.countHospitalPatientByCondition(hospitalId, departmentId);
+        long count = vendorPatientRelationService.countHospitalPatientByCondition(hospitalId, departmentId, userOrPatientName);
         return count;
     }
 
     @RequestMapping(path = "/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<ViewVendorPatientRelationBean> getPatient(HttpServletRequest request,
+                                                          @RequestParam(defaultValue = "", name = "patient_name")String userOrPatientName,
                                                           @RequestParam(defaultValue = "0",  name = "index")  int index,
                                                           @RequestParam(defaultValue = "10", name = "number") int number
     ) {
@@ -137,7 +142,7 @@ public class HospitalPatientAPI {
         Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("0", "0", userDetails);
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
-        List<ViewVendorPatientRelationBean> vendorsPatient = vendorPatientRelationService.getHospitalPatientByCondition(hospitalId, departmentId, index, number);
+        List<ViewVendorPatientRelationBean> vendorsPatient = vendorPatientRelationService.getHospitalPatientByCondition(hospitalId, departmentId, userOrPatientName, index, number);
         return vendorsPatient;
     }
 

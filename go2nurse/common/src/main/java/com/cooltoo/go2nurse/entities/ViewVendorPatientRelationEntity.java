@@ -19,7 +19,9 @@ public class ViewVendorPatientRelationEntity {
     private String id;
     private Date time;
     private long userId;
+    private String userName;
     private long patientId;
+    private String patientName;
     private ServiceVendorType vendorType;
     private long vendorId;
     private long vendorDepartId;
@@ -32,7 +34,6 @@ public class ViewVendorPatientRelationEntity {
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
@@ -41,7 +42,6 @@ public class ViewVendorPatientRelationEntity {
     public Date getTime() {
         return time;
     }
-
     public void setTime(Date time) {
         this.time = time;
     }
@@ -50,7 +50,6 @@ public class ViewVendorPatientRelationEntity {
     public long getUserId() {
         return userId;
     }
-
     public void setUserId(long userId) {
         this.userId = userId;
     }
@@ -59,7 +58,6 @@ public class ViewVendorPatientRelationEntity {
     public long getPatientId() {
         return patientId;
     }
-
     public void setPatientId(long patientId) {
         this.patientId = patientId;
     }
@@ -68,7 +66,6 @@ public class ViewVendorPatientRelationEntity {
     public ServiceVendorType getVendorType() {
         return vendorType;
     }
-
     public void setVendorType(ServiceVendorType vendorType) {
         this.vendorType = vendorType;
     }
@@ -77,7 +74,6 @@ public class ViewVendorPatientRelationEntity {
     public long getVendorId() {
         return vendorId;
     }
-
     public void setVendorId(long vendorId) {
         this.vendorId = vendorId;
     }
@@ -86,7 +82,6 @@ public class ViewVendorPatientRelationEntity {
     public long getVendorDepartId() {
         return vendorDepartId;
     }
-
     public void setVendorDepartId(long vendorDepartId) {
         this.vendorDepartId = vendorDepartId;
     }
@@ -95,7 +90,6 @@ public class ViewVendorPatientRelationEntity {
     public String getRecordFrom() {
         return recordFrom;
     }
-
     public void setRecordFrom(String recordFrom) {
         this.recordFrom = recordFrom;
     }
@@ -104,9 +98,24 @@ public class ViewVendorPatientRelationEntity {
     public long getRecordId() {
         return recordId;
     }
-
     public void setRecordId(long recordId) {
         this.recordId = recordId;
+    }
+
+    @Column(name = "user_name")
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @Column(name = "patient_name")
+    public String getPatientName() {
+        return patientName;
+    }
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
     }
 
     public String toString() {

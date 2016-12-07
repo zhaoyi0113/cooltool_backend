@@ -52,20 +52,24 @@ public class ViewVendorPatientRelationService {
     //             get ----  admin using
     //===============================================================
 
-    public long countVendorsPatientByCondition(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId) {
-        List<Object[]> set = repository.findByConditions(vendorType, vendorId, vendorDepartId);
+    public long countVendorsPatientByCondition(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, String userOrPatientName) {
+        if (VerifyUtil.isStringEmpty(userOrPatientName)) { userOrPatientName = null; }
+        else { userOrPatientName = userOrPatientName.replace('%', '\0').trim()+"%"; }
+        List<Object[]> set = repository.findByConditions(vendorType, vendorId, vendorDepartId, userOrPatientName);
         long count = VerifyUtil.isListEmpty(set) ? 0 : set.size();
-        logger.info("count vendor's patient by vendorId={} vendorDepartId={} vendorType={} contentLike={}, count is {}",
-                vendorId, vendorDepartId, vendorType, count);
+        logger.info("count vendor's patient by vendorId={} vendorDepartId={} vendorType={} userOrPatientName={}, count is {}",
+                vendorId, vendorDepartId, vendorType, userOrPatientName, count);
         return count;
     }
 
-    public List<ViewVendorPatientRelationBean> getVendorsPatientByCondition(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, int pageIndex, int sizePerPage) {
-        logger.info("get vendor's patient by vendorId={} vendorDepartId={} vendorType={} at page={} sizePerPage={}",
-                vendorId, vendorDepartId, vendorType, pageIndex, sizePerPage);
+    public List<ViewVendorPatientRelationBean> getVendorsPatientByCondition(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, String userOrPatientName, int pageIndex, int sizePerPage) {
+        logger.info("get vendor's patient by vendorId={} vendorDepartId={} vendorType={} userOrPatientName={} at page={} sizePerPage={}",
+                vendorId, vendorDepartId, vendorType, userOrPatientName, pageIndex, sizePerPage);
+        if (VerifyUtil.isStringEmpty(userOrPatientName)) { userOrPatientName = null; }
+        else { userOrPatientName = userOrPatientName.replace('%', '\0').trim()+"%"; }
         List<ViewVendorPatientRelationBean> beans;
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<Object[]> resultSet = repository.findByConditions(vendorType, vendorId, vendorDepartId, request);
+        Page<Object[]> resultSet = repository.findByConditions(vendorType, vendorId, vendorDepartId, userOrPatientName, request);
         beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
         if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
@@ -86,20 +90,24 @@ public class ViewVendorPatientRelationService {
     //             get ----  nurse/manager using
     //===============================================================
 
-    public long countHospitalPatientByCondition(Long hospitalId, Long departmentId) {
-        List<Object[]> set = repository.findByConditions(ServiceVendorType.HOSPITAL, hospitalId, departmentId);
+    public long countHospitalPatientByCondition(Long hospitalId, Long departmentId, String userOrPatientName) {
+        if (VerifyUtil.isStringEmpty(userOrPatientName)) { userOrPatientName = null; }
+        else { userOrPatientName = userOrPatientName.replace('%', '\0').trim()+"%"; }
+        List<Object[]> set = repository.findByConditions(ServiceVendorType.HOSPITAL, hospitalId, departmentId, userOrPatientName);
         long count = VerifyUtil.isListEmpty(set) ? 0 : set.size();
-        logger.info("count hospital's patient by hospitalId={} departmentId={}, count is {}",
-                hospitalId, departmentId, count);
+        logger.info("count hospital's patient by hospitalId={} departmentId={} userOrPatientName={}, count is {}",
+                hospitalId, departmentId, userOrPatientName, count);
         return count;
     }
 
-    public List<ViewVendorPatientRelationBean> getHospitalPatientByCondition(Long hospitalId, Long departmentId, int pageIndex, int sizePerPage) {
-        logger.info("get hospital's patient by hospitalId={} departmentId={} at page={} sizePerPage={}",
-                hospitalId, departmentId, pageIndex, sizePerPage);
+    public List<ViewVendorPatientRelationBean> getHospitalPatientByCondition(Long hospitalId, Long departmentId, String userOrPatientName, int pageIndex, int sizePerPage) {
+        logger.info("get hospital's patient by hospitalId={} departmentId={} userOrPatientName={} at page={} sizePerPage={}",
+                hospitalId, departmentId, userOrPatientName, pageIndex, sizePerPage);
+        if (VerifyUtil.isStringEmpty(userOrPatientName)) { userOrPatientName = null; }
+        else { userOrPatientName = userOrPatientName.replace('%', '\0').trim()+"%"; }
         List<ViewVendorPatientRelationBean> beans;
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<Object[]> resultSet = repository.findByConditions(ServiceVendorType.HOSPITAL, hospitalId, departmentId, request);
+        Page<Object[]> resultSet = repository.findByConditions(ServiceVendorType.HOSPITAL, hospitalId, departmentId, userOrPatientName, request);
         beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
         fillPropertyHospitalDepartment(beans,
@@ -182,7 +190,7 @@ public class ViewVendorPatientRelationService {
 
     private void fillPropertyOrderNumberAndForbiddenStatus(List<ViewVendorPatientRelationBean> beans, ServiceVendorType vendorType, Long vendorId, Long departId) {
         // calculate order number
-        List<Object[]> orders = repository.findRecordByConditions(vendorType, vendorId, departId, "order");
+        List<Object[]> orders = repository.findRecordByConditions(vendorType, vendorId, departId, null, "order");
         if (VerifyUtil.isListEmpty(orders)) {
             return;
         }

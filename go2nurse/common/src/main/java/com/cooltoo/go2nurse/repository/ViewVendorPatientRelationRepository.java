@@ -19,18 +19,21 @@ public interface ViewVendorPatientRelationRepository extends JpaRepository<ViewV
     @Query("SELECT DISTINCT vvpr.userId, vvpr.patientId FROM ViewVendorPatientRelationEntity vvpr" +
             " WHERE (?1 IS NULL OR ?1=vvpr.vendorType)" +
             " AND   (?2 IS NULL OR ?2=vvpr.vendorId)" +
-            " AND   (?3 IS NULL OR ?3=vvpr.vendorDepartId)")
-    List<Object[]> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId);
+            " AND   (?3 IS NULL OR ?3=vvpr.vendorDepartId)" +
+            " AND   (?4 IS NULL OR (vvpr.userName LIKE %?4) OR (vvpr.patientName LIKE %?4))")
+    List<Object[]> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, String userOrPatientName);
     @Query("SELECT DISTINCT vvpr.userId, vvpr.patientId  FROM ViewVendorPatientRelationEntity vvpr" +
             " WHERE (?1 IS NULL OR ?1=vvpr.vendorType)" +
             " AND   (?2 IS NULL OR ?2=vvpr.vendorId)" +
-            " AND   (?3 IS NULL OR ?3=vvpr.vendorDepartId)")
-    List<Object[]> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, Sort sort);
+            " AND   (?3 IS NULL OR ?3=vvpr.vendorDepartId)" +
+            " AND   (?4 IS NULL OR (vvpr.userName LIKE %?4) OR (vvpr.patientName LIKE %?4))")
+    List<Object[]> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, String userOrPatientName, Sort sort);
     @Query("SELECT DISTINCT vvpr.userId, vvpr.patientId  FROM ViewVendorPatientRelationEntity vvpr" +
             " WHERE (?1 IS NULL OR ?1=vvpr.vendorType)" +
             " AND   (?2 IS NULL OR ?2=vvpr.vendorId)" +
-            " AND   (?3 IS NULL OR ?3=vvpr.vendorDepartId)")
-    Page<Object[]> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, Pageable page);
+            " AND   (?3 IS NULL OR ?3=vvpr.vendorDepartId)" +
+            " AND   (?4 IS NULL OR (vvpr.userName LIKE %?4) OR (vvpr.patientName LIKE %?4))")
+    Page<Object[]> findByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, String userOrPatientName, Pageable page);
 
 
 
@@ -38,6 +41,7 @@ public interface ViewVendorPatientRelationRepository extends JpaRepository<ViewV
             " WHERE (?1 IS NULL OR ?1=vvpr.vendorType)" +
             " AND   (?2 IS NULL OR ?2=vvpr.vendorId)" +
             " AND   (?3 IS NULL OR ?3=vvpr.vendorDepartId)" +
-            " AND   (?4 IS NULL OR vvpr.recordFrom LIKE ?4)")
-    List<Object[]> findRecordByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, String recordFrom);
+            " AND   (?4 IS NULL OR vvpr.recordFrom LIKE ?4)" +
+            " AND   (?5 IS NULL OR (vvpr.userName LIKE %?5) OR (vvpr.patientName LIKE %?5))")
+    List<Object[]> findRecordByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, String recordFrom, String userOrPatientName);
 }

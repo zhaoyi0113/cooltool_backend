@@ -343,14 +343,15 @@ public class VerifyUtil {
 
     public static String reconstructSQLContentLike(String contentLike) {
         if (VerifyUtil.isStringEmpty(contentLike)) {
-            contentLike = "%";
+            contentLike = "";
         }
         else {
             contentLike = contentLike.trim();
             StringBuilder fuzzyContent = new StringBuilder("%");
-            for (int i=0, count=contentLike.length(); i < count; i ++) {
-                fuzzyContent.append(contentLike.charAt(i)).append("%");
-            }
+//            for (int i=0, count=contentLike.length(); i < count; i ++) {
+//                fuzzyContent.append(contentLike.charAt(i)).append("%");
+//            }
+            fuzzyContent.append(contentLike).append("%");
             contentLike = fuzzyContent.toString();
         }
         return contentLike;

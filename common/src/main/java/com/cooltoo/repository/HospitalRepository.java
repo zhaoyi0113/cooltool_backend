@@ -25,28 +25,28 @@ public interface HospitalRepository extends CrudRepository<HospitalEntity, Integ
     List<HospitalEntity> findBySupportGo2nurse(int supportGo2nurse, Sort sort);
 
     @Query("FROM HospitalEntity h" +
-            " WHERE (?1 IS NOT NULL AND (h.name LIKE %?1% OR h.aliasName LIKE %?1%))" +
+            " WHERE (?1 IS NOT NULL AND (h.name LIKE %?1 OR h.aliasName LIKE %?1))" +
             " AND   (h.enable=1)" +
             " AND   (?2 IS NULL OR h.supportGo2nurse=?2)")
     List<HospitalEntity> findByNameLike(String nameLike, Integer supportGo2nurse);
 
     @Query("SELECT count(h.id) FROM HospitalEntity h" +
-            " WHERE (?1 IS NULL OR (h.name LIKE %?1% OR h.aliasName LIKE %?1%))" +
+            " WHERE (?1 IS NULL OR (h.name LIKE %?1 OR h.aliasName LIKE %?1))" +
             " AND (?2 IS NULL OR h.province=?2)" +
             " AND (?3 IS NULL OR h.city=?3)" +
             " AND (?4 IS NULL OR h.district=?4)" +
-            " AND (?5 IS NULL OR h.address LIKE %?5%)" +
+            " AND (?5 IS NULL OR h.address LIKE %?5)" +
             " AND (?6 IS NULL OR h.enable=?6)" +
             " AND (?7 IS NULL OR h.supportGo2nurse=?7)")
     long countByConditionsAND(String nameLike,
                               Integer province, Integer city, Integer district, String addressLike,
                               Integer enable, Integer supportGo2nurse);
     @Query("FROM HospitalEntity h" +
-            " WHERE (?1 IS NULL OR (h.name LIKE %?1% OR h.aliasName LIKE %?1%))" +
+            " WHERE (?1 IS NULL OR (h.name LIKE %?1 OR h.aliasName LIKE %?1))" +
             " AND (?2 IS NULL OR h.province=?2)" +
             " AND (?3 IS NULL OR h.city=?3)" +
             " AND (?4 IS NULL OR h.district=?4)" +
-            " AND (?5 IS NULL OR h.address LIKE %?5%)" +
+            " AND (?5 IS NULL OR h.address LIKE %?5)" +
             " AND (?6 IS NULL OR h.enable=?6)" +
             " AND (?7 IS NULL OR h.supportGo2nurse=?7)")
     Page<HospitalEntity> findByConditionsAND(String nameLike,
@@ -54,22 +54,22 @@ public interface HospitalRepository extends CrudRepository<HospitalEntity, Integ
                                              Integer enable, Integer supportGo2nurse, Pageable page);
 
     @Query("SELECT count(h.id) FROM HospitalEntity h" +
-            " WHERE (h.name LIKE %?1% OR h.aliasName LIKE %?1%)" +
+            " WHERE (h.name LIKE %?1 OR h.aliasName LIKE %?1)" +
             " OR (h.province=?2)" +
             " OR (h.city=?3)" +
             " OR (h.district=?4)" +
-            " OR (h.address LIKE %?5%)" +
+            " OR (h.address LIKE %?5)" +
             " OR (h.enable=?6)" +
             " OR (h.supportGo2nurse=?7)")
     long countByConditionsOR(String nameLike,
                              Integer province, Integer city, Integer district, String addressLike,
                              Integer enable, Integer supportGo2nurse);
     @Query("FROM HospitalEntity h" +
-            " WHERE (h.name LIKE %?1% OR h.aliasName LIKE %?1%)" +
+            " WHERE (h.name LIKE %?1 OR h.aliasName LIKE %?1)" +
             " OR (h.province=?2)" +
             " OR (h.city=?3)" +
             " OR (h.district=?4)" +
-            " OR (h.address LIKE %?5%)" +
+            " OR (h.address LIKE %?5)" +
             " OR (h.enable=?6)" +
             " OR (h.supportGo2nurse=?7)")
     Page<HospitalEntity> findByConditionsOR(String nameLike,
