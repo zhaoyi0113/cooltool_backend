@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.beans.NursePatientFollowUpBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.service.NursePatientFollowUpService;
 import com.cooltoo.go2nurse.service.PatientService;
+import com.cooltoo.go2nurse.service.UserPatientRelationService;
 import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
@@ -31,6 +32,7 @@ import java.util.Map;
 public class NursePatientFollowUpAPI {
 
     @Autowired private UserService userService;
+    @Autowired private UserPatientRelationService userPatientRelation;
     @Autowired private NursePatientFollowUpService patientFollowUpService;
     @Autowired private CommonNurseHospitalRelationService nurseHospitalRelation;
 
@@ -67,7 +69,8 @@ public class NursePatientFollowUpAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response addPatientFollowUp(@Context HttpServletRequest request,
-                                       @FormParam("user_code") @DefaultValue("0") String userUniqueId
+                                       @FormParam("user_id") @DefaultValue("0") String strUserId,
+                                       @FormParam("patient_id") @DefaultValue("0") String strPatientId
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         NurseHospitalRelationBean nurseHospital = nurseHospitalRelation.getRelationByNurseId(nurseId, null);
@@ -79,17 +82,9 @@ public class NursePatientFollowUpAPI {
             departmentId = nurseHospital.getDepartmentId();
         }
 
-
-        List<UserBean> users = userService.getUserByUniqueId(userUniqueId);
-        if (VerifyUtil.isListEmpty(users)) {
-            throw new com.cooltoo.exception.BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
-        }
-        if (users.size()>1) {
-            throw new com.cooltoo.exception.BadRequestException(ErrorCode.NURSE360_RESULT_NOT_EXPECTED);
-        }
-
-
-        long followUpId = patientFollowUpService.addPatientFollowUp(hospitalId, departmentId, nurseId, users.get(0).getId(), 0);
+        Long userId    = VerifyUtil.isIds(strUserId)    ? VerifyUtil.parseLongIds(strUserId).get(0)    : 0L;
+        Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : 0L;
+        long followUpId = patientFollowUpService.addPatientFollowUp(hospitalId, departmentId, nurseId, userId, patientId);
 
         Map<String, Long> map = new HashMap<>();
         map.put("id", followUpId);

@@ -49,6 +49,7 @@ public class NursePatientFollowUpService {
 
     @Autowired private UserService userService;
     @Autowired private PatientService patientService;
+    @Autowired private UserPatientRelationService userPatientRelation;
     @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
@@ -276,6 +277,10 @@ public class NursePatientFollowUpService {
         }
         if (!patientService.existPatient(patientId)) {
             patientId = 0;
+        }
+        if (patientId>0 && userPatientRelation.existRelation(userId, patientId)) {
+            logger.info("userId -- patientId do not has relation");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         hospitalId   = hospitalId<0 ? 0 : hospitalId;
         departmentId = departmentId<0 ? 0 : departmentId;

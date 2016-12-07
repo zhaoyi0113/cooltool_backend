@@ -95,7 +95,7 @@ public class PatientServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testCountAll() {
-        String name = "病人1";
+        String name = "病人%1";
         int gender = 1;
         String identity = "014";
         String mobile = "814";
@@ -114,7 +114,7 @@ public class PatientServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(4, count);
 
         count = service.countAll(name, gender, mobile, null, status);
-        Assert.assertEquals(2, count);
+        Assert.assertEquals(1, count);
 
         count = service.countAll(name, gender, mobile, identity, status);
         Assert.assertEquals(1, count);

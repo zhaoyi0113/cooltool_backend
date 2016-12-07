@@ -186,11 +186,11 @@ public class NurseServiceTest extends AbstractCooltooTest {
         count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "", null, null, null, null, null);
         Assert.assertEquals(5, count);
 
-        count = service.countByAuthorityAndFuzzyName("", "护士1", null, null, null, null, null);
+        count = service.countByAuthorityAndFuzzyName("", "护士%1", null, null, null, null, null);
         Assert.assertEquals(9, count);
-        count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "护士1", null, null, null, null, null);
+        count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "护士%1", null, null, null, null, null);
         Assert.assertEquals(4, count);
-        count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "护士1", null, null, null, null, null);
+        count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "护士%1", null, null, null, null, null);
         Assert.assertEquals(5, count);
     }
 
@@ -215,7 +215,7 @@ public class NurseServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testGetNurseIdsByName() {
-        String name = "护5";
+        String name = "护%5";
         List<Long> ids = service.getNurseIdsByName(name, 0, 5);
         Assert.assertEquals(2, ids.size());
         Assert.assertTrue(ids.contains(5L));

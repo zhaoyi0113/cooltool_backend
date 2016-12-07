@@ -163,11 +163,11 @@ public class UserServiceTest extends AbstractCooltooTest {
         count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "");
         Assert.assertEquals(5, count);
 
-        count = service.countByAuthorityAndFuzzyName("", "用户1");
+        count = service.countByAuthorityAndFuzzyName("", "用户%1");
         Assert.assertEquals(9, count);
-        count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "用户1");
+        count = service.countByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL.name(), "用户%1");
         Assert.assertEquals(4, count);
-        count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "用户1");
+        count = service.countByAuthorityAndFuzzyName(UserAuthority.DENY_ALL.name(), "用户%1");
         Assert.assertEquals(5, count);
     }
 

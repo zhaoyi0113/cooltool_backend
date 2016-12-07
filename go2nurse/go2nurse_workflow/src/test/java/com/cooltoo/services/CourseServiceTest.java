@@ -70,7 +70,7 @@ public class CourseServiceTest extends AbstractCooltooTest {
         count = service.countByNameLikeAndStatus(name, statusEdt);
         Assert.assertEquals(1, count);
 
-        name = "t2";
+        name = "t%2";
         count = service.countByNameLikeAndStatus(name, statusAll);
         Assert.assertEquals(4, count);
         count = service.countByNameLikeAndStatus(name, statusDis);

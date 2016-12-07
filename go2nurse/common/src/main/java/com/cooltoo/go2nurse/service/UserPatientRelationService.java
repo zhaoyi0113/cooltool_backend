@@ -13,6 +13,7 @@ import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,16 @@ public class UserPatientRelationService {
     //============================================================================
     //                 get
     //============================================================================
+    public boolean existRelation(long userId, long patientId) {
+        List<UserPatientRelationEntity> relations = repository.findByPatientIdAndUserId(patientId, userId, sort);
+        for (UserPatientRelationEntity tmp : relations) {
+            if (null!=tmp && CommonStatus.ENABLED.equals(tmp.getStatus())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Long> getPatientByUser(long lUserId, String strStatus) {
         logger.info("get patients by userId={} with status={}", lUserId, strStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
