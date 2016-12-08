@@ -6,6 +6,7 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserPatientRelationBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.service.PatientService;
 import com.cooltoo.go2nurse.service.UserPatientRelationService;
 import com.cooltoo.util.NumberUtil;
@@ -36,6 +37,8 @@ public class PatientAPI {
 
     @Autowired private PatientService service;
     @Autowired private UserPatientRelationService userPatientRelation;
+
+    @Autowired private WeChatService weChatService;
 
     @Path("/get_patient")
     @GET
@@ -132,8 +135,24 @@ public class PatientAPI {
                                  @FormDataParam("file") InputStream image,
                                  @FormDataParam("file") FormDataContentDisposition disposition
     ) {
-        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : 0L;
+        PatientBean patient = service.updateHeaderImage(patientId, imageName, image);
+        logger.info("upload successfully");
+        return Response.ok(patient).build();
+    }
+
+    @Path("/header_image_wx")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response addHeadPhotoFromWx(@Context HttpServletRequest request,
+                                 @FormDataParam("patient_id") @DefaultValue("0")  String strPatientId,
+                                 @FormDataParam("image_name") @DefaultValue("") String imageName,
+                                       @FormDataParam("image_id") String imageId
+    ) {
+        long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : 0L;
+        String accessToken = (String) request.getAttribute(ContextKeys.USER_ACCESS_TOKEN);
+        InputStream image = weChatService.downloadImageFromWX(accessToken, imageId);
         PatientBean patient = service.updateHeaderImage(patientId, imageName, image);
         logger.info("upload successfully");
         return Response.ok(patient).build();
