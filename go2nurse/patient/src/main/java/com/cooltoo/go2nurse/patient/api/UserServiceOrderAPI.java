@@ -194,6 +194,9 @@ public class UserServiceOrderAPI {
 
 
         Map<String, Object> returnValue = chargeWebHookService.webHookBody(request);
+        if (null==returnValue) {
+            return Response.ok().build();
+        }
 
         Object order = returnValue.get(ChargeWebHookService.ORDER);
         Object message = returnValue.get(ChargeWebHookService.MESSAGE);
