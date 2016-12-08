@@ -146,9 +146,9 @@ public class PatientAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addHeadPhotoFromWx(@Context HttpServletRequest request,
-                                 @FormDataParam("patient_id") @DefaultValue("0")  String strPatientId,
-                                 @FormDataParam("image_name") @DefaultValue("") String imageName,
-                                       @FormDataParam("image_id") String imageId
+                                 @FormParam("patient_id") @DefaultValue("0")  String strPatientId,
+                                 @FormParam("image_name") @DefaultValue("") String imageName,
+                                       @FormParam("image_id") String imageId
     ) {
         long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : 0L;
         String accessToken = (String) request.getAttribute(ContextKeys.USER_ACCESS_TOKEN);
