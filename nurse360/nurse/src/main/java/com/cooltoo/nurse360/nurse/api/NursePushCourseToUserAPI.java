@@ -99,11 +99,12 @@ public class NursePushCourseToUserAPI {
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getCoursesPushed(@Context HttpServletRequest request,
                                      @QueryParam("user_id") @DefaultValue("0") long userId,
+                                     @QueryParam("patient_id") @DefaultValue("0") long patientId,
                                      @QueryParam("index") @DefaultValue("0") int pageIndex,
                                      @QueryParam("number") @DefaultValue("0") int sizePerPage
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<NursePushCourseBean> coursesPushed = pushCourseService.getCoursePushed(nurseId, userId, null, pageIndex, sizePerPage, true);
+        List<NursePushCourseBean> coursesPushed = pushCourseService.getCoursePushed(nurseId, userId, patientId, pageIndex, sizePerPage, true);
         return Response.ok(coursesPushed).build();
     }
 
