@@ -96,15 +96,20 @@ public class UserAPI {
         }
         if (user.getHasDecide()!= UserHospitalizedStatus.IN_HOSPITAL) {
             Long groupId = diagnosticRelationService.getUserCurrentGroupId(userId);
-            List<UserDiagnosticPointRelationBean> relations = diagnosticRelationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.COMPLETED);
-            reExaminationService.addReExaminationByDiagnosticDates(userId, relations);
 
+            // leave hospital
             List<UserHospitalizedRelationBean> hospitalizedRelations = userHospitalizedRelationService.getUserHospitalizedRelationByGroupId(userId, groupId);
             if (!VerifyUtil.isListEmpty(hospitalizedRelations)) {
                 for (UserHospitalizedRelationBean tmp : hospitalizedRelations) {
                     userHospitalizedRelationService.updateRelation(tmp.getId(), false, userId, YesNoEnum.YES.name(), null);
                 }
             }
+
+            // diagnostic completed
+            List<UserDiagnosticPointRelationBean> relations = diagnosticRelationService.updateProcessStatusByUserAndGroup(userId, groupId, ProcessStatus.COMPLETED);
+
+            // add re-examination times
+            reExaminationService.addReExaminationByDiagnosticDates(userId, relations);
         }
         return Response.ok(user).build();
     }
