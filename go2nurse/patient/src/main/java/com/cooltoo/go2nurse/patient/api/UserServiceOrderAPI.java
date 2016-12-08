@@ -169,44 +169,43 @@ public class UserServiceOrderAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response pingPpWebhooksProtocolGet(@Context HttpServletRequest request) {
-        return pingPpWebhooksProtocolPost(request);
+        Object returnMassage = webhook(request);
+        if (returnMassage instanceof String) {
+            return Response.ok(returnMassage).build();
+        }
+        else {
+            return Response.ok().build();
+        }
     }
 
     @Path("/pingpp/webhooks")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response pingPpWebhooksProtocolPost(@Context HttpServletRequest request) {
-//        logger.info("receive web hooks");
-//        try {
-//            ServletInputStream inputStream = request.getInputStream();
-//            Reader reader = new InputStreamReader(inputStream);
-//            String body = CharStreams.toString(reader);
-//            logger.info("receive body "+body);
-//            if(body != null) {
-//                Event event = Event.GSON.fromJson(body, Event.class);
-//                Charge charge = (Charge) event.getData().getObject();
-//                orderService.orderChargeWebhooks(charge.getId(), event.getId(), body);
-//            }
-//        } catch (IOException e) {
-//            logger.error(e.getMessage(), e);
-//        }
-//        return Response.ok().build();
+        Object returnMassage = webhook(request);
+        if (returnMassage instanceof String) {
+            return Response.ok(returnMassage).build();
+        }
+        else {
+            return Response.ok().build();
+        }
+    }
 
-
+    private Object webhook(HttpServletRequest request) {
         Map<String, Object> returnValue = chargeWebHookService.webHookBody(request);
         if (null==returnValue) {
-            return Response.ok().build();
+            return null;
         }
 
         Object order = returnValue.get(ChargeWebHookService.ORDER);
         Object message = returnValue.get(ChargeWebHookService.MESSAGE);
-        if (VerifyUtil.isStringEmpty((String)message)) {
-            return Response.ok().build();
+        if (null==message || ((message instanceof String) && VerifyUtil.isStringEmpty((String)message))) {
+            return null;
         }
         else {
             if (null!=order && (order instanceof ServiceOrderBean) && OrderStatus.TO_DISPATCH.equals(((ServiceOrderBean)order).getOrderStatus())) {
                 ServiceOrderBean orderBean = (ServiceOrderBean)order;
-                notifierForAllModule.orderAlertToGo2nurseUser(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
+                // notifierForAllModule.orderAlertToGo2nurseUser(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
                 // need send message to Manager
                 ServiceVendorType vendorType = orderBean.getVendorType();
                 long vendorId = orderBean.getVendorId();
@@ -216,7 +215,7 @@ public class UserServiceOrderAPI {
                     notifierForAllModule.leanCloudRequestSmsCodeNewOrder(managerMobile, orderBean.getOrderNo());
                 }
             }
-            return Response.ok(returnValue).build();
+            return message;
         }
     }
 
