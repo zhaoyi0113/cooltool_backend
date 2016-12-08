@@ -119,7 +119,7 @@ public class HospitalOrderAPI {
                                                        @RequestParam(defaultValue = "0", name = "nurse_id") long nurseId
     ) {
         //dispatch or replace order's nurse
-        NurseOrderRelationBean nurseOrder = nurseOrderRelation.dispatchToNurse(nurseId, orderId);
+        NurseOrderRelationBean nurseOrder = nurseOrderRelation.dispatchToNurse(nurseId, orderId, true);
         return nurseOrder;
     }
 

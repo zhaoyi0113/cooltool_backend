@@ -86,7 +86,7 @@ public class NurseOrderAPI {
                               @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        Map<String, Long> orderRelativeIds = nurseOrderService.fetchOrder(nurseId, orderId);
+        Map<String, Long> orderRelativeIds = nurseOrderService.fetchOrder(nurseId, orderId, false);
 
         // add patient to nurse_patient_relation table
         Long userId = orderRelativeIds.get("user_id");

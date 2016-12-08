@@ -511,7 +511,7 @@ public class ServiceOrderService {
 
     @Transactional
     public ServiceOrderBean nurseFetchOrder(long orderId, boolean isAdminDispatch) {
-        logger.info("nurse fetch order={}", orderId);
+        logger.info("nurse fetch order={} isAdminDispatch={}", orderId, isAdminDispatch);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -520,7 +520,7 @@ public class ServiceOrderService {
             logger.info("the order is in status={}, can not be dispatch by administrator", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        else if (!OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
+        if (!isAdminDispatch && !OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be fetched", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

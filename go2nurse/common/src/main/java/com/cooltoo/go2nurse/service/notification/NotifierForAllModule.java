@@ -23,6 +23,7 @@ public class NotifierForAllModule {
 
     public static final String NEW_COURSE_ALERT_BODY = "你有一个新课程！";
     public static final String NEW_NOTIFICATION_ALERT_BODY = "你有一条新通知！";
+    public static final String NEW_ORDER_TO_DISPATCH_ALERT_BODY = "您有新订单，请尽快分派！";
     public static final String NEW_ORDER_ALERT_BODY = "有新订单，快来抢！";
     public static final String ORDER_ALERT_BODY = "订单状态有更新";
     public static final String APPOINTMENT_ALERT_BODY = "预约状态有更新";
@@ -105,6 +106,25 @@ public class NotifierForAllModule {
                     VerifyUtil.isStringEmpty(description) ? ("order " + orderStatus.name().toLowerCase() + "!") : description
             );
 
+            StringBuilder msg = messageBean.toHtmlParam();
+            msg.append("&nurse_id=0");
+            for (Long tmpId : nurseIds) {
+                msg.append(",").append(tmpId);
+            }
+            NetworkUtil.newInstance().httpsRequest(nurse360NotifierUrl, "PUT", msg.toString());
+        }
+    }
+
+    public void newOrderToDispatchAlertToNurse360(List<Long> nurseIds, long orderId, OrderStatus orderStatus, String description) {
+        MessageBean messageBean = notifier.createMessage(
+                MessageType.ORDER,
+                NEW_ORDER_TO_DISPATCH_ALERT_BODY,
+                orderId,
+                orderStatus.name(),
+                VerifyUtil.isStringEmpty(description) ? ("order " + orderStatus.name().toLowerCase() + "!") : description
+        );
+
+        if (null!=nurseIds && !nurseIds.isEmpty()) {
             StringBuilder msg = messageBean.toHtmlParam();
             msg.append("&nurse_id=0");
             for (Long tmpId : nurseIds) {

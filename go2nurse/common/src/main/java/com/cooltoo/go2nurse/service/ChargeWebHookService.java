@@ -80,7 +80,7 @@ public class ChargeWebHookService {
 
             Map<String, Object> returnValue = new HashMap<>();
             returnValue.put(ORDER, order);
-            returnValue.put(MESSAGE, body);
+            returnValue.put(MESSAGE, event);
             return returnValue;
         }
 

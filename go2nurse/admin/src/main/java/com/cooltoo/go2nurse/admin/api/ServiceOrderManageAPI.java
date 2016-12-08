@@ -183,7 +183,7 @@ public class ServiceOrderManageAPI {
                                          @FormParam("nurse_id") @DefaultValue("0") long nurseId
     ) {
         //dispatch or replace order's nurse
-        NurseOrderRelationBean nurseOrder = nurseOrderRelation.dispatchToNurse(nurseId, orderId);
+        NurseOrderRelationBean nurseOrder = nurseOrderRelation.dispatchToNurse(nurseId, orderId, true);
         return Response.ok(nurseOrder).build();
     }
 
