@@ -16,6 +16,7 @@ import com.cooltoo.go2nurse.service.ConsultationCategoryService;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
+import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
 import com.cooltoo.services.NurseExtensionService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -42,6 +43,7 @@ public class NurseConsultationAPI {
     @Autowired private UserConsultationService userConsultationService;
     @Autowired private NurseExtensionService nurseExtensionService;
     @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private NursePatientRelationServiceForNurse360 nursePatientRelation;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -235,6 +237,13 @@ public class NurseConsultationAPI {
         }
         else {
             notifierForAllModule.consultationAlertToGo2nurseUser(userId, consultationId, talkStatus, talkContent);
+        }
+
+        // add patient to nurse_patient_relation table
+        Long patientId = talkReturn.get(UserConsultationService.PATIENT_ID);
+        if (null!=userId) {
+            patientId = null==patientId ? 0 : patientId;
+            nursePatientRelation.addUserPatientToNurse(nurseId, patientId, userId);
         }
 
         Map<String, Long> returnValue = new HashMap<>();

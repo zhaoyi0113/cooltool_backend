@@ -40,6 +40,7 @@ public class UserConsultationService {
     public static final String TALK_ID = "talk_id";
     public static final String USER_ID = "user_id";
     public static final String NURSE_ID = "nurse_id";
+    public static final String PATIENT_ID = "patient_id";
 
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "time"),
@@ -567,6 +568,7 @@ public class UserConsultationService {
         returnValue.put(TALK_ID, talkId);
         returnValue.put(NURSE_ID, nurseId);
         returnValue.put(USER_ID, consultation.getUserId());
+        returnValue.put(PATIENT_ID, consultation.getPatientId());
         return returnValue;
     }
 

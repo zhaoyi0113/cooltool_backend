@@ -349,7 +349,7 @@ public class NurseOrderRelationService {
     //                 add
     //============================================================================
     @Transactional
-    public long fetchOrder(long nurseId, long orderId) {
+    public Map<String, Long> fetchOrder(long nurseId, long orderId) {
         logger.info("nurse={} fetches order={}", orderId, nurseId);
         if (!orderService.existOrder(orderId)) {
             logger.info("order not exist");
@@ -388,9 +388,13 @@ public class NurseOrderRelationService {
         ServiceOrderBean order = orderService.nurseFetchOrder(orderId, false);
         notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order fetched!");
 
+
         NurseOrderRelationBean bean = beanConverter.convert(entity);
         logger.info("add relation={}", bean);
-        return bean.getNurseId();
+        Map<String, Long> returnVal = new HashMap<>();
+        returnVal.put("user_id", order.getUserId());
+        returnVal.put("patient_id", order.getPatientId());
+        return returnVal;
     }
 
     //============================================================================

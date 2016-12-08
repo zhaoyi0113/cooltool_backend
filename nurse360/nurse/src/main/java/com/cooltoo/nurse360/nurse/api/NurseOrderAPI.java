@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.go2nurse.service.NurseOrderRelationService;
+import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
 import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 16/10/8.
@@ -26,6 +28,7 @@ public class NurseOrderAPI {
     @Autowired private NurseOrderRelationService nurseOrderService;
     @Autowired private NurseServiceForNurse360 nurseService;
     @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private NursePatientRelationServiceForNurse360 nursePatientRelation;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -83,7 +86,15 @@ public class NurseOrderAPI {
                               @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        nurseOrderService.fetchOrder(nurseId, orderId);
+        Map<String, Long> orderRelativeIds = nurseOrderService.fetchOrder(nurseId, orderId);
+
+        // add patient to nurse_patient_relation table
+        Long userId = orderRelativeIds.get("user_id");
+        Long patientId = orderRelativeIds.get("patient_id");
+        if (null!=userId) {
+            patientId = null==patientId ? 0 : patientId;
+            nursePatientRelation.addUserPatientToNurse(nurseId, patientId, userId);
+        }
         return Response.ok().build();
     }
 
