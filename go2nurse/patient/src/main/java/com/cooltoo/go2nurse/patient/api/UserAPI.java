@@ -2,7 +2,7 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.go2nurse.beans.PatientBean;
+//import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.beans.UserDiagnosticPointRelationBean;
 import com.cooltoo.go2nurse.beans.UserHospitalizedRelationBean;
@@ -37,8 +37,8 @@ public class UserAPI {
     private static final Logger logger = LoggerFactory.getLogger(UserAPI.class.getName());
 
     @Autowired private UserService service;
-    @Autowired private UserPatientRelationService userPatientRelationService;
-    @Autowired private PatientService patientService;
+//    @Autowired private UserPatientRelationService userPatientRelationService;
+//    @Autowired private PatientService patientService;
     @Autowired private UserDiagnosticPointRelationService diagnosticRelationService;
     @Autowired private UserReExaminationDateService reExaminationService;
     @Autowired private UserHospitalizedRelationService userHospitalizedRelationService;
@@ -62,8 +62,9 @@ public class UserAPI {
         UserBean userBean = service.registerUser(name, gender, birthday, mobile, password, smsCode, hasDecide, channel, channelid, openid);
 
         // add default patient
-        PatientBean patientBean = patientService.create(name, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES, YesNoEnum.YES);
-        userPatientRelationService.addPatientToUser(patientBean.getId(), userBean.getId());
+//        String patientName = VerifyUtil.isStringEmpty(name) ? mobile : name;
+//        PatientBean patientBean = patientService.create(patientName, gender, userBean.getBirthday(), "", mobile, YesNoEnum.YES, YesNoEnum.YES);
+//        userPatientRelationService.addPatientToUser(patientBean.getId(), userBean.getId());
 
         // add HOSPITALIZED_DATE diagnostic point datetime when hasDecide is IN_HOSPITAL
         if (UserHospitalizedStatus.IN_HOSPITAL.equals(userBean.getHasDecide())) {
