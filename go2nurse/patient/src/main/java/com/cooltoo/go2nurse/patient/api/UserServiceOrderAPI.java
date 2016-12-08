@@ -165,6 +165,19 @@ public class UserServiceOrderAPI {
         return Response.ok(charge).build();
     }
 
+//@Path("/pingpp/webhooks/test")
+//@GET
+//@Produces(MediaType.APPLICATION_JSON)
+//public Response testSendMsg(@QueryParam("hospitalid") int hospitalId,
+//                            @QueryParam("departmentid") int departmentId
+//) {
+//    List<String> managerMobile = nurseService.getManagerMobiles(hospitalId, departmentId);
+//    notifierForAllModule.leanCloudRequestSmsCodeNewOrder(managerMobile, "M2356543676655765");
+//    List<Long> managerId = nurseService.getManagerId(hospitalId, departmentId);
+//    notifierForAllModule.newOrderToDispatchAlertToNurse360(managerId, 1, OrderStatus.TO_DISPATCH, "new order created!!");
+//    return Response.ok().build();
+//}
+
     @Path("/pingpp/webhooks")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -213,6 +226,8 @@ public class UserServiceOrderAPI {
                 if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
                     List<String> managerMobile = nurseService.getManagerMobiles((int)vendorId, (int)departId);
                     notifierForAllModule.leanCloudRequestSmsCodeNewOrder(managerMobile, orderBean.getOrderNo());
+                    List<Long> managerId = nurseService.getManagerId((int)vendorId, (int)departId);
+                    notifierForAllModule.newOrderToDispatchAlertToNurse360(managerId, orderBean.getId(), orderBean.getOrderStatus(), "new order created!!");
                 }
             }
             return message;
