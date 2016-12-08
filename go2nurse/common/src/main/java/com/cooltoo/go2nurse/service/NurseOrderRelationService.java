@@ -226,7 +226,7 @@ public class NurseOrderRelationService {
     //         administrator usage
     //=================================
     @Transactional
-    public NurseOrderRelationBean dispatchToNurse(long nurseId, long orderId) {
+    public NurseOrderRelationBean dispatchToNurse(long nurseId, long orderId, boolean isAdminToDispatch) {
         logger.info("dispatch order={} to nurse={}", orderId, nurseId);
         if (!orderService.existOrder(orderId)) {
             logger.info("order not exist");
@@ -267,7 +267,7 @@ public class NurseOrderRelationService {
         }
 
         // update order status
-        ServiceOrderBean order = orderService.nurseFetchOrder(orderId, true);
+        ServiceOrderBean order = orderService.nurseFetchOrder(orderId, isAdminToDispatch);
         notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order dispatched by manager!");
         notifierForAllModule.orderAlertToNurse360(entity.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to you!");
         if (null!=original && original.getNurseId()!=nurseId) {
@@ -349,7 +349,7 @@ public class NurseOrderRelationService {
     //                 add
     //============================================================================
     @Transactional
-    public Map<String, Long> fetchOrder(long nurseId, long orderId) {
+    public Map<String, Long> fetchOrder(long nurseId, long orderId, boolean isAdminToDispatch) {
         logger.info("nurse={} fetches order={}", orderId, nurseId);
         if (!orderService.existOrder(orderId)) {
             logger.info("order not exist");
@@ -385,7 +385,7 @@ public class NurseOrderRelationService {
         }
 
         // update order status
-        ServiceOrderBean order = orderService.nurseFetchOrder(orderId, false);
+        ServiceOrderBean order = orderService.nurseFetchOrder(orderId, isAdminToDispatch);
         notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order fetched!");
 
 
