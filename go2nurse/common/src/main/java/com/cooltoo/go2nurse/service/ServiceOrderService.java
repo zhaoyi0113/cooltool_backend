@@ -520,7 +520,7 @@ public class ServiceOrderService {
             logger.info("the order is in status={}, can not be dispatch by administrator", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        else if (!OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
+        if (!isAdminDispatch && !OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be fetched", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
