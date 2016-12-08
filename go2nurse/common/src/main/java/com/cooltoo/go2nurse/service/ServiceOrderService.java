@@ -511,7 +511,7 @@ public class ServiceOrderService {
 
     @Transactional
     public ServiceOrderBean nurseFetchOrder(long orderId, boolean isAdminDispatch) {
-        logger.info("nurse fetch order={}", orderId);
+        logger.info("nurse fetch order={} isAdminDispatch={}", orderId, isAdminDispatch);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
