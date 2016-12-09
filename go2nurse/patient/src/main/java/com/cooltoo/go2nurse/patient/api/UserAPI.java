@@ -42,6 +42,7 @@ public class UserAPI {
     @Autowired private UserDiagnosticPointRelationService diagnosticRelationService;
     @Autowired private UserReExaminationDateService reExaminationService;
     @Autowired private UserHospitalizedRelationService userHospitalizedRelationService;
+    @Autowired private UserCurrentVisitService userCurrentVisitService;
 
     @POST
     @Path("/register")
@@ -96,6 +97,9 @@ public class UserAPI {
             return Response.ok().build();
         }
         if (user.getHasDecide()!= UserHospitalizedStatus.IN_HOSPITAL) {
+            // reset current_visit to hospitalized_date
+            userCurrentVisitService.setUserCurrentVisit(userId, DiagnosticEnumeration.HOSPITALIZED_DATE);
+
             Long groupId = diagnosticRelationService.getUserCurrentGroupId(userId);
 
             // leave hospital
