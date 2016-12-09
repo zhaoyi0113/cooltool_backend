@@ -75,6 +75,7 @@ public enum ErrorCode {
     PAY_FAILED(260, Response.Status.BAD_REQUEST, "支付失败", "Payment failed"),
     OPENID_INVALID(261, Response.Status.BAD_GATEWAY, "Openid 不存在", "Openid Invalid"),
     USER_FORBIDDEN_BY_VENDOR(262, Response.Status.BAD_REQUEST, "服务商屏蔽了用户", "User is forbidden by vendor"),
+    NEED_VISIT_PATIENT_RECORD(263, Response.Status.BAD_REQUEST, "服务员未设置出诊记录", "Server not set record of visiting patient"),
 
 
 

@@ -595,7 +595,7 @@ public class ServiceOrderService {
         if (YesNoEnum.YES.equals(entity.getNeedVisitPatientRecord())
         && !nurseVisitPatientService.isRecordForOrder(orderId)) {
             logger.error("order need record visit patient record and patient sign!");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.NEED_VISIT_PATIENT_RECORD);
         }
 
         entity.setOrderStatus(OrderStatus.COMPLETED);

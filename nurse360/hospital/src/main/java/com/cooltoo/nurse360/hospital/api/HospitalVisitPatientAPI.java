@@ -8,10 +8,7 @@ import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
@@ -146,5 +143,13 @@ public class HospitalVisitPatientAPI {
         List<NurseVisitPatientBean> count;
         count = visitPatientService.getVisitRecordByCondition(userId, patientId, null, null, null, null, null, pageIndex, sizePerPage);
         return count;
+    }
+
+    @RequestMapping(path = "/visit/patient/{visit_patient_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public NurseVisitPatientBean getVisitPatient(HttpServletRequest request,
+                                                 @PathVariable long visit_patient_id
+    ) {
+        NurseVisitPatientBean visitPatient = visitPatientService.getVisitRecord(visit_patient_id);
+        return visitPatient;
     }
 }

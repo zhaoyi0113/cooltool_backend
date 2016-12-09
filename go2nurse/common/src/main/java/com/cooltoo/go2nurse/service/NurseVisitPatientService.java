@@ -52,7 +52,6 @@ public class NurseVisitPatientService {
     @Autowired private UserGo2NurseFileStorageService userFileStorage;
     @Autowired private Go2NurseUtility utility;
 
-    @Autowired private Notifier notifier;
 
     private JSONUtil jsonUtil = JSONUtil.newInstance();
 
@@ -207,6 +206,7 @@ public class NurseVisitPatientService {
         List<Long> nurseIds = new ArrayList<>();
         List<Long> visitRecordIds = new ArrayList<>();
         List<Long> patientSignId = new ArrayList<>();
+        List<Long> orderIds = new ArrayList<>();
         for (NurseVisitPatientBean tmp : beans) {
             if (!userIds.contains(tmp.getUserId())) {
                 userIds.add(tmp.getUserId());
@@ -223,6 +223,9 @@ public class NurseVisitPatientService {
             if (!patientSignId.contains(tmp.getPatientSign())) {
                 patientSignId.add(tmp.getPatientSign());
             }
+            if (!orderIds.contains(tmp.getOrder())) {
+                orderIds.add(tmp.getOrderId());
+            }
         }
 
         Map<Long, UserBean> userIdToBean = userService.getUserIdToBean(userIds);
@@ -230,6 +233,14 @@ public class NurseVisitPatientService {
         Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
         Map<Long, List<String>> visitRecordImage = imageService.getNurseVisitPatientImagesUrl(visitRecordIds);
         Map<Long, String> patientSignImage = imageService.getNurseVisitPatientImageIdToUrl(patientSignId);
+        List<ServiceOrderBean> orders = orderService.getOrderByIds(orderIds);
+        Map<Long, ServiceOrderBean> orderIdToBean = new HashMap<>();
+        if (!VerifyUtil.isListEmpty(orders)) {
+            for (ServiceOrderBean tmp : orders) {
+                if (null==tmp) { continue; }
+                orderIdToBean.put(tmp.getId(), tmp);
+            }
+        }
 
         // fill properties
         for (NurseVisitPatientBean tmp : beans) {
@@ -244,6 +255,8 @@ public class NurseVisitPatientService {
             String patientSign = patientSignImage.get(tmp.getPatientSign());
             tmp.setPatientSignUrl(null==patientSign ? "" : patientSign);
             tmp.setServiceItems(jsonUtil.parseJsonList(tmp.getServiceItem(), NurseVisitPatientServiceItemBean.class));
+            ServiceOrderBean order = orderIdToBean.get(tmp.getOrderId());
+            tmp.setOrder(order);
         }
     }
 
