@@ -3,7 +3,6 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.util.VerifyUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -29,6 +28,7 @@ public class CasebookBean {
     private int hospitalId;
     private int departmentId;
     private Date recentRecordTime;
+    private YesNoEnum hidden;
 
     public long getId() {
         return id;
@@ -151,6 +151,13 @@ public class CasebookBean {
         this.recentRecordTime = recentRecordTime;
     }
 
+    public YesNoEnum getHidden() {
+        return hidden;
+    }
+    public void setHidden(YesNoEnum hidden) {
+        this.hidden = hidden;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -162,6 +169,7 @@ public class CasebookBean {
         msg.append(", nurseId=").append(nurseId);
         msg.append(", name=").append(name);
         msg.append(", description=").append(description);
+        msg.append(", hidden=").append(hidden);
         msg.append(", caseSize=").append(caseSize);
         msg.append(", caseLastRecordTime=").append(recentRecordTime);
         msg.append(", status=").append(status);

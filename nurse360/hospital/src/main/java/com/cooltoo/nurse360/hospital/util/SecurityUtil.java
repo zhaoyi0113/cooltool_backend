@@ -1,5 +1,7 @@
 package com.cooltoo.nurse360.hospital.util;
 
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.nurse360.beans.HospitalAdminAuthentication;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.util.VerifyUtil;
@@ -21,7 +23,7 @@ public class SecurityUtil {
                 return (HospitalAdminUserDetails) adminAuthentication.getDetails();
             }
         }
-        return null;
+        throw new BadRequestException(ErrorCode.NURSE360_ACCOUNT_TOKEN_NOT_FOUND);
     }
 
     public Integer[] getHospitalDepartment(String strHospitalId, String strDepartmentId, HospitalAdminUserDetails userDetails) {

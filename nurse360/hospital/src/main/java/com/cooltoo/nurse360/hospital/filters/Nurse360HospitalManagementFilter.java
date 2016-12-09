@@ -69,6 +69,9 @@ public class Nurse360HospitalManagementFilter extends GenericFilterBean {
                 HospitalAdminAuthentication authentication = new HospitalAdminAuthentication(userDetails);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+            else {
+                SecurityContextHolder.getContext().setAuthentication(null);
+            }
         }
         chain.doFilter(request, response);
     }

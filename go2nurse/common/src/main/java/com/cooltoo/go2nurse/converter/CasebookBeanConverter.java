@@ -23,6 +23,7 @@ public class CasebookBeanConverter implements Converter<CasebookEntity, Casebook
         bean.setNurseId(source.getNurseId());
         bean.setHospitalId(source.getHospitalId());
         bean.setDepartmentId(source.getDepartmentId());
+        bean.setHidden(source.getHidden());
         return bean;
     }
 }

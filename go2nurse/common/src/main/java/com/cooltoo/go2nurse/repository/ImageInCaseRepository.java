@@ -18,6 +18,8 @@ public interface ImageInCaseRepository extends JpaRepository<ImageInCaseEntity, 
             " AND (?2 IS NULL OR iiuc.caseId=?2)")
     long countByCasebookIdAndCaseId(Long casebookId, Long caseId);
 
+    long countByCasebookIdAndCaseIdAndImageId(long casebookId, long caseId, long imageId);
+
     List<ImageInCaseEntity> findByCasebookId(Long casebookId, Sort sort);
     List<ImageInCaseEntity> findByCaseIdIn(List<Long> talkIds);
     List<ImageInCaseEntity> findByCasebookId(Long consultationId);

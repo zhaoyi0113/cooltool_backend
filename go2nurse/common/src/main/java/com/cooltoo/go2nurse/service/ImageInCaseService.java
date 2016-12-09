@@ -37,6 +37,11 @@ public class ImageInCaseService {
     //================================================================
     //            get
     //================================================================
+    public boolean existImage(long casebookId, long caseId, long imageId) {
+        long count = repository.countByCasebookIdAndCaseIdAndImageId(casebookId, caseId, imageId);
+        return count>0;
+    }
+
     public long countImage(Long casebookId, Long caseId) {
         long count = repository.countByCasebookIdAndCaseId(casebookId, caseId);
         logger.info("count by casebookId={} caseId={} count={}", casebookId, caseId, count);

@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
@@ -81,33 +82,44 @@ public class CasebookService {
     //===============================================================
     //             get ----  patient using
     //===============================================================
+    public long countUserCasebook(Long otherNurseId, Long userId, Long patientId,
+                                  String contentLike,
+                                  Integer hospitalId, Integer departmentId,
+                                  Long nurseSelfId, YesNoEnum nurseSelfHidden
+    ) {
+        contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
+        long count = repository.countNurseCasebookByConditions(otherNurseId, userId, patientId, contentLike, CommonStatus.DELETED, hospitalId, departmentId, nurseSelfId, nurseSelfHidden);
+        logger.info("count casebook otherNurseId={} user={} patientId={} contentLike={} hospitalId={} departmentId={} nurseSelfId={} nurseSelfHidden={}, count is {}",
+                userId, patientId, otherNurseId, contentLike, hospitalId, departmentId, nurseSelfId, nurseSelfHidden, count);
+        return count;
+    }
 
-    public List<CasebookBean> getUserCasebook(Long userId, Long patientId, Long nurseId, String contentLike, int pageIndex, int sizePerPage) {
-        logger.info("user={} patient={} nurse={} get casebook (contentLike={}) at page={} sizePerPage={}",
-                userId, patientId, nurseId, contentLike, pageIndex, sizePerPage);
+    public List<CasebookBean> getUserCasebook(Long otherNurseId, Long userId, Long patientId,
+                                              String contentLike,
+                                              Integer hospitalId, Integer departmentId,
+                                              Long nurseSelfId, YesNoEnum nurseSelfHidden,
+                                              int pageIndex, int sizePerPage
+    ) {
+        logger.info("get casebook otherNurseId={} user={} patientId={} contentLike={} hospitalId={} departmentId={} nurseSelfId={} nurseSelfHidden={} at page={} sizePerPage={}",
+                userId, patientId, otherNurseId, contentLike, hospitalId, departmentId, nurseSelfId, nurseSelfHidden, pageIndex, sizePerPage);
+
         List<CasebookBean> beans;
-        if (null==userId && VerifyUtil.isStringEmpty(contentLike)) {
+        if (null==otherNurseId && null==userId && null==patientId
+                && VerifyUtil.isStringEmpty(contentLike)
+                && null==hospitalId && null==departmentId
+                && null==nurseSelfId && null==nurseSelfHidden) {
             beans = new ArrayList<>();
         }
         else {
             contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
             PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-            Page<CasebookEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, patientId, nurseId, CommonStatus.DELETED, contentLike, request);
+            Page<CasebookEntity> resultSet = repository.findNurseCasebookByConditions(otherNurseId, userId, patientId, contentLike, CommonStatus.DELETED, hospitalId, departmentId, nurseSelfId, nurseSelfHidden, request);
             beans = entitiesToBeansForCasebook(resultSet);
             fillOtherPropertiesForCasebook(beans);
         }
-        logger.warn("casebook count={}", beans.size());
-        return beans;
-    }
 
-    public List<CasebookBean> getUserCasebook(Long userId, Long patientId, Long nurseId, int pageIndex, int sizePerPage) {
-        logger.info("user={} patient={} get casebook nurseId={} at page={} sizePerPage={}", userId, patientId, nurseId, pageIndex, sizePerPage);
-        List<CasebookBean> beans;
-        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<CasebookEntity> resultSet = repository.findByUserIdAndStatusNotAndNurseId(userId, patientId, CommonStatus.DELETED, nurseId, request);
-        beans = entitiesToBeansForCasebook(resultSet);
-        fillOtherPropertiesForCasebook(beans);
-        logger.warn("casebook count={}", beans.size());
+        logger.info("get casebook count={}", beans.size());
+
         return beans;
     }
 
@@ -262,7 +274,7 @@ public class CasebookService {
     }
 
     @Transactional
-    public CasebookBean updateCasebook(Long nurseId, Long casebookId, String name, String description) {
+    public CasebookBean updateCasebook(Long nurseId, Long casebookId, String name, String description, YesNoEnum hidden) {
         logger.info("update casebook={} with name={} description={} nurseId={}",
                 casebookId, name, description, nurseId);
         CasebookEntity entity = repository.findOne(casebookId);
@@ -285,6 +297,10 @@ public class CasebookService {
             entity.setDescription(description.trim());
             changed = true;
         }
+        if (null!=hidden && !hidden.equals(entity.getHidden())) {
+            entity.setHidden(hidden);
+            changed = true;
+        }
         if (changed) {
             entity = repository.save(entity);
         }
@@ -299,7 +315,7 @@ public class CasebookService {
     //             add
     //===============================================================
     @Transactional
-    public long addCasebook(int hospitalId, int departmentId, long nurseId, long userId, long patientId, String description, String name) {
+    public long addCasebook(int hospitalId, int departmentId, long nurseId, long userId, long patientId, String description, String name, YesNoEnum hidden) {
         logger.info("add casebook with nurseId={} userId={} patientId={} description={} name={}",
                 nurseId, userId, patientId, description, (null!=name));
 
@@ -347,6 +363,7 @@ public class CasebookService {
         entity.setPatientId(patientId);
         entity.setDescription(description.trim());
         entity.setName(name);
+        entity.setHidden(null==hidden ? YesNoEnum.NO : hidden);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = repository.save(entity);
@@ -365,10 +382,11 @@ public class CasebookService {
     //=======================================
     public CaseBean getCaseById(Long caseId) {
         CaseBean caseBean = caseService.getCaseWithoutInfoById(caseId);
-        if (null!=caseBean) {
-            List<CaseBean> caseBeans = Arrays.asList(new CaseBean[]{caseBean});
-            fillOtherPropertiesForCase(caseBean.getCasebookId(), caseBeans);
+        if (null==caseBean) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
+        List<CaseBean> caseBeans = Arrays.asList(new CaseBean[]{caseBean});
+        fillOtherPropertiesForCase(caseBean.getCasebookId(), caseBeans);
         return caseBean;
     }
 
@@ -409,8 +427,16 @@ public class CasebookService {
     //           deleting
     //=======================================
     @Transactional
-    public List<Long> deleteCase(List<Long> caseIds) {
-        List<Long> deletedIds = caseService.deleteByIds(caseIds);
+    public List<Long> deleteCase(Long nurseId, long caseId) {
+        CaseBean _case = getCaseById(caseId);
+        CasebookBean casebook = getCasebook(_case.getCasebookId());
+        if (null!=nurseId /* 不是管理员/护士长 */
+                && nurseId!=_case.getNurseId()   /* 不是 case 的创建者 */
+                && nurseId!=casebook.getNurseId()/* 不是 book 的创建者 */
+        ) {
+            throw new BadRequestException(ErrorCode.AUTHENTICATION_FORBIDDEN);
+        }
+        List<Long> deletedIds = caseService.deleteByIds(Arrays.asList(new Long[]{caseId}));
         return deletedIds;
     }
 
@@ -439,9 +465,9 @@ public class CasebookService {
     //           updating
     //=======================================
     @Transactional
-    public long updateCase(long caseId, String caseRecord) {
+    public long updateCase(Long nurseId, long caseId, String caseRecord) {
         logger.info("update case caseId={} caseRecord={}.", caseId, caseRecord);
-        caseService.updateCase(caseId, caseRecord);
+        caseService.updateCase(nurseId, caseId, caseRecord);
         return caseId;
     }
 
@@ -457,13 +483,13 @@ public class CasebookService {
         CaseBean _case = caseService.getCaseWithoutInfoById(caseId);
         if (null==_case) {
             logger.error("case is not exist");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (_case.getCasebookId() != casebookId) {
             logger.error("case is not belong to casebook");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (null==nurseId && nurseId!=_case.getNurseId()) {
+        if (null!=nurseId && nurseId!=_case.getNurseId()) {
             logger.error("case is not belong to nurse");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -488,13 +514,13 @@ public class CasebookService {
         CaseBean _case = caseService.getCaseWithoutInfoById(caseId);
         if (null==_case) {
             logger.error("case is not exist");
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         if (_case.getCasebookId() != casebookId) {
             logger.error("case is not belong to casebook");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (null==nurseId && nurseId!=_case.getNurseId()) {
+        if (null!=nurseId && nurseId!=_case.getNurseId()) {
             logger.error("case is not belong to nurse");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -504,7 +530,29 @@ public class CasebookService {
     }
 
     @Transactional
-    public List<Long> deleteCaseImage(long imageId) {
+    public List<Long> deleteCaseImage(Long nurseId, long casebookId, long caseId, long imageId) {
+        CasebookEntity casebook = repository.findOne(casebookId);
+        if (null==casebook) {
+            logger.error("casebook is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        CaseBean _case = caseService.getCaseWithoutInfoById(caseId);
+        if (null==_case) {
+            logger.error("case is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (_case.getCasebookId() != casebookId) {
+            logger.error("case is not belong to casebook");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (null!=nurseId && nurseId!=_case.getNurseId()) {
+            logger.error("case is not belong to nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (!imageService.existImage(casebookId, caseId, imageId)) {
+            logger.error("image is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
         List<Long> imageIds = imageService.deleteByImageIds(Arrays.asList(new Long[]{imageId}));
         return imageIds;
     }

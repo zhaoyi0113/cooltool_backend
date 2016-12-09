@@ -37,7 +37,6 @@ public class CaseService {
 
     @Autowired private CasebookRepository casebookRepository;
     @Autowired private NurseRepository nurseRepository;
-    @Autowired private NurseServiceForGo2Nurse nurseService;
 
 
     //==================================================================
@@ -189,12 +188,16 @@ public class CaseService {
     //                           updating
     //==================================================================
     @Transactional
-    public long updateCase(long caseId, String caseRecord) {
-        logger.info("update case by caseId={} caseRecord={}.", caseId, caseRecord);
+    public long updateCase(Long nurseId, long caseId, String caseRecord) {
+        logger.info("update case by nurseId={} caseId={} caseRecord={}.", nurseId, caseId, caseRecord);
         CaseEntity _case = repository.findOne(caseId);
         if (null==_case) {
             logger.error("case not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (null!=nurseId && nurseId!=_case.getNurseId()) {
+            logger.error("case not belong this nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         boolean changed = false;
         if (!VerifyUtil.isStringEmpty(caseRecord) && !caseRecord.trim().equals(_case.getCaseRecord())) {

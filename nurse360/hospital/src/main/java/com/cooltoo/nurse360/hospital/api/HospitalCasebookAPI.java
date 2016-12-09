@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.hospital.api;
 
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.CaseBean;
 import com.cooltoo.go2nurse.beans.CasebookBean;
 import com.cooltoo.go2nurse.service.CasebookService;
@@ -16,10 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 2016/11/25.
@@ -81,8 +79,11 @@ public class HospitalCasebookAPI {
         Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
         Integer hospitalId   = tmp[0];
         Integer departmentId = tmp[1];
+        if (userDetails.isAdmin()) {
+            return 0;
+        }
         Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
-        long count = casebookService.countCasebookByCondition(userId, patientId, null, null, hospitalId, departmentId);
+        long count = casebookService.countUserCasebook(null, userId, patientId, null, hospitalId, departmentId, userDetails.getId(), null);
         return count;
     }
 
@@ -97,8 +98,11 @@ public class HospitalCasebookAPI {
         Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
         Integer hospitalId   = tmp[0];
         Integer departmentId = tmp[1];
+        if (userDetails.isAdmin()) {
+            return new ArrayList<>();
+        }
         Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
-        List<CasebookBean> casebook = casebookService.getCasebookByCondition(userId, patientId, null, null, hospitalId, departmentId, pageIndex, sizePerPage);
+        List<CasebookBean> casebook = casebookService.getUserCasebook(null, userId, patientId, null, hospitalId, departmentId, userDetails.getId(), null, pageIndex, sizePerPage);
         return casebook;
     }
 
@@ -108,7 +112,10 @@ public class HospitalCasebookAPI {
         Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
         Integer hospitalId   = tmp[0];
         Integer departmentId = tmp[1];
-        long count = casebookService.countCasebookByCondition(null, null, null, null, hospitalId, departmentId);
+        if (userDetails.isAdmin()) {
+            return 0;
+        }
+        long count = casebookService.countUserCasebook(null, null, null, null, hospitalId, departmentId, userDetails.getId(), null);
         return count;
     }
 
@@ -121,7 +128,10 @@ public class HospitalCasebookAPI {
         Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
         Integer hospitalId   = tmp[0];
         Integer departmentId = tmp[1];
-        List<CasebookBean> casebook = casebookService.getCasebookByCondition(null, null, null, null, hospitalId, departmentId, pageIndex, sizePerPage);
+        if (userDetails.isAdmin()) {
+            return new ArrayList<>();
+        }
+        List<CasebookBean> casebook = casebookService.getUserCasebook(null, null, null, null, hospitalId, departmentId, userDetails.getId(), null, pageIndex, sizePerPage);
         return casebook;
     }
 
@@ -137,9 +147,9 @@ public class HospitalCasebookAPI {
     public List<Long> deleteCasebook(HttpServletRequest request,
                                      @RequestParam(defaultValue = "0", name = "casebook_id") long casebookId
     ) {
-        List<Long> allIds = new ArrayList<>();
-        allIds.add(casebookId);
-        allIds = casebookService.deleteCasebookByIds(null, allIds);
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
+        List<Long> allIds = casebookService.deleteCasebookByIds(nurseId, Arrays.asList(new Long[]{casebookId}));
         return allIds;
     }
 
@@ -148,17 +158,15 @@ public class HospitalCasebookAPI {
                                          @RequestParam(defaultValue = "0", name = "user_id")       long userId,
                                          @RequestParam(defaultValue = "0", name = "patient_id")    long patientId,
                                          @RequestParam(defaultValue = "",  name = "description") String description,
-                                         @RequestParam(defaultValue = "",  name = "name")        String name
+                                         @RequestParam(defaultValue = "",  name = "name")        String name,
+                                         @RequestParam(defaultValue = "no",name = "hidden")      String hidden /* yes, no */
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
         Integer hospitalId   = tmp[0];
         Integer departmentId = tmp[1];
-        Long nurseId = 0L;
-        if (userDetails.isNurse() || userDetails.isNurseManager()) {
-            nurseId = userDetails.getId();
-        }
-        long casebookId = casebookService.addCasebook(hospitalId, departmentId, nurseId, userId, patientId, description, name);
+        Long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
+        long casebookId = casebookService.addCasebook(hospitalId, departmentId, nurseId, userId, patientId, description, name, YesNoEnum.parseString(hidden));
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", casebookId);
         return retValue;
@@ -168,9 +176,12 @@ public class HospitalCasebookAPI {
     public CasebookBean editCasebook(HttpServletRequest request,
                                      @RequestParam(defaultValue = "0", name = "casebook_id")   long casebookId,
                                      @RequestParam(defaultValue = "",  name = "name")        String name,
-                                     @RequestParam(defaultValue = "",  name = "description") String description
+                                     @RequestParam(defaultValue = "",  name = "description") String description,
+                                     @RequestParam(defaultValue = "no",name = "hidden")      String hidden /* yes, no */
     ) {
-        CasebookBean casebook = casebookService.updateCasebook(null, casebookId, name, description);
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
+        CasebookBean casebook = casebookService.updateCasebook(nurseId, casebookId, name, description, YesNoEnum.parseString(hidden));
         return casebook;
     }
 
@@ -186,9 +197,9 @@ public class HospitalCasebookAPI {
 
     @RequestMapping(path = "/casebook/case/{case_id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
     public List<Long> deleteCase(@PathVariable long case_id) {
-        List<Long> allIds = new ArrayList<>();
-        allIds.add(case_id);
-        allIds = casebookService.deleteCase(allIds);
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = (userDetails.isAdmin() || userDetails.isNurseManager()) ? null : userDetails.getId();
+        List<Long> allIds = casebookService.deleteCase(nurseId, case_id);
         return allIds;
     }
 
@@ -198,10 +209,7 @@ public class HospitalCasebookAPI {
                                      @RequestParam(defaultValue = "",  name = "case_record") String caseRecord
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        Long nurseId = 0L;
-        if (userDetails.isNurse() || userDetails.isNurseManager()) {
-            nurseId = userDetails.getId();
-        }
+        Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
         long caseId = casebookService.addCase(casebookId, nurseId, caseRecord);
         Map<String, Long> returnValue = new HashMap<>();
         returnValue.put("case_id", caseId);
@@ -213,7 +221,9 @@ public class HospitalCasebookAPI {
                                         @RequestParam(defaultValue = "0", name = "case_id") long caseId,
                                         @RequestParam(defaultValue = "",  name = "case_record") String caseRecord
     ) {
-        caseId = casebookService.updateCase(caseId, caseRecord);
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
+        caseId = casebookService.updateCase(nurseId, caseId, caseRecord);
         Map<String, Long> returnValue = new HashMap<>();
         returnValue.put("case_id", caseId);
         return returnValue;
@@ -227,31 +237,34 @@ public class HospitalCasebookAPI {
                                             @RequestPart(name = "image", required = true)   MultipartFile image
     ) throws IOException {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        Long nurseId = 0L;
-        if (userDetails.isNurse() || userDetails.isNurseManager()) {
-            nurseId = userDetails.getId();
-        }
+        Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
         Map<String, String> imageIdToUrl = casebookService.addCaseImage(nurseId, casebookId, caseId, imageName, image.getInputStream());
         return imageIdToUrl;
     }
 
-    @RequestMapping(path = "/casebook/case/image", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/casebook/case/images", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
     public Map<String, Boolean> deleteCaseImage(HttpServletRequest request,
                                                 @RequestParam(defaultValue = "0", name = "casebook_id") long casebookId,
                                                 @RequestParam(defaultValue = "0", name = "case_id")     long caseId
     ) {
-        casebookService.deleteCaseImage(null, casebookId, caseId);
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
+        casebookService.deleteCaseImage(nurseId, casebookId, caseId);
         Map<String, Boolean> retVal = new HashMap<>();
         retVal.put("deleted", Boolean.TRUE);
         return retVal;
     }
 
-    @RequestMapping(path = "/casebook/case/image/{image_id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/casebook/case/image", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
     public Map<String, Boolean> deleteCaseImage(HttpServletRequest request,
-                                                @PathVariable long imageId
+                                                @RequestParam(defaultValue = "0", name = "casebook_id") long casebookId,
+                                                @RequestParam(defaultValue = "0", name = "case_id")     long caseId,
+                                                @RequestParam(defaultValue = "0", name = "image_id")    long imageId
 
     ) {
-        casebookService.deleteCaseImage(imageId);
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
+        casebookService.deleteCaseImage(nurseId, casebookId, caseId, imageId);
         Map<String, Boolean> retVal = new HashMap<>();
         retVal.put("deleted", Boolean.TRUE);
         return retVal;

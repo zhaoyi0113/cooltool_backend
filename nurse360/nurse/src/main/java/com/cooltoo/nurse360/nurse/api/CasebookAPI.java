@@ -1,10 +1,14 @@
 package com.cooltoo.nurse360.nurse.api;
 
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.CaseBean;
 import com.cooltoo.go2nurse.beans.CasebookBean;
 import com.cooltoo.go2nurse.service.CasebookService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
+import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -31,6 +35,7 @@ public class CasebookAPI {
     private static final Logger logger = LoggerFactory.getLogger(CasebookAPI.class);
 
     @Autowired private CasebookService casebookService;
+    @Autowired private NurseServiceForNurse360 nurseService;
 
     //=================================================================================================================
     //                                           casebook service
@@ -48,7 +53,22 @@ public class CasebookAPI {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         Long userId = !VerifyUtil.isIds(strUserId) ? null : VerifyUtil.parseLongIds(strUserId).get(0);
         Long patientId = !VerifyUtil.isIds(strPatientId) ? null : VerifyUtil.parseLongIds(strPatientId).get(0);
-        List<CasebookBean> casebook = casebookService.getUserCasebook(userId, patientId, null, content, pageIndex, sizePerPage);
+
+        // get department public casebooks and self
+        NurseBean nurse = nurseService.getNurseById(nurseId);
+        Integer hospitalId = null;
+        Integer departmentId = null;
+        NurseHospitalRelationBean hospitalRelation = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
+        if (null!=hospitalRelation) {
+            if (0!=hospitalRelation.getHospitalId()) {
+                hospitalId = hospitalRelation.getHospitalId();
+            }
+            if (0!=hospitalRelation.getDepartmentId()) {
+                departmentId = hospitalRelation.getDepartmentId();
+            }
+        }
+
+        List<CasebookBean> casebook = casebookService.getUserCasebook(null, userId, patientId, content, hospitalId, departmentId, nurseId/* self */, null, pageIndex, sizePerPage);
         return Response.ok(casebook).build();
     }
 
@@ -83,10 +103,11 @@ public class CasebookAPI {
                                 @FormParam("user_id") @DefaultValue("0") long userId,
                                 @FormParam("patient_id") @DefaultValue("0") long patientId,
                                 @FormParam("description") @DefaultValue("") String description,
-                                @FormParam("name") @DefaultValue("") String name
+                                @FormParam("name") @DefaultValue("") String name,
+                                @FormParam("hidden") @DefaultValue("") String hidden /* YES, NO */
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        long casebookId = casebookService.addCasebook(0, 0, nurseId, userId, patientId, description, name);
+        long casebookId = casebookService.addCasebook(0, 0, nurseId, userId, patientId, description, name, YesNoEnum.parseString(hidden));
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", casebookId);
         return Response.ok(retValue).build();
@@ -98,10 +119,11 @@ public class CasebookAPI {
     public Response editCasebook(@Context HttpServletRequest request,
                                  @FormParam("casebook_id") @DefaultValue("0") long casebookId,
                                  @FormParam("name") @DefaultValue("") String name,
-                                 @FormParam("description") @DefaultValue("") String description
+                                 @FormParam("description") @DefaultValue("") String description,
+                                 @FormParam("hidden") @DefaultValue("") String hidden /* YES, NO */
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        CasebookBean casebook = casebookService.updateCasebook(nurseId, casebookId, name, description);
+        CasebookBean casebook = casebookService.updateCasebook(nurseId, casebookId, name, description, YesNoEnum.parseString(hidden));
         return Response.ok(casebook).build();
     }
 
@@ -127,9 +149,8 @@ public class CasebookAPI {
     public Response deleteCase(@Context HttpServletRequest request,
                                @FormParam("case_id") @DefaultValue("0") long caseId
     ) {
-        List<Long> allIds = new ArrayList<>();
-        allIds.add(caseId);
-        allIds = casebookService.deleteCase(allIds);
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        List<Long> allIds = casebookService.deleteCase(nurseId, caseId);
         return Response.ok(allIds).build();
     }
 
@@ -157,7 +178,7 @@ public class CasebookAPI {
                             @FormParam("case_record") @DefaultValue("") String caseRecord
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        caseId = casebookService.updateCase(caseId, caseRecord);
+        caseId = casebookService.updateCase(nurseId, caseId, caseRecord);
         Map<String, Long> returnValue = new HashMap<>();
         returnValue.put("case_id", caseId);
         return Response.ok(returnValue).build();

@@ -23,6 +23,7 @@ public class CasebookEntity {
     private String description;
     private int hospitalId;
     private int departmentId;
+    private YesNoEnum hidden;
 
     @Id
     @GeneratedValue
@@ -77,6 +78,11 @@ public class CasebookEntity {
         return departmentId;
     }
 
+    @Column(name = "hidden")
+    public YesNoEnum getHidden() {
+        return hidden;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -117,6 +123,10 @@ public class CasebookEntity {
         this.departmentId = departmentId;
     }
 
+    public void setHidden(YesNoEnum hidden) {
+        this.hidden = hidden;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -128,6 +138,7 @@ public class CasebookEntity {
         msg.append(", nurseId=").append(nurseId);
         msg.append(", name=").append(name);
         msg.append(", description=").append(description);
+        msg.append(", hidden=").append(hidden);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");
