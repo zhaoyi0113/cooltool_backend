@@ -260,7 +260,7 @@ public class CasebookService {
                 continue;
             }
             logger.warn("can not delete casebook that not making by yourself={}", tmp);
-            throw new BadRequestException(ErrorCode.CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
+            throw new BadRequestException(ErrorCode.NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
         }
 
         for (CasebookEntity tmp : casebooks) {
@@ -285,7 +285,7 @@ public class CasebookService {
 
         if (null!=nurseId && nurseId>0 && entity.getNurseId()!=nurseId) {
             logger.info("casebook not belong to nurse");
-            throw new BadRequestException(ErrorCode.CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
+            throw new BadRequestException(ErrorCode.NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
         }
 
         boolean changed = false;
@@ -454,7 +454,7 @@ public class CasebookService {
         }
         if (nurseId>0 && 0!=casebook.getNurseId() && nurseId!=casebook.getNurseId()) {
             logger.error("casebook not belong this nurse");
-            throw new BadRequestException(ErrorCode.CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
+            throw new BadRequestException(ErrorCode.NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
         }
 
         long caseId = caseService.addCase(casebookId, nurseId, caseRecord);
@@ -491,7 +491,7 @@ public class CasebookService {
         }
         if (null!=nurseId && nurseId!=_case.getNurseId()) {
             logger.error("case is not belong to nurse");
-            throw new BadRequestException(ErrorCode.CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
+            throw new BadRequestException(ErrorCode.NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
         }
 
         long count = imageService.countImage(casebookId, caseId);
@@ -522,7 +522,7 @@ public class CasebookService {
         }
         if (null!=nurseId && nurseId!=_case.getNurseId()) {
             logger.error("case is not belong to nurse");
-            throw new BadRequestException(ErrorCode.CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
+            throw new BadRequestException(ErrorCode.NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
         }
 
         List<Long> imageIds = imageService.deleteByCaseIds(Arrays.asList(new Long[]{caseId}));
@@ -547,7 +547,7 @@ public class CasebookService {
         }
         if (null!=nurseId && nurseId!=_case.getNurseId()) {
             logger.error("case is not belong to nurse");
-            throw new BadRequestException(ErrorCode.CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
+            throw new BadRequestException(ErrorCode.NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU);
         }
         if (!imageService.existImage(casebookId, caseId, imageId)) {
             logger.error("image is not exist");

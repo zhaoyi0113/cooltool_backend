@@ -76,7 +76,6 @@ public enum ErrorCode {
     OPENID_INVALID(261, Response.Status.BAD_GATEWAY, "Openid 不存在", "Openid Invalid"),
     USER_FORBIDDEN_BY_VENDOR(262, Response.Status.BAD_REQUEST, "服务商屏蔽了用户", "User is forbidden by vendor"),
     NEED_VISIT_PATIENT_RECORD(263, Response.Status.BAD_REQUEST, "服务员未设置出诊记录", "Server not set record of visiting patient"),
-    CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU(264, Response.Status.BAD_REQUEST, "该病例不属于你", "This casebook or case do not belong to you"),
 
 
 
@@ -110,6 +109,7 @@ public enum ErrorCode {
     NURSE360_SERVICE_ORDER_NOT_YOURS(3059, Response.Status.BAD_REQUEST, "订单不属于你", "Service order not belong to you"),
     NURSE360_FILE_OPERATION_FAILED(3060, Response.Status.BAD_REQUEST, "文件操作失败", "File operation failed"),
     NURSE360_RESULT_NOT_EXPECTED(3061, Response.Status.BAD_REQUEST, "结果错误", "Result not expected"),
+    NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU(3062, Response.Status.BAD_REQUEST, "该病例不属于你", "This casebook or case do not belong to you"),
     ;
 
     private final int code;

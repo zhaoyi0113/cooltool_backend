@@ -215,7 +215,7 @@ public class HospitalVisitPatientAPI {
     //=========================================
     //       Updating Patient Visit Record
     //=========================================
-    @RequestMapping(path = "/visit/patient", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/visit/patient", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public NurseVisitPatientBean updateVisitPatientRecord(HttpServletRequest request,
                                                           @RequestParam(defaultValue = "0", name = "visit_record_id") long visitRecordId,
                                                           @RequestParam(defaultValue = "",  name = "service_item_ids") String serviceItemId,
