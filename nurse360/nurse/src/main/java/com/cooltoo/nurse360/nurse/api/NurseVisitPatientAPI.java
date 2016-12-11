@@ -171,8 +171,8 @@ public class NurseVisitPatientAPI {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
-    public Response addCaseImage(@Context HttpServletRequest request,
-                                 @FormParam("visit_record_id") @DefaultValue("0") long visitRecordId
+    public Response deleteVisitPatientRecordImage(@Context HttpServletRequest request,
+                                                  @FormParam("visit_record_id") @DefaultValue("0") long visitRecordId
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         visitPatientService.deleteVisitRecordImage(nurseId, visitRecordId);
