@@ -40,7 +40,7 @@ public class HospitalDepartmentServiceItemAPI {
         return count;
     }
 
-    @RequestMapping(path = "/visit/patient/service/item/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/visit/patient/service/item", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<NurseVisitPatientServiceItemBean> getHospitalDepartmentServiceItem(HttpServletRequest request,
                                                                                    @RequestParam(defaultValue = "", name = "vendor_type") String strVendorType,
                                                                                    @RequestParam(defaultValue = "", name = "vendor_id")   String strVendorId,
