@@ -30,7 +30,7 @@ public class HospitalVisitPatientAPI {
 
     @Autowired private NurseVisitPatientService visitPatientService;
     @Autowired private NurseVisitPatientServiceItemService visitPatientServiceItemService;
-    @Autowired private JSONUtil jsonUtil;
+    private JSONUtil jsonUtil = JSONUtil.newInstance();
 
 
     //=============================================================
