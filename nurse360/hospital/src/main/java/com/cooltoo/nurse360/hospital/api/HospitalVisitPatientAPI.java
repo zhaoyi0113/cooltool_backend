@@ -8,6 +8,7 @@ import com.cooltoo.go2nurse.service.NurseVisitPatientServiceItemService;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.util.JSONUtil;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,10 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhaolisong on 2016/11/29.
@@ -174,12 +172,14 @@ public class HospitalVisitPatientAPI {
                                                       @RequestParam(defaultValue = "0", name = "patient_id") long patientId,
                                                       @RequestParam(defaultValue = "",  name = "service_item_ids") String serviceItemId,
                                                       @RequestParam(defaultValue = "",  name = "visit_record") String visitRecord,
+                                                      @RequestParam(defaultValue = "",  name = "visit_time") String visitTime,
                                                       @RequestParam(defaultValue = "0", name = "order_id") long orderId
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
+        Date dVisitTime = new Date(NumberUtil.getTime(visitTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS));
         List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItemService.getVisitPatientServiceItem(serviceItemId);
-        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems);
+        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems, dVisitTime);
 
         Map<String, Long> map = new HashMap<>();
         map.put("id", visitId);
@@ -219,16 +219,18 @@ public class HospitalVisitPatientAPI {
     public NurseVisitPatientBean updateVisitPatientRecord(HttpServletRequest request,
                                                           @RequestParam(defaultValue = "0", name = "visit_record_id") long visitRecordId,
                                                           @RequestParam(defaultValue = "",  name = "service_item_ids") String serviceItemId,
-                                                          @RequestParam(defaultValue = "",  name = "visit_record") String visitRecord
+                                                          @RequestParam(defaultValue = "",  name = "visit_record") String visitRecord,
+                                                          @RequestParam(defaultValue = "",  name = "visit_time") String visitTime
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
+        Date dVisitTime = new Date(NumberUtil.getTime(visitTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS));
         List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItemService.getVisitPatientServiceItem(serviceItemId);
         String serviceItemsJson = "";
         if (!VerifyUtil.isListEmpty(serviceItems)) {
             serviceItemsJson = jsonUtil.toJsonString(serviceItems);
         }
-        NurseVisitPatientBean visit = visitPatientService.updateVisitRecord(nurseId, visitRecordId, visitRecord, serviceItemsJson);
+        NurseVisitPatientBean visit = visitPatientService.updateVisitRecord(nurseId, visitRecordId, visitRecord, serviceItemsJson, dVisitTime);
         return visit;
     }
 

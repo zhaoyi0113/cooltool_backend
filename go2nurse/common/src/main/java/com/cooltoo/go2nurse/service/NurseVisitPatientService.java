@@ -325,7 +325,7 @@ public class NurseVisitPatientService {
     }
 
     @Transactional
-    public NurseVisitPatientBean updateVisitRecord(Long nurseId, Long visitRecordId, String visitRecord, String serviceItem) {
+    public NurseVisitPatientBean updateVisitRecord(Long nurseId, Long visitRecordId, String visitRecord, String serviceItem, Date visitTime) {
         logger.info("update visitRecordId={} with visitRecord={} serviceItem={} nurseId={}",
                 visitRecordId, visitRecord, serviceItem, nurseId);
         NurseVisitPatientEntity entity = repository.findOne(visitRecordId);
@@ -348,6 +348,10 @@ public class NurseVisitPatientService {
             entity.setServiceItem(serviceItem.trim());
             changed = true;
         }
+        if (null!=visitTime && visitTime.getTime()!=entity.getTime().getTime()) {
+            entity.setTime(visitTime);
+            changed = true;
+        }
         if (changed) {
             entity = repository.save(entity);
         }
@@ -362,7 +366,7 @@ public class NurseVisitPatientService {
     //             add
     //===============================================================
     @Transactional
-    public long addVisitRecord(long nurseId, long userId, long patientId, long orderId, String visitRecord, List<NurseVisitPatientServiceItemBean> serviceItems) {
+    public long addVisitRecord(long nurseId, long userId, long patientId, long orderId, String visitRecord, List<NurseVisitPatientServiceItemBean> serviceItems, Date createdTime) {
         logger.info("add visit record with nurseId={} userId={} patientId={} visitRecord={} serviceItem={}",
                 nurseId, userId, patientId, visitRecord, serviceItems);
         if (nurseId>0 && !nurseService.existsNurse(nurseId)) {
@@ -431,7 +435,7 @@ public class NurseVisitPatientService {
         entity.setVendorId(vendorId);
         entity.setVendorDepartId(vendorDepartId);
         entity.setStatus(CommonStatus.ENABLED);
-        entity.setTime(new Date());
+        entity.setTime(null==createdTime ? new Date() : createdTime);
         entity = repository.save(entity);
 
         return entity.getId();

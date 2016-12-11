@@ -129,7 +129,7 @@ public class NurseVisitPatientAPI {
         if (!VerifyUtil.isListEmpty(serviceItems)) {
             serviceItemsJson = jsonUtil.toJsonString(serviceItems);
         }
-        NurseVisitPatientBean visit = visitPatientService.updateVisitRecord(nurseId, visitRecordId, visitRecord, serviceItemsJson);
+        NurseVisitPatientBean visit = visitPatientService.updateVisitRecord(nurseId, visitRecordId, visitRecord, serviceItemsJson, null);
         return Response.ok(visit).build();
     }
 
@@ -145,7 +145,7 @@ public class NurseVisitPatientAPI {
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItem.getVisitPatientServiceItem(serviceItemId);
-        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems);
+        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems, null);
 
         Map<String, Long> map = new HashMap<>();
         map.put("id", visitId);
