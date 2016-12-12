@@ -35,17 +35,20 @@ public class PatientAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(PatientAPI.class);
 
-    @Autowired private PatientService service;
-    @Autowired private UserPatientRelationService userPatientRelation;
+    @Autowired
+    private PatientService service;
+    @Autowired
+    private UserPatientRelationService userPatientRelation;
 
-    @Autowired private WeChatService weChatService;
+    @Autowired
+    private WeChatService weChatService;
 
     @Path("/get_patient")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getPatientWithUserId(@Context HttpServletRequest request) {
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<Long> patientIds = userPatientRelation.getPatientByUser(userId, CommonStatus.ENABLED.name());
         List<PatientBean> patients = service.getAllByStatusAndIds(patientIds, CommonStatus.ENABLED);
         return Response.ok(patients).build();
@@ -62,8 +65,7 @@ public class PatientAPI {
         List<PatientBean> beans;
         if (!VerifyUtil.isListEmpty(patientsId)) {
             beans = service.getAllByStatusAndIds(patientsId, CommonStatus.ENABLED);
-        }
-        else {
+        } else {
             beans = new ArrayList<>();
         }
         logger.info("patient count is {}", beans.size());
@@ -81,7 +83,7 @@ public class PatientAPI {
                            @FormParam("identityCard") @DefaultValue("") String identityCard,
                            @FormParam("mobile") @DefaultValue("") String mobile
     ) {
-        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Date date = null;
         long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (time > 0) {
@@ -90,7 +92,7 @@ public class PatientAPI {
 
         List<Long> usersPatient = userPatientRelation.getPatientByUser(userId, CommonStatus.ENABLED.name());
         PatientBean patient = service.create(name, gender, date, identityCard, mobile, VerifyUtil.isListEmpty(usersPatient) ? YesNoEnum.YES : null, null);
-        if (null!=patient && patient.getId()>0) {
+        if (null != patient && patient.getId() > 0) {
             UserPatientRelationBean relation = userPatientRelation.addPatientToUser(patient.getId(), userId);
             logger.info("user patient relation is {}", relation);
         }
@@ -130,7 +132,7 @@ public class PatientAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addHeadPhoto(@Context HttpServletRequest request,
-                                 @FormDataParam("patient_id") @DefaultValue("0")  String strPatientId,
+                                 @FormDataParam("patient_id") @DefaultValue("0") String strPatientId,
                                  @FormDataParam("image_name") @DefaultValue("") String imageName,
                                  @FormDataParam("file") InputStream image,
                                  @FormDataParam("file") FormDataContentDisposition disposition
@@ -146,13 +148,13 @@ public class PatientAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response addHeadPhotoFromWx(@Context HttpServletRequest request,
-                                 @FormParam("patient_id") @DefaultValue("0")  String strPatientId,
-                                 @FormParam("image_name") @DefaultValue("") String imageName,
-                                       @FormParam("image_id") String imageId
+                                       @FormParam("patient_id") @DefaultValue("0") String strPatientId,
+                                       @FormParam("image_name") @DefaultValue("") String imageName,
+                                       @FormParam("image_id") String imageId,
+                                       @FormParam("app_id") String appId
     ) {
         long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : 0L;
-        String accessToken = (String) request.getAttribute(ContextKeys.USER_ACCESS_TOKEN);
-        InputStream image = weChatService.downloadImageFromWX(accessToken, imageId);
+        InputStream image = weChatService.downloadImageFromWxWithAppid(appId, imageId);
         PatientBean patient = service.updateHeaderImage(patientId, imageName, image);
         logger.info("upload successfully");
         return Response.ok(patient).build();

@@ -289,6 +289,10 @@ public class WeChatService {
 
     public InputStream downloadImageFromWX(String userAccessToken, String mediaId) {
         String appid = weChatTokenAccessRepository.findAppIdFromToken(userAccessToken, CommonStatus.ENABLED);
+        return downloadImageFromWxWithAppid(mediaId, appid);
+    }
+
+    public InputStream downloadImageFromWxWithAppid(String mediaId, String appid) {
         String accessToken = tokenScheduler.getAccessToken(appid);
         String url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=" + accessToken + "&media_id=" + mediaId;
         try {
