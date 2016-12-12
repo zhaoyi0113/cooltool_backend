@@ -293,10 +293,12 @@ public class WeChatService {
     }
 
     public InputStream downloadImageFromWxWithAppid(String mediaId, String appid) {
+        logger.debug("download image from wx for appid "+appid);
         String accessToken = tokenScheduler.getAccessToken(appid);
         String url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=" + accessToken + "&media_id=" + mediaId;
         try {
             HttpEntity entity = HttpUtils.getHttpResponseEntity(url);
+            logger.debug("download image from wx response "+entity.isStreaming());
             return entity.getContent();
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
