@@ -12,6 +12,7 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.service.NurseOrderRelationService;
+import com.cooltoo.go2nurse.service.NurseWalletService;
 import com.cooltoo.leancloud.LeanCloudService;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +50,7 @@ public class NurseServiceForNurse360 {
     @Autowired private LeanCloudService leanCloudService;
     @Autowired private NurseOrderRelationService nurseOrderService;
     @Autowired private NurseQualificationService nurseQualificationService;
+    @Autowired private NurseWalletService walletService;
 
     //===================================================================
     //                     getting
@@ -76,9 +79,13 @@ public class NurseServiceForNurse360 {
         NurseHospitalRelationBean hospitalDepartment = nurseHospitalRelationService.getRelationByNurseId(nurseId, utility.getHttpPrefixForNurseGo());
         List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseIdAndOrderStatus(nurseId, CommonStatus.ENABLED.name(), OrderStatus.IN_PROCESS, 0, 10);
         List<NurseQualificationBean> qualification = nurseQualificationService.getAllNurseQualifications(nurseId, utility.getHttpPrefixForNurseGo());
+        Map<Long, Long> walletRemain = walletService.getNurseWalletRemain(Arrays.asList(new Long[]{nurseId}));
+        Long remain = walletRemain.get(nurseId);
+
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
         bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospitalDepartment);
         bean.setProperty(NurseBean.ORDER, orders);
+        bean.setProperty(NurseBean.WALLET_REMAIN, (remain instanceof Long) ? remain : 0L);
         if (null!=qualification && !qualification.isEmpty()) {
             bean.setProperty(NurseBean.QUALIFICATION, qualification.get(0));
         }
