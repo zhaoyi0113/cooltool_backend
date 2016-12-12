@@ -154,7 +154,7 @@ public class PatientAPI {
                                        @FormParam("app_id") String appId
     ) {
         long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : 0L;
-        InputStream image = weChatService.downloadImageFromWxWithAppid(appId, imageId);
+        InputStream image = weChatService.downloadImageFromWxWithAppid(imageId, appId);
         PatientBean patient = service.updateHeaderImage(patientId, imageName, image);
         logger.info("upload successfully");
         return Response.ok(patient).build();
