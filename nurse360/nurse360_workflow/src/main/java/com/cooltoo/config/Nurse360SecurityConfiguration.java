@@ -52,7 +52,8 @@ public class Nurse360SecurityConfiguration extends WebSecurityConfigurerAdapter 
                 "/configuration/security",
                 "/swagger-ui.html",
                 "/webjars/**",
-                "/togglz-console/**");
+                "/togglz-console/**",
+                "/nurse360_hospital/test/**");
     }
 
     @Override

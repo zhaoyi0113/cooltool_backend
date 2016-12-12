@@ -32,6 +32,11 @@ public class NurseVisitPatientBean {
     private ServiceVendorType vendorType;
     private long vendorId;
     private long vendorDepartId;
+    private long nurseSign;
+    private String nurseSignUrl;
+    private String address;
+    private String patientRecordNo;
+    private String note;
 
     public long getId() {
         return id;
@@ -132,7 +137,6 @@ public class NurseVisitPatientBean {
     public NurseBean getNurse() {
         return nurse;
     }
-
     public void setNurse(NurseBean nurse) {
         this.nurse = nurse;
     }
@@ -140,7 +144,6 @@ public class NurseVisitPatientBean {
     public UserBean getUser() {
         return user;
     }
-
     public void setUser(UserBean user) {
         this.user = user;
     }
@@ -148,7 +151,6 @@ public class NurseVisitPatientBean {
     public PatientBean getPatient() {
         return patient;
     }
-
     public void setPatient(PatientBean patient) {
         this.patient = patient;
     }
@@ -156,7 +158,6 @@ public class NurseVisitPatientBean {
     public List<String> getRecordImages() {
         return recordImages;
     }
-
     public void setRecordImages(List<String> recordImages) {
         this.recordImages = recordImages;
     }
@@ -164,7 +165,6 @@ public class NurseVisitPatientBean {
     public String getPatientSignUrl() {
         return patientSignUrl;
     }
-
     public void setPatientSignUrl(String patientSignUrl) {
         this.patientSignUrl = patientSignUrl;
     }
@@ -172,7 +172,6 @@ public class NurseVisitPatientBean {
     public long getOrderId() {
         return orderId;
     }
-
     public void setOrderId(long orderId) {
         this.orderId = orderId;
     }
@@ -180,7 +179,6 @@ public class NurseVisitPatientBean {
     public ServiceOrderBean getOrder() {
         return order;
     }
-
     public void setOrder(ServiceOrderBean order) {
         this.order = order;
     }
@@ -188,9 +186,43 @@ public class NurseVisitPatientBean {
     public List<NurseVisitPatientServiceItemBean> getServiceItems() {
         return serviceItems;
     }
-
     public void setServiceItems(List<NurseVisitPatientServiceItemBean> serviceItems) {
         this.serviceItems = serviceItems;
+    }
+
+    public long getNurseSign() {
+        return nurseSign;
+    }
+    public void setNurseSign(long nurseSign) {
+        this.nurseSign = nurseSign;
+    }
+
+    public String getNurseSignUrl() {
+        return nurseSignUrl;
+    }
+    public void setNurseSignUrl(String nurseSignUrl) {
+        this.nurseSignUrl = nurseSignUrl;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPatientRecordNo() {
+        return patientRecordNo;
+    }
+    public void setPatientRecordNo(String patientRecordNo) {
+        this.patientRecordNo = patientRecordNo;
+    }
+
+    public String getNote() {
+        return note;
+    }
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public String toString() {
@@ -206,6 +238,11 @@ public class NurseVisitPatientBean {
         msg.append(", vendorType=").append(vendorType);
         msg.append(", vendorId=").append(vendorId);
         msg.append(", vendorDepartId=").append(vendorDepartId);
+        msg.append(", nurseSign=").append(nurseSign);
+        msg.append(", nurseSignUrl=").append(nurseSignUrl);
+        msg.append(", address=").append(address);
+        msg.append(", patientRecordNo=").append(patientRecordNo);
+        msg.append(", note=").append(note);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

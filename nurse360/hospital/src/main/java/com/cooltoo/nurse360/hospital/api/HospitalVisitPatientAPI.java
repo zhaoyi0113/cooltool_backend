@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.*;
@@ -173,13 +172,16 @@ public class HospitalVisitPatientAPI {
                                                       @RequestParam(defaultValue = "",  name = "service_item_ids") String serviceItemId,
                                                       @RequestParam(defaultValue = "",  name = "visit_record") String visitRecord,
                                                       @RequestParam(defaultValue = "",  name = "visit_time") String visitTime,
+                                                      @RequestParam(defaultValue = "",  name = "address") String address,
+                                                      @RequestParam(defaultValue = "",  name = "patient_record_no") String patientRecordNo,
+                                                      @RequestParam(defaultValue = "",  name = "note") String note,
                                                       @RequestParam(defaultValue = "0", name = "order_id") long orderId
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
         Date dVisitTime = new Date(NumberUtil.getTime(visitTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS));
         List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItemService.getVisitPatientServiceItem(serviceItemId);
-        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems, dVisitTime);
+        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems, dVisitTime, address, patientRecordNo, note);
 
         Map<String, Long> map = new HashMap<>();
         map.put("id", visitId);
@@ -188,9 +190,9 @@ public class HospitalVisitPatientAPI {
 
     @RequestMapping(path = "/visit/patient/image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
     public Map<String, String> addVisitPatientRecordImage(HttpServletRequest request,
-                                                          @RequestPart(required = true,  name = "visit_record_id") long visitRecordId,
-                                                          @RequestPart(required = false, name = "image_name") String imageName,
-                                                          @RequestPart(required = true,  name = "image") MultipartFile image
+                                                          @RequestParam(defaultValue = "0",name = "visit_record_id") long visitRecordId,
+                                                          @RequestParam(defaultValue = "", name = "image_name") String imageName,
+                                                          @RequestPart(required = true,    name = "image") MultipartFile image
     ) {
         InputStream imageInput = null;
         try { imageInput = image.getInputStream(); } catch (Exception ex) {}
@@ -200,15 +202,29 @@ public class HospitalVisitPatientAPI {
         return visitImageIdUrl;
     }
 
-    @RequestMapping(path = "/visit/patient/sign", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/visit/patient/sign", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
     public Map<String, String> setPatientSignImage(HttpServletRequest request,
-                                                   @RequestPart(required = true,  name = "visit_record_id") long visitRecordId,
-                                                   @RequestPart(required = false, name = "image_name") String imageName,
+                                                   @RequestParam(required = true,  name = "visit_record_id") String visitRecordId,
+                                                   @RequestParam(required = false, name = "image_name") String imageName,
                                                    @RequestPart(required = true,  name = "image") MultipartFile image
     ) {
         InputStream imageInput = null;
         try { imageInput = image.getInputStream(); } catch (Exception ex) {}
-        Map<String, String> visitImageIdUrl = visitPatientService.addPatientSignImage(visitRecordId, imageName, imageInput);
+        long lVisitRecordId = VerifyUtil.isIds(visitRecordId) ? VerifyUtil.parseLongIds(visitRecordId).get(0) : 0L;
+        Map<String, String> visitImageIdUrl = visitPatientService.addSignImage(false, lVisitRecordId, imageName, imageInput);
+        return visitImageIdUrl;
+    }
+
+    @RequestMapping(path = "/visit/patient/nurse/sign", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
+    public Map<String, String> setNurseSignImage(HttpServletRequest request,
+                                                 @RequestParam(required = true,  name = "visit_record_id") String visitRecordId,
+                                                 @RequestParam(required = false, name = "image_name") String imageName,
+                                                 @RequestPart(required = true,  name = "image") MultipartFile image
+    ) {
+        InputStream imageInput = null;
+        try { imageInput = image.getInputStream(); } catch (Exception ex) {}
+        long lVisitRecordId = VerifyUtil.isIds(visitRecordId) ? VerifyUtil.parseLongIds(visitRecordId).get(0) : 0L;
+        Map<String, String> visitImageIdUrl = visitPatientService.addSignImage(true, lVisitRecordId, imageName, imageInput);
         return visitImageIdUrl;
     }
 
@@ -220,7 +236,10 @@ public class HospitalVisitPatientAPI {
                                                           @RequestParam(defaultValue = "0", name = "visit_record_id") long visitRecordId,
                                                           @RequestParam(defaultValue = "",  name = "service_item_ids") String serviceItemId,
                                                           @RequestParam(defaultValue = "",  name = "visit_record") String visitRecord,
-                                                          @RequestParam(defaultValue = "",  name = "visit_time") String visitTime
+                                                          @RequestParam(defaultValue = "",  name = "visit_time") String visitTime,
+                                                          @RequestParam(defaultValue = "",  name = "address") String address,
+                                                          @RequestParam(defaultValue = "",  name = "note") String note,
+                                                          @RequestParam(defaultValue = "",  name = "patient_record_no") String patientRecordNo
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
@@ -230,7 +249,7 @@ public class HospitalVisitPatientAPI {
         if (!VerifyUtil.isListEmpty(serviceItems)) {
             serviceItemsJson = jsonUtil.toJsonString(serviceItems);
         }
-        NurseVisitPatientBean visit = visitPatientService.updateVisitRecord(nurseId, visitRecordId, visitRecord, serviceItemsJson, dVisitTime);
+        NurseVisitPatientBean visit = visitPatientService.updateVisitRecord(nurseId, visitRecordId, visitRecord, serviceItemsJson, dVisitTime, address, patientRecordNo, note);
         return visit;
     }
 

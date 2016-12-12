@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <go2nurse_nurse_visit_patient_service_item id="1" time_created="2016-11-07 12:09:07" status="1" hospital_id="11" department_id="11" item_name="item 001" item_description="item desc 001"/>
+    <go2nurse_nurse_visit_patient_service_item id="2" time_created="2016-11-07 12:09:07" status="1" hospital_id="11" department_id="22" item_name="item 002" item_description="item desc 002"/>
+    <go2nurse_nurse_visit_patient_service_item id="3" time_created="2016-11-07 12:09:07" status="1" hospital_id="22" department_id="44" item_name="item 003" item_description="item desc 003"/>
+    <go2nurse_nurse_visit_patient_service_item id="4" time_created="2016-11-07 12:09:07" status="1" hospital_id="22" department_id="55" item_name="item 004" item_description="item desc 004"/>
+</dataset>

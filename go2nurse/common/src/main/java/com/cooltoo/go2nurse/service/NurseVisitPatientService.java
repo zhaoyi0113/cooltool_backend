@@ -205,7 +205,7 @@ public class NurseVisitPatientService {
         List<Long> patientIds = new ArrayList<>();
         List<Long> nurseIds = new ArrayList<>();
         List<Long> visitRecordIds = new ArrayList<>();
-        List<Long> patientSignId = new ArrayList<>();
+        List<Long> patientNurseSignId = new ArrayList<>();
         List<Long> orderIds = new ArrayList<>();
         for (NurseVisitPatientBean tmp : beans) {
             if (!userIds.contains(tmp.getUserId())) {
@@ -220,8 +220,11 @@ public class NurseVisitPatientService {
             if (!nurseIds.contains(tmp.getNurseId())) {
                 nurseIds.add(tmp.getNurseId());
             }
-            if (!patientSignId.contains(tmp.getPatientSign())) {
-                patientSignId.add(tmp.getPatientSign());
+            if (!patientNurseSignId.contains(tmp.getPatientSign())) {
+                patientNurseSignId.add(tmp.getPatientSign());
+            }
+            if (!patientNurseSignId.contains(tmp.getNurseSign())) {
+                patientNurseSignId.add(tmp.getNurseSign());
             }
             if (!orderIds.contains(tmp.getOrder())) {
                 orderIds.add(tmp.getOrderId());
@@ -232,7 +235,7 @@ public class NurseVisitPatientService {
         Map<Long, PatientBean> patientIdToBean = patientService.getPatientIdToBean(patientIds);
         Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
         Map<Long, List<String>> visitRecordImage = imageService.getNurseVisitPatientImagesUrl(visitRecordIds);
-        Map<Long, String> patientSignImage = imageService.getNurseVisitPatientImageIdToUrl(patientSignId);
+        Map<Long, String> patientSignImage = imageService.getNurseVisitPatientImageIdToUrl(patientNurseSignId);
         List<ServiceOrderBean> orders = orderService.getOrderByIds(orderIds);
         Map<Long, ServiceOrderBean> orderIdToBean = new HashMap<>();
         if (!VerifyUtil.isListEmpty(orders)) {
@@ -254,6 +257,8 @@ public class NurseVisitPatientService {
             tmp.setRecordImages(null==recordImages ? new ArrayList<>() : recordImages);
             String patientSign = patientSignImage.get(tmp.getPatientSign());
             tmp.setPatientSignUrl(null==patientSign ? "" : patientSign);
+            String nurseSign = patientSignImage.get(tmp.getNurseSign());
+            tmp.setNurseSignUrl(null==nurseSign ? "" : nurseSign);
             tmp.setServiceItems(jsonUtil.parseJsonList(tmp.getServiceItem(), NurseVisitPatientServiceItemBean.class));
             ServiceOrderBean order = orderIdToBean.get(tmp.getOrderId());
             tmp.setOrder(order);
@@ -270,12 +275,14 @@ public class NurseVisitPatientService {
         long nurseId = visitPatientRecord.getNurseId();
         long recordId = visitPatientRecord.getId();
         long patientSign = visitPatientRecord.getPatientSign();
+        long nurseSign = visitPatientRecord.getNurseSign();
 
         UserBean user = userService.getUser(userId);
         PatientBean patient = patientService.getOneById(patientId);
         NurseBean nurse = nurseId<=0 ? null : nurseService.getNurseById(nurseId);
         List<String> recordImages = imageService.getNurseVisitPatientImagesUrl(recordId);
         String patientSignUrl = imageService.getNurseVisitPatientImageUrl(patientSign);
+        String nurseSignUrl   = imageService.getNurseVisitPatientImageUrl(nurseSign);
 
         // fill properties
         visitPatientRecord.setUser(user);
@@ -283,6 +290,7 @@ public class NurseVisitPatientService {
         visitPatientRecord.setNurse(nurse);
         visitPatientRecord.setRecordImages(recordImages);
         visitPatientRecord.setPatientSignUrl(patientSignUrl);
+        visitPatientRecord.setNurseSignUrl(nurseSignUrl);
         visitPatientRecord.setServiceItems(jsonUtil.parseJsonList(visitPatientRecord.getServiceItem(), NurseVisitPatientServiceItemBean.class));
     }
 
@@ -325,9 +333,11 @@ public class NurseVisitPatientService {
     }
 
     @Transactional
-    public NurseVisitPatientBean updateVisitRecord(Long nurseId, Long visitRecordId, String visitRecord, String serviceItem, Date visitTime) {
-        logger.info("update visitRecordId={} with visitRecord={} serviceItem={} nurseId={}",
-                visitRecordId, visitRecord, serviceItem, nurseId);
+    public NurseVisitPatientBean updateVisitRecord(Long nurseId, Long visitRecordId,
+                                                   String visitRecord, String serviceItem, Date visitTime,
+                                                   String address, String patientRecordNo, String note) {
+        logger.info("update visitRecordId={} with nurseId={} visitRecord={} serviceItem={} visitTime={} address={} patientRecordNo={} note={}",
+                visitRecordId, nurseId, visitRecord, serviceItem, visitTime, address, patientRecordNo, note);
         NurseVisitPatientEntity entity = repository.findOne(visitRecordId);
         if (null==entity) {
             logger.error("visit record is not exist");
@@ -352,6 +362,18 @@ public class NurseVisitPatientService {
             entity.setTime(visitTime);
             changed = true;
         }
+        if (!VerifyUtil.isStringEmpty(address) && !address.trim().equals(entity.getAddress())) {
+            entity.setAddress(address.trim());
+            changed = true;
+        }
+        if (!VerifyUtil.isStringEmpty(patientRecordNo) && !patientRecordNo.trim().equals(entity.getPatientRecordNo())) {
+            entity.setPatientRecordNo(patientRecordNo.trim());
+            changed = true;
+        }
+        if (!VerifyUtil.isStringEmpty(note) && !note.trim().equals(entity.getNote())) {
+            entity.setNote(note.trim());
+            changed = true;
+        }
         if (changed) {
             entity = repository.save(entity);
         }
@@ -366,9 +388,13 @@ public class NurseVisitPatientService {
     //             add
     //===============================================================
     @Transactional
-    public long addVisitRecord(long nurseId, long userId, long patientId, long orderId, String visitRecord, List<NurseVisitPatientServiceItemBean> serviceItems, Date createdTime) {
-        logger.info("add visit record with nurseId={} userId={} patientId={} visitRecord={} serviceItem={}",
-                nurseId, userId, patientId, visitRecord, serviceItems);
+    public long addVisitRecord(long nurseId, long userId, long patientId, long orderId,
+                               String visitRecord,
+                               List<NurseVisitPatientServiceItemBean> serviceItems,
+                               Date visitTime,
+                               String address, String patientRecordNo, String note) {
+        logger.info("add visit record with nurseId={} userId={} patientId={} visitRecord={} serviceItem={}, visitTime={} address={} patientRecordNo{}, note={}",
+                nurseId, userId, patientId, visitRecord, serviceItems, visitTime, address, patientRecordNo, note);
         if (nurseId>0 && !nurseService.existsNurse(nurseId)) {
             logger.info("nurse not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -393,6 +419,12 @@ public class NurseVisitPatientService {
                 vendorType = orders.get(0).getVendorType();
                 vendorId = orders.get(0).getVendorId();
                 vendorDepartId = orders.get(0).getVendorId();
+                if (VerifyUtil.isStringEmpty(address)) {
+                    UserAddressBean addressBean = orders.get(0).getAddress();
+                    if (null!=addressBean) {
+                        address = addressBean.toAddress();
+                    }
+                }
             }
         }
         if (null==vendorType) {
@@ -434,8 +466,11 @@ public class NurseVisitPatientService {
         entity.setVendorType(vendorType);
         entity.setVendorId(vendorId);
         entity.setVendorDepartId(vendorDepartId);
+        entity.setAddress(address);
+        entity.setPatientRecordNo(patientRecordNo);
+        entity.setNote(note);
         entity.setStatus(CommonStatus.ENABLED);
-        entity.setTime(null==createdTime ? new Date() : createdTime);
+        entity.setTime(null==visitTime ? new Date() : visitTime);
         entity = repository.save(entity);
 
         return entity.getId();
@@ -466,8 +501,8 @@ public class NurseVisitPatientService {
     }
 
     @Transactional
-    public Map<String, String> addPatientSignImage(long visitRecordId, String imageName, InputStream image) {
-        logger.info("add patient sign image to visitRecordId={} name={} image={}", visitRecordId, imageName, (null!=image));
+    public Map<String, String> addSignImage(boolean isNurse, long visitRecordId, String imageName, InputStream image) {
+        logger.info("add patient/nurse sign image to visitRecordId={} name={} image={}", visitRecordId, imageName, (null!=image));
 
         NurseVisitPatientEntity visitRecord = repository.findOne(visitRecordId);
         if (null==visitRecord) {
@@ -476,13 +511,19 @@ public class NurseVisitPatientService {
         }
         if (null!=image) {
             if (VerifyUtil.isStringEmpty(imageName)) {
-                imageName = "nurse_visit_patient_sign_"+System.currentTimeMillis();
+                imageName = "nurse_visit_patient-nurse_sign_"+System.currentTimeMillis();
             }
             long imageId = userFileStorage.addFile(visitRecord.getPatientSign(), imageName, image);
             String imageUrl = userFileStorage.getFileURL(imageId, utility.getHttpPrefix());
             if (imageId > 0) {
-                visitRecord.setPatientSign(imageId);
-                repository.save(visitRecord);
+                if (!isNurse) {
+                    visitRecord.setPatientSign(imageId);
+                    repository.save(visitRecord);
+                }
+                else {
+                    visitRecord.setNurseSign(imageId);
+                    repository.save(visitRecord);
+                }
             }
             Map<String, String> idAndUrl = new HashMap<>();
             idAndUrl.put("imageUrl", imageUrl);

@@ -122,14 +122,14 @@ public class HospitalNurseAPI {
         return new ArrayList<>();
     }
 
-    @RequestMapping(path = "/nurse/qualification", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/nurse/qualification", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
     public NurseQualificationFileBean editNurseQualification(HttpServletRequest request,
                                                                @RequestParam(defaultValue = "", name = "nurse_id") long nurseId,
                                                                @RequestParam(defaultValue = "", name = "qualification_file_id") long qualificationFileId,
                                                                @RequestParam(defaultValue = "", name = "type") String workfileType,
                                                                @RequestParam(defaultValue = "", name = "expiry") String expiryTime,
                                                                @RequestParam(defaultValue = "", name = "file_name") String fileName,
-                                                               @RequestParam(defaultValue = "", name = "file") MultipartFile file
+                                                               @RequestPart(required = true, name = "file") MultipartFile file
     ) {
         InputStream workFileInputStream = null;
         Date expiryDate = null;

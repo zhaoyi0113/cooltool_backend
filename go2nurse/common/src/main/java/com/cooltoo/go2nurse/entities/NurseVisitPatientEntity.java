@@ -26,6 +26,10 @@ public class NurseVisitPatientEntity {
     private ServiceVendorType vendorType;
     private long vendorId;
     private long vendorDepartId;
+    private long nurseSign;
+    private String address;
+    private String patientRecordNo;
+    private String note;
 
     @Id
     @GeneratedValue
@@ -147,6 +151,38 @@ public class NurseVisitPatientEntity {
         this.vendorDepartId = vendorDepartId;
     }
 
+    @Column(name = "nurse_sign")
+    public long getNurseSign() {
+        return nurseSign;
+    }
+    public void setNurseSign(long nurseSign) {
+        this.nurseSign = nurseSign;
+    }
+
+    @Column(name = "address")
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    @Column(name = "patient_record_no")
+    public String getPatientRecordNo() {
+        return patientRecordNo;
+    }
+    public void setPatientRecordNo(String patientRecordNo) {
+        this.patientRecordNo = patientRecordNo;
+    }
+
+    @Column(name = "note")
+    public String getNote() {
+        return note;
+    }
+    public void setNote(String note) {
+        this.note = note;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass().getName()).append("@").append(hashCode()).append("[");
@@ -160,6 +196,10 @@ public class NurseVisitPatientEntity {
         msg.append(", vendorType=").append(vendorType);
         msg.append(", vendorId=").append(vendorId);
         msg.append(", vendorDepartId=").append(vendorDepartId);
+        msg.append(", nurseSign=").append(nurseSign);
+        msg.append(", address=").append(address);
+        msg.append(", patientRecordNo=").append(patientRecordNo);
+        msg.append(", note=").append(note);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
         msg.append("]");

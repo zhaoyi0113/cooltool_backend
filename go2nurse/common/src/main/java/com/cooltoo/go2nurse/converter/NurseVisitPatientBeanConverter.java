@@ -26,6 +26,10 @@ public class NurseVisitPatientBeanConverter implements Converter<NurseVisitPatie
         bean.setVendorType(source.getVendorType());
         bean.setVendorId(source.getVendorId());
         bean.setVendorDepartId(source.getVendorDepartId());
+        bean.setNurseSign(source.getNurseSign());
+        bean.setPatientRecordNo(null==source.getPatientRecordNo() ? "" : source.getPatientRecordNo());
+        bean.setAddress(null==source.getAddress() ? "" : source.getAddress());
+        bean.setNote(null==source.getNote() ? "" : source.getNote());
         return bean;
     }
 }

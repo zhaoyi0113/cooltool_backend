@@ -121,7 +121,8 @@ public class NurseVisitPatientAPI {
     public Response updateVisitPatientRecord(@Context HttpServletRequest request,
                                              @FormParam("visit_record_id") @DefaultValue("0") long visitRecordId,
                                              @FormParam("visit_record") @DefaultValue("") String visitRecord,
-                                             @FormParam("service_item_ids") @DefaultValue("") String serviceItemIds
+                                             @FormParam("service_item_ids") @DefaultValue("") String serviceItemIds,
+                                             @FormParam("address") @DefaultValue("") String address
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItem.getVisitPatientServiceItem(serviceItemIds);
@@ -129,7 +130,7 @@ public class NurseVisitPatientAPI {
         if (!VerifyUtil.isListEmpty(serviceItems)) {
             serviceItemsJson = jsonUtil.toJsonString(serviceItems);
         }
-        NurseVisitPatientBean visit = visitPatientService.updateVisitRecord(nurseId, visitRecordId, visitRecord, serviceItemsJson, null);
+        NurseVisitPatientBean visit = visitPatientService.updateVisitRecord(nurseId, visitRecordId, visitRecord, serviceItemsJson, null, address, null, null);
         return Response.ok(visit).build();
     }
 
@@ -141,11 +142,12 @@ public class NurseVisitPatientAPI {
                                           @FormParam("patient_id") @DefaultValue("0") long patientId,
                                           @FormParam("service_item_ids") @DefaultValue("") String serviceItemId,
                                           @FormParam("visit_record") @DefaultValue("") String visitRecord,
+                                          @FormParam("address") @DefaultValue("") String address,
                                           @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItem.getVisitPatientServiceItem(serviceItemId);
-        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems, null);
+        long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems, null, address, null, null);
 
         Map<String, Long> map = new HashMap<>();
         map.put("id", visitId);
@@ -191,7 +193,21 @@ public class NurseVisitPatientAPI {
                                         @FormDataParam("image") InputStream image,
                                         @FormDataParam("image")FormDataContentDisposition imageDis
     ) {
-        Map<String, String> visitImageIdUrl = visitPatientService.addPatientSignImage(visitRecordId, imageName, image);
+        Map<String, String> visitImageIdUrl = visitPatientService.addSignImage(false, visitRecordId, imageName, image);
+        return Response.ok(visitImageIdUrl).build();
+    }
+
+    @Path("/nurse/sign")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response addNurseSignImage(@Context HttpServletRequest request,
+                                      @FormDataParam("visit_record_id") @DefaultValue("0") long visitRecordId,
+                                      @FormDataParam("image_name") String imageName,
+                                      @FormDataParam("image") InputStream image,
+                                      @FormDataParam("image")FormDataContentDisposition imageDis
+    ) {
+        Map<String, String> visitImageIdUrl = visitPatientService.addSignImage(true, visitRecordId, imageName, image);
         return Response.ok(visitImageIdUrl).build();
     }
 

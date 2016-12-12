@@ -111,6 +111,20 @@ public class UserAddressBean {
         this.city = city;
     }
 
+    public String toAddress() {
+        StringBuffer address = new StringBuffer();
+        if (null!=province) {
+            address.append(province.getName());
+        }
+        if (null!=city) {
+            address.append(" ").append(city.getName());
+        }
+        if ((getAddress() instanceof String) && getAddress().trim().length()>0) {
+            address.append(" ").append(getAddress().trim());
+        }
+        return address.toString();
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
