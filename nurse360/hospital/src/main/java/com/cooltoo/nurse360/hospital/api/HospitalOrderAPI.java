@@ -5,11 +5,14 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.NurseOrderRelationBean;
+import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.go2nurse.constants.WalletInOutType;
 import com.cooltoo.go2nurse.service.NurseOrderRelationService;
 import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
+import com.cooltoo.go2nurse.service.NurseWalletService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +44,7 @@ public class HospitalOrderAPI {
     @Autowired private NurseOrderRelationService nurseOrderRelation;
     @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private NurseWalletService nurseWalletService;
 
 
     //=============================================================
@@ -110,6 +115,7 @@ public class HospitalOrderAPI {
         ServiceOrderBean order = orderService.completedOrder(false, -1, orderId);
         notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
         notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
+        nurseWalletService.orderCompleted(orderId);
         return order;
     }
 

@@ -233,6 +233,17 @@ public class ServiceOrderBean {
         return fetchTime;
     }
 
+    public String getTotalServerIncome() {
+        return totalServerIncome;
+    }
+    public int getTotalServerIncomeCent() {
+        return totalServerIncomeCent;
+    }
+
+    public YesNoEnum getNeedVisitPatientRecord() {
+        return needVisitPatientRecord;
+    }
+
     public void setId(long id) {
         this.id = id;
     }

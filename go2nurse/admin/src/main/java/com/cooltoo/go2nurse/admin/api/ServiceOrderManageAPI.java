@@ -11,6 +11,7 @@ import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.NurseOrderRelationService;
 import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
+import com.cooltoo.go2nurse.service.NurseWalletService;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.util.VerifyUtil;
@@ -37,6 +38,7 @@ public class ServiceOrderManageAPI {
     @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private NurseOrderRelationService nurseOrderRelation;
     @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private NurseWalletService nurseWalletService;
 
     @Path("/all_order_status")
     @GET
@@ -172,6 +174,8 @@ public class ServiceOrderManageAPI {
         ServiceOrderBean order = orderService.completedOrder(false, -1, orderId);
         notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
         notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
+        nurseWalletService.orderCompleted(orderId);
+
         return Response.ok(order).build();
     }
 

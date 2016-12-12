@@ -1,10 +1,11 @@
 package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.NurseWalletBean;
+import com.cooltoo.go2nurse.beans.ServiceItemBean;
+import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.WalletInOutType;
 import com.cooltoo.go2nurse.converter.NurseWalletBeanConverter;
 import com.cooltoo.go2nurse.entities.NurseWalletEntity;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -36,6 +38,8 @@ public class NurseWalletService {
     @Autowired private NurseWalletBeanConverter beanConverter;
 
     @Autowired private NurseServiceForGo2Nurse nurseService;
+    @Autowired private NurseOrderRelationService nurseOrderRelation;
+    @Autowired private ServiceOrderService serviceOrderService;
 
     //=========================================================================
     //                       GET Wallet In-Out Record
@@ -100,6 +104,7 @@ public class NurseWalletService {
     //=========================================================================
     //                       DELETE Wallet In-Out Record
     //=========================================================================
+    @Transactional
     public long deleteWalletInOut(Long nurseId, long recordId) {
         logger.debug("delete wallet record by walletRecordId={}", recordId);
         if (!repository.exists(recordId)) {
@@ -116,6 +121,7 @@ public class NurseWalletService {
         return recordId;
     }
 
+    @Transactional
     public List<Long> deleteNurseWalletInOut(long nurseId) {
         logger.debug("delete wallet record by nurseId={}", nurseId);
         if (!nurseService.existsNurse(nurseId)) {
@@ -141,10 +147,36 @@ public class NurseWalletService {
     //                       Update Wallet In-Out Record
     //=========================================================================
 
+
+
+
+
     //=========================================================================
     //                       Create Wallet In-Out Record
     //=========================================================================
-    public NurseWalletBean walletInOut(long nurseId, long amount, String summary, WalletInOutType reason, long reasonId) {
+    @Transactional
+    public NurseWalletBean orderCompleted(long orderId) {
+        List<ServiceOrderBean> orders = serviceOrderService.getOrderByOrderId(orderId);
+        if (orders.size()!=1) {
+            logger.warn("order is not unique.");
+            return null;
+        }
+        ServiceOrderBean order = orders.get(0);
+        Map<Long, Long> orderIdToNurseId = nurseOrderRelation.getOrdersWaitStaffId(Arrays.asList(new Long[]{orderId}));
+        if (null!=orderIdToNurseId && orderIdToNurseId.size()==1 && (orderIdToNurseId.get(orderId) instanceof Long)) {
+            Long nurseId = orderIdToNurseId.get(orderId);
+            String summary = "订单";
+            if (order.getServiceItem() instanceof ServiceItemBean) {
+                summary = summary + "-" + order.getServiceItem().getName();
+            }
+            return recordWalletInOut(nurseId, order.getTotalServerIncomeCent(), summary, WalletInOutType.ORDER_IN, orderId);
+        }
+        logger.warn("order has no server.");
+        return null;
+    }
+
+    @Transactional
+    public NurseWalletBean recordWalletInOut(long nurseId, long amount, String summary, WalletInOutType reason, long reasonId) {
         logger.debug("create wallet record by nurseId={} amount={} summary={} reason={} reasonId={}",
                 nurseId, amount, summary, reason, reasonId);
         if (!nurseService.existsNurse(nurseId)) {

@@ -41,6 +41,7 @@ public class UserServiceOrderAPI {
     @Autowired private ChargeWebHookService chargeWebHookService;
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private NurseServiceForGo2Nurse nurseService;
+    @Autowired private NurseWalletService nurseWalletService;
 
     //=========================================================================================
     //                                    Category Service
@@ -276,6 +277,7 @@ public class UserServiceOrderAPI {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.completedOrder(true, userId, orderId);
         notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
+        nurseWalletService.orderCompleted(orderId);
         return Response.ok(order).build();
     }
 
