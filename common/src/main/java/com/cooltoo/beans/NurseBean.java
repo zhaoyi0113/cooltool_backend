@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class NurseBean {
 
-    public static final String WALLET_REMAIN = "wallet_remain";
+    public static final String WALLET_BALANCE = "wallet_remain";
     public static final String HAS_CARD_AND_QUALIFICATION = "has_employee_card_and_qualification";
     public static final String QUALIFICATION = "qualification";
     public static final String SKILL_NOMINATION = "skill_nomination";

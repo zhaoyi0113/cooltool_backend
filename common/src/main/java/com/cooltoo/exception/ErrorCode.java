@@ -110,6 +110,7 @@ public enum ErrorCode {
     NURSE360_FILE_OPERATION_FAILED(3060, Response.Status.BAD_REQUEST, "文件操作失败", "File operation failed"),
     NURSE360_RESULT_NOT_EXPECTED(3061, Response.Status.BAD_REQUEST, "结果错误", "Result not expected"),
     NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU(3062, Response.Status.BAD_REQUEST, "该病例不属于你", "This casebook or case do not belong to you"),
+    NURSE360_AMOUNT_EXCEEDS_BALANCE(3063, Response.Status.BAD_REQUEST, "超出余额范围", "Amount exceeds balance"),
     ;
 
     private final int code;

@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.WalletInOutType;
+import com.cooltoo.go2nurse.constants.WalletProcess;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -21,6 +22,7 @@ public class NurseWalletEntity {
     private long amount;
     private WalletInOutType reason;
     private long reasonId;
+    private WalletProcess process;
 
     @Id
     @GeneratedValue
@@ -90,6 +92,15 @@ public class NurseWalletEntity {
         this.reasonId = reasonId;
     }
 
+    @Column(name = "process")
+    @Enumerated
+    public WalletProcess getProcess() {
+        return process;
+    }
+    public void setProcess(WalletProcess process) {
+        this.process = process;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -101,6 +112,7 @@ public class NurseWalletEntity {
         msg.append(", amount=").append(amount);
         msg.append(", reason=").append(reason);
         msg.append(", reasonId=").append(reasonId);
+        msg.append(", process=").append(process);
         msg.append("]");
         return msg.toString();
     }

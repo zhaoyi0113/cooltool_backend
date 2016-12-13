@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -7,6 +8,7 @@ import com.cooltoo.go2nurse.beans.NurseWalletBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.WalletInOutType;
+import com.cooltoo.go2nurse.constants.WalletProcess;
 import com.cooltoo.go2nurse.converter.NurseWalletBeanConverter;
 import com.cooltoo.go2nurse.entities.NurseWalletEntity;
 import com.cooltoo.go2nurse.repository.NurseWalletRepository;
@@ -33,6 +35,9 @@ public class NurseWalletService {
             new Sort.Order(Sort.Direction.DESC, "nurseId"),
             new Sort.Order(Sort.Direction.DESC, "id")
     );
+    private static final Sort sortId = new Sort(
+            new Sort.Order(Sort.Direction.DESC, "id")
+    );
 
     @Autowired private NurseWalletRepository repository;
     @Autowired private NurseWalletBeanConverter beanConverter;
@@ -40,15 +45,46 @@ public class NurseWalletService {
     @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private NurseOrderRelationService nurseOrderRelation;
     @Autowired private ServiceOrderService serviceOrderService;
+    @Autowired private ServiceOrderService orderService;
 
     //=========================================================================
-    //                       GET Wallet In-Out Record
+    //                       GET Wallet Balance Record
     //=========================================================================
-    public Map<Long, Long> getNurseWalletRemain(List<Long> nurseIds) {
-        logger.debug("get nurse wallet remain by nurseIds={}", nurseIds);
-        Map<Long, Long> nurseRemain = new HashMap<>();
+    //=======================================
+    //   GET Wallet Balance Record -- Admin
+    //=======================================
+    public long countNurseWalletFlowRecord(Long nurseId, WalletInOutType reason, WalletProcess process, String summary) {
+        summary = VerifyUtil.isStringEmpty(summary) ? null : VerifyUtil.reconstructSQLContentLike(summary);
+        long count = repository.countByConditions(nurseId, process, reason, summary);
+        logger.debug("count nurse wallet balance by nurseId={} reason={} process={} summary={}, count={}",
+                nurseId, reason, process, summary, count);
+        return count;
+    }
+
+    public List<NurseWalletBean> getNurseWalletFlowRecord(Long nurseId,
+                                                          WalletInOutType reason,
+                                                          WalletProcess process,
+                                                          String summary,
+                                                          int pageIndex, int sizePerPage
+    ) {
+        logger.debug("get nurse wallet balance by nurseId={} reason={} process={} summary={} at pageIndex={} sizePerPage",
+                nurseId, reason, process, summary, pageIndex, sizePerPage);
+        summary = VerifyUtil.isStringEmpty(summary) ? null : VerifyUtil.reconstructSQLContentLike(summary);
+        PageRequest page = new PageRequest(pageIndex, sizePerPage, sortId);
+        Page<NurseWalletEntity> entities = repository.findByConditions(nurseId, process, reason, summary, page);
+        List<NurseWalletBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
+        return beans;
+    }
+
+    //=======================================
+    //   GET Wallet Balance Record -- Nurse
+    //=======================================
+    public Map<Long, Long> getNurseWalletBalance(List<Long> nurseIds) {
+        logger.debug("get nurse wallet balance by nurseIds={}", nurseIds);
+        Map<Long, Long> nurseBalance = new HashMap<>();
         if (!VerifyUtil.isListEmpty(nurseIds)) {
-            List<Object[]> nurseToAmount = repository.findNurseWalletInOut(nurseIds);
+            List<Object[]> nurseToAmount = repository.findNurseWalletInOut(nurseIds, null);
             if (!VerifyUtil.isListEmpty(nurseToAmount)) {
                 for (Object[] tmp : nurseToAmount) {
                     if (null==tmp || tmp.length!=2) {
@@ -62,24 +98,48 @@ public class NurseWalletService {
                     if (null==amount) {
                         continue;
                     }
-                    Long exist = nurseRemain.get(nurseId);
+                    Long exist = nurseBalance.get(nurseId);
                     exist = null==exist ? 0L : exist;
-                    nurseRemain.put(nurseId, exist+amount);
+                    nurseBalance.put(nurseId, exist+amount);
                 }
             }
         }
-        return nurseRemain;
+        return nurseBalance;
+    }
+
+    public long getNurseWalletBalance(long nurseId) {
+        logger.debug("get nurse wallet balance by nurseId={}", nurseId);
+        long nurseBalance = 0;
+        List<Object[]> nurseToAmount = repository.findNurseWalletInOut(Arrays.asList(new Long[]{nurseId}), null);
+        if (!VerifyUtil.isListEmpty(nurseToAmount)) {
+            for (Object[] tmp : nurseToAmount) {
+                if (null==tmp || tmp.length!=2) {
+                    continue;
+                }
+                Long tmpNurseId = (tmp[0] instanceof Long) ? (Long)tmp[0] : null;
+                if (null==tmpNurseId) {
+                    continue;
+                }
+                Long tmpAmount  = (tmp[1] instanceof Long) ? (Long)tmp[1] : null;
+                if (null==tmpAmount) {
+                    continue;
+                }
+                nurseBalance += tmpAmount;
+            }
+        }
+        logger.debug("get nurse wallet balance={} by nurseId={}", nurseBalance, nurseId);
+        return nurseBalance;
     }
 
     public List<NurseWalletBean> getNurseWalletRecord(long nurseId, int pageIndex, int sizePerPage) {
-        logger.info("get nurse wallet remain by nurseId={} at pageIndex={} sizePerPage={}", nurseId, pageIndex, sizePerPage);
+        logger.info("get nurse wallet flow record by nurseId={} at pageIndex={} sizePerPage={}", nurseId, pageIndex, sizePerPage);
         if (!nurseService.existsNurse(nurseId)) {
             logger.error("nurse not exist!");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
         List<CommonStatus> statuses = Arrays.asList(new CommonStatus[]{CommonStatus.ENABLED});
         PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<NurseWalletEntity> entities = repository.findByNurseIdAndStatus(nurseId, statuses, page);
+        Page<NurseWalletEntity> entities = repository.findByNurseIdAndStatus(nurseId, null, statuses, page);
         List<NurseWalletBean> beans = entitiesToBeans(entities);
 
         logger.info("get nurse wallet record, count={}", beans.size());
@@ -101,6 +161,39 @@ public class NurseWalletService {
         return beans;
     }
 
+    private void fillOtherProperties(List<NurseWalletBean> beans) {
+        if (null == beans || beans.isEmpty()) {
+            return;
+        }
+
+        List<Long> orderIds = new ArrayList<>();
+        List<Long> nurseIds = new ArrayList<>();
+        for (NurseWalletBean tmp : beans) {
+            if (WalletInOutType.ORDER_IN.equals(tmp.getReason()) && !orderIds.contains(tmp.getReasonId())) {
+                orderIds.add(tmp.getReasonId());
+            }
+            if (!nurseIds.contains(tmp.getNurseId())) {
+                nurseIds.add(tmp.getNurseId());
+            }
+        }
+
+        Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
+        List<ServiceOrderBean> orders = orderService.getOrderByIds(orderIds);
+        Map<Long, ServiceOrderBean> orderIdToBean = new HashMap<>();
+        for (ServiceOrderBean tmp : orders) {
+            orderIdToBean.put(tmp.getId(), tmp);
+        }
+
+        for (NurseWalletBean tmp : beans) {
+            if (WalletInOutType.ORDER_IN.equals(tmp.getReason())) {
+                ServiceOrderBean order = orderIdToBean.get(tmp.getReasonId());
+                tmp.setProperties(NurseWalletBean.REASON_ORDER, order);
+            }
+            NurseBean nurse = nurseIdToBean.get(tmp.getNurseId());
+            tmp.setNurse(nurse);
+        }
+    }
+
     //=========================================================================
     //                       DELETE Wallet In-Out Record
     //=========================================================================
@@ -114,6 +207,10 @@ public class NurseWalletService {
         NurseWalletEntity entity = repository.findOne(recordId);
         if (null!=nurseId && nurseId!=entity.getNurseId()) {
             logger.error("wallet record not belong to nurse!");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (!WalletProcess.COMPLETED.equals(entity.getProcess())) {
+            logger.error("wallet record process status is not Completed!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         entity.setStatus(CommonStatus.DELETED);
@@ -132,7 +229,7 @@ public class NurseWalletService {
         List<NurseWalletEntity> entities = repository.findByNurseId(nurseId);
         if (!VerifyUtil.isListEmpty(entities)) {
             for (NurseWalletEntity tmp : entities){
-                if (CommonStatus.ENABLED.equals(tmp.getStatus())) {
+                if (CommonStatus.ENABLED.equals(tmp.getStatus()) && WalletProcess.COMPLETED.equals(tmp.getProcess())) {
                     tmp.setStatus(CommonStatus.DELETED);
                     deletedIds.add(tmp.getId());
                 }
@@ -146,9 +243,22 @@ public class NurseWalletService {
     //=========================================================================
     //                       Update Wallet In-Out Record
     //=========================================================================
-
-
-
+    @Transactional
+    public NurseWalletBean updateWalletInOutStatus(long walletInOutId, WalletProcess process) {
+        logger.debug("update wallet record={} process status to={}", walletInOutId, process);
+        if (null==process) {
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
+        }
+        NurseWalletEntity entity = repository.findOne(walletInOutId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+        }
+        if (!process.equals(entity.getProcess())) {
+            entity.setProcess(process);
+            entity = repository.save(entity);
+        }
+        return beanConverter.convert(entity);
+    }
 
 
     //=========================================================================
@@ -169,14 +279,14 @@ public class NurseWalletService {
             if (order.getServiceItem() instanceof ServiceItemBean) {
                 summary = summary + "-" + order.getServiceItem().getName();
             }
-            return recordWalletInOut(nurseId, order.getTotalServerIncomeCent(), summary, WalletInOutType.ORDER_IN, orderId);
+            return recordWalletInOut(nurseId, order.getTotalServerIncomeCent(), summary, WalletProcess.COMPLETED, WalletInOutType.ORDER_IN, orderId);
         }
         logger.warn("order has no server.");
         return null;
     }
 
     @Transactional
-    public NurseWalletBean recordWalletInOut(long nurseId, long amount, String summary, WalletInOutType reason, long reasonId) {
+    public NurseWalletBean recordWalletInOut(long nurseId, long amount, String summary, WalletProcess process, WalletInOutType reason, long reasonId) {
         logger.debug("create wallet record by nurseId={} amount={} summary={} reason={} reasonId={}",
                 nurseId, amount, summary, reason, reasonId);
         if (!nurseService.existsNurse(nurseId)) {
@@ -187,13 +297,18 @@ public class NurseWalletService {
             logger.error("wallet in-out type is null");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        List<NurseWalletEntity> wallets = repository.findByNurseIdAndReasonAndReasonId(nurseId, reason, reasonId, sort);
+
         NurseWalletEntity entity = null;
-        if (VerifyUtil.isListEmpty(wallets)) {
-            entity = new NurseWalletEntity();
+        List<NurseWalletEntity> wallets = repository.findByNurseIdAndReasonAndReasonId(nurseId, reason, reasonId, sort);
+        if (!WalletInOutType.WITHDRAW.equals(reason)) {
+            if (VerifyUtil.isListEmpty(wallets)) {
+                entity = new NurseWalletEntity();
+            } else {
+                entity = wallets.get(wallets.size() - 1);
+            }
         }
         else {
-            entity = wallets.get(wallets.size()-1);
+            entity = new NurseWalletEntity();
         }
         entity.setNurseId(nurseId);
         entity.setReason(reason);
@@ -202,19 +317,22 @@ public class NurseWalletService {
         entity.setStatus(CommonStatus.ENABLED);
         entity.setAmount(amount);
         entity.setSummary(summary);
+        entity.setProcess(process);
         entity = repository.save(entity);
 
-        wallets = repository.findByNurseIdAndReasonAndReasonId(nurseId, reason, reasonId, sort);
-        if (!VerifyUtil.isListEmpty(wallets)) {
-            for (int i=0; i<wallets.size(); i++) {
-                NurseWalletEntity tmp = wallets.get(i);
-                if (tmp.getId()==entity.getId()) {
-                    wallets.remove(i);
-                    break;
-                }
-            }
+        if (!WalletInOutType.WITHDRAW.equals(reason)) {
+            wallets = repository.findByNurseIdAndReasonAndReasonId(nurseId, reason, reasonId, sort);
             if (!VerifyUtil.isListEmpty(wallets)) {
-                repository.delete(wallets);
+                for (int i = 0; i < wallets.size(); i++) {
+                    NurseWalletEntity tmp = wallets.get(i);
+                    if (tmp.getId() == entity.getId()) {
+                        wallets.remove(i);
+                        break;
+                    }
+                }
+                if (!VerifyUtil.isListEmpty(wallets)) {
+                    repository.delete(wallets);
+                }
             }
         }
 

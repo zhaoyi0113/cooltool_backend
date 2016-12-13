@@ -21,6 +21,7 @@ public class NurseWalletBeanConverter implements Converter<NurseWalletEntity, Nu
         bean.setAmountCent(source.getAmount());
         bean.setReason(source.getReason());
         bean.setReasonId(source.getReasonId());
+        bean.setProcess(source.getProcess());
         return bean;
     }
 }

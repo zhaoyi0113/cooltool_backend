@@ -79,14 +79,14 @@ public class NurseServiceForNurse360 {
         NurseHospitalRelationBean hospitalDepartment = nurseHospitalRelationService.getRelationByNurseId(nurseId, utility.getHttpPrefixForNurseGo());
         List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseIdAndOrderStatus(nurseId, CommonStatus.ENABLED.name(), OrderStatus.IN_PROCESS, 0, 10);
         List<NurseQualificationBean> qualification = nurseQualificationService.getAllNurseQualifications(nurseId, utility.getHttpPrefixForNurseGo());
-        Map<Long, Long> walletRemain = walletService.getNurseWalletRemain(Arrays.asList(new Long[]{nurseId}));
-        Long remain = walletRemain.get(nurseId);
-        remain = (remain instanceof Long) ? remain : 0L;
+        Map<Long, Long> walletBalance = walletService.getNurseWalletBalance(Arrays.asList(new Long[]{nurseId}));
+        Long balance = walletBalance.get(nurseId);
+        balance = (balance instanceof Long) ? balance : 0L;
 
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
         bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospitalDepartment);
         bean.setProperty(NurseBean.ORDER, orders);
-        bean.setProperty(NurseBean.WALLET_REMAIN, VerifyUtil.parsePrice(remain.intValue()));
+        bean.setProperty(NurseBean.WALLET_BALANCE, VerifyUtil.parsePrice(balance.intValue()));
         if (null!=qualification && !qualification.isEmpty()) {
             bean.setProperty(NurseBean.QUALIFICATION, qualification.get(0));
         }

@@ -5,15 +5,20 @@ package com.cooltoo.go2nurse.constants;
  */
 public enum WalletInOutType {
     NONE,
-    ORDER_IN;
+    ORDER_IN,
+    WITHDRAW;
 
 
     public static WalletInOutType parseString(String type) {
         WalletInOutType ret = null;
         if (NONE.name().equalsIgnoreCase(type)) {
             ret = NONE;
-        } else if (ORDER_IN.name().equalsIgnoreCase(type)) {
+        }
+        else if (ORDER_IN.name().equalsIgnoreCase(type)) {
             ret = ORDER_IN;
+        }
+        else if (WITHDRAW.name().equalsIgnoreCase(type)) {
+            ret = WITHDRAW;
         }
         return ret;
     }
@@ -22,8 +27,12 @@ public enum WalletInOutType {
         WalletInOutType ret = null;
         if (NONE.ordinal()==type) {
             ret = NONE;
-        } else if (ORDER_IN.ordinal()==type) {
+        }
+        else if (ORDER_IN.ordinal()==type) {
             ret = ORDER_IN;
+        }
+        else if (WITHDRAW.ordinal()==type) {
+            ret = WITHDRAW;
         }
         return ret;
     }

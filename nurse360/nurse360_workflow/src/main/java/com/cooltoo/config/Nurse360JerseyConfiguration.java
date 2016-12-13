@@ -55,7 +55,8 @@ public class Nurse360JerseyConfiguration extends ResourceConfig {
         register(NursePatientFollowUpManageAPI.class);
         register(NursePatientQuestionnaireAPI.class);
         register(NurseManageAPIForNurse360.class);
-        register(NurseWalletRecordAPI.class);
+        register(NurseWalletAPI.class);
+        register(NurseWalletManageAPI.class);
 
         register(NotifierAPI.class);
 
