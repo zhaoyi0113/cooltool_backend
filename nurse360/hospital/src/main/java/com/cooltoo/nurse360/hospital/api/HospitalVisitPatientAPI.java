@@ -76,21 +76,23 @@ public class HospitalVisitPatientAPI {
     //       Getting Patient Visit Record
     //=========================================
     @RequestMapping(path = "/visit/patient/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public long countVisitPatient(HttpServletRequest request) {
+    public long countVisitPatient(HttpServletRequest request,
+                                  @RequestParam(defaultValue = "", name = "content") String contentLike
+    ) {
         long count = 0;
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         if (userDetails.isNurseManager()) {
             Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
             Long hospitalId = tmp[0];
             Long departmentId = tmp[1];
-            count = visitPatientService.countVisitRecordByCondition(null, null, null, null,
+            count = visitPatientService.countVisitRecordByCondition(null, null, null, contentLike,
                     ServiceVendorType.HOSPITAL, hospitalId, departmentId
             );
             return count;
         }
         else if (userDetails.isNurse()) {
             count = visitPatientService.countVisitRecordByCondition(
-                    null, null, userDetails.getId(), null, null, null, null
+                    null, null, userDetails.getId(), contentLike, null, null, null
             );
             return count;
         }
@@ -99,8 +101,9 @@ public class HospitalVisitPatientAPI {
 
     @RequestMapping(path = "/visit/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<NurseVisitPatientBean> getVisitPatient(HttpServletRequest request,
-                                                       @RequestParam(defaultValue = "0", name = "index")  int pageIndex,
-                                                       @RequestParam(defaultValue = "10",name = "number") int sizePerPage
+                                                       @RequestParam(defaultValue = "",  name = "content")String contentLike,
+                                                       @RequestParam(defaultValue = "0", name = "index")     int pageIndex,
+                                                       @RequestParam(defaultValue = "10",name = "number")    int sizePerPage
     ) {
         List<NurseVisitPatientBean> count = new ArrayList<>();
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
@@ -108,14 +111,14 @@ public class HospitalVisitPatientAPI {
             Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
             Long hospitalId = tmp[0];
             Long departmentId = tmp[1];
-            count = visitPatientService.getVisitRecordByCondition(null, null, null, null,
+            count = visitPatientService.getVisitRecordByCondition(null, null, null, contentLike,
                     ServiceVendorType.HOSPITAL, hospitalId, departmentId, pageIndex, sizePerPage
             );
             return count;
         }
         else if (userDetails.isNurse()) {
             count = visitPatientService.getVisitRecordByCondition(
-                    null, null, userDetails.getId(), null, null, null, null, pageIndex, sizePerPage
+                    null, null, userDetails.getId(), contentLike, null, null, null, pageIndex, sizePerPage
             );
             return count;
         }

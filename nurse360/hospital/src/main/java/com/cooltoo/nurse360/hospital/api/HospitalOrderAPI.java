@@ -21,10 +21,7 @@ import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
@@ -184,6 +181,15 @@ public class HospitalOrderAPI {
     //=============================================================
     //            Authentication of NURSE/MANAGER Role
     //=============================================================
+    @RequestMapping(path = "/order/{order_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<ServiceOrderBean> countUserOrder(HttpServletRequest request,
+                                                 @PathVariable long order_id
+    ) {
+        List<ServiceOrderBean> orders = orderService.getOrderByOrderId(order_id);
+        return orders;
+    }
+
+
     @RequestMapping(path = "/order/user/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countUserOrder(HttpServletRequest request,
                                @RequestParam(defaultValue = "0",name = "user_id")       long userId,
