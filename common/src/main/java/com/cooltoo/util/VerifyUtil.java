@@ -122,6 +122,9 @@ public class VerifyUtil {
     }
 
     public static String parsePrice(int price) {
+        boolean negative = price<0;
+        price = negative ? -price : price;
+
         int prefix = (price/100);
         int suffix = (price%100);
         String strPrice = prefix +".";
@@ -131,6 +134,8 @@ public class VerifyUtil {
         else {
             strPrice = strPrice+suffix;
         }
+
+        strPrice = negative ? ("-"+strPrice) : strPrice;
         return strPrice;
     }
 

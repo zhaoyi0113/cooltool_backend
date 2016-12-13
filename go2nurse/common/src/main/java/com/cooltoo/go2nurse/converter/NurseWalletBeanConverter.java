@@ -18,7 +18,7 @@ public class NurseWalletBeanConverter implements Converter<NurseWalletEntity, Nu
         bean.setTime(source.getTime());
         bean.setNurseId(source.getNurseId());
         bean.setSummary(source.getSummary());
-        bean.setAmount(source.getAmount());
+        bean.setAmountCent(source.getAmount());
         bean.setReason(source.getReason());
         bean.setReasonId(source.getReasonId());
         return bean;

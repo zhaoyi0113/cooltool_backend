@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.WalletInOutType;
+import com.cooltoo.util.VerifyUtil;
 
 import java.util.Date;
 
@@ -15,7 +16,8 @@ public class NurseWalletBean {
     private Date time;
     private long nurseId;
     private String summary;
-    private long amount;
+    private long amountCent;
+    private String amount;
     private WalletInOutType reason;
     private long reasonId;
 
@@ -54,11 +56,13 @@ public class NurseWalletBean {
         this.summary = summary;
     }
 
-    public long getAmount() {
-        return amount;
+    public String getAmount() { return amount; }
+    public long getAmountCent() {
+        return amountCent;
     }
-    public void setAmount(long amount) {
-        this.amount = amount;
+    public void setAmountCent(long amountCent) {
+        this.amountCent = amountCent;
+        this.amount = VerifyUtil.parsePrice((int)amountCent);
     }
 
     public WalletInOutType getReason() {
@@ -83,7 +87,7 @@ public class NurseWalletBean {
         msg.append(", status=").append(status);
         msg.append(", nurseId=").append(nurseId);
         msg.append(", summary=").append(summary);
-        msg.append(", amount=").append(amount);
+        msg.append(", amountCent=").append(amountCent);
         msg.append(", reason=").append(reason);
         msg.append(", reasonId=").append(reasonId);
         msg.append("]");
