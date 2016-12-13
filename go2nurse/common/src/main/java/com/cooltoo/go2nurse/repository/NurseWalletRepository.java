@@ -20,10 +20,10 @@ public interface NurseWalletRepository extends JpaRepository<NurseWalletEntity, 
     List<NurseWalletEntity> findByNurseId(long nurseId);
     List<NurseWalletEntity> findByNurseIdAndReasonAndReasonId(long nurseId, WalletInOutType inOutType, long reasonId, Sort sort);
 
-    @Query("SELECT nw.nurseId, nw.amount FROM NurseWalletEntity nw" +
+    @Query("FROM NurseWalletEntity nw" +
             " WHERE nw.nurseId IN (?1)" +
             "   AND (?2 IS NULL OR ?2=nw.process)")
-    List<Object[]> findNurseWalletInOut(List<Long> nurseIds, WalletProcess process);
+    List<NurseWalletEntity> findNurseWalletInOut(List<Long> nurseIds, WalletProcess process);
 
     @Query("FROM NurseWalletEntity nw" +
             " WHERE (?1 IS NULL OR ?1=nw.nurseId)" +

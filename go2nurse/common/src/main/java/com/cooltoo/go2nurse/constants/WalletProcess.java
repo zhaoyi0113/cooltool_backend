@@ -5,7 +5,8 @@ package com.cooltoo.go2nurse.constants;
  */
 public enum WalletProcess {
     COMPLETED,
-    PROCESSING;
+    PROCESSING,
+    REFUSED;
 
 
     public static WalletProcess parseString(String type) {
@@ -15,6 +16,9 @@ public enum WalletProcess {
         }
         else if (PROCESSING.name().equalsIgnoreCase(type)) {
             ret = PROCESSING;
+        }
+        else if (REFUSED.name().equalsIgnoreCase(type)) {
+            ret = REFUSED;
         }
         return ret;
     }
@@ -26,6 +30,9 @@ public enum WalletProcess {
         }
         else if (PROCESSING.ordinal()==type) {
             ret = PROCESSING;
+        }
+        else if (REFUSED.ordinal()==type) {
+            ret = REFUSED;
         }
         return ret;
     }

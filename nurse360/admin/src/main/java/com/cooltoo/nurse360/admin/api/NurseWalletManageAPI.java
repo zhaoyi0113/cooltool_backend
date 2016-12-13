@@ -74,5 +74,15 @@ public class NurseWalletManageAPI {
         return Response.ok(record).build();
     }
 
+    @Path("/withdraw/refused/{flow_record_id}")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response refusedWithdraw(@Context HttpServletRequest request,
+                                    @PathParam("flow_record_id") @DefaultValue("0") long flowRecordId
+    ) {
+        NurseWalletBean record = nurseWalletService.updateWalletInOutStatus(flowRecordId, WalletProcess.REFUSED);
+        return Response.ok(record).build();
+    }
+
 
 }

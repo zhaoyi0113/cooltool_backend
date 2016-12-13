@@ -84,20 +84,16 @@ public class NurseWalletService {
         logger.debug("get nurse wallet balance by nurseIds={}", nurseIds);
         Map<Long, Long> nurseBalance = new HashMap<>();
         if (!VerifyUtil.isListEmpty(nurseIds)) {
-            List<Object[]> nurseToAmount = repository.findNurseWalletInOut(nurseIds, null);
+            List<NurseWalletEntity> nurseToAmount = repository.findNurseWalletInOut(nurseIds, null);
             if (!VerifyUtil.isListEmpty(nurseToAmount)) {
-                for (Object[] tmp : nurseToAmount) {
-                    if (null==tmp || tmp.length!=2) {
+                for (NurseWalletEntity tmp : nurseToAmount) {
+                    if (null==tmp) { continue; }
+                    if (!WalletProcess.COMPLETED.equals(tmp.getProcess())
+                     && !WalletProcess.PROCESSING.equals(tmp.getProcess())) {
                         continue;
                     }
-                    Long nurseId = (tmp[0] instanceof Long) ? (Long)tmp[0] : null;
-                    if (null==nurseId) {
-                        continue;
-                    }
-                    Long amount  = (tmp[1] instanceof Long) ? (Long)tmp[1] : null;
-                    if (null==amount) {
-                        continue;
-                    }
+                    Long nurseId = tmp.getNurseId();
+                    Long amount = tmp.getAmount();
                     Long exist = nurseBalance.get(nurseId);
                     exist = null==exist ? 0L : exist;
                     nurseBalance.put(nurseId, exist+amount);
@@ -110,20 +106,16 @@ public class NurseWalletService {
     public long getNurseWalletBalance(long nurseId) {
         logger.debug("get nurse wallet balance by nurseId={}", nurseId);
         long nurseBalance = 0;
-        List<Object[]> nurseToAmount = repository.findNurseWalletInOut(Arrays.asList(new Long[]{nurseId}), null);
+        List<NurseWalletEntity> nurseToAmount = repository.findNurseWalletInOut(Arrays.asList(new Long[]{nurseId}), null);
         if (!VerifyUtil.isListEmpty(nurseToAmount)) {
-            for (Object[] tmp : nurseToAmount) {
-                if (null==tmp || tmp.length!=2) {
+            for (NurseWalletEntity tmp : nurseToAmount) {
+                if (null==tmp) { continue; }
+                if (!WalletProcess.COMPLETED.equals(tmp.getProcess())
+                 && !WalletProcess.PROCESSING.equals(tmp.getProcess())) {
                     continue;
                 }
-                Long tmpNurseId = (tmp[0] instanceof Long) ? (Long)tmp[0] : null;
-                if (null==tmpNurseId) {
-                    continue;
-                }
-                Long tmpAmount  = (tmp[1] instanceof Long) ? (Long)tmp[1] : null;
-                if (null==tmpAmount) {
-                    continue;
-                }
+
+                Long tmpAmount = tmp.getAmount();
                 nurseBalance += tmpAmount;
             }
         }
