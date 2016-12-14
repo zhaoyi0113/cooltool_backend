@@ -83,49 +83,19 @@ public class NurseServiceForGo2Nurse {
         return nurseIdToBean;
     }
 
+    public String getNurseMobile(long nurseId) {
+        String mobile = commonNurseService.getNurseMobile(nurseId);
+        return mobile;
+    }
+
     public List<Long> getManagerId(int hospitalId, int departmentId) {
-        List<NurseBean> managerInDepart = getManagers(hospitalId, departmentId);
-        List<Long> managersId = new ArrayList<>();
-        for (NurseBean tmp : managerInDepart) {
-            Long nurseId = tmp.getId();
-            if (managersId.contains(nurseId)) {
-                continue;
-            }
-            managersId.add(nurseId);
-        }
-        return managersId;
+        List<Long> managersIdInDepartId = commonNurseService.getManagersId(hospitalId, departmentId);
+        return managersIdInDepartId;
     }
 
     public List<String> getManagerMobiles(int hospitalId, int departmentId) {
-        List<NurseBean> managerInDepart = getManagers(hospitalId, departmentId);
-        List<String> managersMobile = new ArrayList<>();
-        for (NurseBean tmp : managerInDepart) {
-            String mobile = tmp.getMobile();
-            if (VerifyUtil.isStringEmpty(mobile)) {
-                continue;
-            }
-            managersMobile.add(mobile);
-        }
-        return managersMobile;
-    }
-
-    private List<NurseBean> getManagers(int hospitalId, int departmentId) {
-        List<NurseBean> nursesInDepart = getNurseByCanAnswerQuestion(null, null, null, hospitalId, departmentId, null);
-        List<NurseBean> managersMobile = new ArrayList<>();
-        for (NurseBean tmp : nursesInDepart) {
-            String mobile = tmp.getMobile();
-            if (VerifyUtil.isStringEmpty(mobile)) {
-                continue;
-            }
-            NurseExtensionBean extension = (NurseExtensionBean) tmp.getProperty(NurseBean.INFO_EXTENSION);
-            if (null==extension) {
-                continue;
-            }
-            if (YesNoEnum.YES.equals(extension.getIsManager())) {
-                managersMobile.add(tmp);
-            }
-        }
-        return managersMobile;
+        List<String> managersMobileInDepart = commonNurseService.getManagersMobile(hospitalId, departmentId);
+        return managersMobileInDepart;
     }
 
     public long countNurseByCanAnswerQuestion(String name, String strCanAnswerQuestion, String strCanSeeAllOrder, Integer hospitalId, Integer departmentId, RegisterFrom registerFrom) {

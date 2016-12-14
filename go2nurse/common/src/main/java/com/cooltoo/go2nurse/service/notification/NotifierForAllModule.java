@@ -1,11 +1,14 @@
 package com.cooltoo.go2nurse.service.notification;
 
 import com.cooltoo.constants.ReadingStatus;
+import com.cooltoo.go2nurse.beans.NurseWalletBean;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.PatientFollowUpType;
+import com.cooltoo.go2nurse.constants.WalletProcess;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
 import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
+import com.cooltoo.go2nurse.service.NurseWalletService;
 import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 2016/11/17.
@@ -31,6 +36,8 @@ public class NotifierForAllModule {
     public static final String PUSH_COURSE_ALERT_BODY = "你有一条定制推送";
     public static final String FOLLOW_UP_ALERT_BODY = "你有一条随访记录";
     public static final String FOLLOW_UP_REPLY_ALERT_BODY = "你有一条随访回复";
+    public static final String WITHDRAW_COMPLETED_ALERT_BODY = "提现成功，请查收";
+    public static final String WITHDRAW_REFUSED_ALERT_BODY = "拒绝提现";
 
 
     @Value("${nurse360_notifier_url}")
@@ -40,6 +47,7 @@ public class NotifierForAllModule {
 
     @Autowired private Notifier notifier;
     @Autowired private NurseOrderRelationRepository nurseOrderRelation;
+    @Autowired private NurseWalletService nurseWalletService;
 
 
     //========================================================================================
@@ -47,12 +55,54 @@ public class NotifierForAllModule {
     //                              LeanCloud Request SMS Code
     //
     //========================================================================================
+    public void withdrawAlertToNurse360(long nurseId, long withdrawRecordId, String description) {
+        NurseWalletBean walletFlowRecord = nurseWalletService.getNurseWalletRecord(withdrawRecordId);
+        if (null!=walletFlowRecord) {
+            WalletProcess process = walletFlowRecord.getProcess();
+            String body = WalletProcess.COMPLETED.equals(process)
+                    ? WITHDRAW_COMPLETED_ALERT_BODY
+                    : WITHDRAW_REFUSED_ALERT_BODY;
+            MessageBean messageBean = notifier.createMessage(
+                    MessageType.NURSE_WITHDRAW,
+                    body,
+                    withdrawRecordId,
+                    process.name(),
+                    VerifyUtil.isStringEmpty(description) ? ("withdraw " + process.name().toLowerCase() + "!") : description
+            );
+
+            StringBuilder msg = messageBean.toHtmlParam();
+            msg.append("&nurse_id=").append(nurseId);
+            NetworkUtil.newInstance().httpsRequest(nurse360NotifierUrl, "PUT", msg.toString());
+        }
+    }
+
+    //========================================================================================
+    //
+    //                              LeanCloud Request SMS Code
+    //
+    //========================================================================================
+    public void leanCloudRequestSmsCodeWithdrawSuccess(List<String> mobiles, String summary) {
+        Map<String, String> param = new HashMap<>();
+        param.put("summary", summary);
+        notifier.leanCloudRequestSmsCode(mobiles, MessageBean.LEANCLOUD_MSG_TEMPLATE_QSHL_WITHDRAW_SUCCESS, param);
+    }
+
+    public void leanCloudRequestSmsCodeWithdrawRefused(List<String> mobiles, String reason) {
+        Map<String, String> param = new HashMap<>();
+        param.put("reason", reason);
+        notifier.leanCloudRequestSmsCode(mobiles, MessageBean.LEANCLOUD_MSG_TEMPLATE_QSHL_WITHDRAW_REFUSED, param);
+    }
+
     public void leanCloudRequestSmsCodeNewOrder(List<String> mobiles, String orderNo) {
-        notifier.leanCloudRequestSmsCode(mobiles, MessageBean.LEANCLOUD_MSG_TEMPLATE_QSHL_NEW_ORDER, orderNo);
+        Map<String, String> param = new HashMap<>();
+        param.put("orderNo", orderNo);
+        notifier.leanCloudRequestSmsCode(mobiles, MessageBean.LEANCLOUD_MSG_TEMPLATE_QSHL_NEW_ORDER, param);
     }
 
     public void leanCloudRequestSmsCodeRedispatch(List<String> mobiles, String orderNo) {
-        notifier.leanCloudRequestSmsCode(mobiles, MessageBean.LEANCLOUD_MSG_TEMPLATE_QSHL_REDISPATCH, orderNo);
+        Map<String, String> param = new HashMap<>();
+        param.put("orderNo", orderNo);
+        notifier.leanCloudRequestSmsCode(mobiles, MessageBean.LEANCLOUD_MSG_TEMPLATE_QSHL_REDISPATCH, param);
     }
 
 

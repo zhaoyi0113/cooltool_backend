@@ -3,7 +3,9 @@ package com.cooltoo.nurse360.admin.api;
 import com.cooltoo.go2nurse.beans.NurseWalletBean;
 import com.cooltoo.go2nurse.constants.WalletInOutType;
 import com.cooltoo.go2nurse.constants.WalletProcess;
+import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
 import com.cooltoo.go2nurse.service.NurseWalletService;
+import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,6 +14,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,6 +24,8 @@ import java.util.List;
 public class NurseWalletManageAPI {
 
     @Autowired private NurseWalletService nurseWalletService;
+    @Autowired private NurseServiceForGo2Nurse nurseService;
+    @Autowired private NotifierForAllModule notifierForAllModule;
 
     @Path("/count")
     @GET
@@ -64,23 +69,46 @@ public class NurseWalletManageAPI {
         return Response.ok(flowRecords).build();
     }
 
-    @Path("/withdraw/completed/{flow_record_id}")
+    @Path("/withdraw/completed")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response completedWithdraw(@Context HttpServletRequest request,
-                                      @PathParam("flow_record_id") @DefaultValue("0") long flowRecordId
+                                      @FormParam("flow_record_id") @DefaultValue("0") long flowRecordId
     ) {
         NurseWalletBean record = nurseWalletService.updateWalletInOutStatus(flowRecordId, WalletProcess.COMPLETED);
+        if (null!=record
+                && WalletInOutType.WITHDRAW.equals(record.getReason())
+                && WalletProcess.COMPLETED.equals(record.getProcess())) {
+            String message = record.getSummary() + " 成功";
+            notifierForAllModule.withdrawAlertToNurse360(record.getNurseId(), flowRecordId, message);
+            String mobile = nurseService.getNurseMobile(record.getNurseId());
+            if (!VerifyUtil.isStringEmpty(mobile)) {
+                notifierForAllModule.leanCloudRequestSmsCodeWithdrawSuccess(Arrays.asList(new String[]{mobile}), record.getSummary());
+            }
+        }
         return Response.ok(record).build();
     }
 
-    @Path("/withdraw/refused/{flow_record_id}")
+    @Path("/withdraw/refused")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response refusedWithdraw(@Context HttpServletRequest request,
-                                    @PathParam("flow_record_id") @DefaultValue("0") long flowRecordId
+                                    @FormParam("flow_record_id") @DefaultValue("0") long flowRecordId,
+                                    @FormParam("refused_reason") @DefaultValue("") String refusedReason
+
     ) {
         NurseWalletBean record = nurseWalletService.updateWalletInOutStatus(flowRecordId, WalletProcess.REFUSED);
+        if (null!=record
+                && WalletInOutType.WITHDRAW.equals(record.getReason())
+                && WalletProcess.REFUSED.equals(record.getProcess())) {
+            String message = record.getSummary() + " 被拒绝";
+            notifierForAllModule.withdrawAlertToNurse360(record.getNurseId(), flowRecordId, message);
+            String mobile = nurseService.getNurseMobile(record.getNurseId());
+            if (!VerifyUtil.isStringEmpty(mobile)) {
+                message += "。原因："+refusedReason;
+                notifierForAllModule.leanCloudRequestSmsCodeWithdrawRefused(Arrays.asList(new String[]{mobile}), message);
+            }
+        }
         return Response.ok(record).build();
     }
 

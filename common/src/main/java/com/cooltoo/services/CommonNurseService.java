@@ -1,5 +1,7 @@
 package com.cooltoo.services;
 
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.UserAuthority;
@@ -7,6 +9,7 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.entities.HospitalDepartmentEntity;
 import com.cooltoo.entities.HospitalEntity;
 import com.cooltoo.entities.NurseEntity;
+import com.cooltoo.entities.NurseExtensionEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.repository.HospitalDepartmentRepository;
@@ -23,8 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -40,6 +42,7 @@ public class CommonNurseService {
     @Autowired private NurseRepository nurseRepository;
     @Autowired private HospitalRepository hospitalRepository;
     @Autowired private HospitalDepartmentRepository departmentRepository;
+    @Autowired private NurseExtensionService nurseExtensionService;
 
     //========================================================================
     //                        getting
@@ -111,6 +114,57 @@ public class CommonNurseService {
         logger.info("get nurseIds by authority={}", authority);
         List<Long> nurseIds = nurseRepository.findIdsByAuthority(authority);
         logger.info("count is {}", nurseIds.size());
+        return nurseIds;
+    }
+
+    public String getNurseMobile(long nurseId) {
+        NurseEntity nurse = nurseRepository.findOne(nurseId);
+        if (null!=nurse) {
+            String mobile = nurse.getMobile();
+            return VerifyUtil.isStringEmpty(mobile) ? null : mobile;
+        }
+        return null;
+    }
+
+    public List<String> getManagersMobile(int hospitalId, int departmentId) {
+        List<Long> managerId = getManagersId(hospitalId, departmentId);
+        List<NurseEntity> managers = getNurseByIds(managerId);
+        List<String> managersMobile = new ArrayList<>();
+        for (NurseEntity tmp : managers) {
+            String mobile = tmp.getMobile();
+            if (VerifyUtil.isStringEmpty(mobile)) {
+                continue;
+            }
+            if (!managersMobile.contains(mobile)) {
+                managersMobile.add(mobile);
+            }
+        }
+        return managersMobile;
+    }
+
+    public List<Long> getManagersId(int hospitalId, int departmentId) {
+        Iterable<NurseEntity> nursesInDepart = getNurseByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL, null, null, null, hospitalId, departmentId, null);
+        List<Long> nurseIds = new ArrayList<>();
+        for (NurseEntity tmp : nursesInDepart) {
+            if (!nurseIds.contains(tmp.getId())) {
+                nurseIds.add(tmp.getId());
+            }
+        }
+
+        nurseIds.clear();
+        Map<Long, NurseExtensionBean> nurseExtensions = nurseExtensionService.getExtensionByNurseIds(nurseIds);
+        if (!VerifyUtil.isMapEmpty(nurseExtensions)) {
+            Set<Long> keys = nurseExtensions.keySet();
+            for (Long k : keys) {
+                NurseExtensionBean extension = nurseExtensions.get(k);
+                if (null == extension) {
+                    continue;
+                }
+                if (YesNoEnum.YES.equals(extension.getIsManager())) {
+                    nurseIds.add(k);
+                }
+            }
+        }
         return nurseIds;
     }
 

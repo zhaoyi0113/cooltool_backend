@@ -12,6 +12,8 @@ public class MessageBean {
 
     public static final String LEANCLOUD_MSG_TEMPLATE_QSHL_NEW_ORDER  = "qshl_new_order";
     public static final String LEANCLOUD_MSG_TEMPLATE_QSHL_REDISPATCH = "qshl_redispatch";
+    public static final String LEANCLOUD_MSG_TEMPLATE_QSHL_WITHDRAW_SUCCESS = "qshl_withdraw_success";
+    public static final String LEANCLOUD_MSG_TEMPLATE_QSHL_WITHDRAW_REFUSED = "qshl_withdraw_refused";
 
 
     private String alertBody;

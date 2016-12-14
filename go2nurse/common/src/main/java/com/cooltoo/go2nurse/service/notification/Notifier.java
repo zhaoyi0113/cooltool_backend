@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/9/14.
@@ -24,7 +25,7 @@ public class Notifier {
     @Autowired private AppleNotifier appleNotifier;
     @Autowired private LeanCloudNotifier leanCloudNotifier;
 
-    public void leanCloudRequestSmsCode(List<String> mobiles, String template, String orderNo) {
+    public void leanCloudRequestSmsCode(List<String> mobiles, String template, Map<String, String> orderNo) {
         leanCloudNotifier.sendOrderMessage(mobiles, template, orderNo);
     }
 

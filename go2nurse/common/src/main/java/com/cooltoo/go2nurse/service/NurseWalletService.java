@@ -138,6 +138,16 @@ public class NurseWalletService {
         return beans;
     }
 
+    public NurseWalletBean getNurseWalletRecord(long walletRecordId) {
+        NurseWalletEntity entity = repository.findOne(walletRecordId);
+        if (null==entity) {
+            return null;
+        }
+        NurseWalletBean bean = beanConverter.convert(entity);
+        fillOtherProperties(Arrays.asList(new NurseWalletBean[]{bean}));
+        return bean;
+    }
+
     private List<NurseWalletBean> entitiesToBeans(Iterable<NurseWalletEntity> entities) {
         List<NurseWalletBean> beans = new ArrayList<>();
         if (null==entities) {
@@ -269,7 +279,7 @@ public class NurseWalletService {
             Long nurseId = orderIdToNurseId.get(orderId);
             String summary = "订单";
             if (order.getServiceItem() instanceof ServiceItemBean) {
-                summary = summary + "-" + order.getServiceItem().getName();
+                summary = summary + " " + order.getServiceItem().getName();
             }
             return recordWalletInOut(nurseId, order.getTotalServerIncomeCent(), summary, WalletProcess.COMPLETED, WalletInOutType.ORDER_IN, orderId);
         }

@@ -53,7 +53,7 @@ public class NurseWalletAPI {
         if (canWithdraw<lWithdrawCase) {
             throw new BadRequestException(ErrorCode.NURSE360_AMOUNT_EXCEEDS_BALANCE);
         }
-        NurseWalletBean bean = nurseWalletService.recordWalletInOut(nurseId, -lWithdrawCase, "提现-"+amount, WalletProcess.PROCESSING, WalletInOutType.WITHDRAW, 0L);
+        NurseWalletBean bean = nurseWalletService.recordWalletInOut(nurseId, -lWithdrawCase, "提现 "+amount, WalletProcess.PROCESSING, WalletInOutType.WITHDRAW, 0L);
         return Response.ok(bean).build();
     }
 

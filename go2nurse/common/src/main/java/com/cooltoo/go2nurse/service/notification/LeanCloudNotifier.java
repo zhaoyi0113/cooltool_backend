@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by hp on 2016/9/13.
@@ -97,13 +98,16 @@ public class LeanCloudNotifier {
 
     }
 
-    public void sendOrderMessage(List<String> mobiles, String template, String orderNo) {
+    public void sendOrderMessage(List<String> mobiles, String template, Map<String, String> parameters) {
         if (VerifyUtil.isListEmpty(mobiles)) {
             return;
         }
         Map<String, Object> customJson = new HashMap<>();
         customJson.put("template", template);
-        customJson.put("orderNo", orderNo);
+        Set<String> keys = parameters.keySet();
+        for (String k : keys) {
+            customJson.put(k, parameters.get(k));
+        }
         for (String mobile : mobiles) {
             if (VerifyUtil.isStringEmpty(mobile)) {
                 continue;
