@@ -1,12 +1,7 @@
 package com.cooltoo.nurse360.admin.api;
 
-import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.NurseVisitPatientBean;
-import com.cooltoo.go2nurse.beans.NurseVisitPatientServiceItemBean;
 import com.cooltoo.go2nurse.service.NurseVisitPatientService;
-import com.cooltoo.go2nurse.service.NurseVisitPatientServiceItemService;
-import com.cooltoo.util.JSONUtil;
-import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;

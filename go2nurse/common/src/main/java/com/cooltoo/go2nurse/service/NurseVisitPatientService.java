@@ -11,7 +11,6 @@ import com.cooltoo.go2nurse.converter.NurseVisitPatientBeanConverter;
 import com.cooltoo.go2nurse.entities.NurseVisitPatientEntity;
 import com.cooltoo.go2nurse.repository.NurseVisitPatientRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
-import com.cooltoo.go2nurse.service.notification.Notifier;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.JSONUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -61,7 +60,7 @@ public class NurseVisitPatientService {
 
     public long countVisitRecordByCondition(Long userId, Long patientId, Long nurseId, String contentLike) {
         contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
-        long count = repository.countByConditions(userId, patientId, nurseId, contentLike, null, null, null);
+        long count = repository.countByConditions(userId, patientId, nurseId, contentLike, null, null, null, null);
         logger.info("count visit record user={} patientId={} nurseId={} contentLike={}, count is {}",
                 userId, patientId, nurseId, contentLike, count);
         return count;
@@ -73,7 +72,7 @@ public class NurseVisitPatientService {
         List<NurseVisitPatientBean> beans;
         contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
         PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<NurseVisitPatientEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, null, null, null, request);
+        Page<NurseVisitPatientEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, null, null, null, null, request);
         beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
 
