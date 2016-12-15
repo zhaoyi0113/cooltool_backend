@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.hospital.api;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.NurseVisitPatientBean;
 import com.cooltoo.go2nurse.beans.NurseVisitPatientServiceItemBean;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
@@ -45,7 +46,7 @@ public class HospitalVisitPatientAPI {
         Long vendorId = VerifyUtil.isIds(strVendorId) ? VerifyUtil.parseLongIds(strVendorId).get(0) : 0L;
         Long departId = VerifyUtil.isIds(strDepartId) ? VerifyUtil.parseLongIds(strDepartId).get(0) : 0L;
         long count = visitPatientService.countVisitRecordByCondition(null, null, null, null,
-                vendorType, vendorId, departId
+                vendorType, vendorId, departId, null
         );
         return count;
     }
@@ -61,11 +62,11 @@ public class HospitalVisitPatientAPI {
         ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
         Long vendorId = VerifyUtil.isIds(strVendorId) ? VerifyUtil.parseLongIds(strVendorId).get(0) : 0L;
         Long departId = VerifyUtil.isIds(strDepartId) ? VerifyUtil.parseLongIds(strDepartId).get(0) : 0L;
-        List<NurseVisitPatientBean> set = visitPatientService.getVisitRecordByCondition(null, null, null, null,
-                vendorType, vendorId, departId,
+        List<NurseVisitPatientBean> record = visitPatientService.getVisitRecordByCondition(null, null, null, null,
+                vendorType, vendorId, departId, null,
                 pageIndex, sizePerPage
         );
-        return set;
+        return record;
     }
 
 
@@ -86,13 +87,13 @@ public class HospitalVisitPatientAPI {
             Long hospitalId = tmp[0];
             Long departmentId = tmp[1];
             count = visitPatientService.countVisitRecordByCondition(null, null, null, contentLike,
-                    ServiceVendorType.HOSPITAL, hospitalId, departmentId
+                    ServiceVendorType.HOSPITAL, hospitalId, departmentId, CommonStatus.DELETED
             );
             return count;
         }
         else if (userDetails.isNurse()) {
             count = visitPatientService.countVisitRecordByCondition(
-                    null, null, userDetails.getId(), contentLike, null, null, null
+                    null, null, userDetails.getId(), contentLike, null, null, null, CommonStatus.DELETED
             );
             return count;
         }
@@ -105,24 +106,24 @@ public class HospitalVisitPatientAPI {
                                                        @RequestParam(defaultValue = "0", name = "index")     int pageIndex,
                                                        @RequestParam(defaultValue = "10",name = "number")    int sizePerPage
     ) {
-        List<NurseVisitPatientBean> count = new ArrayList<>();
+        List<NurseVisitPatientBean> records = new ArrayList<>();
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         if (userDetails.isNurseManager()) {
             Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
             Long hospitalId = tmp[0];
             Long departmentId = tmp[1];
-            count = visitPatientService.getVisitRecordByCondition(null, null, null, contentLike,
-                    ServiceVendorType.HOSPITAL, hospitalId, departmentId, pageIndex, sizePerPage
+            records = visitPatientService.getVisitRecordByCondition(null, null, null, contentLike,
+                    ServiceVendorType.HOSPITAL, hospitalId, departmentId, CommonStatus.DELETED, pageIndex, sizePerPage
             );
-            return count;
+            return records;
         }
         else if (userDetails.isNurse()) {
-            count = visitPatientService.getVisitRecordByCondition(
-                    null, null, userDetails.getId(), contentLike, null, null, null, pageIndex, sizePerPage
+            records = visitPatientService.getVisitRecordByCondition(
+                    null, null, userDetails.getId(), contentLike, null, null, null, CommonStatus.DELETED, pageIndex, sizePerPage
             );
-            return count;
+            return records;
         }
-        return count;
+        return records;
     }
 
     @RequestMapping(path = "/visit/patient/userid/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
@@ -136,7 +137,7 @@ public class HospitalVisitPatientAPI {
 //        Long departmentId = tmp[1];
         long count = 0;
         Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
-        count = visitPatientService.countVisitRecordByCondition(userId, patientId, null, null, null, null, null);
+        count = visitPatientService.countVisitRecordByCondition(userId, patientId, null, null, null, null, null, CommonStatus.DELETED);
         return count;
 }
 
@@ -152,9 +153,9 @@ public class HospitalVisitPatientAPI {
 //        Long hospitalId   = tmp[0];
 //        Long departmentId = tmp[1];
         Long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : null;
-        List<NurseVisitPatientBean> count;
-        count = visitPatientService.getVisitRecordByCondition(userId, patientId, null, null, null, null, null, pageIndex, sizePerPage);
-        return count;
+        List<NurseVisitPatientBean> records;
+        records = visitPatientService.getVisitRecordByCondition(userId, patientId, null, null, null, null, null, CommonStatus.DELETED, pageIndex, sizePerPage);
+        return records;
     }
 
     @RequestMapping(path = "/visit/patient/{visit_patient_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)

@@ -16,27 +16,28 @@ import java.util.List;
  */
 public interface NurseVisitPatientRepository extends JpaRepository<NurseVisitPatientEntity, Long>{
 
-
     @Query("SELECT count(nvp.id) FROM NurseVisitPatientEntity nvp" +
-            " WHERE (?1 IS NULL OR nvp.userId=?1)" +
-            " AND (?2 IS NULL OR nvp.patientId=?2)" +
-            " AND (?3 IS NULL OR nvp.nurseId=?3)" +
-            " AND ((?4 IS NULL) OR (nvp.visitRecord LIKE %?4))" +
-            " AND (?5 IS NULL OR nvp.vendorType=?5)" +
-            " AND (?6 IS NULL OR nvp.vendorId=?6)" +
-            " AND (?7 IS NULL OR nvp.vendorDepartId=?7)")
-    long countByConditions(Long userId, Long patientId, Long nurseId, String contentLike, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId);
+            " WHERE (?1 IS NULL OR ?1=nvp.userId)" +
+            "   AND (?2 IS NULL OR ?2=nvp.patientId)" +
+            "   AND (?3 IS NULL OR ?3=nvp.nurseId)" +
+            "   AND ((?4 IS NULL) OR (nvp.visitRecord LIKE %?4))" +
+            "   AND (?5 IS NULL OR ?5=nvp.vendorType)" +
+            "   AND (?6 IS NULL OR ?6=nvp.vendorId)" +
+            "   AND (?7 IS NULL OR ?7=nvp.vendorDepartId)" +
+            "   AND (?8 IS NULL OR ?8<>nvp.status)")
+    long countByConditions(Long userId, Long patientId, Long nurseId, String contentLike, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, CommonStatus statusNot);
 
 
     @Query("FROM NurseVisitPatientEntity nvp" +
-            " WHERE (?1 IS NULL OR nvp.userId=?1)" +
-            " AND (?2 IS NULL OR nvp.patientId=?2)" +
-            " AND (?3 IS NULL OR nvp.nurseId=?3)" +
-            " AND ((?4 IS NULL) OR (nvp.visitRecord LIKE %?4))" +
-            " AND (?5 IS NULL OR nvp.vendorType=?5)" +
-            " AND (?6 IS NULL OR nvp.vendorId=?6)" +
-            " AND (?7 IS NULL OR nvp.vendorDepartId=?7)")
-    Page<NurseVisitPatientEntity> findByConditions(Long userId, Long patientId, Long nurseId, String contentLike, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, Pageable page);
+            " WHERE (?1 IS NULL OR ?1=nvp.userId)" +
+            "   AND (?2 IS NULL OR ?2=nvp.patientId)" +
+            "   AND (?3 IS NULL OR ?3=nvp.nurseId)" +
+            "   AND ((?4 IS NULL) OR (nvp.visitRecord LIKE %?4))" +
+            "   AND (?5 IS NULL OR ?5=nvp.vendorType)" +
+            "   AND (?6 IS NULL OR ?6=nvp.vendorId)" +
+            "   AND (?7 IS NULL OR ?7=nvp.vendorDepartId)" +
+            "   AND (?8 IS NULL OR ?8<>nvp.status)")
+    Page<NurseVisitPatientEntity> findByConditions(Long userId, Long patientId, Long nurseId, String contentLike, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, CommonStatus statusNot, Pageable page);
 
 
     @Query("FROM NurseVisitPatientEntity nvp" +
