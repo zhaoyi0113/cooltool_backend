@@ -308,8 +308,8 @@ public class NurseVisitPatientService {
 
         List<NurseVisitPatientEntity> visitRecord = repository.findAll(visitRecordId);
         if (VerifyUtil.isListEmpty(visitRecord)) {
-            logger.info("delete nothing");
-            return retValue;
+            logger.error("delete nothing");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
         if (null!=nurseId) {
@@ -317,8 +317,8 @@ public class NurseVisitPatientService {
                 if (tmp.getNurseId() == nurseId) {
                     continue;
                 }
-                logger.warn("can not delete visit record that not making by yourself={}", tmp);
-                return retValue;
+                logger.error("can not delete visit record that not making by yourself={}", tmp);
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
 

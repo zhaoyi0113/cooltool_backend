@@ -256,6 +256,16 @@ public class HospitalVisitPatientAPI {
         return visit;
     }
 
+    @RequestMapping(path = "/visit/patient", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public long setDeleteStatusOfVisitPatientRecord(HttpServletRequest request,
+                                                    @RequestParam(defaultValue = "0", name = "visit_record_id") long visitRecordId
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = userDetails.isNurse() ? userDetails.getId() : null;
+        List<Long> updateIds = visitPatientService.setDeleteStatusVisitRecordByIds(nurseId, Arrays.asList(new Long[]{visitRecordId}));
+        return updateIds.get(0);
+    }
+
     @RequestMapping(path = "/visit/patient/image", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
     public Map<String, Boolean> deleteVisitPatientRecordImage(HttpServletRequest request,
                                                               @RequestParam(defaultValue = "0", name = "visit_record_id") long visitRecordId
