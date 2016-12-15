@@ -9,6 +9,7 @@ import com.cooltoo.go2nurse.beans.CasebookBean;
 import com.cooltoo.go2nurse.service.CasebookService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NurseServiceForNurse360;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -21,10 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/8/28.
@@ -104,10 +102,13 @@ public class CasebookAPI {
                                 @FormParam("patient_id") @DefaultValue("0") long patientId,
                                 @FormParam("description") @DefaultValue("") String description,
                                 @FormParam("name") @DefaultValue("") String name,
-                                @FormParam("hidden") @DefaultValue("") String hidden /* YES, NO */
+                                @FormParam("hidden") @DefaultValue("") String hidden /* YES, NO */,
+                                @FormParam("time") @DefaultValue("") String time   /* YYYY-MM-DD hh:mm:ss */
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        long casebookId = casebookService.addCasebook(0, 0, nurseId, userId, patientId, description, name, YesNoEnum.parseString(hidden));
+        long lTime = NumberUtil.getTime(time, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date dTime = lTime<=0 ? null : new Date(lTime);
+        long casebookId = casebookService.addCasebook(0, 0, nurseId, userId, patientId, description, name, YesNoEnum.parseString(hidden), dTime);
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", casebookId);
         return Response.ok(retValue).build();
@@ -120,10 +121,13 @@ public class CasebookAPI {
                                  @FormParam("casebook_id") @DefaultValue("0") long casebookId,
                                  @FormParam("name") @DefaultValue("") String name,
                                  @FormParam("description") @DefaultValue("") String description,
-                                 @FormParam("hidden") @DefaultValue("") String hidden /* YES, NO */
+                                 @FormParam("hidden") @DefaultValue("") String hidden /* YES, NO */,
+                                 @FormParam("time") @DefaultValue("") String time   /* YYYY-MM-DD hh:mm:ss */
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        CasebookBean casebook = casebookService.updateCasebook(nurseId, casebookId, name, description, YesNoEnum.parseString(hidden));
+        long lTime = NumberUtil.getTime(time, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date dTime = lTime<=0 ? null : new Date(lTime);
+        CasebookBean casebook = casebookService.updateCasebook(nurseId, casebookId, name, description, YesNoEnum.parseString(hidden), dTime);
         return Response.ok(casebook).build();
     }
 

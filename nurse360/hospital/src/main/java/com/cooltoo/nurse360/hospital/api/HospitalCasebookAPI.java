@@ -6,6 +6,7 @@ import com.cooltoo.go2nurse.beans.CasebookBean;
 import com.cooltoo.go2nurse.service.CasebookService;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,14 +160,17 @@ public class HospitalCasebookAPI {
                                          @RequestParam(defaultValue = "0", name = "patient_id")    long patientId,
                                          @RequestParam(defaultValue = "",  name = "description") String description,
                                          @RequestParam(defaultValue = "",  name = "name")        String name,
-                                         @RequestParam(defaultValue = "no",name = "hidden")      String hidden /* yes, no */
+                                         @RequestParam(defaultValue = "no",name = "hidden")      String hidden /* yes, no */,
+                                         @RequestParam(defaultValue = "",  name = "time")        String time   /* YYYY-MM-DD hh:mm:ss */
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
         Integer hospitalId   = tmp[0];
         Integer departmentId = tmp[1];
         Long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
-        long casebookId = casebookService.addCasebook(hospitalId, departmentId, nurseId, userId, patientId, description, name, YesNoEnum.parseString(hidden));
+        long lTime = NumberUtil.getTime(time, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date dTime = lTime<=0 ? null : new Date(lTime);
+        long casebookId = casebookService.addCasebook(hospitalId, departmentId, nurseId, userId, patientId, description, name, YesNoEnum.parseString(hidden), dTime);
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", casebookId);
         return retValue;
@@ -177,11 +181,14 @@ public class HospitalCasebookAPI {
                                      @RequestParam(defaultValue = "0", name = "casebook_id")   long casebookId,
                                      @RequestParam(defaultValue = "",  name = "name")        String name,
                                      @RequestParam(defaultValue = "",  name = "description") String description,
-                                     @RequestParam(defaultValue = "no",name = "hidden")      String hidden /* yes, no */
+                                     @RequestParam(defaultValue = "no",name = "hidden")      String hidden /* yes, no */,
+                                     @RequestParam(defaultValue = "",  name = "time")        String time   /* YYYY-MM-DD hh:mm:ss */
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
-        CasebookBean casebook = casebookService.updateCasebook(nurseId, casebookId, name, description, YesNoEnum.parseString(hidden));
+        long lTime = NumberUtil.getTime(time, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date dTime = lTime<=0 ? null : new Date(lTime);
+        CasebookBean casebook = casebookService.updateCasebook(nurseId, casebookId, name, description, YesNoEnum.parseString(hidden), dTime);
         return casebook;
     }
 

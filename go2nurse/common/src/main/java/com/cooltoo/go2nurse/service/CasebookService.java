@@ -274,7 +274,7 @@ public class CasebookService {
     }
 
     @Transactional
-    public CasebookBean updateCasebook(Long nurseId, Long casebookId, String name, String description, YesNoEnum hidden) {
+    public CasebookBean updateCasebook(Long nurseId, Long casebookId, String name, String description, YesNoEnum hidden, Date time) {
         logger.info("update casebook={} with name={} description={} nurseId={}",
                 casebookId, name, description, nurseId);
         CasebookEntity entity = repository.findOne(casebookId);
@@ -301,6 +301,10 @@ public class CasebookService {
             entity.setHidden(hidden);
             changed = true;
         }
+        if (null!=time && time.getTime()!=entity.getTime().getTime()) {
+            entity.setTime(time);
+            changed = true;
+        }
         if (changed) {
             entity = repository.save(entity);
         }
@@ -315,7 +319,7 @@ public class CasebookService {
     //             add
     //===============================================================
     @Transactional
-    public long addCasebook(int hospitalId, int departmentId, long nurseId, long userId, long patientId, String description, String name, YesNoEnum hidden) {
+    public long addCasebook(int hospitalId, int departmentId, long nurseId, long userId, long patientId, String description, String name, YesNoEnum hidden, Date time) {
         logger.info("add casebook with nurseId={} userId={} patientId={} description={} name={}",
                 nurseId, userId, patientId, description, (null!=name));
 
@@ -365,7 +369,7 @@ public class CasebookService {
         entity.setName(name);
         entity.setHidden(null==hidden ? YesNoEnum.NO : hidden);
         entity.setStatus(CommonStatus.ENABLED);
-        entity.setTime(new Date());
+        entity.setTime(null==time ? new Date() : time);
         entity = repository.save(entity);
 
         return entity.getId();
