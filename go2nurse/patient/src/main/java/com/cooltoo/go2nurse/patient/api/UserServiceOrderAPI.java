@@ -102,7 +102,7 @@ public class UserServiceOrderAPI {
         List<ServiceItemBean> returnItem = new ArrayList<>();
         for (ServiceItemBean tmp : serviceItems) {
             String uniqueString = tmp.getVendorType().name()+"_"+tmp.getVendorId()+"_"+tmp.getVendorDepartId();
-            if (!vendorUniqueString.contains(uniqueString)) {
+            if (vendorUniqueString.contains(uniqueString)) {
                 continue;
             }
 
@@ -140,7 +140,7 @@ public class UserServiceOrderAPI {
         List<ServiceItemBean> returnItem = new ArrayList<>();
         for (ServiceItemBean tmp : serviceItems) {
             String uniqueString = tmp.getVendorType().name()+"_"+tmp.getVendorId()+"_"+tmp.getVendorDepartId();
-            if (!vendorUniqueString.contains(uniqueString)) {
+            if (vendorUniqueString.contains(uniqueString)) {
                 continue;
             }
 
