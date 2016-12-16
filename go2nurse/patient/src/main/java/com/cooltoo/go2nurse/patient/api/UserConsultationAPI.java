@@ -143,6 +143,9 @@ public class UserConsultationAPI {
 
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", consultationId);
+        if (nurseId>0) {
+            notifierForAllModule.consultationAlertToNurse360(nurseId, consultationId, ConsultationTalkStatus.USER_SPEAK, diseaseDescription);
+        }
         return Response.ok(retValue).build();
     }
 
