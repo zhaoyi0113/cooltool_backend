@@ -76,6 +76,8 @@ public enum ErrorCode {
     OPENID_INVALID(261, Response.Status.BAD_GATEWAY, "Openid 不存在", "Openid Invalid"),
     USER_FORBIDDEN_BY_VENDOR(262, Response.Status.BAD_REQUEST, "服务商屏蔽了用户", "User is forbidden by vendor"),
     NEED_VISIT_PATIENT_RECORD(263, Response.Status.BAD_REQUEST, "服务员未设置出诊记录", "Server not set record of visiting patient"),
+    NURSE_DO_NOT_FORBID_USER(264, Response.Status.BAD_REQUEST, "护士没有屏蔽了用户", "Nurse do not forbid user"),
+    VENDOR_DO_NOT_FORBID_USER(265, Response.Status.BAD_REQUEST, "服务商没有屏蔽了用户", "Vendor do not forbid user"),
 
 
 

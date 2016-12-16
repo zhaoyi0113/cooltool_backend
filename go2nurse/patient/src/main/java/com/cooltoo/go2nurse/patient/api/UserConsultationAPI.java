@@ -3,6 +3,8 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.exception.*;
+import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.go2nurse.beans.ConsultationCategoryBean;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpRecordBean;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
@@ -12,10 +14,8 @@ import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
 import com.cooltoo.go2nurse.constants.PatientFollowUpType;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatService;
-import com.cooltoo.go2nurse.service.ConsultationCategoryService;
-import com.cooltoo.go2nurse.service.NursePatientFollowUpRecordService;
+import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
-import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -46,6 +46,7 @@ public class UserConsultationAPI {
     @Autowired private WeChatService weChatService;
     @Autowired private NursePatientFollowUpRecordService patientFollowRecordService;
     @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private DenyPatientService denyPatientService;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -126,12 +127,20 @@ public class UserConsultationAPI {
                                     @FormParam("clinical_history") @DefaultValue("") String clinicalHistory
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        if (nurseId>0) {
+            boolean isDenied = denyPatientService.isNurseOrVendorDenyPatient(userId, null, nurseId);
+            if (isDenied) {
+                throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
+            }
+        }
+
         long consultationId = userConsultationService.addConsultation(
                 categoryId, nurseId, userId, patientId,
                 diseaseDescription, clinicalHistory,
                 ConsultationCreator.USER,
                 ConsultationReason.CONSULTATION
         );
+
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", consultationId);
         return Response.ok(retValue).build();
@@ -179,8 +188,14 @@ public class UserConsultationAPI {
                                      @FormParam("completed") @DefaultValue("") String strCompleted/* YES , NO */
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        Long categoryId = VerifyUtil.isIds(strCategoryId) ? VerifyUtil.parseLongIds(strCategoryId).get(0) : null;
         Long nurseId = VerifyUtil.isIds(strNurseId) ? VerifyUtil.parseLongIds(strNurseId).get(0) : null;
+        if (null!=nurseId && nurseId>0) {
+            boolean isDenied = denyPatientService.isNurseOrVendorDenyPatient(userId, null, nurseId);
+            if (isDenied) {
+                throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
+            }
+        }
+        Long categoryId = VerifyUtil.isIds(strCategoryId) ? VerifyUtil.parseLongIds(strCategoryId).get(0) : null;
         YesNoEnum completed = YesNoEnum.parseString(strCompleted);
         UserConsultationBean bean = userConsultationService.updateConsultationStatus(userId, consultationId, categoryId, nurseId, null, completed);
         return Response.ok(bean).build();
@@ -230,6 +245,12 @@ public class UserConsultationAPI {
     ) {
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.parseString(strTalkStatus);
         UserConsultationBean consultation = userConsultationService.getUserConsultation(consultationId, null);
+        if (consultation.getNurseId()>0) {
+            boolean isDenied = denyPatientService.isNurseOrVendorDenyPatient(consultation.getUserId(), null, consultation.getNurseId());
+            if (isDenied) {
+                throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
+            }
+        }
         long consultationNurseId = consultation.getNurseId();
         long followUpRecordId = 0;
         if (ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {

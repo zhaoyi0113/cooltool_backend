@@ -80,6 +80,10 @@ public class ServiceVendorCategoryAndItemService {
     //=========================================
     //             Vendor Service
     //=========================================
+    public boolean existVendor(long vendorId) {
+        return vendorRep.exists(vendorId);
+    }
+
     public ServiceVendorBean getVendorById(long vendorId) {
         logger.info("get service vendor by vendorId={}", vendorId);
         ServiceVendorEntity vendor = vendorRep.findOne(vendorId);
@@ -139,6 +143,10 @@ public class ServiceVendorCategoryAndItemService {
     //=========================================
     //             Category Service
     //=========================================
+    public boolean existCategory(long categoryId) {
+        return categoryRep.exists(categoryId);
+    }
+
     public long countTopCategory(List<CommonStatus> statuses) {
         return countCategoryByParentId(0L, statuses);
     }

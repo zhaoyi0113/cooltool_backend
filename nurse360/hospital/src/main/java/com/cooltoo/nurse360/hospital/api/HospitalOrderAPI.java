@@ -4,14 +4,13 @@ import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.NurseOrderRelationBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
-import com.cooltoo.go2nurse.service.NurseOrderRelationService;
-import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
-import com.cooltoo.go2nurse.service.NurseWalletService;
-import com.cooltoo.go2nurse.service.ServiceOrderService;
+import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
@@ -39,6 +38,7 @@ public class HospitalOrderAPI {
     @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private NurseWalletService nurseWalletService;
+    @Autowired private DenyPatientService denyPatientService;
 
 
     //=============================================================
@@ -118,6 +118,10 @@ public class HospitalOrderAPI {
                                                        @RequestParam(defaultValue = "0", name = "order_id") long orderId,
                                                        @RequestParam(defaultValue = "0", name = "nurse_id") long nurseId
     ) {
+        List<ServiceOrderBean> order = orderService.getOrderByOrderId(orderId);
+        if (!VerifyUtil.isListEmpty(order) && denyPatientService.isNurseDenyPatient(order.get(0).getUserId(), 0, nurseId)) {
+            throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
+        }
         //dispatch or replace order's nurse
         NurseOrderRelationBean nurseOrder = nurseOrderRelation.dispatchToNurse(nurseId, orderId, true);
         return nurseOrder;

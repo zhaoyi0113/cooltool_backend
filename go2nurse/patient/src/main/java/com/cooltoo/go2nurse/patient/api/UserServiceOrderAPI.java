@@ -1,17 +1,17 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
+import com.cooltoo.exception.*;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.go2nurse.constants.WhoDenyPatient;
 import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
-import com.cooltoo.go2nurse.beans.ServiceItemBean;
-import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.util.VerifyUtil;
 import com.pingplusplus.model.Charge;
@@ -42,6 +42,8 @@ public class UserServiceOrderAPI {
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private NurseWalletService nurseWalletService;
+
+    @Autowired private DenyPatientService denyPatientService;
 
     //=========================================================================================
     //                                    Category Service
@@ -81,10 +83,33 @@ public class UserServiceOrderAPI {
     public Response getServiceItemByCategoryId(@Context HttpServletRequest request,
                                                @QueryParam("category_id") @DefaultValue("0") long categoryId
     ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<CommonStatus> statuses = new ArrayList<>();
         statuses.add(CommonStatus.ENABLED);
         List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByCategoryId(null, null, null, categoryId, null, YesNoEnum.YES, statuses);
-        return Response.ok(serviceItems).build();
+
+        // filter the vendor deny patient
+        List<DenyPatientBean> patientDeniedByVendor = denyPatientService.getWhoDenyPatient(userId, null, WhoDenyPatient.VENDOR);
+        List<String> vendorUniqueString = new ArrayList<>();
+        for (DenyPatientBean tmp : patientDeniedByVendor) {
+            String uniqueString = tmp.getVendorType().name()+"_"+tmp.getVendorId()+"_"+tmp.getDepartId();
+            if (!vendorUniqueString.contains(uniqueString)) {
+                vendorUniqueString.add(uniqueString);
+            }
+        }
+
+        // filtered the items
+        List<ServiceItemBean> returnItem = new ArrayList<>();
+        for (ServiceItemBean tmp : serviceItems) {
+            String uniqueString = tmp.getVendorType().name()+"_"+tmp.getVendorId()+"_"+tmp.getVendorDepartId();
+            if (!vendorUniqueString.contains(uniqueString)) {
+                continue;
+            }
+
+            returnItem.add(tmp);
+        }
+
+        return Response.ok(returnItem).build();
     }
 
     @Path("/vendor/item")
@@ -95,11 +120,34 @@ public class UserServiceOrderAPI {
                                            @QueryParam("vendor_type") @DefaultValue("0") String strVendorType, /* company, hospital*/
                                            @QueryParam("vendor_id") @DefaultValue("0") long vendorId
     ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<CommonStatus> statuses = new ArrayList<>();
         statuses.add(CommonStatus.ENABLED);
         ServiceVendorType vendorType = ServiceVendorType.parseString(strVendorType);
         List<ServiceItemBean> serviceItems = serviceCategoryItemService.getItemByCategoryId(vendorType, vendorId, null, null, null, YesNoEnum.YES, statuses);
-        return Response.ok(serviceItems).build();
+
+        // filter the vendor deny patient
+        List<DenyPatientBean> patientDeniedByVendor = denyPatientService.getWhoDenyPatient(userId, null, WhoDenyPatient.VENDOR);
+        List<String> vendorUniqueString = new ArrayList<>();
+        for (DenyPatientBean tmp : patientDeniedByVendor) {
+            String uniqueString = tmp.getVendorType().name()+"_"+tmp.getVendorId()+"_"+tmp.getDepartId();
+            if (!vendorUniqueString.contains(uniqueString)) {
+                vendorUniqueString.add(uniqueString);
+            }
+        }
+
+        // filtered the items
+        List<ServiceItemBean> returnItem = new ArrayList<>();
+        for (ServiceItemBean tmp : serviceItems) {
+            String uniqueString = tmp.getVendorType().name()+"_"+tmp.getVendorId()+"_"+tmp.getVendorDepartId();
+            if (!vendorUniqueString.contains(uniqueString)) {
+                continue;
+            }
+
+            returnItem.add(tmp);
+        }
+
+        return Response.ok(returnItem).build();
     }
 
 
@@ -143,8 +191,15 @@ public class UserServiceOrderAPI {
                                  @FormParam("start_time") @DefaultValue("") String startTime,
                                  @FormParam("count") @DefaultValue("0") int count,
                                  @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage
-                                 ) {
+    ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        ServiceItemBean item = serviceCategoryItemService.getItemById(serviceItemId);
+        if (null!=item) {
+            boolean isUserDenied = denyPatientService.isVendorDenyPatient(userId, 0, item.getVendorType(), item.getVendorId(), item.getVendorDepartId());
+            if (isUserDenied) {
+                throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
+            }
+        }
         ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage);
         return Response.ok(order).build();
     }

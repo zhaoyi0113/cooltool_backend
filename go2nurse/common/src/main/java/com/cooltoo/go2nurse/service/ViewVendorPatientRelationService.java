@@ -6,6 +6,7 @@ import com.cooltoo.go2nurse.beans.PatientBean;
 import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.beans.ViewVendorPatientRelationBean;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.go2nurse.constants.WhoDenyPatient;
 import com.cooltoo.go2nurse.repository.ViewVendorPatientRelationRepository;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.services.CommonDepartmentService;
@@ -43,9 +44,9 @@ public class ViewVendorPatientRelationService {
     @Autowired private PatientService patientService;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
-    @Autowired private ServiceVendorAuthorizationService vendorAuthorizationService;
 
     @Autowired private Go2NurseUtility utility;
+    @Autowired private DenyPatientService denyPatientService;
 
 
     //===============================================================
@@ -73,10 +74,12 @@ public class ViewVendorPatientRelationService {
         beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
         if (ServiceVendorType.HOSPITAL.equals(vendorType)) {
-            fillPropertyHospitalDepartment(beans,
+            fillPropertyHospitalDepartment(
+                    beans,
                     null!=vendorId       ? vendorId.intValue()       : 0,
                     null!=vendorDepartId ? vendorDepartId.intValue() : 0);
-            fillPropertyOrderNumberAndForbiddenStatus(beans,
+            fillPropertyOrderNumber(
+                    beans,
                     vendorType,
                     null!=vendorId       ? vendorId       : 0,
                     null!=vendorDepartId ? vendorDepartId : 0);
@@ -113,13 +116,33 @@ public class ViewVendorPatientRelationService {
         fillPropertyHospitalDepartment(beans,
                 null!=hospitalId   ? hospitalId.intValue()   : 0,
                 null!=departmentId ? departmentId.intValue() : 0);
-        fillPropertyOrderNumberAndForbiddenStatus(beans,
+        fillPropertyOrderNumber(beans,
                 ServiceVendorType.HOSPITAL,
                 null!=hospitalId   ? hospitalId   : 0,
                 null!=departmentId ? departmentId : 0);
 
         logger.warn("visit record count={}", beans.size());
         return beans;
+    }
+
+
+    public void setForbiddenFlag(List<ViewVendorPatientRelationBean> vendorPatientRelations,
+                                  Long nurseId,
+                                  ServiceVendorType vendorType, Long vendorId, Long departId
+    ) {
+        List<Long> usersIdNurseDenied  = new ArrayList<>();
+        List<Long> usersIdVendorDenied = new ArrayList<>();
+        if (null!=nurseId) {
+            usersIdNurseDenied = denyPatientService.deniedUserId(WhoDenyPatient.NURSE, nurseId, null, null, null);
+        }
+        if (null!=vendorType && null!=vendorId) {
+            usersIdVendorDenied = denyPatientService.deniedUserId(WhoDenyPatient.VENDOR, null, vendorType, vendorId, departId);
+        }
+
+        for (ViewVendorPatientRelationBean tmp : vendorPatientRelations) {
+            boolean isForbidden = usersIdVendorDenied.contains(tmp.getUserId()) || usersIdNurseDenied.contains(tmp.getUserId());
+            tmp.setProperties(ViewVendorPatientRelationService.PROP_FORBIDDEN, isForbidden);
+        }
     }
 
     private List<ViewVendorPatientRelationBean> entitiesToBeans(Iterable<Object[]> entities) {
@@ -188,7 +211,7 @@ public class ViewVendorPatientRelationService {
         }
     }
 
-    private void fillPropertyOrderNumberAndForbiddenStatus(List<ViewVendorPatientRelationBean> beans, ServiceVendorType vendorType, Long vendorId, Long departId) {
+    private void fillPropertyOrderNumber(List<ViewVendorPatientRelationBean> beans, ServiceVendorType vendorType, Long vendorId, Long departId) {
         // calculate order number
         List<Object[]> orders = repository.findRecordByConditions(vendorType, vendorId, departId, null, "order");
         if (VerifyUtil.isListEmpty(orders)) {
@@ -208,15 +231,11 @@ public class ViewVendorPatientRelationService {
             }
         }
 
-        // get forbidden status
-        List<Long> userId = vendorAuthorizationService.getForbiddenUserIds(vendorType, vendorId, departId);
-
         // fill properties
         for (ViewVendorPatientRelationBean tmp : beans) {
             String key = tmp.getUserId()+"_"+tmp.getPatientId();
             Long size = patientOrderNumber.get(key);
             tmp.setProperties(PROP_ORDER_NUMBER, null==size ? 0L : size);
-            tmp.setProperties(PROP_FORBIDDEN,    userId.contains(tmp.getUserId()));
         }
 
     }

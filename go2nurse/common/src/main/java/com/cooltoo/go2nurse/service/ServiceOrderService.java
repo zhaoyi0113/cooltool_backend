@@ -57,7 +57,6 @@ public class ServiceOrderService {
     @Autowired private PingPPService pingPPService;
     @Autowired private WeChatService weChatService;
     @Autowired private WeChatPayService weChatPayService;
-    @Autowired private ServiceVendorAuthorizationService vendorAuthorizationService;
     @Autowired private NurseVisitPatientService nurseVisitPatientService;
 
     @Autowired private NurseOrderRelationRepository nurseOrderRelationRepository;
@@ -750,8 +749,6 @@ public class ServiceOrderService {
         }
 
         String serviceItemJson = jsonUtil.toJsonString(serviceItem);
-        vendorAuthorizationService.throwUserForbiddenException(userId,
-                serviceItem.getVendorType(), serviceItem.getVendorId(), serviceItem.getVendorDepartId());
 
         // get vendor
         ServiceVendorType vendorType = serviceItem.getVendorType();

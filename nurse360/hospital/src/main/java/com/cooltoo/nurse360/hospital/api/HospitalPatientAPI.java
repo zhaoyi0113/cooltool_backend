@@ -3,6 +3,7 @@ package com.cooltoo.nurse360.hospital.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.go2nurse.constants.WhoDenyPatient;
 import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
@@ -27,11 +28,11 @@ import java.util.*;
 public class HospitalPatientAPI {
 
     @Autowired private ViewVendorPatientRelationService vendorPatientRelationService;
-    @Autowired private ServiceVendorAuthorizationService vendorAuthorizationService;
     @Autowired private UserService userService;
     @Autowired private UserPatientRelationService userPatientRelation;
     @Autowired private PatientService patientService;
     @Autowired private NursePatientRelationServiceForNurse360 nursePatientRelationService;
+    @Autowired private DenyPatientService denyPatientService;
 
     //=============================================================
     //            Permit ALL Role
@@ -142,7 +143,9 @@ public class HospitalPatientAPI {
         Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("0", "0", userDetails);
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
+        Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
         List<ViewVendorPatientRelationBean> vendorsPatient = vendorPatientRelationService.getHospitalPatientByCondition(hospitalId, departmentId, userOrPatientName, index, number);
+        vendorPatientRelationService.setForbiddenFlag(vendorsPatient, nurseId, ServiceVendorType.HOSPITAL, hospitalId, departmentId);
         return vendorsPatient;
     }
 
@@ -152,11 +155,27 @@ public class HospitalPatientAPI {
                               @RequestParam(defaultValue = "false", name = "forbidden") boolean forbidden
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("0", "0", userDetails);
-        Long hospitalId   = tmp[0];
-        Long departmentId = tmp[1];
-        CommonStatus forbiddenStatus = forbidden ? CommonStatus.ENABLED : CommonStatus.DISABLED;
-        vendorAuthorizationService.forbidUser(userId, ServiceVendorType.HOSPITAL, hospitalId, departmentId, forbiddenStatus);
+        if (userDetails.isNurseManager()) {
+            Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("0", "0", userDetails);
+            Long hospitalId = tmp[0];
+            Long departmentId = tmp[1];
+            if (forbidden) {
+                denyPatientService.denyPatient(WhoDenyPatient.VENDOR, null, ServiceVendorType.HOSPITAL, hospitalId, departmentId, userId, null);
+            }
+            else {
+                denyPatientService.enablePatient(WhoDenyPatient.VENDOR, null, ServiceVendorType.HOSPITAL, hospitalId, departmentId, userId, null);
+            }
+        }
+        else if (userDetails.isNurse()) {
+            long nurseId = userDetails.getId();
+            if (forbidden) {
+                denyPatientService.denyPatient(WhoDenyPatient.NURSE, nurseId, null, null, null, userId, null);
+            }
+            else {
+                denyPatientService.enablePatient(WhoDenyPatient.NURSE, nurseId, null, null, null, userId, null);
+            }
+
+        }
         return;
     }
 }

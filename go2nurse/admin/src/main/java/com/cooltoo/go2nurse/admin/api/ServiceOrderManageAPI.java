@@ -9,11 +9,8 @@ import com.cooltoo.go2nurse.beans.NurseOrderRelationBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
-import com.cooltoo.go2nurse.service.NurseOrderRelationService;
-import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
-import com.cooltoo.go2nurse.service.NurseWalletService;
+import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
-import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +36,7 @@ public class ServiceOrderManageAPI {
     @Autowired private NurseOrderRelationService nurseOrderRelation;
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private NurseWalletService nurseWalletService;
+    @Autowired private DenyPatientService denyPatientService;
 
     @Path("/all_order_status")
     @GET
@@ -186,6 +184,10 @@ public class ServiceOrderManageAPI {
                                          @FormParam("order_id") @DefaultValue("0") long orderId,
                                          @FormParam("nurse_id") @DefaultValue("0") long nurseId
     ) {
+        List<ServiceOrderBean> order = orderService.getOrderByOrderId(orderId);
+        if (!VerifyUtil.isListEmpty(order) && denyPatientService.isNurseDenyPatient(order.get(0).getUserId(), 0, nurseId)) {
+            throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
+        }
         //dispatch or replace order's nurse
         NurseOrderRelationBean nurseOrder = nurseOrderRelation.dispatchToNurse(nurseId, orderId, true);
         return Response.ok(nurseOrder).build();

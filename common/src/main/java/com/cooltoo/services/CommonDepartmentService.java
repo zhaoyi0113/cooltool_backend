@@ -42,6 +42,10 @@ public class CommonDepartmentService {
     //=======================================================
     //        get
     //=======================================================
+    public boolean existsDepartment(int hospitalId, int departmentId) {
+        return repository.countByHospitalIdAndId(hospitalId, departmentId) > 0;
+    }
+
     public boolean existsDepartment(Integer departmentId) {
         return repository.exists(departmentId);
     }
