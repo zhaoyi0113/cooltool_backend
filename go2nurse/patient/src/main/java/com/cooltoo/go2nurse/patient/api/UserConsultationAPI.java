@@ -47,6 +47,7 @@ public class UserConsultationAPI {
     @Autowired private NursePatientFollowUpRecordService patientFollowRecordService;
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private DenyPatientService denyPatientService;
+    @Autowired private NursePatientRelationService nursePatientRelationService;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -145,6 +146,10 @@ public class UserConsultationAPI {
         retValue.put("id", consultationId);
         if (nurseId>0) {
             notifierForAllModule.consultationAlertToNurse360(nurseId, consultationId, ConsultationTalkStatus.USER_SPEAK, diseaseDescription);
+
+            // add patient to nurse_patient_relation table
+            patientId = 0>patientId ? 0 : patientId;
+            nursePatientRelationService.addUserPatientToNurse(nurseId, patientId, userId);
         }
         return Response.ok(retValue).build();
     }

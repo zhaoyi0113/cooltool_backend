@@ -12,7 +12,7 @@ import com.cooltoo.go2nurse.service.PatientService;
 import com.cooltoo.go2nurse.service.UserPatientRelationService;
 import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
-import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
+import com.cooltoo.go2nurse.service.NursePatientRelationService;
 import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import java.util.Map;
 @Path("/nurse/patient")
 public class NursePatientAPI {
 
-    @Autowired private NursePatientRelationServiceForNurse360 nursePatientService;
+    @Autowired private NursePatientRelationService nursePatientService;
     @Autowired private UserService userService;
     @Autowired private UserPatientRelationService userPatientRelationService;
     @Autowired private PatientService patientService;

@@ -1,7 +1,6 @@
-package com.cooltoo.nurse360.service;
+package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.NursePatientRelationBean;
@@ -10,8 +9,6 @@ import com.cooltoo.go2nurse.beans.UserBean;
 import com.cooltoo.go2nurse.converter.NursePatientRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.NursePatientRelationEntity;
 import com.cooltoo.go2nurse.repository.NursePatientRelationRepository;
-import com.cooltoo.go2nurse.service.PatientService;
-import com.cooltoo.go2nurse.service.UserService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +24,10 @@ import java.util.*;
 /**
  * Created by zhaolisong on 16/9/28.
  */
-@Service("NursePatientRelationServiceForNurse360")
-public class NursePatientRelationServiceForNurse360 {
+@Service("NursePatientRelationService")
+public class NursePatientRelationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NursePatientRelationServiceForNurse360.class);
+    private static final Logger logger = LoggerFactory.getLogger(NursePatientRelationService.class);
 
     public static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "id")

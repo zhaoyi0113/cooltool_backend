@@ -14,7 +14,7 @@ import com.cooltoo.go2nurse.service.NurseOrderRelationService;
 import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
-import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
+import com.cooltoo.go2nurse.service.NursePatientRelationService;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.NurseQualificationService;
 import com.cooltoo.util.NumberUtil;
@@ -40,7 +40,7 @@ import java.util.Map;
 public class HospitalNurseAPI {
 
     @Autowired private NurseServiceForGo2Nurse nurseService;
-    @Autowired private NursePatientRelationServiceForNurse360 nursePatientRelation;
+    @Autowired private NursePatientRelationService nursePatientRelation;
     @Autowired private NurseOrderRelationService nurseOrderRelationService;
     @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
     @Autowired private NurseQualificationService nurseQualificationService;

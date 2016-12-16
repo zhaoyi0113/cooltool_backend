@@ -7,7 +7,7 @@ import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.go2nurse.service.NurseOrderRelationService;
-import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
+import com.cooltoo.go2nurse.service.NursePatientRelationService;
 import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,7 +28,7 @@ public class NurseOrderAPI {
     @Autowired private NurseOrderRelationService nurseOrderService;
     @Autowired private NurseServiceForNurse360 nurseService;
     @Autowired private NotifierForAllModule notifierForAllModule;
-    @Autowired private NursePatientRelationServiceForNurse360 nursePatientRelation;
+    @Autowired private NursePatientRelationService nursePatientRelation;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

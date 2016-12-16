@@ -7,7 +7,7 @@ import com.cooltoo.go2nurse.constants.WhoDenyPatient;
 import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
-import com.cooltoo.nurse360.service.NursePatientRelationServiceForNurse360;
+import com.cooltoo.go2nurse.service.NursePatientRelationService;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,7 +31,7 @@ public class HospitalPatientAPI {
     @Autowired private UserService userService;
     @Autowired private UserPatientRelationService userPatientRelation;
     @Autowired private PatientService patientService;
-    @Autowired private NursePatientRelationServiceForNurse360 nursePatientRelationService;
+    @Autowired private NursePatientRelationService nursePatientRelationService;
     @Autowired private DenyPatientService denyPatientService;
 
     //=============================================================
