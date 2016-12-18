@@ -48,7 +48,7 @@ public class ImageInCaseService {
         return count;
     }
 
-    public Map<Long, List<String>> getCaseIdToImagesUrl(Long casebookId) {
+    public Map<Long, List<String>> getCaseIdToImagesUrl(Long casebookId, Map<Long, Map<Long, String>> caseIdToMapOfImageIdToUrl) {
         if (null==casebookId) {
             return new HashMap<>();
         }
@@ -70,12 +70,22 @@ public class ImageInCaseService {
             if (VerifyUtil.isStringEmpty(url)) {
                 continue;
             }
+
             List<String> imagesUrl = caseId2Map.get(tmp.getCaseId());
             if (null==imagesUrl) {
                 imagesUrl = new ArrayList<>();
                 caseId2Map.put(tmp.getCaseId(), imagesUrl);
             }
             imagesUrl.add(url);
+
+            if (null!=caseIdToMapOfImageIdToUrl) {
+                Map<Long, String> caseImageIdToUrl = caseIdToMapOfImageIdToUrl.get(tmp.getCaseId());
+                if (null==caseImageIdToUrl) {
+                    caseImageIdToUrl = new HashMap<>();
+                    caseIdToMapOfImageIdToUrl.put(tmp.getCaseId(), caseImageIdToUrl);
+                }
+                caseImageIdToUrl.put(tmp.getImageId(), url);
+            }
         }
 
         return caseId2Map;

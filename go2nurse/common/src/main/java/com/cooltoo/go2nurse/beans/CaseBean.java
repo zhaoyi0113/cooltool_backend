@@ -8,6 +8,7 @@ import com.cooltoo.util.VerifyUtil;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 2016/10/23.
@@ -22,6 +23,7 @@ public class CaseBean {
     private long casebookId;
     private String caseRecord;
     private List<String> imagesUrl;
+    private Map<Long, String> imageIdToUrl;
 
     public long getId() {
         return id;
@@ -66,7 +68,6 @@ public class CaseBean {
     public void setCasebookId(long casebookId) {
         this.casebookId = casebookId;
     }
-
     public void setCaseRecord(String caseRecord) {
         this.caseRecord = caseRecord;
     }
@@ -74,7 +75,6 @@ public class CaseBean {
     public NurseBean getNurse() {
         return nurse;
     }
-
     public void setNurse(NurseBean nurse) {
         this.nurse = nurse;
     }
@@ -82,9 +82,15 @@ public class CaseBean {
     public List<String> getImagesUrl() {
         return imagesUrl;
     }
-
     public void setImagesUrl(List<String> imagesUrl) {
         this.imagesUrl = imagesUrl;
+    }
+
+    public Map<Long, String> getImageIdToUrl() {
+        return imageIdToUrl;
+    }
+    public void setImageIdToUrl(Map<Long, String> imageIdToUrl) {
+        this.imageIdToUrl = imageIdToUrl;
     }
 
     public String toString() {

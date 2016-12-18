@@ -417,13 +417,16 @@ public class CasebookService {
         }
 
         Map<Long, NurseBean> userIdToBean = nurseService.getNurseIdToBean(nurseIds);
-        Map<Long, List<String>> casebookIdToImagesUrl = imageService.getCaseIdToImagesUrl(casebookId);
+        Map<Long, Map<Long, String>> caseIdToMapOfImageIdToUrl = new HashMap<>();
+        Map<Long, List<String>> caseIdToImagesUrl = imageService.getCaseIdToImagesUrl(casebookId, caseIdToMapOfImageIdToUrl);
 
         for (CaseBean tmp : beans) {
             NurseBean user = userIdToBean.get(tmp.getNurseId());
             tmp.setNurse(user);
-            List<String> imagesUrl = casebookIdToImagesUrl.get(tmp.getId());
+            List<String> imagesUrl = caseIdToImagesUrl.get(tmp.getId());
             tmp.setImagesUrl(imagesUrl);
+            Map<Long, String> imagesIdToUrl = caseIdToMapOfImageIdToUrl.get(tmp.getId());
+            tmp.setImageIdToUrl(imagesIdToUrl);
         }
     }
 
