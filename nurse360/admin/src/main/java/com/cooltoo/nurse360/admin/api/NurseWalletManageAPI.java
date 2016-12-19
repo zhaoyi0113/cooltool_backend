@@ -32,7 +32,7 @@ public class NurseWalletManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response countFlowRecord(@Context HttpServletRequest request,
                                     @QueryParam("nurse_id") @DefaultValue("") String nurseId,
-                                    @QueryParam("reason") @DefaultValue("")     String reason, /* order_in, withdraw */
+                                    @QueryParam("reason") @DefaultValue("")     String reason, /* order_income, withdraw */
                                     @QueryParam("process") @DefaultValue("")    String process,/* completed, processing, refused */
                                     @QueryParam("summary") @DefaultValue("")    String summary
     ) {
@@ -51,7 +51,7 @@ public class NurseWalletManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFlowRecord(@Context HttpServletRequest request,
                                   @QueryParam("nurse_id") @DefaultValue("") String nurseId,
-                                  @QueryParam("reason") @DefaultValue("")     String reason, /* order_in, withdraw */
+                                  @QueryParam("reason") @DefaultValue("")     String reason, /* order_income, withdraw */
                                   @QueryParam("process") @DefaultValue("")    String process,/* completed, processing, refused */
                                   @QueryParam("summary") @DefaultValue("")    String summary,
                                   @QueryParam("index") @DefaultValue("0") int pageIndex,
