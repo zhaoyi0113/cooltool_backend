@@ -233,7 +233,7 @@ public class CommonNurseService {
         return resultSet;
     }
 
-    public Iterable<NurseEntity> getNurseByQueryString(UserAuthority authority, YesNoEnum canAnswerNursingQuestion, String fuzzyName, String hospitalName, String departmentName, int pageIndex, int number) {
+    public Iterable<NurseEntity> getNurseByQueryString(UserAuthority authority, YesNoEnum canAnswerNursingQuestion, YesNoEnum isExpert, String fuzzyName, String hospitalName, String departmentName, int pageIndex, int number) {
         logger.info("get nurse by authority={} canAnswerNursingQuestion={} fuzzyName={} hospitalName={} departmentName={} at page {} with number {}",
                 authority, canAnswerNursingQuestion, fuzzyName, hospitalName, departmentName, pageIndex, number);
         PageRequest page = new PageRequest(pageIndex, number, sort);
@@ -261,7 +261,7 @@ public class CommonNurseService {
         departmentIds.add(Integer.MIN_VALUE);
         departments.clear();
 
-        resultSet = nurseRepository.findByQueryString(authority, canAnswerNursingQuestion, fuzzyName, hospitalIds, departmentIds, page);
+        resultSet = nurseRepository.findByQueryString(authority, canAnswerNursingQuestion, fuzzyName, hospitalIds, departmentIds, isExpert, page);
 
         return resultSet;
     }

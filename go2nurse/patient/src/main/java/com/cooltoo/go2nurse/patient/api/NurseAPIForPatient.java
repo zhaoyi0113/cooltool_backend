@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.RegisterFrom;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
 import com.cooltoo.util.VerifyUtil;
@@ -69,7 +70,7 @@ public class NurseAPIForPatient {
                                  @QueryParam("number") @DefaultValue("10") int number
 
     ) {
-        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByQueryString(canAnswerNursingQuestion, query, index, number);
+        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByQueryString(canAnswerNursingQuestion, query, YesNoEnum.YES.name(), index, number);
         return Response.ok(nurses).build();
     }
 
