@@ -78,7 +78,7 @@ public class DoctorManageAPI {
         statuses.add(CommonStatus.DISABLED);
         Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
         Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
-        long doctorsCount = doctorService.countDoctor(hospitalId, departmentId, statuses);
+        long doctorsCount = doctorService.countDoctor(hospitalId, departmentId, statuses, false);
         return Response.ok(doctorsCount).build();
     }
 
@@ -96,7 +96,7 @@ public class DoctorManageAPI {
         statuses.add(CommonStatus.DISABLED);
         Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
         Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
-        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, pageIndex, sizePerPage);
+        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, false, pageIndex, sizePerPage);
         return Response.ok(doctors).build();
     }
 

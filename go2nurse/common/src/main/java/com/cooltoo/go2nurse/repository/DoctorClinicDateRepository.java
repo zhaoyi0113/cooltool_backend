@@ -38,4 +38,10 @@ public interface DoctorClinicDateRepository extends JpaRepository<DoctorClinicDa
             " AND (?3 IS NULL OR cDate.clinicDate>=?3)" +
             " AND (?4 IS NULL OR cDate.clinicDate<=?4)")
     Page<DoctorClinicDateEntity> findDoctorByConditions(long doctorId, List<CommonStatus> status, Date start, Date end, Pageable page);
+
+    @Query("SELECT cDate.doctorId FROM DoctorClinicDateEntity cDate" +
+            " WHERE cDate.doctorId IN (?1)" +
+            "   AND ?2 =  cDate.status" +
+            "   AND ?3 <= cDate.clinicDate")
+    List<Object> findDoctorHasClinicDate(List<Long> doctorIds, CommonStatus status, Date time);
 }

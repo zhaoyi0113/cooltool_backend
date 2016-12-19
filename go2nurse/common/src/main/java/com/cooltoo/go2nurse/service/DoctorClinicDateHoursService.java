@@ -55,6 +55,20 @@ public class DoctorClinicDateHoursService {
     //==============================================================
     //                      getting
     //==============================================================
+    public List<Long> getDoctorWhoHasClinicDate(List<Long> doctorIds) {
+        List<Long> doctorHasClinicDate = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(doctorIds)) {
+            return doctorHasClinicDate;
+        }
+        List<Object> resultData = dateRepository.findDoctorHasClinicDate(doctorIds, CommonStatus.ENABLED, new Date(System.currentTimeMillis()));
+        for (Object tmp : resultData) {
+            if ((tmp instanceof Long) && !doctorHasClinicDate.contains(tmp)) {
+                doctorHasClinicDate.add((Long)tmp);
+            }
+        }
+        return doctorHasClinicDate;
+    }
+
     public DoctorClinicDateBean getClinicDateById(long clinicDateId) {
         logger.info("get clinic date by id={}", clinicDateId);
         DoctorClinicDateEntity date = dateRepository.findOne(clinicDateId);

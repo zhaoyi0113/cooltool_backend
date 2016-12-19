@@ -34,7 +34,7 @@ public class HospitalDoctorAPI {
     ) {
         List<CommonStatus> statuses = CommonStatus.getAll();
         statuses.remove(CommonStatus.DELETED);
-        long count = doctorService.countDoctor(hospitalId, departmentId, statuses);
+        long count = doctorService.countDoctor(hospitalId, departmentId, statuses, false);
         return count;
     }
 
@@ -46,7 +46,7 @@ public class HospitalDoctorAPI {
     ) {
         List<CommonStatus> statuses = CommonStatus.getAll();
         statuses.remove(CommonStatus.DELETED);
-        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, index, number);
+        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, false, index, number);
         return doctors;
     }
 
@@ -80,7 +80,7 @@ public class HospitalDoctorAPI {
 
         List<CommonStatus> statuses = CommonStatus.getAll();
         statuses.remove(CommonStatus.DELETED);
-        long count = doctorService.countDoctor(hospitalId, departmentId, statuses);
+        long count = doctorService.countDoctor(hospitalId, departmentId, statuses, false);
         return count;
     }
 
@@ -92,7 +92,7 @@ public class HospitalDoctorAPI {
 
         List<CommonStatus> statuses = CommonStatus.getAll();
         statuses.remove(CommonStatus.DELETED);
-        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, index, number);
+        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, false, index, number);
         return doctors;
     }
 }

@@ -46,7 +46,7 @@ public class UserDoctorAPI {
         statuses.add(CommonStatus.ENABLED);
         Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
         Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
-        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, pageIndex, sizePerPage);
+        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, true, pageIndex, sizePerPage);
         return Response.ok(doctors).build();
     }
 
@@ -147,21 +147,4 @@ public class UserDoctorAPI {
         return Response.ok(appointment).build();
     }
 
-    @Path("/list/{hospital_id}/{department_id}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getByHospitalDepartment(@Context HttpServletRequest request,
-                                            @PathParam("hospital_id") @DefaultValue("") String strHospitalId,
-                                            @PathParam("department_id") @DefaultValue("") String strDepartmentId
-    ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        statuses.add(CommonStatus.ENABLED);
-        statuses.add(CommonStatus.DISABLED);
-        Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
-        Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
-
-        int countDoctor = (int) doctorService.countDoctor(hospitalId, departmentId, statuses);
-        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, 0, countDoctor);
-        return Response.ok(doctors).build();
-    }
 }
