@@ -24,6 +24,7 @@ public class NurseWalletEntity {
     private long reasonId;
     private WalletProcess process;
     private Date processTime;
+    private String processRecord;
 
     @Id
     @GeneratedValue
@@ -110,6 +111,14 @@ public class NurseWalletEntity {
         this.processTime = processTime;
     }
 
+    @Column(name = "process_record")
+    public String getProcessRecord() {
+        return processRecord;
+    }
+    public void setProcessRecord(String processRecord) {
+        this.processRecord = processRecord;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -123,6 +132,7 @@ public class NurseWalletEntity {
         msg.append(", reasonId=").append(reasonId);
         msg.append(", process=").append(process);
         msg.append(", processTime=").append(processTime);
+        msg.append(", processRecord=").append(processRecord);
         msg.append("]");
         return msg.toString();
     }

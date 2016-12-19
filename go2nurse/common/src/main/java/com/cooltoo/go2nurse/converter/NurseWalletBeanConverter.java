@@ -25,6 +25,9 @@ public class NurseWalletBeanConverter implements Converter<NurseWalletEntity, Nu
         bean.setReasonId(source.getReasonId());
         bean.setProcess(source.getProcess());
 
+        String processRecord = source.getProcessRecord();
+        bean.setProcessRecord(null==processRecord ? "" : processRecord);
+
         Date processTime = source.getProcessTime();
         bean.setProcessTime(null==processTime ? new Date(0) : processTime);
         return bean;

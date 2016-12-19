@@ -246,7 +246,7 @@ public class NurseWalletService {
     //                       Update Wallet In-Out Record
     //=========================================================================
     @Transactional
-    public NurseWalletBean updateWalletInOutStatus(long walletInOutId, WalletProcess process) {
+    public NurseWalletBean updateWalletInOutStatus(long walletInOutId, WalletProcess process, String processRecord) {
         logger.debug("update wallet record={} process status to={}", walletInOutId, process);
         if (null==process) {
             throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_IS_EMPTY);
@@ -255,6 +255,10 @@ public class NurseWalletService {
         if (null==entity) {
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
+        if (!WalletInOutType.WITHDRAW.equals(entity.getReason())) {
+            logger.error("wallet record reason={} is not expected", entity.getReason());
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_STATUS_NOT_EXPECTED);
+        }
         if (!WalletProcess.PROCESSING.equals(entity.getProcess())) {
             logger.error("wallet record process={} is not expected", entity.getProcess());
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_STATUS_NOT_EXPECTED);
@@ -262,6 +266,9 @@ public class NurseWalletService {
         if (!process.equals(entity.getProcess())) {
             entity.setProcess(process);
             entity.setProcessTime(new Date());
+            if (!VerifyUtil.isStringEmpty(processRecord)) {
+                entity.setProcessRecord(processRecord);
+            }
             entity = repository.save(entity);
         }
         return beanConverter.convert(entity);

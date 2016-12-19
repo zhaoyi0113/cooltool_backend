@@ -73,14 +73,15 @@ public class NurseWalletManageAPI {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response completedWithdraw(@Context HttpServletRequest request,
-                                      @FormParam("flow_record_id") @DefaultValue("0") long flowRecordId
+                                      @FormParam("record_id")      @DefaultValue("0")  long recordId,
+                                      @FormParam("process_record") @DefaultValue("") String processRecord
     ) {
-        NurseWalletBean record = nurseWalletService.updateWalletInOutStatus(flowRecordId, WalletProcess.COMPLETED);
+        NurseWalletBean record = nurseWalletService.updateWalletInOutStatus(recordId, WalletProcess.COMPLETED, processRecord);
         if (null!=record
                 && WalletInOutType.WITHDRAW.equals(record.getReason())
                 && WalletProcess.COMPLETED.equals(record.getProcess())) {
             String message = record.getSummary() + " 成功";
-            notifierForAllModule.withdrawAlertToNurse360(record.getNurseId(), flowRecordId, message);
+            notifierForAllModule.withdrawAlertToNurse360(record.getNurseId(), recordId, message);
             String mobile = nurseService.getNurseMobile(record.getNurseId());
             if (!VerifyUtil.isStringEmpty(mobile)) {
                 notifierForAllModule.leanCloudRequestSmsCodeWithdrawSuccess(Arrays.asList(new String[]{mobile}), record.getSummary());
@@ -93,16 +94,16 @@ public class NurseWalletManageAPI {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response refusedWithdraw(@Context HttpServletRequest request,
-                                    @FormParam("flow_record_id") @DefaultValue("0") long flowRecordId,
+                                    @FormParam("record_id")      @DefaultValue("0")  long recordId,
                                     @FormParam("refused_reason") @DefaultValue("") String refusedReason
 
     ) {
-        NurseWalletBean record = nurseWalletService.updateWalletInOutStatus(flowRecordId, WalletProcess.REFUSED);
+        NurseWalletBean record = nurseWalletService.updateWalletInOutStatus(recordId, WalletProcess.REFUSED, refusedReason);
         if (null!=record
                 && WalletInOutType.WITHDRAW.equals(record.getReason())
                 && WalletProcess.REFUSED.equals(record.getProcess())) {
             String message = record.getSummary() + " 被拒绝";
-            notifierForAllModule.withdrawAlertToNurse360(record.getNurseId(), flowRecordId, message);
+            notifierForAllModule.withdrawAlertToNurse360(record.getNurseId(), recordId, message);
             String mobile = nurseService.getNurseMobile(record.getNurseId());
             if (!VerifyUtil.isStringEmpty(mobile)) {
                 message += "。原因："+refusedReason;
