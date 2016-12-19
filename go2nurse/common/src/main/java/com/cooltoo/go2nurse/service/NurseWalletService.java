@@ -255,8 +255,13 @@ public class NurseWalletService {
         if (null==entity) {
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
+        if (!WalletProcess.PROCESSING.equals(entity.getProcess())) {
+            logger.error("wallet record process={} is not expected", entity.getProcess());
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_STATUS_NOT_EXPECTED);
+        }
         if (!process.equals(entity.getProcess())) {
             entity.setProcess(process);
+            entity.setProcessTime(new Date());
             entity = repository.save(entity);
         }
         return beanConverter.convert(entity);
@@ -320,6 +325,7 @@ public class NurseWalletService {
         entity.setAmount(amount);
         entity.setSummary(summary);
         entity.setProcess(process);
+        entity.setProcessTime(new Date());
         entity = repository.save(entity);
 
         if (!WalletInOutType.WITHDRAW.equals(reason)) {

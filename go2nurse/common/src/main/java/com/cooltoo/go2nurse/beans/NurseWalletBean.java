@@ -28,6 +28,7 @@ public class NurseWalletBean {
     private WalletInOutType reason;
     private long reasonId;
     private WalletProcess process;
+    private Date processTime;
     private Map<String, Object> properties = new HashMap<>();
 
     public long getId() {
@@ -102,6 +103,13 @@ public class NurseWalletBean {
         this.process = process;
     }
 
+    public Date getProcessTime() {
+        return processTime;
+    }
+    public void setProcessTime(Date processTime) {
+        this.processTime = processTime;
+    }
+
     public Map<String, Object> getProperties() {
         return properties;
     }
@@ -124,6 +132,7 @@ public class NurseWalletBean {
         msg.append(", reason=").append(reason);
         msg.append(", reasonId=").append(reasonId);
         msg.append(", process=").append(process);
+        msg.append(", processTime=").append(processTime);
         msg.append("]");
         return msg.toString();
     }

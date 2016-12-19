@@ -5,6 +5,8 @@ import com.cooltoo.go2nurse.entities.NurseWalletEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 /**
  * Created by zhaolisong on 12/12/2016.
  */
@@ -22,6 +24,9 @@ public class NurseWalletBeanConverter implements Converter<NurseWalletEntity, Nu
         bean.setReason(source.getReason());
         bean.setReasonId(source.getReasonId());
         bean.setProcess(source.getProcess());
+
+        Date processTime = source.getProcessTime();
+        bean.setProcessTime(null==processTime ? new Date(0) : processTime);
         return bean;
     }
 }
