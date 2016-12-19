@@ -171,7 +171,7 @@ public class NurseWalletService {
         List<Long> orderIds = new ArrayList<>();
         List<Long> nurseIds = new ArrayList<>();
         for (NurseWalletBean tmp : beans) {
-            if (WalletInOutType.ORDER_IN.equals(tmp.getReason()) && !orderIds.contains(tmp.getReasonId())) {
+            if (WalletInOutType.ORDER_INCOME.equals(tmp.getReason()) && !orderIds.contains(tmp.getReasonId())) {
                 orderIds.add(tmp.getReasonId());
             }
             if (!nurseIds.contains(tmp.getNurseId())) {
@@ -187,7 +187,7 @@ public class NurseWalletService {
         }
 
         for (NurseWalletBean tmp : beans) {
-            if (WalletInOutType.ORDER_IN.equals(tmp.getReason())) {
+            if (WalletInOutType.ORDER_INCOME.equals(tmp.getReason())) {
                 ServiceOrderBean order = orderIdToBean.get(tmp.getReasonId());
                 tmp.setProperties(NurseWalletBean.REASON_ORDER, order);
             }
@@ -281,7 +281,7 @@ public class NurseWalletService {
             if (order.getServiceItem() instanceof ServiceItemBean) {
                 summary = summary + " " + order.getServiceItem().getName();
             }
-            return recordWalletInOut(nurseId, order.getTotalServerIncomeCent(), summary, WalletProcess.COMPLETED, WalletInOutType.ORDER_IN, orderId);
+            return recordWalletInOut(nurseId, order.getTotalServerIncomeCent(), summary, WalletProcess.COMPLETED, WalletInOutType.ORDER_INCOME, orderId);
         }
         logger.warn("order has no server.");
         return null;

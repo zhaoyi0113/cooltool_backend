@@ -32,8 +32,8 @@ public class NurseWalletManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response countFlowRecord(@Context HttpServletRequest request,
                                     @QueryParam("nurse_id") @DefaultValue("") String nurseId,
-                                    @QueryParam("reason") @DefaultValue("")     String reason, /**/
-                                    @QueryParam("process") @DefaultValue("")    String process,/**/
+                                    @QueryParam("reason") @DefaultValue("")     String reason, /* order_in, withdraw */
+                                    @QueryParam("process") @DefaultValue("")    String process,/* completed, processing, refused */
                                     @QueryParam("summary") @DefaultValue("")    String summary
     ) {
         Long lNurseId = VerifyUtil.isIds(nurseId) ? VerifyUtil.parseLongIds(nurseId).get(0) : null;
@@ -51,8 +51,8 @@ public class NurseWalletManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFlowRecord(@Context HttpServletRequest request,
                                   @QueryParam("nurse_id") @DefaultValue("") String nurseId,
-                                  @QueryParam("reason") @DefaultValue("")     String reason, /**/
-                                  @QueryParam("process") @DefaultValue("")    String process,/**/
+                                  @QueryParam("reason") @DefaultValue("")     String reason, /* order_in, withdraw */
+                                  @QueryParam("process") @DefaultValue("")    String process,/* completed, processing, refused */
                                   @QueryParam("summary") @DefaultValue("")    String summary,
                                   @QueryParam("index") @DefaultValue("0") int pageIndex,
                                   @QueryParam("number") @DefaultValue("10") int sizePerPage
