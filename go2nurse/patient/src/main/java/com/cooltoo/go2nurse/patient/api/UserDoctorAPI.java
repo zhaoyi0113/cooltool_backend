@@ -46,7 +46,7 @@ public class UserDoctorAPI {
         statuses.add(CommonStatus.ENABLED);
         Integer hospitalId = !VerifyUtil.isIds(strHospitalId) ? null : VerifyUtil.parseIntIds(strHospitalId).get(0);
         Integer departmentId = !VerifyUtil.isIds(strDepartmentId) ? null : VerifyUtil.parseIntIds(strDepartmentId).get(0);
-        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, true, pageIndex, sizePerPage);
+        List<DoctorBean> doctors = doctorService.getDoctor(hospitalId, departmentId, statuses, false, pageIndex, sizePerPage);
         return Response.ok(doctors).build();
     }
 
