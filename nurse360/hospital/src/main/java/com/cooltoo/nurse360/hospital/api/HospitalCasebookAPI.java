@@ -276,4 +276,27 @@ public class HospitalCasebookAPI {
         retVal.put("deleted", Boolean.TRUE);
         return retVal;
     }
+
+
+    @RequestMapping(path = "/casebook/case/image/ids", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Boolean> deleteCaseImagesById(HttpServletRequest request,
+                                                @RequestParam(defaultValue = "0", name = "casebook_id") long casebookId,
+                                                @RequestParam(defaultValue = "0", name = "case_id")     long caseId,
+                                                @RequestParam(defaultValue = "0", name = "image_ids")    String imageIds
+
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
+        String[] ids = imageIds.split("_");
+        Map<String, Boolean> retVal = new HashMap<>();
+        for(String id: ids){
+            casebookService.deleteCaseImage(nurseId, casebookId, caseId, Integer.parseInt(id));
+            retVal.put(id, Boolean.TRUE);
+
+        }
+        return retVal;
+
+    }
+
+
 }
