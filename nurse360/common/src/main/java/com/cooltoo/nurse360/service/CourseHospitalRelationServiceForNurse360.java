@@ -168,7 +168,10 @@ public class CourseHospitalRelationServiceForNurse360 {
         boolean hasCooltoo = departmentIds.contains(Integer.valueOf(-1));
         departmentIds.remove(Integer.valueOf(-1));
 
-        List<HospitalDepartmentEntity> departments = departmentRepository.findByIdIn(departmentIds, new Sort(new Sort.Order(Sort.Direction.ASC, "id")));
+        List<HospitalDepartmentEntity> departments = null;
+        if (!VerifyUtil.isListEmpty(departmentIds)) {
+            departments = departmentRepository.findByIdIn(departmentIds, new Sort(new Sort.Order(Sort.Direction.ASC, "id")));
+        }
         if (VerifyUtil.isListEmpty(departments) && !hasCooltoo) {
             logger.error("department not exist");
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);

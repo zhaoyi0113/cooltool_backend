@@ -113,9 +113,13 @@ public class NotificationManageAPI {
         logger.info("new notification");
         Nurse360NotificationBean notification = notificationService.addNotification(title, introduction, strSignificance);
         logger.info("notification is {}", notification);
-        List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
         if (null!=notification) {
             long notificationId = notification.getId();
+            List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
+            // cooltoo notification
+            if (-1==hospitalId && !departmentIds.contains(-1)) {
+                departmentIds.add(-1);
+            }
             notificationHospitalRelationService.setNotificationToHospital(notificationId, hospitalId, departmentIds);
         }
         if (null!=notification) {
@@ -149,6 +153,10 @@ public class NotificationManageAPI {
         logger.info("notification is {}", notification);
         if (null!=notification) {
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
+            // cooltoo notification
+            if (-1==hospitalId && !departmentIds.contains(-1)) {
+                departmentIds.add(-1);
+            }
             notificationHospitalRelationService.setNotificationToHospital(notificationId, hospitalId, departmentIds);
         }
         return Response.ok(notification).build();

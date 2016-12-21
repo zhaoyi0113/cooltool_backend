@@ -28,9 +28,9 @@ import java.util.*;
  * Created by hp on 2016/8/28.
  */
 @Path("/nurse/casebook")
-public class CasebookAPI {
+public class NurseCasebookAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(CasebookAPI.class);
+    private static final Logger logger = LoggerFactory.getLogger(NurseCasebookAPI.class);
 
     @Autowired private CasebookService casebookService;
     @Autowired private NurseServiceForNurse360 nurseService;
