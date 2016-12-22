@@ -29,6 +29,19 @@ public class NotificationManageAPI {
     @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
     @Autowired private NotifierForAllModule notifierForAllModule;
 
+    private List<CommonStatus> getStatuses(String status) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        CommonStatus eStatus = CommonStatus.parseString(status);
+        if (null!=eStatus) {
+            statuses.add(eStatus);
+        }
+        else if ("ALL".equalsIgnoreCase(status)) {
+            statuses = CommonStatus.getAll();
+            statuses.remove(CommonStatus.DELETED);
+        }
+        return statuses;
+    }
+
     @Path("/alert/{notification_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -69,18 +82,13 @@ public class NotificationManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response countNotification(@Context HttpServletRequest request,
                                       @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                      @QueryParam("department_id") @DefaultValue("0") int departmentId,
+                                      @QueryParam("department_id") @DefaultValue("") String departmentId,
                                       @QueryParam("status") @DefaultValue("ALL") String status
     ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        CommonStatus eStatus = CommonStatus.parseString(status);
-        if (null!=eStatus) {
-            statuses.add(eStatus);
-        }
-        else if ("ALL".equalsIgnoreCase(status)) {
-            statuses = CommonStatus.getAll();
-        }
-        long count = notificationService.countNotificationByConditions(null, statuses, ServiceVendorType.HOSPITAL, new Long(hospitalId), new Long(departmentId));
+        List<CommonStatus> statuses = getStatuses(status);
+
+        Long lDepartmentId = VerifyUtil.isIds(departmentId) ? VerifyUtil.parseLongIds(departmentId).get(0) : null;
+        long count = notificationService.countNotificationByConditions(null, statuses, ServiceVendorType.HOSPITAL, new Long(hospitalId), lDepartmentId);
         logger.info("count = {}", count);
         return Response.ok(count).build();
     }
@@ -90,22 +98,17 @@ public class NotificationManageAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getNotificationByStatus(@Context HttpServletRequest request,
                                             @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                            @QueryParam("department_id") @DefaultValue("0") int departmentId,
+                                            @QueryParam("department_id") @DefaultValue("") String departmentId,
                                             @QueryParam("status") @DefaultValue("ALL") String status,
                                             @QueryParam("index")  @DefaultValue("0") int index,
                                             @QueryParam("number") @DefaultValue("10") int number
     ) {
-        List<CommonStatus> statuses = new ArrayList<>();
-        CommonStatus eStatus = CommonStatus.parseString(status);
-        if (null!=eStatus) {
-            statuses.add(eStatus);
-        }
-        else if ("ALL".equalsIgnoreCase(status)) {
-            statuses = CommonStatus.getAll();
-        }
+        List<CommonStatus> statuses = getStatuses(status);
+
+        Long lDepartmentId = VerifyUtil.isIds(departmentId) ? VerifyUtil.parseLongIds(departmentId).get(0) : null;
         List<Nurse360NotificationBean> notifications = notificationService.getNotificationByConditions(
                 null, statuses,
-                ServiceVendorType.HOSPITAL, new Long(hospitalId), new Long(departmentId),
+                ServiceVendorType.HOSPITAL, new Long(hospitalId), lDepartmentId,
                 index, number
         );
         return Response.ok(notifications).build();
