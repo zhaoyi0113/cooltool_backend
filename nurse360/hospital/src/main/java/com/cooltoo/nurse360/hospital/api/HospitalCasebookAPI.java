@@ -108,7 +108,9 @@ public class HospitalCasebookAPI {
     }
 
     @RequestMapping(path = "/casebook/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public long countCasebook(HttpServletRequest request) {
+    public long countCasebook(HttpServletRequest request,
+                              @RequestParam(defaultValue = "", name = "name") String name
+    ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
         Integer hospitalId   = tmp[0];
@@ -116,12 +118,13 @@ public class HospitalCasebookAPI {
         if (userDetails.isAdmin()) {
             return 0;
         }
-        long count = casebookService.countUserCasebook(null, null, null, null, hospitalId, departmentId, userDetails.getId(), null);
+        long count = casebookService.countUserCasebook(null, null, null, name, hospitalId, departmentId, userDetails.getId(), null);
         return count;
     }
 
     @RequestMapping(path = "/casebook", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<CasebookBean> getCasebook(HttpServletRequest request,
+                                          @RequestParam(defaultValue = "", name = "name") String name,
                                           @RequestParam(defaultValue = "0",  name = "index") int pageIndex,
                                           @RequestParam(defaultValue = "10", name = "number") int sizePerPage
     ) {
@@ -132,7 +135,7 @@ public class HospitalCasebookAPI {
         if (userDetails.isAdmin()) {
             return new ArrayList<>();
         }
-        List<CasebookBean> casebook = casebookService.getUserCasebook(null, null, null, null, hospitalId, departmentId, userDetails.getId(), null, pageIndex, sizePerPage);
+        List<CasebookBean> casebook = casebookService.getUserCasebook(null, null, null, name, hospitalId, departmentId, userDetails.getId(), null, pageIndex, sizePerPage);
         return casebook;
     }
 
