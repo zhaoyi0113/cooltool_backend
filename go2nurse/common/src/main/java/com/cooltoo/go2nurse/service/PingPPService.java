@@ -1,7 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.util.VerifyUtil;
-import com.google.gson.GsonBuilder;
 import com.pingplusplus.Pingpp;
 import com.pingplusplus.exception.PingppException;
 import com.pingplusplus.model.Charge;
@@ -60,12 +59,12 @@ public class PingPPService {
         chargeMap.put("currency", "cny");
         // 商品的标题，该参数最长为 32 个 Unicode 字符，
         // 银联全渠道（upacp/upacp_wap）限制在 32 个字节
-        chargeMap.put("subject", subject);
+        chargeMap.put("subject", stringLimit(subject, 16));
         // 商品的描述信息，该参数最长为 128 个 Unicode 字符，
         // yeepay_wap 对于该参数长度限制为 100 个 Unicode 字符。
-        chargeMap.put("body", body);
+        chargeMap.put("body", stringLimit(body, 100));
         // 订单附加说明，最多 255 个 Unicode 字符。
-        chargeMap.put("description", description);
+        chargeMap.put("description", stringLimit(description, 254));
         chargeMap.put("extra", extra);
         try {
             //发起交易请求
@@ -77,6 +76,16 @@ public class PingPPService {
             return null;
         }
         return charge;
+    }
+
+    private String stringLimit(String src, int lengthLimit) {
+        if (VerifyUtil.isStringEmpty(src)) {
+            return "";
+        }
+        if (lengthLimit>0 && src.length()>lengthLimit) {
+            return src.substring(0, lengthLimit);
+        }
+        return src;
     }
 
 }
