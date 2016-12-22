@@ -3,9 +3,9 @@ package com.cooltoo.nurse360.admin.api;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
-import com.cooltoo.nurse360.service.NotificationHospitalRelationServiceForNurse360;
 import com.cooltoo.nurse360.service.NotificationServiceForNurse360;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.VerifyUtil;
@@ -18,9 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Path("/admin/notification")
 public class NotificationManageAPI {
@@ -28,7 +26,6 @@ public class NotificationManageAPI {
     private static final Logger logger = LoggerFactory.getLogger(NotificationManageAPI.class);
 
     @Autowired private NotificationServiceForNurse360 notificationService;
-    @Autowired private NotificationHospitalRelationServiceForNurse360 notificationHospitalRelationService;
     @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
     @Autowired private NotifierForAllModule notifierForAllModule;
 
@@ -40,10 +37,9 @@ public class NotificationManageAPI {
     ) {
         Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
         if (null!=notification) {
-            List<Integer> hospitals = notificationHospitalRelationService.getHospitalIdByNotificationId(notificationId, CommonStatus.ENABLED.name());
-            List<Integer> departments = notificationHospitalRelationService.getDepartmentIdByNotificationId(notificationId, CommonStatus.ENABLED.name());
-            if (!VerifyUtil.isListEmpty(hospitals)) {
-                List<Long> nurseIds = nurseHospitalRelationService.getNurseIdByHospitalAndDepartIds(hospitals.get(0), departments);
+            if (ServiceVendorType.HOSPITAL.equals(notification.getVendorType())) {
+                List<Integer> departmentIds = Arrays.asList(new Integer[]{(int)notification.getDepartId()});
+                List<Long> nurseIds = nurseHospitalRelationService.getNurseIdByHospitalAndDepartIds((int)notification.getVendorId(), departmentIds);
                 notifierForAllModule.newNotificationAlertToNurse360(nurseIds, notificationId, "new", notification.getTitle());
             }
         }
@@ -58,8 +54,8 @@ public class NotificationManageAPI {
     ) {
         logger.info("get notification by notification id");
         Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
-        List<HospitalBean> hospitals = notificationHospitalRelationService.getHospitalByNotificationId(notificationId, CommonStatus.ENABLED.name());
-        List<HospitalDepartmentBean> departments = notificationHospitalRelationService.getDepartmentByNotificationId(notificationId, CommonStatus.ENABLED.name());
+        List<HospitalBean> hospitals = notificationService.getHospitalByNotificationId(notificationId);
+        List<HospitalDepartmentBean> departments = notificationService.getDepartmentByNotificationId(notificationId);
         Map<String, Object> retVal = new HashMap<>();
         retVal.put("notification", notification);
         retVal.put("hospital", hospitals);
@@ -72,14 +68,19 @@ public class NotificationManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response countNotification(@Context HttpServletRequest request,
-                                      @QueryParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                      @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
+                                      @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                      @QueryParam("department_id") @DefaultValue("0") int departmentId,
                                       @QueryParam("status") @DefaultValue("ALL") String status
     ) {
-        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
-        List<Long> notificationIds = notificationHospitalRelationService.getNotificationInHospitalAndDepartment(hospitalId, departmentId, status);
-        notificationIds = notificationService.getNotificationIdByStatusAndIds(status, notificationIds);
-        int count = VerifyUtil.isListEmpty(notificationIds) ? 0 : notificationIds.size();
+        List<CommonStatus> statuses = new ArrayList<>();
+        CommonStatus eStatus = CommonStatus.parseString(status);
+        if (null!=eStatus) {
+            statuses.add(eStatus);
+        }
+        else if ("ALL".equalsIgnoreCase(status)) {
+            statuses = CommonStatus.getAll();
+        }
+        long count = notificationService.countNotificationByConditions(null, statuses, ServiceVendorType.HOSPITAL, new Long(hospitalId), new Long(departmentId));
         logger.info("count = {}", count);
         return Response.ok(count).build();
     }
@@ -88,16 +89,25 @@ public class NotificationManageAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getNotificationByStatus(@Context HttpServletRequest request,
-                                            @QueryParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                            @QueryParam("department_id") @DefaultValue("") String strDepartmentId,
+                                            @QueryParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                            @QueryParam("department_id") @DefaultValue("0") int departmentId,
                                             @QueryParam("status") @DefaultValue("ALL") String status,
                                             @QueryParam("index")  @DefaultValue("0") int index,
                                             @QueryParam("number") @DefaultValue("10") int number
     ) {
-        Integer departmentId = VerifyUtil.isIds(strDepartmentId) ? VerifyUtil.parseIntIds(strDepartmentId).get(0) : null;
-        List<Long> notificationIds = notificationHospitalRelationService.getNotificationInHospitalAndDepartment(hospitalId, departmentId, status);
-        notificationIds = notificationService.getNotificationIdByStatusAndIds(status, notificationIds);
-        List<Nurse360NotificationBean> notifications = notificationService.getNotificationByIds(notificationIds, index, number);
+        List<CommonStatus> statuses = new ArrayList<>();
+        CommonStatus eStatus = CommonStatus.parseString(status);
+        if (null!=eStatus) {
+            statuses.add(eStatus);
+        }
+        else if ("ALL".equalsIgnoreCase(status)) {
+            statuses = CommonStatus.getAll();
+        }
+        List<Nurse360NotificationBean> notifications = notificationService.getNotificationByConditions(
+                null, statuses,
+                ServiceVendorType.HOSPITAL, new Long(hospitalId), new Long(departmentId),
+                index, number
+        );
         return Response.ok(notifications).build();
     }
 
@@ -107,33 +117,26 @@ public class NotificationManageAPI {
                                     @FormParam("title") @DefaultValue("") String title,
                                     @FormParam("introduction") @DefaultValue("") String introduction,
                                     @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
-                                    @FormParam("department_ids") @DefaultValue("") String strDepartmentIds,
+                                    @FormParam("department_ids") @DefaultValue("0") int departmentId,
                                     @FormParam("significance") @DefaultValue("") String strSignificance /* YES, NO */
     ) {
         logger.info("new notification");
-        Nurse360NotificationBean notification = notificationService.addNotification(title, introduction, strSignificance);
-        logger.info("notification is {}", notification);
+        Nurse360NotificationBean notification = notificationService.addNotification(title, introduction, strSignificance, ServiceVendorType.HOSPITAL, hospitalId, departmentId);
+        Map<String, Object> retVal = new HashMap<>();
+        retVal.put("notification", notification);
+
         if (null!=notification) {
             long notificationId = notification.getId();
-            List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
-            // cooltoo notification
-            if (-1==hospitalId && !departmentIds.contains(-1)) {
-                departmentIds.add(-1);
-            }
-            notificationHospitalRelationService.setNotificationToHospital(notificationId, hospitalId, departmentIds);
-        }
-        if (null!=notification) {
-            long notificationId = notification.getId();
-            List<HospitalBean> hospitals = notificationHospitalRelationService.getHospitalByNotificationId(notificationId, CommonStatus.ENABLED.name());
-            List<HospitalDepartmentBean> departments = notificationHospitalRelationService.getDepartmentByNotificationId(notificationId, CommonStatus.ENABLED.name());
-            Map<String, Object> retVal = new HashMap<>();
-            retVal.put("notification", notification);
+
+            List<HospitalBean> hospitals = notificationService.getHospitalByNotificationId(notificationId);
+            List<HospitalDepartmentBean> departments = notificationService.getDepartmentByNotificationId(notificationId);
             retVal.put("hospital", hospitals);
             retVal.put("department", departments);
 
             return Response.ok(retVal).build();
         }
-        return Response.ok(notification).build();
+
+        return Response.ok(retVal).build();
     }
 
     @Path("/edit")
@@ -143,22 +146,17 @@ public class NotificationManageAPI {
                                        @FormParam("notification_id") @DefaultValue("0") long notificationId,
                                        @FormParam("title") @DefaultValue("") String title,
                                        @FormParam("introduction") @DefaultValue("") String introduction,
-                                       @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                       @FormParam("hospital_id") @DefaultValue("") String strHospitalId,
                                        @FormParam("department_ids") @DefaultValue("") String strDepartmentIds,
                                        @FormParam("significance") @DefaultValue("") String strSignificance /* yes, no */,
                                        @FormParam("status") @DefaultValue("disabled") String status /* enabled, disabled, deleted */
     ) {
         logger.info("update notification");
-        Nurse360NotificationBean notification = notificationService.updateNotification(notificationId, title, introduction, null, strSignificance, status);
-        logger.info("notification is {}", notification);
-        if (null!=notification) {
-            List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
-            // cooltoo notification
-            if (-1==hospitalId && !departmentIds.contains(-1)) {
-                departmentIds.add(-1);
-            }
-            notificationHospitalRelationService.setNotificationToHospital(notificationId, hospitalId, departmentIds);
-        }
+        Long vendorId = VerifyUtil.isIds(strHospitalId)   ? VerifyUtil.parseLongIds(strHospitalId).get(0)   : null;
+        Long departId = VerifyUtil.isIds(strDepartmentIds)? VerifyUtil.parseLongIds(strDepartmentIds).get(0): null;
+        Nurse360NotificationBean notification = notificationService.updateNotification(
+                notificationId, title, introduction, null, strSignificance, status,
+                ServiceVendorType.HOSPITAL, vendorId, departId);
         return Response.ok(notification).build();
     }
 
@@ -170,7 +168,7 @@ public class NotificationManageAPI {
                                        @FormParam("content") @DefaultValue("") String content
     ) {
         logger.info("update notification content");
-        Nurse360NotificationBean notification = notificationService.updateNotification(notificationId, null, null, content, null, null);
+        Nurse360NotificationBean notification = notificationService.updateNotification(notificationId, null, null, content, null, null, null, null, null);
         return Response.ok(notification).build();
     }
 }

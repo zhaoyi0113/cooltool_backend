@@ -7,6 +7,7 @@ import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.constants.CourseStatus;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.nurse360.beans.Nurse360CourseBean;
 import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.entities.NurseCourseRelationEntity;
@@ -15,6 +16,7 @@ import com.cooltoo.nurse360.repository.NurseCourseRelationRepository;
 import com.cooltoo.nurse360.repository.NurseNotificationRelationRepository;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.repository.NurseHospitalRelationRepository;
+import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -49,7 +52,6 @@ public class NurseExtensionServiceForNurse360 {
     @Autowired private CourseHospitalRelationServiceForNurse360 courseHospitalRelationService;
     // notification
     @Autowired private NotificationServiceForNurse360 notificationService;
-    @Autowired private NotificationHospitalRelationServiceForNurse360 notificationHospitalRelationService;
 
     //========================================================================
     //                getting
@@ -81,7 +83,7 @@ public class NurseExtensionServiceForNurse360 {
         List<Long> courseIdInHospital = courseHospitalRelationService.getCourseInHospitalAndDepartment(
                 nurseHospitalRelation.getHospitalId(), 0, CommonStatus.ENABLED.name()
         );
-        courseIdInDepartment = mergeListValue(courseIdInHospital, courseIdInDepartment);
+        courseIdInDepartment = SetUtil.newInstance().mergeListValue(courseIdInHospital, courseIdInDepartment);
 
         // get course
         courses = courseService.getCourseByIds(courseIdInDepartment, pageIndex, number);
@@ -164,33 +166,43 @@ public class NurseExtensionServiceForNurse360 {
         return notification;
     }
 
-    public List<Nurse360NotificationBean> getNotificationByNurseId(long nurseId, int pageIndex, int number) {
+    public List<Nurse360NotificationBean> getNotificationByNurseId(long nurseId, int pageIndex, int sizePerPage) {
         logger.info("get course by nurseId={}", nurseId);
-        List<Nurse360NotificationBean> notifications = new ArrayList<>();
+        List<Long> notificationIds = new ArrayList<>();
 
         // get nurse hospital department relation
+        long hospitalId = 0;
+        long departId = 0;
         List<NurseHospitalRelationEntity> nurseHospitalRelations = nurseHospitalRelationRepository.findByNurseId(nurseId, nurseHospitalRelationSort);
-        if (null==nurseHospitalRelations || nurseHospitalRelations.isEmpty() || nurseHospitalRelations.size()!=1) {
-            return notifications;
+        if (null!=nurseHospitalRelations && nurseHospitalRelations.size()==1) {
+            NurseHospitalRelationEntity nurseHospitalRelation = nurseHospitalRelations.get(0);
+            hospitalId = nurseHospitalRelation.getHospitalId();
+            departId = nurseHospitalRelation.getDepartmentId();
         }
-        NurseHospitalRelationEntity nurseHospitalRelation = nurseHospitalRelations.get(0);
 
-        // get notification id
-        List<Long> notificationIdInDepartment = notificationHospitalRelationService.getNotificationInHospitalAndDepartment(
-                nurseHospitalRelation.getHospitalId(), nurseHospitalRelation.getDepartmentId(), CommonStatus.ENABLED.name()
-        );
-        List<Long> notificationIdInHospital = notificationHospitalRelationService.getNotificationInHospitalAndDepartment(
-                nurseHospitalRelation.getHospitalId(), 0, CommonStatus.ENABLED.name()
-        );
-        notificationIdInDepartment = mergeListValue(notificationIdInHospital, notificationIdInDepartment);
+        List<CommonStatus> statuses = Arrays.asList(new CommonStatus[]{CommonStatus.ENABLED});
+        // get cooltoo's notificationIds
+        List<Long> tmpNotificationIds = notificationService.getNotificationIdByVendor(statuses, ServiceVendorType.HOSPITAL, -1L, 0L);
+        SetUtil.newInstance().mergeListValue(tmpNotificationIds, notificationIds);
+
+        // get hospital's notificationIds that nurse in
+        tmpNotificationIds = notificationService.getNotificationIdByVendor(statuses, ServiceVendorType.HOSPITAL, hospitalId, 0L);
+        SetUtil.newInstance().mergeListValue(tmpNotificationIds, notificationIds);
+
+        // get department's notificationIds that nurse in
+        tmpNotificationIds = notificationService.getNotificationIdByVendor(statuses, ServiceVendorType.HOSPITAL, hospitalId, departId);
+        SetUtil.newInstance().mergeListValue(tmpNotificationIds, notificationIds);
+
+        // get notification that nurse has read
+        List<Long> notificationIdsNurseRead = nurseNotificationRelationRepository.findNotificationIdByNurseIdAndReadingStatus(nurseId, ReadingStatus.READ);
+        SetUtil.newInstance().mergeListValue(notificationIdsNurseRead, notificationIds);
 
         // get notification
-        notifications = notificationService.getNotificationByIds(notificationIdInDepartment, pageIndex, number);
+        List<Nurse360NotificationBean> notifications = notificationService.getNotificationByIds(notificationIds, pageIndex, sizePerPage);
 
         // notification that nurse has read
-        List<Long> notificationReadId = nurseNotificationRelationRepository.findNotificationIdByNurseIdAndReadingStatus(nurseId, ReadingStatus.READ);
         for (Nurse360NotificationBean tmp : notifications) {
-            if (notificationReadId.contains(tmp.getId())) {
+            if (notificationIdsNurseRead.contains(tmp.getId())) {
                 tmp.setHasRead(YesNoEnum.YES);
             }
             else {
@@ -201,25 +213,6 @@ public class NurseExtensionServiceForNurse360 {
         return notifications;
     }
 
-    private List<Long> mergeListValue(List<Long> list1, List<Long> list2) {
-        if (VerifyUtil.isListEmpty(list1) && VerifyUtil.isListEmpty(list2)) {
-            return new ArrayList<>();
-        }
-        if (VerifyUtil.isListEmpty(list1)) {
-            return list2;
-        }
-        if (VerifyUtil.isListEmpty(list2)) {
-            return list1;
-        }
-
-        for (Long tmpId : list1) {
-            if (list2.contains(tmpId)) {
-                continue;
-            }
-            list2.add(tmpId);
-        }
-        return list2;
-    }
     //========================================================================
     //                adding
     //========================================================================
@@ -255,7 +248,7 @@ public class NurseExtensionServiceForNurse360 {
 
     @Transactional
     public long readNotification(long nurseId, long notificationId) {
-        logger.info("nurse={} read notification={}");
+        logger.info("nurse={} read notification={}", nurseId, notificationId);
         if (!notificationService.existsNotification(notificationId)) {
             logger.error("notification not exist");
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);

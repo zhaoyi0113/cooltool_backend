@@ -53,4 +53,26 @@ public final class SetUtil {
         }
         return val;
     }
+
+    public List mergeListValue(List list1, List list2) {
+        if (VerifyUtil.isListEmpty(list1) && VerifyUtil.isListEmpty(list2)) {
+            return new ArrayList<>();
+        }
+        if (VerifyUtil.isListEmpty(list1)) {
+            return list2;
+        }
+        if (VerifyUtil.isListEmpty(list2)) {
+            if (null==list2) {
+                list2 = new ArrayList();
+            }
+        }
+
+        for (Object tmp : list1) {
+            if (list2.contains(tmp)) {
+                continue;
+            }
+            list2.add(tmp);
+        }
+        return list2;
+    }
 }

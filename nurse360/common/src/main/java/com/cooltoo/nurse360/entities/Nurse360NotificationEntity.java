@@ -2,6 +2,7 @@ package com.cooltoo.nurse360.entities;
 
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.go2nurse.constants.ServiceVendorType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -20,6 +21,9 @@ public class Nurse360NotificationEntity {
     private String introduction;
     private String content;
     private YesNoEnum significance;
+    private ServiceVendorType vendorType;
+    private long vendorId;
+    private long departId;
 
     @Id
     @GeneratedValue
@@ -27,10 +31,16 @@ public class Nurse360NotificationEntity {
     public long getId() {
         return id;
     }
+    public void setId(long id) {
+        this.id = id;
+    }
 
     @Column(name = "time_created")
     public Date getTime() {
         return time;
+    }
+    public void setTime(Date time) {
+        this.time = time;
     }
 
     @Column(name = "status")
@@ -38,20 +48,32 @@ public class Nurse360NotificationEntity {
     public CommonStatus getStatus() {
         return status;
     }
+    public void setStatus(CommonStatus status) {
+        this.status = status;
+    }
 
     @Column(name = "title")
     public String getTitle() {
         return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @Column(name = "introduction")
     public String getIntroduction() {
         return introduction;
     }
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
 
     @Column(name = "content")
     public String getContent() {
         return content;
+    }
+    public void setContent(String content) {
+        this.content = content;
     }
 
     @Column(name = "significance")
@@ -59,33 +81,33 @@ public class Nurse360NotificationEntity {
     public YesNoEnum getSignificance() {
         return significance;
     }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
-
-    public void setStatus(CommonStatus status) {
-        this.status = status;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setIntroduction(String introduction) {
-        this.introduction = introduction;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public void setSignificance(YesNoEnum significance) {
         this.significance = significance;
+    }
+
+    @Column(name = "vendor_type")
+    @Enumerated
+    public ServiceVendorType getVendorType() {
+        return vendorType;
+    }
+    public void setVendorType(ServiceVendorType vendorType) {
+        this.vendorType = vendorType;
+    }
+
+    @Column(name = "vendor_id")
+    public long getVendorId() {
+        return vendorId;
+    }
+    public void setVendorId(long vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    @Column(name = "depart_id")
+    public long getDepartId() {
+        return departId;
+    }
+    public void setDepartId(long departId) {
+        this.departId = departId;
     }
 
     public String toString() {
