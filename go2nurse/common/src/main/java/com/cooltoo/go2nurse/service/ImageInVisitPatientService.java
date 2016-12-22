@@ -137,6 +137,23 @@ public class ImageInVisitPatientService {
         return imageIds;
     }
 
+    @Transactional
+    public List<Long> deleteByNurseVisitPatientId(long nurseVisitPatientId, long imageId) {
+        List<ImageInVisitPatientEntity> images = repository.findByNurseVisitPatientIdAndImageId(nurseVisitPatientId, imageId);
+        if (null==images || images.isEmpty()) {
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+        }
+
+        List<Long> imageIds = new ArrayList<>();
+        for (ImageInVisitPatientEntity tmp : images) {
+            imageIds.add(tmp.getImageId());
+        }
+        userStorage.deleteFiles(imageIds);
+        repository.delete(images);
+
+        return imageIds;
+    }
+
     //====================================================
     //                   adding
     //====================================================

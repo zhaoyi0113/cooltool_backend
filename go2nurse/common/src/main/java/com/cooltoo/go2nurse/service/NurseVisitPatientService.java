@@ -527,7 +527,7 @@ public class NurseVisitPatientService {
 
 
     //===============================================================
-    //             add
+    //             delete
     //===============================================================
     @Transactional
     public List<Long> deleteVisitRecordImage(long nurseId, long visitRecordId) {
@@ -545,6 +545,68 @@ public class NurseVisitPatientService {
 
         List<Long> imageIds = imageService.deleteByNurseVisitPatientId(visitRecordId);
         return imageIds;
+    }
+
+    @Transactional
+    public List<Long> deleteVisitRecordImage(long nurseId, long visitRecordId, long imageId) {
+        logger.info("delete image to visitRecordId={} by nurseId={}", visitRecordId, nurseId);
+
+        NurseVisitPatientEntity visitRecord = repository.findOne(visitRecordId);
+        if (null==visitRecord) {
+            logger.error("visit record is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (nurseId>0 && nurseId!=visitRecord.getNurseId()) {
+            logger.error("visit record is not belong to nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        List<Long> imageIds = imageService.deleteByNurseVisitPatientId(visitRecordId, imageId);
+        return imageIds;
+    }
+
+    @Transactional
+    public long deletePatientSignImage(long nurseId, long visitRecordId) {
+        logger.info("delete patient sign image to visitRecordId={} by nurseId={}", visitRecordId, nurseId);
+
+        NurseVisitPatientEntity visitRecord = repository.findOne(visitRecordId);
+        if (null==visitRecord) {
+            logger.error("visit record is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (nurseId>0 && nurseId!=visitRecord.getNurseId()) {
+            logger.error("visit record is not belong to nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        long patientSign = visitRecord.getPatientSign();
+
+        userFileStorage.deleteFile(patientSign);
+        visitRecord.setPatientSign(0);
+        repository.save(visitRecord);
+
+        return patientSign;
+    }
+
+    @Transactional
+    public long deleteNurseSignImage(long nurseId, long visitRecordId) {
+        logger.info("delete nurse sign image to visitRecordId={} by nurseId={}", visitRecordId, nurseId);
+
+        NurseVisitPatientEntity visitRecord = repository.findOne(visitRecordId);
+        if (null==visitRecord) {
+            logger.error("visit record is not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (nurseId>0 && nurseId!=visitRecord.getNurseId()) {
+            logger.error("visit record is not belong to nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        long nurseSign = visitRecord.getNurseSign();
+
+        userFileStorage.deleteFile(nurseSign);
+        visitRecord.setNurseSign(0);
+        repository.save(visitRecord);
+
+        return nurseSign;
     }
 
 }

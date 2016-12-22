@@ -278,4 +278,44 @@ public class HospitalVisitPatientAPI {
         retVal.put("deleted", Boolean.TRUE);
         return retVal;
     }
+
+    @RequestMapping(path = "/visit/patient/sign", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Boolean> deletePatientSignImage(HttpServletRequest request,
+                                                       @RequestParam(defaultValue = "0", name = "visit_record_id") long visitRecordId
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
+        long patientSignId = visitPatientService.deletePatientSignImage(nurseId, visitRecordId);
+        Map<String, Boolean> retVal = new HashMap<>();
+        retVal.put("deleted", Boolean.TRUE);
+        return retVal;
+    }
+
+    @RequestMapping(path = "/visit/patient/nurse/sign", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Boolean> deleteNurseSignImage(HttpServletRequest request,
+                                                    @RequestParam(defaultValue = "0", name = "visit_record_id") long visitRecordId
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
+        long patientSignId = visitPatientService.deleteNurseSignImage(nurseId, visitRecordId);
+        Map<String, Boolean> retVal = new HashMap<>();
+        retVal.put("deleted", Boolean.TRUE);
+        return retVal;
+    }
+
+    @RequestMapping(path = "/visit/patient/image/ids", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public Map<String, Boolean> deleteVisitPatientRecordImage(HttpServletRequest request,
+                                                              @RequestParam(defaultValue = "0", name = "visit_record_id") long visitRecordId,
+                                                              @RequestParam(defaultValue = "0", name = "image_ids")     String strImageIds
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
+        List<Long> imageIds = VerifyUtil.isIds(strImageIds) ? VerifyUtil.parseLongIds(strImageIds) : new ArrayList<>();
+        for (Long tmp : imageIds) {
+            visitPatientService.deleteVisitRecordImage(nurseId, visitRecordId, tmp);
+        }
+        Map<String, Boolean> retVal = new HashMap<>();
+        retVal.put("deleted", Boolean.TRUE);
+        return retVal;
+    }
 }

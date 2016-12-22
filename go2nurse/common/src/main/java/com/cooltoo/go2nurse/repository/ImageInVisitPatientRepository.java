@@ -19,4 +19,5 @@ public interface ImageInVisitPatientRepository extends JpaRepository<ImageInVisi
     List<ImageInVisitPatientEntity> findByNurseVisitPatientId(Long nurseVisitPatientId, Sort sort);
     List<ImageInVisitPatientEntity> findByNurseVisitPatientId(Long nurseVisitPatientId);
     List<ImageInVisitPatientEntity> findByNurseVisitPatientIdIn(List<Long> nurseVisitPatientIds, Sort sort);
+    List<ImageInVisitPatientEntity> findByNurseVisitPatientIdAndImageId(Long nurseVisitPatientId, Long imageId);
 }
