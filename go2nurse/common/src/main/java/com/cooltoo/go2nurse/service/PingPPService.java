@@ -82,6 +82,8 @@ public class PingPPService {
         if (VerifyUtil.isStringEmpty(src)) {
             return "";
         }
+        src = src.replace('\r', ' ');
+        src = src.replace('\n', ' ');
         if (lengthLimit>0 && src.length()>lengthLimit) {
             return src.substring(0, lengthLimit);
         }
