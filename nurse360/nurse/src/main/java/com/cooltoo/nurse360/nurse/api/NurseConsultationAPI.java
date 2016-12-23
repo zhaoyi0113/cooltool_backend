@@ -150,7 +150,8 @@ public class NurseConsultationAPI {
     public Response addConsultation(@Context HttpServletRequest request,
                                     @FormParam("user_id") @DefaultValue("0") long userId,
                                     @FormParam("patient_id") @DefaultValue("0") long patientId,
-                                    @FormParam("follow_up_description") @DefaultValue("") String diseaseDescription
+                                    @FormParam("follow_up_description") @DefaultValue("") String diseaseDescription,
+                                    @FormParam("category_id") @DefaultValue("0") long categoryId
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         if (!nurseCanAnswerConsultation(nurseId, 0)) {
@@ -158,7 +159,7 @@ public class NurseConsultationAPI {
         }
 
         long consultationId = userConsultationService.addConsultation(
-                0, nurseId, userId, patientId,
+                categoryId, nurseId, userId, patientId,
                 diseaseDescription, "",
                 ConsultationCreator.NURSE,
                 ConsultationReason.PATIENT_FOLLOW_UP

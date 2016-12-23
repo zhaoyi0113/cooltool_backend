@@ -70,7 +70,7 @@ public class ImageInVisitPatientService {
         return imageUrl;
     }
 
-    public Map<Long, List<String>> getNurseVisitPatientImagesUrl(List<Long> nurseVisitPatientIds) {
+    public Map<Long, List<String>> getNurseVisitPatientImagesUrl(List<Long> nurseVisitPatientIds, Map<Long, Map<Long, String>> visitRecordIdToMapOfImageIdToUrl) {
         if (VerifyUtil.isListEmpty(nurseVisitPatientIds)) {
             return new HashMap<>();
         }
@@ -98,6 +98,15 @@ public class ImageInVisitPatientService {
                 visitId2Map.put(tmp.getNurseVisitPatientId(), imagesUrl);
             }
             imagesUrl.add(url);
+
+            if (null!=visitRecordIdToMapOfImageIdToUrl) {
+                Map<Long, String> recordImageIdToUrl = visitRecordIdToMapOfImageIdToUrl.get(tmp.getNurseVisitPatientId());
+                if (null==recordImageIdToUrl) {
+                    recordImageIdToUrl = new HashMap<>();
+                    visitRecordIdToMapOfImageIdToUrl.put(tmp.getNurseVisitPatientId(), recordImageIdToUrl);
+                }
+                recordImageIdToUrl.put(tmp.getImageId(), url);
+            }
         }
 
         return visitId2Map;
