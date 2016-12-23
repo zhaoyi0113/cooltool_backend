@@ -195,7 +195,6 @@ public class NurseExtensionServiceForNurse360 {
 
         // get notification that nurse has read
         List<Long> notificationIdsNurseRead = nurseNotificationRelationRepository.findNotificationIdByNurseIdAndReadingStatus(nurseId, ReadingStatus.READ);
-        SetUtil.newInstance().mergeListValue(notificationIdsNurseRead, notificationIds);
 
         // get notification
         List<Nurse360NotificationBean> notifications = notificationService.getNotificationByIds(notificationIds, pageIndex, sizePerPage);
