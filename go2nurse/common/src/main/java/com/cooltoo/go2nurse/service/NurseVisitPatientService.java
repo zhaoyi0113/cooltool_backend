@@ -225,7 +225,8 @@ public class NurseVisitPatientService {
         Map<Long, UserBean> userIdToBean = userService.getUserIdToBean(userIds);
         Map<Long, PatientBean> patientIdToBean = patientService.getPatientIdToBean(patientIds);
         Map<Long, NurseBean> nurseIdToBean = nurseService.getNurseIdToBean(nurseIds);
-        Map<Long, List<String>> visitRecordImage = imageService.getNurseVisitPatientImagesUrl(visitRecordIds);
+        Map<Long, Map<Long, String>> visitRecordIdToMapOfImageIdToUrl = new HashMap<>();
+        Map<Long, List<String>> visitRecordImage = imageService.getNurseVisitPatientImagesUrl(visitRecordIds, visitRecordIdToMapOfImageIdToUrl);
         Map<Long, String> patientSignImage = imageService.getNurseVisitPatientImageIdToUrl(patientNurseSignId);
         List<ServiceOrderBean> orders = orderService.getOrderByIds(orderIds);
         Map<Long, ServiceOrderBean> orderIdToBean = new HashMap<>();
@@ -244,6 +245,8 @@ public class NurseVisitPatientService {
             tmp.setPatient(patient);
             NurseBean nurse = nurseIdToBean.get(tmp.getNurseId());
             tmp.setNurse(nurse);
+            Map<Long, String> recordImageIdToUrl = visitRecordIdToMapOfImageIdToUrl.get(tmp.getId());
+            tmp.setRecordImageIdToUrl(recordImageIdToUrl);
             List<String> recordImages = visitRecordImage.get(tmp.getId());
             tmp.setRecordImages(null==recordImages ? new ArrayList<>() : recordImages);
             String patientSign = patientSignImage.get(tmp.getPatientSign());

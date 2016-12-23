@@ -6,6 +6,7 @@ import com.cooltoo.go2nurse.constants.ServiceVendorType;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhaolisong on 2016/11/06.
@@ -25,6 +26,7 @@ public class NurseVisitPatientBean {
     private List<NurseVisitPatientServiceItemBean> serviceItems;
     private String visitRecord;
     private List<String> recordImages;
+    private Map<Long, String> recordImageIdToUrl;
     private long patientSign;
     private String patientSignUrl;
     private long orderId;
@@ -160,6 +162,13 @@ public class NurseVisitPatientBean {
     }
     public void setRecordImages(List<String> recordImages) {
         this.recordImages = recordImages;
+    }
+
+    public Map<Long, String> getRecordImageIdToUrl() {
+        return recordImageIdToUrl;
+    }
+    public void setRecordImageIdToUrl(Map<Long, String> recordImageIdToUrl) {
+        this.recordImageIdToUrl = recordImageIdToUrl;
     }
 
     public String getPatientSignUrl() {
