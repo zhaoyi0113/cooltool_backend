@@ -100,10 +100,10 @@ public class ImageInVisitPatientService {
             imagesUrl.add(url);
 
             if (null!=visitRecordIdToMapOfImageIdToUrl) {
-                Map<Long, String> recordImageIdToUrl = visitRecordIdToMapOfImageIdToUrl.get(tmp.getId());
+                Map<Long, String> recordImageIdToUrl = visitRecordIdToMapOfImageIdToUrl.get(tmp.getNurseVisitPatientId());
                 if (null==recordImageIdToUrl) {
                     recordImageIdToUrl = new HashMap<>();
-                    visitRecordIdToMapOfImageIdToUrl.put(tmp.getId(), recordImageIdToUrl);
+                    visitRecordIdToMapOfImageIdToUrl.put(tmp.getNurseVisitPatientId(), recordImageIdToUrl);
                 }
                 recordImageIdToUrl.put(tmp.getImageId(), url);
             }
