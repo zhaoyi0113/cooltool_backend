@@ -122,36 +122,51 @@ public class HospitalNurseAPI {
         return new ArrayList<>();
     }
 
-    @RequestMapping(path = "/nurse/qualification", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
-    public NurseQualificationFileBean editNurseQualification(HttpServletRequest request,
-                                                               @RequestParam(defaultValue = "", name = "nurse_id") long nurseId,
-                                                               @RequestParam(defaultValue = "", name = "qualification_file_id") long qualificationFileId,
-                                                               @RequestParam(defaultValue = "", name = "type") String workfileType,
-                                                               @RequestParam(defaultValue = "", name = "expiry") String expiryTime,
-                                                               @RequestParam(defaultValue = "", name = "file_name") String fileName,
-                                                               @RequestPart(required = true, name = "file") MultipartFile file
+    @RequestMapping(path = "/nurse/qualification", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public NurseQualificationFileBean deleteNurseQualification(HttpServletRequest request,
+                                                               @RequestParam(defaultValue = "0", name = "qualification_file_id") long qualificationFileId
+    ) {
+        NurseQualificationFileBean file = nurseQualificationService.deleteFileByFileId(qualificationFileId);
+        return file;
+    }
+
+    @RequestMapping(path = "/nurse/qualification", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
+    public String addNurseQualification(HttpServletRequest request,
+                                        @RequestParam(defaultValue = "0",name = "nurse_id") long nurseId,
+                                        @RequestParam(defaultValue = "", name = "type") String workfileType,
+                                        @RequestParam(defaultValue = "", name = "file_name") String fileName,
+                                        @RequestPart(required = true, name = "file") MultipartFile file
     ) {
         InputStream workFileInputStream = null;
-        Date expiryDate = null;
-        try {
-            workFileInputStream = file.getInputStream();
-            if (!VerifyUtil.isStringEmpty(expiryTime)) {
-                long millisecond = NumberUtil.getTime(expiryTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-                expiryDate = new Date(millisecond);
-            }
-        } catch (Exception ex) {
+        try { workFileInputStream = file.getInputStream(); } catch (Exception ex) {
             throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
         }
-
-        if (VerifyUtil.isStringEmpty(fileName)) {
-            fileName = "nurse_qualification_file_" + System.currentTimeMillis();
-        }
-        NurseQualificationFileBean qualificationFile = nurseQualificationService.updateQualificationFile(
-                qualificationFileId,
+        String imageUrl = nurseQualificationService.addWorkFile(
+                nurseId,
+                "",
                 workfileType,
                 fileName,
+                workFileInputStream);
+        return imageUrl;
+    }
+
+    @RequestMapping(path = "/nurse/qualification/edit", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
+    public NurseQualificationFileBean editNurseQualification(HttpServletRequest request,
+                                                             @RequestParam(defaultValue = "0", name = "qualification_file_id") long qualificationFileId,
+                                                             @RequestParam(defaultValue = "", name = "file_name") String fileName,
+                                                             @RequestPart(required = true, name = "file") MultipartFile file
+    ) {
+        InputStream workFileInputStream = null;
+        try { workFileInputStream = file.getInputStream(); } catch (Exception ex) {
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
+        }
+//        long qualificationFileId = VerifyUtil.isIds(strQualificationFileId) ? VerifyUtil.parseLongIds(strQualificationFileId).get(0) : 0L;
+        NurseQualificationFileBean qualificationFile = nurseQualificationService.updateQualificationFile(
+                qualificationFileId,
+                null,
+                fileName,
                 workFileInputStream,
-                expiryDate,
+                null,
                 utility.getHttpPrefixForNurseGo());
         return qualificationFile;
     }

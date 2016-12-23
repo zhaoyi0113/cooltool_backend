@@ -325,7 +325,7 @@ public class NurseQualificationService {
         WorkFileType enumType = WorkFileType.parseString(strWorkfileType);
         if (null==enumType) {
             logger.info("The workfile type do not have the relative WorkFileType enumeration =={}", strWorkfileType);
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
+            return null;
         }
         WorkFileTypeBean workfileType = workfileTypeService.getWorkFileTypeByType(enumType);
         if (null==workfileType) {

@@ -209,7 +209,11 @@ public class NurseQualificationFileService {
         // set WorkFileId
         if (null!=file) {
             if (VerifyUtil.isStringEmpty(fileName)) {
-                fileName = "upload_qualification_file_"+workFileType.getName()+System.nanoTime();
+                fileName = "upload_qualification_file_";
+                if (null!=workFileType) {
+                    fileName += workFileType.getName();
+                }
+                fileName += System.nanoTime();
             }
             long fileId = secretStorage.addFile(entity.getWorkfileId(), fileName, file);
             if (fileId > 0) {
