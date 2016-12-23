@@ -507,7 +507,13 @@ public class NurseVisitPatientService {
             if (VerifyUtil.isStringEmpty(imageName)) {
                 imageName = "nurse_visit_patient-nurse_sign_"+System.currentTimeMillis();
             }
-            long imageId = userFileStorage.addFile(visitRecord.getPatientSign(), imageName, image);
+            long imageId = 0;
+            if (!isNurse) {
+                imageId = userFileStorage.addFile(visitRecord.getPatientSign(), imageName, image);
+            }
+            else {
+                imageId = userFileStorage.addFile(visitRecord.getNurseSign(), imageName, image);
+            }
             String imageUrl = userFileStorage.getFileURL(imageId, utility.getHttpPrefix());
             if (imageId > 0) {
                 if (!isNurse) {
