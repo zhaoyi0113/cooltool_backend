@@ -89,6 +89,30 @@ public class ViewVendorPatientRelationService {
         return beans;
     }
 
+    public List<String> getVendorsByPatient(Long userId, Long patientId) {
+        logger.info("get vendors by userId={} patientId={}", userId, patientId);
+        if (null==userId && null==patientId) {
+            return new ArrayList<>();
+        }
+        List<Object[]> set = repository.findVendorsByPatient(userId, patientId);
+        // vendorTypeOrdinal_vendorId_departId
+        List<String> keys = new ArrayList<>();
+        if (!VerifyUtil.isListEmpty(set)) {
+            for (Object[] tmp : set) {
+                if (null==tmp || tmp.length==0) { continue; }
+                StringBuilder tmpStr = new StringBuilder();
+                tmpStr.append(tmp[0]).append("_").append(tmp[1]).append("_").append(tmp[2]);
+                String key = tmpStr.toString();
+                if (!keys.contains(key)) {
+                    keys.add(key);
+                }
+            }
+        }
+
+        logger.warn("view record count={}", keys.size());
+        return keys;
+    }
+
     //===============================================================
     //             get ----  nurse/manager using
     //===============================================================
@@ -121,7 +145,7 @@ public class ViewVendorPatientRelationService {
                 null!=hospitalId   ? hospitalId   : 0,
                 null!=departmentId ? departmentId : 0);
 
-        logger.warn("visit record count={}", beans.size());
+        logger.warn("view record count={}", beans.size());
         return beans;
     }
 
@@ -133,10 +157,10 @@ public class ViewVendorPatientRelationService {
         List<Long> usersIdNurseDenied  = new ArrayList<>();
         List<Long> usersIdVendorDenied = new ArrayList<>();
         if (null!=nurseId) {
-            usersIdNurseDenied = denyPatientService.deniedUserId(WhoDenyPatient.NURSE, nurseId, null, null, null);
+            usersIdNurseDenied = denyPatientService.getDeniedUserId(WhoDenyPatient.NURSE, nurseId, null, null, null);
         }
         if (null!=vendorType && null!=vendorId) {
-            usersIdVendorDenied = denyPatientService.deniedUserId(WhoDenyPatient.VENDOR, null, vendorType, vendorId, departId);
+            usersIdVendorDenied = denyPatientService.getDeniedUserId(WhoDenyPatient.VENDOR, null, vendorType, vendorId, departId);
         }
 
         for (ViewVendorPatientRelationBean tmp : vendorPatientRelations) {

@@ -44,4 +44,11 @@ public interface ViewVendorPatientRelationRepository extends JpaRepository<ViewV
             " AND   (?4 IS NULL OR vvpr.recordFrom LIKE ?4)" +
             " AND   (?5 IS NULL OR (vvpr.userName LIKE %?5) OR (vvpr.patientName LIKE %?5))")
     List<Object[]> findRecordByConditions(ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, String recordFrom, String userOrPatientName);
+
+
+
+    @Query("SELECT DISTINCT vvpr.vendorType, vvpr.vendorId, vvpr.vendorDepartId FROM ViewVendorPatientRelationEntity vvpr" +
+            " WHERE (?1 IS NULL OR ?1=vvpr.userId)" +
+            " AND   (?2 IS NULL OR ?2=vvpr.patientId)")
+    List<Object[]> findVendorsByPatient(Long userId, Long patientId);
 }

@@ -2,7 +2,6 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.DenyPatientBean;
@@ -11,7 +10,6 @@ import com.cooltoo.go2nurse.constants.WhoDenyPatient;
 import com.cooltoo.go2nurse.converter.DenyPatientBeanConverter;
 import com.cooltoo.go2nurse.entities.DenyPatientEntity;
 import com.cooltoo.go2nurse.repository.DenyPatientRepository;
-import com.cooltoo.repository.NurseHospitalRelationRepository;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.VerifyUtil;
@@ -107,7 +105,7 @@ public class DenyPatientService {
         return entities;
     }
 
-    public List<Long> deniedUserId(WhoDenyPatient whoDenyPatient, Long nurseId, ServiceVendorType vendorType, Long vendorId, Long departId) {
+    public List<Long> getDeniedUserId(WhoDenyPatient whoDenyPatient, Long nurseId, ServiceVendorType vendorType, Long vendorId, Long departId) {
         logger.debug("deny whoDeny={} nurseId={} vendorType={} vendorId={} departId={}",
                 whoDenyPatient, nurseId, vendorType, vendorId, departId);
         List<DenyPatientEntity> entities = repository.findByConditions(whoDenyPatient, nurseId, vendorType, vendorId, departId, null, null, sort);
