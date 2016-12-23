@@ -1,12 +1,15 @@
 package com.cooltoo;
 
 import com.cooltoo.go2nurse.features.GoToNurseFeatures;
+import org.apache.catalina.connector.Connector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
+import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +37,8 @@ public class Application {
     @Value("${togglz_property}")
     private String togglzFilePath;
 
+    @Value("${embedded_http_port}")
+    private String embededHttpPort;
 
     @Bean
     public FeatureProvider featureProvider() {
@@ -57,6 +62,19 @@ public class Application {
                 return new SimpleFeatureUser("admin", true);
             }
         };
+    }
+
+    @Bean
+    public EmbeddedServletContainerFactory servletContainer() {
+        TomcatEmbeddedServletContainerFactory tomcat = new TomcatEmbeddedServletContainerFactory();
+        tomcat.addAdditionalTomcatConnectors(createStandardConnector());
+        return tomcat;
+    }
+
+    private Connector createStandardConnector() {
+        Connector connector = new Connector(TomcatEmbeddedServletContainerFactory.DEFAULT_PROTOCOL);
+        connector.setPort(Integer.parseInt(embededHttpPort));
+        return connector;
     }
 
     public static void main(String[] args) {
