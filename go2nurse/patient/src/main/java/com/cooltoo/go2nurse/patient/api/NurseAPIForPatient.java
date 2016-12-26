@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.RegisterFrom;
@@ -71,7 +72,7 @@ public class NurseAPIForPatient {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getNurseById(@Context HttpServletRequest request,
-                                 @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
+                                 @QueryParam("can_answer_nursing_question") @DefaultValue("YES") String canAnswerNursingQuestion,
                                  @QueryParam("query") @DefaultValue("") String query,
                                  @QueryParam("index")  @DefaultValue("0")  int index,
                                  @QueryParam("number") @DefaultValue("10") int number
@@ -83,6 +84,10 @@ public class NurseAPIForPatient {
         List<Long> nurseIds = nursePatientRelationService.getNurseIdByPatientId(userId, null, CommonStatus.ENABLED);
         for (int i=0; i<nurses.size(); i++) {
             NurseBean tmp = nurses.get(i);
+            NurseExtensionBean extension = (NurseExtensionBean) tmp.getProperty(NurseBean.INFO_EXTENSION);
+            if (null!=extension && YesNoEnum.YES.equals(extension.getIsExpert())) {
+                continue;
+            }
             if (!nurseIds.contains(tmp.getId())) {
                 nurses.remove(i);
                 i--;
