@@ -45,7 +45,7 @@ public class CommonNurseAuthorizationService {
         for (NurseAuthorizationEntity tmp : entities) {
             return beanConverter.convert(tmp);
         }
-        return allDenied(nurseId);
+        return defaultAuth(nurseId);
     }
 
     public Map<Long, NurseAuthorizationBean> getAuthorizationByNurseIds(List<Long> nurseIds) {
@@ -64,14 +64,14 @@ public class CommonNurseAuthorizationService {
 
         for (Long tmpId : nurseIds) {
             if (!map.containsKey(tmpId)) {
-                map.put(tmpId, allDenied(tmpId));
+                map.put(tmpId, defaultAuth(tmpId));
             }
         }
 
         return map;
     }
 
-    private NurseAuthorizationBean allDenied(long nurseId) {
+    private NurseAuthorizationBean defaultAuth(long nurseId) {
         NurseAuthorizationBean bean = new NurseAuthorizationBean();
         bean.setId(0);
         bean.setTime(new Date());
@@ -81,7 +81,6 @@ public class CommonNurseAuthorizationService {
         bean.setAuthOrderAdmin(UserAuthority.AGREE_ALL);
         bean.setAuthNotificationHeadNurse(UserAuthority.DENY_ALL);
         bean.setAuthConsultationHeadNurse(UserAuthority.AGREE_ALL);
-        bean.setAuthConsultationAdmin(UserAuthority.AGREE_ALL);
         return bean;
     }
 
@@ -114,7 +113,6 @@ public class CommonNurseAuthorizationService {
             entity.setAuthOrderAdmin(UserAuthority.AGREE_ALL);
             entity.setAuthNotificationHeadNurse(UserAuthority.DENY_ALL);
             entity.setAuthConsultationHeadNurse(UserAuthority.AGREE_ALL);
-            entity.setAuthConsultationAdmin(UserAuthority.AGREE_ALL);
         }
         else {
             entity = entities.get(0);
@@ -131,9 +129,6 @@ public class CommonNurseAuthorizationService {
         }
         if (null!=authConsultationHeadNurse && !authConsultationHeadNurse.equals(entity.getAuthConsultationHeadNurse())) {
             entity.setAuthConsultationHeadNurse(authConsultationHeadNurse);
-        }
-        if (null!=authConsultationAdmin && !authConsultationAdmin.equals(entity.getAuthConsultationAdmin())) {
-            entity.setAuthConsultationAdmin(authConsultationAdmin);
         }
 
         entity = repository.save(entity);

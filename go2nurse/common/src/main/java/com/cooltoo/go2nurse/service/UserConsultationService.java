@@ -544,9 +544,9 @@ public class UserConsultationService {
     //           adding
     //=======================================
     @Transactional
-    public Map<String, Long> addTalk(long consultationId, long nurseId, ConsultationTalkStatus talkStatus, String talkContent) {
-        logger.info("add consultation talk, consultationId={} nurseId={} talkStatus={} talkContent={}.",
-                consultationId, nurseId, talkStatus, talkContent);
+    public Map<String, Long> addTalk(long consultationId, long userId, long nurseId, ConsultationTalkStatus talkStatus, String talkContent) {
+        logger.info("add consultation talk, consultationId={} userId={} nurseId={} talkStatus={} talkContent={}.",
+                consultationId, userId, nurseId, talkStatus, talkContent);
         UserConsultationEntity consultation = repository.findOne(consultationId);
         if (null==consultation) {
             logger.error("consultation is not exist");
@@ -554,6 +554,10 @@ public class UserConsultationService {
         }
         if (nurseId>0 && 0!=consultation.getNurseId() && nurseId!=consultation.getNurseId()) {
             logger.error("consultation not belong this nurse");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (userId>0 && 0!=consultation.getUserId() && userId!=consultation.getUserId()) {
+            logger.error("consultation not belong this user");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         if (YesNoEnum.YES.equals(consultation.getCompleted())) {

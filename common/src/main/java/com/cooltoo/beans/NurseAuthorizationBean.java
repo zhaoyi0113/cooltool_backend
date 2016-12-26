@@ -19,7 +19,6 @@ public class NurseAuthorizationBean {
     private UserAuthority authOrderAdmin;
     private UserAuthority authNotificationHeadNurse;
     private UserAuthority authConsultationHeadNurse;
-    private UserAuthority authConsultationAdmin;
 
     public long getId() {
         return id;
@@ -77,13 +76,6 @@ public class NurseAuthorizationBean {
         this.authConsultationHeadNurse = authConsultationHeadNurse;
     }
 
-    public UserAuthority getAuthConsultationAdmin() {
-        return authConsultationAdmin;
-    }
-    public void setAuthConsultationAdmin(UserAuthority authConsultationAdmin) {
-        this.authConsultationAdmin = authConsultationAdmin;
-    }
-
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass().getName()).append("@").append(hashCode()).append("[");
@@ -95,7 +87,6 @@ public class NurseAuthorizationBean {
         msg.append(", authOrderAdmin=").append(authOrderAdmin);
         msg.append(", authNotificationHeadNurse=").append(authNotificationHeadNurse);
         msg.append(", authConsultationHeadNurse=").append(authConsultationHeadNurse);
-        msg.append(", authConsultationAdmin=").append(authConsultationAdmin);
         msg.append(" ]");
         return msg.toString();
     }

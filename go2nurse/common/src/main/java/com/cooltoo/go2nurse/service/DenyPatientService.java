@@ -49,21 +49,25 @@ public class DenyPatientService {
     //====================================================================
     //                        Getting Method
     //====================================================================
-    public boolean isNurseOrVendorDenyPatient(long userId, Long patientId, long nurseId) {
-        boolean isDenied = false;
+    public boolean isUserDeniedByNurseOrVendor(long userId, Long patientId, long nurseId) {
         patientId = null==patientId ? 0L : patientId;
-        isDenied = isNurseDenyPatient(userId, patientId, nurseId);
-        logger.debug("nurse={} deny user={} patient={}? {}", nurseId, userId, patientId, isDenied);
+
+        boolean nurseDenied = isNurseDenyPatient(userId, patientId, nurseId);
+        logger.debug("nurse={} deny user={} patient={}? {}", nurseId, userId, patientId, nurseDenied);
+        if (nurseDenied) {
+            throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_NURSE);
+        }
         NurseHospitalRelationBean hospitalRelation = nurseHospitalRelation.getRelationByNurseId(nurseId, null);
         if (null!=hospitalRelation) {
             Long hospitalId = new Long(hospitalRelation.getHospitalId());
             Long departmentId = new Long(hospitalRelation.getDepartmentId());
             boolean isVendorDenied = isVendorDenyPatient(userId, patientId, ServiceVendorType.HOSPITAL, hospitalId, departmentId);
             logger.debug("hospital={} department={} deny user={} patient={}? {}", hospitalId, departmentId, userId, patientId, isVendorDenied);
-
-            isDenied = isDenied || isVendorDenied;
+            if (isVendorDenied) {
+                throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
+            }
         }
-        return isDenied;
+        return true;
     }
 
     public boolean isVendorDenyPatient(long userId, long patientId, ServiceVendorType vendorType, long vendorId, long departId) {
