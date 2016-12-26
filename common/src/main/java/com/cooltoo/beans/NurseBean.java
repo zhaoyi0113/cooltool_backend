@@ -26,6 +26,7 @@ public class NurseBean {
     public static final String ORDER = "order";
     public static final String COMPLETED_ORDER_COUNT = "completed_order_count";
     public static final String PATIENT_COUNT = "patient_count";
+    public static final String AUTHORIZATION = "authorization";
 
     public static String getSkillNomination() {
         return SKILL_NOMINATION;

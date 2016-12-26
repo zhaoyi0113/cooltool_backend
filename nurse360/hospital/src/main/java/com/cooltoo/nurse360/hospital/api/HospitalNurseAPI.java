@@ -1,10 +1,8 @@
 package com.cooltoo.nurse360.hospital.api;
 
-import com.cooltoo.beans.NurseBean;
-import com.cooltoo.beans.NurseHospitalRelationBean;
-import com.cooltoo.beans.NurseQualificationBean;
-import com.cooltoo.beans.NurseQualificationFileBean;
+import com.cooltoo.beans.*;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.UserType;
 import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.exception.BadRequestException;
@@ -16,6 +14,7 @@ import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.go2nurse.service.NursePatientRelationService;
 import com.cooltoo.nurse360.util.Nurse360Utility;
+import com.cooltoo.services.CommonNurseAuthorizationService;
 import com.cooltoo.services.NurseQualificationService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -45,6 +44,7 @@ public class HospitalNurseAPI {
     @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
     @Autowired private NurseQualificationService nurseQualificationService;
     @Autowired private Nurse360Utility utility;
+    @Autowired private CommonNurseAuthorizationService nurseAuthorizationService;
 
     //=============================================================
     //            Authentication of ADMINISTRATOR Role
@@ -94,9 +94,11 @@ public class HospitalNurseAPI {
         return nurses;
     }
 
+
     //===============================================================
     //                   Qualification Service
     //===============================================================
+
     @RequestMapping(path = "/nurse/qualification", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<NurseQualificationBean> getNurseQualification(HttpServletRequest request,
                                                               @RequestParam(defaultValue = "", name = "nurse_id") long nurseId
@@ -170,6 +172,34 @@ public class HospitalNurseAPI {
                 utility.getHttpPrefixForNurseGo());
         return qualificationFile;
     }
+
+
+    //===============================================================
+    //                   Authorization Service
+    //===============================================================
+
+    @RequestMapping(path = "/nurse/authorization", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public NurseAuthorizationBean editNurseAuthorization(HttpServletRequest request,
+                                                         @RequestParam(defaultValue = "0", name = "nurse_id")            long nurseId,
+                                                         @RequestParam(defaultValue = "",  name = "auth_order")        String authOrderHeadNurse,
+                                                         @RequestParam(defaultValue = "",  name = "auth_notification") String authNotificationHeadNurse,
+                                                         @RequestParam(defaultValue = "",  name = "auth_consultation") String authConsultationHeadNurse
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (userDetails.isNurseManager() || userDetails.isAdmin()) {
+            UserAuthority authOrder  = UserAuthority.parseString(authOrderHeadNurse);
+            UserAuthority authNotify = UserAuthority.parseString(authNotificationHeadNurse);
+            UserAuthority authConsul = UserAuthority.parseString(authConsultationHeadNurse);
+            return nurseAuthorizationService.setAuthorization(nurseId, authOrder, null, authNotify, authConsul, null);
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+    }
+
+
+    //===============================================================
+    //                   Common  method
+    //===============================================================
+
 
     private void fillNurseOtherProperties(List<NurseBean> nurses) {
         List<Long> nurseIds = new ArrayList<>();

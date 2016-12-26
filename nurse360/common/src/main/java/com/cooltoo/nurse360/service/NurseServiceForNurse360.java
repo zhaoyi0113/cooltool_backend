@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.service;
 
+import com.cooltoo.beans.NurseAuthorizationBean;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
@@ -15,6 +16,7 @@ import com.cooltoo.go2nurse.service.NurseOrderRelationService;
 import com.cooltoo.go2nurse.service.NurseWalletService;
 import com.cooltoo.leancloud.LeanCloudService;
 import com.cooltoo.nurse360.util.Nurse360Utility;
+import com.cooltoo.services.CommonNurseAuthorizationService;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.services.CommonNurseService;
 import com.cooltoo.services.NurseExtensionService;
@@ -51,6 +53,7 @@ public class NurseServiceForNurse360 {
     @Autowired private NurseOrderRelationService nurseOrderService;
     @Autowired private NurseQualificationService nurseQualificationService;
     @Autowired private NurseWalletService walletService;
+    @Autowired private CommonNurseAuthorizationService nurseAuthorizationService;
 
     //===================================================================
     //                     getting
@@ -75,6 +78,7 @@ public class NurseServiceForNurse360 {
         if (!VerifyUtil.isStringEmpty(backgroundPath)) {
             bean.setBackgroundImageUrl(utility.getHttpPrefixForNurseGo() + backgroundPath);
         }
+
         NurseExtensionBean extension = nurseExtensionService.getExtensionByNurseId(nurseId);
         NurseHospitalRelationBean hospitalDepartment = nurseHospitalRelationService.getRelationByNurseId(nurseId, utility.getHttpPrefixForNurseGo());
         List<ServiceOrderBean> orders = nurseOrderService.getOrderByNurseIdAndOrderStatus(nurseId, CommonStatus.ENABLED.name(), OrderStatus.IN_PROCESS, 0, 10);
@@ -82,6 +86,7 @@ public class NurseServiceForNurse360 {
         Map<Long, Long> walletBalance = walletService.getNurseWalletBalance(Arrays.asList(new Long[]{nurseId}));
         Long balance = walletBalance.get(nurseId);
         balance = (balance instanceof Long) ? balance : 0L;
+        NurseAuthorizationBean authorization = nurseAuthorizationService.getAuthorizationByNurseId(nurseId);
 
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
         bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospitalDepartment);
@@ -90,6 +95,8 @@ public class NurseServiceForNurse360 {
         if (null!=qualification && !qualification.isEmpty()) {
             bean.setProperty(NurseBean.QUALIFICATION, qualification.get(0));
         }
+        bean.setProperty(NurseBean.AUTHORIZATION, authorization);
+
         return bean;
     }
 
@@ -153,12 +160,17 @@ public class NurseServiceForNurse360 {
         Map<Long, String> imageId2Path = nursegoFileStorage.getFilePath(imageIds);
         Map<Long, NurseExtensionBean> nurseId2Extension = nurseExtensionService.getExtensionByNurseIds(nurseIds);
         Map<Long, NurseHospitalRelationBean> nurseId2Hospital = nurseHospitalRelationService.getRelationMapByNurseIds(nurseIds, utility.getHttpPrefixForNurseGo());
+        Map<Long, NurseAuthorizationBean> nurseId2Authorization = nurseAuthorizationService.getAuthorizationByNurseIds(nurseIds);
         for (NurseBean bean : beans) {
             long nurseId = bean.getId();
+
             NurseExtensionBean extension = nurseId2Extension.get(nurseId);
             NurseHospitalRelationBean hospital = nurseId2Hospital.get(nurseId);
+            NurseAuthorizationBean authorization = nurseId2Authorization.get(nurseId);
+
             bean.setProperty(NurseBean.INFO_EXTENSION, extension);
             bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospital);
+            bean.setProperty(NurseBean.AUTHORIZATION, authorization);
 
             long imageId = bean.getProfilePhotoId();
             String imgPath = imageId2Path.get(imageId);

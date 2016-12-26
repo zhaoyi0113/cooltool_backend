@@ -78,6 +78,9 @@ public enum ErrorCode {
     NEED_VISIT_PATIENT_RECORD(263, Response.Status.BAD_REQUEST, "服务员未设置出诊记录", "Server not set record of visiting patient"),
     NURSE_DO_NOT_FORBID_USER(264, Response.Status.BAD_REQUEST, "护士没有屏蔽了用户", "Nurse do not forbid user"),
     VENDOR_DO_NOT_FORBID_USER(265, Response.Status.BAD_REQUEST, "服务商没有屏蔽了用户", "Vendor do not forbid user"),
+    USER_FORBIDDEN_BY_NURSE(266, Response.Status.BAD_REQUEST, "护士屏蔽了用户", "User is forbidden by nurse"),
+    NURSE_AUTH_DENIED_BY_HEAD_NURSE(267, Response.Status.BAD_REQUEST, "护士长禁用了护士的咨询权限", "Nurse's consultation authorization is forbidden by head nurse"),
+    NURSE_AUTH_DENIED_BY_ADMIN(268, Response.Status.BAD_REQUEST, "管理员禁用了护士的咨询权限", "Nurse's consultation authorization is forbidden by admin"),
 
 
 

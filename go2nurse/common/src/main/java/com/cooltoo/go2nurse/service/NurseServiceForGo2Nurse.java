@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.service;
 
+import com.cooltoo.beans.NurseAuthorizationBean;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
@@ -14,6 +15,7 @@ import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.services.CommonNurseService;
+import com.cooltoo.services.CommonNurseAuthorizationService;
 import com.cooltoo.services.NurseExtensionService;
 import com.cooltoo.services.file.UserFileStorageService;
 import com.cooltoo.util.VerifyUtil;
@@ -42,6 +44,7 @@ public class NurseServiceForGo2Nurse {
     @Autowired private UserFileStorageService nursegoFileStorage;
     @Autowired private Go2NurseUtility utility;
     @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
+    @Autowired private CommonNurseAuthorizationService nurseAuthorizationService;
 
     //===================================================================
     //                     getting
@@ -61,12 +64,17 @@ public class NurseServiceForGo2Nurse {
         String backgroundPath = nursegoFileStorage.getFilePath(bean.getBackgroundImageId());
         bean.setProfilePhotoUrl(utility.getHttpPrefixForNurseGo()+profilePath);
         bean.setBackgroundImageUrl(utility.getHttpPrefixForNurseGo()+backgroundPath);
+
         NurseExtensionBean extension = nurseExtensionService.getExtensionByNurseId(nurseId);
         NurseHospitalRelationBean hospitalDepartment = nurseHospitalRelationService.getRelationByNurseId(nurseId, utility.getHttpPrefixForNurseGo());
         Float score = nurseDoctorScoreService.getScoreByReceiverTypeAndId(UserType.NURSE, nurseId);
+        NurseAuthorizationBean authorization = nurseAuthorizationService.getAuthorizationByNurseId(nurseId);
+
         bean.setProperty(NurseBean.INFO_EXTENSION, extension);
         bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospitalDepartment);
         bean.setProperty(NurseBean.SCORE, null==score ? 0F : score);
+        bean.setProperty(NurseBean.AUTHORIZATION, authorization);
+
         return bean;
     }
 
@@ -180,14 +188,20 @@ public class NurseServiceForGo2Nurse {
         Map<Long, NurseExtensionBean> nurseId2Extension = nurseExtensionService.getExtensionByNurseIds(nurseIds);
         Map<Long, NurseHospitalRelationBean> nurseId2Hospital = nurseHospitalRelationService.getRelationMapByNurseIds(nurseIds, utility.getHttpPrefixForNurseGo());
         Map<Long, Float> nurseId2Score = nurseDoctorScoreService.getScoreByReceiverTypeAndIds(UserType.NURSE, nurseIds);
+        Map<Long, NurseAuthorizationBean> nurseId2Authorization = nurseAuthorizationService.getAuthorizationByNurseIds(nurseIds);
+
         for (NurseBean bean : beans) {
             long nurseId = bean.getId();
+
             NurseExtensionBean extension = nurseId2Extension.get(nurseId);
             NurseHospitalRelationBean hospital = nurseId2Hospital.get(nurseId);
             Float score = nurseId2Score.get(nurseId);
+            NurseAuthorizationBean authorization = nurseId2Authorization.get(nurseId);
+
             bean.setProperty(NurseBean.INFO_EXTENSION, extension);
             bean.setProperty(NurseBean.HOSPITAL_DEPARTMENT, hospital);
             bean.setProperty(NurseBean.SCORE, null==score ? 0F : score);
+            bean.setProperty(NurseBean.AUTHORIZATION, authorization);
 
             long imageId = bean.getProfilePhotoId();
             String imgPath = imageId2Path.get(imageId);
