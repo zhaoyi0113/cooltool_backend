@@ -41,6 +41,19 @@ public class NursePatientRelationService {
     //============================================================================
     //                 get
     //============================================================================
+    public List<Long> getNurseIdByPatientId(long userId, Long patientId, CommonStatus status) {
+        logger.info("get nurseId by userId={} patientId={} and status={}", userId, patientId, status);
+        List<Object> resultSet = repository.findByUserIdAndPatientId(userId, patientId, status);
+        List<Long> nurseIds = new ArrayList<>();
+        for (Object tmp : resultSet) {
+            if (tmp instanceof Long) {
+                nurseIds.add((Long) tmp);
+            }
+        }
+        logger.info("count is {}", nurseIds.size());
+
+        return nurseIds;
+    }
     public Map<Long, Long> getNursePatientNumber(List<Long> nursesId, CommonStatus status) {
         int size = null==nursesId ? 0 : nursesId.size();
         Map<Long, Long> nurseIdToPatientNumber = new HashMap<>();

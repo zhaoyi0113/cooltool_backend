@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -19,4 +20,10 @@ public interface NursePatientRelationRepository extends JpaRepository<NursePatie
 
     List<NursePatientRelationEntity> findByNurseIdInAndStatus(List<Long> nursesId, CommonStatus status);
     Page<NursePatientRelationEntity> findByNurseIdInAndStatus(List<Long> nursesId, CommonStatus status, Pageable page);
+
+    @Query("SELECT npr.nurseId FROM NursePatientRelationEntity npr" +
+            " WHERE (?1 IS NULL OR ?1=npr.userId)" +
+            "   AND (?2 IS NULL OR ?2=npr.patientId)" +
+            "   AND (?3 IS NULL OR ?3=npr.status)")
+    List<Object> findByUserIdAndPatientId(long userId, Long patientId, CommonStatus status);
 }

@@ -10,11 +10,13 @@ import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +31,44 @@ public class NurseAuthorizationJudgeService {
     @Autowired private ServiceOrderService orderService;
     @Autowired private ViewVendorPatientRelationService vendorPatientRelationService;
 
+    public List<NurseBean> canNurseAnswerConsultation(List<NurseBean> nurses, Long userId) {
+        List<NurseBean> nurseCanAnswer = new ArrayList<>();
+
+        if (VerifyUtil.isListEmpty(nurses) || null==userId) {
+            return nurseCanAnswer;
+        }
+
+        // nurse authorization
+        PersonalAuthorization nurseAuth = new PersonalAuthorization();
+        List<String> vendorsKey = vendorPatientRelationService.getVendorsByPatient(userId, null);
+
+        for (NurseBean tmp : nurses) {
+            nurseAuth.setNurse(tmp);
+
+            NurseExtensionBean nurseExtensionInfo = (NurseExtensionBean) tmp.getProperty(NurseBean.INFO_EXTENSION);
+            // is nurse denied by administrator
+            if (null==nurseExtensionInfo || !YesNoEnum.YES.equals(nurseExtensionInfo.getAnswerNursingQuestion())) {
+                continue;
+            }
+            // is nurse a expert
+            if (null!=nurseExtensionInfo && YesNoEnum.YES.equals(nurseExtensionInfo.getIsExpert())) {
+                nurseCanAnswer.add(tmp);
+                continue;
+            }
+
+            boolean isPatientBelongToDepartment = vendorsKey.contains(nurseAuth.getKey());
+            if (isPatientBelongToDepartment) {
+                if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthConsultationHeadNurse())) {
+                    continue;
+                }
+            }
+
+            nurseCanAnswer.add(tmp);
+        }
+
+        return nurseCanAnswer;
+    }
+
     public boolean canNurseAnswerConsultation(Long nurseId, Long userId) {
         if (null==nurseId || null==userId) {
             return false;
@@ -40,12 +80,12 @@ public class NurseAuthorizationJudgeService {
         nurseAuth.setNurse(nurse);
 
         // is nurse denied by administrator
-        if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthConsultationAdmin())) {
+        NurseExtensionBean nurseExtensionInfo = (NurseExtensionBean) nurse.getProperty(NurseBean.INFO_EXTENSION);
+        if (null==nurseExtensionInfo || !YesNoEnum.YES.equals(nurseExtensionInfo.getAnswerNursingQuestion())) {
             throw new BadRequestException(ErrorCode.NURSE_AUTH_DENIED_BY_ADMIN);
         }
 
         // is nurse a expert
-        NurseExtensionBean nurseExtensionInfo = (NurseExtensionBean) nurse.getProperty(NurseBean.INFO_EXTENSION);
         if (null!=nurseExtensionInfo && YesNoEnum.YES.equals(nurseExtensionInfo.getIsExpert())) {
             return true;
         }
@@ -53,7 +93,7 @@ public class NurseAuthorizationJudgeService {
         List<String> vendorsKey = vendorPatientRelationService.getVendorsByPatient(userId, null);
         boolean isPatientBelongToDepartment = vendorsKey.contains(nurseAuth.getKey());
         if (isPatientBelongToDepartment) {
-            if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthOrderHeadNurse())) {
+            if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthConsultationHeadNurse())) {
                 throw new BadRequestException(ErrorCode.NURSE_AUTH_DENIED_BY_HEAD_NURSE);
             }
         }
@@ -148,7 +188,7 @@ public class NurseAuthorizationJudgeService {
 
         private void updateKey() {
             StringBuilder msg = new StringBuilder();
-            msg.append(null==vendorType ? null : vendorType.ordinal());
+            msg.append(null==vendorType ? null : vendorType.name());
             msg.append("_").append(vendorId);
             msg.append("_").append(departId);
             vendorKey = msg.toString();

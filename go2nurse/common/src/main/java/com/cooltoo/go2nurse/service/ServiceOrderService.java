@@ -265,10 +265,10 @@ public class ServiceOrderService {
     //                                        updating
     //==================================================================================================
     @Transactional
-    public ServiceOrderBean updateOrder(long orderId, Long patientId, Long addressId,
+    public ServiceOrderBean updateOrder(long orderId, Long patientId, String address,
                                         String strStartTime, Integer count, String leaveAMessage) {
-        logger.info("update service order={} by patientId={} addressId={} strStartTime={} count={} leaveAMessage={}",
-                orderId, patientId, addressId, strStartTime, count, leaveAMessage);
+        logger.info("update service order={} by patientId={} address={} strStartTime={} count={} leaveAMessage={}",
+                orderId, patientId, address, strStartTime, count, leaveAMessage);
 
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
@@ -290,11 +290,8 @@ public class ServiceOrderService {
             changed = true;
         }
 
-        if (addressId != null && addressService.existAddress(addressId)) {
-            UserAddressBean address = addressService.getOneById(addressId);
-            String addressJson = jsonUtil.toJsonString(address);
-            entity.setAddressId(addressId);
-            entity.setAddress(addressJson);
+        if (!VerifyUtil.isStringEmpty(address) && !address.equals(entity.getAddress())) {
+            entity.setAddress(address);
             changed = true;
         }
 
@@ -705,10 +702,10 @@ public class ServiceOrderService {
     //                                       Adding
     //============================================================================================
     @Transactional
-    public ServiceOrderBean addOrder(long serviceItemId, long userId, long patientId, long addressId,
+    public ServiceOrderBean addOrder(long serviceItemId, long userId, long patientId, String address,
                                      String strStartTime, int count, String leaveAMessage) {
         logger.debug("add service order by serviceItemId={} userId={} patientId={} addressId={} strStartTime={} count={} leaveAMessage={}",
-                serviceItemId, userId, patientId, addressId, strStartTime, count, leaveAMessage);
+                serviceItemId, userId, patientId, address, strStartTime, count, leaveAMessage);
         if (!serviceCategoryItemService.existItem(serviceItemId)) {
             logger.error("service item not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -721,9 +718,9 @@ public class ServiceOrderService {
             logger.error("patient not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (addressId != 0 && !addressService.existAddress(addressId)) {
-            logger.error("address not exists");
-            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        if (VerifyUtil.isStringEmpty(address)) {
+            logger.error("address is empty");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (lStartTime < 0) {
@@ -801,11 +798,6 @@ public class ServiceOrderService {
         PatientBean patient = patientService.getOneById(patientId);
         String patientJson = jsonUtil.toJsonString(patient);
 
-        // get address
-        UserAddressBean address = addressService.getOneById(addressId);
-        String addressJson = jsonUtil.toJsonString(address);
-
-
         //===========================================
         //               new order
         //===========================================
@@ -839,8 +831,7 @@ public class ServiceOrderService {
             entity.setPatient(patientJson);
         }
 
-        entity.setAddressId(addressId);
-        entity.setAddress(addressJson);
+        entity.setAddress(address);
 
         entity.setServiceStartTime(new Date(lStartTime));
         entity.setServiceTimeDuration(serviceItem.getServiceTimeDuration() * count);

@@ -1,6 +1,5 @@
 package com.cooltoo.nurse360.nurse.api;
 
-import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
@@ -12,12 +11,9 @@ import com.cooltoo.go2nurse.beans.UserConsultationTalkBean;
 import com.cooltoo.go2nurse.constants.ConsultationCreator;
 import com.cooltoo.go2nurse.constants.ConsultationReason;
 import com.cooltoo.go2nurse.constants.ConsultationTalkStatus;
-import com.cooltoo.go2nurse.service.ConsultationCategoryService;
+import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
-import com.cooltoo.go2nurse.service.UserConsultationService;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
-import com.cooltoo.go2nurse.service.NursePatientRelationService;
-import com.cooltoo.services.NurseExtensionService;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +37,10 @@ public class NurseConsultationAPI {
 
     @Autowired private ConsultationCategoryService categoryService;
     @Autowired private UserConsultationService userConsultationService;
-    @Autowired private NurseExtensionService nurseExtensionService;
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private NursePatientRelationService nursePatientRelation;
+    @Autowired private NurseAuthorizationJudgeService nurseAuthorizationJudgeService;
+    @Autowired private DenyPatientService denyPatientService;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -223,12 +220,11 @@ public class NurseConsultationAPI {
                                         @FormParam("talk_content") @DefaultValue("") String talkContent
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        if (!nurseCanAnswerConsultation(nurseId, consultationId)) {
-            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
-        }
+        nurseCanAnswerConsultation(nurseId, consultationId);
+
 
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.NURSE_SPEAK;
-        Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
+        Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, 0, nurseId, talkStatus, talkContent);
 
         Long userId = talkReturn.get(UserConsultationService.USER_ID);
         UserConsultationBean consultation = userConsultationService.getUserConsultationNoProperties(consultationId);
@@ -265,9 +261,7 @@ public class NurseConsultationAPI {
                                              @FormDataParam("image") InputStream image
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        if (!nurseCanAnswerConsultation(nurseId, consultationId)) {
-            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
-        }
+        nurseCanAnswerConsultation(nurseId, consultationId);
 
         Map<String, String> imageIdToUrl = userConsultationService.addTalkImage(0, consultationId, talkId, imageName, image);
         return Response.ok(imageIdToUrl).build();
@@ -293,21 +287,16 @@ public class NurseConsultationAPI {
     }
 
     private boolean nurseCanAnswerConsultation(long nurseId, long consultationId) {
-        NurseExtensionBean nurseExtension = nurseExtensionService.getExtensionByNurseId(nurseId);
-        if (null==nurseExtension) {
-            return false;
-        }
-
         if (consultationId>0) {
             UserConsultationBean consultation = userConsultationService.getUserConsultation(consultationId, ConsultationTalkStatus.NONE);
-            if (null == consultation) {
-                return false;
-            }
-            if (consultation.getNurseId() != nurseId) {
-                return false;
+            if (null != consultation) {
+                if (denyPatientService.isNurseDenyPatient(consultation.getUserId(), 0, nurseId)) {
+                    throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_NURSE);
+                }
+                nurseAuthorizationJudgeService.canNurseAnswerConsultation(nurseId, consultation.getUserId());
             }
         }
 
-        return YesNoEnum.YES.equals(nurseExtension.getAnswerNursingQuestion());
+        return true;
     }
 }

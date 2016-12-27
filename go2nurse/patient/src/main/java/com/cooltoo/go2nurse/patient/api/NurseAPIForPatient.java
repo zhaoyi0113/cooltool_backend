@@ -1,10 +1,16 @@
 package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseExtensionBean;
+import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.service.NurseAuthorizationJudgeService;
+import com.cooltoo.go2nurse.service.NursePatientRelationService;
 import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
+import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -22,6 +28,8 @@ import java.util.List;
 public class NurseAPIForPatient {
 
     @Autowired private NurseServiceForGo2Nurse nurseServiceForGo2Nurse;
+    @Autowired private NurseAuthorizationJudgeService nurseAuthorizationJudgeService;
+    @Autowired private NursePatientRelationService nursePatientRelationService;
 
     @Path("/{nurse_id}")
     @GET
@@ -64,13 +72,28 @@ public class NurseAPIForPatient {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response getNurseById(@Context HttpServletRequest request,
-                                 @QueryParam("can_answer_nursing_question") @DefaultValue("") String canAnswerNursingQuestion,
+                                 @QueryParam("can_answer_nursing_question") @DefaultValue("YES") String canAnswerNursingQuestion,
                                  @QueryParam("query") @DefaultValue("") String query,
                                  @QueryParam("index")  @DefaultValue("0")  int index,
                                  @QueryParam("number") @DefaultValue("10") int number
 
     ) {
-        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByQueryString(canAnswerNursingQuestion, query, YesNoEnum.YES.name(), index, number);
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByQueryString(canAnswerNursingQuestion, query, null);
+        nurses = nurseAuthorizationJudgeService.canNurseAnswerConsultation(nurses, userId);
+        List<Long> nurseIds = nursePatientRelationService.getNurseIdByPatientId(userId, null, CommonStatus.ENABLED);
+        for (int i=0; i<nurses.size(); i++) {
+            NurseBean tmp = nurses.get(i);
+            NurseExtensionBean extension = (NurseExtensionBean) tmp.getProperty(NurseBean.INFO_EXTENSION);
+            if (null!=extension && YesNoEnum.YES.equals(extension.getIsExpert())) {
+                continue;
+            }
+            if (!nurseIds.contains(tmp.getId())) {
+                nurses.remove(i);
+                i--;
+            }
+        }
+        nurses = SetUtil.newInstance().getSetByPage(nurses, index, number, null);
         return Response.ok(nurses).build();
     }
 

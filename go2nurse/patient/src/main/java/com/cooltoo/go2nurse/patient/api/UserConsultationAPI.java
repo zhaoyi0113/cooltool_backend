@@ -3,8 +3,6 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.exception.*;
-import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.go2nurse.beans.ConsultationCategoryBean;
 import com.cooltoo.go2nurse.beans.NursePatientFollowUpRecordBean;
 import com.cooltoo.go2nurse.beans.UserConsultationBean;
@@ -48,6 +46,7 @@ public class UserConsultationAPI {
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private DenyPatientService denyPatientService;
     @Autowired private NursePatientRelationService nursePatientRelationService;
+    @Autowired private NurseAuthorizationJudgeService nurseAuthorizationJudgeService;
 
     //=================================================================================================================
     //                                           consultation category service
@@ -129,10 +128,8 @@ public class UserConsultationAPI {
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         if (nurseId>0) {
-            boolean isDenied = denyPatientService.isNurseOrVendorDenyPatient(userId, null, nurseId);
-            if (isDenied) {
-                throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
-            }
+            denyPatientService.isUserDeniedByNurseOrVendor(userId, null, nurseId);
+            nurseAuthorizationJudgeService.canNurseAnswerConsultation(nurseId, userId);
         }
 
         long consultationId = userConsultationService.addConsultation(
@@ -198,10 +195,8 @@ public class UserConsultationAPI {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         Long nurseId = VerifyUtil.isIds(strNurseId) ? VerifyUtil.parseLongIds(strNurseId).get(0) : null;
         if (null!=nurseId && nurseId>0) {
-            boolean isDenied = denyPatientService.isNurseOrVendorDenyPatient(userId, null, nurseId);
-            if (isDenied) {
-                throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
-            }
+            denyPatientService.isUserDeniedByNurseOrVendor(userId, null, nurseId);
+            nurseAuthorizationJudgeService.canNurseAnswerConsultation(nurseId, userId);
         }
         Long categoryId = VerifyUtil.isIds(strCategoryId) ? VerifyUtil.parseLongIds(strCategoryId).get(0) : null;
         YesNoEnum completed = YesNoEnum.parseString(strCompleted);
@@ -251,15 +246,20 @@ public class UserConsultationAPI {
                                         @FormParam("talk_status") @DefaultValue("") String strTalkStatus,
                                         @FormParam("talk_content") @DefaultValue("") String talkContent
     ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ConsultationTalkStatus talkStatus = ConsultationTalkStatus.parseString(strTalkStatus);
         UserConsultationBean consultation = userConsultationService.getUserConsultation(consultationId, null);
+
+        // check authorization
         if (consultation.getNurseId()>0) {
-            boolean isDenied = denyPatientService.isNurseOrVendorDenyPatient(consultation.getUserId(), null, consultation.getNurseId());
-            if (isDenied) {
-                throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
+            denyPatientService.isUserDeniedByNurseOrVendor(consultation.getUserId(), null, consultation.getNurseId());
+            // is nurse forbidden for answering consultation function
+            if (ConsultationReason.CONSULTATION.equals(consultation.getReason())) {
+                nurseAuthorizationJudgeService.canNurseAnswerConsultation(consultation.getNurseId(), userId);
             }
         }
-        long consultationNurseId = consultation.getNurseId();
+
+        // is follow-up record? yes, update the follow-up record status
         long followUpRecordId = 0;
         if (ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
             List<NursePatientFollowUpRecordBean> followUpRecords = patientFollowRecordService.getPatientFollowUpRecord(CommonStatus.ENABLED, PatientFollowUpType.CONSULTATION, consultationId);
@@ -268,8 +268,12 @@ public class UserConsultationAPI {
                 followUpRecordId = tmp.getId();
             }
         }
-        Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, nurseId, talkStatus, talkContent);
+        // add talk
+        Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, userId, nurseId, talkStatus, talkContent);
 
+
+        // alert nurse
+        long consultationNurseId = consultation.getNurseId();
         if (consultationNurseId>0) {
             if (ConsultationReason.PATIENT_FOLLOW_UP.equals(consultation.getReason())) {
                 notifierForAllModule.followUpTalkAlertToNurse360(

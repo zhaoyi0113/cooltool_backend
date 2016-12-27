@@ -43,7 +43,7 @@ public class ServiceOrderBean {
     private long patientId;
     private PatientBean patient;
     private long addressId;
-    private UserAddressBean address;
+    private String address;
     private Date serviceStartTime;
     private int serviceTimeDuration;
     private TimeUnit serviceTimeUnit;
@@ -144,7 +144,7 @@ public class ServiceOrderBean {
         return addressId;
     }
 
-    public UserAddressBean getAddress() {
+    public String getAddress() {
         return address;
     }
 
@@ -320,7 +320,7 @@ public class ServiceOrderBean {
         this.addressId = addressId;
     }
 
-    public void setAddress(UserAddressBean address) {
+    public void setAddress(String address) {
         this.address = address;
     }
 

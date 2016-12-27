@@ -6,6 +6,7 @@ import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
 import com.cooltoo.util.JSONUtil;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -75,7 +76,22 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
         bean.setAddressId(source.getAddressId());
         if (null!=source.getAddress()) {
             UserAddressBean address = jsonUtil.parseJsonBean(source.getAddress(), UserAddressBean.class);
-            bean.setAddress(address);
+            if (null!=address) {
+                StringBuilder tmpAddress = new StringBuilder();
+                if (null!=address.getProvince()) {
+                    tmpAddress.append(address.getProvince().getName());
+                }
+                if (null!=address.getCity()) {
+                    tmpAddress.append(address.getCity().getName());
+                }
+                if (!VerifyUtil.isStringEmpty(address.getAddress())) {
+                    tmpAddress.append(address.getAddress());
+                }
+                bean.setAddress(tmpAddress.toString());
+            }
+            else {
+                bean.setAddress(source.getAddress());
+            }
         }
 
         bean.setServiceStartTime(source.getServiceStartTime());

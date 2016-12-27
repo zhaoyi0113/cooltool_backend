@@ -137,11 +137,11 @@ public class NurseServiceForGo2Nurse {
         return beans;
     }
 
-    public List<NurseBean> getNurseByQueryString(String strCanAnswerQuestion, String name, String strIsExpert, int pageIndex, int sizePerPage) {
-        logger.info("get nurse can answer questions at pageIndex={} sizePerPage={}", pageIndex, sizePerPage);
-        YesNoEnum canAnswerQuestion = YesNoEnum.parseString(strCanAnswerQuestion);
+    public List<NurseBean> getNurseByQueryString(String strCanAnswerNursingQuestion, String name, String strIsExpert) {
+        logger.info("get nurse can answer questions");
+        YesNoEnum canAnswer = YesNoEnum.parseString(strCanAnswerNursingQuestion);
         YesNoEnum isExpert = YesNoEnum.parseString(strIsExpert);
-        Iterable<NurseEntity> nurses = commonNurseService.getNurseByQueryString(UserAuthority.AGREE_ALL, canAnswerQuestion, isExpert, name, name, name, pageIndex, sizePerPage);
+        Iterable<NurseEntity> nurses = commonNurseService.getNurseCanAnswerConsultation(canAnswer, isExpert, name, name, name);
         List<NurseBean> beans = entitiesToBeans(nurses);
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());

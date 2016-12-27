@@ -22,7 +22,6 @@ public class NurseAuthorizationBeanConverter implements Converter<NurseAuthoriza
         bean.setAuthOrderAdmin(source.getAuthOrderAdmin());
         bean.setAuthNotificationHeadNurse(source.getAuthNotificationHeadNurse());
         bean.setAuthConsultationHeadNurse(source.getAuthConsultationHeadNurse());
-        bean.setAuthConsultationAdmin(source.getAuthConsultationAdmin());
         return bean;
     }
 }

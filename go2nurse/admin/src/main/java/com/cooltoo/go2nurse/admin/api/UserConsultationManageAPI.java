@@ -122,7 +122,7 @@ public class UserConsultationManageAPI {
                                         @FormParam("consultation_id") @DefaultValue("0") long consultationId,
                                         @FormParam("talk_content") @DefaultValue("") String talkContent
     ) {
-        Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, 0, ConsultationTalkStatus.ADMIN_SPEAK, talkContent);
+        Map<String, Long> talkReturn = userConsultationService.addTalk(consultationId, 0, 0, ConsultationTalkStatus.ADMIN_SPEAK, talkContent);
         Long talkId = talkReturn.get(UserConsultationService.TALK_ID);
         return Response.ok(talkId).build();
     }

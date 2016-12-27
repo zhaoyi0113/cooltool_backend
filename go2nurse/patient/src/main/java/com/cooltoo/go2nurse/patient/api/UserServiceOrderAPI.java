@@ -185,11 +185,11 @@ public class UserServiceOrderAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response userAddOrder(@Context HttpServletRequest request,
-                                 @FormParam("service_item_id") @DefaultValue("0") long serviceItemId,
-                                 @FormParam("patient_id") @DefaultValue("0") long patientId,
-                                 @FormParam("address_id") @DefaultValue("0") long addressId,
-                                 @FormParam("start_time") @DefaultValue("") String startTime,
-                                 @FormParam("count") @DefaultValue("0") int count,
+                                 @FormParam("service_item_id") @DefaultValue("0")  long serviceItemId,
+                                 @FormParam("patient_id")      @DefaultValue("0")  long patientId,
+                                 @FormParam("address")         @DefaultValue("0")String address,
+                                 @FormParam("start_time")      @DefaultValue("") String startTime,
+                                 @FormParam("count")           @DefaultValue("0")   int count,
                                  @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
@@ -200,7 +200,7 @@ public class UserServiceOrderAPI {
                 throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
             }
         }
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage);
         return Response.ok(order).build();
     }
 
@@ -295,17 +295,16 @@ public class UserServiceOrderAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response userEditOrder(@Context HttpServletRequest request,
-                                  @FormParam("order_id") @DefaultValue("0") long orderId,
+                                  @FormParam("order_id")   @DefaultValue("0") long orderId,
                                   @FormParam("patient_id") @DefaultValue("") String strPatientId,
-                                  @FormParam("address_id") @DefaultValue("") String strAddressId,
+                                  @FormParam("address")    @DefaultValue("") String strAddress,
                                   @FormParam("start_time") @DefaultValue("") String startTime,
-                                  @FormParam("count") @DefaultValue("") String strCount,
+                                  @FormParam("count")      @DefaultValue("") String strCount,
                                   @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage
     ) {
         Long patientId = !VerifyUtil.isIds(strPatientId) ? null : VerifyUtil.parseLongIds(strPatientId).get(0);
-        Long addressId = !VerifyUtil.isIds(strAddressId) ? null : VerifyUtil.parseLongIds(strAddressId).get(0);
         Integer count = !VerifyUtil.isIds(strCount) ? null : VerifyUtil.parseIntIds(strCount).get(0);
-        ServiceOrderBean order = orderService.updateOrder(orderId, patientId, addressId, startTime, count, leaveAMessage);
+        ServiceOrderBean order = orderService.updateOrder(orderId, patientId, strAddress, startTime, count, leaveAMessage);
         return Response.ok(order).build();
     }
 

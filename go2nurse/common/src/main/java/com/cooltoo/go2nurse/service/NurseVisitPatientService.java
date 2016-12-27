@@ -414,9 +414,9 @@ public class NurseVisitPatientService {
                 vendorId = orders.get(0).getVendorId();
                 vendorDepartId = orders.get(0).getVendorId();
                 if (VerifyUtil.isStringEmpty(address)) {
-                    UserAddressBean addressBean = orders.get(0).getAddress();
-                    if (null!=addressBean) {
-                        address = addressBean.toAddress();
+                    String orderAddress = orders.get(0).getAddress();
+                    if (!VerifyUtil.isStringEmpty(orderAddress)) {
+                        address = orderAddress;
                     }
                 }
             }

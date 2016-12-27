@@ -21,7 +21,6 @@ public class NurseAuthorizationEntity {
     private UserAuthority authOrderAdmin;
     private UserAuthority authNotificationHeadNurse;
     private UserAuthority authConsultationHeadNurse;
-    private UserAuthority authConsultationAdmin;
 
     @Id
     @GeneratedValue
@@ -89,14 +88,6 @@ public class NurseAuthorizationEntity {
         this.authConsultationHeadNurse = authConsultationHeadNurse;
     }
 
-    @Column(name = "enable_consultation_admin")
-    public UserAuthority getAuthConsultationAdmin() {
-        return authConsultationAdmin;
-    }
-    public void setAuthConsultationAdmin(UserAuthority authConsultationAdmin) {
-        this.authConsultationAdmin = authConsultationAdmin;
-    }
-
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass().getName()).append("@").append(hashCode()).append("[");
@@ -108,7 +99,6 @@ public class NurseAuthorizationEntity {
         msg.append(", authOrderAdmin=").append(authOrderAdmin);
         msg.append(", authNotificationHeadNurse=").append(authNotificationHeadNurse);
         msg.append(", authConsultationHeadNurse=").append(authConsultationHeadNurse);
-        msg.append(", authConsultationAdmin=").append(authConsultationAdmin);
         msg.append(" ]");
         return msg.toString();
     }
