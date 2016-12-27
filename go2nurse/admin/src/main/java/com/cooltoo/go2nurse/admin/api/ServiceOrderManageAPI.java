@@ -197,13 +197,13 @@ public class ServiceOrderManageAPI {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response modifyTimeAddressMessage(@Context HttpServletRequest request,
-                                             @FormParam("order_id") @DefaultValue("0") long orderId,
-                                             @FormParam("address") @DefaultValue("0") long addressId,
-                                             @FormParam("start_time") @DefaultValue("") String startTime,
+                                             @FormParam("order_id")    @DefaultValue("0")   long orderId,
+                                             @FormParam("address")      @DefaultValue("") String address,
+                                             @FormParam("start_time")   @DefaultValue("") String startTime,
                                              @FormParam("message_left") @DefaultValue("") String messageLeft
     ) {
         //modify start_time, address, message left, score
-        ServiceOrderBean order = orderService.updateOrder(orderId, null, addressId, startTime, null, messageLeft);
+        ServiceOrderBean order = orderService.updateOrder(orderId, null, address, startTime, null, messageLeft);
         return Response.ok(order).build();
     }
 
@@ -238,15 +238,15 @@ public class ServiceOrderManageAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response createOrder(@Context HttpServletRequest request,
-                                @FormParam("service_item_id") @DefaultValue("0") long serviceItemId,
-                                @FormParam("user_id")    @DefaultValue("0") long userId,
-                                @FormParam("patient_id") @DefaultValue("0") long patientId,
-                                @FormParam("address_id") @DefaultValue("0") long addressId,
-                                @FormParam("start_time") @DefaultValue("") String startTime,
-                                @FormParam("count") @DefaultValue("0") int count,
+                                @FormParam("service_item_id") @DefaultValue("0")  long serviceItemId,
+                                @FormParam("user_id")         @DefaultValue("0")  long userId,
+                                @FormParam("patient_id")      @DefaultValue("0")  long patientId,
+                                @FormParam("address")         @DefaultValue("") String address,
+                                @FormParam("start_time")      @DefaultValue("") String startTime,
+                                @FormParam("count")           @DefaultValue("0")   int count,
                                 @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage
     ) {
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage);
         return Response.ok(order).build();
     }
 

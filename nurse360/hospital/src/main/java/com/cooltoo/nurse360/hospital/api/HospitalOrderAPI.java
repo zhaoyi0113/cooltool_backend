@@ -129,13 +129,13 @@ public class HospitalOrderAPI {
 
     @RequestMapping(path = "/manager/order/modify", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public ServiceOrderBean modifyTimeAddressMessage(HttpServletRequest request,
-                                                     @RequestParam(defaultValue = "0", name = "order_id") long orderId,
-                                                     @RequestParam(defaultValue = "0", name = "address")  long addressId,
+                                                     @RequestParam(defaultValue = "0", name = "order_id")       long orderId,
+                                                     @RequestParam(defaultValue = "0", name = "address")      String address,
                                                      @RequestParam(defaultValue = "",  name = "start_time")   String startTime,
                                                      @RequestParam(defaultValue = "",  name = "message_left") String messageLeft
     ) {
         //modify start_time, address, message left, score
-        ServiceOrderBean order = orderService.updateOrder(orderId, null, addressId, startTime, null, messageLeft);
+        ServiceOrderBean order = orderService.updateOrder(orderId, null, address, startTime, null, messageLeft);
         return order;
     }
 
@@ -169,12 +169,12 @@ public class HospitalOrderAPI {
                                         @RequestParam(defaultValue = "0", name = "service_item_id")   long serviceItemId,
                                         @RequestParam(defaultValue = "0", name = "user_id")           long userId,
                                         @RequestParam(defaultValue = "0", name = "patient_id")        long patientId,
-                                        @RequestParam(defaultValue = "0", name = "address_id")        long addressId,
+                                        @RequestParam(defaultValue = "0", name = "address")         String address,
                                         @RequestParam(defaultValue = "0", name = "start_time")      String startTime,
                                         @RequestParam(defaultValue = "0", name = "count")              int count,
                                         @RequestParam(defaultValue = "",  name = "leave_a_message") String leaveAMessage
     ) {
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, addressId, startTime, count, leaveAMessage);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage);
         return order;
     }
 
