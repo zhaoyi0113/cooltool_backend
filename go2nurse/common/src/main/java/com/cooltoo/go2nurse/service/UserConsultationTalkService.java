@@ -97,7 +97,7 @@ public class UserConsultationTalkService {
     }
 
     public Map<Long, Long> getUnreadTalkSizeByConsultationIds(List<Long> consultationIds, ConsultationTalkStatus talkStatusNotMatch) {
-        logger.info("get consultationId-->one talk by consultationIds={}.",
+        logger.info("get consultationId-->one talk by consultationIds size={}.",
                 VerifyUtil.isListEmpty(consultationIds) ? 0 : consultationIds.size());
         if (VerifyUtil.isListEmpty(consultationIds)) {
             return new HashMap<>();
@@ -122,6 +122,29 @@ public class UserConsultationTalkService {
         }
         logger.info("count is {}", consultationIdToUnreadTalkSize.size());
         return consultationIdToUnreadTalkSize;
+    }
+
+    public Map<Long, UserConsultationTalkBean> getLastTalkByConsultationId(List<Long> consultationIds) {
+        logger.info("get consultationId-->last one talk by consultationIds size={}.",
+                VerifyUtil.isListEmpty(consultationIds) ? 0 : consultationIds.size());
+        if (VerifyUtil.isListEmpty(consultationIds)) {
+            return new HashMap<>();
+        }List<UserConsultationTalkEntity> talks = repository.findByStatusNotAndConsultationIdIn(CommonStatus.DELETED, consultationIds, sort);
+        Map<Long, UserConsultationTalkBean> consultationIdToLastTalk = new HashMap<>();
+        for (UserConsultationTalkEntity tmp : talks) {
+            if (null==tmp) { continue; }
+            if (consultationIdToLastTalk.containsKey(tmp.getConsultationId())) {
+                UserConsultationTalkBean tmpLastTalk = consultationIdToLastTalk.get(tmp.getConsultationId());
+                if (tmpLastTalk.getTime().getTime()<tmp.getTime().getTime()) {
+                    consultationIdToLastTalk.put(tmp.getConsultationId(), beanConverter.convert(tmp));
+                }
+            }
+            else {
+                consultationIdToLastTalk.put(tmp.getConsultationId(), beanConverter.convert(tmp));
+            }
+        }
+
+        return consultationIdToLastTalk;
     }
 
     private List<UserConsultationTalkBean> entitiesToBeans(Iterable<UserConsultationTalkEntity> entities) {

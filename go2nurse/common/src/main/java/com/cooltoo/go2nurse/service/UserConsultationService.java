@@ -225,8 +225,9 @@ public class UserConsultationService {
 
         // fill talk's nurse information
         nurseIds.clear();
-        Map<Long, UserConsultationTalkBean> consultationIdToTalkBean = talkService.getBestTalkByConsultationIds(consultationIds);
-        Collection<UserConsultationTalkBean> consultationTalks = consultationIdToTalkBean.values();
+        //Map<Long, UserConsultationTalkBean> consultationIdToTalkBean = talkService.getBestTalkByConsultationIds(consultationIds);
+        Map<Long, UserConsultationTalkBean> consultationIdToLastTalk = talkService.getLastTalkByConsultationId(consultationIds);
+        Collection<UserConsultationTalkBean> consultationTalks = consultationIdToLastTalk.values();
         for (UserConsultationTalkBean tmp : consultationTalks) {
             if (!nurseIds.contains(tmp.getNurseId())) {
                 nurseIds.add(tmp.getNurseId());
@@ -251,7 +252,7 @@ public class UserConsultationService {
             List<String> imagesUrl = consultationIdToImagesUrl.get(tmp.getId());
             tmp.setImagesUrl(imagesUrl);
 
-            UserConsultationTalkBean talk = consultationIdToTalkBean.get(tmp.getId());
+            UserConsultationTalkBean talk = consultationIdToLastTalk.get(tmp.getId());
             List<UserConsultationTalkBean> talkList = new ArrayList<>();
             if (null!=talk) {
                 talkList.add(talk);
