@@ -19,7 +19,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hp on 2016/8/12.
@@ -79,22 +81,30 @@ public class NurseAPIForPatient {
 
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByQueryString(canAnswerNursingQuestion, query, null);
-        nurses = nurseAuthorizationJudgeService.canNurseAnswerConsultation(nurses, userId);
-        List<Long> nurseIds = nursePatientRelationService.getNurseIdByPatientId(userId, null, CommonStatus.ENABLED);
-        for (int i=0; i<nurses.size(); i++) {
-            NurseBean tmp = nurses.get(i);
-            NurseExtensionBean extension = (NurseExtensionBean) tmp.getProperty(NurseBean.INFO_EXTENSION);
-            if (null!=extension && YesNoEnum.YES.equals(extension.getIsExpert())) {
-                continue;
-            }
-            if (!nurseIds.contains(tmp.getId())) {
-                nurses.remove(i);
-                i--;
-            }
-        }
-        nurses = SetUtil.newInstance().getSetByPage(nurses, index, number, null);
+
+        List<Long> nursesId = nurseServiceForGo2Nurse.getNurseIdByQueryString(
+                YesNoEnum.parseString(canAnswerNursingQuestion),
+                query,
+                YesNoEnum.YES);
+        List<Long> patientsNurseIds = nursePatientRelationService.getNurseIdByPatientId(userId, null, CommonStatus.ENABLED);
+        nursesId = SetUtil.newInstance().mergeListValue(nursesId, patientsNurseIds);
+        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByIds(nursesId, index, number);
         return Response.ok(nurses).build();
     }
 
+
+    // can_answer_nursing_question ===> yes/no/none
+    @Path("/can/answer/question")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response canNurseAnswerConsultation(@Context HttpServletRequest request,
+                                               @QueryParam("nures_id") @DefaultValue("0") long nurseId
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        boolean canNurseAnswerConsultation = nurseAuthorizationJudgeService.canNurseAnswerConsultation(nurseId, userId);
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("result", canNurseAnswerConsultation);
+        return Response.ok(result).build();
+    }
 }

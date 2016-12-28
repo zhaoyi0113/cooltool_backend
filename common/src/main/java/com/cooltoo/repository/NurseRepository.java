@@ -35,6 +35,7 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
 
     List<NurseEntity> findByName(String name);
     List<NurseEntity> findByIdIn(List<Long> ids);
+    Page<NurseEntity> findByIdIn(List<Long> ids, Pageable page);
 
 //=========================================================
 // query nurse by realName or hospitalId or departmentId
@@ -46,6 +47,12 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
             " AND   ((?3 IS NULL OR n.realName LIKE %?3) OR (nhr.hospitalId IN (?4)) OR (nhr.departmentId IN (?5)))")
     List<NurseEntity> findByQueryString(UserAuthority authority, YesNoEnum answerNursingQuestion, String fuzzyName, List<Integer> hospitalId, List<Integer> departmentId, YesNoEnum isExpert, Sort sort);
 
+    @Query("SELECT n.id FROM NurseEntity n LEFT JOIN n.extensions ne LEFT JOIN n.hospitalRelation nhr" +
+            " WHERE (n.authority=?1)" +
+            " AND   (?2 IS NULL OR ne.answerNursingQuestion=?2)" +
+            " AND   (?6 IS NULL OR ne.isExpert=?6)" +
+            " AND   ((?3 IS NULL OR n.realName LIKE %?3) OR (nhr.hospitalId IN (?4)) OR (nhr.departmentId IN (?5)))")
+    List<Long> findNurseIdByQueryString(UserAuthority authority, YesNoEnum answerNursingQuestion, String fuzzyName, List<Integer> hospitalId, List<Integer> departmentId, YesNoEnum isExpert, Sort sort);
 
     //==================================================================
     //              for administrator user

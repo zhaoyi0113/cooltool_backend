@@ -81,6 +81,7 @@ public enum ErrorCode {
     USER_FORBIDDEN_BY_NURSE(266, Response.Status.BAD_REQUEST, "护士屏蔽了用户", "User is forbidden by nurse"),
     NURSE_AUTH_DENIED_BY_HEAD_NURSE(267, Response.Status.BAD_REQUEST, "护士长禁用了护士的咨询权限", "Nurse's consultation authorization is forbidden by head nurse"),
     NURSE_AUTH_DENIED_BY_ADMIN(268, Response.Status.BAD_REQUEST, "管理员禁用了护士的咨询权限", "Nurse's consultation authorization is forbidden by admin"),
+    NURSE_NOT_BELONG_TO_DEPARTMENT(269, Response.Status.BAD_REQUEST, "护士不属于该科室", "Nurse do not belong to department"),
 
 
 

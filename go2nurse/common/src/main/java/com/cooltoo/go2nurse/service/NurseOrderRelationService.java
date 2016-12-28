@@ -1,9 +1,12 @@
 package com.cooltoo.go2nurse.service;
 
-import com.cooltoo.beans.NurseExtensionBean;
+import com.cooltoo.beans.NurseAuthorizationBean;
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ManagedBy;
+import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.NurseOrderRelationBean;
@@ -14,8 +17,6 @@ import com.cooltoo.go2nurse.converter.NurseOrderRelationBeanConverter;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
 import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
-import com.cooltoo.repository.NurseHospitalRelationRepository;
-import com.cooltoo.services.NurseExtensionService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +35,10 @@ public class NurseOrderRelationService {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseOrderRelationService.class);
 
-    private static final Sort nurseHospitalRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
     private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
     private static final List<OrderStatus> orderStatuses = Arrays.asList(new OrderStatus[]{OrderStatus.TO_SERVICE});
 
-    @Autowired private NurseExtensionService nurseExtensionService;
-    @Autowired private NurseHospitalRelationRepository nurseHospitalRelationRepository;
     @Autowired private NurseOrderRelationRepository repository;
     @Autowired private NurseOrderRelationBeanConverter beanConverter;
     @Autowired private ServiceOrderService orderService;
@@ -82,36 +80,56 @@ public class NurseOrderRelationService {
     public List<ServiceOrderBean> getAllOrder(long nurseId, String strStatus, int pageIndex, int sizePerPage) {
         logger.info("get orders by nurseId={} with status={}", nurseId, strStatus);
 
-        List<ServiceOrderBean> orders = new ArrayList<>();
+        NurseBean nurse = nurseService.getNurseById(nurseId);
 
         // get nurse extension information
-        NurseExtensionBean nurseExtensionInfo = nurseExtensionService.getExtensionByNurseId(nurseId);
-        boolean canSeeAllOrder = true;
-        if (null==nurseExtensionInfo || null==nurseExtensionInfo.getCanSeeAllOrder() || !YesNoEnum.YES.equals(nurseExtensionInfo.getCanSeeAllOrder())) {
-            canSeeAllOrder = false;
-        }
+        // nurse can see all order
+        // NurseExtensionBean nurseExtensionInfo = nurseExtensionService.getExtensionByNurseId(nurseId);
+        // boolean canSeeAllOrder = true;
+        // if (null==nurseExtensionInfo || null==nurseExtensionInfo.getCanSeeAllOrder() || !YesNoEnum.YES.equals(nurseExtensionInfo.getCanSeeAllOrder())) {
+        //     canSeeAllOrder = false;
+        // }
 
-        // get nurse hospital department relation
-        List<NurseHospitalRelationEntity> nurseHospitalRelations = nurseHospitalRelationRepository.findByNurseId(nurseId, nurseHospitalRelationSort);
-        if (null==nurseHospitalRelations || nurseHospitalRelations.isEmpty() || nurseHospitalRelations.size()!=1) {
-            return orders;
+        // get nurse hospital department Id
+        ServiceVendorType vendorType = null;
+        Long hospitalId = null;
+        Long departmentId = null;
+        NurseHospitalRelationBean nurseHospital = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
+        if (null!=nurseHospital) {
+            vendorType = ServiceVendorType.HOSPITAL;
+            hospitalId = new Long(nurseHospital.getHospitalId());
+            departmentId = new Long(nurseHospital.getDepartmentId());
         }
-        NurseHospitalRelationEntity nurseHospitalRelation = nurseHospitalRelations.get(0);
 
         // get orders
-        if (canSeeAllOrder) {
-            orders = orderService.getOrderByConditions(null, null, orderStatuses, pageIndex, sizePerPage);
-        }
-        else {
-            orders = orderService.getOrderByConditions(
-                    new Long(nurseHospitalRelation.getHospitalId()), ServiceVendorType.HOSPITAL,
-                    orderStatuses, pageIndex, sizePerPage);
-        }
+        List<ServiceOrderBean> orders = orderService.getOrderByConditions(orderStatuses,
+                vendorType,
+                hospitalId,
+                departmentId,
+                ManagedBy.COOLTOO,
+                pageIndex, sizePerPage);
 
         List<Long> orderId = repository.findOrderIdByNurseId(nurseId);
         if (null==orderId) { orderId = new ArrayList<>(); }
+
+        // get nurse authorization
+        NurseAuthorizationBean nurseAuthorization = (NurseAuthorizationBean) nurse.getProperty(NurseBean.AUTHORIZATION);
         for (ServiceOrderBean tmp : orders) {
             tmp.setIsNurseFetched(orderId.contains(tmp.getId()) ? YesNoEnum.YES : YesNoEnum.NO);
+            if (!UserAuthority.AGREE_ALL.equals(nurseAuthorization.getAuthOrderAdmin())) {
+                tmp.setProperty(ServiceOrderBean.CANNOT_FETCH_REASON, ServiceOrderBean.CANNOT_FETCH_REASON_FORBIDDEN_BY_ADMIN);
+                continue;
+            }
+            if (ManagedBy.COOLTOO.equals(tmp.getServiceItemManagedBy())) {
+                continue;
+            }
+            if (!UserAuthority.AGREE_ALL.equals(nurseAuthorization.getAuthOrderHeadNurse())
+             && (tmp.getVendorType()==vendorType)
+             && (tmp.getVendorId()==hospitalId)
+             && (tmp.getVendorDepartId()==departmentId)
+            ) {
+                tmp.setProperty(ServiceOrderBean.CANNOT_FETCH_REASON, ServiceOrderBean.CANNOT_FETCH_REASON_FORBIDDEN_BY_HEAD_NURSE);
+            }
         }
 
         logger.info("count is {}", orders.size());

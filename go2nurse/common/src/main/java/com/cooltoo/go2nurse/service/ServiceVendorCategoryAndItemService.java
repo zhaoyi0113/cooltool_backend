@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.service;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -786,7 +787,7 @@ public class ServiceVendorCategoryAndItemService {
     public ServiceItemBean updateItem(long itemId, String name, String clazz, String description,
                                       String price, String discount, String serverIncome, YesNoEnum needVisitPatientRecord,
                                       Integer timeDuration, String timeUnit, Integer grade,
-                                      Long categoryId, Long vendorId, String strVendorType, Long vendorDepartId,
+                                      Long categoryId, String strVendorType, Long vendorId, Long vendorDepartId, ManagedBy managedBy,
                                       String strStatus) {
         StringBuilder log = new StringBuilder();
         log.append("add service item={} by name={} clazz={} description={} ");
@@ -843,6 +844,10 @@ public class ServiceVendorCategoryAndItemService {
             int incomeCent = entity.getServerIncomeCent();
             YesNoEnum managerApproved = (priceCent-discountCent-incomeCent)>=0 ? YesNoEnum.YES : YesNoEnum.NO;
             entity.setManagerApproved(managerApproved);
+            changed = true;
+        }
+        if (null!= managedBy && !managedBy.equals(entity.getManagedBy())) {
+            entity.setManagedBy(managedBy);
             changed = true;
         }
         if (null!=timeDuration && timeDuration!=entity.getServiceTimeDuration()) {
@@ -1027,7 +1032,7 @@ public class ServiceVendorCategoryAndItemService {
     public ServiceItemBean addItem(String name, String clazz, String description,
                                    String price, String discount, String serverIncome, YesNoEnum needVisitPatientRecord,
                                    int timeDuration, String timeUnit, int grade,
-                                   long categoryId, long vendorId, String strVendorType, long vendorDepartId
+                                   long categoryId, String strVendorType, long vendorId, long vendorDepartId, ManagedBy managedBy
     ) {
         StringBuilder log = new StringBuilder();
         log.append("add service item by name={} clazz={} description={} ");
@@ -1063,6 +1068,7 @@ public class ServiceVendorCategoryAndItemService {
 
         YesNoEnum managerApproved = (servicePriceCent-serviceDiscountCent-serverIncomeCent)>=0 ? YesNoEnum.YES : YesNoEnum.NO;
         entity.setManagerApproved(managerApproved);
+        entity.setManagedBy(null== managedBy ? ManagedBy.SELF : managedBy);
         entity.setServiceTimeDuration(timeDuration);
         entity.setServiceTimeUnit(serviceTimeUnit);
         entity.setGrade(grade<0 ? 0 : grade);

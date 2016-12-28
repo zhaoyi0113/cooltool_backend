@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
@@ -282,13 +283,14 @@ public class ServiceCategoryAndItemManageAPI {
                                    @FormParam("category_id") @DefaultValue("0") long categoryId,
                                    @FormParam("vendor_type") @DefaultValue("") String vendorType,
                                    @FormParam("vendor_id") @DefaultValue("0") long vendorId,
-                                   @FormParam("vendor_depart_id") @DefaultValue("0") long vendorDepartId
+                                   @FormParam("vendor_depart_id") @DefaultValue("0") long vendorDepartId,
+                                   @FormParam("managed_by") @DefaultValue("") String strManagedBy
     ) {
         ServiceItemBean serviceItem = vendorCategoryAndItemService.addItem(
                 name, clazz, description,
                 price, discount, serverIncome, YesNoEnum.parseString(strNeedVisitRecord),
                 timeDuration, timeUnit, grade,
-                categoryId, vendorId, vendorType, vendorDepartId);
+                categoryId, vendorType, vendorId, vendorDepartId, ManagedBy.parseString(strManagedBy));
         return Response.ok(serviceItem).build();
     }
 
@@ -383,18 +385,20 @@ public class ServiceCategoryAndItemManageAPI {
                                     @FormParam("vendor_type") @DefaultValue("") String vendorType,
                                     @FormParam("vendor_id") @DefaultValue("") String strVendorId,
                                     @FormParam("vendor_depart_id") @DefaultValue("") String strVendorDepartId,
-                                    @FormParam("status") @DefaultValue("") String status
+                                    @FormParam("status") @DefaultValue("") String status,
+                                    @FormParam("managed_by") @DefaultValue("") String strManagedBy
     ) {
         Integer timeDuration = !VerifyUtil.isIds(strTimeDuration) ? null : VerifyUtil.parseIntIds(strTimeDuration).get(0);
         Integer grade = !VerifyUtil.isIds(strGrade) ? null : VerifyUtil.parseIntIds(strGrade).get(0);
         Long categoryId = !VerifyUtil.isIds(strCategoryId) ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
         Long vendorId = !VerifyUtil.isIds(strVendorId) ? null : VerifyUtil.parseLongIds(strVendorId).get(0);
         Long vendorDepartId = !VerifyUtil.isIds(strVendorDepartId) ? null : VerifyUtil.parseLongIds(strVendorDepartId).get(0);
+        ManagedBy managedBy = ManagedBy.parseString(strManagedBy);
         ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItem(
                 itemId, name, clazz, description,
                 price, discount, serverIncome, YesNoEnum.parseString(strNeedVisitRecord),
                 timeDuration, timeUnit, grade,
-                categoryId, vendorId, vendorType, vendorDepartId, status);
+                categoryId, vendorType, vendorId, vendorDepartId, managedBy, status);
         return Response.ok(serviceItem).build();
     }
 

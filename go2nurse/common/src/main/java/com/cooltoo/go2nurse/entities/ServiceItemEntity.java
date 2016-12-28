@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.ServiceClass;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
@@ -35,6 +36,7 @@ public class ServiceItemEntity {
     private int serverIncomeCent;
     private YesNoEnum needVisitPatientRecord;
     private YesNoEnum managerApproved;
+    private ManagedBy managedBy;
 
     @Id
     @GeneratedValue
@@ -141,6 +143,11 @@ public class ServiceItemEntity {
         return managerApproved;
     }
 
+    @Column(name = "managed_by")
+    public ManagedBy getManagedBy() {
+        return managedBy;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -221,6 +228,10 @@ public class ServiceItemEntity {
         this.managerApproved = managerApproved;
     }
 
+    public void setManagedBy(ManagedBy managedBy) {
+        this.managedBy = managedBy;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -244,6 +255,7 @@ public class ServiceItemEntity {
         msg.append(", serverIncomeCent=").append(serverIncomeCent);
         msg.append(", needVisitPatientRecord=").append(needVisitPatientRecord);
         msg.append(", managerApproved=").append(managerApproved);
+        msg.append(", managedBy=").append(managedBy);
         msg.append(", grade=").append(grade);
         msg.append("]");
         return msg.toString();

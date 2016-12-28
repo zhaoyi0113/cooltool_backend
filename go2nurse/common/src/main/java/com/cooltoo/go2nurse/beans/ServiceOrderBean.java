@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
@@ -23,10 +24,14 @@ public class ServiceOrderBean {
 
     public static final String FLAG = "FLAG";
     public static final String WAIT_STAFF = "WaitStaff";
+    public static final String CANNOT_FETCH_REASON = "cannot_fetch_reason";
+    public static final String CANNOT_FETCH_REASON_FORBIDDEN_BY_ADMIN = "FORBIDDEN_BY_ADMIN";
+    public static final String CANNOT_FETCH_REASON_FORBIDDEN_BY_HEAD_NURSE = "FORBIDDEN_BY_HEAD_NURSE";
 
     private long id;
     private Date time;
     private CommonStatus status;
+    private ManagedBy serviceItemManagedBy;
     private long serviceItemId;
     private ServiceItemBean serviceItem;
     private ServiceVendorType vendorType;
@@ -78,6 +83,10 @@ public class ServiceOrderBean {
 
     public CommonStatus getStatus() {
         return status;
+    }
+
+    public ManagedBy getServiceItemManagedBy() {
+        return serviceItemManagedBy;
     }
 
     public long getServiceItemId() {
@@ -256,6 +265,10 @@ public class ServiceOrderBean {
         this.status = status;
     }
 
+    public void setServiceItemManagedBy(ManagedBy serviceItemManagedBy) {
+        this.serviceItemManagedBy = serviceItemManagedBy;
+    }
+
     public void setServiceItemId(long serviceItemId) {
         this.serviceItemId = serviceItemId;
     }
@@ -431,6 +444,7 @@ public class ServiceOrderBean {
         msg.append("id=").append(id);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
+        msg.append(", serviceItemManagedBy=").append(serviceItemManagedBy);
         msg.append(", serviceItem=").append(serviceItem);
         msg.append(", userId=").append(userId);
         msg.append(", patient=").append(patient);

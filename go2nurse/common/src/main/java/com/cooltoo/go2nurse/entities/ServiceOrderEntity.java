@@ -1,13 +1,13 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -20,6 +20,7 @@ public class ServiceOrderEntity {
     private long id;
     private Date time;
     private CommonStatus status;
+    private ManagedBy managedBy;
     private long serviceItemId;
     private String serviceItem;
     private ServiceVendorType vendorType;
@@ -78,6 +79,12 @@ public class ServiceOrderEntity {
     @Column(name = "service_item")
     public String getServiceItem() {
         return serviceItem;
+    }
+
+    @Column(name = "item_managed_by")
+    @Enumerated
+    public ManagedBy getManagedBy() {
+        return managedBy;
     }
 
     @Column(name = "item_vendor_type")
@@ -248,6 +255,10 @@ public class ServiceOrderEntity {
         this.serviceItem = serviceItem;
     }
 
+    public void setManagedBy(ManagedBy managedBy) {
+        this.managedBy = managedBy;
+    }
+
     public void setVendorType(ServiceVendorType vendorType) {
         this.vendorType = vendorType;
     }
@@ -371,6 +382,7 @@ public class ServiceOrderEntity {
         msg.append("id=").append(id);
         msg.append(", time=").append(time);
         msg.append(", status=").append(status);
+        msg.append(", managedBy=").append(managedBy);
         msg.append(", serviceItem=").append(serviceItem);
         msg.append(", userId=").append(userId);
         msg.append(", patient=").append(patient);

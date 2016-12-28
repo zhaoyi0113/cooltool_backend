@@ -127,6 +127,11 @@ public class NurseAuthorizationJudgeService {
         boolean isOrderBelongToDepartment = nurseAuth.getKey().equals(ordersVendor.getKey());
         // order belong to the department nurse in
         if (isOrderBelongToDepartment) {
+            // is this nurse the employee of this department
+            NurseHospitalRelationBean nurseHospitalRelation = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.INFO_EXTENSION);
+            if (null==nurseHospitalRelation || !YesNoEnum.YES.equals(nurseHospitalRelation.getApproval())) {
+                throw new BadRequestException(ErrorCode.NURSE_NOT_BELONG_TO_DEPARTMENT);
+            }
             // is patient belong to department nurse in
             List<String> vendorsKey = vendorPatientRelationService.getVendorsByPatient(order.getUserId(), null);
             boolean isPatientBelongToDepartment = vendorsKey.contains(nurseAuth.getKey());
@@ -140,6 +145,35 @@ public class NurseAuthorizationJudgeService {
         return true;
     }
 
+    public List<NurseBean> canNurseOfDepartFetchOrder(List<NurseBean> nurses) {
+        if (VerifyUtil.isListEmpty(nurses)) {
+            return nurses;
+        }
+
+        List<NurseBean> nurseFetchOrder = new ArrayList<>();
+        PersonalAuthorization nurseAuth = new PersonalAuthorization();
+        for (NurseBean tmp : nurses) {
+            nurseAuth.setNurse(tmp);
+
+            // is nurse denied by administrator
+            if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthOrderAdmin())) {
+                continue;
+            }
+
+            NurseHospitalRelationBean nurseHospitalRelation = (NurseHospitalRelationBean) tmp.getProperty(NurseBean.INFO_EXTENSION);
+            // this nurse is not an employee of this department
+            if (null==nurseHospitalRelation || !YesNoEnum.YES.equals(nurseHospitalRelation.getApproval())) {
+                continue;
+            }
+            // is patient belong to department nurse in
+            if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthOrderHeadNurse())) {
+                continue;
+            }
+            nurseFetchOrder.add(tmp);
+        }
+
+        return nurseFetchOrder;
+    }
 
     public boolean couldNursePublishNotification(long nurseId) {
         if(nurseService.existsNurse(nurseId)){

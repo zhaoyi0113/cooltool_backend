@@ -33,6 +33,7 @@ public class ServiceItemBeanConverter implements Converter<ServiceItemEntity, Se
         bean.setServerIncomeCent(source.getServerIncomeCent());
         bean.setNeedVisitPatientRecord(source.getNeedVisitPatientRecord());
         bean.setManagerApproved(source.getManagerApproved());
+        bean.setManagedBy(source.getManagedBy());
         return bean;
     }
 }

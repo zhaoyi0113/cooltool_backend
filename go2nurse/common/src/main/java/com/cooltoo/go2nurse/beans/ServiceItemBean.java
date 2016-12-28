@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.ServiceClass;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
@@ -44,6 +45,7 @@ public class ServiceItemBean {
     private String serverIncome;
     private YesNoEnum needVisitPatientRecord;
     private YesNoEnum managerApproved;
+    private ManagedBy managedBy;
 
     public long getId() {
         return id;
@@ -262,6 +264,13 @@ public class ServiceItemBean {
         this.managerApproved = managerApproved;
     }
 
+    public ManagedBy getManagedBy() {
+        return managedBy;
+    }
+    public void setManagedBy(ManagedBy managedBy) {
+        this.managedBy = managedBy;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -280,10 +289,17 @@ public class ServiceItemBean {
         msg.append(", description=").append(description);
         msg.append(", imageId=").append(imageId);
         msg.append(", detailImageId=").append(detailImageId);
-        msg.append(", servicePrice=").append(servicePrice);
-        msg.append(", servicePriceCent=").append(servicePriceCent);
         msg.append(", serviceTimeDuration=").append(serviceTimeDuration);
         msg.append(", serviceTimeUnit=").append(serviceTimeUnit);
+        msg.append(", servicePrice=").append(servicePrice);
+        msg.append(", servicePriceCent=").append(servicePriceCent);
+        msg.append(", serviceDiscount=").append(serviceDiscount);
+        msg.append(", serviceDiscountCent=").append(serviceDiscountCent);
+        msg.append(", serverIncome=").append(serverIncome);
+        msg.append(", serverIncomeCent=").append(serverIncomeCent);
+        msg.append(", needVisitPatientRecord=").append(needVisitPatientRecord);
+        msg.append(", managerApproved=").append(managerApproved);
+        msg.append(", managedBy=").append(managedBy);
         msg.append(", grade=").append(grade);
         msg.append("]");
         return msg.toString();

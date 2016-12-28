@@ -91,6 +91,15 @@ public class NurseServiceForGo2Nurse {
         return nurseIdToBean;
     }
 
+    public List<NurseBean> getNurseByIds(List<Long> nurseIds, int pageIndex, int sizePerPage) {
+        logger.info("get nurse by nurseId={}", nurseIds);
+        Iterable<NurseEntity> nurses = commonNurseService.getNurseByIds(nurseIds, pageIndex, sizePerPage);
+        List<NurseBean> beans = entitiesToBeans(nurses);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     public String getNurseMobile(long nurseId) {
         String mobile = commonNurseService.getNurseMobile(nurseId);
         return mobile;
@@ -137,15 +146,11 @@ public class NurseServiceForGo2Nurse {
         return beans;
     }
 
-    public List<NurseBean> getNurseByQueryString(String strCanAnswerNursingQuestion, String name, String strIsExpert) {
+    public List<Long> getNurseIdByQueryString(YesNoEnum canAnswerNursingQuestion, String name, YesNoEnum isExpert) {
         logger.info("get nurse can answer questions");
-        YesNoEnum canAnswer = YesNoEnum.parseString(strCanAnswerNursingQuestion);
-        YesNoEnum isExpert = YesNoEnum.parseString(strIsExpert);
-        Iterable<NurseEntity> nurses = commonNurseService.getNurseCanAnswerConsultation(canAnswer, isExpert, name, name, name);
-        List<NurseBean> beans = entitiesToBeans(nurses);
-        fillOtherProperties(beans);
-        logger.info("count is {}", beans.size());
-        return beans;
+        List<Long> nurses = commonNurseService.getNurseCanAnswerConsultationId(canAnswerNursingQuestion, isExpert, name, name, name);
+        logger.info("count is {}", nurses.size());
+        return nurses;
     }
 
 

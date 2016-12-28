@@ -4,6 +4,7 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.go2nurse.service.NurseAuthorizationJudgeService;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.go2nurse.service.NurseOrderRelationService;
@@ -29,6 +30,7 @@ public class NurseOrderAPI {
     @Autowired private NurseServiceForNurse360 nurseService;
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private NursePatientRelationService nursePatientRelation;
+    @Autowired private NurseAuthorizationJudgeService nurseAuthorizationJudgeService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -86,6 +88,9 @@ public class NurseOrderAPI {
                               @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        if (orderId>0) {
+            nurseAuthorizationJudgeService.canNurseFetchOrder(nurseId, orderId);
+        }
         Map<String, Long> orderRelativeIds = nurseOrderService.fetchOrder(nurseId, orderId, false);
 
         // add patient to nurse_patient_relation table

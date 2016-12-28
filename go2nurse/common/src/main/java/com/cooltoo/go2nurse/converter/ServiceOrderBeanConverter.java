@@ -26,6 +26,7 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
         bean.setId(source.getId());
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
+        bean.setServiceItemManagedBy(source.getManagedBy());
 
         bean.setServiceItemId(source.getServiceItemId());
         if (null!=source.getServiceItem()) {

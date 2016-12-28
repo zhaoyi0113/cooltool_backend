@@ -93,6 +93,19 @@ public class CommonNurseService {
         return entities;
     }
 
+    public Iterable<NurseEntity> getNurseByIds(List<Long> userIds, int pageIndex, int sizePerPage) {
+        logger.info("get nurse by ids={}", userIds);
+        if (VerifyUtil.isListEmpty(userIds)) {
+            return new ArrayList<>();
+        }
+        PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<NurseEntity> entities = nurseRepository.findByIdIn(userIds, page);
+        if (null==entities) {
+            return new ArrayList<>();
+        }
+        return entities;
+    }
+
     public List<Long> getNurseIdsByName(String fuzzyQueryName, int pageIndex, int sizePerPage) {
         logger.info("get nurseIds by fuzzily name={}", fuzzyQueryName);
         if (VerifyUtil.isStringEmpty(fuzzyQueryName)) {
@@ -261,6 +274,38 @@ public class CommonNurseService {
         departments.clear();
 
         resultSet = nurseRepository.findByQueryString(UserAuthority.AGREE_ALL, canAnswerNursingQuestion, fuzzyName, hospitalIds, departmentIds, isExpert, sort);
+        logger.info("get nurse can answer consultation, size={}", resultSet.size());
+        return resultSet;
+    }
+
+    public List<Long> getNurseCanAnswerConsultationId(YesNoEnum canAnswerNursingQuestion, YesNoEnum isExpert, String fuzzyName, String hospitalName, String departmentName) {
+        logger.info("get nurse can answer consultation by canAnswerNursingQuestion={} isExpert={} fuzzyName={} hospitalName={} departmentName={}",
+                canAnswerNursingQuestion, isExpert, fuzzyName, hospitalName, departmentName);
+        List<Long> resultSet = null;
+
+        fuzzyName = (VerifyUtil.isStringEmpty(fuzzyName)) ? null : VerifyUtil.reconstructSQLContentLike(fuzzyName);
+        hospitalName = (VerifyUtil.isStringEmpty(hospitalName)) ? null : VerifyUtil.reconstructSQLContentLike(hospitalName);
+        departmentName = (VerifyUtil.isStringEmpty(departmentName)) ? null : VerifyUtil.reconstructSQLContentLike(departmentName);
+
+        // get hospital Ids
+        List<HospitalEntity> hospitals = hospitalRepository.findByNameLike(hospitalName, 1);
+        List<Integer> hospitalIds = new ArrayList<>();
+        for (HospitalEntity tmp : hospitals) {
+            hospitalIds.add(tmp.getId());
+        }
+        hospitalIds.add(Integer.MIN_VALUE);
+        hospitals.clear();
+
+        // get hospital Ids
+        List<HospitalDepartmentEntity> departments = departmentRepository.findByNameLike(departmentName);
+        List<Integer> departmentIds = new ArrayList<>();
+        for (HospitalDepartmentEntity tmp : departments) {
+            departmentIds.add(tmp.getId());
+        }
+        departmentIds.add(Integer.MIN_VALUE);
+        departments.clear();
+
+        resultSet = nurseRepository.findNurseIdByQueryString(UserAuthority.AGREE_ALL, canAnswerNursingQuestion, fuzzyName, hospitalIds, departmentIds, isExpert, sort);
         logger.info("get nurse can answer consultation, size={}", resultSet.size());
         return resultSet;
     }

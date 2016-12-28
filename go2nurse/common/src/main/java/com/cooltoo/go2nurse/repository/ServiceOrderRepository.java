@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.repository;
 
+import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
@@ -9,7 +10,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import javax.ws.rs.QueryParam;
 import java.util.List;
 
 /**
@@ -27,11 +27,11 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrderEntity
             " AND   (?3 IS NULL OR ?3=order1.patientId)" +
             " AND   (?4 IS NULL OR ?4=order1.categoryId)" +
             " AND   (?5 IS NULL OR ?5=order1.topCategoryId)" +
-            " AND   (?6 IS NULL OR ?6=order1.vendorType)" +
-            " AND   (?7 IS NULL OR ?7=order1.vendorId)" +
-            " AND   (?8 IS NULL OR ?8=order1.orderStatus)" +
+            " AND   (?6 IS NULL OR ?6=order1.orderStatus)" +
+            " AND   (?7 IS NULL OR ?7=order1.vendorType)" +
+            " AND   (?8 IS NULL OR ?8=order1.vendorId)" +
             " AND   (?9 IS NULL OR ?9=order1.vendorDepartId)")
-    long countByConditions(Long itemId, Long userId, Long patientId, Long categoryId, Long topCategoryId, ServiceVendorType vendorType, Long vendorId, OrderStatus orderStatus, Long vendorDepartId);
+    long countByConditions(Long itemId, Long userId, Long patientId, Long categoryId, Long topCategoryId, OrderStatus orderStatus, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId);
 
     @Query("FROM ServiceOrderEntity order1" +
             " WHERE (?1 IS NULL OR ?1=order1.serviceItemId)" +
@@ -39,24 +39,35 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrderEntity
             " AND   (?3 IS NULL OR ?3=order1.patientId)" +
             " AND   (?4 IS NULL OR ?4=order1.categoryId)" +
             " AND   (?5 IS NULL OR ?5=order1.topCategoryId)" +
-            " AND   (?6 IS NULL OR ?6=order1.vendorType)" +
-            " AND   (?7 IS NULL OR ?7=order1.vendorId)" +
-            " AND   (?8 IS NULL OR ?8=order1.orderStatus)" +
+            " AND   (?6 IS NULL OR ?6=order1.orderStatus)" +
+            " AND   (?7 IS NULL OR ?7=order1.vendorType)" +
+            " AND   (?8 IS NULL OR ?8=order1.vendorId)" +
             " AND   (?9 IS NULL OR ?9=order1.vendorDepartId)")
-    Page<ServiceOrderEntity> findByConditions(Long itemId, Long userId, Long patientId, Long categoryId, Long topCategoryId, ServiceVendorType vendorType, Long vendorId, OrderStatus orderStatus, Long vendorDepartId, Pageable page);
+    Page<ServiceOrderEntity> findByConditions(Long itemId, Long userId, Long patientId, Long categoryId, Long topCategoryId, OrderStatus orderStatus, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, Pageable page);
+
 
     List<ServiceOrderEntity> findByOrderStatus(OrderStatus orderStatus);
 
 
-    @Query("FROM ServiceOrderEntity order1" +
-            " WHERE (?1 IS NULL OR order1.vendorType=?1)" +
-            " AND (?2 IS NULL OR order1.vendorId=?2)" +
-            " AND (order1.orderStatus IN (?3))")
-    Page<ServiceOrderEntity> findByConditions(ServiceVendorType vendorType, Long vendorId, List<OrderStatus> orderStatus, Pageable page);
+    @Query("FROM ServiceOrderEntity so" +
+            " WHERE (so.orderStatus IN (?1))" +
+            "   AND (" +
+            "            (" +
+            "                   (?2 IS NULL OR ?2=so.vendorType)" +
+            "               AND (?3 IS NULL OR ?3=so.vendorId)" +
+            "               AND (?4 IS NULL OR ?4=so.vendorDepartId)" +
+            "            )" +
+            "         OR (" +
+            "                   (?5 IS NULL OR ?5=so.managedBy)" +
+            "            )" +
+            "        )")
+    Page<ServiceOrderEntity> findByConditions(List<OrderStatus> orderStatus, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, ManagedBy managedBy, Pageable page);
+    Page<ServiceOrderEntity> findByConditions(List<OrderStatus> orderStatus, ManagedBy managedBy, Pageable page);
 
-    @Query("SELECT order1.id FROM ServiceOrderEntity order1" +
-            " WHERE (order1.id IN (?1))" +
-            " AND (?2 IS NULL OR order1.orderStatus=?2)")
+
+    @Query("SELECT so.id FROM ServiceOrderEntity so" +
+            " WHERE (so.id IN (?1))" +
+            " AND   (?2 IS NULL OR so.orderStatus=?2)")
     List<Long> findByIdInAndOrderStatus(List<Long> orderIds, OrderStatus orderStatus);
     List<ServiceOrderEntity> findByIdIn(List<Long> orderIds);
 }

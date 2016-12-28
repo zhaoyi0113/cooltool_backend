@@ -7,16 +7,14 @@ import com.cooltoo.constants.WorkFileType;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.service.NurseDoctorScoreService;
-import com.cooltoo.go2nurse.service.NurseOrderRelationService;
-import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
+import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
-import com.cooltoo.go2nurse.service.NursePatientRelationService;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseAuthorizationService;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.services.NurseQualificationService;
+import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,11 +38,11 @@ public class HospitalNurseAPI {
     @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private NursePatientRelationService nursePatientRelation;
     @Autowired private NurseOrderRelationService nurseOrderRelationService;
-    @Autowired private NurseDoctorScoreService nurseDoctorScoreService;
     @Autowired private NurseQualificationService nurseQualificationService;
     @Autowired private Nurse360Utility utility;
     @Autowired private CommonNurseAuthorizationService nurseAuthorizationService;
     @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
+    @Autowired private NurseAuthorizationJudgeService nurseAuthorizationJudgeService;
 
     //=============================================================
     //            Authentication of ADMINISTRATOR Role
@@ -90,6 +88,42 @@ public class HospitalNurseAPI {
         Integer departmentId = tmp[1];
 
         List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(fuzzyName, null, null, hospitalId, departmentId, null, index, number);
+        fillNurseOtherProperties(nurses);
+        return nurses;
+    }
+
+    @RequestMapping(path = "/nurse/can/serve/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public long countNurseCanServe(HttpServletRequest request,
+                                   @RequestParam(defaultValue = "",  name = "fuzzy_name") String fuzzyName,
+                                   @RequestParam(defaultValue = "",  name = "hospital_id") String strHospitalId,
+                                   @RequestParam(defaultValue = "",  name = "department_id") String strDepartmentId
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment(strHospitalId, strDepartmentId, userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
+
+        List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(fuzzyName, null, null, hospitalId, departmentId, null);
+        nurses = nurseAuthorizationJudgeService.canNurseOfDepartFetchOrder(nurses);
+        return nurses.size();
+    }
+
+    @RequestMapping(path = "/nurse/can/serve", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<NurseBean> getNurseCanServe(HttpServletRequest request,
+                                            @RequestParam(defaultValue = "",  name = "fuzzy_name") String fuzzyName,
+                                            @RequestParam(defaultValue = "",  name = "hospital_id") String strHospitalId,
+                                            @RequestParam(defaultValue = "",  name = "department_id") String strDepartmentId,
+                                            @RequestParam(defaultValue = "0",  name = "index") int index,
+                                            @RequestParam(defaultValue = "10", name = "number") int number
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment(strHospitalId, strDepartmentId, userDetails);
+        Integer hospitalId   = tmp[0];
+        Integer departmentId = tmp[1];
+
+        List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(fuzzyName, null, null, hospitalId, departmentId, null);
+        nurses = nurseAuthorizationJudgeService.canNurseOfDepartFetchOrder(nurses);
+        nurses = SetUtil.newInstance().getSetByPage(nurses, index, number, null);
         fillNurseOtherProperties(nurses);
         return nurses;
     }

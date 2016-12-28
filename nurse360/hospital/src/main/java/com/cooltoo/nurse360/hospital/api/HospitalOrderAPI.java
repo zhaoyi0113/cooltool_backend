@@ -57,8 +57,8 @@ public class HospitalOrderAPI {
         Long departmentId = tmp[1];
         long count = orderService.countOrderByConditions(
                 null, null, null, null, null,
-                hospitalId,
                 ServiceVendorType.parseString(strVendorType),
+                hospitalId,
                 departmentId,
                 OrderStatus.parseString(strOrderStatus));
         return count;
@@ -79,8 +79,8 @@ public class HospitalOrderAPI {
         Long departmentId = tmp[1];
         List<ServiceOrderBean> orders = orderService.getOrderByConditions(
                 null, null, null, null, null,
-                hospitalId,
                 ServiceVendorType.parseString(strVendorType),
+                hospitalId,
                 departmentId,
                 OrderStatus.parseString(strOrderStatus),
                 index, number);
@@ -206,7 +206,7 @@ public class HospitalOrderAPI {
                 null,
                 userId, patientId,
                 null, null,
-                hospitalId, ServiceVendorType.HOSPITAL, departmentId,
+                ServiceVendorType.HOSPITAL, hospitalId, departmentId,
                 OrderStatus.parseString(strOrderStatus));
         return count;
     }
@@ -228,7 +228,7 @@ public class HospitalOrderAPI {
                 null,
                 userId, patientId,
                 null, null,
-                hospitalId, ServiceVendorType.HOSPITAL, departmentId,
+                ServiceVendorType.HOSPITAL, hospitalId, departmentId,
                 OrderStatus.parseString(strOrderStatus),
                 index, number);
         setOrderWaitStaff(orders);
@@ -281,8 +281,8 @@ public class HospitalOrderAPI {
         else if (userDetails.isNurseManager()) {
             long count = orderService.countOrderByConditions(
                     null, null, null, null, null,
-                    hospitalId,
                     ServiceVendorType.HOSPITAL,
+                    hospitalId,
                     departmentId,
                     OrderStatus.parseString(strOrderStatus));
             return count;
@@ -313,8 +313,8 @@ public class HospitalOrderAPI {
         else if (userDetails.isNurseManager()) {
             List<ServiceOrderBean> orders = orderService.getOrderByConditions(
                     null, null, null, null, null,
-                    hospitalId,
                     ServiceVendorType.HOSPITAL,
+                    hospitalId,
                     departmentId,
                     OrderStatus.parseString(strOrderStatus),
                     index, number);
