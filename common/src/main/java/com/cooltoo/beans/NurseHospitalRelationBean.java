@@ -3,6 +3,7 @@ package com.cooltoo.beans;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import java.util.Date;
 
@@ -20,11 +21,12 @@ public class NurseHospitalRelationBean {
     private HospitalDepartmentBean department;
     private Date time;
     private CommonStatus status;
+    private YesNoEnum approval;
+    private Date approvalTime;
 
     public long getId() {
         return id;
     }
-
     public void setId(long id) {
         this.id = id;
     }
@@ -32,7 +34,6 @@ public class NurseHospitalRelationBean {
     public long getNurseId() {
         return nurseId;
     }
-
     public void setNurseId(long nurseId) {
         this.nurseId = nurseId;
     }
@@ -40,7 +41,6 @@ public class NurseHospitalRelationBean {
     public int getHospitalId() {
         return hospitalId;
     }
-
     public void setHospitalId(int hospitalId) {
         this.hospitalId = hospitalId;
     }
@@ -48,7 +48,6 @@ public class NurseHospitalRelationBean {
     public int getDepartmentId() {
         return departmentId;
     }
-
     public void setDepartmentId(int departmentId) {
         this.departmentId = departmentId;
     }
@@ -56,7 +55,6 @@ public class NurseHospitalRelationBean {
     public HospitalBean getHospital() {
         return this.hospital;
     }
-
     public void setHospital(HospitalBean hospital) {
         this.hospital = hospital;
     }
@@ -64,7 +62,6 @@ public class NurseHospitalRelationBean {
     public HospitalDepartmentBean getDepartment() {
         return this.department;
     }
-
     public void setDepartment(HospitalDepartmentBean department) {
         this.department = department;
     }
@@ -72,7 +69,6 @@ public class NurseHospitalRelationBean {
     public HospitalDepartmentBean getParentDepart() {
         return this.parentDepart;
     }
-
     public void setParentDepart(HospitalDepartmentBean parentDepart) {
         this.parentDepart = parentDepart;
     }
@@ -80,7 +76,6 @@ public class NurseHospitalRelationBean {
     public Date getTime() {
         return time;
     }
-
     public void setTime(Date time) {
         this.time = time;
     }
@@ -88,9 +83,22 @@ public class NurseHospitalRelationBean {
     public CommonStatus getStatus() {
         return status;
     }
-
     public void setStatus(CommonStatus status) {
         this.status = status;
+    }
+
+    public YesNoEnum getApproval() {
+        return approval;
+    }
+    public void setApproval(YesNoEnum approval) {
+        this.approval = approval;
+    }
+
+    public Date getApprovalTime() {
+        return approvalTime;
+    }
+    public void setApprovalTime(Date approvalTime) {
+        this.approvalTime = approvalTime;
     }
 
     public String toString() {

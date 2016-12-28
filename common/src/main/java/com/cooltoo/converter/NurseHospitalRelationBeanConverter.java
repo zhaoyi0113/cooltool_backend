@@ -1,5 +1,6 @@
 package com.cooltoo.converter;
 
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import org.springframework.core.convert.converter.Converter;
@@ -19,6 +20,8 @@ public class NurseHospitalRelationBeanConverter implements Converter<NurseHospit
         bean.setDepartmentId(source.getDepartmentId());
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
+        bean.setApproval(null==source.getApproval() ? YesNoEnum.NONE : source.getApproval());
+        bean.setApprovalTime(source.getApprovalTime());
         return bean;
     }
 }

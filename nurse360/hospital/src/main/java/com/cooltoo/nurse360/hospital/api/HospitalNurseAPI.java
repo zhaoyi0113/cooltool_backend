@@ -3,8 +3,8 @@ package com.cooltoo.nurse360.hospital.api;
 import com.cooltoo.beans.*;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.UserAuthority;
-import com.cooltoo.constants.UserType;
 import com.cooltoo.constants.WorkFileType;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.service.NurseDoctorScoreService;
@@ -15,8 +15,8 @@ import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.go2nurse.service.NursePatientRelationService;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseAuthorizationService;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.services.NurseQualificationService;
-import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +44,7 @@ public class HospitalNurseAPI {
     @Autowired private NurseQualificationService nurseQualificationService;
     @Autowired private Nurse360Utility utility;
     @Autowired private CommonNurseAuthorizationService nurseAuthorizationService;
+    @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
 
     //=============================================================
     //            Authentication of ADMINISTRATOR Role
@@ -195,6 +195,29 @@ public class HospitalNurseAPI {
         throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
+    @RequestMapping(path = "/nurse/belong-to-us", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    public YesNoEnum setNurseBelongToDepartmentOrNot(HttpServletRequest request,
+                                                     @RequestParam(defaultValue = "0",   name = "nurse_id")   long nurseId,
+                                                     @RequestParam(defaultValue = "NONE",name = "approval") String strApproval
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (userDetails.isNurseManager() || userDetails.isAdmin()) {
+            NurseHospitalRelationBean nurseHospitalRelation = nurseHospitalRelationService.getRelationByNurseId(nurseId, "");
+            if (userDetails.isNurseManager() && null!=nurseHospitalRelation) {
+                Integer hospitalId = (Integer) userDetails.getProperty(HospitalAdminUserDetails.HOSPITAL_ID);
+                Integer departmentId = (Integer) userDetails.getProperty(HospitalAdminUserDetails.DEPARTMENT_ID);
+                if (hospitalId != nurseHospitalRelation.getHospitalId()
+                        || departmentId != nurseHospitalRelation.getDepartmentId()) {
+                    throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+                }
+            }
+            YesNoEnum approval  = YesNoEnum.parseString(strApproval);
+            nurseHospitalRelationService.approvalRelation(nurseId, approval);
+            return approval;
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+    }
+
 
     //===============================================================
     //                   Common  method
@@ -216,14 +239,11 @@ public class HospitalNurseAPI {
 
         Map<Long, Long> nursePatientNumber = nursePatientRelation.getNursePatientNumber(nurseIds, CommonStatus.ENABLED);
         Map<Long, Long> nurseOrderCompleted= nurseOrderRelationService.getNurseCompletedOrderNumber(nurseIds, CommonStatus.ENABLED);
-        Map<Long, Float> nurseScore = nurseDoctorScoreService.getScoreByReceiverTypeAndIds(UserType.NURSE, nurseIds);
         Map<Long, List<NurseQualificationFileBean>> nurseQualificationFiles = nurseQualificationService.getAllNurseQualificationFiles(nurseIds, "");
         for (NurseBean tmp : nurses) {
             Long patientNumber = nursePatientNumber.get(tmp.getId());
             Long orderNumber = nurseOrderCompleted.get(tmp.getId());
-            Float score = nurseScore.get(tmp.getId());
             List<NurseQualificationFileBean> qualificationFiles = nurseQualificationFiles.get(tmp.getId());
-            tmp.setProperty(NurseBean.SCORE, null==score ? 0.0 : score);
             tmp.setProperty(NurseBean.COMPLETED_ORDER_COUNT, null==orderNumber ? 0 : orderNumber);
             tmp.setProperty(NurseBean.PATIENT_COUNT, null==patientNumber ? 0 : patientNumber);
             tmp.setProperty(NurseBean.QUALIFICATION, nurseQualificationFiles);

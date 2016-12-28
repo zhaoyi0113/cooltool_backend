@@ -4,6 +4,7 @@ import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.converter.NurseHospitalRelationBeanConverter;
 import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.exception.BadRequestException;
@@ -234,6 +235,9 @@ public class CommonNurseHospitalRelationService {
         }
         relation.setTime(new Date());
         relation.setStatus(CommonStatus.ENABLED);
+        // waiting head-nurse's approval
+        relation.setApproval(YesNoEnum.NONE);
+        relation.setApprovalTime(null);
         relation = repository.save(relation);
 
         // delete others
@@ -265,6 +269,29 @@ public class CommonNurseHospitalRelationService {
         }
         Integer hospitalId = hospitalService.newOne(hospitalName, "", -1, -1, -1, "", 0, 0, null, null);
         return setRelation(nurseId, hospitalId, -1);
+    }
+
+    @Transactional
+    public long approvalRelation(long nurseId, YesNoEnum approval) {
+        logger.info("head-nurse approval={} nurse={}'s relationship", approval, nurseId);
+        List<NurseHospitalRelationEntity> relations = repository.findByNurseId(nurseId, sort);
+        if (!VerifyUtil.isListEmpty(relations)) {
+            if (null==approval) {
+                logger.info("approval parameter is null");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+            NurseHospitalRelationEntity tmp = relations.get(0);
+            relations.remove(0);
+            tmp.setApproval(approval);
+            tmp.setApprovalTime(new Date());
+            repository.save(tmp);
+
+            if (!VerifyUtil.isListEmpty(relations)) {
+                repository.delete(relations);
+            }
+            return tmp.getId();
+        }
+        throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
     }
 
     //========================================================

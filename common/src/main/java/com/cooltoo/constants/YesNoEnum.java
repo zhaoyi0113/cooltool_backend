@@ -6,6 +6,7 @@ package com.cooltoo.constants;
 public enum YesNoEnum {
     NO,
     YES,
+    /**not set, waiting*/
     NONE
     ;
 

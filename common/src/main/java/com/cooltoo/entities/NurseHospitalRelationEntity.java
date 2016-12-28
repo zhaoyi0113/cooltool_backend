@@ -1,6 +1,7 @@
 package com.cooltoo.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,6 +20,8 @@ public class NurseHospitalRelationEntity {
     private int departmentId;
     private Date time;
     private CommonStatus status;
+    private YesNoEnum approval;
+    private Date approvalTime;
 
     @Id
     @GeneratedValue
@@ -86,6 +89,23 @@ public class NurseHospitalRelationEntity {
 
     public void setNurse(NurseEntity nurse) {
         this.nurse = nurse;
+    }
+
+    @Column(name = "approval")
+    @Enumerated
+    public YesNoEnum getApproval() {
+        return approval;
+    }
+    public void setApproval(YesNoEnum approval) {
+        this.approval = approval;
+    }
+
+    @Column(name = "approval_time")
+    public Date getApprovalTime() {
+        return approvalTime;
+    }
+    public void setApprovalTime(Date approvalTime) {
+        this.approvalTime = approvalTime;
     }
 
     public String toString() {

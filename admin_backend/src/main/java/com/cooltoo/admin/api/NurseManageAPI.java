@@ -192,6 +192,20 @@ public class NurseManageAPI {
         return Response.ok(nurseBean).build();
     }
 
+    @Path("/edit_nurse/department/approval")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminUserLoginAuthentication(requireUserLogin = true)
+    public Response editNurseBasicInfo(@Context HttpServletRequest request,
+                                       @FormParam("nurse_id") @DefaultValue("0") long nurseId,
+                                       @FormParam("department_approval") @DefaultValue("") String strApproval
+    ) {
+        YesNoEnum approval = YesNoEnum.parseString(strApproval);
+        hospitalRelationService.approvalRelation(nurseId, approval);
+        return Response.ok(approval).build();
+    }
+
+
 
     @Path("/edit_nurse/add_head_photo")
     @POST
