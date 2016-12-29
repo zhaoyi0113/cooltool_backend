@@ -116,6 +116,7 @@ public class NurseOrderRelationService {
         NurseAuthorizationBean nurseAuthorization = (NurseAuthorizationBean) nurse.getProperty(NurseBean.AUTHORIZATION);
         for (ServiceOrderBean tmp : orders) {
             tmp.setIsNurseFetched(orderId.contains(tmp.getId()) ? YesNoEnum.YES : YesNoEnum.NO);
+            tmp.setProperty(ServiceOrderBean.CANNOT_FETCH_REASON, "");
             if (!UserAuthority.AGREE_ALL.equals(nurseAuthorization.getAuthOrderAdmin())) {
                 tmp.setProperty(ServiceOrderBean.CANNOT_FETCH_REASON, ServiceOrderBean.CANNOT_FETCH_REASON_FORBIDDEN_BY_ADMIN);
                 continue;
