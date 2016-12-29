@@ -1,9 +1,9 @@
 package com.cooltoo.nurse360.service;
 
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ReadingStatus;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.entities.NurseHospitalRelationEntity;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.constants.CourseStatus;
@@ -15,7 +15,7 @@ import com.cooltoo.nurse360.entities.NurseNotificationRelationEntity;
 import com.cooltoo.nurse360.repository.NurseCourseRelationRepository;
 import com.cooltoo.nurse360.repository.NurseNotificationRelationRepository;
 import com.cooltoo.nurse360.util.Nurse360Utility;
-import com.cooltoo.repository.NurseHospitalRelationRepository;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -39,12 +39,11 @@ public class NurseExtensionServiceForNurse360 {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseExtensionServiceForNurse360.class);
 
-    private static final Sort nurseHospitalRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
     private static final Sort nurseCourseRelationSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
     @Autowired private Nurse360Utility utility;
     // nurse hospital, course, notification relation
-    @Autowired private NurseHospitalRelationRepository nurseHospitalRelationRepository;
+    @Autowired private CommonNurseHospitalRelationService nurseHospitalRelation;
     @Autowired private NurseCourseRelationRepository nurseCourseRelationRepository;
     @Autowired private NurseNotificationRelationRepository nurseNotificationRelationRepository;
     // course
@@ -69,21 +68,36 @@ public class NurseExtensionServiceForNurse360 {
         logger.info("get course by nurseId={}", nurseId);
         List<Nurse360CourseBean> courses = new ArrayList<>();
 
+        Integer hospitalId = null;
+        Integer departmentId = null;
         // get nurse hospital department relation
-        List<NurseHospitalRelationEntity> nurseHospitalRelations = nurseHospitalRelationRepository.findByNurseId(nurseId, nurseHospitalRelationSort);
-        if (null==nurseHospitalRelations || nurseHospitalRelations.isEmpty() || nurseHospitalRelations.size()!=1) {
-            return courses;
+        NurseHospitalRelationBean nurseHospitalRel = nurseHospitalRelation.getRelationByNurseId(nurseId, "");
+        if (null!=nurseHospitalRel && YesNoEnum.YES.equals(nurseHospitalRel.getApproval())) {
+            hospitalId = nurseHospitalRel.getHospitalId();
+            departmentId = nurseHospitalRel.getDepartmentId();
         }
-        NurseHospitalRelationEntity nurseHospitalRelation = nurseHospitalRelations.get(0);
 
-        // get courseId
-        List<Long> courseIdInDepartment = courseHospitalRelationService.getCourseInHospitalAndDepartment(
-                nurseHospitalRelation.getHospitalId(), nurseHospitalRelation.getDepartmentId(), CommonStatus.ENABLED.name()
+        // get department courseId
+        List<Long> courseIdInDepartment = new ArrayList<>();
+        if (null!=hospitalId && null!=departmentId) {
+            courseIdInDepartment = courseHospitalRelationService.getCourseInHospitalAndDepartment(
+                    hospitalId, departmentId, CommonStatus.ENABLED.name()
+            );
+        }
+        // get hospital courseId
+        List<Long> courseIdInHospital = new ArrayList<>();
+        if (null!=hospitalId) {
+            courseIdInHospital = courseHospitalRelationService.getCourseInHospitalAndDepartment(
+                    hospitalId, 0, CommonStatus.ENABLED.name()
+            );
+        }
+        // get cooltoo courseId
+        List<Long> courseIdInCooltoo = courseHospitalRelationService.getCourseInHospitalAndDepartment(
+                -1, 0, CommonStatus.ENABLED.name()
         );
-        List<Long> courseIdInHospital = courseHospitalRelationService.getCourseInHospitalAndDepartment(
-                nurseHospitalRelation.getHospitalId(), 0, CommonStatus.ENABLED.name()
-        );
+
         courseIdInDepartment = SetUtil.newInstance().mergeListValue(courseIdInHospital, courseIdInDepartment);
+        courseIdInDepartment = SetUtil.newInstance().mergeListValue(courseIdInDepartment, courseIdInCooltoo);
 
         // get course
         courses = courseService.getCourseByIds(courseIdInDepartment, pageIndex, number);
@@ -171,27 +185,30 @@ public class NurseExtensionServiceForNurse360 {
         List<Long> notificationIds = new ArrayList<>();
 
         // get nurse hospital department relation
-        long hospitalId = 0;
-        long departId = 0;
-        List<NurseHospitalRelationEntity> nurseHospitalRelations = nurseHospitalRelationRepository.findByNurseId(nurseId, nurseHospitalRelationSort);
-        if (null!=nurseHospitalRelations && nurseHospitalRelations.size()==1) {
-            NurseHospitalRelationEntity nurseHospitalRelation = nurseHospitalRelations.get(0);
-            hospitalId = nurseHospitalRelation.getHospitalId();
-            departId = nurseHospitalRelation.getDepartmentId();
+        Long hospitalId = null;
+        Long departmentId = null;
+        NurseHospitalRelationBean nurseHospitalRel = nurseHospitalRelation.getRelationByNurseId(nurseId, "");
+        if (null!=nurseHospitalRel && YesNoEnum.YES.equals(nurseHospitalRel.getApproval())) {
+            hospitalId = new Long(nurseHospitalRel.getHospitalId());
+            departmentId = new Long(nurseHospitalRel.getDepartmentId());
         }
 
         List<CommonStatus> statuses = Arrays.asList(new CommonStatus[]{CommonStatus.ENABLED});
         // get cooltoo's notificationIds
         List<Long> tmpNotificationIds = notificationService.getNotificationIdByVendor(statuses, ServiceVendorType.HOSPITAL, -1L, 0L);
-        SetUtil.newInstance().mergeListValue(tmpNotificationIds, notificationIds);
+        notificationIds = SetUtil.newInstance().mergeListValue(tmpNotificationIds, notificationIds);
 
         // get hospital's notificationIds that nurse in
-        tmpNotificationIds = notificationService.getNotificationIdByVendor(statuses, ServiceVendorType.HOSPITAL, hospitalId, 0L);
-        SetUtil.newInstance().mergeListValue(tmpNotificationIds, notificationIds);
+        if (null!=hospitalId) {
+            tmpNotificationIds = notificationService.getNotificationIdByVendor(statuses, ServiceVendorType.HOSPITAL, hospitalId, 0L);
+            notificationIds = SetUtil.newInstance().mergeListValue(tmpNotificationIds, notificationIds);
+        }
 
         // get department's notificationIds that nurse in
-        tmpNotificationIds = notificationService.getNotificationIdByVendor(statuses, ServiceVendorType.HOSPITAL, hospitalId, departId);
-        SetUtil.newInstance().mergeListValue(tmpNotificationIds, notificationIds);
+        if (null!=hospitalId && null!=departmentId) {
+            tmpNotificationIds = notificationService.getNotificationIdByVendor(statuses, ServiceVendorType.HOSPITAL, hospitalId, departmentId);
+            notificationIds = SetUtil.newInstance().mergeListValue(tmpNotificationIds, notificationIds);
+        }
 
         // get notification that nurse has read
         List<Long> notificationIdsNurseRead = nurseNotificationRelationRepository.findNotificationIdByNurseIdAndReadingStatus(nurseId, ReadingStatus.READ);

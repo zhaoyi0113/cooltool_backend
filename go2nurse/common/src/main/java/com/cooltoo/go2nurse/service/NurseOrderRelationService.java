@@ -95,7 +95,7 @@ public class NurseOrderRelationService {
         Long hospitalId = null;
         Long departmentId = null;
         NurseHospitalRelationBean nurseHospital = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
-        if (null!=nurseHospital) {
+        if (null!=nurseHospital && YesNoEnum.YES.equals(nurseHospital.getApproval())) {
             vendorType = ServiceVendorType.HOSPITAL;
             hospitalId = new Long(nurseHospital.getHospitalId());
             departmentId = new Long(nurseHospital.getDepartmentId());
