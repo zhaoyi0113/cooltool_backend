@@ -62,6 +62,9 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrderEntity
             "            )" +
             "        )")
     Page<ServiceOrderEntity> findByConditions(List<OrderStatus> orderStatus, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, ManagedBy managedBy, Pageable page);
+    @Query("FROM ServiceOrderEntity so" +
+            " WHERE (so.orderStatus IN (?1))" +
+            "   AND (?5 IS NULL OR ?5=so.managedBy)")
     Page<ServiceOrderEntity> findByConditions(List<OrderStatus> orderStatus, ManagedBy managedBy, Pageable page);
 
 

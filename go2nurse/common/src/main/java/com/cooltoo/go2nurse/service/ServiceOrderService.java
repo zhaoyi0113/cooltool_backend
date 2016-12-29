@@ -169,11 +169,12 @@ public class ServiceOrderService {
                 orderStatus, vendorType, vendorId, managedBy, pageIndex, sizePerPage);
         PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, sort);
         Page<ServiceOrderEntity> entities = null;
-        if (null==vendorType) {
-            entities = repository.findByConditions(orderStatus, managedBy, pageRequest);
-        }
-        else {
-            entities = repository.findByConditions(orderStatus, vendorType, vendorId, departId, managedBy, pageRequest);
+        if (!VerifyUtil.isListEmpty(orderStatus)) {
+            if (null == vendorType) {
+                entities = repository.findByConditions(orderStatus, managedBy, pageRequest);
+            } else {
+                entities = repository.findByConditions(orderStatus, vendorType, vendorId, departId, managedBy, pageRequest);
+            }
         }
         List<ServiceOrderBean> beans = entitiesToBeans(entities);
         fillOtherProperties(beans);
