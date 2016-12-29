@@ -74,7 +74,7 @@ public class ServiceOrderManageAPI {
         }
 
         OrderStatus orderStatus = OrderStatus.parseString(strOrderStatus);
-        long count = orderService.countOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorId, vendorType, vendorDepartId, orderStatus);
+        long count = orderService.countOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorType, vendorId, vendorDepartId, orderStatus);
         return Response.ok(count).build();
     }
 
@@ -109,7 +109,7 @@ public class ServiceOrderManageAPI {
         }
 
         OrderStatus orderStatus = OrderStatus.parseString(strOrderStatus);
-        List<ServiceOrderBean> orders = orderService.getOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorId, vendorType, vendorDepartId, orderStatus, pageIndex, sizePerPage);
+        List<ServiceOrderBean> orders = orderService.getOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorType, vendorId, vendorDepartId, orderStatus, pageIndex, sizePerPage);
         return Response.ok(orders).build();
     }
 
