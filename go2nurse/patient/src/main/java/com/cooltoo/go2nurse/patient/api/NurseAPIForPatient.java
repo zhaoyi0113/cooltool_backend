@@ -7,6 +7,7 @@ import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
+import com.cooltoo.go2nurse.service.DenyPatientService;
 import com.cooltoo.go2nurse.service.NurseAuthorizationJudgeService;
 import com.cooltoo.go2nurse.service.NursePatientRelationService;
 import com.cooltoo.go2nurse.service.NurseServiceForGo2Nurse;
@@ -32,6 +33,7 @@ public class NurseAPIForPatient {
     @Autowired private NurseServiceForGo2Nurse nurseServiceForGo2Nurse;
     @Autowired private NurseAuthorizationJudgeService nurseAuthorizationJudgeService;
     @Autowired private NursePatientRelationService nursePatientRelationService;
+    @Autowired private DenyPatientService denyPatientService;
 
     @Path("/{nurse_id}")
     @GET
@@ -103,6 +105,9 @@ public class NurseAPIForPatient {
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         boolean canNurseAnswerConsultation = nurseAuthorizationJudgeService.canNurseAnswerConsultation(nurseId, userId);
+        if (canNurseAnswerConsultation) {
+            canNurseAnswerConsultation = denyPatientService.isUserDeniedByNurseOrVendor(userId, null, nurseId);
+        }
         Map<String, Boolean> result = new HashMap<>();
         result.put("result", canNurseAnswerConsultation);
         return Response.ok(result).build();
