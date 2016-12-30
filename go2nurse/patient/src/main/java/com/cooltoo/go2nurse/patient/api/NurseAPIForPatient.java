@@ -100,7 +100,7 @@ public class NurseAPIForPatient {
     @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response canNurseAnswerConsultation(@Context HttpServletRequest request,
-                                               @QueryParam("nures_id") @DefaultValue("0") long nurseId
+                                               @QueryParam("nurse_id") @DefaultValue("0") long nurseId
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         boolean canNurseAnswerConsultation = nurseAuthorizationJudgeService.canNurseAnswerConsultation(nurseId, userId);
