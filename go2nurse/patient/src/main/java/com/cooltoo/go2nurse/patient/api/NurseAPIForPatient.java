@@ -95,7 +95,6 @@ public class NurseAPIForPatient {
     }
 
 
-    // can_answer_nursing_question ===> yes/no/none
     @Path("/can/answer/question")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
