@@ -136,6 +136,24 @@ public class NurseConsultationAPI {
     }
 
 
+    @Path("/can/answer")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Nurse360LoginAuthentication(requireNurseLogin = true)
+    public Response canNurseAnswerConsultation(@Context HttpServletRequest request,
+                                               @QueryParam("user_id") @DefaultValue("0") long userId
+    ) {
+        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        boolean canNurseAnswerConsultation = nurseAuthorizationJudgeService.canNurseAnswerConsultation(nurseId, userId);
+        if (canNurseAnswerConsultation) {
+            canNurseAnswerConsultation = denyPatientService.isUserDeniedByNurseOrVendor(userId, null, nurseId);
+        }
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("result", canNurseAnswerConsultation);
+        return Response.ok(result).build();
+    }
+
+
     //===================================================================================================
     //                         patient follow-up consultation
     //===================================================================================================
