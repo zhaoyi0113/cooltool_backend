@@ -28,8 +28,8 @@ public class HospitalDepartmentAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHospital(@Context HttpServletRequest request) {
-        int count = (int)hospitalService.countHospitalByConditions(true, null, null, null, null, null, 1, 1);
-        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, null, null, null, null, null, 1, 1, 0, count);
+        int count = (int)hospitalService.countHospitalByConditions(true, null, null, null, null, null, 1, null);
+        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, null, null, null, null, null, 1, null, 0, count);
         return Response.ok(hospitals).build();
     }
 
