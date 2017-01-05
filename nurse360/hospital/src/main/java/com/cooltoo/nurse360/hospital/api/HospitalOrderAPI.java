@@ -180,7 +180,7 @@ public class HospitalOrderAPI {
         return orderCount;
     }
 
-    @RequestMapping(path = "/manager/order/service/item", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/manager/order/service/item", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<ServiceItemBean> getServiceItem(HttpServletRequest request,
                                                 @RequestParam("index")  int pageIndex,
                                                 @RequestParam("number") int sizePerPage
