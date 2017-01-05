@@ -160,7 +160,7 @@ public class NurseAuthorizationJudgeService {
                 continue;
             }
 
-            NurseHospitalRelationBean nurseHospitalRelation = (NurseHospitalRelationBean) tmp.getProperty(NurseBean.INFO_EXTENSION);
+            NurseHospitalRelationBean nurseHospitalRelation = (NurseHospitalRelationBean) tmp.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
             // this nurse is not an employee of this department
             if (null==nurseHospitalRelation || !YesNoEnum.YES.equals(nurseHospitalRelation.getApproval())) {
                 continue;
