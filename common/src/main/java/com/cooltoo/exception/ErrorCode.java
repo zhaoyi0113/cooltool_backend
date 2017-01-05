@@ -115,9 +115,10 @@ public enum ErrorCode {
     NURSE360_SERVICE_ORDER_NOT_YOURS(3059, Response.Status.BAD_REQUEST, "订单不属于你", "Service order not belong to you"),
     NURSE360_FILE_OPERATION_FAILED(3060, Response.Status.BAD_REQUEST, "文件操作失败", "File operation failed"),
     NURSE360_RESULT_NOT_EXPECTED(3061, Response.Status.BAD_REQUEST, "结果错误", "Result not expected"),
-    NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU(3062, Response.Status.BAD_REQUEST, "该病例不属于你", "This casebook or case do not belong to you"),
+    NURSE360_CASEBOOK_OR_CASE_NOT_BELONG_TO_YOU(3062, Response.Status.BAD_REQUEST, "该病例不属于你", "This casebook or case does not belong to you"),
     NURSE360_AMOUNT_EXCEEDS_BALANCE(3063, Response.Status.BAD_REQUEST, "超出余额范围", "Amount exceeds balance"),
     NURSE360_RECORD_STATUS_NOT_EXPECTED(3064, Response.Status.BAD_REQUEST, "数据记录状态不符合操作要求", "Record status is not expected"),
+    NURSE360_NOTIFICATION_NOT_BELONG_TO_YOU(3065, Response.Status.BAD_REQUEST, "该通知不属于你", "This notification does not belong to you"),
     ;
 
     private final int code;
