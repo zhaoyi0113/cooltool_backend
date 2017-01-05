@@ -7,6 +7,7 @@ import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.NurseOrderRelationBean;
+import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,7 @@ import java.util.Map;
 @RequestMapping(path = "/nurse360_hospital")
 public class HospitalOrderAPI {
 
+    @Autowired private ServiceVendorCategoryAndItemService serviceVendorCategoryAndItemService;
     @Autowired private ServiceOrderService orderService;
     @Autowired private NurseOrderRelationService nurseOrderRelation;
     @Autowired private NurseServiceForGo2Nurse nurseService;
@@ -162,6 +165,36 @@ public class HospitalOrderAPI {
             notifierForAllModule.newOrderAlertToNurse360(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
         }
         return;
+    }
+
+    @RequestMapping(path = "/manager/order/service/item/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public long countServiceItem(HttpServletRequest request) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+        Long hospitalId   = tmp[0];
+        Long departmentId = tmp[1];
+        long orderCount = serviceVendorCategoryAndItemService.countItemByCategoryId(
+                ServiceVendorType.HOSPITAL, hospitalId, departmentId,
+                null, null, YesNoEnum.YES,
+                Arrays.asList(new CommonStatus[]{CommonStatus.ENABLED}));
+        return orderCount;
+    }
+
+    @RequestMapping(path = "/manager/order/service/item", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    public List<ServiceItemBean> getServiceItem(HttpServletRequest request,
+                                                @RequestParam("index")  int pageIndex,
+                                                @RequestParam("number") int sizePerPage
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+        Long hospitalId   = tmp[0];
+        Long departmentId = tmp[1];
+        List<ServiceItemBean> items = serviceVendorCategoryAndItemService.getItemByCategoryId(
+                ServiceVendorType.HOSPITAL, hospitalId, departmentId,
+                null, null, YesNoEnum.YES,
+                Arrays.asList(new CommonStatus[]{CommonStatus.ENABLED}),
+                pageIndex, sizePerPage);
+        return items;
     }
 
     @RequestMapping(path = "/manager/order/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
