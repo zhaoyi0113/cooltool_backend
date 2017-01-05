@@ -5,7 +5,6 @@ import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.beans.NurseAuthorizationBean;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
