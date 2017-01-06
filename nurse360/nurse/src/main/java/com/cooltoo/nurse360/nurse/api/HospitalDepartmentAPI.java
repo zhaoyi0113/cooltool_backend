@@ -29,11 +29,12 @@ public class HospitalDepartmentAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHospital(@Context HttpServletRequest request,
-                                @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName
+                                @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
+                                @QueryParam("index")  @DefaultValue("0")       int pageIndex,
+                                @QueryParam("number") @DefaultValue("10")      int sizePerPage
     ) {
         fuzzyName = VerifyUtil.isStringEmpty(fuzzyName) ? null : fuzzyName;
-        int count = (int)hospitalService.countHospitalByConditions(true, fuzzyName, null, null, null, null, 1, null);
-        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, fuzzyName, null, null, null, null, 1, null, 0, count);
+        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, fuzzyName, null, null, null, null, 1, null, pageIndex, sizePerPage);
         return Response.ok(hospitals).build();
     }
 
