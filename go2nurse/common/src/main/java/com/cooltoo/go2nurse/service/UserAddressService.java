@@ -72,6 +72,26 @@ public class UserAddressService {
         return beans;
     }
 
+    public UserAddressBean getUserDefaultAddress(long userId) {
+        logger.info("get user={} 's addresses", userId);
+        List<UserAddressEntity> userAddress = repository.findByUserId(userId, sort);
+        UserAddressEntity userDefaultAddress = null;
+        for (UserAddressEntity tmp : userAddress) {
+            if (CommonStatus.ENABLED.equals(tmp.getStatus()) && YesNoEnum.YES.equals(tmp.getIsDefault())) {
+                userDefaultAddress = tmp;
+                break;
+            }
+        }
+        if (null==userDefaultAddress) {
+            throw new BadRequestException(ErrorCode.USER_NOT_SET_DEFAULT_ADDRESS);
+        }
+
+        List<UserAddressBean> beans = entities2Beans(Arrays.asList(new UserAddressEntity[]{userDefaultAddress}));
+        fillOtherProperties(beans);
+        logger.info("count is {}", userAddress.size());
+        return beans.get(0);
+    }
+
     //=======================================================
     //        delete
     //=======================================================

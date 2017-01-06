@@ -1,13 +1,23 @@
 package com.cooltoo.nurse360.hospital.api;
 
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.NurseVisitPatientBean;
 import com.cooltoo.go2nurse.beans.NurseVisitPatientServiceItemBean;
+import com.cooltoo.go2nurse.beans.UserAddressBean;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.NurseVisitPatientService;
 import com.cooltoo.go2nurse.service.NurseVisitPatientServiceItemService;
+import com.cooltoo.go2nurse.service.UserAddressService;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
+import com.cooltoo.nurse360.service.file.TemporaryFileStorageServiceForNurse360;
+import com.cooltoo.nurse360.util.Nurse360Utility;
+import com.cooltoo.nurse360.util.PdfUtil;
+import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.JSONUtil;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -31,6 +41,10 @@ public class HospitalVisitPatientAPI {
     @Autowired private NurseVisitPatientService visitPatientService;
     @Autowired private NurseVisitPatientServiceItemService visitPatientServiceItemService;
     private JSONUtil jsonUtil = JSONUtil.newInstance();
+    @Autowired private TemporaryFileStorageServiceForNurse360 temporaryFileStorageService;
+    @Autowired private Nurse360Utility nurse360Utility;
+    @Autowired private UserAddressService userAddressService;
+    @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
 
 
     //=============================================================
@@ -317,5 +331,54 @@ public class HospitalVisitPatientAPI {
         Map<String, Boolean> retVal = new HashMap<>();
         retVal.put("deleted", Boolean.TRUE);
         return retVal;
+    }
+
+    @RequestMapping(path = "/visit/patient/pdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public String makePdfVisitPatientRecord(HttpServletRequest request,
+                                            @RequestParam(defaultValue = "0", name = "user_id") long userId,
+                                            @RequestParam(defaultValue = "0", name = "patient_id") long patientId
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+        if (userDetails.isNurse() || userDetails.isNurseManager()) {
+            Long hospitalId   = tmp[0];
+            Long departmentId = tmp[1];
+            if (userId>0 && patientId>0) {
+                List<NurseVisitPatientBean> visitPatientRecords = visitPatientService.getVisitRecordByCondition(userId, patientId, null, null, ServiceVendorType.HOSPITAL, hospitalId, departmentId, CommonStatus.DELETED, 0, 0);
+                if (!VerifyUtil.isListEmpty(visitPatientRecords)) {
+                    NurseBean nurse = (NurseBean) userDetails.getUserBean();
+                    UserAddressBean address = userAddressService.getUserDefaultAddress(userId);
+                    String temporaryFilePath = PdfUtil.createVisitPatientRecordPrint(
+                            getHospitalAddress(nurse),
+                            "",
+                            visitPatientRecords.get(0).getUser(),
+                            address,
+                            visitPatientRecords.get(0).getPatient(),
+                            visitPatientRecords,
+                            temporaryFileStorageService,
+                            nurse360Utility
+                    );
+                    return nurse360Utility.getHttpPrefix()+temporaryFilePath;
+                }
+            }
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_CREATE_PDF_FAILED);
+    }
+
+    private String getHospitalAddress(NurseBean nurse) {
+        NurseHospitalRelationBean nurseHospitalRelation = nurseHospitalRelationService.getRelationByNurseId(nurse.getId(), "");
+        if (null==nurseHospitalRelation) {
+            return "";
+        }
+        else {
+            StringBuilder str = new StringBuilder();
+            if (null!=nurseHospitalRelation.getHospital()) {
+                str.append(nurseHospitalRelation.getHospital().getName());
+            }
+            if (null!=nurseHospitalRelation.getDepartment().getName()) {
+                str.append(nurseHospitalRelation.getDepartment().getName());
+            }
+            return str.toString();
+        }
     }
 }

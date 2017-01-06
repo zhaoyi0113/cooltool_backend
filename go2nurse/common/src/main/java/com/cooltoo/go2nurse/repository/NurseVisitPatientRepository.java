@@ -41,6 +41,18 @@ public interface NurseVisitPatientRepository extends JpaRepository<NurseVisitPat
 
 
     @Query("FROM NurseVisitPatientEntity nvp" +
+            " WHERE (?1 IS NULL OR ?1=nvp.userId)" +
+            "   AND (?2 IS NULL OR ?2=nvp.patientId)" +
+            "   AND (?3 IS NULL OR ?3=nvp.nurseId)" +
+            "   AND ((?4 IS NULL) OR (nvp.visitRecord LIKE %?4))" +
+            "   AND (?5 IS NULL OR ?5=nvp.vendorType)" +
+            "   AND (?6 IS NULL OR ?6=nvp.vendorId)" +
+            "   AND (?7 IS NULL OR ?7=nvp.vendorDepartId)" +
+            "   AND (?8 IS NULL OR ?8<>nvp.status)")
+    List<NurseVisitPatientEntity> findByConditions(Long userId, Long patientId, Long nurseId, String contentLike, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, CommonStatus statusNot, Sort sort);
+
+
+    @Query("FROM NurseVisitPatientEntity nvp" +
             " WHERE (?1 IS NULL OR nvp.userId=?1)" +
             " AND   (?2 IS NULL OR nvp.patientId=?2)" +
             " AND   (?3 IS NULL OR nvp.nurseId=?3)" +

@@ -93,8 +93,14 @@ public class NurseVisitPatientService {
                 userId, patientId, nurseId, contentLike, vendorType, vendorId, vendorDepartId, statusNot, pageIndex, sizePerPage);
         List<NurseVisitPatientBean> beans;
         contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
-        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<NurseVisitPatientEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, vendorType, vendorId, vendorDepartId, statusNot, request);
+        Iterable<NurseVisitPatientEntity> resultSet = null;
+        if (pageIndex>=0 && sizePerPage>0) {
+            PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+            resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, vendorType, vendorId, vendorDepartId, statusNot, request);
+        }
+        else {
+            resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, vendorType, vendorId, vendorDepartId, statusNot, sort);
+        }
         beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
 

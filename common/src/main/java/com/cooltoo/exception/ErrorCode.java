@@ -82,6 +82,7 @@ public enum ErrorCode {
     NURSE_AUTH_DENIED_BY_HEAD_NURSE(267, Response.Status.BAD_REQUEST, "护士长禁用了护士的咨询权限", "Nurse's consultation authorization is forbidden by head nurse"),
     NURSE_AUTH_DENIED_BY_ADMIN(268, Response.Status.BAD_REQUEST, "管理员禁用了护士的咨询权限", "Nurse's consultation authorization is forbidden by admin"),
     NURSE_NOT_BELONG_TO_DEPARTMENT(269, Response.Status.BAD_REQUEST, "护士不属于该科室", "Nurse do not belong to department"),
+    USER_NOT_SET_DEFAULT_ADDRESS(270, Response.Status.BAD_REQUEST, "用户没有设置默认地址", "User do not set the default address"),
 
 
 
@@ -119,6 +120,8 @@ public enum ErrorCode {
     NURSE360_AMOUNT_EXCEEDS_BALANCE(3063, Response.Status.BAD_REQUEST, "超出余额范围", "Amount exceeds balance"),
     NURSE360_RECORD_STATUS_NOT_EXPECTED(3064, Response.Status.BAD_REQUEST, "数据记录状态不符合操作要求", "Record status is not expected"),
     NURSE360_NOTIFICATION_NOT_BELONG_TO_YOU(3065, Response.Status.BAD_REQUEST, "该通知不属于你", "This notification does not belong to you"),
+    NURSE360_CREATE_PDF_FAILED(3066, Response.Status.BAD_REQUEST, "创建 PDF 文件失败", "Create pdf file failed"),
+    NURSE360_NO_CONTENT(3067, Response.Status.BAD_REQUEST, "空内容", "No content"),
     ;
 
     private final int code;
