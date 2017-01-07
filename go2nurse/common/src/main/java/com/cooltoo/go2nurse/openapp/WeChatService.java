@@ -146,7 +146,7 @@ public class WeChatService {
                             try {
                                 String userToken = userTokenEntity.get(0).getToken();
                                 //if found login token, redirect to token url
-                                String url = "http://" + serverHost + "/go2nurse/";
+                                String url = "https://" + serverHost + "/go2nurse/";
                                 if(registerRequired){
                                     url = addParameterOnUrl(url, "token", userToken);
                                 }
@@ -182,7 +182,7 @@ public class WeChatService {
             }
         }
         try {
-            String urlStr = "http://" + serverHost + "/go2nurse/";
+            String urlStr = "https://" + serverHost + "/go2nurse/";
             if (registerRequired) {
                 urlStr += "#/register";
             }
