@@ -45,11 +45,6 @@ public class HospitalNurseAPI {
     @Autowired private NurseAuthorizationJudgeService nurseAuthorizationJudgeService;
 
     //=============================================================
-    //            Authentication of ADMINISTRATOR Role
-    //=============================================================
-
-
-    //=============================================================
     //            Authentication of NURSE/MANAGER Role
     //=============================================================
     @RequestMapping(path = "/nurse/{nurse_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
@@ -92,7 +87,10 @@ public class HospitalNurseAPI {
         return nurses;
     }
 
-    @RequestMapping(path = "/nurse/can/serve/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    //=============================================================
+    //            Authentication of MANAGER Role
+    //=============================================================
+    @RequestMapping(path = "/manager/nurse/can/serve/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countNurseCanServe(HttpServletRequest request,
                                    @RequestParam(defaultValue = "",  name = "fuzzy_name") String fuzzyName,
                                    @RequestParam(defaultValue = "",  name = "hospital_id") String strHospitalId,
@@ -108,7 +106,7 @@ public class HospitalNurseAPI {
         return nurses.size();
     }
 
-    @RequestMapping(path = "/nurse/can/serve", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/manager/nurse/can/serve", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<NurseBean> getNurseCanServe(HttpServletRequest request,
                                             @RequestParam(defaultValue = "",  name = "fuzzy_name") String fuzzyName,
                                             @RequestParam(defaultValue = "",  name = "hospital_id") String strHospitalId,

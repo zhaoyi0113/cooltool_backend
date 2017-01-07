@@ -33,4 +33,19 @@ public enum GenderType {
         }
         return retVal;
     }
+
+    public static String genderInfo(GenderType genderType) {
+        if (FEMALE.equals(genderType)) {
+            return "女";
+        }
+        else if (MALE.equals(genderType)) {
+            return "男";
+        }
+        else if (SECRET.equals(genderType)) {
+            return "保密";
+        }
+        else {
+            return "保密";
+        }
+    }
 }

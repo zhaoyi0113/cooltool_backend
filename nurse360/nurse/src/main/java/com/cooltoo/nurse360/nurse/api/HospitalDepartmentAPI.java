@@ -5,6 +5,7 @@ import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,9 +28,13 @@ public class HospitalDepartmentAPI {
     @Path("/hospital")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getHospital(@Context HttpServletRequest request) {
-        int count = (int)hospitalService.countHospitalByConditions(true, null, null, null, null, null, 1, 1);
-        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, null, null, null, null, null, 1, 1, 0, count);
+    public Response getHospital(@Context HttpServletRequest request,
+                                @QueryParam("fuzzy_name") @DefaultValue("") String fuzzyName,
+                                @QueryParam("index")  @DefaultValue("0")       int pageIndex,
+                                @QueryParam("number") @DefaultValue("10")      int sizePerPage
+    ) {
+        fuzzyName = VerifyUtil.isStringEmpty(fuzzyName) ? null : fuzzyName;
+        List<HospitalBean> hospitals = hospitalService.searchHospitalByConditions(true, fuzzyName, null, null, null, null, 1, null, pageIndex, sizePerPage);
         return Response.ok(hospitals).build();
     }
 
