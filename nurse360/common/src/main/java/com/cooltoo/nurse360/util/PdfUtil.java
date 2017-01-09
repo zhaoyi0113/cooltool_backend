@@ -28,7 +28,7 @@ public class PdfUtil {
      *          出诊记录打印
      ***************************************************************************/
     public static String createVisitPatientRecordPrint(String vendorName,
-                                                       String patientNumber,
+                                                       String diagnose,
                                                        UserBean user,
                                                        UserAddressBean userAddress,
                                                        PatientBean patient,
@@ -279,7 +279,7 @@ public class PdfUtil {
         // FN
         Paragraph headerFN= new Paragraph();
         headerFN.add(newChunk(head_field_name_size_row_1_2, head_field_name_row_1_2, head_font_normal_row_1));
-        headerFN.add(underline(newChunk(head_completion_size_row_1_2, patientNumber, head_font_underline_row_1)));
+        headerFN.add(underline(newChunk(head_completion_size_row_1_2, patient.getId()+"", head_font_underline_row_1)));
         cell = new PdfPCell(headerFN);
         cell.setBorder(Rectangle.NO_BORDER);
         cell.setHorizontalAlignment(head_alignment_h_row_1_2);
@@ -297,7 +297,7 @@ public class PdfUtil {
         headerPatientInfo.add(newChunk(head_field_name_size_row_2_1_3, head_field_name_row_2_1_3, head_font_normal_row_2));
         headerPatientInfo.add(underline(newChunk(head_completion_size_row_2_1_3, patient.getAge()+"", head_font_underline_row_2)));
         headerPatientInfo.add(newChunk(head_field_name_size_row_2_1_4, head_field_name_row_2_1_4, head_font_normal_row_2));
-        headerPatientInfo.add(underline(newChunk(head_completion_size_row_2_1_4, "", head_font_underline_row_2)));
+        headerPatientInfo.add(underline(newChunk(head_completion_size_row_2_1_4, diagnose, head_font_underline_row_2)));
         cell = new PdfPCell(headerPatientInfo);
         cell.setBorder(Rectangle.NO_BORDER);
         cell.setHorizontalAlignment(head_alignment_h_row_2_1);
@@ -494,6 +494,7 @@ public class PdfUtil {
         // write document
         pdfWriter.flush();
         document.close();
+        pdfWriter.setCloseStream(true);
         pdfWriter.close();
 
         FileUtil.getInstance().moveFile(file.getAbsolutePath(), temporaryFileStorage.getStoragePath()+file.getName());
