@@ -165,8 +165,7 @@ public class FileUtil {
         if (file.isDirectory()) {
             return true;
         }
-        file.deleteOnExit();
-        return true;
+        return file.delete();
     }
 
     /*=================================================================
