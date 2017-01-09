@@ -3,6 +3,7 @@ package com.cooltoo.util;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.services.file.AbstractFileStorageService;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,46 @@ public class FileUtil {
         output.close();
     }
 
+    public boolean copyFile(File fromFile, File toFile) {
+        FileInputStream in = null;
+        FileOutputStream out = null;
+        try {
+            in = new FileInputStream(fromFile);
+            out = new FileOutputStream(toFile);
+            return copyStream(in, out);
+        }
+        catch (Exception e) {
+            logger.error("failed! copy file from {} to {}, exception is {}",
+                    fromFile.getAbsoluteFile(),
+                    toFile.getAbsoluteFile(),
+                    e.getMessage());
+            return false;
+        }
+        finally {
+            if (out != null) {
+                try { out.close(); } catch (IOException ioe) {}
+            }
+            if (in != null) {
+                try { in.close(); } catch (IOException ioe) {}
+            }
+        }
+    }
+
+    public boolean copyStream(InputStream in, OutputStream out) {
+        final int MAX = 4096;
+        byte[] buf = new byte[MAX];
+        try {
+            for (int bytesRead = in.read(buf, 0, MAX); bytesRead != -1; bytesRead = in.read(buf, 0, MAX)) {
+                out.write(buf, 0, bytesRead);
+            }
+            return true;
+        }
+        catch (IOException ioe) {
+            logger.error("failed! copy stream, exception is {}", ioe.getMessage());
+            return false;
+        }
+    }
+
     public boolean moveFile(String srcPath, String destPath) {
         logger.info("move file  " + srcPath + " to " + destPath);
         File src = new File(srcPath);
@@ -78,7 +119,8 @@ public class FileUtil {
             return false;
         }
 
-        boolean success = src.renameTo(dest);
+        boolean success = copyFile(src, dest);
+        success = success && deleteFile(srcPath);
         if (!success) {
             logger.error("Failed to move "+src+" to "+dest);
         }

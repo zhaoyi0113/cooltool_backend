@@ -494,7 +494,6 @@ public class PdfUtil {
         // write document
         pdfWriter.flush();
         document.close();
-        pdfWriter.setCloseStream(true);
         pdfWriter.close();
 
         FileUtil.getInstance().moveFile(file.getAbsolutePath(), temporaryFileStorage.getStoragePath()+file.getName());

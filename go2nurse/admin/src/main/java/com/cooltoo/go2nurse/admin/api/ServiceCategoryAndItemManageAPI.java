@@ -405,12 +405,22 @@ public class ServiceCategoryAndItemManageAPI {
     @Path("/item/approve")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    public Response editServiceItem(@Context HttpServletRequest request,
-                                    @FormParam("item_id") @DefaultValue("0") long itemId
+    public Response approveServiceItem(@Context HttpServletRequest request,
+                                       @FormParam("item_id") @DefaultValue("0") long itemId
     ) {
         ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItemManagerApproved(itemId, YesNoEnum.YES);
         return Response.ok(serviceItem).build();
     }
+//
+//    @Path("/item/disapprove")
+//    @PUT
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response disapproveServiceItem(@Context HttpServletRequest request,
+//                                          @FormParam("item_id") @DefaultValue("0") long itemId
+//    ) {
+//        ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItemManagerApproved(itemId, YesNoEnum.NO);
+//        return Response.ok(serviceItem).build();
+//    }
 
     @Path("/item/edit_image")
     @POST
