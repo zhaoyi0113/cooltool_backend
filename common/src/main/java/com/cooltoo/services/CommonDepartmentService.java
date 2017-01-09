@@ -297,7 +297,7 @@ public class CommonDepartmentService {
         String value = bean.getName();
         if (!VerifyUtil.isStringEmpty(value)) {
             if (!entity.getName().equals(bean.getName())) {
-                List<HospitalDepartmentEntity> sameName = repository.findByName(bean.getName());
+                List<HospitalDepartmentEntity> sameName = repository.findByHospitalIdAndParentIdAndName(entity.getHospitalId(), entity.getParentId(), bean.getName());
                 if (!sameName.isEmpty()) {
                     throw new BadRequestException(ErrorCode.DATA_ERROR);
                 }
@@ -444,7 +444,9 @@ public class CommonDepartmentService {
             logger.error("new department name is empty!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        List<HospitalDepartmentEntity> sameName = repository.findByName(name);
+
+        parentId = parentId<=0 ? 0 : parentId;
+        List<HospitalDepartmentEntity> sameName = repository.findByHospitalIdAndParentIdAndName(hospitalId, parentId, name);
         if (!sameName.isEmpty()) {
             logger.error("new department name is already exist!");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -460,6 +462,7 @@ public class CommonDepartmentService {
         entity.setAddress(address);
         entity.setOutpatientAddress(outpatientAddress);
         entity.setTransportation(transportation);
+        entity.setParentId(parentId);
 
         String uniqueId = null;
         for (int i = 10; i>0; i--) {
@@ -484,9 +487,6 @@ public class CommonDepartmentService {
         enable = enable<0 ? enable : (enable>1 ? 1 : enable);
         if (enable>=0) {
             entity.setEnable(enable);
-        }
-        if (parentId>0) {
-            entity.setParentId(parentId);
         }
         if(null!=image) {
             try {

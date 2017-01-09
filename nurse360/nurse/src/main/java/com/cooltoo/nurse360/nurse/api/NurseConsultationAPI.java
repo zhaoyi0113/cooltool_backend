@@ -292,11 +292,6 @@ public class NurseConsultationAPI {
     public Response addConsultationTalkImage(@Context HttpServletRequest request,
                                              @FormParam("consultation_id") @DefaultValue("0") long consultationId
     ) {
-        long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        if (!nurseCanAnswerConsultation(nurseId, consultationId)) {
-            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
-        }
-
         consultationId = userConsultationService.updateConsultationUnreadTalkStatusToRead(consultationId, ConsultationTalkStatus.NURSE_SPEAK);
 
         Map<String, Long> retValue = new HashMap<>();
