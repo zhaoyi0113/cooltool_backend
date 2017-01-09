@@ -790,7 +790,7 @@ public class ServiceVendorCategoryAndItemService {
                                       Long categoryId, String strVendorType, Long vendorId, Long vendorDepartId, ManagedBy managedBy,
                                       String strStatus) {
         StringBuilder log = new StringBuilder();
-        log.append("add service item={} by name={} clazz={} description={} ");
+        log.append("updateItem service item={} by name={} clazz={} description={} ");
         log.append("price={} discount={} serverIncome={} needVisitPatientRecord={} ");
         log.append("timeDuration={} timeUnit={} grade={} ");
         log.append("categoryId={} vendorId={} vendorType={} vendorDepartId={} ");

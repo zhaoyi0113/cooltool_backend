@@ -98,7 +98,11 @@ public class NumberUtil {
     private static final String PRICE="^\\d{0,7}\\.{0,1}\\d{0,2}$";
     public static Integer getCent(String price) {
         if (price instanceof String) {
+            price = price.trim();
             if (!price.matches(PRICE)) {
+                return null;
+            }
+            if (price.length()==0) {
                 return null;
             }
             StringBuilder strCent = new StringBuilder(price);
