@@ -11,8 +11,8 @@ import java.util.List;
 public enum  OrderStatus {
     CANCELLED(-1, "CANCELLED"),  // 取消订单
     TO_PAY(0, "TO_PAY"), // 下单成功，等待支付
-    PAID(1, "PAID"), // 支付成功，等待管理员提醒抢单或派单
-    WAIT_NURSE_FETCH(2, "WAIT_NURSE_FETCH"), // 提醒抢单，等待护士抢单
+    PAID(1, "TO_DISPATCH"), // 支付成功，等待管理员提醒抢单或派单
+    WAIT_NURSE_FETCH(2, "TO_SERVICE"), // 提醒抢单，等待护士抢单
     IN_PROCESS(3, "IN_PROCESS"), // 抢单成功(或派单成功), 上门服务
     COMPLETED(4, "COMPLETED"),  // 服务完成
     CREATE_CHARGE_FAILED(-2, "CREATE_CHARGE_FAILED"), //创建订单失败
