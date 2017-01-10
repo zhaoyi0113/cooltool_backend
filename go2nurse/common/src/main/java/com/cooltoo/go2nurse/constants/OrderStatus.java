@@ -11,8 +11,8 @@ import java.util.List;
 public enum  OrderStatus {
     CANCELLED(-1, "CANCELLED"),  // 取消订单
     TO_PAY(0, "TO_PAY"), // 下单成功，等待支付
-    TO_DISPATCH(1, "PAID"), // 支付成功，等待管理员提醒抢单或派单
-    TO_SERVICE(2, "WAIT_NURSE_FETCH"), // 提醒抢单，等待护士抢单
+    PAID(1, "PAID"), // 支付成功，等待管理员提醒抢单或派单
+    WAIT_NURSE_FETCH(2, "WAIT_NURSE_FETCH"), // 提醒抢单，等待护士抢单
     IN_PROCESS(3, "IN_PROCESS"), // 抢单成功(或派单成功), 上门服务
     COMPLETED(4, "COMPLETED"),  // 服务完成
     CREATE_CHARGE_FAILED(-2, "CREATE_CHARGE_FAILED"), //创建订单失败
@@ -34,11 +34,11 @@ public enum  OrderStatus {
         if (TO_PAY.name.equalsIgnoreCase(type)) {
             ret = TO_PAY;
         }
-        else if (TO_DISPATCH.name.equalsIgnoreCase(type)) {
-            ret = TO_DISPATCH;
+        else if (PAID.name.equalsIgnoreCase(type)) {
+            ret = PAID;
         }
-        else if (TO_SERVICE.name.equalsIgnoreCase(type)) {
-            ret = TO_SERVICE;
+        else if (WAIT_NURSE_FETCH.name.equalsIgnoreCase(type)) {
+            ret = WAIT_NURSE_FETCH;
         }
         else if (IN_PROCESS.name.equalsIgnoreCase(type)) {
             ret = IN_PROCESS;
@@ -66,11 +66,11 @@ public enum  OrderStatus {
         if (TO_PAY.id == type) {
             ret = TO_PAY;
         }
-        else if (TO_DISPATCH.id == type) {
-            ret = TO_DISPATCH;
+        else if (PAID.id == type) {
+            ret = PAID;
         }
-        else if (TO_SERVICE.id == type) {
-            ret = TO_SERVICE;
+        else if (WAIT_NURSE_FETCH.id == type) {
+            ret = WAIT_NURSE_FETCH;
         }
         else if (IN_PROCESS.id == type) {
             ret = IN_PROCESS;
@@ -96,8 +96,8 @@ public enum  OrderStatus {
     public static List<OrderStatus> getAll() {
         List<OrderStatus> all = new ArrayList<>();
         all.add(OrderStatus.TO_PAY);
-        all.add(OrderStatus.TO_DISPATCH);
-        all.add(OrderStatus.TO_SERVICE);
+        all.add(OrderStatus.PAID);
+        all.add(OrderStatus.WAIT_NURSE_FETCH);
         all.add(OrderStatus.IN_PROCESS);
         all.add(OrderStatus.COMPLETED);
         all.add(OrderStatus.CANCELLED);

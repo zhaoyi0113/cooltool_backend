@@ -487,7 +487,7 @@ public class ServiceOrderService {
             logger.error("order status={}, not to_pay", order.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        order.setOrderStatus(OrderStatus.TO_DISPATCH);
+        order.setOrderStatus(OrderStatus.PAID);
 
         order = repository.save(order);
         logger.info("order charged is {}", order);
@@ -504,12 +504,12 @@ public class ServiceOrderService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
-        if (!OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())
-         && !OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
+        if (!OrderStatus.PAID.equals(entity.getOrderStatus())
+         && !OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be fetched", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        entity.setOrderStatus(OrderStatus.TO_SERVICE);
+        entity.setOrderStatus(OrderStatus.WAIT_NURSE_FETCH);
         entity = repository.save(entity);
         logger.info("order fetched is {}", entity);
 
@@ -523,11 +523,11 @@ public class ServiceOrderService {
         if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (isAdminDispatch && !OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())) {
+        if (isAdminDispatch && !OrderStatus.PAID.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be dispatch by administrator", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        if (!isAdminDispatch && !OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
+        if (!isAdminDispatch && !OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be fetched", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -549,7 +549,7 @@ public class ServiceOrderService {
             logger.info("the order is in status={}, can not be given_up", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        entity.setOrderStatus(OrderStatus.TO_DISPATCH);
+        entity.setOrderStatus(OrderStatus.PAID);
         entity = repository.save(entity);
         logger.info("order fetched is {}", entity);
 
@@ -595,8 +595,8 @@ public class ServiceOrderService {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
-        if (!OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())
-         && !OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())
+        if (!OrderStatus.PAID.equals(entity.getOrderStatus())
+         && !OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
          && !OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
         ) {
             logger.info("the order is in status={}, can not be completed", entity.getOrderStatus());
@@ -630,8 +630,8 @@ public class ServiceOrderService {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
-        if (!OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())
-                && !OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())
+        if (!OrderStatus.PAID.equals(entity.getOrderStatus())
+                && !OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
                 && !OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
         ) {
             logger.info("the order is in status={}, can not be refunded", entity.getOrderStatus());
@@ -944,7 +944,7 @@ public class ServiceOrderService {
         if (entity.getTotalPriceCent()-entity.getTotalDiscountCent() > 0) {
             entity.setOrderStatus(OrderStatus.TO_PAY);
         } else {
-            entity.setOrderStatus(OrderStatus.TO_DISPATCH);
+            entity.setOrderStatus(OrderStatus.PAID);
         }
         entity.setPayTime(new Date(0));
         entity.setPaymentAmountCent(0);

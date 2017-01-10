@@ -37,7 +37,7 @@ public class NurseOrderRelationService {
 
     private static final Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
 
-    private static final List<OrderStatus> orderStatuses = Arrays.asList(new OrderStatus[]{OrderStatus.TO_SERVICE});
+    private static final List<OrderStatus> orderStatuses = Arrays.asList(new OrderStatus[]{OrderStatus.WAIT_NURSE_FETCH});
 
     @Autowired private NurseOrderRelationRepository repository;
     @Autowired private NurseOrderRelationBeanConverter beanConverter;

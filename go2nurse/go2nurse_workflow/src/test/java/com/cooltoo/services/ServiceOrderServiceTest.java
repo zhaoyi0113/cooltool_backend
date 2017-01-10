@@ -126,8 +126,8 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
     public void updateOrder() {
     /*
     TO_PAY(0, "TO_PAY"), // 等待支付
-    TO_DISPATCH(1, "TO_DISPATCH"), // 等待接单
-    TO_SERVICE(2, "TO_SERVICE"), // 等待服务
+    PAID(1, "PAID"), // 等待接单
+    WAIT_NURSE_FETCH(2, "WAIT_NURSE_FETCH"), // 等待服务
     IN_PROCESS(3, "IN_PROCESS"), // 服务中
     COMPLETED(4, "COMPLETED"),  // 服务完成
         <go2nurse_service_order id="276"     order_status="1"

@@ -216,13 +216,13 @@ public class ServiceOrderManageAPI {
                                             @FormParam("department_id") @DefaultValue("0") int departmentId,
                                             @FormParam("register_from") @DefaultValue("") String registerFrom/* cooltoo, go2nurse */
     ) {
-        //change order status to TO_SERVICE (提醒抢单，等待护士抢单)
+        //change order status to WAIT_NURSE_FETCH (提醒抢单，等待护士抢单)
         orderService.alertNurseToFetchOrder(orderId);
         //notify nurse in department to fetch order
         List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
         if (null!=orders && !orders.isEmpty()) {
             ServiceOrderBean order = orders.get(0);
-            if (OrderStatus.TO_SERVICE.equals(order.getOrderStatus())) {
+            if (OrderStatus.WAIT_NURSE_FETCH.equals(order.getOrderStatus())) {
                 List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(null, YesNoEnum.YES.name(), null, hospitalId, departmentId, RegisterFrom.parseString(registerFrom));
                 List<Long> nursesId = getNurseIds(nurses);
                 notifierForAllModule.newOrderAlertToNurse360(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");

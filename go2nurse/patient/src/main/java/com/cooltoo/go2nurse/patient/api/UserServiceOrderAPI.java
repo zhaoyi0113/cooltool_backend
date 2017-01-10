@@ -161,7 +161,7 @@ public class UserServiceOrderAPI {
     public Response getUserOrder(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<ServiceOrderBean> userOrders = orderService.getOrderByUserId(userId);
-        List<DoctorAppointmentBean> doctorAppointments = doctorAppointmentService.getDoctorAppointment(userId, "CANCELLED,TO_SERVICE,COMPLETED");
+        List<DoctorAppointmentBean> doctorAppointments = doctorAppointmentService.getDoctorAppointment(userId, "CANCELLED,WAIT_NURSE_FETCH,COMPLETED");
         List<Object> retVal = sortOrderAndAppointment(userOrders, doctorAppointments);
         return Response.ok(retVal).build();
     }
@@ -230,7 +230,7 @@ public class UserServiceOrderAPI {
 //    List<String> managerMobile = nurseService.getManagerMobiles(hospitalId, departmentId);
 //    notifierForAllModule.leanCloudRequestSmsCodeNewOrder(managerMobile, "M2356543676655765");
 //    List<Long> managerId = nurseService.getManagerId(hospitalId, departmentId);
-//    notifierForAllModule.newOrderToDispatchAlertToNurse360(managerId, 1, OrderStatus.TO_DISPATCH, "new order created!!");
+//    notifierForAllModule.newOrderToDispatchAlertToNurse360(managerId, 1, OrderStatus.PAID, "new order created!!");
 //    return Response.ok().build();
 //}
 
@@ -272,7 +272,7 @@ public class UserServiceOrderAPI {
             return null;
         }
         else {
-            if (null!=order && (order instanceof ServiceOrderBean) && OrderStatus.TO_DISPATCH.equals(((ServiceOrderBean)order).getOrderStatus())) {
+            if (null!=order && (order instanceof ServiceOrderBean) && OrderStatus.PAID.equals(((ServiceOrderBean)order).getOrderStatus())) {
                 ServiceOrderBean orderBean = (ServiceOrderBean)order;
                 // notifierForAllModule.orderAlertToGo2nurseUser(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
                 // need send message to Manager

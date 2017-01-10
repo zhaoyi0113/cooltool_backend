@@ -52,7 +52,7 @@ public class HospitalOrderAPI {
                            @RequestParam(defaultValue = "",  name = "vendor_type")  String strVendorType, /* hospital, company */
                            @RequestParam(defaultValue = "",  name = "vendor_id")    String strVendorId,
                            @RequestParam(defaultValue = "",  name = "depart_id")    String strDepartId,
-                           @RequestParam(defaultValue = "",  name = "order_status") String strOrderStatus /* CANCELLED, TO_PAY, TO_DISPATCH, TO_SERVICE, IN_PROCESS, COMPLETED, CREATE_CHARGE_FAILED*/
+                           @RequestParam(defaultValue = "",  name = "order_status") String strOrderStatus /* CANCELLED, TO_PAY, PAID, WAIT_NURSE_FETCH, IN_PROCESS, COMPLETED, CREATE_CHARGE_FAILED*/
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId(strVendorId, strDepartId, userDetails);
@@ -151,7 +151,7 @@ public class HospitalOrderAPI {
                                         @RequestParam(defaultValue = "0", name = "department_id") int departmentId,
                                         @RequestParam(defaultValue = "",  name = "register_from") String registerFrom/* cooltoo, go2nurse */
     ) {
-        //change order status to TO_SERVICE (提醒抢单，等待护士抢单)
+        //change order status to WAIT_NURSE_FETCH (提醒抢单，等待护士抢单)
         orderService.alertNurseToFetchOrder(orderId);
         //notify nurse in department to fetch order
         List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);

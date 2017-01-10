@@ -104,7 +104,7 @@ public class DoctorAppointmentService {
         }
 
         List<OrderStatus> statuses = new ArrayList<>();
-        statuses.add(OrderStatus.TO_SERVICE);
+        statuses.add(OrderStatus.WAIT_NURSE_FETCH);
         statuses.add(OrderStatus.COMPLETED);
 
         List<Object> hourIds = repository.findHourIdByConditionsForUser(clinicDateIds, statuses);
@@ -304,7 +304,7 @@ public class DoctorAppointmentService {
         entity.setUserId(userId);
         entity.setPatientId(patientId);
         entity.setPatientJson(jsonUtil.toJsonString(patientBean));
-        entity.setOrderStatus(OrderStatus.TO_SERVICE);
+        entity.setOrderStatus(OrderStatus.WAIT_NURSE_FETCH);
         entity = repository.save(entity);
 
         return beanConverter.convert(entity);
@@ -372,14 +372,14 @@ public class DoctorAppointmentService {
         entity.setUserId(userId);
         entity.setPatientId(patientId);
         entity.setPatientJson(jsonUtil.toJsonString(patientBean));
-        entity.setOrderStatus(OrderStatus.TO_SERVICE);
+        entity.setOrderStatus(OrderStatus.WAIT_NURSE_FETCH);
         entity = repository.save(entity);
 
         // check after insert
         entities = repository.findByClinicHoursId(clinicHoursId, sort);
         for (int i=entities.size()-1, valid=0; i>=0; i--) {
             DoctorAppointmentEntity tmp = entities.get(i);
-            if (!OrderStatus.TO_SERVICE.equals(tmp.getOrderStatus()) && !OrderStatus.COMPLETED.equals(tmp.getOrderStatus())) {
+            if (!OrderStatus.WAIT_NURSE_FETCH.equals(tmp.getOrderStatus()) && !OrderStatus.COMPLETED.equals(tmp.getOrderStatus())) {
                 continue;
             }
             valid ++;
@@ -423,7 +423,7 @@ public class DoctorAppointmentService {
         boolean userHasAppointed = false;
         for (DoctorAppointmentEntity tmp : appointments) {
             OrderStatus status = tmp.getOrderStatus();
-            if (!OrderStatus.TO_SERVICE.equals(status) && !OrderStatus.COMPLETED.equals(status)) {
+            if (!OrderStatus.WAIT_NURSE_FETCH.equals(status) && !OrderStatus.COMPLETED.equals(status)) {
                 continue;
             }
             if (tmp.getPatientId()==patientId) {
