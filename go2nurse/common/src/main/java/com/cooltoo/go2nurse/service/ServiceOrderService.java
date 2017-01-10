@@ -503,7 +503,9 @@ public class ServiceOrderService {
         if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (!OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())) {
+
+        if (!OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())
+         && !OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be fetched", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -567,8 +569,9 @@ public class ServiceOrderService {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
-        if (OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
-         || OrderStatus.COMPLETED.equals(entity.getOrderStatus())) {
+
+        // only to_pay can be canceled
+        if (!OrderStatus.TO_PAY.equals(entity.getOrderStatus())) {
             logger.info("the order is in status={}, can not be cancelled", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -581,7 +584,7 @@ public class ServiceOrderService {
 
     @Transactional
     public ServiceOrderBean completedOrder(boolean checkUser, long userId, long orderId) {
-        logger.info("cancel order={} by user={} checkFlag={}", orderId, userId, checkUser);
+        logger.info("complete order={} by user={} checkFlag={}", orderId, userId, checkUser);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -592,13 +595,16 @@ public class ServiceOrderService {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
-        if (!OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())) {
+        if (!OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())
+         && !OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())
+         && !OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
+        ) {
             logger.info("the order is in status={}, can not be completed", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         // check needVisitPatientRecord
         if (YesNoEnum.YES.equals(entity.getNeedVisitPatientRecord())
-        && !nurseVisitPatientService.isRecordForOrder(orderId)) {
+         && !nurseVisitPatientService.isRecordForOrder(orderId)) {
             logger.error("order need record visit patient record and patient sign!");
             throw new BadRequestException(ErrorCode.NEED_VISIT_PATIENT_RECORD);
         }
@@ -607,6 +613,87 @@ public class ServiceOrderService {
         entity.setCompletedTime(new Date());
         entity = repository.save(entity);
         logger.info("order completed is {}", entity);
+
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
+    public ServiceOrderBean refundFeeOfOrder(boolean checkUser, long userId, long orderId) {
+        logger.info("refund fee of order={} by user={} checkFlag={}", orderId, userId, checkUser);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null == entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (checkUser) {
+            if (entity.getUserId() != userId) {
+                logger.error("order not belong to user");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
+        if (!OrderStatus.TO_DISPATCH.equals(entity.getOrderStatus())
+                && !OrderStatus.TO_SERVICE.equals(entity.getOrderStatus())
+                && !OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
+        ) {
+            logger.info("the order is in status={}, can not be refunded", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        entity.setOrderStatus(OrderStatus.REFUND_IN_PROCESS);
+        entity.setCompletedTime(new Date());
+        entity = repository.save(entity);
+        logger.info("order completed is {}", entity);
+
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
+    public ServiceOrderBean completeRefundOfOrder(boolean checkUser, long userId, long orderId) {
+        logger.info("complete refund of order={} by user={} checkFlag={}", orderId, userId, checkUser);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null == entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (checkUser) {
+            if (entity.getUserId() != userId) {
+                logger.error("order not belong to user");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
+        if (!OrderStatus.REFUND_IN_PROCESS.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, refund can not be completed", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        entity.setOrderStatus(OrderStatus.REFUND_COMPLETED);
+        entity.setCompletedTime(new Date());
+        entity = repository.save(entity);
+        logger.info("order's refund completed is {}", entity);
+
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
+    public ServiceOrderBean failRefundOrder(boolean checkUser, long userId, long orderId) {
+        logger.info("failed to refund order={} by user={} checkFlag={}", orderId, userId, checkUser);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null == entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (checkUser) {
+            if (entity.getUserId() != userId) {
+                logger.error("order not belong to user");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
+        if (!OrderStatus.REFUND_IN_PROCESS.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, refund can not be set to failed_refund", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        entity.setOrderStatus(OrderStatus.REFUND_FAILED);
+        entity.setCompletedTime(new Date());
+        entity = repository.save(entity);
+        logger.info("order refund_failed is {}", entity);
 
         return beanConverter.convert(entity);
     }

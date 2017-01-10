@@ -380,9 +380,7 @@ public class HospitalOrderAPI {
         for (ServiceOrderBean tmp : orders) {
             Long nurseId = orderIdToNurseId.get(tmp.getId());
             NurseBean nurse = nurseIdToBean.get(nurseId);
-            if (null!=nurse) {
-                tmp.setProperty(ServiceOrderBean.WAIT_STAFF, nurse);
-            }
+            tmp.setProperty(ServiceOrderBean.WAIT_STAFF, nurse);
         }
     }
 }

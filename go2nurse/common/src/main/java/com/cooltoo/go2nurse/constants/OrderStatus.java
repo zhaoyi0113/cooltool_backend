@@ -11,11 +11,14 @@ import java.util.List;
 public enum  OrderStatus {
     CANCELLED(-1, "CANCELLED"),  // 取消订单
     TO_PAY(0, "TO_PAY"), // 下单成功，等待支付
-    TO_DISPATCH(1, "TO_DISPATCH"), // 支付成功，等待管理员提醒抢单或派单
-    TO_SERVICE(2, "TO_SERVICE"), // 提醒抢单，等待护士抢单
+    TO_DISPATCH(1, "PAID"), // 支付成功，等待管理员提醒抢单或派单
+    TO_SERVICE(2, "WAIT_NURSE_FETCH"), // 提醒抢单，等待护士抢单
     IN_PROCESS(3, "IN_PROCESS"), // 抢单成功(或派单成功), 上门服务
     COMPLETED(4, "COMPLETED"),  // 服务完成
-    CREATE_CHARGE_FAILED(-2, "CREATE_CHARGE_FAILED") //创建订单失败
+    CREATE_CHARGE_FAILED(-2, "CREATE_CHARGE_FAILED"), //创建订单失败
+    REFUND_IN_PROCESS(5, "REFUND_IN_PROCESS"), // 退款处理中
+    REFUND_COMPLETED(6, "REFUND_COMPLETED"), // 退款完成
+    REFUND_FAILED(-3, "REFUND_FAILED") // 退款完成
     ;
 
     private String name;
@@ -49,6 +52,12 @@ public enum  OrderStatus {
         else if (CREATE_CHARGE_FAILED.name.equalsIgnoreCase(type)) {
             ret = CREATE_CHARGE_FAILED;
         }
+        else if (REFUND_IN_PROCESS.name.equalsIgnoreCase(type)) {
+            ret = REFUND_IN_PROCESS;
+        }
+        else if (REFUND_COMPLETED.name.equalsIgnoreCase(type)) {
+            ret = REFUND_COMPLETED;
+        }
         return ret;
     }
 
@@ -75,6 +84,12 @@ public enum  OrderStatus {
         else if (CREATE_CHARGE_FAILED.id == type) {
             ret = CREATE_CHARGE_FAILED;
         }
+        else if (REFUND_IN_PROCESS.id == type) {
+            ret = REFUND_IN_PROCESS;
+        }
+        else if (REFUND_COMPLETED.id == type) {
+            ret = REFUND_COMPLETED;
+        }
         return ret;
     }
 
@@ -87,6 +102,8 @@ public enum  OrderStatus {
         all.add(OrderStatus.COMPLETED);
         all.add(OrderStatus.CANCELLED);
         all.add(OrderStatus.CREATE_CHARGE_FAILED);
+        all.add(OrderStatus.REFUND_IN_PROCESS);
+        all.add(OrderStatus.REFUND_COMPLETED);
         return all;
     }
 
