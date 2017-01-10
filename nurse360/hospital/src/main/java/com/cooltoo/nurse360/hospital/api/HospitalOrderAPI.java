@@ -134,11 +134,13 @@ public class HospitalOrderAPI {
     public ServiceOrderBean modifyTimeAddressMessage(HttpServletRequest request,
                                                      @RequestParam(defaultValue = "0", name = "order_id")       long orderId,
                                                      @RequestParam(defaultValue = "0", name = "address")      String address,
+                                                     @RequestParam(defaultValue = "",  name = "count")        String strCount,
                                                      @RequestParam(defaultValue = "",  name = "start_time")   String startTime,
                                                      @RequestParam(defaultValue = "",  name = "message_left") String messageLeft
     ) {
         //modify start_time, address, message left, score
-        ServiceOrderBean order = orderService.updateOrder(orderId, null, address, startTime, null, messageLeft);
+        Integer count = !VerifyUtil.isIds(strCount) ? null : VerifyUtil.parseIntIds(strCount).get(0);
+        ServiceOrderBean order = orderService.updateOrder(orderId, null, address, startTime, count, messageLeft);
         return order;
     }
 
