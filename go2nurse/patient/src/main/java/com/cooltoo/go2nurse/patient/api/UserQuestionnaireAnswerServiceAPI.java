@@ -1,5 +1,6 @@
 package com.cooltoo.go2nurse.patient.api;
 
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.*;
@@ -37,6 +38,8 @@ public class UserQuestionnaireAnswerServiceAPI {
     @Autowired private QuestionnaireService questionnaireService;
     @Autowired private UserQuestionnaireAnswerService userAnswerService;
     @Autowired private UserService userService;
+    @Autowired private NursePatientFollowUpService nursePatientFollowUpService;
+    @Autowired private NursePatientFollowUpRecordService nursePatientFollowUpRecordService;
 
     @Path("/questionnaire_of_hospital_or_not")
     @GET
@@ -157,7 +160,18 @@ public class UserQuestionnaireAnswerServiceAPI {
                                              @QueryParam("number") @DefaultValue("0") int sizePerPage
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+
+        // add un-replied questionnaires pushed by nurse
+        List<QuestionnaireBean> tmpQuestionnaires = unRepliedQuestionnairesPushedByNurse(userId);
+
+        // get user questionnaires
         List<QuestionnaireBean> usersQuestionnaires = userAnswerService.getUserQuestionnaire(userId);
+
+        if (!VerifyUtil.isListEmpty(tmpQuestionnaires)) {
+            usersQuestionnaires = SetUtil.newInstance().mergeListValue(usersQuestionnaires, tmpQuestionnaires);
+        }
+
+        // get by page
         if (pageIndex<=0 && sizePerPage<=0) {
         }
         else {
@@ -284,5 +298,32 @@ public class UserQuestionnaireAnswerServiceAPI {
                     "user replay questionnaire follow-up!");
         }
         return Response.ok(followUpRecordId).build();
+    }
+
+
+    //=============================================================
+    //
+    //=============================================================
+    private List<QuestionnaireBean> unRepliedQuestionnairesPushedByNurse(Long userId) {
+        List<Long> followUpIds = nursePatientFollowUpService.getPatientFollowUpIds(userId, null, null);
+        List<NursePatientFollowUpRecordBean> followUpRecords = nursePatientFollowUpRecordService.getPatientFollowUpRecordByFollowUpIds(
+                CommonStatus.DELETED, PatientFollowUpType.QUESTIONNAIRE, YesNoEnum.NO, null, followUpIds, null, 0, 0, 0, true
+        );
+        List<Long> questionnaireIds = new ArrayList<>();
+        for (NursePatientFollowUpRecordBean tmp : followUpRecords) {
+            if (PatientFollowUpType.QUESTIONNAIRE.equals(tmp.getFollowUpType())) {
+                questionnaireIds.add(tmp.getRelativeQuestionnaireId());
+            }
+        }
+        List<QuestionnaireBean> usersQuestionnaires = questionnaireService.getQuestionnaireByIds(questionnaireIds);
+        List<QuestionnaireBean> returnVal = new ArrayList<>();
+        for (Long tmpId : questionnaireIds) {
+            for (QuestionnaireBean tmp : usersQuestionnaires) {
+                if (tmp.getId()==tmpId) {
+                    returnVal.add(tmp);
+                }
+            }
+        }
+        return returnVal;
     }
 }

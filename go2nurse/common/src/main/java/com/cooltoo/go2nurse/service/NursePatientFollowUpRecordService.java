@@ -106,6 +106,9 @@ public class NursePatientFollowUpRecordService {
                     new Sort.Order(Sort.Direction.DESC, "id")
             );
         }
+        else {
+            tmpSort = sort;
+        }
         if (!VerifyUtil.isListEmpty(followUpIds)) {
             Iterable<NursePatientFollowUpRecordEntity> resultSet;
             if (noPage) {
