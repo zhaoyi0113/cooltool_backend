@@ -334,9 +334,9 @@ public class HospitalVisitPatientAPI {
     }
 
     @RequestMapping(path = "/visit/patient/pdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public String makePdfVisitPatientRecord(HttpServletRequest request,
-                                            @RequestParam(defaultValue = "0", name = "user_id") long userId,
-                                            @RequestParam(defaultValue = "0", name = "patient_id") long patientId
+    public Map<String, String> makePdfVisitPatientRecord(HttpServletRequest request,
+                                                         @RequestParam(defaultValue = "0", name = "user_id") long userId,
+                                                         @RequestParam(defaultValue = "0", name = "patient_id") long patientId
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
@@ -358,7 +358,9 @@ public class HospitalVisitPatientAPI {
                             temporaryFileStorageService,
                             nurse360Utility
                     );
-                    return nurse360Utility.getHttpPrefix()+temporaryFilePath;
+                    Map<String, String> map = new HashMap<>();
+                    map.put("pdf_url", nurse360Utility.getHttpPrefix()+temporaryFilePath);
+                    return map;
                 }
             }
         }
