@@ -363,7 +363,7 @@ public class HospitalOrderAPI {
     //=============================================================
     private List<Long> getOrderIds(List<ServiceOrderBean> orders) {
         List<Long> orderIds = new ArrayList<>();
-        if (!VerifyUtil.isListEmpty(orderIds)) {
+        if (!VerifyUtil.isListEmpty(orders)) {
             for (ServiceOrderBean tmp : orders) {
                 orderIds.add(tmp.getId());
             }
