@@ -4,14 +4,14 @@ import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.util.VerifyUtil;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hp on 2016/6/28.
  */
 public class QuestionnaireBean {
+    public static final String FOLLOW_UP = "follow_up";
+
     private long id;
     private long categoryId;
     private String title;
@@ -22,6 +22,7 @@ public class QuestionnaireBean {
     private List<QuestionBean> questions;
     private Date time;
     private CommonStatus status;
+    private Map<String, Object> properties = new HashMap<>();
 
     //=================================
     //    user questionnaire score
@@ -156,6 +157,14 @@ public class QuestionnaireBean {
         this.statistics = statistics;
     }
 
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(String key, Object value) {
+        this.properties.put(key, value);
+    }
+
     public QuestionnaireBean clone() {
         QuestionnaireBean bean = new QuestionnaireBean();
         bean.setId(id);
@@ -164,6 +173,7 @@ public class QuestionnaireBean {
         bean.setDescription(description);
         bean.setConclusion(conclusion);
         bean.setHospitalId(hospitalId);
+        bean.setHospital(hospital);
         bean.setTime(time);
         bean.setStatus(status);
 
@@ -176,8 +186,11 @@ public class QuestionnaireBean {
         }
 
         bean.setGroupId(groupId);
+        bean.setPatient(patient);
         bean.setUserScore(userScore);
         bean.setUserConclusion(userConclusion);
+
+        bean.setStatistics(statistics);
         return bean;
     }
 

@@ -315,14 +315,18 @@ public class UserQuestionnaireAnswerServiceAPI {
                 questionnaireIds.add(tmp.getRelativeQuestionnaireId());
             }
         }
-        List<QuestionnaireBean> usersQuestionnaires = questionnaireService.getQuestionnaireByIds(questionnaireIds);
+        Map<Long, QuestionnaireBean> usersQuestionnaires = questionnaireService.getQuestionnaireIdToBeanMapByIds(questionnaireIds);
+
         List<QuestionnaireBean> returnVal = new ArrayList<>();
-        for (Long tmpId : questionnaireIds) {
-            for (QuestionnaireBean tmp : usersQuestionnaires) {
-                if (tmp.getId()==tmpId) {
-                    returnVal.add(tmp);
-                }
+        for (NursePatientFollowUpRecordBean tmp : followUpRecords) {
+            if (!PatientFollowUpType.QUESTIONNAIRE.equals(tmp.getFollowUpType())) {
+                continue;
             }
+            QuestionnaireBean tmpQuestionnaire = usersQuestionnaires.get(tmp.getRelativeQuestionnaireId());
+
+            QuestionnaireBean tmpCloneQuestionnaire = tmpQuestionnaire.clone();
+            tmpCloneQuestionnaire.setProperties(QuestionnaireBean.FOLLOW_UP, tmp);
+            returnVal.add(tmpCloneQuestionnaire);
         }
         return returnVal;
     }

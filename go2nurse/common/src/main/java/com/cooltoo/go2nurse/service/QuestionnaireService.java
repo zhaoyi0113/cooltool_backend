@@ -165,14 +165,14 @@ public class QuestionnaireService {
         return beans;
     }
 
-//    public Map<Long, QuestionnaireBean> getQuestionnaireIdToBeanMapByIds(List<Long> questionnaireIds) {
-//        List<QuestionnaireBean> beans = getQuestionnaireByIds(questionnaireIds);
-//        Map<Long, QuestionnaireBean> idToBean = new HashMap<>();
-//        for (QuestionnaireBean bean : beans) {
-//            idToBean.put(bean.getId(), bean);
-//        }
-//        return idToBean;
-//    }
+    public Map<Long, QuestionnaireBean> getQuestionnaireIdToBeanMapByIds(List<Long> questionnaireIds) {
+        List<QuestionnaireBean> beans = getQuestionnaireByIds(questionnaireIds);
+        Map<Long, QuestionnaireBean> idToBean = new HashMap<>();
+        for (QuestionnaireBean bean : beans) {
+            idToBean.put(bean.getId(), bean);
+        }
+        return idToBean;
+    }
 
     public List<QuestionnaireBean> getQuestionnaireByIds(List<Long> questionnaireIds) {
         logger.info("get questionnaire by ids={}", questionnaireIds);
