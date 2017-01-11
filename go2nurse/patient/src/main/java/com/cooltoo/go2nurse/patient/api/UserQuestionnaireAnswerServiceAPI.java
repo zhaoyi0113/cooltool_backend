@@ -325,7 +325,7 @@ public class UserQuestionnaireAnswerServiceAPI {
             QuestionnaireBean tmpQuestionnaire = usersQuestionnaires.get(tmp.getRelativeQuestionnaireId());
 
             QuestionnaireBean tmpCloneQuestionnaire = tmpQuestionnaire.clone();
-            tmpCloneQuestionnaire.setProperties(QuestionnaireBean.FOLLOW_UP, tmp);
+            tmpCloneQuestionnaire.setProperties(QuestionnaireBean.FOLLOW_UP_RECORD, tmp);
             returnVal.add(tmpCloneQuestionnaire);
         }
         return returnVal;

@@ -10,7 +10,7 @@ import java.util.*;
  * Created by hp on 2016/6/28.
  */
 public class QuestionnaireBean {
-    public static final String FOLLOW_UP = "follow_up";
+    public static final String FOLLOW_UP_RECORD = "follow_up";
 
     private long id;
     private long categoryId;
