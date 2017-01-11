@@ -11,6 +11,8 @@ import java.util.Date;
  */
 public class NursePatientFollowUpRecordBean {
 
+    private String from = "nurse_follow_up";
+
     private long id;
     private Date time;
     private CommonStatus status;
@@ -118,6 +120,10 @@ public class NursePatientFollowUpRecordBean {
 
     public void setTimeUpdated(Date timeUpdated) {
         this.timeUpdated = timeUpdated;
+    }
+
+    public String getFrom() {
+        return from;
     }
 
     @Override

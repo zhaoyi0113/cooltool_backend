@@ -162,13 +162,17 @@ public class UserQuestionnaireAnswerServiceAPI {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
 
         // add un-replied questionnaires pushed by nurse
-        List<QuestionnaireBean> tmpQuestionnaires = unRepliedQuestionnairesPushedByNurse(userId);
+        List<NursePatientFollowUpRecordBean> tmpFollowUpQuestionnaires = unRepliedQuestionnairesPushedByNurse(userId);
 
         // get user questionnaires
-        List<QuestionnaireBean> usersQuestionnaires = userAnswerService.getUserQuestionnaire(userId);
+        List<QuestionnaireBean> tmpUsersAnsweredQuestionnaires = userAnswerService.getUserQuestionnaire(userId);
 
-        if (!VerifyUtil.isListEmpty(tmpQuestionnaires)) {
-            usersQuestionnaires = SetUtil.newInstance().mergeListValue(usersQuestionnaires, tmpQuestionnaires);
+        List<Object> usersQuestionnaires = new ArrayList<>();
+        if (!VerifyUtil.isListEmpty(tmpFollowUpQuestionnaires)) {
+            usersQuestionnaires = SetUtil.newInstance().mergeListValue(tmpFollowUpQuestionnaires, usersQuestionnaires);
+        }
+        if (!VerifyUtil.isListEmpty(tmpUsersAnsweredQuestionnaires)) {
+            usersQuestionnaires = SetUtil.newInstance().mergeListValue(tmpUsersAnsweredQuestionnaires, usersQuestionnaires);
         }
 
         // get by page
@@ -304,30 +308,11 @@ public class UserQuestionnaireAnswerServiceAPI {
     //=============================================================
     //
     //=============================================================
-    private List<QuestionnaireBean> unRepliedQuestionnairesPushedByNurse(Long userId) {
+    private List<NursePatientFollowUpRecordBean> unRepliedQuestionnairesPushedByNurse(Long userId) {
         List<Long> followUpIds = nursePatientFollowUpService.getPatientFollowUpIds(userId, null, null);
         List<NursePatientFollowUpRecordBean> followUpRecords = nursePatientFollowUpRecordService.getPatientFollowUpRecordByFollowUpIds(
                 CommonStatus.DELETED, PatientFollowUpType.QUESTIONNAIRE, YesNoEnum.NO, null, followUpIds, null, 0, 0, 0, true
         );
-        List<Long> questionnaireIds = new ArrayList<>();
-        for (NursePatientFollowUpRecordBean tmp : followUpRecords) {
-            if (PatientFollowUpType.QUESTIONNAIRE.equals(tmp.getFollowUpType())) {
-                questionnaireIds.add(tmp.getRelativeQuestionnaireId());
-            }
-        }
-        Map<Long, QuestionnaireBean> usersQuestionnaires = questionnaireService.getQuestionnaireIdToBeanMapByIds(questionnaireIds);
-
-        List<QuestionnaireBean> returnVal = new ArrayList<>();
-        for (NursePatientFollowUpRecordBean tmp : followUpRecords) {
-            if (!PatientFollowUpType.QUESTIONNAIRE.equals(tmp.getFollowUpType())) {
-                continue;
-            }
-            QuestionnaireBean tmpQuestionnaire = usersQuestionnaires.get(tmp.getRelativeQuestionnaireId());
-
-            QuestionnaireBean tmpCloneQuestionnaire = tmpQuestionnaire.clone();
-            tmpCloneQuestionnaire.setProperties(QuestionnaireBean.FOLLOW_UP_RECORD, tmp);
-            returnVal.add(tmpCloneQuestionnaire);
-        }
-        return returnVal;
+        return followUpRecords;
     }
 }

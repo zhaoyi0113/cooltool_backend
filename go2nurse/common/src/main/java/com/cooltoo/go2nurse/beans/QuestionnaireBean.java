@@ -12,6 +12,8 @@ import java.util.*;
 public class QuestionnaireBean {
     public static final String FOLLOW_UP_RECORD = "follow_up";
 
+    private String from = "patient";
+
     private long id;
     private long categoryId;
     private String title;
@@ -163,6 +165,10 @@ public class QuestionnaireBean {
 
     public void setProperties(String key, Object value) {
         this.properties.put(key, value);
+    }
+
+    public String getFrom() {
+        return from;
     }
 
     public QuestionnaireBean clone() {
