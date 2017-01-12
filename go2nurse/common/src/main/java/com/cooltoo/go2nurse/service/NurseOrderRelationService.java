@@ -287,10 +287,10 @@ public class NurseOrderRelationService {
 
         // update order status
         ServiceOrderBean order = orderService.nurseFetchOrder(orderId, isAdminToDispatch);
-        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order dispatched by manager!");
-        notifierForAllModule.orderAlertToNurse360(entity.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to you!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), OrderStatus.parseString(order.getOrderStatus()), "order dispatched by manager!");
+        notifierForAllModule.orderAlertToNurse360(entity.getNurseId(), order.getId(), OrderStatus.parseString(order.getOrderStatus()), "order dispatched to you!");
         if (null!=original && original.getNurseId()!=nurseId) {
-            notifierForAllModule.orderAlertToNurse360(original.getNurseId(), order.getId(), order.getOrderStatus(), "order dispatched to other!");
+            notifierForAllModule.orderAlertToNurse360(original.getNurseId(), order.getId(), OrderStatus.parseString(order.getOrderStatus()), "order dispatched to other!");
         }
 
         NurseOrderRelationBean bean = beanConverter.convert(entity);
@@ -405,7 +405,7 @@ public class NurseOrderRelationService {
 
         // update order status
         ServiceOrderBean order = orderService.nurseFetchOrder(orderId, isAdminToDispatch);
-        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order fetched!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), OrderStatus.parseString(order.getOrderStatus()), "order fetched!");
 
 
         NurseOrderRelationBean bean = beanConverter.convert(entity);
@@ -449,7 +449,7 @@ public class NurseOrderRelationService {
 
         // update order status
         ServiceOrderBean order = orderService.nurseGiveUpOrder(orderId);
-        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), order.getOrderStatus(), "order be given up!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), order.getId(), OrderStatus.parseString(order.getOrderStatus()), "order be given up!");
 
         return nurseId;
     }

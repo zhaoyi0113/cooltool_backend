@@ -283,7 +283,7 @@ public class UserServiceOrderAPI {
                     List<String> managerMobile = nurseService.getManagerMobiles((int)vendorId, (int)departId);
                     notifierForAllModule.leanCloudRequestSmsCodeNewOrder(managerMobile, orderBean.getOrderNo());
                     List<Long> managerId = nurseService.getManagerId((int)vendorId, (int)departId);
-                    notifierForAllModule.newOrderToDispatchAlertToNurse360(managerId, orderBean.getId(), orderBean.getOrderStatus(), "new order created!!");
+                    notifierForAllModule.newOrderToDispatchAlertToNurse360(managerId, orderBean.getId(), OrderStatus.parseString(orderBean.getOrderStatus()), "new order created!!");
                 }
             }
             return message;
@@ -317,7 +317,7 @@ public class UserServiceOrderAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.cancelOrder(true, userId, orderId);
-        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse360(orderId, OrderStatus.parseString(order.getOrderStatus()), "order completed!");
         return Response.ok(order).build();
     }
 
@@ -330,7 +330,7 @@ public class UserServiceOrderAPI {
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         ServiceOrderBean order = orderService.completedOrder(true, userId, orderId);
-        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse360(orderId, OrderStatus.parseString(order.getOrderStatus()), "order completed!");
         nurseWalletService.orderCompleted(orderId);
         return Response.ok(order).build();
     }

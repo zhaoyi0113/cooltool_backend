@@ -158,8 +158,8 @@ public class ServiceOrderManageAPI {
                                 @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.cancelOrder(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order canceled!");
-        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order canceled!");
+        notifierForAllModule.orderAlertToNurse360(orderId, OrderStatus.parseString(order.getOrderStatus()), "order canceled!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, OrderStatus.parseString(order.getOrderStatus()), "order canceled!");
         return Response.ok(order).build();
     }
 
@@ -170,8 +170,8 @@ public class ServiceOrderManageAPI {
                                    @FormParam("order_id") @DefaultValue("0") long orderId
     ) {
         ServiceOrderBean order = orderService.completedOrder(false, -1, orderId);
-        notifierForAllModule.orderAlertToNurse360(orderId, order.getOrderStatus(), "order completed!");
-        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, order.getOrderStatus(), "order completed!");
+        notifierForAllModule.orderAlertToNurse360(orderId, OrderStatus.parseString(order.getOrderStatus()), "order completed!");
+        notifierForAllModule.orderAlertToGo2nurseUser(order.getUserId(), orderId, OrderStatus.parseString(order.getOrderStatus()), "order completed!");
         nurseWalletService.orderCompleted(orderId);
 
         return Response.ok(order).build();
@@ -225,7 +225,7 @@ public class ServiceOrderManageAPI {
             if (OrderStatus.WAIT_NURSE_FETCH.equals(order.getOrderStatus())) {
                 List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(null, YesNoEnum.YES.name(), null, hospitalId, departmentId, RegisterFrom.parseString(registerFrom));
                 List<Long> nursesId = getNurseIds(nurses);
-                notifierForAllModule.newOrderAlertToNurse360(nursesId, order.getId(), order.getOrderStatus(), "new order can fetch");
+                notifierForAllModule.newOrderAlertToNurse360(nursesId, order.getId(), OrderStatus.parseString(order.getOrderStatus()), "new order can fetch");
             }
             else {
                 logger.error("order status is {}, can not to fetch by nurse", order.getOrderStatus());
