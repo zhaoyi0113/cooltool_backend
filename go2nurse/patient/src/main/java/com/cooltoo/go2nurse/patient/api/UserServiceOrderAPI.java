@@ -200,7 +200,7 @@ public class UserServiceOrderAPI {
                 throw new BadRequestException(ErrorCode.USER_FORBIDDEN_BY_VENDOR);
             }
         }
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage, null);
         return Response.ok(order).build();
     }
 

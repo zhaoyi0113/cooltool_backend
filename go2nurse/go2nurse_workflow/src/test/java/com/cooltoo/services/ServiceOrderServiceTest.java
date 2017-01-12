@@ -254,7 +254,7 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         long lStartTime = NumberUtil.getTime(startTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         int count = 15;
         String leaveMessage = "message test";
-        ServiceOrderBean order = orderService.addOrder(itemId, userId, patientId, address, startTime, count, leaveMessage);
+        ServiceOrderBean order = orderService.addOrder(itemId, userId, patientId, address, startTime, count, leaveMessage, null);
         Assert.assertTrue(order.getId()>0);
         Assert.assertEquals(userId, order.getUserId());
         Assert.assertEquals(patientId, order.getPatientId());

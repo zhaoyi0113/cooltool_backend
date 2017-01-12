@@ -54,7 +54,7 @@ public class PingServiceOrderTestAPI {
         String body = "order description";
         String description = "order extra descritpion";
         String address = "order address";
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, 1, "this is a test order");
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, 1, "this is a test order", null);
         logger.info("service order "+order);
         Charge charge = orderService.payForService(userId, order.getId(), channel, ip);
 //        Charge charge = pingPPService.createCharge(orderNo, channel, amount, ip, subject, body, description);

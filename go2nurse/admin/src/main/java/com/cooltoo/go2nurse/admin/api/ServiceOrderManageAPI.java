@@ -244,9 +244,10 @@ public class ServiceOrderManageAPI {
                                 @FormParam("address")         @DefaultValue("") String address,
                                 @FormParam("start_time")      @DefaultValue("") String startTime,
                                 @FormParam("count")           @DefaultValue("0")   int count,
-                                @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage
+                                @FormParam("leave_a_message") @DefaultValue("") String leaveAMessage,
+                                @FormParam("order_status")    @DefaultValue("") String orderStatus
     ) {
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage, orderStatus);
         return Response.ok(order).build();
     }
 

@@ -207,9 +207,10 @@ public class HospitalOrderAPI {
                                         @RequestParam(defaultValue = "0", name = "address")         String address,
                                         @RequestParam(defaultValue = "0", name = "start_time")      String startTime,
                                         @RequestParam(defaultValue = "0", name = "count")              int count,
-                                        @RequestParam(defaultValue = "",  name = "leave_a_message") String leaveAMessage
+                                        @RequestParam(defaultValue = "",  name = "leave_a_message") String leaveAMessage,
+                                        @RequestParam(defaultValue = "",  name = "order_status")    String orderStatus
     ) {
-        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage);
+        ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage, orderStatus);
         return order;
     }
 

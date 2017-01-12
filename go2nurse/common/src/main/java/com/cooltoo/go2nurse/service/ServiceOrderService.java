@@ -799,9 +799,16 @@ public class ServiceOrderService {
     //============================================================================================
     @Transactional
     public ServiceOrderBean addOrder(long serviceItemId, long userId, long patientId, String address,
-                                     String strStartTime, int count, String leaveAMessage) {
-        logger.debug("add service order by serviceItemId={} userId={} patientId={} addressId={} strStartTime={} count={} leaveAMessage={}",
-                serviceItemId, userId, patientId, address, strStartTime, count, leaveAMessage);
+                                     String strStartTime, int count, String leaveAMessage, String orderStatus) {
+        logger.debug("add service order by serviceItemId={} userId={} patientId={} addressId={} strStartTime={} count={} leaveAMessage={} orderStatus={}",
+                serviceItemId, userId, patientId, address, strStartTime, count, leaveAMessage, orderStatus);
+
+        OrderStatus newOrderStatus = OrderStatus.parseString(orderStatus);
+        if (null!=newOrderStatus && !OrderStatus.TO_PAY.equals(newOrderStatus) && !OrderStatus.PAID.equals(newOrderStatus)) {
+            logger.error("new order status is not NULL, TO_PAY or PAID");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
         if (!serviceCategoryItemService.existItem(serviceItemId)) {
             logger.error("service item not exists");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -941,11 +948,15 @@ public class ServiceOrderService {
         entity.setOrderNo(orderNo);
         entity.setLeaveAMessage(leaveAMessage);
 
-        if (entity.getTotalPriceCent()-entity.getTotalDiscountCent() > 0) {
-            entity.setOrderStatus(OrderStatus.TO_PAY);
-        } else {
-            entity.setOrderStatus(OrderStatus.PAID);
+        entity.setOrderStatus(newOrderStatus);
+        if (null==newOrderStatus) {
+            if (entity.getTotalPriceCent() - entity.getTotalDiscountCent() > 0) {
+                entity.setOrderStatus(OrderStatus.TO_PAY);
+            } else {
+                entity.setOrderStatus(OrderStatus.PAID);
+            }
         }
+
         entity.setPayTime(new Date(0));
         entity.setPaymentAmountCent(0);
 
