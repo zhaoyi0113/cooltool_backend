@@ -29,6 +29,10 @@ public enum  OrderStatus {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public static OrderStatus parseString(String type) {
         OrderStatus ret = null;
         if (TO_PAY.name.equalsIgnoreCase(type)) {

@@ -103,7 +103,7 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
         bean.setTotalServerIncomeCent(source.getTotalIncomeCent());
         bean.setNeedVisitPatientRecord(source.getNeedVisitPatientRecord());
         bean.setOrderNo(source.getOrderNo());
-        bean.setOrderStatus(source.getOrderStatus());
+        bean.setOrderStatus(null!=source.getOrderStatus() ? source.getOrderStatus().getName() : "");
         bean.setPayTime(source.getPayTime());
         bean.setPaymentAmountCent(source.getPaymentAmountCent());
         bean.setLeaveAMessage(source.getLeaveAMessage());

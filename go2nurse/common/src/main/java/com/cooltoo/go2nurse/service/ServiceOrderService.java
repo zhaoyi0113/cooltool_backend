@@ -217,7 +217,7 @@ public class ServiceOrderService {
             if (null==entities) { continue; }
             ServiceOrderBean bean = beanConverter.convert(entity);
             if (null!=ordersCompleted && ordersCompleted.contains(bean.getId())) {
-                bean.setOrderStatus(OrderStatus.COMPLETED);
+                bean.setOrderStatus(OrderStatus.COMPLETED.getName());
             }
             bean.setProperty(ServiceOrderBean.FLAG, "order");
             beans.add(bean);

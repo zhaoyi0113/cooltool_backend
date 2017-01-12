@@ -61,7 +61,7 @@ public class ServiceOrderBean {
     private int totalServerIncomeCent;
     private YesNoEnum needVisitPatientRecord;
     private String orderNo;
-    private OrderStatus orderStatus;
+    private String orderStatus;
     private Date payTime;
     private String paymentAmount;
     private int paymentAmountCent;
@@ -210,7 +210,7 @@ public class ServiceOrderBean {
         return orderNo;
     }
 
-    public OrderStatus getOrderStatus() {
+    public String getOrderStatus() {
         return orderStatus;
     }
 
@@ -376,7 +376,7 @@ public class ServiceOrderBean {
         this.orderNo = orderNo;
     }
 
-    public void setOrderStatus(OrderStatus orderStatus) {
+    public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
 
