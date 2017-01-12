@@ -95,6 +95,14 @@ public class HospitalOrderAPI {
     //=============================================================
     //            Authentication of MANAGER Role
     //=============================================================
+    @RequestMapping(path = "/manager/order/delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public ServiceOrderBean deleteOrder(HttpServletRequest request,
+                                        @RequestParam(defaultValue = "0", name = "order_id") long orderId
+    ) {
+        ServiceOrderBean order = orderService.deleteOrder(false, -1, orderId);
+        return order;
+    }
+
     @RequestMapping(path = "/manager/order/cancel", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public ServiceOrderBean cancelOrder(HttpServletRequest request,
                                         @RequestParam(defaultValue = "0", name = "order_id") long orderId

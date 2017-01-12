@@ -1,6 +1,7 @@
 package com.cooltoo.services;
 
 import com.cooltoo.AbstractCooltooTest;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
@@ -200,6 +201,48 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         orderId = 278;
         clientIp = "127.0.0.1";
         charge = (Object)orderService.payForService(userId, orderId, channel, clientIp);
+    }
+
+    @Test
+    public void deleteOrder() {
+        long orderId = 276;
+        long userId = 1;
+        ServiceOrderBean order = null;
+        Throwable th = null;
+        try {
+            order = orderService.deleteOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
+
+        userId = 463;
+        th = null;
+        try {
+            order = orderService.deleteOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNull(th);
+        Assert.assertEquals(orderId, order.getId());
+        Assert.assertEquals(CommonStatus.DELETED, order.getStatus());
+
+        orderId = 279;
+        th = null;
+        try {
+            order = orderService.deleteOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
+
+        orderId = 280;
+        th = null;
+        try {
+            order = orderService.deleteOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
+
+        orderId = 282;
+        th = null;
+        try {
+            order = orderService.deleteOrder(true, userId, orderId);
+        } catch (Exception ex) { th = ex; }
+        Assert.assertNotNull(th);
     }
 
     @Test

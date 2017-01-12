@@ -618,6 +618,35 @@ public class ServiceOrderService {
     }
 
     @Transactional
+    public ServiceOrderBean deleteOrder(boolean checkUser, long userId, long orderId) {
+        logger.info("delete order={} by user={} checkFlag={}", orderId, userId, checkUser);
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null == entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (checkUser) {
+            if (entity.getUserId() != userId) {
+                logger.error("order not belong to user");
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+        }
+
+        // only REFUND_IN_PROCESS / IN_PROCESS / WAIT_NURSE_FETCH / PAID can not be deleted
+        if (OrderStatus.REFUND_IN_PROCESS.equals(entity.getOrderStatus())
+                && OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
+                && OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
+                && OrderStatus.PAID.equals(entity.getOrderStatus())) {
+            logger.info("the order is in status={}, can not be deleted", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        entity.setStatus(CommonStatus.DELETED);
+        entity = repository.save(entity);
+        logger.info("order deleted is {}", entity);
+
+        return beanConverter.convert(entity);
+    }
+
+    @Transactional
     public ServiceOrderBean refundFeeOfOrder(boolean checkUser, long userId, long orderId) {
         logger.info("refund fee of order={} by user={} checkFlag={}", orderId, userId, checkUser);
         ServiceOrderEntity entity = repository.findOne(orderId);

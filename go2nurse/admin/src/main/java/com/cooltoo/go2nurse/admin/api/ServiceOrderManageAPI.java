@@ -151,6 +151,16 @@ public class ServiceOrderManageAPI {
         return Response.ok(orders.get(0)).build();
     }
 
+    @Path("/delete")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteOrder(@Context HttpServletRequest request,
+                                @FormParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        ServiceOrderBean order = orderService.deleteOrder(false, -1, orderId);
+        return Response.ok(order).build();
+    }
+
     @Path("/cancel")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
