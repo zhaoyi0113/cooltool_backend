@@ -272,7 +272,7 @@ public class UserServiceOrderAPI {
             return null;
         }
         else {
-            if (null!=order && (order instanceof ServiceOrderBean) && OrderStatus.PAID.equals(((ServiceOrderBean)order).getOrderStatus())) {
+            if (null!=order && (order instanceof ServiceOrderBean) && OrderStatus.PAID.equals(OrderStatus.parseString(((ServiceOrderBean)order).getOrderStatus()))) {
                 ServiceOrderBean orderBean = (ServiceOrderBean)order;
                 // notifierForAllModule.orderAlertToGo2nurseUser(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
                 // need send message to Manager

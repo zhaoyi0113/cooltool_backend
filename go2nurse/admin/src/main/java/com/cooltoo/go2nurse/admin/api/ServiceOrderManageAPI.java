@@ -222,13 +222,13 @@ public class ServiceOrderManageAPI {
         List<ServiceOrderBean> orders = orderService.getOrderByOrderId(orderId);
         if (null!=orders && !orders.isEmpty()) {
             ServiceOrderBean order = orders.get(0);
-            if (OrderStatus.WAIT_NURSE_FETCH.equals(order.getOrderStatus())) {
+            if (OrderStatus.WAIT_NURSE_FETCH.equals(OrderStatus.parseString(order.getOrderStatus()))) {
                 List<NurseBean> nurses = nurseService.getNurseByCanAnswerQuestion(null, YesNoEnum.YES.name(), null, hospitalId, departmentId, RegisterFrom.parseString(registerFrom));
                 List<Long> nursesId = getNurseIds(nurses);
                 notifierForAllModule.newOrderAlertToNurse360(nursesId, order.getId(), OrderStatus.parseString(order.getOrderStatus()), "new order can fetch");
             }
             else {
-                logger.error("order status is {}, can not to fetch by nurse", order.getOrderStatus());
+                logger.error("order status is {}, can not to fetch by nurse", OrderStatus.parseString(order.getOrderStatus()));
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }

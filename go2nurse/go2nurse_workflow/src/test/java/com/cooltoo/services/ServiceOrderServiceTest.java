@@ -220,7 +220,7 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         } catch (Exception ex) { th = ex; }
         Assert.assertNull(th);
         Assert.assertEquals(orderId, order.getId());
-        Assert.assertEquals(OrderStatus.CANCELLED, order.getOrderStatus());
+        Assert.assertEquals(OrderStatus.CANCELLED, OrderStatus.parseString(order.getOrderStatus()));
 
         orderId = 279;
         th = null;
