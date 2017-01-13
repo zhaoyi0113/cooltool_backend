@@ -211,41 +211,34 @@ public class HospitalNurseAPI {
     //===============================================================
 
     @RequestMapping(path = "/nurse/authorization", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
-    public NurseAuthorizationBean editNurseAuthorization(HttpServletRequest request,
+    public boolean editNurseAuthorization(HttpServletRequest request,
                                                          @RequestParam(defaultValue = "0", name = "nurse_id")            long nurseId,
                                                          @RequestParam(defaultValue = "",  name = "auth_order")        String authOrderHeadNurse,
                                                          @RequestParam(defaultValue = "",  name = "auth_notification") String authNotificationHeadNurse,
-                                                         @RequestParam(defaultValue = "",  name = "auth_consultation") String authConsultationHeadNurse
+                                                         @RequestParam(defaultValue = "",  name = "auth_consultation") String authConsultationHeadNurse,
+                                                         @RequestParam(defaultValue = "",  name = "approval")          String headNurseApproval
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         if (userDetails.isNurseManager() || userDetails.isAdmin()) {
             UserAuthority authOrder  = UserAuthority.parseString(authOrderHeadNurse);
             UserAuthority authNotify = UserAuthority.parseString(authNotificationHeadNurse);
             UserAuthority authConsul = UserAuthority.parseString(authConsultationHeadNurse);
-            return nurseAuthorizationService.setAuthorization(nurseId, authOrder, null, authNotify, authConsul, null);
-        }
-        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
-    }
+            if (null!=authOrder || null!=authNotify || null!=authConsul) {
+                nurseAuthorizationService.setAuthorization(nurseId, authOrder, null, authNotify, authConsul, null);
+            }
 
-    @RequestMapping(path = "/nurse/belong-to-us", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
-    public YesNoEnum setNurseBelongToDepartmentOrNot(HttpServletRequest request,
-                                                     @RequestParam(defaultValue = "0",   name = "nurse_id")   long nurseId,
-                                                     @RequestParam(defaultValue = "NONE",name = "approval") String strApproval
-    ) {
-        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        if (userDetails.isNurseManager() || userDetails.isAdmin()) {
+
+            YesNoEnum approval = YesNoEnum.parseString(headNurseApproval);
             NurseHospitalRelationBean nurseHospitalRelation = nurseHospitalRelationService.getRelationByNurseId(nurseId, "");
-            if (userDetails.isNurseManager() && null!=nurseHospitalRelation) {
-                Integer hospitalId = (Integer) userDetails.getProperty(HospitalAdminUserDetails.HOSPITAL_ID);
-                Integer departmentId = (Integer) userDetails.getProperty(HospitalAdminUserDetails.DEPARTMENT_ID);
-                if (hospitalId != nurseHospitalRelation.getHospitalId()
-                        || departmentId != nurseHospitalRelation.getDepartmentId()) {
+            if (null!=approval && userDetails.isNurseManager() && null!=nurseHospitalRelation) {
+                Integer   hospitalId   = (Integer) userDetails.getProperty(HospitalAdminUserDetails.HOSPITAL_ID);
+                Integer   departmentId = (Integer) userDetails.getProperty(HospitalAdminUserDetails.DEPARTMENT_ID);
+                if (hospitalId != nurseHospitalRelation.getHospitalId() || departmentId != nurseHospitalRelation.getDepartmentId()) {
                     throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
                 }
+                nurseHospitalRelationService.approvalRelation(nurseId, approval);
             }
-            YesNoEnum approval  = YesNoEnum.parseString(strApproval);
-            nurseHospitalRelationService.approvalRelation(nurseId, approval);
-            return approval;
+            return true;
         }
         throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
