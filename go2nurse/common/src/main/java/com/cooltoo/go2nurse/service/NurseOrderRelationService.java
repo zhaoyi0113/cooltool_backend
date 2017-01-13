@@ -107,6 +107,7 @@ public class NurseOrderRelationService {
                 hospitalId,
                 departmentId,
                 ManagedBy.COOLTOO,
+                CommonStatus.parseString(strStatus),
                 pageIndex, sizePerPage);
 
         List<Long> orderId = repository.findOrderIdByNurseId(nurseId);
@@ -155,7 +156,7 @@ public class NurseOrderRelationService {
         logger.info("count orders by nurseId={} with status={} and orderStatus={}", nurseId, strStatus, orderStatus);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Long> resultSet = repository.findByNurseIdAndStatus(nurseId, status, sort);
-        List<Long> orderIdExisted = orderService.isOrderIdExisted(resultSet, orderStatus);
+        List<Long> orderIdExisted = orderService.isOrderIdExisted(resultSet, orderStatus, status);
 
         return VerifyUtil.isListEmpty(orderIdExisted) ? 0 : orderIdExisted.size();
     }
@@ -164,7 +165,7 @@ public class NurseOrderRelationService {
         logger.info("get orders by nurseId={} with status={} and orderStatus={} at index={} number={}", nurseId, strStatus, orderStatus, pageIndex, sizePerPage);
         CommonStatus status = CommonStatus.parseString(strStatus);
         List<Long> resultSet = repository.findByNurseIdAndStatus(nurseId, status, sort);
-        List<Long> orderIdExisted = orderService.isOrderIdExisted(resultSet, orderStatus);
+        List<Long> orderIdExisted = orderService.isOrderIdExisted(resultSet, orderStatus, status);
         List<Long> orderIdExistedSorted = new ArrayList<>();
         if (!VerifyUtil.isListEmpty(resultSet)) {
             for (Long tmp : resultSet) {
@@ -217,7 +218,7 @@ public class NurseOrderRelationService {
                         completedOrderIds.add(tmp.getOrderId());
                     }
                 }
-                completedOrderIds = orderService.isOrderIdExisted(completedOrderIds, OrderStatus.COMPLETED);
+                completedOrderIds = orderService.isOrderIdExisted(completedOrderIds, OrderStatus.COMPLETED, status);
                 for (NurseOrderRelationEntity tmp : resultSet) {
                     String key = tmp.getNurseId()+"_"+tmp.getOrderId();
                     if (nurseOrder.contains(key)) {

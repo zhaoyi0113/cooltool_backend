@@ -63,7 +63,7 @@ public class HospitalOrderAPI {
                 ServiceVendorType.parseString(strVendorType),
                 hospitalId,
                 departmentId,
-                OrderStatus.parseString(strOrderStatus));
+                OrderStatus.parseString(strOrderStatus), CommonStatus.ENABLED);
         return count;
     }
 
@@ -85,7 +85,7 @@ public class HospitalOrderAPI {
                 ServiceVendorType.parseString(strVendorType),
                 hospitalId,
                 departmentId,
-                OrderStatus.parseString(strOrderStatus),
+                OrderStatus.parseString(strOrderStatus), CommonStatus.ENABLED,
                 index, number);
         setOrderWaitStaff(orders);
         return orders;
@@ -251,7 +251,7 @@ public class HospitalOrderAPI {
                 userId, patientId,
                 null, null,
                 ServiceVendorType.HOSPITAL, hospitalId, departmentId,
-                OrderStatus.parseString(strOrderStatus));
+                OrderStatus.parseString(strOrderStatus), CommonStatus.ENABLED);
         return count;
     }
 
@@ -273,7 +273,7 @@ public class HospitalOrderAPI {
                 userId, patientId,
                 null, null,
                 ServiceVendorType.HOSPITAL, hospitalId, departmentId,
-                OrderStatus.parseString(strOrderStatus),
+                OrderStatus.parseString(strOrderStatus), CommonStatus.ENABLED,
                 index, number);
         setOrderWaitStaff(orders);
         return orders;
@@ -328,7 +328,7 @@ public class HospitalOrderAPI {
                     ServiceVendorType.HOSPITAL,
                     hospitalId,
                     departmentId,
-                    OrderStatus.parseString(strOrderStatus));
+                    OrderStatus.parseString(strOrderStatus), CommonStatus.ENABLED);
             return count;
         }
         return 0;
@@ -360,7 +360,7 @@ public class HospitalOrderAPI {
                     ServiceVendorType.HOSPITAL,
                     hospitalId,
                     departmentId,
-                    OrderStatus.parseString(strOrderStatus),
+                    OrderStatus.parseString(strOrderStatus), CommonStatus.ENABLED,
                     index, number);
             setOrderWaitStaff(orders);
             return orders;

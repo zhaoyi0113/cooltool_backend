@@ -109,12 +109,12 @@ public class ServiceOrderService {
         return beans;
     }
 
-    public List<Long> isOrderIdExisted(List<Long> orderIds, OrderStatus orderStatus) {
+    public List<Long> isOrderIdExisted(List<Long> orderIds, OrderStatus orderStatus, CommonStatus status) {
         if (VerifyUtil.isListEmpty(orderIds)) {
             return new ArrayList<>();
         }
         logger.info("get service order id by orderId size={} and orderStatus={}", orderIds.size(), orderStatus);
-        List<Long> resultSet = repository.findByIdInAndOrderStatus(orderIds, orderStatus);
+        List<Long> resultSet = repository.findByIdInAndOrderStatus(orderIds, orderStatus, status);
         if (null == resultSet) {
             resultSet = new ArrayList<>();
         }
@@ -135,11 +135,12 @@ public class ServiceOrderService {
     public long countOrderByConditions(Long serviceItemId, Long userId, Long patientId,
                                        Long categoryId, Long topCategoryId,
                                        ServiceVendorType vendorType, Long vendorId, Long vendorDepartId,
-                                       OrderStatus orderStatus
+                                       OrderStatus orderStatus,
+                                       CommonStatus status
     ) {
         logger.info("get order by userId={} patientId={} itemId={} categoryId={} topCategoryId={} vendorType={} vendorId={} vendorDepartId={} orderStatus={}",
                 userId, patientId, serviceItemId, categoryId, topCategoryId, vendorType, vendorId, vendorDepartId, orderStatus);
-        long count = repository.countByConditions(serviceItemId, userId, patientId, categoryId, topCategoryId, orderStatus, vendorType, vendorId, vendorDepartId);
+        long count = repository.countByConditions(serviceItemId, userId, patientId, categoryId, topCategoryId, orderStatus, vendorType, vendorId, vendorDepartId, status);
         logger.info("count is {}", count);
         return count;
     }
@@ -148,12 +149,13 @@ public class ServiceOrderService {
                                                        Long categoryId, Long topCategoryId,
                                                        ServiceVendorType vendorType, Long vendorId, Long vendorDepartId,
                                                        OrderStatus orderStatus,
+                                                       CommonStatus status,
                                                        int pageIndex, int sizePerPage
     ) {
         logger.info("get order by userId={} patientId={} itemId={} categoryId={} topCategoryId={} vendorType={} vendorId={} vendorDepartId={} orderStatus={} pageIndex={} sizePerPage={}",
                 userId, patientId, serviceItemId, categoryId, topCategoryId, vendorType, vendorId, vendorDepartId, orderStatus, pageIndex, sizePerPage);
         PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<ServiceOrderEntity> entities = repository.findByConditions(serviceItemId, userId, patientId, categoryId, topCategoryId, orderStatus, vendorType, vendorId, vendorDepartId, pageRequest);
+        Page<ServiceOrderEntity> entities = repository.findByConditions(serviceItemId, userId, patientId, categoryId, topCategoryId, orderStatus, vendorType, vendorId, vendorDepartId, status, pageRequest);
         List<ServiceOrderBean> beans = entitiesToBeans(entities);
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
@@ -163,6 +165,7 @@ public class ServiceOrderService {
     public List<ServiceOrderBean> getOrderByConditions(List<OrderStatus> orderStatus,
                                                        ServiceVendorType vendorType, Long vendorId, Long departId,
                                                        ManagedBy managedBy,
+                                                       CommonStatus status,
                                                        int pageIndex, int sizePerPage
     ) {
         logger.info("get order by orderStatus={} vendorType={} vendorId={} departId={} managedBy={} at pageIndex={} sizePerPage={}",
@@ -171,9 +174,9 @@ public class ServiceOrderService {
         Page<ServiceOrderEntity> entities = null;
         if (!VerifyUtil.isListEmpty(orderStatus)) {
             if (null == vendorType) {
-                entities = repository.findByConditions(orderStatus, managedBy, pageRequest);
+                entities = repository.findByConditions(orderStatus, managedBy, status, pageRequest);
             } else {
-                entities = repository.findByConditions(orderStatus, vendorType, vendorId, departId, managedBy, pageRequest);
+                entities = repository.findByConditions(orderStatus, vendorType, vendorId, departId, managedBy, status, pageRequest);
             }
         }
         List<ServiceOrderBean> beans = entitiesToBeans(entities);
@@ -196,9 +199,9 @@ public class ServiceOrderService {
         return beans;
     }
 
-    public List<ServiceOrderBean> getOrderByUserId(long userId) {
-        logger.info("get service order by userId={}", userId);
-        List<ServiceOrderEntity> entities = repository.findByUserId(userId, sort);
+    public List<ServiceOrderBean> getOrderByUserId(long userId, CommonStatus status) {
+        logger.info("get service order by userId={} status={}", userId, status);
+        List<ServiceOrderEntity> entities = repository.findByUserIdAndStatus(userId, status, sort);
         List<ServiceOrderBean> beans = entitiesToBeans(entities);
         fillOtherProperties(beans);
         logger.info("service order count is {}", beans.size());

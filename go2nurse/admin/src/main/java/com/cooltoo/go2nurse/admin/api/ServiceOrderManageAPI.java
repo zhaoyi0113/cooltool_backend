@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.*;
@@ -74,7 +75,7 @@ public class ServiceOrderManageAPI {
         }
 
         OrderStatus orderStatus = OrderStatus.parseString(strOrderStatus);
-        long count = orderService.countOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorType, vendorId, vendorDepartId, orderStatus);
+        long count = orderService.countOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorType, vendorId, vendorDepartId, orderStatus, CommonStatus.ENABLED);
         return Response.ok(count).build();
     }
 
@@ -109,7 +110,7 @@ public class ServiceOrderManageAPI {
         }
 
         OrderStatus orderStatus = OrderStatus.parseString(strOrderStatus);
-        List<ServiceOrderBean> orders = orderService.getOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorType, vendorId, vendorDepartId, orderStatus, pageIndex, sizePerPage);
+        List<ServiceOrderBean> orders = orderService.getOrderByConditions(itemId, userId, patientId, categoryId, topCategoryId, vendorType, vendorId, vendorDepartId, orderStatus, CommonStatus.ENABLED, pageIndex, sizePerPage);
         return Response.ok(orders).build();
     }
 
@@ -119,7 +120,7 @@ public class ServiceOrderManageAPI {
     public Response getServiceOrderByUser(@Context HttpServletRequest request,
                                           @QueryParam("user_id") @DefaultValue("0") long userId
     ) {
-        List<ServiceOrderBean> orders = orderService.getOrderByUserId(userId);
+        List<ServiceOrderBean> orders = orderService.getOrderByUserId(userId, CommonStatus.ENABLED);
         return Response.ok(orders).build();
     }
 

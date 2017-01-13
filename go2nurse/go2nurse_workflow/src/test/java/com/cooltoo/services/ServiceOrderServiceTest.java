@@ -59,16 +59,16 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         long categoryId = 204;
         long topCategoryId = 200;
         OrderStatus orderStatus = OrderStatus.CANCELLED;
-        long count = orderService.countOrderByConditions(null, userId, null, null, null, null, null, null, null);
+        long count = orderService.countOrderByConditions(null, userId, null, null, null, null, null, null, null, null);
         Assert.assertEquals(4, count);
 
-        count = orderService.countOrderByConditions(null, null,null,  categoryId, null, null, null, null, null);
+        count = orderService.countOrderByConditions(null, null,null,  categoryId, null, null, null, null, null, null);
         Assert.assertEquals(3, count);
 
-        count = orderService.countOrderByConditions(null, null, null, null, topCategoryId, null, null, null, null);
+        count = orderService.countOrderByConditions(null, null, null, null, topCategoryId, null, null, null, null, null);
         Assert.assertEquals(6, count);
 
-        count = orderService.countOrderByConditions(null, null, null, null, null, null, null, null, orderStatus);
+        count = orderService.countOrderByConditions(null, null, null, null, null, null, null, null, orderStatus, null);
         Assert.assertEquals(0, count);
     }
 
@@ -78,20 +78,20 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         long categoryId = 204;
         long topCategoryId = 200;
         OrderStatus orderStatus = OrderStatus.CANCELLED;
-        List<ServiceOrderBean> beans = orderService.getOrderByConditions(null, userId, null, null, null, null, null, null, null, 0, 10);
+        List<ServiceOrderBean> beans = orderService.getOrderByConditions(null, userId, null, null, null, null, null, null, null, null, 0, 10);
         Assert.assertEquals(4, beans.size());
         Assert.assertEquals(283, beans.get(0).getId());
         Assert.assertEquals(282, beans.get(1).getId());
         Assert.assertEquals(280, beans.get(2).getId());
         Assert.assertEquals(279, beans.get(3).getId());
 
-        beans = orderService.getOrderByConditions(null, null, null, categoryId, null, null, null, null, null, 0, 10);
+        beans = orderService.getOrderByConditions(null, null, null, categoryId, null, null, null, null, null, null, 0, 10);
         Assert.assertEquals(3, beans.size());
         Assert.assertEquals(278, beans.get(0).getId());
         Assert.assertEquals(277, beans.get(1).getId());
         Assert.assertEquals(276, beans.get(2).getId());
 
-        beans = orderService.getOrderByConditions(null, null, null, null, topCategoryId, null, null, null, null, 0, 10);
+        beans = orderService.getOrderByConditions(null, null, null, null, topCategoryId, null, null, null, null, null, 0, 10);
         Assert.assertEquals(6, beans.size());
         Assert.assertEquals(283, beans.get(0).getId());
         Assert.assertEquals(280, beans.get(1).getId());
@@ -100,7 +100,7 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(277, beans.get(4).getId());
         Assert.assertEquals(276, beans.get(5).getId());
 
-        beans = orderService.getOrderByConditions(null, null, null, null, null, null, null, null, orderStatus, 0, 10);
+        beans = orderService.getOrderByConditions(null, null, null, null, null, null, null, null, orderStatus, null, 0, 10);
         Assert.assertEquals(0, beans.size());
     }
 
@@ -115,7 +115,7 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
     @Test
     public void getOrderByUserId() {
         long userId = 452;
-        List<ServiceOrderBean> beans = orderService.getOrderByUserId(userId);
+        List<ServiceOrderBean> beans = orderService.getOrderByUserId(userId, null);
         Assert.assertEquals(4, beans.size());
         Assert.assertEquals(283, beans.get(0).getId());
         Assert.assertEquals(282, beans.get(1).getId());
