@@ -32,7 +32,7 @@ public class JSONUtil {
             return returnValue;
         }
         catch (Exception ex) {
-            logger.error("parse the json list error, json={}, class={}", content, clazz);
+            logger.warn("parse the json list error, json={}, class={}", content, clazz);
             return (T) new ArrayList<T>();
         }
     }
