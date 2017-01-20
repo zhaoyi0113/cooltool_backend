@@ -25,6 +25,7 @@ import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.JSONUtil;
 import com.cooltoo.util.NumberUtil;
+import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -342,7 +343,9 @@ public class HospitalVisitPatientAPI {
     @RequestMapping(path = "/visit/patient/pdf", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public Map<String, List<String>> makePdfVisitPatientRecord(HttpServletRequest request,
                                                                @RequestParam(defaultValue = "0", name = "user_id") long userId,
-                                                               @RequestParam(defaultValue = "0", name = "patient_id") long patientId
+                                                               @RequestParam(defaultValue = "0", name = "patient_id") long patientId,
+                                                               @RequestParam(defaultValue = "0", name = "index") int pageIndex,
+                                                               @RequestParam(defaultValue = "0", name = "index") int sizePerPage
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
@@ -359,7 +362,8 @@ public class HospitalVisitPatientAPI {
                         Arrays.asList(new String[]{userId+"_"+patientId}),
                         true,
                         nurse360Utility.getHttpPrefix());
-                map.put("pdf_url", dirAndUrls.get(userId+"_"+patientId));
+                List<String> urls = dirAndUrls.get(userId+"_"+patientId);
+                map.put("pdf_url", SetUtil.newInstance().getSetByPage(urls, pageIndex, sizePerPage, null));
                 return map;
             }
 
@@ -400,7 +404,8 @@ public class HospitalVisitPatientAPI {
                             true,
                             nurse360Utility.getHttpPrefix());
 
-                    map.put("pdf_url", dirAndUrls.get(userId+"_"+patientId));
+                    List<String> urls = dirAndUrls.get(userId+"_"+patientId);
+                    map.put("pdf_url", SetUtil.newInstance().getSetByPage(urls, pageIndex, sizePerPage, null));
                     return map;
                 }
             }
