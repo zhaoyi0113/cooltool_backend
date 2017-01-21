@@ -93,13 +93,27 @@ public class CommonNurseService {
         return entities;
     }
 
-    public Iterable<NurseEntity> getNurseByIds(List<Long> userIds, int pageIndex, int sizePerPage) {
-        logger.info("get nurse by ids={}", userIds);
-        if (VerifyUtil.isListEmpty(userIds)) {
+    public Iterable<NurseEntity> getNurseByIds(List<Long> nurseIds, int pageIndex, int sizePerPage) {
+        logger.info("get nurse by ids={}", nurseIds);
+        if (VerifyUtil.isListEmpty(nurseIds)) {
             return new ArrayList<>();
         }
         PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
-        Page<NurseEntity> entities = nurseRepository.findByIdIn(userIds, page);
+        Page<NurseEntity> entities = nurseRepository.findByIdIn(nurseIds, page);
+        if (null==entities) {
+            return new ArrayList<>();
+        }
+        return entities;
+    }
+
+    public Iterable<NurseEntity> getNurseByNameAndIds(UserAuthority userAuthority, String fuzzyName, List<Long> nurseIds, int pageIndex, int sizePerPage) {
+        logger.info("get nurse by authority={} fuzzyName={} ids={} at page={} size={}",
+                userAuthority, fuzzyName, null==nurseIds ? 0 : nurseIds.size(), pageIndex, sizePerPage);
+        if (VerifyUtil.isListEmpty(nurseIds)) {
+            return new ArrayList<>();
+        }
+        PageRequest page = new PageRequest(pageIndex, sizePerPage, sort);
+        Page<NurseEntity> entities = nurseRepository.findByNameAndIdIn(userAuthority, fuzzyName, nurseIds, page);
         if (null==entities) {
             return new ArrayList<>();
         }

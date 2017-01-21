@@ -2,10 +2,7 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
-import com.cooltoo.constants.CommonStatus;
-import com.cooltoo.constants.ContextKeys;
-import com.cooltoo.constants.RegisterFrom;
-import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.constants.*;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.service.DenyPatientService;
 import com.cooltoo.go2nurse.service.NurseAuthorizationJudgeService;
@@ -90,7 +87,7 @@ public class NurseAPIForPatient {
                 YesNoEnum.YES);
         List<Long> patientsNurseIds = nursePatientRelationService.getNurseIdByPatientId(userId, null, CommonStatus.ENABLED);
         nursesId = SetUtil.newInstance().mergeListValue(nursesId, patientsNurseIds);
-        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByIds(nursesId, index, number);
+        List<NurseBean> nurses = nurseServiceForGo2Nurse.getNurseByNameAndIds(UserAuthority.AGREE_ALL, query, nursesId, index, number);
         return Response.ok(nurses).build();
     }
 

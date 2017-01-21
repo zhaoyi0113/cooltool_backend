@@ -100,6 +100,16 @@ public class NurseServiceForGo2Nurse {
         return beans;
     }
 
+    public List<NurseBean> getNurseByNameAndIds(UserAuthority userAuthority, String fuzzyName, List<Long> nurseIds, int pageIndex, int sizePerPage) {
+        logger.info("get nurse by nurseId={}", nurseIds);
+        fuzzyName = (VerifyUtil.isStringEmpty(fuzzyName)) ? null : VerifyUtil.reconstructSQLContentLike(fuzzyName);
+        Iterable<NurseEntity> nurses = commonNurseService.getNurseByNameAndIds(userAuthority, fuzzyName, nurseIds, pageIndex, sizePerPage);
+        List<NurseBean> beans = entitiesToBeans(nurses);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     public String getNurseMobile(long nurseId) {
         String mobile = commonNurseService.getNurseMobile(nurseId);
         return mobile;
@@ -148,7 +158,7 @@ public class NurseServiceForGo2Nurse {
 
     public List<Long> getNurseIdByQueryString(YesNoEnum canAnswerNursingQuestion, String name, YesNoEnum isExpert) {
         logger.info("get nurse can answer questions");
-        List<Long> nurses = commonNurseService.getNurseCanAnswerConsultationId(canAnswerNursingQuestion, isExpert, name, name, name);
+        List<Long> nurses = commonNurseService.getNurseCanAnswerConsultationId(canAnswerNursingQuestion, isExpert, name, null, null);
         logger.info("count is {}", nurses.size());
         return nurses;
     }

@@ -37,6 +37,12 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
     List<NurseEntity> findByIdIn(List<Long> ids);
     Page<NurseEntity> findByIdIn(List<Long> ids, Pageable page);
 
+    @Query("SELECT n FROM NurseEntity n" +
+            " WHERE (?1 IS NULL OR ?1=n.authority)" +
+            " AND   (?2 IS NULL OR (n.realName LIKE %?2) OR (n.name LIKE %?2))" +
+            " AND   (n.id IN (?3))")
+    Page<NurseEntity> findByNameAndIdIn(UserAuthority authority, String fuzzyName, List<Long> ids, Pageable page);
+
 //=========================================================
 // query nurse by realName or hospitalId or departmentId
 //=========================================================
@@ -51,7 +57,7 @@ public interface NurseRepository extends JpaRepository<NurseEntity, Long> {
             " WHERE (n.authority=?1)" +
             " AND   (?2 IS NULL OR ne.answerNursingQuestion=?2)" +
             " AND   (?6 IS NULL OR ne.isExpert=?6)" +
-            " AND   ((?3 IS NULL OR n.realName LIKE %?3) OR (nhr.hospitalId IN (?4)) OR (nhr.departmentId IN (?5)))")
+            " AND   ((?3 IS NULL OR n.realName LIKE %?3 OR n.name LIKE %?3) OR (nhr.hospitalId IN (?4)) OR (nhr.departmentId IN (?5)))")
     List<Long> findNurseIdByQueryString(UserAuthority authority, YesNoEnum answerNursingQuestion, String fuzzyName, List<Integer> hospitalId, List<Integer> departmentId, YesNoEnum isExpert, Sort sort);
 
     //==================================================================
