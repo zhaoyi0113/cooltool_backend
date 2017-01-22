@@ -2,7 +2,6 @@ package com.cooltoo.nurse360.service.file;
 
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,6 +132,54 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
     }
 
     /**
+     * get files (which end with relative path in its storage)
+     * @param filePath deleted file paths, path format is
+     *                  userId_patientId_pageIndex_
+     */
+    public List<PageFile> getFileAfterRecord(String filePath, long recordId) {
+        Map<String, List<String>> dirAndFiles = parseFilePath(Arrays.asList(new String[]{filePath}));
+        Map<String, List<PageFile>> dirAndPageFiles = parsePageFile(dirAndFiles, false);
+
+        String dir = filePath + File.separator;
+        List<PageFile> pageFiles = dirAndPageFiles.get(dir);
+
+        List<PageFile> pagesAfterRecordId = new ArrayList<>();
+
+        for (PageFile page : pageFiles) {
+            if (page.containRecord(recordId)>=0) {
+                pagesAfterRecordId.add(page);
+            }
+        }
+        return pagesAfterRecordId;
+    }
+
+    /**
+     * update file paths(which end with relative path in its storage)
+     * @param filePath deleted file paths, path format is
+     *                  userId_patientId_pageIndex_
+     */
+    public PageFile getLastFile(String filePath) {
+        Map<String, List<String>> dirAndFiles = parseFilePath(Arrays.asList(new String[]{filePath}));
+        Map<String, List<PageFile>> dirAndPageFiles = parsePageFile(dirAndFiles, false);
+
+        String dir = filePath + File.separator;
+        List<PageFile> pageFiles = dirAndPageFiles.get(dir);
+
+        PageFile lastPage = null;
+        for (PageFile page : pageFiles) {
+            if (null==lastPage) {
+                lastPage = page;
+                continue;
+            }
+
+            if (lastPage.pageIndex<page.pageIndex) {
+                lastPage = page;
+            }
+        }
+        return lastPage;
+    }
+
+    /**
      * get file paths(which end with relative path in its storage)
      * @param filePaths deleted file paths, path format is
      *                  userId_patientId_pageIndex_
@@ -191,11 +238,17 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
             File[] files = destDir.listFiles(new FileFilter() {
                 @Override
                 public boolean accept(File pathname) {
+                    if (null==pathname) {
+                        return false;
+                    }
                     String name = pathname.getName();
-                    int pageIndex = name.indexOf("_");
+                    if (!name.matches("^\\d+_\\d+_\\d+_\\d+_\\d+$")) {
+                        return false;
+                    }
                     if (fillEmpty) {
                         return true;
                     }
+                    int pageIndex = name.indexOf("_");
                     if (pageIndex>=1) {
                         return pageIndexPrefix.contains(name.substring(0, pageIndex+1));
                     }
@@ -344,9 +397,9 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
 
     class PageFile {
         int pageIndex = -1;
-        int firstRecord = -1;
+        int firstRecordId = -1;
         int firstLine = -1;
-        int secondRecord = -1;
+        int secondRecordId = -1;
         int secondLine= -1;
         String fileName = "";
         File file = null;
@@ -360,12 +413,25 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
             String[] nameParts = this.fileName.split("_");
             if (nameParts.length==5) {
                 pageIndex = VerifyUtil.parseIntIds(nameParts[0]).get(0);
-                firstRecord = VerifyUtil.parseIntIds(nameParts[1]).get(0);
+                firstRecordId = VerifyUtil.parseIntIds(nameParts[1]).get(0);
                 firstLine = VerifyUtil.parseIntIds(nameParts[2]).get(0);
-                secondRecord = VerifyUtil.parseIntIds(nameParts[3]).get(0);
+                secondRecordId = VerifyUtil.parseIntIds(nameParts[3]).get(0);
                 secondLine = VerifyUtil.parseIntIds(nameParts[4]).get(0);
             }
 
+        }
+
+        public int containRecord(long recordId) {
+            if (secondRecordId<recordId) {
+                return -1;
+            }
+            if (firstRecordId<=recordId && recordId<=secondRecordId) {
+                return 0;
+            }
+            if (firstRecordId>recordId) {
+                return 1;
+            }
+            return -1;
         }
     }
 

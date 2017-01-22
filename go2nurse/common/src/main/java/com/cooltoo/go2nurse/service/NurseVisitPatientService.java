@@ -34,9 +34,12 @@ public class NurseVisitPatientService {
 
     private static final Logger logger = LoggerFactory.getLogger(NurseVisitPatientService.class);
 
-    private static final Sort sort = new Sort(
+    public static final Sort SORT_TIME_ID_DESC = new Sort(
             new Sort.Order(Sort.Direction.DESC, "time"),
             new Sort.Order(Sort.Direction.DESC, "id")
+    );
+    public static final Sort SORT_ID_ASC = new Sort(
+            new Sort.Order(Sort.Direction.ASC, "id")
     );
 
     @Autowired private NurseVisitPatientRepository repository;
@@ -71,7 +74,7 @@ public class NurseVisitPatientService {
                 userId, patientId, nurseId, contentLike, pageIndex, sizePerPage);
         List<NurseVisitPatientBean> beans;
         contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
-        PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+        PageRequest request = new PageRequest(pageIndex, sizePerPage, SORT_TIME_ID_DESC);
         Page<NurseVisitPatientEntity> resultSet = repository.findByConditions(userId, patientId, nurseId, contentLike, null, null, null, null, request);
         beans = entitiesToBeans(resultSet);
         fillOtherProperties(beans);
@@ -88,7 +91,13 @@ public class NurseVisitPatientService {
         return count;
     }
 
-    public List<NurseVisitPatientBean> getVisitRecordByCondition(Long userId, Long patientId, Long nurseId, String contentLike, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, CommonStatus statusNot, int pageIndex, int sizePerPage) {
+    public List<NurseVisitPatientBean> getVisitRecordByCondition(Long userId, Long patientId, Long nurseId,
+                                                                 String contentLike,
+                                                                 ServiceVendorType vendorType, Long vendorId, Long vendorDepartId,
+                                                                 CommonStatus statusNot,
+                                                                 int pageIndex, int sizePerPage,
+                                                                 Sort sort
+    ) {
         logger.info("get visit record user={} patientId={} nurseId={} contentLike={} vendorType={} vendorId={} departId={} statusNot={} at page={} sizePerPage={}",
                 userId, patientId, nurseId, contentLike, vendorType, vendorId, vendorDepartId, statusNot, pageIndex, sizePerPage);
         List<NurseVisitPatientBean> beans;
@@ -108,7 +117,6 @@ public class NurseVisitPatientService {
         return beans;
     }
 
-
     //===============================================================
     //             get ----  patient using
     //===============================================================
@@ -126,7 +134,7 @@ public class NurseVisitPatientService {
         if (VerifyUtil.isListEmpty(orderIds)) {
             return orderRecorded;
         }
-        List<NurseVisitPatientEntity> entities = repository.findByOrderIdIn(orderIds, sort);
+        List<NurseVisitPatientEntity> entities = repository.findByOrderIdIn(orderIds, SORT_TIME_ID_DESC);
         if (!VerifyUtil.isListEmpty(entities)) {
             for (NurseVisitPatientEntity tmp : entities) {
                 if (null==tmp) { continue; }
@@ -151,7 +159,7 @@ public class NurseVisitPatientService {
         }
         else {
             contentLike = VerifyUtil.isStringEmpty(contentLike) ? null : VerifyUtil.reconstructSQLContentLike(contentLike);
-            PageRequest request = new PageRequest(pageIndex, sizePerPage, sort);
+            PageRequest request = new PageRequest(pageIndex, sizePerPage, SORT_TIME_ID_DESC);
             Page<NurseVisitPatientEntity> resultSet = repository.findByUserNurseStatusNotAndContentLike(userId, patientId, nurseId, CommonStatus.DELETED, contentLike, request);
             beans = entitiesToBeans(resultSet);
             fillOtherProperties(beans);
