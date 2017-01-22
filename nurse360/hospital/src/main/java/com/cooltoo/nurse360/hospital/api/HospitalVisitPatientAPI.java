@@ -419,7 +419,7 @@ public class HospitalVisitPatientAPI {
                                                                @RequestParam(defaultValue = "0", name = "user_id") long userId,
                                                                @RequestParam(defaultValue = "0", name = "patient_id") long patientId,
                                                                @RequestParam(defaultValue = "0", name = "index") int pageIndex,
-                                                               @RequestParam(defaultValue = "10", name = "index") int sizePerPage
+                                                               @RequestParam(defaultValue = "10", name = "number") int sizePerPage
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
