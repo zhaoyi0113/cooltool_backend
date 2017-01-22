@@ -161,7 +161,7 @@ public class UserServiceOrderAPI {
     public Response getUserOrder(@Context HttpServletRequest request) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         List<ServiceOrderBean> userOrders = orderService.getOrderByUserId(userId, CommonStatus.ENABLED);
-        List<DoctorAppointmentBean> doctorAppointments = doctorAppointmentService.getDoctorAppointment(userId, "CANCELLED,WAIT_NURSE_FETCH,COMPLETED");
+        List<DoctorAppointmentBean> doctorAppointments = doctorAppointmentService.getDoctorAppointment(userId, "CANCELLED,TO_SERVICE,COMPLETED");
         List<Object> retVal = sortOrderAndAppointment(userOrders, doctorAppointments);
         return Response.ok(retVal).build();
     }
