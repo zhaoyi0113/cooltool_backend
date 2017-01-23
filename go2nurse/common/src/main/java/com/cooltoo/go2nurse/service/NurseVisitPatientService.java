@@ -117,6 +117,24 @@ public class NurseVisitPatientService {
         return beans;
     }
 
+    public List<NurseVisitPatientBean> getVisitRecordByCondition(Long userId, Long patientId,
+                                                                 ServiceVendorType vendorType, Long vendorId, Long vendorDepartId,
+                                                                 CommonStatus statusNot,
+                                                                 Long startRecordId,
+                                                                 Sort sort
+    ) {
+        logger.info("get visit record user={} patientId={} vendorType={} vendorId={} departId={} statusNot={} startRecordId={}",
+                userId, patientId, vendorType, vendorId, vendorDepartId, statusNot, startRecordId);
+        List<NurseVisitPatientBean> beans;
+        Iterable<NurseVisitPatientEntity> resultSet = null;
+        resultSet = repository.findByConditions(userId, patientId, vendorType, vendorId, vendorDepartId, startRecordId, statusNot, sort);
+        beans = entitiesToBeans(resultSet);
+        fillOtherProperties(beans);
+
+        logger.warn("visit record count={}", beans.size());
+        return beans;
+    }
+
     //===============================================================
     //             get ----  patient using
     //===============================================================

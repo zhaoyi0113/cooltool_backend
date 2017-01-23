@@ -7,17 +7,24 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.*;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.PUT;
 import java.io.*;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -39,6 +46,8 @@ public final class NetworkUtil {
     }
 
     private NetworkUtil() {}
+
+
 
     /**
      * 抓取网络文件落地到本地；如果有一个抓取失败，则全部删掉。
@@ -140,6 +149,8 @@ public final class NetworkUtil {
         return result;
     }
 
+
+
     /**
      * 获取请求主机IP地址,如果通过代理进来，则透过防火墙获取真实IP地址;
      */
@@ -194,6 +205,8 @@ public final class NetworkUtil {
         }
         return ip;
     }
+
+
 
     /**
      * 发送https请求
@@ -252,6 +265,8 @@ public final class NetworkUtil {
         return null;
     }
 
+
+
     // X.509是一种非常通用的证书格式。所有的证书都符合ITU-T X.509国际标准，
     // 因此(理论上)为一种应用创建的证书可以用于任何其他符合X.509标准的应用。
     private static class DefaultX509TrustManager implements X509TrustManager {
@@ -303,6 +318,88 @@ public final class NetworkUtil {
             logger.error("https请求异常：{}", e);
         } finally {
             htpMethod.releaseConnection();
+        }
+        return resStr;
+    }
+
+
+
+
+    /**
+     * 发送https请求(https 双向认证)
+     * @param requestUrl 请求地址
+     * @param requestMethod 请求方式（GET、POST）
+     * @param outputStr 提交的数据
+     * @return 返回微信服务器响应的信息
+     */
+    public final String httpsRequest(String requestUrl, String requestMethod, String outputStr, String password, String certificationFilePath) {
+        String resStr = null;
+        try{
+            //================================================================
+            KeyStore keyStore  = KeyStore.getInstance("PKCS12");
+            FileInputStream instream = new FileInputStream(new File(certificationFilePath));
+            try {
+                keyStore.load(instream, password.toCharArray());
+            } finally {
+                instream.close();
+            }
+
+            // Trust own CA and all self-signed certs
+            SSLContext sslcontext = SSLContexts.custom()
+                    .loadKeyMaterial(keyStore, password.toCharArray())
+                    .build();
+            // Allow TLSv1 protocol only
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                    sslcontext,
+                    new String[] { "TLSv1" },
+                    null,
+                    SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+            CloseableHttpClient httpclient = HttpClients.custom()
+                    .setSSLContext(sslcontext)
+                    .setSSLSocketFactory(sslsf)
+                    .build();
+            try {
+
+                HttpUriRequest uriRequest = null;
+                if ("PUT".equalsIgnoreCase(requestMethod)) {
+                    uriRequest = new HttpPut(requestUrl);
+                }
+                else if ("GET".equalsIgnoreCase(requestMethod)) {
+                    uriRequest = new HttpGet(requestUrl);
+                }
+                else if ("POST".equalsIgnoreCase(requestMethod)) {
+                    uriRequest = new HttpPost(requestUrl);
+                }
+
+                System.out.println("executing request" + uriRequest.getRequestLine());
+
+                CloseableHttpResponse response = httpclient.execute(uriRequest);
+                try {
+                    HttpEntity entity = response.getEntity();
+
+                    System.out.println("----------------------------------------");
+                    System.out.println(response.getStatusLine());
+                    if (entity != null) {
+                        System.out.println("Response content length: " + entity.getContentLength());
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entity.getContent()));
+                        String text;
+                        while ((text = bufferedReader.readLine()) != null) {
+                            System.out.println(text);
+                        }
+
+                    }
+                    EntityUtils.consume(entity);
+                } finally {
+                    response.close();
+                }
+            } finally {
+                httpclient.close();
+            }
+        } catch (UnsupportedEncodingException uee) {
+            logger.error("参数编码异常：{}", uee.getMessage(), uee);
+        } catch(Exception e) {
+            logger.error("https请求异常：{}", e.getMessage(), e);
+        } finally {
         }
         return resStr;
     }

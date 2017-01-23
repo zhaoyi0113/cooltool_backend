@@ -57,34 +57,48 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
 
     /**
      * delete file paths(which end with relative path in its storage)
-     * @param filePaths deleted file paths, path format is
-     *                  userId_patientId_pageIndex_
+     * @param fileDir get file dir path, dir path format is userId_patientId
+     * @param prefix file prefix, file prefix format is vendorType_vendorId_departId
      */
-    @Override
-    public void deleteFileByPaths(List<String> filePaths) {
-        logger.info("delete visit_patient file, filepath={}", filePaths);
-        if (VerifyUtil.isListEmpty(filePaths)) {
-            logger.info("filepath is empty");
+    public void deleteFileByPaths(String fileDir, String prefix) {
+        logger.info("delete visit_patient file, fileDir={} prefix={}", fileDir, prefix);
+        if (VerifyUtil.isStringEmpty(fileDir)) {
+            logger.info("fileDir is empty");
             return;
         }
 
-        // userId_patientId --> pageIndex_
-        Map<String, List<String>> dirAndFiles = parseFilePath(filePaths);
-        // userId_patientId --> pageIndex_ is empty
-        if (dirAndFiles.isEmpty()) {
-            return;
-        }
-
-        Map<String, List<PageFile>> dirAndPages = parsePageFile(dirAndFiles, false);
-        if (dirAndPages.isEmpty()) {
+        List<PageFile> pages = parsePageFile(fileDir, prefix);
+        if (pages.isEmpty()) {
             return;
         }
 
         // delete files
-        Set<String> dirs = dirAndPages.keySet();
-        for (String dir : dirs) {
-            List<PageFile> pages = dirAndPages.get(dir);
-            for (PageFile page : pages) {
+        for (PageFile page : pages) {
+            page.file.delete();
+        }
+    }
+
+    /**
+     * delete file paths(which end with relative path in its storage)
+     * @param fileDir get file dir path, dir path format is userId_patientId
+     * @param prefix file prefix, file prefix format is vendorType_vendorId_departId
+     * @param pageIndex page index, file prefix format is vendorType_vendorId_departId
+     */
+    public void deleteFileByPaths(String fileDir, String prefix, long pageIndex) {
+        logger.info("delete visit_patient file, fileDir={} prefix={}", fileDir, prefix);
+        if (VerifyUtil.isStringEmpty(fileDir)) {
+            logger.info("fileDir is empty");
+            return;
+        }
+
+        List<PageFile> pages = parsePageFile(fileDir, prefix);
+        if (pages.isEmpty()) {
+            return;
+        }
+
+        // delete files
+        for (PageFile page : pages) {
+            if (page.pageIndex>=pageIndex) {
                 page.file.delete();
             }
         }
@@ -93,55 +107,41 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
 
     /**
      * exist file paths(which end with relative path in its storage)
-     * @param filePaths deleted file paths, path format is
-     *                  userId_patientId_pageIndex_
+     * @param fileDir get file dir path, dir path format is userId_patientId
+     * @param prefix file prefix, file prefix format is vendorType_vendorId_departId
      */
-    public Map<String, Boolean>  isFilePathExist(List<String> filePaths) {
-        Map<String, List<String>> dirAndFiles = parseFilePath(filePaths);
-        Map<String, Boolean> dirExisted = new HashMap<>();
-        if (null==dirAndFiles) {
-            return dirExisted;
-        }
+    public boolean isFilePathExist(String fileDir, final String prefix) {
+        // dest_visit_patient_dir--->visit_patient_base_path/
+        String visitRecordPath = getStoragePath();
+        // dest_relative_dir--->userId_patientId/
+        String destRelativeDirPath = fileDir;
+        // visit_patient directory existed
+        File destDir = new File(visitRecordPath + destRelativeDirPath);
 
-        // delete files
-        Set<String> dirs = dirAndFiles.keySet();
-        for (String dir : dirs) {
-            // dest_visit_patient_dir--->visit_patient_base_path/
-            String visitRecordPath = getStoragePath();
-            // dest_relative_dir--->userId_patientId/
-            String destRelativeDirPath = dir;
-            // visit_patient directory existed
-            File destDir = new File(visitRecordPath + destRelativeDirPath);
-
-            String dirName = dir.substring(0, dir.length() - 1);
-            if (destDir.exists() && destDir.isDirectory()) {
-                String[] fileNames = destDir.list();
-                if (null != fileNames && fileNames.length > 0) {
-                    dirExisted.put(dirName, true);
+        boolean isExisted = false;
+        if (destDir.exists() && destDir.isDirectory()) {
+            String[] fileNames = destDir.list();
+            if (null!=fileNames && fileNames.length!=0) {
+                for (String fileName : fileNames) {
+                    if (fileName.startsWith(prefix)) {
+                        isExisted = true;
+                        break;
+                    }
                 }
-                else {
-                    dirExisted.put(dirName, false);
-                }
-            }
-            else {
-                dirExisted.put(dirName, false);
             }
         }
 
-        return dirExisted;
+        return isExisted;
     }
 
     /**
      * get files (which end with relative path in its storage)
-     * @param filePath deleted file paths, path format is
-     *                  userId_patientId_pageIndex_
+     * @param fileDir get file dir path, dir path format is userId_patientId
+     * @param prefix file prefix, file prefix format is vendorType_vendorId_departId
+     * @return page files
      */
-    public List<PageFile> getFileAfterRecord(String filePath, long recordId) {
-        Map<String, List<String>> dirAndFiles = parseFilePath(Arrays.asList(new String[]{filePath}));
-        Map<String, List<PageFile>> dirAndPageFiles = parsePageFile(dirAndFiles, false);
-
-        String dir = filePath + File.separator;
-        List<PageFile> pageFiles = dirAndPageFiles.get(dir);
+    public List<PageFile> getFileAfterRecord(String fileDir, final String prefix, long recordId) {
+        List<PageFile> pageFiles = parsePageFile(fileDir, prefix);
 
         List<PageFile> pagesAfterRecordId = new ArrayList<>();
 
@@ -155,15 +155,11 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
 
     /**
      * update file paths(which end with relative path in its storage)
-     * @param filePath deleted file paths, path format is
-     *                  userId_patientId_pageIndex_
+     * @param fileDir get file dir path, dir path format is userId_patientId
+     * @param prefix file prefix, file prefix format is vendorType_vendorId_departId
      */
-    public PageFile getLastFile(String filePath) {
-        Map<String, List<String>> dirAndFiles = parseFilePath(Arrays.asList(new String[]{filePath}));
-        Map<String, List<PageFile>> dirAndPageFiles = parsePageFile(dirAndFiles, false);
-
-        String dir = filePath + File.separator;
-        List<PageFile> pageFiles = dirAndPageFiles.get(dir);
+    public PageFile getLastFile(String fileDir, String prefix) {
+        List<PageFile> pageFiles = parsePageFile(fileDir, prefix);
 
         PageFile lastPage = null;
         for (PageFile page : pageFiles) {
@@ -180,144 +176,85 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
     }
 
     /**
-     * get file paths(which end with relative path in its storage)
-     * @param filePaths deleted file paths, path format is
-     *                  userId_patientId_pageIndex_
+     * get file url(which end with relative path in its storage)
+     * @param fileDir get file dir path, dir path format is userId_patientId
+     * @param prefix file prefix, file prefix format is vendorType_vendorId_departId
+     * @param nginxPrefix nginx url prefix, nginx url prefix format is http(s)://ip:port/
+     * @return dir-->page file urls, path format is
+     *                  [userId_patientId --> [page file urls]]
      */
-    public Map<String, List<String>> getFileUrl(List<String> filePaths, boolean fillEmpty, String nginxPrefix) {
-        Map<String, List<String>> dirAndFiles = parseFilePath(filePaths);
-        Map<String, List<PageFile>> dirAndPageFiles = parsePageFile(dirAndFiles, fillEmpty);
+    public List<String> getFileUrl(String fileDir, String prefix, String nginxPrefix) {
+        List<PageFile> pageFiles = parsePageFile(fileDir, prefix);
 
-        Map<String, List<String>> dirAndUrls = new HashMap<>();
-        if (!dirAndPageFiles.isEmpty()) {
-            Set<String> keys = dirAndPageFiles.keySet();
-            for (String key : keys) {
-                List<PageFile> pages = dirAndPageFiles.get(key);
-                List<String> pageUrls = dirAndUrls.get(key.substring(0, key.length()-1));
-                if (null==pageUrls) {
-                    pageUrls = new ArrayList<>();
-                    dirAndUrls.put(key.substring(0, key.length()-1), pageUrls);
-                }
-                for (PageFile page : pages) {
-                    pageUrls.add(nginxPrefix + getNginxRelativePath() + key + page.fileName);
-                }
+        List<String> pageUrls = new ArrayList<>();
+        if (!pageFiles.isEmpty()) {
+            for (PageFile page : pageFiles) {
+                pageUrls.add(nginxPrefix + getNginxRelativePath() + fileDir + File.separator + page.fileName);
             }
         }
 
-        return dirAndUrls;
+        return pageUrls;
     }
 
     /**
      * get file paths(which end with relative path in its storage)
-     * @param dirAndFiles dir-->file prefix, path format is
-     *                  [userId_patientId --> [pageIndex_]]
-     * @return dir-->page file, path format is
+     * @param fileDir get file dir path, dir path format is userId_patientId
+     * @param prefix file prefix, file prefix format is vendorType_vendorId_departId
+     * @return page files, path format is
      *                  [userId_patientId --> [page file]]
      */
-    private Map<String, List<PageFile>> parsePageFile(Map<String, List<String>> dirAndFiles, boolean fillEmpty) {
-        Map<String, List<PageFile>> dirAndPage = new HashMap<>();
-        if (null==dirAndFiles) {
-            return dirAndPage;
+    private List<PageFile> parsePageFile(String fileDir, final String prefix) {
+        List<PageFile> pages = new ArrayList<>();
+        if (null==fileDir || fileDir.trim().isEmpty()) {
+            return pages;
         }
 
-        // delete files
-        Set<String> dirs = dirAndFiles.keySet();
-        for (String dir : dirs) {
-            final List<String> pageIndexPrefix = dirAndFiles.get(dir);
+        // dest_visit_patient_dir--->visit_patient_base_path/
+        String visitRecordPath    = getStoragePath();
+        // dest_relative_dir--->userId_patientId/
+        String destRelativeDirPath= fileDir;
+        // visit_patient directory existed
+        File destDir = new File(visitRecordPath + destRelativeDirPath);
+        if (!destDir.exists()) {
+            return pages;
+        }
 
-            // dest_visit_patient_dir--->visit_patient_base_path/
-            String visitRecordPath    = getStoragePath();
-            // dest_relative_dir--->userId_patientId/
-            String destRelativeDirPath= dir;
-            // visit_patient directory existed
-            File destDir = new File(visitRecordPath + destRelativeDirPath);
-            if (!destDir.exists()) {
-                continue;
-            }
-
-            File[] files = destDir.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    if (null==pathname) {
-                        return false;
-                    }
-                    String name = pathname.getName();
-                    if (!name.matches("^\\d+_\\d+_\\d+_\\d+_\\d+$")) {
-                        return false;
-                    }
-                    if (fillEmpty) {
-                        return true;
-                    }
-                    int pageIndex = name.indexOf("_");
-                    if (pageIndex>=1) {
-                        return pageIndexPrefix.contains(name.substring(0, pageIndex+1));
-                    }
+        File[] files = destDir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                if (null==pathname) {
                     return false;
                 }
-            });
-
-            List<PageFile> pages = dirAndPage.get(dir);
-            if (null==pages) {
-                pages = new ArrayList<>();
-                dirAndPage.put(dir, pages);
-            }
-            if (null!=files) {
-                for (File file : files) {
-                    PageFile pageFile = new PageFile(file);
-                    pages.add(pageFile);
+                String name = pathname.getName();
+                if (!name.matches("^[\\d+_]+\\d+$")) {
+                    return false;
                 }
-                Collections.sort(pages, new PageSorter());
+                if (null==prefix || prefix.trim().isEmpty()) {
+                    return false;
+                }
+                if (!name.startsWith(prefix)) {
+                    return false;
+                }
+                return true;
             }
+        });
+
+        if (null!=files) {
+            for (File file : files) {
+                PageFile pageFile = new PageFile(file);
+                pages.add(pageFile);
+            }
+            Collections.sort(pages, new PageSorter());
         }
 
-        return dirAndPage;
-    }
-
-    /**
-     * parse file paths(which end with relative path in its storage)
-     * @param filePaths file paths, path format is [userId_patientId_pageIndex_]
-     * @return dir-->file prefix, path format is
-     *                  [userId_patientId --> [pageIndex_]]
-     */
-    private Map<String, List<String>> parseFilePath(List<String> filePaths) {
-
-        // userId_patientId --> pageIndex_
-        Map<String, List<String>> dirAndFiles = new HashMap<>();
-        if (filePaths.isEmpty()) {
-            return dirAndFiles;
-        }
-
-        // parse file paths
-        for (String filePath : filePaths) {
-            //[userId, patientId, pageIndex]
-            String[] recordFileParts = filePath.split("_");
-            if (recordFileParts.length<2) {
-                logger.warn("file name is invalid, file={}", filePath);
-                continue;
-            }
-
-            // dest_relative_dir--->userId_patientId/
-            String destRelativeDirPath      =
-                    recordFileParts[0] + "_" +
-                    recordFileParts[1] + File.separator;
-
-            List<String> filesPrefix = dirAndFiles.get(destRelativeDirPath);
-            if (null==filesPrefix) {
-                filesPrefix = new ArrayList<>();
-                dirAndFiles.put(destRelativeDirPath, filesPrefix);
-            }
-
-            if (recordFileParts.length>=3) {
-                filesPrefix.add(recordFileParts[2] + "_");
-            }
-        }
-        return dirAndFiles;
+        return pages;
     }
 
     /**
      * srcFileAbsolutePath---->dir/userId_patientId/
-     * @param srcVisitRecordFileAbsolutePath path list, path format is
-     *                                       vr_userId_patientId_pageIndex_1stRecordId_1stLineIndex_2ndRecordId_2ndLineIndex
+     * @param srcVisitRecordFileAbsolutePath
+     * path list, path format is
+     *      vr_userId_patientId_vendorType_vendorId_departId_pageIndex_1stRecordId_1stLineIndex_2ndRecordId_2ndLineIndex
      */
     @Override
     public Map<String, String> moveFileToHere(List<String> srcVisitRecordFileAbsolutePath) {
@@ -332,12 +269,11 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
         try {
             for (String filePath : srcVisitRecordFileAbsolutePath) {
                 String pageFileName = filePath.substring(filePath.indexOf("vr_"));
-                //[tempFile_vr, userId, patientId, pageIndex, 1stRecordId, 1stLineIndex, 2ndRecordId, 2ndLineIndex]
+                //[tempFile_vr, userId, patientId, vendorType, vendorId, departId, pageIndex, 1stRecordId, 1stLineIndex, 2ndRecordId, 2ndLineIndex]
                 String[] recordFileParts = pageFileName.split("_");
-                if (recordFileParts.length!=8) {
+                if (recordFileParts.length!=11) {
                     continue;
                 }
-
 
                 // dest_visit_patient_dir--->visit_patient_base_path/
                 String visitRecordPath    = getStoragePath();
@@ -345,13 +281,16 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
                 String destRelativeDirPath      =
                         recordFileParts[1] + "_" +
                         recordFileParts[2] + File.separator;
-                // dest_relative_file_path--->pageIndex_1stRecordId_1stLineIndex_2ndRecordId_2ndLineIndex
+                // dest_relative_file_path--->vendorType_vendorId_departId_pageIndex_1stRecordId_1stLineIndex_2ndRecordId_2ndLineIndex
                 String destRelativeFilePath =
                         recordFileParts[3] + "_" +
                         recordFileParts[4] + "_" +
                         recordFileParts[5] + "_" +
                         recordFileParts[6] + "_" +
-                        recordFileParts[7];
+                        recordFileParts[7] + "_" +
+                        recordFileParts[8] + "_" +
+                        recordFileParts[9] + "_" +
+                        recordFileParts[10];
 
                 // make the visit_patient directory if necessary
                 File destDir = new File(visitRecordPath + destRelativeDirPath);
@@ -385,6 +324,7 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
     @Deprecated @Override public void deleteFiles(List<Long> fileIds) {
         throw new UnsupportedOperationException();
     }
+    @Deprecated @Override public void deleteFileByPaths(List<String> filePaths) { throw new UnsupportedOperationException(); }
     @Deprecated @Override public String getFilePath(long fileId) {
         throw new UnsupportedOperationException();
     }
@@ -395,14 +335,17 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
         throw new UnsupportedOperationException();
     }
 
-    class PageFile {
-        int pageIndex = -1;
-        int firstRecordId = -1;
-        int firstLine = -1;
-        int secondRecordId = -1;
-        int secondLine= -1;
-        String fileName = "";
-        File file = null;
+    public static class PageFile {
+        public int vendorType = -1;
+        public long vendorId = -1;
+        public long departId = -1;
+        public int pageIndex = -1;
+        public long firstRecordId = -1;
+        public int firstLine = -1;
+        public long secondRecordId = -1;
+        public int secondLine= -1;
+        public String fileName = "";
+        public File file = null;
 
         public PageFile(File file) {
             if (null==file) {
@@ -411,12 +354,15 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
             this.fileName = file.getName();
             this.file = file;
             String[] nameParts = this.fileName.split("_");
-            if (nameParts.length==5) {
-                pageIndex = VerifyUtil.parseIntIds(nameParts[0]).get(0);
-                firstRecordId = VerifyUtil.parseIntIds(nameParts[1]).get(0);
-                firstLine = VerifyUtil.parseIntIds(nameParts[2]).get(0);
-                secondRecordId = VerifyUtil.parseIntIds(nameParts[3]).get(0);
-                secondLine = VerifyUtil.parseIntIds(nameParts[4]).get(0);
+            if (nameParts.length==8) {
+                vendorType    = VerifyUtil.parseIntIds( nameParts[0]).get(0);
+                vendorId      = VerifyUtil.parseLongIds(nameParts[1]).get(0);
+                departId      = VerifyUtil.parseLongIds(nameParts[2]).get(0);
+                pageIndex     = VerifyUtil.parseIntIds( nameParts[3]).get(0);
+                firstRecordId = VerifyUtil.parseLongIds(nameParts[4]).get(0);
+                firstLine     = VerifyUtil.parseIntIds( nameParts[5]).get(0);
+                secondRecordId= VerifyUtil.parseLongIds(nameParts[6]).get(0);
+                secondLine    = VerifyUtil.parseIntIds( nameParts[7]).get(0);
             }
 
         }
@@ -435,7 +381,7 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
         }
     }
 
-    class PageSorter implements Comparator<PageFile> {
+    public static class PageSorter implements Comparator<PageFile> {
 
         @Override
         public int compare(PageFile o1, PageFile o2) {

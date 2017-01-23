@@ -1,5 +1,7 @@
 package com.cooltoo.go2nurse.openapp;
 
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -174,5 +176,83 @@ public class WeChatPayService {
         sb.append("key=" + weChatApiKey);
         String sign = NumberUtil.md5Encode(sb.toString(), characterEncoding, "MD5").toUpperCase();
         return sign;
+    }
+
+    /**
+     * <A href="https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_4&index=6">微信公众号申请退款API详细介绍</A>
+     * @param appId 微信分配的公众账号ID(企业号corpId即为此appId).
+     * @param mchId 微信支付分配的商户号.
+     * @param devInfo 终端设备号(门店号或收银设备ID)，注意：PC网页或公众号内支付请传"WEB"
+     *
+     *（二选一）
+     * @param transactionId 微信生成的订单号，在支付通知中有返回
+     * @param outTradeNo 商户侧传给微信的订单号
+     *
+     * @param outRefundNo 商户退款单号, 商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔
+     * @param totalFee 总金额，订单总金额，单位为分，只能为整数，详见支付金额
+     * @param refundFee 退款金额，退款总金额，订单总金额，单位为分，只能为整数，详见支付金额
+     * @param refundFeeType 货币类型，符合ISO 4217标准的三位字母代码，默认人民币：CNY，其他值列表详见货币类型
+     * @param opUserId 操作员帐号, 默认为商户号
+     */
+    public Map<String, String> refundByWeChat(String appId, String mchId, String devInfo,
+                                              String transactionId, String outTradeNo,
+                                              String outRefundNo,
+                                              int totalFee, int refundFee, String refundFeeType,
+                                              String opUserId
+    ) {
+        Map<String, String> keyParam = new HashMap();
+        String key = "aphid";
+        keyParam.put(key, appId);
+
+        key = "mch_id";
+        keyParam.put(key, mchId);
+
+        key = "device_info";
+        keyParam.put(key, devInfo);
+
+        // 随机字符串,不长于32位.推荐随机数生成算法
+        key = "nonce_str";
+        keyParam.put(key, NumberUtil.createNoncestr(31));
+
+        if (null!=transactionId && transactionId.trim().length()>0) {
+            key = "transaction_id";
+            keyParam.put(key, transactionId);
+        }
+        else if (null!=outTradeNo && outTradeNo.trim().length()>0) {
+            key = "out_trade_no";
+            keyParam.put(key, outTradeNo);
+        }
+        else {
+            logger.error("wechat order number and vendor order number are both empty.");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        key = "out_refund_no";
+        keyParam.put(key, outRefundNo);
+
+        key = "total_fee";
+        keyParam.put(key, String.valueOf(totalFee));
+
+        key = "refund_fee";
+        keyParam.put(key, String.valueOf(refundFee));
+
+        key = "refund_fee_type";
+        keyParam.put(key, refundFeeType);
+
+        if (null!=opUserId && opUserId.trim().length()>0) {
+            key = "op_user_id";
+            keyParam.put(key, opUserId);
+        }
+
+        key = "sign";
+        keyParam.put(key, createSign(apiKey, "UTF-8", new TreeMap<>(keyParam)));
+
+        logger.info("request refund parameter map===="+keyParam);
+
+        String xmlWeChatOrder = VerifyUtil.getRequestXml(new TreeMap<>(keyParam));
+        logger.info("create sign xml "+xmlWeChatOrder);
+        String response = NetworkUtil.newInstance().httpsRequest(REFUND_URL, "POST", xmlWeChatOrder, "nopassword", "/Users/zhaolisong/Downloads/cert-2/apiclient_cert.p12");
+        keyParam = VerifyUtil.parseResponseXml(response);
+        return keyParam;
     }
 }

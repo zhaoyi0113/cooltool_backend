@@ -18,7 +18,13 @@ import java.util.List;
 /**
  * Created by zhaolisong on 19/01/2017.
  */
-public class VisitPatientRecordPrinter {
+public class VisitPatientRecordPagePrinter {
+    public static final float   CONTENT_ROW_HEIGHT = 6f;
+    public static final int     CONTENT_ROW_SIZE   = 36;
+    public static final float[] PAGE_PADDING       = new float[]{11, 11, 11, 11};
+    public static final String  BASE_FONT          = "simsun.ttf";
+    public static final int     MAX_CHAR_IN_CELL   = 72;
+
 
     public final FontUtil fontUtil = FontUtil.newInstance();
     public final TextUtil textUtil = TextUtil.newInstance();
@@ -40,21 +46,21 @@ public class VisitPatientRecordPrinter {
     private float contentRowHeight;
     private int contentRowSize;
 
-    public VisitPatientRecordPrinter(int dpi,
-                                     PageSize pageSize,
-                                     float[] pagePadding, /* header, footer, left, right */
+    public VisitPatientRecordPagePrinter(int dpi,
+                                         PageSize pageSize,
+                                         float[] pagePadding, /* header, footer, left, right */
                                      String fontName,
-                                     String hospitalName,
-                                     String fileNumber,
-                                     String patientName,
-                                     String gender,
-                                     String age,
-                                     String diagnosis,
-                                     String contactPeople,
-                                     String homeAddress,
-                                     String contactPhone,
-                                     float contentRowHeight,
-                                     int contentRowSize
+                                         String hospitalName,
+                                         String fileNumber,
+                                         String patientName,
+                                         String gender,
+                                         String age,
+                                         String diagnosis,
+                                         String contactPeople,
+                                         String homeAddress,
+                                         String contactPhone,
+                                         float contentRowHeight,
+                                         int contentRowSize
     ) {
         this.dpi = dpi;
         this.pageSize = pageSize;
@@ -405,11 +411,17 @@ public class VisitPatientRecordPrinter {
     }
 
     public List<String> pageContent(long userId,
-                                           long patientId,
-                                           Page page,
-                                           List<Record> records,
-                                           int maxCharSizeInCell,
-                                           String storagePath
+                                    long patientId,
+                                    int  vendorType, // 0: NONE; 1:COMPANY; 2: HOSPITAL
+                                    long vendorId,
+                                    long departmentId,
+                                    Page page,
+                                    List<Record> records,
+                                    int maxCharSizeInCell,
+                                    String storagePath,
+                                    long startRecordId,
+                                    int  startLineIndex,
+                                    int startPageIndex
     ) {
         Row       row   = null;
         Cell      cell  = null;
@@ -422,18 +434,22 @@ public class VisitPatientRecordPrinter {
         //===============================================
         // 内容 - 36行
         //===============================================
-        int pageIndex = 1;
+        int pageIndex = startPageIndex;
         int rowSizeLeft = contentRowSize;
 
         long pageFirstLineRecordId = 0;
         int pageFirstLineIndex = 0;
         for (int i = 0; i < records.size(); i ++) {
             Record record = records.get(i);
-            String[] lines = record.lines(maxCharSizeInCell);
-            int[] linesInPage = record.linesInPage();
+            if (record.id()<startRecordId) {
+                continue;
+            }
 
-            for (int lineIndex = 0; lineIndex < linesInPage.length; lineIndex++) {
-                if (linesInPage[lineIndex] > 0) {
+            String[] lines = record.lines(maxCharSizeInCell);
+            int   lineSize = lines.length;
+
+            for (int lineIndex = 0; lineIndex < lineSize; lineIndex++) {
+                if (record.id()==startRecordId && lineIndex < startLineIndex) {
                     continue;
                 }
                 boolean needDrawDateAndSign = (lineIndex == 0);
@@ -510,15 +526,12 @@ public class VisitPatientRecordPrinter {
                 }
                 row.addCell(cell);
 
-                // 标识该行已写入
-                linesInPage[lineIndex] = pageIndex;
-
                 // 添加到页面中
                 page.addRow(row);
                 rowSizeLeft--;
 
                 // 满一页后
-                if (0 == rowSizeLeft || (i+1==records.size() && lineIndex+1==linesInPage.length)) {
+                if (0 == rowSizeLeft || (i+1==records.size() && lineIndex+1==lineSize)) {
                     // 封底
                     page.getLastRow().addCellBorders(RectRegion.BOTTOM);
                     // 保存
@@ -526,6 +539,9 @@ public class VisitPatientRecordPrinter {
                     absPath.append("vr_")
                             .append(userId).append("_")
                             .append(patientId).append("_")
+                            .append(vendorType).append("_")
+                            .append(vendorId).append("_")
+                            .append(departmentId).append("_")
                             .append(pageIndex).append("_")
                             .append(pageFirstLineRecordId).append("_")
                             .append(pageFirstLineIndex).append("_")

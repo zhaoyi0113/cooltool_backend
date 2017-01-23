@@ -76,7 +76,6 @@ public class VerifyUtil {
     }
 
     public static boolean isIds(String ids) {
-        logger.info("is ids={}", ids);
         if (ids instanceof String) {
             return ids.matches(IDS);
         }

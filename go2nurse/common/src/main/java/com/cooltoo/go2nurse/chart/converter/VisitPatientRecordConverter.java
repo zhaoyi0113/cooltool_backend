@@ -1,7 +1,7 @@
 package com.cooltoo.go2nurse.chart.converter;
 
 import com.cooltoo.go2nurse.beans.NurseVisitPatientBean;
-import com.cooltoo.go2nurse.chart.generator.VisitPatientRecordPrinter;
+import com.cooltoo.go2nurse.chart.generator.VisitPatientRecordPagePrinter;
 import com.cooltoo.go2nurse.chart.util.TextUtil;
 import com.cooltoo.util.NumberUtil;
 import org.springframework.stereotype.Component;
@@ -13,16 +13,16 @@ import java.util.List;
  * Created by zhaolisong on 19/01/2017.
  */
 @Component
-public class VisitPatientRecordConverter implements Converter<NurseVisitPatientBean, VisitPatientRecordPrinter.Record>{
+public class VisitPatientRecordConverter implements Converter<NurseVisitPatientBean, VisitPatientRecordPagePrinter.Record>{
 
     private TextUtil textUtil = TextUtil.newInstance();
 
     @Override
-    public VisitPatientRecordPrinter.Record convert(NurseVisitPatientBean source) {
+    public VisitPatientRecordPagePrinter.Record convert(NurseVisitPatientBean source) {
         if (null==source) {
             return null;
         }
-        VisitPatientRecordPrinter.Record record = new VisitPatientRecordPrinter.Record();
+        VisitPatientRecordPagePrinter.Record record = new VisitPatientRecordPagePrinter.Record();
         record.id(source.getId())
                 .date(NumberUtil.timeToString(source.getTime(), NumberUtil.DATE_YYYY_MM_DD_HH_MM))
                 .nurseSignUrl(source.getNurseSignUrl())
@@ -34,13 +34,13 @@ public class VisitPatientRecordConverter implements Converter<NurseVisitPatientB
     }
 
     @Override
-    public List<VisitPatientRecordPrinter.Record> convert(List<NurseVisitPatientBean> sources) {
-        List<VisitPatientRecordPrinter.Record> returnVal = new ArrayList<>();
+    public List<VisitPatientRecordPagePrinter.Record> convert(List<NurseVisitPatientBean> sources) {
+        List<VisitPatientRecordPagePrinter.Record> returnVal = new ArrayList<>();
         if (null==sources) {
             return returnVal;
         }
         for (NurseVisitPatientBean tmp : sources) {
-            VisitPatientRecordPrinter.Record record = convert(tmp);
+            VisitPatientRecordPagePrinter.Record record = convert(tmp);
             if (null!=record) {
                 returnVal.add(record);
             }

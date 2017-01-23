@@ -61,4 +61,15 @@ public interface NurseVisitPatientRepository extends JpaRepository<NurseVisitPat
     Page<NurseVisitPatientEntity> findByUserNurseStatusNotAndContentLike(Long userId, Long patientId, Long nurseId, CommonStatus status, String contentLike, Pageable page);
 
     List<NurseVisitPatientEntity> findByOrderIdIn(List<Long> orderId, Sort sort);
+
+
+    @Query("FROM NurseVisitPatientEntity nvp" +
+            " WHERE (?1 IS NULL OR ?1=nvp.userId)" +
+            "   AND (?2 IS NULL OR ?2=nvp.patientId)" +
+            "   AND (?3 IS NULL OR ?3=nvp.vendorType)" +
+            "   AND (?4 IS NULL OR ?4=nvp.vendorId)" +
+            "   AND (?5 IS NULL OR ?5=nvp.vendorDepartId)" +
+            "   AND (?6 IS NULL OR ?6<=nvp.id)" +
+            "   AND (?7 IS NULL OR ?7<>nvp.status)")
+    List<NurseVisitPatientEntity> findByConditions(Long userId, Long patientId, ServiceVendorType vendorType, Long vendorId, Long vendorDepartId, Long startRecordId, CommonStatus statusNot, Sort sort);
 }
