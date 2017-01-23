@@ -147,6 +147,23 @@ public class ImageInVisitPatientService {
     }
 
     @Transactional
+    public List<Long> deleteByNurseVisitPatientIds(List<Long> nurseVisitPatientId) {
+        List<ImageInVisitPatientEntity> images = repository.findByNurseVisitPatientIdIn(nurseVisitPatientId, sort);
+        if (null==images || images.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Long> imageIds = new ArrayList<>();
+        for (ImageInVisitPatientEntity tmp : images) {
+            imageIds.add(tmp.getImageId());
+        }
+        userStorage.deleteFiles(imageIds);
+        repository.delete(images);
+
+        return imageIds;
+    }
+
+    @Transactional
     public List<Long> deleteByNurseVisitPatientId(long nurseVisitPatientId, long imageId) {
         List<ImageInVisitPatientEntity> images = repository.findByNurseVisitPatientIdAndImageId(nurseVisitPatientId, imageId);
         if (null==images || images.isEmpty()) {

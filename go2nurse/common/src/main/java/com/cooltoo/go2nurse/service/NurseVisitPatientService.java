@@ -482,7 +482,19 @@ public class NurseVisitPatientService {
         }
         visitRecord = VerifyUtil.isStringEmpty(visitRecord) ? "" : visitRecord.trim();
 
-        NurseVisitPatientEntity entity = new NurseVisitPatientEntity();
+
+        // 关联订单的记录已存在
+        NurseVisitPatientEntity entity = null;
+        if (orderId>0) {
+            List<NurseVisitPatientEntity> existedRecords = repository.findByOrderIdIn(Arrays.asList(new Long[]{orderId}), SORT_TIME_ID_DESC);
+            if (!VerifyUtil.isListEmpty(existedRecords)) {
+                entity = existedRecords.get(0);
+            }
+        }
+
+        if (null==entity) {
+            entity = new NurseVisitPatientEntity();
+        }
         entity.setNurseId(nurseId<0 ? 0 : nurseId);
         entity.setUserId(userId);
         entity.setPatientId(patientId);
@@ -498,6 +510,20 @@ public class NurseVisitPatientService {
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(null==visitTime ? new Date() : visitTime);
         entity = repository.save(entity);
+
+        if (orderId>0) {
+            List<NurseVisitPatientEntity> existedRecords = repository.findByOrderIdIn(Arrays.asList(new Long[]{orderId}), SORT_TIME_ID_DESC);
+            if (!VerifyUtil.isListEmpty(existedRecords)) {
+                List<Long> visitRecordIds = new ArrayList<>();
+                for (NurseVisitPatientEntity tmp : existedRecords) {
+                    if (tmp.getId()==entity.getId()) {
+                        continue;
+                    }
+                    visitRecordIds.add(tmp.getId());
+                }
+                deleteVisitRecord(visitRecordIds);
+            }
+        }
 
         return entity.getId();
     }
@@ -648,6 +674,40 @@ public class NurseVisitPatientService {
         repository.save(visitRecord);
 
         return nurseSign;
+    }
+
+    @Transactional
+    public List<Long> deleteVisitRecord(List<Long> visitRecordIds) {
+        logger.info("delete visitRecord by visit record id={}", visitRecordIds);
+        if (VerifyUtil.isListEmpty(visitRecordIds)) {
+            return visitRecordIds;
+        }
+        List<NurseVisitPatientEntity> visitRecords = repository.findAll(visitRecordIds);
+        if (VerifyUtil.isListEmpty(visitRecords)) {
+            return visitRecordIds;
+        }
+
+        List<Long> visitRecordExisted = new ArrayList<>();
+        List<Long> patientSignIds = new ArrayList<>();
+        List<Long> nurseSingIds   = new ArrayList<>();
+        for (NurseVisitPatientEntity tmp : visitRecords) {
+            if (!patientSignIds.contains(tmp.getPatientSign())) {
+                patientSignIds.add(tmp.getPatientSign());
+            }
+            if (!nurseSingIds.contains(tmp.getNurseSign())) {
+                nurseSingIds.add(tmp.getNurseSign());
+            }
+            if (!visitRecordExisted.contains(tmp.getId())) {
+                visitRecordExisted.add(tmp.getId());
+            }
+        }
+
+        userFileStorage.deleteFiles(nurseSingIds);
+        userFileStorage.deleteFiles(patientSignIds);
+        imageService.deleteByNurseVisitPatientIds(visitRecordExisted);
+        repository.delete(visitRecords);
+
+        return visitRecordExisted;
     }
 
 }
