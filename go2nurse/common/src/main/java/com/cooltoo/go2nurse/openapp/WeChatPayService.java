@@ -193,15 +193,17 @@ public class WeChatPayService {
      * @param refundFee 退款金额，退款总金额，订单总金额，单位为分，只能为整数，详见支付金额
      * @param refundFeeType 货币类型，符合ISO 4217标准的三位字母代码，默认人民币：CNY，其他值列表详见货币类型
      * @param opUserId 操作员帐号, 默认为商户号
+     * @param certP12File 商户p12证书路径
      */
     public Map<String, String> refundByWeChat(String appId, String mchId, String devInfo,
                                               String transactionId, String outTradeNo,
                                               String outRefundNo,
                                               int totalFee, int refundFee, String refundFeeType,
-                                              String opUserId
+                                              String opUserId,
+                                              String certP12File
     ) {
         Map<String, String> keyParam = new HashMap();
-        String key = "aphid";
+        String key = "appid";
         keyParam.put(key, appId);
 
         key = "mch_id";
@@ -214,15 +216,16 @@ public class WeChatPayService {
         key = "nonce_str";
         keyParam.put(key, NumberUtil.createNoncestr(31));
 
+        if (null!=outTradeNo && outTradeNo.trim().length()>0) {
+            key = "out_trade_no";
+            keyParam.put(key, outTradeNo);
+        }
         if (null!=transactionId && transactionId.trim().length()>0) {
             key = "transaction_id";
             keyParam.put(key, transactionId);
         }
-        else if (null!=outTradeNo && outTradeNo.trim().length()>0) {
-            key = "out_trade_no";
-            keyParam.put(key, outTradeNo);
-        }
-        else {
+        if ((null==transactionId || transactionId.trim().length()==0)
+         && (null==outTradeNo    || outTradeNo.trim().length()==0)) {
             logger.error("wechat order number and vendor order number are both empty.");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -243,6 +246,15 @@ public class WeChatPayService {
             key = "op_user_id";
             keyParam.put(key, opUserId);
         }
+        else {
+            keyParam.put(key, mchId);
+        }
+
+        key = "refund_account";
+        keyParam.put(key, "REFUND_SOURCE_UNSETTLED_FUNDS");
+
+        key = "sign_type";
+        keyParam.put(key, "MD5");
 
         key = "sign";
         keyParam.put(key, createSign(apiKey, "UTF-8", new TreeMap<>(keyParam)));
@@ -251,7 +263,7 @@ public class WeChatPayService {
 
         String xmlWeChatOrder = VerifyUtil.getRequestXml(new TreeMap<>(keyParam));
         logger.info("create sign xml "+xmlWeChatOrder);
-        String response = NetworkUtil.newInstance().httpsRequest(REFUND_URL, "POST", xmlWeChatOrder, "nopassword", "/Users/zhaolisong/Downloads/cert-2/apiclient_cert.p12");
+        String response = NetworkUtil.newInstance().httpsRequest(REFUND_URL, "POST", keyParam, xmlWeChatOrder, mchId, certP12File);
         keyParam = VerifyUtil.parseResponseXml(response);
         return keyParam;
     }

@@ -8,8 +8,10 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
@@ -332,7 +334,7 @@ public final class NetworkUtil {
      * @param outputStr 提交的数据
      * @return 返回微信服务器响应的信息
      */
-    public final String httpsRequest(String requestUrl, String requestMethod, String outputStr, String password, String certificationFilePath) {
+    public final String httpsRequest(String requestUrl, String requestMethod, Map<String, String> parameters, String outputStr, String password, String certificationFilePath) {
         String resStr = null;
         try{
             //================================================================
@@ -369,6 +371,19 @@ public final class NetworkUtil {
                 }
                 else if ("POST".equalsIgnoreCase(requestMethod)) {
                     uriRequest = new HttpPost(requestUrl);
+                    HttpEntity httpEntity = new StringEntity(outputStr, "UTF-8");
+                    RequestConfig requestConfig = RequestConfig.custom()
+                            .setSocketTimeout(1000*60)
+                            .setConnectTimeout(1000*60)
+                            .build();
+                    ((HttpPost)uriRequest).setConfig(requestConfig);
+                    ((HttpPost)uriRequest).setEntity(httpEntity);
+                    if (null!=parameters) {
+                        Set<String> keys = parameters.keySet();
+                        for (String key : keys) {
+                            uriRequest.addHeader(key, parameters.get(key).toString());
+                        }
+                    }
                 }
 
                 System.out.println("executing request" + uriRequest.getRequestLine());
