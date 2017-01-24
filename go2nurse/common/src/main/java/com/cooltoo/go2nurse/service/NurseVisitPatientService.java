@@ -528,7 +528,7 @@ public class NurseVisitPatientService {
         entity.setPatientRecordNo(patientRecordNo);
         entity.setNote(note);
         entity.setStatus(CommonStatus.ENABLED);
-        if (null!=visitRecord) {
+        if (null!=visitTime) {
             entity.setTime(visitTime);
         }
         else if (null==entity.getTime()) {
