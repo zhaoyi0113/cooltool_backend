@@ -83,6 +83,7 @@ public enum ErrorCode {
     NURSE_AUTH_DENIED_BY_ADMIN(268, Response.Status.BAD_REQUEST, "管理员禁用了护士的咨询权限", "Nurse's consultation authorization is forbidden by admin"),
     NURSE_NOT_BELONG_TO_DEPARTMENT(269, Response.Status.BAD_REQUEST, "护士不属于该科室", "Nurse do not belong to department"),
     USER_NOT_SET_DEFAULT_ADDRESS(270, Response.Status.BAD_REQUEST, "用户没有设置默认地址", "User do not set the default address"),
+    HAS_PAID(271, Response.Status.BAD_REQUEST, "已经支付", "Has Paid"),
 
 
 

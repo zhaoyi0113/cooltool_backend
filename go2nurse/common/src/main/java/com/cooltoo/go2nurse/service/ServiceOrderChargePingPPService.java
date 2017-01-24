@@ -155,18 +155,22 @@ public class ServiceOrderChargePingPPService {
         }
 
         ServiceOrderChargePingPPEntity entity = null;
-        List<ServiceOrderChargePingPPEntity> entities = repository.findByChargeId(chargeId);
+        List<ServiceOrderChargePingPPEntity> entities = repository.findByAppTypeAndOrderId(appType, orderId, sort);
         if (VerifyUtil.isListEmpty(entities)) {
             entity = new ServiceOrderChargePingPPEntity();
         }
         else {
+            // user had pay for it
+            for (ServiceOrderChargePingPPEntity tmp : entities) {
+                if (ChargeStatus.CHARGE_SUCCEED.equals(tmp.getChargeStatus())) {
+                    throw new BadRequestException(ErrorCode.HAS_PAID);
+                }
+            }
+
+            // delete the invalid charges
             entity = entities.get(0);
             entities.remove(0);
-
-            for (ServiceOrderChargePingPPEntity tmp : entities) {
-                tmp.setStatus(CommonStatus.DISABLED);
-            }
-            repository.save(entities);
+            repository.delete(entities);
         }
         entity.setOrderId(orderId);
         entity.setOrderNo(orderNo);
