@@ -334,16 +334,15 @@ public final class NetworkUtil {
      * @param outputStr 提交的数据
      * @return 返回微信服务器响应的信息
      */
-    public final String httpsRequest(String requestUrl, String requestMethod, Map<String, String> parameters, String outputStr, String password, String certificationFilePath) {
+    public final String httpsRequest(String requestUrl, String requestMethod, Map<String, String> parameters, String outputStr, String password, InputStream certificationFileInputStream) {
         String resStr = null;
         try{
             //================================================================
             KeyStore keyStore  = KeyStore.getInstance("PKCS12");
-            FileInputStream instream = new FileInputStream(new File(certificationFilePath));
             try {
-                keyStore.load(instream, password.toCharArray());
+                keyStore.load(certificationFileInputStream, password.toCharArray());
             } finally {
-                instream.close();
+                certificationFileInputStream.close();
             }
 
             // Trust own CA and all self-signed certs

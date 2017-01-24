@@ -2,13 +2,21 @@ package com.cooltoo.services.wechat;
 
 import com.cooltoo.go2nurse.openapp.WeChatPayService;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 /**
  * Created by zhaolisong on 23/01/2017.
  */
 public class WeChatRefundTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         WeChatPayService weChatPayService = new WeChatPayService();
+
+        File keyFile = new File("go2nurse/go2nurse_workflow/src/test/resources/api_client_cert_1252899001.p12");
+        System.out.println(keyFile.getAbsolutePath());
+        FileInputStream instream = new FileInputStream(keyFile);
         weChatPayService.refundByWeChat(
                 "wxbeec5531b4ae001a",
                 "1252899001",
@@ -20,7 +28,7 @@ public class WeChatRefundTest {
                 1,
                 "CNY",
                 null,
-                "/Users/zhaolisong/Downloads/cert-3-1252899001/apiclient_cert.p12");
+                instream);
 /*
 
         {

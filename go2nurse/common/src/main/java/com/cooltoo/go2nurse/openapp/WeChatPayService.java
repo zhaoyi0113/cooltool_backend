@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -193,14 +194,14 @@ public class WeChatPayService {
      * @param refundFee 退款金额，退款总金额，订单总金额，单位为分，只能为整数，详见支付金额
      * @param refundFeeType 货币类型，符合ISO 4217标准的三位字母代码，默认人民币：CNY，其他值列表详见货币类型
      * @param opUserId 操作员帐号, 默认为商户号
-     * @param certP12File 商户p12证书路径
+     * @param certP12FileInputStream 商户p12证书
      */
     public Map<String, String> refundByWeChat(String appId, String mchId, String devInfo,
                                               String transactionId, String outTradeNo,
                                               String outRefundNo,
                                               int totalFee, int refundFee, String refundFeeType,
                                               String opUserId,
-                                              String certP12File
+                                              InputStream certP12FileInputStream
     ) {
         Map<String, String> keyParam = new HashMap();
         String key = "appid";
@@ -263,7 +264,7 @@ public class WeChatPayService {
 
         String xmlWeChatOrder = VerifyUtil.getRequestXml(new TreeMap<>(keyParam));
         logger.info("create sign xml "+xmlWeChatOrder);
-        String response = NetworkUtil.newInstance().httpsRequest(REFUND_URL, "POST", keyParam, xmlWeChatOrder, mchId, certP12File);
+        String response = NetworkUtil.newInstance().httpsRequest(REFUND_URL, "POST", keyParam, xmlWeChatOrder, mchId, certP12FileInputStream);
         keyParam = VerifyUtil.parseResponseXml(response);
         return keyParam;
     }
