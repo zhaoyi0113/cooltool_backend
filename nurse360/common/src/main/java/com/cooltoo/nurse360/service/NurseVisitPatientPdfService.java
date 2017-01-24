@@ -38,6 +38,10 @@ import java.util.*;
 @Service("NurseVisitPatientPdfService")
 public class NurseVisitPatientPdfService {
 
+    public static final int GET_PAGE = 1;
+    public static final int ADD_PAGE = 2;
+    public static final int EDIT_PAGE = 3;
+
     private static final Logger logger = LoggerFactory.getLogger(NurseVisitPatientPdfService.class);
 
     @Autowired private NurseVisitPatientService nurseVisitPatientService;
@@ -52,12 +56,12 @@ public class NurseVisitPatientPdfService {
     public boolean recreateVisitPatientPages(Long userId, Long patientId,
                                              ServiceVendorType vendorType, Long vendorId, Long departId,
                                              Long recordId,
-                                             boolean isAddRecord/* true: add record; false: modify or delete record*/
+                                             int operation /* 1: get page; 2: add record; 3: modify or delete record*/
     ) {
 
         FontUtil.loadBaseFont(nurse360Utility.getFontSimsun());
         logger.info("create visit patient pages, userId={} patientId={} vendorType={} vendorId={} departId={} recordId={} isAddRecord={}",
-                userId, patientId, vendorType, vendorId, departId, recordId, isAddRecord);
+                userId, patientId, vendorType, vendorId, departId, recordId, operation);
 
         long startRecordId = 0;
         int  startRecordLine = 0;
@@ -65,7 +69,7 @@ public class NurseVisitPatientPdfService {
 
         PageFile firstPage = null;
         List<PageFile> pagesNeedRemoved = null;
-        if (!isAddRecord) {
+        if (EDIT_PAGE==operation) {
             pagesNeedRemoved = visitPatientFileStorageService.getFileAfterRecord(
                     userId + "_" + patientId,
                     vendorType.ordinal() + "_" + vendorId + "_" + departId,
@@ -80,7 +84,8 @@ public class NurseVisitPatientPdfService {
                     }
                 }
             }
-        } else {
+        }
+        else if (EDIT_PAGE==operation) {
             firstPage = visitPatientFileStorageService.getLastFile(
                     userId + "_" + patientId,
                     vendorType.ordinal() + "_" + vendorId + "_" + departId);
@@ -159,7 +164,7 @@ public class NurseVisitPatientPdfService {
                     page, records,
                     VisitPatientRecordPagePrinter.MAX_CHAR_IN_CELL,
                     temporaryFileStorageService.getStoragePath(),
-                    startRecordId, startRecordLine, startPageIndex);
+                    startRecordId, startRecordLine, startPageIndex, operation!=GET_PAGE);
             // move pages to visit_patient/
             visitPatientFileStorageService.moveFileToHere(savedPageFilePaths);
 

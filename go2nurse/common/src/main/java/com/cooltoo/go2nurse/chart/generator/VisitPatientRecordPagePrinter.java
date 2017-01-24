@@ -421,7 +421,8 @@ public class VisitPatientRecordPagePrinter {
                                     String storagePath,
                                     long startRecordId,
                                     int  startLineIndex,
-                                    int startPageIndex
+                                    int startPageIndex,
+                                    boolean overridePageExisted
     ) {
         Row       row   = null;
         Cell      cell  = null;
@@ -548,7 +549,9 @@ public class VisitPatientRecordPagePrinter {
                             .append(record.id()).append("_")
                             .append(lineIndex).append("");
                     File file = new File(absPath.toString());
-                    page.save(file);
+                    if (overridePageExisted && file.exists()) {
+                        page.save(file);
+                    }
                     fileAbsPaths.add(absPath.toString());
 
 

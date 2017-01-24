@@ -443,7 +443,7 @@ public class HospitalVisitPatientAPI {
                     nurseVisitPatientPdfService.recreateVisitPatientPages(
                             userId, patientId,
                             ServiceVendorType.HOSPITAL, hospitalId, departmentId,
-                            0L, false);
+                            0L, NurseVisitPatientPdfService.GET_PAGE);
                 }
                 return;
             }
@@ -452,14 +452,14 @@ public class HospitalVisitPatientAPI {
                 nurseVisitPatientPdfService.recreateVisitPatientPages(
                         userId, patientId,
                         ServiceVendorType.HOSPITAL, hospitalId, departmentId,
-                        0L, true);
+                        0L, NurseVisitPatientPdfService.ADD_PAGE);
             }
 
             if (isModify && modifyRecordId>0) {
                 nurseVisitPatientPdfService.recreateVisitPatientPages(
                         userId, patientId,
                         ServiceVendorType.HOSPITAL, hospitalId, departmentId,
-                        modifyRecordId, false);
+                        modifyRecordId, NurseVisitPatientPdfService.EDIT_PAGE);
             }
         }
 
