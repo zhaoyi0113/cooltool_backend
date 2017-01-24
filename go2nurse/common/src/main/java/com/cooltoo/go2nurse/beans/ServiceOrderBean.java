@@ -27,6 +27,7 @@ public class ServiceOrderBean {
     public static final String CANNOT_FETCH_REASON = "cannot_fetch_reason";
     public static final String CANNOT_FETCH_REASON_FORBIDDEN_BY_ADMIN = "FORBIDDEN_BY_ADMIN";
     public static final String CANNOT_FETCH_REASON_FORBIDDEN_BY_HEAD_NURSE = "FORBIDDEN_BY_HEAD_NURSE";
+    public static final String ORDER_VISIT_RECORD_ID = "order_visit_record_id";
 
     private long id;
     private Date time;

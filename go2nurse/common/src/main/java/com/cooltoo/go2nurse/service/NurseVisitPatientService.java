@@ -135,6 +135,26 @@ public class NurseVisitPatientService {
         return beans;
     }
 
+    public Map<Long, Long> getOrdersVisitRecordIds(List<Long> orderIds) {
+        Map<Long, Long> orderRecorded = new HashMap<>();
+        if (VerifyUtil.isListEmpty(orderIds)) {
+            return orderRecorded;
+        }
+        List<NurseVisitPatientEntity> entities = repository.findByOrderIdIn(orderIds, SORT_TIME_ID_DESC);
+        if (!VerifyUtil.isListEmpty(entities)) {
+            for (NurseVisitPatientEntity tmp : entities) {
+                if (null==tmp) { continue; }
+                Long recorded = orderRecorded.get(tmp.getOrderId());
+                // record already
+                if (null!=recorded) { continue; }
+                // judge record
+                orderRecorded.put(tmp.getOrderId(), tmp.getId());
+            }
+        }
+        logger.debug("the visit patient of order recorded. size={}", orderRecorded.size());
+        return orderRecorded;
+    }
+
     //===============================================================
     //             get ----  patient using
     //===============================================================
@@ -508,7 +528,12 @@ public class NurseVisitPatientService {
         entity.setPatientRecordNo(patientRecordNo);
         entity.setNote(note);
         entity.setStatus(CommonStatus.ENABLED);
-        entity.setTime(null==visitTime ? new Date() : visitTime);
+        if (null!=visitRecord) {
+            entity.setTime(visitTime);
+        }
+        else if (null==entity.getTime()) {
+            entity.setTime(new Date());
+        }
         entity = repository.save(entity);
 
         if (orderId>0) {

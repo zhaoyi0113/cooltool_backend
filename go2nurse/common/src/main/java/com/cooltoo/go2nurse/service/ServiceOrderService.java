@@ -239,14 +239,6 @@ public class ServiceOrderService {
 
         // set pingpp charge
         Map<Long, List<ServiceOrderChargePingPPBean>> orderId2Charge = orderPingPPService.getOrderPingPPResult(AppType.GO_2_NURSE, orderIds);
-        for (ServiceOrderBean tmp : beans) {
-            List<ServiceOrderChargePingPPBean> charges = orderId2Charge.get(tmp.getId());
-            if (null == charges) {
-                tmp.setPingPP(new ArrayList<>());
-            } else {
-                tmp.setPingPP(charges);
-            }
-        }
 
         // set fetch time
         final Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
@@ -258,14 +250,20 @@ public class ServiceOrderService {
             }
             orderIdToFetchTime.put(tmp.getOrderId(), tmp.getTime());
         }
+
+        // get visit record ids
+        Map<Long, Long> orderIdToVisitRecordId = nurseVisitPatientService.getOrdersVisitRecordIds(orderIds);
+
         Date _1970 = new Date(0); // 1970-01-00 08:00:00
         for (ServiceOrderBean tmp : beans) {
+            List<ServiceOrderChargePingPPBean> charges = orderId2Charge.get(tmp.getId());
+            tmp.setPingPP(null==charges ? new ArrayList<>() : charges);
+
             Date fetchTime = orderIdToFetchTime.get(tmp.getId());
-            if (null == fetchTime) {
-                tmp.setFetchTime(_1970);
-            } else {
-                tmp.setFetchTime(fetchTime);
-            }
+            tmp.setFetchTime(null==fetchTime ? _1970 : fetchTime);
+
+            Long visitRecordId = orderIdToVisitRecordId.get(tmp.getId());
+            tmp.setProperty(ServiceOrderBean.ORDER_VISIT_RECORD_ID, null==visitRecordId ? 0L : visitRecordId);
         }
     }
 
