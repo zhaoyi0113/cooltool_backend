@@ -5,6 +5,7 @@ import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.go2nurse.constants.OrderStatus;
 
+import javax.persistence.criteria.Order;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class DoctorAppointmentBean {
     private long userId;
     private long patientId;
     private PatientBean patient;
-    private OrderStatus orderStatus;
+    private String orderStatus;
     private float score;
     private Map<String, Object> properties = new HashMap<>();
 
@@ -111,7 +112,7 @@ public class DoctorAppointmentBean {
         return patient;
     }
 
-    public OrderStatus getOrderStatus() {
+    public String getOrderStatus() {
         return orderStatus;
     }
 
@@ -191,7 +192,7 @@ public class DoctorAppointmentBean {
         this.patient = patient;
     }
 
-    public void setOrderStatus(OrderStatus orderStatus) {
+    public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
 

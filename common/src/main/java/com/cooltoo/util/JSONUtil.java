@@ -32,7 +32,7 @@ public class JSONUtil {
             return returnValue;
         }
         catch (Exception ex) {
-            logger.warn("parse the json list error, json={}, class={}", content, clazz);
+            logger.warn("parse the json list error, json={}, class={} throwable={}", content, clazz, ex.getMessage());
             return (T) new ArrayList<T>();
         }
     }
@@ -43,7 +43,7 @@ public class JSONUtil {
             return mapper.readValue(content, clazz);
         }
         catch (Exception ex) {
-            logger.error("parse the json list error, json={}, class={} throwable={}", content, clazz, ex);
+            logger.error("parse the json list error, json={}, class={} throwable={}", content, clazz, ex.getMessage());
             return null;
         }
     }

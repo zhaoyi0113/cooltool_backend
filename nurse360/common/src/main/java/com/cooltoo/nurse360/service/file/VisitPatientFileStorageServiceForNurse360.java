@@ -253,11 +253,11 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
     /**
      * srcFileAbsolutePath---->dir/userId_patientId/
      * @param srcVisitRecordFileAbsolutePath
+     * @param overrideFile override file if destination file is exist or not
      * path list, path format is
      *      vr_userId_patientId_vendorType_vendorId_departId_pageIndex_1stRecordId_1stLineIndex_2ndRecordId_2ndLineIndex
      */
-    @Override
-    public Map<String, String> moveFileToHere(List<String> srcVisitRecordFileAbsolutePath) {
+    public Map<String, String> moveFileToHere(List<String> srcVisitRecordFileAbsolutePath, boolean overrideFile) {
         logger.info("move file to visit_patient. file={}", srcVisitRecordFileAbsolutePath);
         if (VerifyUtil.isListEmpty(srcVisitRecordFileAbsolutePath)) {
             logger.info("the files list is empty");
@@ -299,7 +299,12 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
                 }
 
                 // move storage file to visit_patient dir
-                fileUtil.moveFile(filePath, visitRecordPath + destRelativeDirPath + destRelativeFilePath);
+                File file = new File(visitRecordPath + destRelativeDirPath + destRelativeFilePath);
+                if (!overrideFile && file.exists()) {
+                }
+                else {
+                    fileUtil.moveFile(filePath, visitRecordPath + destRelativeDirPath + destRelativeFilePath);
+                }
 
                 // cache moved file
                 successMoved.put(visitRecordPath + destRelativeDirPath + destRelativeFilePath, filePath);
@@ -332,6 +337,9 @@ public class VisitPatientFileStorageServiceForNurse360 extends AbstractFileStora
         throw new UnsupportedOperationException();
     }
     @Deprecated @Override public boolean fileExist(long fileId) {
+        throw new UnsupportedOperationException();
+    }
+    @Deprecated @Override public Map<String, String> moveFileToHere(List<String> srcVisitRecordFileAbsolutePath) {
         throw new UnsupportedOperationException();
     }
 

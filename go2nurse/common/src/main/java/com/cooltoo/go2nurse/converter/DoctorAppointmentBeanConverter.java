@@ -33,7 +33,7 @@ public class DoctorAppointmentBeanConverter implements Converter<DoctorAppointme
             bean.setPatient(patient);
         }
         bean.setOrderNo(source.getOrderNo());
-        bean.setOrderStatus(source.getOrderStatus());
+        bean.setOrderStatus(null!=source.getOrderStatus() ? source.getOrderStatus().getName() : "");
         bean.setHospitalId(source.getHospitalId());
         if (null!=source.getHospitalJson()) {
             HospitalBean hospital = jsonUtil.parseJsonBean(source.getHospitalJson(), HospitalBean.class);

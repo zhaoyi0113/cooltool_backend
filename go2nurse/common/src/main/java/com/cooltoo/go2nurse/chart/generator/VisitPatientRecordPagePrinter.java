@@ -549,7 +549,9 @@ public class VisitPatientRecordPagePrinter {
                             .append(record.id()).append("_")
                             .append(lineIndex).append("");
                     File file = new File(absPath.toString());
-                    if (overridePageExisted && file.exists()) {
+                    if (!overridePageExisted && file.exists()) {
+                    }
+                    else {
                         page.save(file);
                     }
                     fileAbsPaths.add(absPath.toString());

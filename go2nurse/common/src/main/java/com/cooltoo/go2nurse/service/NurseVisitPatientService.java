@@ -522,6 +522,9 @@ public class NurseVisitPatientService {
                     visitRecordIds.add(tmp.getId());
                 }
                 deleteVisitRecord(visitRecordIds);
+                deleteNurseSignImage(0, entity.getId());
+                deleteVisitRecordImage(0, entity.getId());
+                deletePatientSignImage(0, entity.getId());
             }
         }
 

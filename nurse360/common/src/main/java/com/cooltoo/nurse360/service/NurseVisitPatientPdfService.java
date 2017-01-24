@@ -166,7 +166,7 @@ public class NurseVisitPatientPdfService {
                     temporaryFileStorageService.getStoragePath(),
                     startRecordId, startRecordLine, startPageIndex, operation!=GET_PAGE);
             // move pages to visit_patient/
-            visitPatientFileStorageService.moveFileToHere(savedPageFilePaths);
+            visitPatientFileStorageService.moveFileToHere(savedPageFilePaths, operation!=GET_PAGE);
 
             return true;
         }
