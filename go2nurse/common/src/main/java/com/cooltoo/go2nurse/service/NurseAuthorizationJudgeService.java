@@ -4,6 +4,7 @@ import com.cooltoo.beans.NurseAuthorizationBean;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.beans.NurseHospitalRelationBean;
+import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
@@ -61,6 +62,9 @@ public class NurseAuthorizationJudgeService {
                 if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthConsultationHeadNurse())) {
                     continue;
                 }
+                if (CommonStatus.ENABLED.equals(nurseAuth.getAuthority().getDenyAllAuthHeadNurse())) {
+                    continue;
+                }
             }
 
             nurseCanAnswer.add(tmp);
@@ -94,6 +98,9 @@ public class NurseAuthorizationJudgeService {
         boolean isPatientBelongToDepartment = vendorsKey.contains(nurseAuth.getKey());
         if (isPatientBelongToDepartment) {
             if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthConsultationHeadNurse())) {
+                throw new BadRequestException(ErrorCode.NURSE_AUTH_DENIED_BY_HEAD_NURSE);
+            }
+            if (CommonStatus.ENABLED.equals(nurseAuth.getAuthority().getDenyAllAuthHeadNurse())) {
                 throw new BadRequestException(ErrorCode.NURSE_AUTH_DENIED_BY_HEAD_NURSE);
             }
         }
@@ -139,6 +146,9 @@ public class NurseAuthorizationJudgeService {
                 if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthOrderHeadNurse())) {
                     throw new BadRequestException(ErrorCode.NURSE_AUTH_DENIED_BY_HEAD_NURSE);
                 }
+                if (CommonStatus.ENABLED.equals(nurseAuth.getAuthority().getDenyAllAuthHeadNurse())) {
+                    throw new BadRequestException(ErrorCode.NURSE_AUTH_DENIED_BY_HEAD_NURSE);
+                }
             }
         }
 
@@ -169,6 +179,9 @@ public class NurseAuthorizationJudgeService {
             if (UserAuthority.DENY_ALL.equals(nurseAuth.getAuthority().getAuthOrderHeadNurse())) {
                 continue;
             }
+            if (CommonStatus.ENABLED.equals(nurseAuth.getAuthority().getDenyAllAuthHeadNurse())) {
+                continue;
+            }
             nurseFetchOrder.add(tmp);
         }
 
@@ -182,6 +195,16 @@ public class NurseAuthorizationJudgeService {
             // is head nurse
             if (null!=extension && YesNoEnum.YES.equals(extension.getIsManager())) {
                 return true;
+            }
+            NurseHospitalRelationBean nurseHospitalRelation = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
+            // this nurse is not an employee of this department
+            if (null==nurseHospitalRelation || !YesNoEnum.YES.equals(nurseHospitalRelation.getApproval())) {
+                return false;
+            }
+            PersonalAuthorization nurseAuth = new PersonalAuthorization();
+            nurseAuth.setNurse(nurse);
+            if (CommonStatus.ENABLED.equals(nurseAuth.getAuthority().getDenyAllAuthHeadNurse())) {
+                return false;
             }
             // has authorization of publishing notification
             NurseAuthorizationBean authorization = (NurseAuthorizationBean) nurse.getProperty(NurseBean.AUTHORIZATION);

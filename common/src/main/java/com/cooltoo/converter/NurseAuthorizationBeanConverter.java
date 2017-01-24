@@ -18,6 +18,7 @@ public class NurseAuthorizationBeanConverter implements Converter<NurseAuthoriza
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
         bean.setNurseId(source.getNurseId());
+        bean.setDenyAllAuthHeadNurse(source.getDenyAllAuthHeadNurse());
         bean.setAuthOrderHeadNurse(source.getAuthOrderHeadNurse());
         bean.setAuthOrderAdmin(source.getAuthOrderAdmin());
         bean.setAuthNotificationHeadNurse(source.getAuthNotificationHeadNurse());

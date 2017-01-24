@@ -15,6 +15,7 @@ public class NurseAuthorizationBean {
     private Date      time;
     private CommonStatus status;
     private long      nurseId;
+    private CommonStatus  denyAllAuthHeadNurse;
     private UserAuthority authOrderHeadNurse;
     private UserAuthority authOrderAdmin;
     private UserAuthority authNotificationHeadNurse;
@@ -46,6 +47,13 @@ public class NurseAuthorizationBean {
     }
     public void setNurseId(long nurseId) {
         this.nurseId = nurseId;
+    }
+
+    public CommonStatus getDenyAllAuthHeadNurse() {
+        return denyAllAuthHeadNurse;
+    }
+    public void setDenyAllAuthHeadNurse(CommonStatus denyAllAuthHeadNurse) {
+        this.denyAllAuthHeadNurse = denyAllAuthHeadNurse;
     }
 
     public UserAuthority getAuthOrderHeadNurse() {

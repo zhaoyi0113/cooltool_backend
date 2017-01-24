@@ -17,6 +17,7 @@ public class NurseAuthorizationEntity {
     private Date time;
     private CommonStatus status;
     private long nurseId;
+    private CommonStatus  denyAllAuthHeadNurse;
     private UserAuthority authOrderHeadNurse;
     private UserAuthority authOrderAdmin;
     private UserAuthority authNotificationHeadNurse;
@@ -54,6 +55,14 @@ public class NurseAuthorizationEntity {
     }
     public void setNurseId(long nurseId) {
         this.nurseId = nurseId;
+    }
+
+    @Column(name = "deny_all_head_nurse")
+    public CommonStatus getDenyAllAuthHeadNurse() {
+        return denyAllAuthHeadNurse;
+    }
+    public void setDenyAllAuthHeadNurse(CommonStatus denyAllAuthHeadNurse) {
+        this.denyAllAuthHeadNurse = denyAllAuthHeadNurse;
     }
 
     @Column(name = "enable_order_head_nurse")

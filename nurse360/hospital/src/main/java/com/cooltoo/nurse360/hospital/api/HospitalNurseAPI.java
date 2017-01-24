@@ -212,19 +212,22 @@ public class HospitalNurseAPI {
 
     @RequestMapping(path = "/nurse/authorization", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public boolean editNurseAuthorization(HttpServletRequest request,
-                                                         @RequestParam(defaultValue = "0", name = "nurse_id")            long nurseId,
-                                                         @RequestParam(defaultValue = "",  name = "auth_order")        String authOrderHeadNurse,
-                                                         @RequestParam(defaultValue = "",  name = "auth_notification") String authNotificationHeadNurse,
-                                                         @RequestParam(defaultValue = "",  name = "auth_consultation") String authConsultationHeadNurse,
-                                                         @RequestParam(defaultValue = "",  name = "approval")          String headNurseApproval
+                                          @RequestParam(defaultValue = "0", name = "nurse_id")            long nurseId,
+                                          @RequestParam(defaultValue = "",  name = "auth_order")        String authOrderHeadNurse,
+                                          @RequestParam(defaultValue = "",  name = "auth_notification") String authNotificationHeadNurse,
+                                          @RequestParam(defaultValue = "",  name = "auth_consultation") String authConsultationHeadNurse,
+                                          @RequestParam(defaultValue = "",  name = "approval")          String headNurseApproval,
+                                          @RequestParam(defaultValue = "",  name = "deny_all_auth")     String denyAllAuthHeadNurse
+
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         if (userDetails.isNurseManager() || userDetails.isAdmin()) {
+            CommonStatus  denyAllAuth= CommonStatus.parseString(denyAllAuthHeadNurse);
             UserAuthority authOrder  = UserAuthority.parseString(authOrderHeadNurse);
             UserAuthority authNotify = UserAuthority.parseString(authNotificationHeadNurse);
             UserAuthority authConsul = UserAuthority.parseString(authConsultationHeadNurse);
             if (null!=authOrder || null!=authNotify || null!=authConsul) {
-                nurseAuthorizationService.setAuthorization(nurseId, authOrder, null, authNotify, authConsul, null);
+                nurseAuthorizationService.setAuthorization(nurseId, denyAllAuth, authOrder, null, authNotify, authConsul, null);
             }
 
 

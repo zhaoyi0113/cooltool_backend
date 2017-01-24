@@ -77,6 +77,7 @@ public class CommonNurseAuthorizationService {
         bean.setTime(new Date());
         bean.setStatus(CommonStatus.ENABLED);
         bean.setNurseId(nurseId);
+        bean.setDenyAllAuthHeadNurse(CommonStatus.DISABLED);
         bean.setAuthOrderHeadNurse(UserAuthority.AGREE_ALL);
         bean.setAuthOrderAdmin(UserAuthority.AGREE_ALL);
         bean.setAuthNotificationHeadNurse(UserAuthority.DENY_ALL);
@@ -90,12 +91,13 @@ public class CommonNurseAuthorizationService {
     //================================================================================
     @Transactional
     public NurseAuthorizationBean setAuthorization(long nurseId,
+                                                   CommonStatus denyAllAuthHeadNurse,
                                                    UserAuthority authOrderHeadNurse,
                                                    UserAuthority authOrderAdmin,
                                                    UserAuthority authNotificationHeadNurse,
                                                    UserAuthority authConsultationHeadNurse,
                                                    UserAuthority authConsultationAdmin) {
-        logger.info("set nurse authorization. nurseId={} authOrderHeadNurse={} authOrderAdmin={} authNotificationHeadNurse={} authConsultationHeadNurse={} authConsultationAdmin={}",
+        logger.info("set nurse authorization. nurseId={} denyAllAuthHeadNurses={} authOrderHeadNurse={} authOrderAdmin={} authNotificationHeadNurse={} authConsultationHeadNurse={} authConsultationAdmin={}",
                 nurseId, authOrderHeadNurse, authOrderAdmin, authNotificationHeadNurse, authConsultationHeadNurse, authConsultationAdmin);
         if (!nurseRepository.exists(nurseId)) {
             logger.warn("nurse not exist");
@@ -109,6 +111,7 @@ public class CommonNurseAuthorizationService {
             entity.setTime(new Date());
             entity.setStatus(CommonStatus.ENABLED);
             entity.setNurseId(nurseId);
+            entity.setDenyAllAuthHeadNurse(CommonStatus.DISABLED);
             entity.setAuthOrderHeadNurse(UserAuthority.AGREE_ALL);
             entity.setAuthOrderAdmin(UserAuthority.AGREE_ALL);
             entity.setAuthNotificationHeadNurse(UserAuthority.DENY_ALL);
@@ -118,6 +121,9 @@ public class CommonNurseAuthorizationService {
             entity = entities.get(0);
         }
 
+        if (null!=denyAllAuthHeadNurse && !denyAllAuthHeadNurse.equals(entity.getDenyAllAuthHeadNurse())) {
+            entity.setDenyAllAuthHeadNurse(denyAllAuthHeadNurse);
+        }
         if (null!=authOrderHeadNurse && !authOrderHeadNurse.equals(entity.getAuthOrderHeadNurse())) {
             entity.setAuthOrderHeadNurse(authOrderHeadNurse);
         }
