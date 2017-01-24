@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.go2nurse.beans.DoctorAppointmentBean;
+import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.service.DoctorAppointmentService;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.util.NumberUtil;
@@ -92,7 +93,7 @@ public class DoctorAppointmentManageAPI {
                                       @FormParam("appointment_id") @DefaultValue("0") long appointmentId
     ) {
         DoctorAppointmentBean appointment = doctorAppointmentService.cancelAppointment(0, 0, appointmentId);
-        notifierForAllModule.appointmentAlertToGo2nurseUser(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment cancelled!");
+        notifierForAllModule.appointmentAlertToGo2nurseUser(appointment.getUserId(), appointment.getId(), OrderStatus.parseString(appointment.getOrderStatus()), "appointment cancelled!");
         return Response.ok(appointment).build();
     }
 
@@ -103,7 +104,7 @@ public class DoctorAppointmentManageAPI {
                                         @FormParam("appointment_id") @DefaultValue("0") long appointmentId
     ) {
         DoctorAppointmentBean appointment = doctorAppointmentService.completeAppointment(0, 0, appointmentId);
-        notifierForAllModule.appointmentAlertToGo2nurseUser(appointment.getUserId(), appointment.getId(), appointment.getOrderStatus(), "appointment completed!");
+        notifierForAllModule.appointmentAlertToGo2nurseUser(appointment.getUserId(), appointment.getId(), OrderStatus.parseString(appointment.getOrderStatus()), "appointment completed!");
         return Response.ok(appointment).build();
     }
 }
