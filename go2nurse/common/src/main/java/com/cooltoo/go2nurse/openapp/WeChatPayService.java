@@ -248,8 +248,10 @@ public class WeChatPayService {
             keyParam.put(key, opUserId);
         }
         else {
+            key = "op_user_id";
             keyParam.put(key, mchId);
         }
+
 
         key = "refund_account";
         keyParam.put(key, "REFUND_SOURCE_UNSETTLED_FUNDS");
