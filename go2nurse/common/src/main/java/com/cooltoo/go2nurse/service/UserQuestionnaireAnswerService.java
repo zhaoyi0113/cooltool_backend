@@ -377,8 +377,8 @@ public class UserQuestionnaireAnswerService {
             }
             else {
                 Date time = currentQuestionnaire.getTime();
-                if (time.getTime()>currentAnswer.getTime().getTime()) {
-                    currentQuestionnaire.setTime(time);
+                if (time.getTime()<currentAnswer.getTime().getTime()) {
+                    currentQuestionnaire.setTime(currentAnswer.getTime());
                 }
             }
 
