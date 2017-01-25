@@ -285,49 +285,88 @@ public class ServiceOrderService {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
-        if (!OrderStatus.TO_PAY.equals(entity.getOrderStatus())) {
-            logger.info("the order is in status={}, can not be modified", entity.getOrderStatus());
-            throw new BadRequestException(ErrorCode.DATA_ERROR);
-        }
+        boolean changed = false;
+        String  newPatientJson       = null;
+        String  newAddress           = null;
+        Date    newStartTime         = null;
+        int     newTimeDuration      = -1;
+        int     newTotalPriceCent    = -1;
+        int     newTotalDiscountCent = -1;
+        int     newTotalIncomeCent   = -1;
+        int     newItemCount         = -1;
+        String  newLeaveMessage      = null;
         JSONUtil jsonUtil = JSONUtil.newInstance();
 
-        boolean changed = false;
-        if (patientId != null && patientService.existPatient(patientId)) {
+        if (patientId != null && patientService.existPatient(patientId) && patientId!=entity.getPatientId()) {
             PatientBean patient = patientService.getOneById(patientId);
-            String patientJson = jsonUtil.toJsonString(patient);
-            entity.setPatientId(patientId);
-            entity.setPatient(patientJson);
+            newPatientJson = jsonUtil.toJsonString(patient);
             changed = true;
         }
 
         if (!VerifyUtil.isStringEmpty(address) && !address.equals(entity.getAddress())) {
-            entity.setAddress(address);
+            newAddress = address;
             changed = true;
         }
 
         long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (lStartTime > 0) {
-            entity.setServiceStartTime(new Date(lStartTime));
+        if (lStartTime > 0 && lStartTime!=entity.getServiceStartTime().getTime()) {
+            newStartTime = new Date(lStartTime);
             changed = true;
+
         }
 
-        if (null != count) {
+        if (null!=count && count!=entity.getItemCount()) {
             ServiceOrderBean bean = beanConverter.convert(entity);
-            ServiceItemBean item = bean.getServiceItem();
-            entity.setServiceTimeDuration(item.getServiceTimeDuration() * count);
-            entity.setTotalPriceCent(item.getServicePriceCent() * count);
-            entity.setTotalDiscountCent(item.getServiceDiscountCent() * count);
-            entity.setTotalIncomeCent(item.getServerIncomeCent() * count);
-            entity.setItemCount(count);
+            ServiceItemBean item  = bean.getServiceItem();
+            newTimeDuration       = count * item.getServiceTimeDuration();
+            newTotalPriceCent     = count * item.getServicePriceCent();
+            newTotalDiscountCent  = count * item.getServiceDiscountCent();
+            newTotalIncomeCent    = count * item.getServerIncomeCent();
+            newItemCount          = count;
             changed = true;
         }
 
-        if (!VerifyUtil.isStringEmpty(leaveAMessage)) {
-            entity.setLeaveAMessage(leaveAMessage);
+        if (!VerifyUtil.isStringEmpty(leaveAMessage) && !leaveAMessage.equals(entity.getLeaveAMessage())) {
+            newLeaveMessage = leaveAMessage;
             changed = true;
         }
 
         if (changed) {
+            if (!OrderStatus.TO_PAY.equals(entity.getOrderStatus())) {
+                logger.info("the order is in status={}, can not be modified", entity.getOrderStatus());
+                throw new BadRequestException(ErrorCode.DATA_ERROR);
+            }
+
+            if (null!=newPatientJson) {
+                entity.setPatientId(patientId);
+                entity.setPatient(newPatientJson);
+            }
+            if (null!=newAddress) {
+                entity.setAddress(address);
+            }
+            if (null!=newStartTime) {
+                entity.setServiceStartTime(new Date(lStartTime));
+            }
+
+            if (newTimeDuration>0) {
+                entity.setServiceTimeDuration(newTimeDuration);
+            }
+            if (newTotalPriceCent>0) {
+                entity.setTotalPriceCent(newTotalPriceCent);
+            }
+            if (newTotalDiscountCent>0) {
+                entity.setTotalDiscountCent(newTotalDiscountCent);
+            }
+            if (newTotalIncomeCent>0) {
+                entity.setTotalIncomeCent(newTotalIncomeCent);
+            }
+            if (newItemCount>0) {
+                entity.setItemCount(newItemCount);
+            }
+            if (null!=newLeaveMessage) {
+                entity.setLeaveAMessage(newLeaveMessage);
+            }
+
             entity = repository.save(entity);
         }
 
@@ -335,6 +374,7 @@ public class ServiceOrderService {
         logger.info("service order added is {}", bean);
         return bean;
     }
+
     @Transactional
     public void updateOrderStatusForHeadNurse(long orderId, OrderStatus orderStatus) {
         logger.info("update service order={} orderStatus={}", orderId, orderStatus);
