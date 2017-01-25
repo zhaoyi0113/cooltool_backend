@@ -371,6 +371,17 @@ public class UserQuestionnaireAnswerService {
             String answer = currentAnswer.getAnswer();
             userScore += parseUserAnswerScore(answer);
 
+            // set answer time
+            if (null==currentQuestionnaire.getTime()) {
+                currentQuestionnaire.setTime(currentAnswer.getTime());
+            }
+            else {
+                Date time = currentQuestionnaire.getTime();
+                if (time.getTime()>currentAnswer.getTime().getTime()) {
+                    currentQuestionnaire.setTime(time);
+                }
+            }
+
             // set answer to question
             long questionId = currentAnswer.getQuestionId();
             List<QuestionBean> questions = currentQuestionnaire.getQuestions();
