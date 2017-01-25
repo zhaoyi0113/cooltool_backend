@@ -340,7 +340,7 @@ public class ServiceOrderService {
         logger.info("update service order={} orderStatus={}", orderId, orderStatus);
 
         if (OrderStatus.CANCELLED.equals(orderStatus)) {
-            completedOrder(false, 0L, orderId);
+            cancelOrder(false, 0L, orderId);
             return;
         }
         if (OrderStatus.COMPLETED.equals(orderStatus)) {
