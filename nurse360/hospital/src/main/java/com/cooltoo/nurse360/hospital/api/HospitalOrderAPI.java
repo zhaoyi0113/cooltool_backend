@@ -144,11 +144,17 @@ public class HospitalOrderAPI {
                                                      @RequestParam(defaultValue = "0", name = "address")      String address,
                                                      @RequestParam(defaultValue = "",  name = "count")        String strCount,
                                                      @RequestParam(defaultValue = "",  name = "start_time")   String startTime,
-                                                     @RequestParam(defaultValue = "",  name = "message_left") String messageLeft
+                                                     @RequestParam(defaultValue = "",  name = "message_left") String messageLeft,
+                                                     @RequestParam(defaultValue = "",  name = "order_status") String orderStatus
     ) {
         //modify start_time, address, message left, score
         Integer count = !VerifyUtil.isIds(strCount) ? null : VerifyUtil.parseIntIds(strCount).get(0);
         ServiceOrderBean order = orderService.updateOrder(orderId, null, address, startTime, count, messageLeft);
+
+        OrderStatus enumOrderStatus = OrderStatus.parseString(orderStatus);
+        if (null!=orderStatus) {
+            orderService.updateOrderStatusForHeadNurse(orderId, enumOrderStatus);
+        }
         return order;
     }
 

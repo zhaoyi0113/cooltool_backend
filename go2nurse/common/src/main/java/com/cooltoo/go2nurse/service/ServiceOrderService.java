@@ -335,6 +335,52 @@ public class ServiceOrderService {
         logger.info("service order added is {}", bean);
         return bean;
     }
+    @Transactional
+    public void updateOrderStatusForHeadNurse(long orderId, OrderStatus orderStatus) {
+        logger.info("update service order={} orderStatus={}", orderId, orderStatus);
+
+        if (OrderStatus.CANCELLED.equals(orderStatus)) {
+            completedOrder(false, 0L, orderId);
+            return;
+        }
+        if (OrderStatus.COMPLETED.equals(orderStatus)) {
+            completedOrder(false, 0L, orderId);
+            return;
+        }
+
+        ServiceOrderEntity entity = repository.findOne(orderId);
+        if (null == entity) {
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        if (null == orderStatus) {
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        boolean canChangeStatus = true;
+        if (OrderStatus.REFUND_IN_PROCESS.equals(orderStatus)
+        && !OrderStatus.PAID.equals(entity.getOrderStatus())
+        && !OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
+        && !OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())) {
+            canChangeStatus = false;
+        }
+        if (!canChangeStatus) {
+            logger.info("the order is in status={}, can not be modified", entity.getOrderStatus());
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        boolean changed = false;
+        if (null!=orderStatus && !orderStatus.equals(entity.getOrderStatus())) {
+            entity.setOrderStatus(orderStatus);
+            changed = true;
+        }
+        if (changed) {
+            entity = repository.save(entity);
+        }
+
+        ServiceOrderBean bean = beanConverter.convert(entity);
+        logger.info("service order added is {}", bean);
+        return;
+    }
 
     @Transactional
     public Charge payForService(Long userId, Long orderId, String channel, String clientIP) {
