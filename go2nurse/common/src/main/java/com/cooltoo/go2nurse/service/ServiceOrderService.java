@@ -312,7 +312,6 @@ public class ServiceOrderService {
         if (lStartTime > 0 && lStartTime!=entity.getServiceStartTime().getTime()) {
             newStartTime = new Date(lStartTime);
             changed = true;
-
         }
 
         if (null!=count && count!=entity.getItemCount()) {

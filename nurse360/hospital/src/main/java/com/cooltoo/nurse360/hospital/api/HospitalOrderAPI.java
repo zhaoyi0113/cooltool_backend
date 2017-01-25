@@ -141,7 +141,7 @@ public class HospitalOrderAPI {
     @RequestMapping(path = "/manager/order/modify", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public ServiceOrderBean modifyTimeAddressMessage(HttpServletRequest request,
                                                      @RequestParam(defaultValue = "0", name = "order_id")       long orderId,
-                                                     @RequestParam(defaultValue = "0", name = "address")      String address,
+                                                     @RequestParam(defaultValue = "",  name = "address")      String address,
                                                      @RequestParam(defaultValue = "",  name = "count")        String strCount,
                                                      @RequestParam(defaultValue = "",  name = "start_time")   String startTime,
                                                      @RequestParam(defaultValue = "",  name = "message_left") String messageLeft,
