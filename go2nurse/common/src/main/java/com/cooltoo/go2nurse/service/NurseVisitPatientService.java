@@ -180,7 +180,7 @@ public class NurseVisitPatientService {
                 // record already
                 if (null!=recorded && Boolean.TRUE.equals(recorded)) { continue; }
                 // judge record
-                recorded = tmp.getPatientSign()>0;
+                recorded = CommonStatus.ENABLED.equals(tmp.getStatus());
                 orderRecorded.put(tmp.getOrderId(), recorded);
             }
         }
