@@ -297,27 +297,26 @@ public class ServiceOrderService {
         String  newLeaveMessage      = null;
         JSONUtil jsonUtil = JSONUtil.newInstance();
 
-        if (patientId != null && patientService.existPatient(patientId) && patientId!=entity.getPatientId()) {
+        ServiceOrderBean orderBean = beanConverter.convert(entity);
+
+        if (patientId != null && patientService.existPatient(patientId) && patientId!=orderBean.getPatientId()) {
             PatientBean patient = patientService.getOneById(patientId);
             newPatientJson = jsonUtil.toJsonString(patient);
             changed = true;
         }
-        logger.info("changed is {}, patientIdOrg=", changed, entity.getPatientId());
 
-        if (!VerifyUtil.isStringEmpty(address) && !address.equals(entity.getAddress())) {
+        if (!VerifyUtil.isStringEmpty(address) && !address.equals(orderBean.getAddress())) {
             newAddress = address;
             changed = true;
         }
-        logger.info("changed is {}, addressOrg=", changed, entity.getAddress());
 
         long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (lStartTime > 0 && lStartTime!=entity.getServiceStartTime().getTime()) {
+        if (lStartTime > 0 && lStartTime!=orderBean.getServiceStartTime().getTime()) {
             newStartTime = new Date(lStartTime);
             changed = true;
         }
-        logger.info("changed is {}, serviceStartTimeOrg=", changed, entity.getServiceStartTime().getTime());
 
-        if (null!=count && count!=entity.getItemCount()) {
+        if (null!=count && count!=orderBean.getItemCount()) {
             ServiceOrderBean bean = beanConverter.convert(entity);
             ServiceItemBean item  = bean.getServiceItem();
             newTimeDuration       = count * item.getServiceTimeDuration();
@@ -327,13 +326,11 @@ public class ServiceOrderService {
             newItemCount          = count;
             changed = true;
         }
-        logger.info("changed is {}, itemCountOrg=", changed, entity.getItemCount());
 
-        if (!VerifyUtil.isStringEmpty(leaveAMessage) && !leaveAMessage.equals(entity.getLeaveAMessage())) {
+        if (!VerifyUtil.isStringEmpty(leaveAMessage) && !leaveAMessage.equals(orderBean.getLeaveAMessage())) {
             newLeaveMessage = leaveAMessage;
             changed = true;
         }
-        logger.info("changed is {}, leaveAMessageOrg=", changed, entity.getLeaveAMessage());
 
         if (changed) {
             if (!OrderStatus.TO_PAY.equals(entity.getOrderStatus())) {
