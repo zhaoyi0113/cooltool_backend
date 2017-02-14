@@ -302,17 +302,20 @@ public class ServiceOrderService {
             newPatientJson = jsonUtil.toJsonString(patient);
             changed = true;
         }
+        logger.info("changed is {}, patientIdOrg=", changed, entity.getPatientId());
 
         if (!VerifyUtil.isStringEmpty(address) && !address.equals(entity.getAddress())) {
             newAddress = address;
             changed = true;
         }
+        logger.info("changed is {}, addressOrg=", changed, entity.getAddress());
 
         long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         if (lStartTime > 0 && lStartTime!=entity.getServiceStartTime().getTime()) {
             newStartTime = new Date(lStartTime);
             changed = true;
         }
+        logger.info("changed is {}, serviceStartTimeOrg=", changed, entity.getServiceStartTime().getTime());
 
         if (null!=count && count!=entity.getItemCount()) {
             ServiceOrderBean bean = beanConverter.convert(entity);
@@ -324,11 +327,13 @@ public class ServiceOrderService {
             newItemCount          = count;
             changed = true;
         }
+        logger.info("changed is {}, itemCountOrg=", changed, entity.getItemCount());
 
         if (!VerifyUtil.isStringEmpty(leaveAMessage) && !leaveAMessage.equals(entity.getLeaveAMessage())) {
             newLeaveMessage = leaveAMessage;
             changed = true;
         }
+        logger.info("changed is {}, leaveAMessageOrg=", changed, entity.getLeaveAMessage());
 
         if (changed) {
             if (!OrderStatus.TO_PAY.equals(entity.getOrderStatus())) {
