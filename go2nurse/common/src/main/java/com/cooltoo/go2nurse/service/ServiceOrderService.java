@@ -396,10 +396,10 @@ public class ServiceOrderService {
         }
 
         boolean canChangeStatus = true;
-        if (OrderStatus.REFUND_IN_PROCESS.equals(orderStatus)
-        && !OrderStatus.PAID.equals(entity.getOrderStatus())
-        && !OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
-        && !OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())) {
+        if (!OrderStatus.REFUND_IN_PROCESS.equals(orderStatus)
+         && !OrderStatus.PAID.equals(entity.getOrderStatus())
+         && !OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
+         && !OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())) {
             canChangeStatus = false;
         }
         if (!canChangeStatus) {
