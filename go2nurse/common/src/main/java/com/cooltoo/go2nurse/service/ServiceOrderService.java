@@ -944,7 +944,7 @@ public class ServiceOrderService {
 
     private Map<String, Object> refundByPingPP(ServiceOrderChargeBean charge, String refundReason, Integer refundAmount) {
         PaymentPingPP payment = (PaymentPingPP) PaymentFactory.newPayment(PaymentFactory.TYPE_PingPP);
-        Map<String, Object> parameters = payment.prepareRefund(utility.getPingPPAPIKey(), charge.getChargeId(), refundAmount, refundReason, null);
+        Map<String, Object> parameters = payment.prepareRefund(utility.getPingPPAPIKey(), utility.getPingPPRSAPrivateKey(), charge.getChargeId(), refundAmount, refundReason, null);
         Map<String, Object> refundResponse = payment.refund(parameters);
 
         refundResponse.put(RefundReturnValue, refundResponse.get(IPayment.RETURN_VALUE));

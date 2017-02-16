@@ -81,18 +81,25 @@ public class PaymentPingPP implements IPayment {
 
     @Override
     public Map refund(Map parameters) {
-        Object apiKey   = parameters.remove("api_key");
+        Object apiKey    = parameters.remove("api_key");
+        Object privateKey= parameters.remove("private_key");
+        Object chargeId  = parameters.remove("charge_id");
         if (apiKey instanceof String) {
             Pingpp.apiKey = apiKey.toString();
         }
+        if (privateKey instanceof String) {
+            Pingpp.privateKey = privateKey.toString();
+        }
 
-        Refund instance = new Refund();
+        Refund instance = null;
         HashMap<String, Object> returnVal = new HashMap<>();
         try {
-            Refund refund = instance.update(parameters);
+            Charge charge = Charge.retrieve(chargeId.toString());
+            instance = charge.getRefunds().create(parameters);
             returnVal.put(RETURN_CODE, CODE_SUCCESS);
-            returnVal.put(RETURN_VALUE, refund);
+            returnVal.put(RETURN_VALUE, instance);
         } catch (Exception e) {
+            e.printStackTrace();
             returnVal.put(RETURN_CODE, CODE_FAIL);
             returnVal.put(RETURN_VALUE, null);
             returnVal.put(RETURN_MESSAGE, e.getMessage());
@@ -258,6 +265,7 @@ public class PaymentPingPP implements IPayment {
     /**
      * <A href="https://www.pingxx.com/api?language=Java#创建-refund-对象">Ping++ 退款API详细介绍</A>
      * @param apiKey Ping++ API-Key.
+     * @param privateKey RSA 加密验签私钥.
      * @param chargeId 退款的 charge 对象 id.
      * @param amount 退款金额大于0, 单位为对应币种的最小货币单位. 必须小于等于可退款金额, 默认为全额退款。
      * @param description 退款详情, 最多 255 个 Unicode 字符.
@@ -267,13 +275,13 @@ public class PaymentPingPP implements IPayment {
      *                      "recharge_funds":使用可用余额退款.
      * @return Refund 参数
      */
-    public Map<String, Object> prepareRefund(String apiKey,
+    public Map<String, Object> prepareRefund(String apiKey, String privateKey,
                                              String chargeId, Integer amount, String description,
                                              String fundingSource
     ) {
         Map<String, Object> chargeMap = new HashMap<>();
 
-        chargeMap.put("id", chargeId);
+        chargeMap.put("charge_id", chargeId);
         if (amount instanceof Integer) {
             chargeMap.put("amount", amount);
         }
@@ -287,6 +295,7 @@ public class PaymentPingPP implements IPayment {
 
         // api key, RAS private key
         chargeMap.put("api_key", apiKey);
+        chargeMap.put("private_key", privateKey);
 
         return chargeMap;
     }
@@ -310,5 +319,4 @@ public class PaymentPingPP implements IPayment {
 
         return chargeMap;
     }
-
 }
