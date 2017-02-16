@@ -60,7 +60,7 @@ public class JSONUtil {
             return mapper.readValue(content, clazz);
         }
         catch (Exception ex) {
-            logger.error("parse the json bean error, json={}, class={} throwable={}", content, clazz, ex.getMessage());
+            logger.warn("parse the json bean error, json={}, class={} throwable={}", content, clazz, ex.getMessage());
             return null;
         }
     }

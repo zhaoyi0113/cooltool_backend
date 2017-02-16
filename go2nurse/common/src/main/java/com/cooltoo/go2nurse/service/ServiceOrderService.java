@@ -892,6 +892,14 @@ public class ServiceOrderService {
                 }
             }
         }
+        else {
+            if (PaymentPlatform.PingPP.equals(charge.getPaymentPlatform())) {
+                logger.error("Ping++ refund is failed. message is {}", refundResult);
+            }
+            else if (PaymentPlatform.WX.equals(charge.getPaymentPlatform())) {
+                logger.error("WeChat refund is failed. message is {}", refundResult);
+            }
+        }
 
         return beanConverter.convert(entity);
     }
@@ -939,8 +947,7 @@ public class ServiceOrderService {
         Map<String, Object> parameters = payment.prepareRefund(utility.getPingPPAPIKey(), charge.getChargeId(), refundAmount, refundReason, null);
         Map<String, Object> refundResponse = payment.refund(parameters);
 
-        Map<String, Object> returnVal = new HashMap<>();
-        returnVal.put(RefundReturnValue, refundResponse.get(IPayment.RETURN_VALUE));
+        refundResponse.put(RefundReturnValue, refundResponse.get(IPayment.RETURN_VALUE));
         return refundResponse;
     }
 
