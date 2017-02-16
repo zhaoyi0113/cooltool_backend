@@ -183,24 +183,24 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         String clientIp = "";
         Throwable th = null;
         try {
-            orderService.payForService(userId, orderId, channel, clientIp);
+            orderService.payForServiceByPingPP(userId, orderId, channel, clientIp);
         } catch (Exception ex) { th=ex; }
         Assert.assertNotNull(th);
 
         userId = 463;
         th = null;
         try {
-            orderService.payForService(userId, orderId, channel, clientIp);
+            orderService.payForServiceByPingPP(userId, orderId, channel, clientIp);
         } catch (Exception ex) { th=ex; }
         Assert.assertNotNull(th);
 
         channel = "wx";
-        Object charge = (Object)orderService.payForService(userId, orderId, channel, clientIp);
+        Object charge = (Object)orderService.payForServiceByPingPP(userId, orderId, channel, clientIp);
         Assert.assertNull(charge);
 
         orderId = 278;
         clientIp = "127.0.0.1";
-        charge = (Object)orderService.payForService(userId, orderId, channel, clientIp);
+        charge = (Object)orderService.payForServiceByPingPP(userId, orderId, channel, clientIp);
     }
 
     @Test

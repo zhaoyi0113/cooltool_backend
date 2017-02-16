@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.PaymentPlatform;
 import com.cooltoo.go2nurse.constants.AppType;
 import com.cooltoo.go2nurse.constants.ChargeStatus;
 import com.cooltoo.go2nurse.constants.ChargeType;
@@ -10,7 +11,7 @@ import java.util.Date;
 /**
  * Created by hp on 2016/7/15.
  */
-public class ServiceOrderChargePingPPBean {
+public class ServiceOrderChargeBean {
     private long id;
     private Date time;
     private CommonStatus status;
@@ -24,6 +25,7 @@ public class ServiceOrderChargePingPPBean {
     private String webhooksEventId;
     private String webhooksEventJson;
     private ChargeStatus chargeStatus;
+    private PaymentPlatform paymentPlatform;
 
     public long getId() {
         return id;
@@ -43,6 +45,10 @@ public class ServiceOrderChargePingPPBean {
 
     public String getOrderNo() {
         return orderNo;
+    }
+
+    public PaymentPlatform getPaymentPlatform() {
+        return paymentPlatform;
     }
 
     public String getChannel() {
@@ -97,6 +103,10 @@ public class ServiceOrderChargePingPPBean {
         this.orderNo = orderNo;
     }
 
+    public void setPaymentPlatform(PaymentPlatform paymentPlatform) {
+        this.paymentPlatform = paymentPlatform;
+    }
+
     public void setChannel(String channel) {
         this.channel = channel;
     }
@@ -138,6 +148,7 @@ public class ServiceOrderChargePingPPBean {
         msg.append(", status=").append(status);
         msg.append(", orderId=").append(orderId);
         msg.append(", orderNo=").append(orderNo);
+        msg.append(", paymentPlatform=").append(paymentPlatform);
         msg.append(", channel=").append(channel);
         msg.append(", appType=").append(appType);
         msg.append(", pingPPType=").append(chargeType);

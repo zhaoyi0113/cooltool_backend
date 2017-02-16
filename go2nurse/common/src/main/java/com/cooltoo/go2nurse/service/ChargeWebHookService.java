@@ -29,8 +29,10 @@ import java.util.TreeMap;
 
 /**
  * Created by zhaolisong on 16/9/29.
+ * @deprecated move the function to ServiceOrderService.chargeWebHooks
  */
-@Service("ChargeWebHookService")
+@Deprecated
+//@Service("ChargeWebHookService")
 public class ChargeWebHookService {
 
     private static final Logger logger = LoggerFactory.getLogger(ChargeWebHookService.class);
@@ -76,7 +78,7 @@ public class ChargeWebHookService {
         if (null!=event) {
             logger.info("this is ping++ charge");
             Charge charge = (Charge)event.getData().getObject();
-            order = orderService.orderChargeWebhooks(charge.getId(), event.getId(), body);
+//            order = orderService.updateOrderCharge(charge.getId(), event.getId(), body);
 
             Map<String, Object> returnValue = new HashMap<>();
             returnValue.put(ORDER, order);
@@ -136,7 +138,7 @@ public class ChargeWebHookService {
             }
 
             String outTradeNo = keyValue.get("out_trade_no").toString();
-            order = orderService.orderChargeWebhooks(outTradeNo, outTradeNo, jsonUtil.toJsonString(keyValue));
+//            order = orderService.updateOrderCharge(outTradeNo, outTradeNo, jsonUtil.toJsonString(keyValue));
 
             weixinResponse = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
             returnValue.put(ORDER, order);

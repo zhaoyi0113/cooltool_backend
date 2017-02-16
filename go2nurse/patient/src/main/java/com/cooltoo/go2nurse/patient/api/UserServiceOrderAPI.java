@@ -38,7 +38,6 @@ public class UserServiceOrderAPI {
     @Autowired private DoctorAppointmentService doctorAppointmentService;
     @Autowired private ServiceOrderService orderService;
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
-    @Autowired private ChargeWebHookService chargeWebHookService;
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private NurseServiceForGo2Nurse nurseService;
     @Autowired private NurseWalletService nurseWalletService;
@@ -204,6 +203,17 @@ public class UserServiceOrderAPI {
         return Response.ok(order).build();
     }
 
+    @Path("/refund")
+    @PUT
+    @LoginAuthentication(requireUserLogin = true)
+    public Response userRequestRefund(@Context HttpServletRequest request,
+                                      @FormParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        ServiceOrderBean order = orderService.refundFeeOfOrder(true, userId, orderId);
+        return Response.ok(order).build();
+    }
+
     @Path("/get_charge_of_order")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -216,7 +226,7 @@ public class UserServiceOrderAPI {
         String remoteIP;
         try { remoteIP = NetworkUtil.newInstance().getIpAddress(request); }
         catch (IOException ex) { remoteIP = "127.0.0.1"; }
-        Charge charge = orderService.payForService(userId, orderId, channel, remoteIP);
+        Charge charge = orderService.payForServiceByPingPP(userId, orderId, channel, remoteIP);
         logger.debug("pay success with charge "+charge);
         return Response.ok(charge).build();
     }
@@ -261,20 +271,29 @@ public class UserServiceOrderAPI {
     }
 
     private Object webhook(HttpServletRequest request) {
-        Map<String, Object> returnValue = chargeWebHookService.webHookBody(request);
+        String requestBody = NetworkUtil.newInstance().readHttpRequestBody(request);
+        if (null==requestBody) {
+            return null;
+        }
+        logger.info("web-hook information is: {}", requestBody);
+
+        Map<String, Object> returnValue = orderService.chargeWebHooks(requestBody);
         if (null==returnValue) {
             return null;
         }
 
-        Object order = returnValue.get(ChargeWebHookService.ORDER);
-        Object message = returnValue.get(ChargeWebHookService.MESSAGE);
+        Object order = returnValue.get("order");
+        Object message = returnValue.get("message");
         if (null==message || ((message instanceof String) && VerifyUtil.isStringEmpty((String)message))) {
             return null;
         }
         else {
-            if (null!=order && (order instanceof ServiceOrderBean) && OrderStatus.PAID.equals(OrderStatus.parseString(((ServiceOrderBean)order).getOrderStatus()))) {
+            OrderStatus orderStatus = null;
+            if (order instanceof ServiceOrderBean) {
+                orderStatus = OrderStatus.parseString(((ServiceOrderBean)order).getOrderStatus());
+            }
+            if (null!=order && (order instanceof ServiceOrderBean) && (OrderStatus.PAID.equals(orderStatus))) {
                 ServiceOrderBean orderBean = (ServiceOrderBean)order;
-                // notifierForAllModule.orderAlertToGo2nurseUser(orderBean.getUserId(), orderBean.getId(), orderBean.getOrderStatus(), "waiting for dispatch order!");
                 // need send message to Manager
                 ServiceVendorType vendorType = orderBean.getVendorType();
                 long vendorId = orderBean.getVendorId();

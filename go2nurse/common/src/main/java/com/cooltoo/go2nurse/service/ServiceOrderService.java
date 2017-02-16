@@ -2,27 +2,31 @@ package com.cooltoo.go2nurse.service;
 
 import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.ManagedBy;
+import com.cooltoo.constants.PaymentPlatform;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.go2nurse.constants.AppType;
-import com.cooltoo.go2nurse.constants.ChargeType;
+import com.cooltoo.go2nurse.constants.*;
 import com.cooltoo.go2nurse.entities.NurseOrderRelationEntity;
-import com.cooltoo.go2nurse.openapp.WeChatPayService;
 import com.cooltoo.go2nurse.openapp.WeChatService;
+import com.cooltoo.go2nurse.payment.IPayment;
+import com.cooltoo.go2nurse.payment.PaymentFactory;
+import com.cooltoo.go2nurse.payment.PaymentPingPP;
+import com.cooltoo.go2nurse.payment.PaymentWeChat;
 import com.cooltoo.go2nurse.repository.NurseOrderRelationRepository;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.JSONUtil;
-import com.pingplusplus.model.Charge;
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.beans.*;
-import com.cooltoo.go2nurse.constants.OrderStatus;
-import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.converter.ServiceOrderBeanConverter;
 import com.cooltoo.go2nurse.entities.ServiceOrderEntity;
 import com.cooltoo.go2nurse.repository.ServiceOrderRepository;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
+import com.pingplusplus.model.Charge;
+import com.pingplusplus.model.Event;
+import com.pingplusplus.model.Refund;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +46,8 @@ public class ServiceOrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceOrderService.class);
 
+    public static final String RefundReturnValue = "refund_return_value";
+
     private static final Sort sort = new Sort(
             new Sort.Order(Sort.Direction.DESC, "time"),
             new Sort.Order(Sort.Direction.DESC, "id")
@@ -53,13 +59,13 @@ public class ServiceOrderService {
     @Autowired private UserService userService;
     @Autowired private ServiceVendorCategoryAndItemService serviceCategoryItemService;
     @Autowired private PatientService patientService;
-    @Autowired private ServiceOrderChargePingPPService orderPingPPService;
-    @Autowired private PingPPService pingPPService;
+    @Autowired private ServiceOrderChargeService orderChargeService;
     @Autowired private WeChatService weChatService;
-    @Autowired private WeChatPayService weChatPayService;
     @Autowired private NurseVisitPatientService nurseVisitPatientService;
 
     @Autowired private NurseOrderRelationRepository nurseOrderRelationRepository;
+
+    @Autowired private Go2NurseUtility utility;
 
     //=====================================================================
     //                   getting
@@ -238,7 +244,7 @@ public class ServiceOrderService {
         }
 
         // set pingpp charge
-        Map<Long, List<ServiceOrderChargePingPPBean>> orderId2Charge = orderPingPPService.getOrderPingPPResult(AppType.GO_2_NURSE, orderIds);
+        Map<Long, List<ServiceOrderChargeBean>> orderId2Charge = orderChargeService.getOrderPingPPResult(AppType.GO_2_NURSE, orderIds);
 
         // set fetch time
         final Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
@@ -256,7 +262,7 @@ public class ServiceOrderService {
 
         Date _1970 = new Date(0); // 1970-01-00 08:00:00
         for (ServiceOrderBean tmp : beans) {
-            List<ServiceOrderChargePingPPBean> charges = orderId2Charge.get(tmp.getId());
+            List<ServiceOrderChargeBean> charges = orderId2Charge.get(tmp.getId());
             tmp.setPingPP(null==charges ? new ArrayList<>() : charges);
 
             Date fetchTime = orderIdToFetchTime.get(tmp.getId());
@@ -424,7 +430,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    public Charge payForService(Long userId, Long orderId, String channel, String clientIP) {
+    public Charge payForServiceByPingPP(Long userId, Long orderId, String channel, String clientIP) {
         logger.info("create charge object for order={} channel={} clientIp={}", orderId, channel, clientIP);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
@@ -452,22 +458,27 @@ public class ServiceOrderService {
         }
 
         /* create PingPP charge for payment */
-        Charge charge = pingPPService.createCharge(
-                orderNo, channel,
+        PaymentPingPP       payment    = (PaymentPingPP) PaymentFactory.newPayment(PaymentFactory.TYPE_PingPP);
+        Map<String, Object> parameters = payment.preparePayment(
+                utility.getPingPPAPIKey(), utility.getPingPPRSAPrivateKey(), utility.getPingPPAPPId(),
+                clientIP, channel, orderNo,
                 order.getTotalConsumptionCent()-order.getPreferentialCent(),
-                clientIP,
-                order.getServiceItem().getName(), order.getServiceItem().getDescription(), order.getLeaveAMessage(), extra);
+                order.getServiceItem().getName(), order.getServiceItem().getDescription(), order.getLeaveAMessage(), extra
+        );
+        Map<String, Object> payResponse = payment.pay(parameters);
 
         /* invoke PingPP SDK failed! */
-        if (null == charge) {
+        Object objCharge = payResponse.get(IPayment.RETURN_VALUE);
+        if (!(objCharge instanceof Charge)) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
             logger.info("create charge object failed ");
-            return charge;
+            return null;
         }
 
+        Charge charge = (Charge) objCharge;
         /* record PingPP charge instance, and wait for callback! */
-        orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, channel, ChargeType.CHARGE, charge.getId(), charge.toString());
+        orderChargeService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, PaymentPlatform.PingPP, channel, ChargeType.CHARGE, charge.getId(), charge.toString());
 
         return charge;
     }
@@ -502,28 +513,22 @@ public class ServiceOrderService {
         String wechatNo = NumberUtil.createNoncestr(31);
 
         /* Invoke WeChat payment! */
-        Map<String, String> weChatResponse = weChatPayService.payByWeChat(openId, "WEB", clientIP,
-                weChatAccount.getAppId(), weChatAccount.getMchId(), weChatPayService.getApiKey(),
-                wechatNo, "JSAPI", "订单=" + orderNo + " 描述=" + order.getServiceItem().getName(),
-                "CNY", order.getTotalConsumptionCent(), weChatPayService.getNotifyUrl());
-        logger.debug("get wei chat pay response "+weChatResponse);
-
+        PaymentWeChat       payment   = (PaymentWeChat) PaymentFactory.newPayment(PaymentFactory.TYPE_WeChat);
+        Map<String, String> parameters = payment.preparePayment(
+                "api_key", weChatAccount.getAppId(), weChatAccount.getMchId(),
+                "WEB", "JSAPI", openId,
+                clientIP, wechatNo, "订单=" + orderNo + " 描述=" + order.getServiceItem().getName(),
+                "CNY", order.getTotalConsumptionCent()-order.getPreferentialCent(), utility.getWechatNotifyUrl());
+        Map<String, String> payResponse = payment.pay(parameters);
         /* WeChat payment failed! */
-        if (!"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("return_code"))
-         || !"SUCCESS".equalsIgnoreCase((String) weChatResponse.get("result_code"))) {
+        if (!"SUCCESS".equalsIgnoreCase((String) payResponse.get("return_code"))
+         || !"SUCCESS".equalsIgnoreCase((String) payResponse.get("result_code"))) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
             logger.error("WeChat make order failed!");
             throw new BadRequestException(ErrorCode.PAY_FAILED);
         }
-
-        /* WeChat payment success! then check the sign */
-        String sign1 = (String) weChatResponse.get("sign");
-        weChatResponse.remove("sign");
-        String sign2 = weChatPayService.createSign(weChatPayService.getApiKey(), "UTF-8", new TreeMap<>(weChatResponse));
-
-        /* The sign is not right */
-        if (!sign2.equalsIgnoreCase(sign1)) {
+        if (!payment.checkSign(payResponse)) {
             entity.setOrderStatus(OrderStatus.CREATE_CHARGE_FAILED);
             repository.save(entity);
             logger.error("WeChat sign not match!");
@@ -531,21 +536,23 @@ public class ServiceOrderService {
         }
 
         /* WeChat payment success!  record WeChat payment information, and wait for callback! */
-        orderPingPPService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, "wx", ChargeType.CHARGE, wechatNo, weChatResponse.toString());
-        weChatResponse.remove("mch_id");
-        weChatResponse.remove("device_info");
+        orderChargeService.addOrderCharge(order.getId(), AppType.GO_2_NURSE, orderNo, PaymentPlatform.WX, "wx", ChargeType.CHARGE, wechatNo, payResponse.toString());
+        payResponse.remove("mch_id");
+        payResponse.remove("device_info");
 
-        return signWeChatResponse(weChatAccount.getAppId(), weChatResponse.get("prepay_id"),  weChatResponse.get("nonce_str"));
+        return signWeChatResponse(weChatAccount.getAppId(), payResponse.get("prepay_id"),  payResponse.get("nonce_str"));
     }
 
     private Map<String, String> signWeChatResponse(String appid, String prepayId, String noncestr) {
         StringBuffer buffer = new StringBuffer();
         String signType = "MD5";
         String timeStamp = System.currentTimeMillis()+"";
-        buffer.append("appId=").append(appid).append("&nonceStr=").append(noncestr)
-                .append("&package=prepay_id=").append(prepayId)
-                .append("&signType="+signType).append("&timeStamp=").append(timeStamp)
-                .append("&key=").append(weChatPayService.getApiKey());
+        buffer.append("appId=").append(appid)
+              .append("&nonceStr=").append(noncestr)
+              .append("&package=prepay_id=").append(prepayId)
+              .append("&signType="+signType)
+              .append("&timeStamp=").append(timeStamp)
+              .append("&key=").append(utility.getWechatApiKey());
         logger.debug("pay sign parameter:"+buffer.toString());
         String md5 = NumberUtil.signString(buffer.toString(), "MD5").toUpperCase();
         logger.debug("MD5 sign:"+md5);
@@ -557,14 +564,56 @@ public class ServiceOrderService {
         sign.put("paySign", md5);
         logger.debug("create sign for payment "+sign);
         return sign;
-
     }
 
     @Transactional
-    public ServiceOrderBean orderChargeWebhooks(String chargeId, String webhooksEventId, String webhooksEventJson) {
-        logger.info("order charge webhooks event callback chargeId={} webhooksEventId={} webhooksEventJson={}",
-                chargeId, webhooksEventId, webhooksEventJson);
-        ServiceOrderChargePingPPBean charge = orderPingPPService.orderChargePingPpWebhooks(chargeId, webhooksEventId, webhooksEventJson);
+    public Map<String, Object> chargeWebHooks(String webHooksBody) {
+        Map<String, Object> returnVal = new HashMap<>();
+        PaymentPingPP pingPP = (PaymentPingPP) PaymentFactory.newPayment(PaymentFactory.TYPE_PingPP);
+        PaymentWeChat weChat = (PaymentWeChat) PaymentFactory.newPayment(PaymentFactory.TYPE_WeChat);
+
+        Map<String, String> parameter = new HashMap<>();
+        parameter.put(IPayment.WEB_HOOK_BODY, webHooksBody);
+
+        ServiceOrderBean order = null;
+
+        Map<String, Object> notifyResult = pingPP.processNotify(parameter);
+        if (notifyResult.get(IPayment.RETURN_VALUE) instanceof Event) {
+            Event event = (Event) notifyResult.get(IPayment.RETURN_VALUE);
+            Object eventObj = event.getData().getObject();
+            if (eventObj instanceof Charge) {
+                logger.info("this is ping++ charge web-hook");
+                order = updateOrderCharge(((Charge)eventObj).getId(), event.getId(), webHooksBody, OrderStatus.PAID);
+            }
+            else if (eventObj instanceof Refund) {
+                logger.info("this is ping++ refund web-hook");
+                order = updateOrderCharge(((Refund)eventObj).getId(), event.getId(), webHooksBody, OrderStatus.REFUND_COMPLETED);
+            }
+
+            returnVal.put("order", order);
+            returnVal.put("message", event);
+            return returnVal;
+        }
+
+        notifyResult = weChat.processNotify(parameter);
+        if (notifyResult.get(IPayment.RETURN_VALUE) instanceof Map) {
+            logger.info("this is WeChat charge web-hook");
+            Map event = (Map) notifyResult.get(IPayment.RETURN_VALUE);
+            String outTradeNo = event.get("out_trade_no").toString();
+            order = updateOrderCharge(outTradeNo, outTradeNo, JSONUtil.newInstance().toJsonString(event), OrderStatus.PAID);
+            returnVal.put("order", order);
+            returnVal.put("message", weChat.processReturnValue(parameter));
+            return returnVal;
+        }
+
+        return returnVal;
+    }
+
+    @Transactional
+    public ServiceOrderBean updateOrderCharge(String chargeId, String webhooksEventId, String webhooksEventJson, OrderStatus orderStatus) {
+        logger.info("order charge webhooks event callback chargeId={} webhooksEventId={} webhooksEventJson={} orderStatus={}",
+                chargeId, webhooksEventId, webhooksEventJson, orderStatus);
+        ServiceOrderChargeBean charge = orderChargeService.orderChargePingPpWebhooks(chargeId, webhooksEventId, webhooksEventJson);
         long orderId = charge.getOrderId();
         ServiceOrderEntity order = repository.findOne(orderId);
         if (null == order) {
@@ -575,7 +624,7 @@ public class ServiceOrderService {
             logger.error("order status={}, not to_pay", order.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        order.setOrderStatus(OrderStatus.PAID);
+        order.setOrderStatus(orderStatus);
 
         order = repository.save(order);
         logger.info("order charged is {}", order);
@@ -721,9 +770,10 @@ public class ServiceOrderService {
 
         // only REFUND_IN_PROCESS / IN_PROCESS / WAIT_NURSE_FETCH / PAID can not be deleted
         if (OrderStatus.REFUND_IN_PROCESS.equals(entity.getOrderStatus())
-                && OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
-                && OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
-                && OrderStatus.PAID.equals(entity.getOrderStatus())) {
+         || OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
+         || OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
+         || OrderStatus.PAID.equals(entity.getOrderStatus())
+        ) {
             logger.info("the order is in status={}, can not be deleted", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
@@ -748,8 +798,8 @@ public class ServiceOrderService {
             }
         }
         if (!OrderStatus.PAID.equals(entity.getOrderStatus())
-                && !OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
-                && !OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
+         && !OrderStatus.WAIT_NURSE_FETCH.equals(entity.getOrderStatus())
+         && !OrderStatus.IN_PROCESS.equals(entity.getOrderStatus())
         ) {
             logger.info("the order is in status={}, can not be refunded", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -764,7 +814,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    public ServiceOrderBean completeRefundOfOrder(boolean checkUser, long userId, long orderId) {
+    public ServiceOrderBean completeRefundOfOrder(boolean checkUser, long userId, long orderId, Integer refundAmount, String refundReason) {
         logger.info("complete refund of order={} by user={} checkFlag={}", orderId, userId, checkUser);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
@@ -776,17 +826,122 @@ public class ServiceOrderService {
                 throw new BadRequestException(ErrorCode.DATA_ERROR);
             }
         }
-        if (!OrderStatus.REFUND_IN_PROCESS.equals(entity.getOrderStatus())) {
-            logger.info("the order is in status={}, refund can not be completed", entity.getOrderStatus());
+        if (!OrderStatus.REFUND_FAILED.equals(entity.getOrderStatus())
+         && !OrderStatus.REFUND_IN_PROCESS.equals(entity.getOrderStatus())) {
+            logger.error("the order is in status={}, refund can not be completed", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        entity.setOrderStatus(OrderStatus.REFUND_COMPLETED);
-        entity.setCompletedTime(new Date());
-        entity = repository.save(entity);
-        logger.info("order's refund completed is {}", entity);
+        // get user payment information
+        List<ServiceOrderChargeBean> charges = orderChargeService.getOrderPingPPResult(AppType.GO_2_NURSE, orderId);
+        ServiceOrderChargeBean charge = null;
+        ServiceOrderChargeBean failedRefund = null;
+        if (!VerifyUtil.isListEmpty(charges)) {
+            for (ServiceOrderChargeBean tmp : charges) {
+                if (ChargeType.CHARGE.equals(tmp.getChargeType())
+                 && ChargeStatus.CHARGE_SUCCEED.equals(tmp.getChargeStatus())) {
+                    charge = tmp;
+                }
+                if (null==failedRefund
+                 && ChargeType.REFUND.equals(tmp.getChargeType())
+                 && (ChargeStatus.CHARGE_FAILED.equals(tmp.getChargeStatus()) || ChargeStatus.CHARGE_CREATED.equals(tmp.getChargeStatus()))
+                ) {
+                    failedRefund = tmp;
+                }
+            }
+        }
+
+        // user do not pay for the order
+        if (null==charge) {
+            entity.setOrderStatus(OrderStatus.REFUND_COMPLETED);
+            entity.setCompletedTime(new Date());
+            entity = repository.save(entity);
+            logger.info("user do not pay for the order. order's refund completed is {}", entity);
+            return beanConverter.convert(entity);
+        }
+
+        // refund the fee of the order
+        Map<String, Object> refundResult = null;
+        if (PaymentPlatform.PingPP.equals(charge.getPaymentPlatform())) {
+            refundResult = refundByPingPP(charge, refundReason, refundAmount);
+        }
+        else if (PaymentPlatform.WX.equals(charge.getPaymentPlatform())) {
+            refundResult = refundByWeChat(charge, failedRefund, refundAmount);
+        }
+        if (null!=refundReason && null!=refundResult.get(RefundReturnValue)) {
+            Object refundValue = refundResult.get(RefundReturnValue);
+            if (PaymentPlatform.PingPP.equals(charge.getPaymentPlatform())) {
+                Refund refund = (Refund) refundValue;
+                /* record PingPP refund instance, and wait for callback via web_hooks! */
+                orderChargeService.addOrderCharge(orderId, AppType.GO_2_NURSE, entity.getOrderNo(), PaymentPlatform.PingPP, charge.getChannel(), ChargeType.REFUND, refund.getId(), refund.toString());
+            }
+            else if (PaymentPlatform.WX.equals(charge.getPaymentPlatform())) {
+                Map wechatRefundResponse = (Map) refundValue;
+                String wechatReturnCode  = (String) wechatRefundResponse.get("return_code");
+                String wechatRefundNo    = (String) wechatRefundResponse.get("out_refund_no");
+                /* Record WeChat refund instance! */
+                orderChargeService.addOrderCharge(orderId, AppType.GO_2_NURSE, entity.getOrderNo(), PaymentPlatform.WX, "wx", ChargeType.REFUND, wechatRefundNo, JSONUtil.newInstance().toJsonString(wechatRefundResponse));
+                /* WeChat refund success, and set order status to REFUND_COMPLETED*/
+                if ("SUCCESS".equalsIgnoreCase(wechatReturnCode)) {
+                    wechatRefundResponse.put("refund_reason", (null==refundReason||refundReason.isEmpty()) ? "无" : refundReason);
+                    orderChargeService.orderChargePingPpWebhooks(wechatRefundNo, wechatRefundNo, JSONUtil.newInstance().toJsonString(wechatRefundResponse));
+
+                    entity.setOrderStatus(OrderStatus.REFUND_COMPLETED);
+                    entity.setCompletedTime(new Date());
+                    entity = repository.save(entity);
+                }
+            }
+        }
 
         return beanConverter.convert(entity);
+    }
+
+    private Map<String, Object> refundByWeChat(ServiceOrderChargeBean charge, ServiceOrderChargeBean failedRefund, Integer refundAmount) {
+        Map<String, Object> returnVal = new HashMap<>();
+
+        String chargeJson = charge.getWebhooksEventJson();
+        Map<String, String> chargeMap = JSONUtil.newInstance().parseJsonMap(chargeJson, String.class, String.class);
+        String  appId      = chargeMap.get("appid");
+        String  mchId      = chargeMap.get("mch_id");
+        String  opUserId   = mchId;
+        String  devInfo    = chargeMap.get("device_info");
+        String  transId    = chargeMap.get("transaction_id");
+        String  feeType    = chargeMap.get("fee_type");
+        Integer totalFee   = VerifyUtil.parseIntIds(chargeMap.get("total_fee")).get(0);
+        String  outRefundNo= NumberUtil.createNoncestr(31);
+        // 微信提示: 一笔退款失败后重新提交，请不要更换退款单号，请使用原商户退款单号。
+        if (null!=failedRefund) {
+            outRefundNo = failedRefund.getChargeId();
+        }
+        else {
+            for (int i=5; i>=0 && orderChargeService.existsChargeId(outRefundNo); i--) {
+                outRefundNo = NumberUtil.createNoncestr(31);
+            }
+            if (orderChargeService.existsChargeId(outRefundNo)) {
+                returnVal.put(RefundReturnValue, null);
+                return returnVal;
+            }
+        }
+        if (null==refundAmount) {
+            refundAmount  = totalFee;
+        }
+
+        PaymentWeChat payment = (PaymentWeChat) PaymentFactory.newPayment(PaymentFactory.TYPE_WeChat);
+        Map<String, String> parameters = payment.prepareRefund(utility.getWechatApiKey(), appId, mchId, opUserId, devInfo, transId, null, outRefundNo, totalFee, refundAmount, feeType);
+        Map<String, String> refundResponse = payment.refund(parameters);
+
+        returnVal.put(RefundReturnValue, refundResponse);
+        return returnVal;
+    }
+
+    private Map<String, Object> refundByPingPP(ServiceOrderChargeBean charge, String refundReason, Integer refundAmount) {
+        PaymentPingPP payment = (PaymentPingPP) PaymentFactory.newPayment(PaymentFactory.TYPE_PingPP);
+        Map<String, Object> parameters = payment.prepareRefund(utility.getPingPPAPIKey(), charge.getChargeId(), refundAmount, refundReason, null);
+        Map<String, Object> refundResponse = payment.refund(parameters);
+
+        Map<String, Object> returnVal = new HashMap<>();
+        returnVal.put(RefundReturnValue, refundResponse.get(IPayment.RETURN_VALUE));
+        return refundResponse;
     }
 
     @Transactional

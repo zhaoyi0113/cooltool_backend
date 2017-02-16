@@ -2,8 +2,8 @@ package com.cooltoo.go2nurse.patient.api;
 
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.go2nurse.beans.ServiceOrderBean;
+import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
-import com.cooltoo.go2nurse.service.PingPPService;
 import com.cooltoo.go2nurse.service.ServiceOrderService;
 import com.google.common.io.CharStreams;
 import com.pingplusplus.model.Charge;
@@ -31,9 +31,6 @@ public class PingServiceOrderTestAPI {
     private static final Logger logger = LoggerFactory.getLogger(PingServiceOrderTestAPI.class);
 
     @Autowired
-    private PingPPService pingPPService;
-
-    @Autowired
     private ServiceOrderService orderService;
 
     @POST
@@ -56,7 +53,7 @@ public class PingServiceOrderTestAPI {
         String address = "order address";
         ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, 1, "this is a test order", null);
         logger.info("service order "+order);
-        Charge charge = orderService.payForService(userId, order.getId(), channel, ip);
+        Charge charge = orderService.payForServiceByPingPP(userId, order.getId(), channel, ip);
 //        Charge charge = pingPPService.createCharge(orderNo, channel, amount, ip, subject, body, description);
         logger.info("create charge object "+charge);
         return Response.ok(charge).build();
@@ -74,7 +71,7 @@ public class PingServiceOrderTestAPI {
             if(body != null) {
                 Event event = Event.GSON.fromJson(body, Event.class);
                 Charge charge = (Charge) event.getData().getObject();
-                orderService.orderChargeWebhooks(event.getId(), charge.getId(), body);
+                orderService.updateOrderCharge(event.getId(), charge.getId(), body, OrderStatus.PAID);
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

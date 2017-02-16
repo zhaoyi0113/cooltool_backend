@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.patient.api.wechat;
 
 import com.cooltoo.constants.ContextKeys;
+import com.cooltoo.go2nurse.beans.ServiceOrderBean;
 import com.cooltoo.go2nurse.beans.WeChatAccountBean;
 import com.cooltoo.go2nurse.filters.WeChatAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatAccountService;
@@ -49,5 +50,18 @@ public class WeChatPayAPI {
         Map<String, String> charge = orderService.payForServiceByWeChat(userId, orderId, openId, remoteIP, weChatAccount);
         logger.debug("pay success with wechat="+charge);
         return Response.ok(charge).build();
+    }
+
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @WeChatAuthentication
+    public Response refundByWeChat(@Context HttpServletRequest request,
+                                   @FormParam("order_id") @DefaultValue("0") long orderId
+    ) {
+        long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+
+        ServiceOrderBean order = orderService.refundFeeOfOrder(true, userId, orderId);
+        logger.debug("refund wechat order="+order);
+        return Response.ok(order).build();
     }
 }

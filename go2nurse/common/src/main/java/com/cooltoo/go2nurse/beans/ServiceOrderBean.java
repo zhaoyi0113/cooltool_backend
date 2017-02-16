@@ -5,7 +5,6 @@ import com.cooltoo.beans.HospitalDepartmentBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.go2nurse.constants.OrderStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 import com.cooltoo.util.VerifyUtil;
@@ -71,7 +70,7 @@ public class ServiceOrderBean {
     private Date fetchTime;
     private Date completedTime;
     private YesNoEnum isNurseFetched;
-    private List<ServiceOrderChargePingPPBean> pingPP;
+    private List<ServiceOrderChargeBean> pingPP;
     private Map<String, Object> properties = new HashMap<>();
 
     public long getId() {
@@ -406,11 +405,11 @@ public class ServiceOrderBean {
         this.fetchTime = fetchTime;
     }
 
-    public List<ServiceOrderChargePingPPBean> getPingPP() {
+    public List<ServiceOrderChargeBean> getPingPP() {
         return pingPP;
     }
 
-    public void setPingPP(List<ServiceOrderChargePingPPBean> pingPP) {
+    public void setPingPP(List<ServiceOrderChargeBean> pingPP) {
         this.pingPP = pingPP;
     }
 

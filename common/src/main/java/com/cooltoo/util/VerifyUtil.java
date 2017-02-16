@@ -467,4 +467,16 @@ public class VerifyUtil {
                 + "]]></return_code><return_msg><![CDATA[" + return_msg
                 + "]]></return_msg></xml>";
     }
+
+    public static String stringLimit(String src, int lengthLimit) {
+        if (VerifyUtil.isStringEmpty(src)) {
+            return "";
+        }
+        src = src.replace('\r', ' ');
+        src = src.replace('\n', ' ');
+        if (lengthLimit>0 && src.length()>lengthLimit) {
+            return src.substring(0, lengthLimit);
+        }
+        return src;
+    }
 }

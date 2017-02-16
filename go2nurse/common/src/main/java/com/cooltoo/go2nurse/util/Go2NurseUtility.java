@@ -1,14 +1,9 @@
 package com.cooltoo.go2nurse.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by hp on 2016/6/12.
@@ -42,5 +37,39 @@ public class Go2NurseUtility {
 
     public String getHttpPrefixOfficialPathForNurseGo() {
         return httpPrefixForNurseGo+nursegoOfficialPath;
+    }
+
+
+
+    @Value("${wechat_notify_url}")
+    private String wechatNotifyUrl;
+    public String getWechatNotifyUrl() {
+        return wechatNotifyUrl;
+    }
+
+    @Value("${wechat_api_key}")
+    private String wechatApiKey;
+    public String getWechatApiKey() {
+        return wechatApiKey;
+    }
+
+
+
+    @Value("${pingpp_go2nurse_api_key}")
+    private String pingPPAPIKey;
+    public String getPingPPAPIKey() {
+        return pingPPAPIKey;
+    }
+
+    @Value("${pingpp_go2nurse_app_id}")
+    private String pingPPAPPId;
+    public String getPingPPAPPId() {
+        return pingPPAPPId;
+    }
+
+    @Value("${pingpp_go2nurse_rsa_private_key}")
+    private String pingPPRSAPrivateKey;
+    public String getPingPPRSAPrivateKey() {
+        return pingPPRSAPrivateKey;
     }
 }

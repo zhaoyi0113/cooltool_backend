@@ -15,7 +15,8 @@ import java.util.Map;
 /**
  * Created by hp on 2016/7/15.
  */
-@Service("PingPPService")
+@Deprecated
+//@Service("PingPPService")
 public class PingPPService {
 
     private static final Logger logger = LoggerFactory.getLogger(PingPPService.class);
@@ -59,12 +60,12 @@ public class PingPPService {
         chargeMap.put("currency", "cny");
         // 商品的标题，该参数最长为 32 个 Unicode 字符，
         // 银联全渠道（upacp/upacp_wap）限制在 32 个字节
-        chargeMap.put("subject", stringLimit(subject, 16));
+        chargeMap.put("subject", VerifyUtil.stringLimit(subject, 16));
         // 商品的描述信息，该参数最长为 128 个 Unicode 字符，
         // yeepay_wap 对于该参数长度限制为 100 个 Unicode 字符。
-        chargeMap.put("body", stringLimit(body, 100));
+        chargeMap.put("body", VerifyUtil.stringLimit(body, 100));
         // 订单附加说明，最多 255 个 Unicode 字符。
-        chargeMap.put("description", stringLimit(description, 254));
+        chargeMap.put("description", VerifyUtil.stringLimit(description, 254));
         chargeMap.put("extra", extra);
         try {
             //发起交易请求

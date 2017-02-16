@@ -37,6 +37,7 @@ public class WeChatPayService {
     public final static String MENU_GET_URL = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=ACCESS_TOKEN";
     // 菜单删除（GET）
     public final static String MENU_DELETE_URL = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=ACCESS_TOKEN";
+
     /***************************************
      *            微信支付接口地址           *
      ***************************************/
@@ -157,12 +158,64 @@ public class WeChatPayService {
     }
 
     /**
+     * <A href="https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_2">微信公众号查询订单API详细介绍</A>
+     * @param appId 微信分配的公众账号ID(企业号corpId即为此appId).
+     * @param mchId 微信支付分配的商户号.
+     *
+     *（二选一）
+     * @param transactionId 微信生成的订单号，在支付通知中有返回，建议优先使用
+     * @param outTradeNo 商户侧传给微信的订单号
+     */
+    public Map<String, String> checkPaymentByWeChat(String appId, String mchId,
+                                                    String transactionId,
+                                                    String outTradeNo
+    ) {
+        Map<String, String> keyParam = new HashMap();
+
+        String key = "appid";
+        keyParam.put(key, appId);
+
+        key = "mch_id";
+        keyParam.put(key, mchId);
+
+        if (null!=transactionId && transactionId.length()!=0) {
+            key = "transaction_id";
+            keyParam.put(key, transactionId);
+        }
+        if (null!=outTradeNo && outTradeNo.length()!=0) {
+            key = "out_trade_no";
+            keyParam.put(key, outTradeNo);
+        }
+        if ((null==transactionId || transactionId.trim().length()==0)
+         && (null==outTradeNo    || outTradeNo.trim().length()==0)) {
+            logger.error("wechat order number and vendor order number are both empty.");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        // 随机字符串,不长于32位.推荐随机数生成算法
+        key = "nonce_str";
+        keyParam.put(key, NumberUtil.createNoncestr(31));
+
+        key = "sign";
+        keyParam.put(key, createSign(apiKey, "UTF-8", new TreeMap<>(keyParam)));
+
+        logger.info("request payment parameter map===="+keyParam);
+
+        String xmlWeChatOrder = VerifyUtil.getRequestXml(new TreeMap<>(keyParam));
+        logger.info("create sign xml "+xmlWeChatOrder);
+        String response = NetworkUtil.newInstance().httpsRequest(CHECK_ORDER_URL, "POST", xmlWeChatOrder, null);
+        keyParam = VerifyUtil.parseResponseXml(response);
+        return keyParam;
+    }
+
+    /**
      * @Description：sign签名
+     * @param weChatApiKey WeChat Api Key
      * @param characterEncoding 编码格式
      * @param parameters 请求参数
      * @return
      */
-    public String createSign(String weChatApiKey, String characterEncoding, SortedMap<String,Object> parameters){
+    public String createSign(String weChatApiKey, String characterEncoding, SortedMap<String,Object> parameters) {
         StringBuffer sb = new StringBuffer();
         Set es = parameters.entrySet();
         Iterator it = es.iterator();
@@ -177,6 +230,29 @@ public class WeChatPayService {
         sb.append("key=" + weChatApiKey);
         String sign = NumberUtil.md5Encode(sb.toString(), characterEncoding, "MD5").toUpperCase();
         return sign;
+    }
+
+    /**
+     * @Description：检查 sign 签名
+     * @param weChatApiKey WeChat Api Key
+     * @param characterEncoding 编码格式
+     * @param parameters 返回参数
+     * @return
+     */
+    public boolean checkSign(String weChatApiKey, String characterEncoding, SortedMap<String,Object> parameters) {
+        if (null==parameters && parameters.isEmpty()) {
+            return false;
+        }
+
+        Object signObj = parameters.get("sign");
+        if (!(signObj instanceof String)) {
+            return false;
+        }
+
+        String sign = (String)signObj;
+        parameters.remove("sign");
+        String newSign = createSign(weChatApiKey, characterEncoding, parameters);
+        return sign.equals(newSign);
     }
 
     /**
@@ -252,7 +328,6 @@ public class WeChatPayService {
             keyParam.put(key, mchId);
         }
 
-
         key = "refund_account";
         keyParam.put(key, "REFUND_SOURCE_UNSETTLED_FUNDS");
 
@@ -267,6 +342,120 @@ public class WeChatPayService {
         String xmlWeChatOrder = VerifyUtil.getRequestXml(new TreeMap<>(keyParam));
         logger.info("create sign xml "+xmlWeChatOrder);
         String response = NetworkUtil.newInstance().httpsRequest(REFUND_URL, "POST", keyParam, xmlWeChatOrder, mchId, certP12FileInputStream);
+        keyParam = VerifyUtil.parseResponseXml(response);
+        return keyParam;
+    }
+
+    /**
+     * <A href="https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_5&index=7">微信公众号查询退款API详细介绍</A>
+     * @param appId   微信分配的公众账号ID(企业号corpId即为此appId).
+     * @param mchId   微信支付分配的商户号.
+     * @param devInfo 终端设备号(门店号或收银设备ID)，注意：PC网页或公众号内支付请传"WEB"
+
+     * 四选一
+     * @param transactionId 微信订单号 String(32)  微信订单号
+     * @param outTradeNo    商户订单号 String(32) 商户系统内部的订单号
+     * @param outRefundNo   商户退款单号 String(32) 商户侧传给微信的退款单号
+     * @param refundId      微信退款单号 String(28) 微信生成的退款单号，在申请退款接口有返回
+    */
+
+    public Map<String, String> checkRefundByWeChat(String appId, String mchId, String devInfo,
+                                                   String outRefundNo,
+                                                   String refundId,
+                                                   String transactionId,
+                                                   String outTradeNo
+    ) {
+        Map<String, String> keyParam = new HashMap();
+        String key = "appid";
+        keyParam.put(key, appId);
+
+        key = "mch_id";
+        keyParam.put(key, mchId);
+
+        key = "device_info";
+        keyParam.put(key, devInfo);
+
+        // 随机字符串,不长于32位.推荐随机数生成算法
+        key = "nonce_str";
+        keyParam.put(key, NumberUtil.createNoncestr(31));
+
+        if (null!=transactionId && transactionId.length()!=0) {
+            key = "transaction_id";
+            keyParam.put(key, transactionId);
+        }
+        if (null!=outTradeNo && outTradeNo.length()!=0) {
+            key = "out_trade_no";
+            keyParam.put(key, outTradeNo);
+        }
+        if (null!=outRefundNo && outRefundNo.length()!=0) {
+            key = "out_refund_no";
+            keyParam.put(key, outRefundNo);
+        }
+        if (null!=refundId && refundId.length()!=0) {
+            key = "refund_id";
+            keyParam.put(key, refundId);
+        }
+        if ((null==transactionId || 0==transactionId.trim().length())
+         && (null==outTradeNo    || 0==outTradeNo.trim().length())
+         && (null==outRefundNo   || 0==outRefundNo.trim().length())
+         && (null==refundId      || 0==refundId.trim().length())) {
+            logger.error("wechat order number and vendor order number are both empty.");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        key = "sign_type";
+        keyParam.put(key, "MD5");
+
+        key = "sign";
+        keyParam.put(key, createSign(apiKey, "UTF-8", new TreeMap<>(keyParam)));
+
+        logger.info("request refund parameter map===="+keyParam);
+
+        String xmlWeChatOrder = VerifyUtil.getRequestXml(new TreeMap<>(keyParam));
+        logger.info("create sign xml "+xmlWeChatOrder);
+        String response = NetworkUtil.newInstance().httpsRequest(CHECK_REFUND_URL, "POST", xmlWeChatOrder);
+        keyParam = VerifyUtil.parseResponseXml(response);
+        return keyParam;
+    }
+
+    /**
+     * <A href="https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_3&index=5">微信公众号关闭退款API详细介绍</A>
+     * @param appId      微信分配的公众账号ID(企业号corpId即为此appId).
+     * @param mchId      微信支付分配的商户号.
+     * @param outTradeNo 商户订单号，商户系统内部的订单号
+     */
+    public Map<String, String> closeOrderByWeChat(String appId, String mchId, String outTradeNo) {
+        Map<String, String> keyParam = new HashMap();
+        String key = "appid";
+        keyParam.put(key, appId);
+
+        key = "mch_id";
+        keyParam.put(key, mchId);
+
+        // 随机字符串,不长于32位.推荐随机数生成算法
+        key = "nonce_str";
+        keyParam.put(key, NumberUtil.createNoncestr(31));
+
+        if (null!=outTradeNo && outTradeNo.length()!=0) {
+            key = "out_trade_no";
+            keyParam.put(key, outTradeNo);
+        }
+        if ((null==outTradeNo || 0==outTradeNo.trim().length())) {
+            logger.error("wechat order number and vendor order number are both empty.");
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+
+        key = "sign_type";
+        keyParam.put(key, "MD5");
+
+        key = "sign";
+        keyParam.put(key, createSign(apiKey, "UTF-8", new TreeMap<>(keyParam)));
+
+        logger.info("request refund parameter map===="+keyParam);
+
+        String xmlWeChatOrder = VerifyUtil.getRequestXml(new TreeMap<>(keyParam));
+        logger.info("create sign xml "+xmlWeChatOrder);
+        String response = NetworkUtil.newInstance().httpsRequest(CLOSE_ORDER_URL, "POST", xmlWeChatOrder);
         keyParam = VerifyUtil.parseResponseXml(response);
         return keyParam;
     }

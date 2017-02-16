@@ -2,6 +2,7 @@ package com.cooltoo.util;
 
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.google.common.io.CharStreams;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.ConnectException;
@@ -49,6 +51,35 @@ public final class NetworkUtil {
 
     private NetworkUtil() {}
 
+    /**
+     * 读取 Http 的请求内容。
+     * @param request Http servlet 请求
+     * @return Http 的请求内容
+     */
+    public final String readHttpRequestBody(HttpServletRequest request) {
+        if (null==request) {
+            return null;
+        }
+
+        ServletInputStream inputStream;
+        try { inputStream = request.getInputStream(); } catch (IOException io) { inputStream = null; }
+        if (null==inputStream) {
+            logger.warn("get http servlet request's input stream is null");
+            return null;
+        }
+
+        String body;
+        try { body = CharStreams.toString(new InputStreamReader(inputStream)); } catch (IOException io) { body = null; }
+        if (null==body) {
+            logger.warn("get http servlet request's body is null");
+            return null;
+        }
+
+        if (null==body || body.isEmpty()) {
+            body = "";
+        }
+        return body;
+    }
 
 
     /**
@@ -335,7 +366,7 @@ public final class NetworkUtil {
      * @return 返回微信服务器响应的信息
      */
     public final String httpsRequest(String requestUrl, String requestMethod, Map<String, String> parameters, String outputStr, String password, InputStream certificationFileInputStream) {
-        String resStr = null;
+        StringBuilder resStr = new StringBuilder();
         try{
             //================================================================
             KeyStore keyStore  = KeyStore.getInstance("PKCS12");
@@ -397,8 +428,10 @@ public final class NetworkUtil {
                         System.out.println("Response content length: " + entity.getContentLength());
                         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entity.getContent()));
                         String text;
+                        resStr = new StringBuilder();
                         while ((text = bufferedReader.readLine()) != null) {
                             System.out.println(text);
+                            resStr.append(text).append("\n");
                         }
 
                     }
@@ -415,6 +448,6 @@ public final class NetworkUtil {
             logger.error("https请求异常：{}", e.getMessage(), e);
         } finally {
         }
-        return resStr;
+        return resStr.toString();
     }
 }

@@ -15,8 +15,10 @@ import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -225,6 +227,17 @@ public class HospitalOrderAPI {
                                         @RequestParam(defaultValue = "",  name = "order_status")    String orderStatus
     ) {
         ServiceOrderBean order = orderService.addOrder(serviceItemId, userId, patientId, address, startTime, count, leaveAMessage, orderStatus);
+        return order;
+    }
+
+    @RequestMapping(path = "/manager/order/refund", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    public ServiceOrderBean orderRefund(HttpServletRequest request,
+                                        @RequestParam(defaultValue = "0", name = "order_id")      long   orderId,
+                                        @RequestParam(defaultValue = "",  name = "refund_reason") String refundReason,
+                                        @RequestParam(defaultValue = "",  name = "refund_amount") String refundAmount
+    ) {
+        Integer amount = NumberUtil.getCent(refundAmount);
+        ServiceOrderBean order = orderService.completeRefundOfOrder(false, 0, orderId, amount, refundReason);
         return order;
     }
 

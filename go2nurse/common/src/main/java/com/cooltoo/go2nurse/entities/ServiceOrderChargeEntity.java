@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.PaymentPlatform;
 import com.cooltoo.go2nurse.constants.AppType;
 import com.cooltoo.go2nurse.constants.ChargeStatus;
 import com.cooltoo.go2nurse.constants.ChargeType;
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "go2nurse_service_order_charge_pingpp")
-public class ServiceOrderChargePingPPEntity {
+public class ServiceOrderChargeEntity {
     private long id;
     private Date time;
     private CommonStatus status;
@@ -27,6 +28,7 @@ public class ServiceOrderChargePingPPEntity {
     private String webhooksEventId;
     private String webhooksEventJson;
     private ChargeStatus chargeStatus;
+    private PaymentPlatform paymentPlatform;
 
     @Id
     @GeneratedValue
@@ -59,6 +61,11 @@ public class ServiceOrderChargePingPPEntity {
     @Column(name = "channel")
     public String getChannel() {
         return channel;
+    }
+
+    @Column(name = "payment_platform")
+    public PaymentPlatform getPaymentPlatform() {
+        return paymentPlatform;
     }
 
     @Column(name = "app_type")
@@ -119,6 +126,10 @@ public class ServiceOrderChargePingPPEntity {
         this.orderNo = orderNo;
     }
 
+    public void setPaymentPlatform(PaymentPlatform paymentPlatform) {
+        this.paymentPlatform = paymentPlatform;
+    }
+
     public void setChannel(String channel) {
         this.channel = channel;
     }
@@ -160,6 +171,7 @@ public class ServiceOrderChargePingPPEntity {
         msg.append(", status=").append(status);
         msg.append(", orderId=").append(orderId);
         msg.append(", orderNo=").append(orderNo);
+        msg.append(", paymentPlatform=").append(paymentPlatform);
         msg.append(", channel=").append(channel);
         msg.append(", appType=").append(appType);
         msg.append(", pingPPType=").append(chargeType);

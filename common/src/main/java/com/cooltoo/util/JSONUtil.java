@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -20,6 +21,22 @@ public class JSONUtil {
     }
 
     private JSONUtil(){}
+
+    public <T> T parseJsonMap(String content, Class keyType, Class valueType) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            TypeFactory typeFactory = mapper.getTypeFactory();
+            T returnValue =  mapper.readValue(content, typeFactory.constructMapType(HashMap.class, keyType, valueType));
+            if (null==returnValue) {
+                return (T) new HashMap<T, T>();
+            }
+            return returnValue;
+        }
+        catch (Exception ex) {
+            logger.warn("parse the json map error, json={}, keyClass={} valueClass={} throwable={}", content, keyType, valueType, ex.getMessage());
+            return (T) new HashMap<T, T>();
+        }
+    }
 
     public <T> T parseJsonList(String content, Class clazz) {
         try {
