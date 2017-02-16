@@ -151,7 +151,7 @@ public class PaymentPingPP implements IPayment {
         String notifyBody = objNotifyBody.toString().trim();
         Event event = null;
         try {
-            event = JSONUtil.newInstance().parseJsonBean(notifyBody, Event.class);
+            event = Event.GSON.fromJson(notifyBody, Event.class);
         } catch (JsonSyntaxException josnEx) {
             returnValue.put(RETURN_MESSAGE, josnEx.getMessage());
             return returnValue;
