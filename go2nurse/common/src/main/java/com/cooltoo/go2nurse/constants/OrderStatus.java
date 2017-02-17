@@ -17,6 +17,7 @@ public enum  OrderStatus {
     COMPLETED(4, "COMPLETED"),  // 服务完成
     CREATE_CHARGE_FAILED(-2, "CREATE_CHARGE_FAILED"), //创建订单失败
     REFUND_IN_PROCESS(5, "REFUND_IN_PROCESS"), // 退款处理中
+    REFUND_PROCESSED(5, "REFUND_PROCESSED"), // 退款已处理
     REFUND_COMPLETED(6, "REFUND_COMPLETED"), // 退款完成
     REFUND_FAILED(-3, "REFUND_FAILED") // 退款完成
     ;
@@ -59,6 +60,9 @@ public enum  OrderStatus {
         else if (REFUND_IN_PROCESS.name.equalsIgnoreCase(type)) {
             ret = REFUND_IN_PROCESS;
         }
+        else if (REFUND_PROCESSED.name().equalsIgnoreCase(type)) {
+            ret = REFUND_PROCESSED;
+        }
         else if (REFUND_COMPLETED.name.equalsIgnoreCase(type)) {
             ret = REFUND_COMPLETED;
         }
@@ -91,6 +95,9 @@ public enum  OrderStatus {
         else if (REFUND_IN_PROCESS.id == type) {
             ret = REFUND_IN_PROCESS;
         }
+        else if (REFUND_PROCESSED.id == type) {
+            ret = REFUND_PROCESSED;
+        }
         else if (REFUND_COMPLETED.id == type) {
             ret = REFUND_COMPLETED;
         }
@@ -107,6 +114,7 @@ public enum  OrderStatus {
         all.add(OrderStatus.CANCELLED);
         all.add(OrderStatus.CREATE_CHARGE_FAILED);
         all.add(OrderStatus.REFUND_IN_PROCESS);
+        all.add(OrderStatus.REFUND_PROCESSED);
         all.add(OrderStatus.REFUND_COMPLETED);
         return all;
     }

@@ -830,7 +830,7 @@ public class ServiceOrderService {
         }
         if (!OrderStatus.REFUND_FAILED.equals(entity.getOrderStatus())
          && !OrderStatus.REFUND_IN_PROCESS.equals(entity.getOrderStatus())) {
-            logger.error("the order is in status={}, refund can not be completed", entity.getOrderStatus());
+            logger.error("the order is in status={}, refund can not be processed", entity.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
@@ -875,7 +875,12 @@ public class ServiceOrderService {
             if (PaymentPlatform.PingPP.equals(charge.getPaymentPlatform())) {
                 Refund refund = (Refund) refundValue;
                 /* record PingPP refund instance, and wait for callback via web_hooks! */
-                orderChargeService.addOrderCharge(orderId, AppType.GO_2_NURSE, entity.getOrderNo(), PaymentPlatform.PingPP, charge.getChannel(), ChargeType.REFUND, refund.getId(), refund.toString());
+                Object orderCharge = orderChargeService.addOrderCharge(orderId, AppType.GO_2_NURSE, entity.getOrderNo(), PaymentPlatform.PingPP, charge.getChannel(), ChargeType.REFUND, refund.getId(), refund.toString());
+                if (null!=orderCharge) {
+                    entity.setOrderStatus(OrderStatus.REFUND_PROCESSED);
+                    entity.setCompletedTime(new Date());
+                    entity = repository.save(entity);
+                }
             }
             else if (PaymentPlatform.WX.equals(charge.getPaymentPlatform())) {
                 Map wechatRefundResponse = (Map) refundValue;
