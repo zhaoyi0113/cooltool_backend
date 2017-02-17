@@ -17,9 +17,9 @@ public enum  OrderStatus {
     COMPLETED(4, "COMPLETED"),  // 服务完成
     CREATE_CHARGE_FAILED(-2, "CREATE_CHARGE_FAILED"), //创建订单失败
     REFUND_IN_PROCESS(5, "REFUND_IN_PROCESS"), // 退款处理中
-    REFUND_PROCESSED(5, "REFUND_PROCESSED"), // 退款已处理
-    REFUND_COMPLETED(6, "REFUND_COMPLETED"), // 退款完成
-    REFUND_FAILED(-3, "REFUND_FAILED") // 退款完成
+    REFUND_PROCESSED(6, "REFUND_PROCESSED"), // 退款管理员已处理
+    REFUND_COMPLETED(7, "REFUND_COMPLETED"), // 退款完成
+    REFUND_FAILED(-3, "REFUND_FAILED") // 退款失败
     ;
 
     private String name;
