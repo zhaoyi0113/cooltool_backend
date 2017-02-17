@@ -205,6 +205,7 @@ public class UserServiceOrderAPI {
 
     @Path("/refund")
     @PUT
+    @Produces(MediaType.APPLICATION_JSON)
     @LoginAuthentication(requireUserLogin = true)
     public Response userRequestRefund(@Context HttpServletRequest request,
                                       @FormParam("order_id") @DefaultValue("0") long orderId
