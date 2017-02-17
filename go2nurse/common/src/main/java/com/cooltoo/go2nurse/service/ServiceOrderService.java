@@ -610,7 +610,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    public ServiceOrderBean updateOrderCharge(String chargeId, String webhooksEventId, String webhooksEventJson, OrderStatus orderStatus) {
+    private ServiceOrderBean updateOrderCharge(String chargeId, String webhooksEventId, String webhooksEventJson, OrderStatus orderStatus) {
         logger.info("order charge webhooks event callback chargeId={} webhooksEventId={} webhooksEventJson={} orderStatus={}",
                 chargeId, webhooksEventId, webhooksEventJson, orderStatus);
         ServiceOrderChargeBean charge = orderChargeService.orderChargePingPpWebhooks(chargeId, webhooksEventId, webhooksEventJson);
@@ -620,8 +620,10 @@ public class ServiceOrderService {
             logger.error("order not exist");
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
-        if (!OrderStatus.TO_PAY.equals(order.getOrderStatus())) {
-            logger.error("order status={}, not to_pay", order.getOrderStatus());
+        if (!OrderStatus.TO_PAY.equals(order.getOrderStatus())
+         && !OrderStatus.REFUND_IN_PROCESS.equals(order.getOrderStatus())
+        ) {
+            logger.error("order status={}, not to_pay or refund_in_process", order.getOrderStatus());
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
         order.setOrderStatus(orderStatus);
