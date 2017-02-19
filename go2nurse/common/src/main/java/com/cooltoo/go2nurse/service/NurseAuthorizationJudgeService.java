@@ -135,7 +135,7 @@ public class NurseAuthorizationJudgeService {
         // order belong to the department nurse in
         if (isOrderBelongToDepartment) {
             // is this nurse the employee of this department
-            NurseHospitalRelationBean nurseHospitalRelation = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.INFO_EXTENSION);
+            NurseHospitalRelationBean nurseHospitalRelation = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
             if (null==nurseHospitalRelation || !YesNoEnum.YES.equals(nurseHospitalRelation.getApproval())) {
                 throw new BadRequestException(ErrorCode.NURSE_NOT_BELONG_TO_DEPARTMENT);
             }
