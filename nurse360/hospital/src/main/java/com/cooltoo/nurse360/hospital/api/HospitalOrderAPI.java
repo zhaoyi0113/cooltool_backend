@@ -246,11 +246,18 @@ public class HospitalOrderAPI {
     //            Authentication of NURSE/MANAGER Role
     //=============================================================
     @RequestMapping(path = "/order/{order_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
-    public ServiceOrderBean countUserOrder(HttpServletRequest request,
-                                                 @PathVariable long order_id
+    public ServiceOrderBean getUserOrder(HttpServletRequest request,
+                                         @PathVariable long order_id
     ) {
         List<ServiceOrderBean> orders = orderService.getOrderByOrderId(order_id);
         return orders.get(0);
+    }
+    @RequestMapping(path = "/order/order_no/{order_no}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public ServiceOrderBean getUserOrder(HttpServletRequest request,
+                                         @PathVariable String order_no
+    ) {
+        ServiceOrderBean order = orderService.getOneOrderByOrderNo(order_no);
+        return order;
     }
 
 

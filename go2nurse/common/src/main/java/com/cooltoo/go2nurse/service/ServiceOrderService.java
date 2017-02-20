@@ -97,6 +97,19 @@ public class ServiceOrderService {
         return beans;
     }
 
+    public ServiceOrderBean getOneOrderByOrderNo(String orderNo) {
+        List<ServiceOrderBean> beans = getOrderByOrderNo(orderNo);
+        if (beans.size()>1) {
+            logger.error("orderNo={} get more than one orders", orderNo);
+            throw new BadRequestException(ErrorCode.DATA_ERROR);
+        }
+        if (beans.isEmpty()) {
+            logger.error("orderNo={} get no orders", orderNo);
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        return beans.get(0);
+    }
+
     public long countAllOrder() {
         long count = repository.count();
         logger.info("count all service order is {}", count);
