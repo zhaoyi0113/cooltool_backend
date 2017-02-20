@@ -55,6 +55,7 @@ public class CourseCategoryServiceForNurse360 {
         }
         List<Nurse360CourseCategoryBean> beans = entitiesToBeans(Arrays.asList(new Nurse360CourseCategoryEntity[]{category}));
         fillOtherProperties(beans);
+        logger.info("course category is {}", beans);
         return beans.get(0);
     }
 
@@ -246,6 +247,7 @@ public class CourseCategoryServiceForNurse360 {
         Nurse360CourseCategoryBean bean = beanConverter.convert(entity);
         bean.setImageUrl(imageUrl);
 
+        logger.info("course category is {}", bean);
         return bean;
     }
 }
