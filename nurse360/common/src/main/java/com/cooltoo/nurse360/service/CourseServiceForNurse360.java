@@ -12,6 +12,7 @@ import com.cooltoo.nurse360.service.file.TemporaryFileStorageServiceForNurse360;
 import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
+import com.google.common.base.Verify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +96,18 @@ public class CourseServiceForNurse360 {
         fillOtherProperties(beans);
         logger.info("count is {}", beans.size());
         return beans;
+    }
+
+    public List<Long> getCourseIdByStatusesAndIds(List<CourseStatus> statuses, List<Long> courseIds) {
+        logger.info("get courseId by statuses={} ids={}", statuses, courseIds);
+        List<Long> resultSet = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(statuses) || VerifyUtil.isListEmpty(courseIds)) {
+            return resultSet;
+        }
+
+        resultSet = repository.findCourseIdByStatusInAndIdIn(statuses, courseIds, sort);
+        logger.info("count is {}", resultSet.size());
+        return resultSet;
     }
 
     public List<Long> getCourseIdByStatusAndIds(String strStatus, List<Long> courseIds) {

@@ -1066,6 +1066,10 @@ public class ServiceVendorCategoryAndItemService {
         entity.setServerIncomeCent(null==serverIncomeCent ? 0 : serverIncomeCent);
         entity.setNeedVisitPatientRecord(null==needVisitPatientRecord ? YesNoEnum.NO : needVisitPatientRecord);
 
+        servicePriceCent    = null==servicePriceCent    ? 0 : servicePriceCent;
+        serviceDiscountCent = null==serviceDiscountCent ? 0 : serviceDiscountCent;
+        serverIncomeCent    = null==serverIncomeCent    ? 0 : serverIncomeCent;
+
         YesNoEnum managerApproved = (servicePriceCent-serviceDiscountCent-serverIncomeCent)>=0 ? YesNoEnum.YES : YesNoEnum.NO;
         entity.setManagerApproved(managerApproved);
         entity.setManagedBy(null== managedBy ? ManagedBy.SELF : managedBy);
