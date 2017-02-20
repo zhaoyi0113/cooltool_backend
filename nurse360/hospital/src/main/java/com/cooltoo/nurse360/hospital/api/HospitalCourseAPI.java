@@ -53,7 +53,7 @@ public class HospitalCourseAPI {
     //=============================================================
     //            Authentication of NURSE/MANAGER Role
     //=============================================================
-    @RequestMapping(path = "/courses/nurse/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/nurse/courses/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public int countCourse(HttpServletRequest request) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         if (!userDetails.isAdmin()) {
@@ -69,7 +69,7 @@ public class HospitalCourseAPI {
         return 0;
     }
 
-    @RequestMapping(path = "/courses/nurse", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/nurse/courses", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<Nurse360CourseBean> getCourse(HttpServletRequest request,
                                               @RequestParam(defaultValue = "0",  name = "index")  int index,
                                               @RequestParam(defaultValue = "10", name = "number") int number
@@ -88,7 +88,7 @@ public class HospitalCourseAPI {
         return new ArrayList<>();
     }
 
-    @RequestMapping(path = "/courses/nurse/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/nurse/courses/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
     public Nurse360CourseBean addCourse(HttpServletRequest request,
                                         @RequestParam(defaultValue = "", name = "name")         String name,
                                         @RequestParam(defaultValue = "", name = "introduction") String introduction,
@@ -110,7 +110,7 @@ public class HospitalCourseAPI {
         throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
-    @RequestMapping(path = "/courses/nurse/edit", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/nurse/courses/edit", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public Nurse360CourseBean addCourse(HttpServletRequest request,
                                         @RequestParam(defaultValue = "0",name = "course_id")    long courseId,
                                         @RequestParam(defaultValue = "", name = "name")         String name,
@@ -129,7 +129,7 @@ public class HospitalCourseAPI {
         throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
-    @RequestMapping(path = "/courses/nurse/edit/front/cover", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
+    @RequestMapping(path = "/nurse/courses/edit/front/cover", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
     public Nurse360CourseBean editCourseFrontCover(HttpServletRequest request,
                                                    @RequestParam(defaultValue = "0", name = "course_id")  long          courseId,
                                                    @RequestParam(defaultValue = "",  name = "image_name") String        imageName,
@@ -145,7 +145,7 @@ public class HospitalCourseAPI {
         throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
-    @RequestMapping(path = "/courses/nurse/edit/status", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/nurse/courses/edit/status", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public Nurse360CourseBean editCourseStatus(HttpServletRequest request,
                                                @RequestParam(defaultValue = "0",         name = "course_id")  long   courseId,
                                                @RequestParam(defaultValue = "disabled",  name = "status")     String status
@@ -166,7 +166,7 @@ public class HospitalCourseAPI {
 
     // 获取课程详情
     // param={"course_id":"1","nginx_url":"http://nginx_server_ip:port/storage_or_temporary_path/"}
-    @RequestMapping(path = "/courses/nurse/get/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/nurse/courses/get/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public Map<String, Object> getCourseDetail(HttpServletRequest request,
                                                @RequestParam(defaultValue = "0", name = "course_id") long courseId
     ) {
@@ -185,7 +185,7 @@ public class HospitalCourseAPI {
 
 
     // 将课程置为 editing, 并且将课程对应的图片迁至临时文件夹
-    @RequestMapping(path = "/courses/nurse/edit/content/cache", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/nurse/courses/edit/content/cache", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public Nurse360CourseBean cacheCourse2Temporary(HttpServletRequest request,
                                                     @RequestParam(defaultValue = "0", name = "course_id") long courseId
 
@@ -198,7 +198,7 @@ public class HospitalCourseAPI {
 
 
     // 课程为 editing 时, 向课程中添加图片，图片缓存在临时文件夹
-    @RequestMapping(path = "/courses/nurse/edit/content/add/image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
+    @RequestMapping(path = "/nurse/courses/edit/content/add/image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
     public String addImage2Temporary(HttpServletRequest request,
                                      @RequestParam(defaultValue = "0", name = "course_id")  long          courseId,
                                      @RequestParam(defaultValue = "",  name = "image_name") String        imageName,
@@ -225,7 +225,7 @@ public class HospitalCourseAPI {
 
     // 提交课程，将获取置为 disable, 将缓存在临时文件夹的图片，导入 storage 文件夹，
     // 并替换 content 中 <img/> src 的引用值。
-    @RequestMapping(path = "/courses/nurse/edit/content/submit", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/nurse/courses/edit/content/submit", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public Nurse360CourseBean updateCourseContent(HttpServletRequest request,
                                                   @RequestParam(defaultValue = "0", name = "course_id")  long   courseId,
                                                   @RequestParam(defaultValue = "",  name = "content")    String content
