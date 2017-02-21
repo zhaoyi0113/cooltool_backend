@@ -190,6 +190,7 @@ public class CourseManageAPI {
         if (null!=course) {
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
             if (-1==hospitalId) {
+                departmentIds.clear();
                 departmentIds.add(Integer.valueOf(-1));
             }
             courseHospitalRelationService.setCourseToHospital(courseId, departmentIds);

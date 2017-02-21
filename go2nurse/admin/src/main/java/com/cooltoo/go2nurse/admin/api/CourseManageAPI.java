@@ -104,7 +104,8 @@ public class CourseManageAPI {
         if (null!=course) {
             courseCategoryRelation.setCourseRelation(courseId, categoryId);
             List<Integer> departmentIds = VerifyUtil.parseIntIds(strDepartmentIds);
-            if (-1==hospitalId && !departmentIds.contains(Integer.valueOf(-1))) {
+            if (-1==hospitalId) {
+                departmentIds.clear();
                 departmentIds.add(Integer.valueOf(-1));
             }
             courseRelationManageService.setCourseToDepartmentRelationship(courseId, departmentIds);
