@@ -174,9 +174,9 @@ public class NurseExtensionServiceForNurse360 {
     //********************
     //  get notification
     //********************
-    public Nurse360NotificationBean getNotificationById(long nurseId, long notificationId) {
+    public Nurse360NotificationBean getNotificationById(long nurseId, long notificationId, String httpPrefix) {
         logger.info("nurse={} get notification by notificationId={}", nurseId, notificationId);
-        Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
+        Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId, httpPrefix);
         return notification;
     }
 

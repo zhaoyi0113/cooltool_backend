@@ -5,6 +5,7 @@ import com.cooltoo.nurse360.beans.Nurse360CourseBean;
 import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NurseExtensionServiceForNurse360;
+import com.cooltoo.nurse360.util.Nurse360Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class NurseExtensionAPI {
 
     @Autowired private NurseExtensionServiceForNurse360 nurseExtensionService;
+    @Autowired private Nurse360Utility utility;
 
     @Path("/course/{index}/{number}")
     @GET
@@ -96,7 +98,7 @@ public class NurseExtensionAPI {
                                         @PathParam("notification_id") @DefaultValue("0") long notificationId
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        Nurse360NotificationBean notification = nurseExtensionService.getNotificationById(nurseId, notificationId);
+        Nurse360NotificationBean notification = nurseExtensionService.getNotificationById(nurseId, notificationId, utility.getHttpPrefix());
         return Response.ok(notification).build();
     }
 
