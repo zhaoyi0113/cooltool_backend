@@ -354,9 +354,25 @@ public class NotificationServiceForNurse360 {
             // move them to temporary file storage path
             // replace the image tag src url to temporary file storage relative path
             //
+            Map<String, String> srcUrlToFileInTempBasePath = new HashMap<>();
 
+            // if image already in temporary path
+            for (int i=0; i<srcUrls.size(); i++) {
+                String srcUrl = srcUrls.get(i);
+                if (tempStorage.fileExist(srcUrl)) {
+                    srcUrls.remove(i);
+                    i--;
+                    srcUrlToFileInTempBasePath.put(srcUrl, tempStorage.getStoragePath()+tempStorage.getRelativePathInStorage(srcUrl));
+                }
+            }
             // download the image tags src to /temp path
-            Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.newInstance().fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
+            Map<String, String> srcUrlToDownloadFileInTempBasePath = NetworkUtil.newInstance().fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
+            Set<String> downloadUrls = srcUrlToDownloadFileInTempBasePath.keySet();
+            for (String srcUrl : downloadUrls) {
+                srcUrlToFileInTempBasePath.put(srcUrl, srcUrlToDownloadFileInTempBasePath.get(srcUrl));
+            }
+
+            logger.info("srcUrl map : {}", srcUrlToFileInTempBasePath);
 
             // move image to cooltoo file storage system
             // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path
