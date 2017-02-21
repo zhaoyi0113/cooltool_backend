@@ -291,8 +291,8 @@ public class ActivityService {
             entity.setDescription(description);
         }
         if (!VerifyUtil.isStringEmpty(datetime)) {
-            long date = NumberUtil.getTime(datetime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-            if (date>0) {
+            Long date = NumberUtil.getTime(datetime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+            if (null!=date) {
                 entity.setTime(new Date(date));
             }
         }
@@ -360,8 +360,8 @@ public class ActivityService {
             changed = true;
         }
         if (!VerifyUtil.isStringEmpty(datetime)) {
-            long date = NumberUtil.getTime(datetime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-            if (date>0) {
+            Long date = NumberUtil.getTime(datetime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+            if (null!=date) {
                 entity.setTime(new Date(date));
                 changed = true;
             }

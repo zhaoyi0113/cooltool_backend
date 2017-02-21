@@ -329,8 +329,8 @@ public class ServiceOrderService {
             changed = true;
         }
 
-        long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (lStartTime > 0 && lStartTime!=orderBean.getServiceStartTime().getTime()) {
+        Long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        if (lStartTime != null && lStartTime!=orderBean.getServiceStartTime().getTime()) {
             newStartTime = new Date(lStartTime);
             changed = true;
         }
@@ -1124,8 +1124,8 @@ public class ServiceOrderService {
             logger.error("address is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
-        long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (lStartTime < 0) {
+        Long lStartTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        if (null==lStartTime) {
             logger.error("start time not valid");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }

@@ -85,13 +85,13 @@ public class UserService {
             throw new BadRequestException(ErrorCode.DATA_ERROR);
         }
 
-        long birthdayMilliSecond = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Long birthdayMilliSecond = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         UserHospitalizedStatus hasDecide = UserHospitalizedStatus.parseString(strHasDecide);
 
         UserEntity entity = new UserEntity();
         entity.setName(name);
         entity.setGender(null == genderType ? GenderType.SECRET : genderType);
-        entity.setBirthday(birthdayMilliSecond < 0 ? new Date(0) : new Date(birthdayMilliSecond));
+        entity.setBirthday(birthdayMilliSecond == null ? new Date(0) : new Date(birthdayMilliSecond));
         entity.setMobile(mobile);
         entity.setPassword(password);
         entity.setAuthority(UserAuthority.AGREE_ALL);
@@ -146,8 +146,8 @@ public class UserService {
                         currentUser.setPassword(password);
                         currentUser.setName(name);
                         currentUser.setStatus(CommonStatus.ENABLED);
-                        long birthdayMilliSecond = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-                        currentUser.setBirthday(birthdayMilliSecond < 0 ? new Date(0) : new Date(birthdayMilliSecond));
+                        Long birthdayMilliSecond = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+                        currentUser.setBirthday(birthdayMilliSecond == null ? new Date(0) : new Date(birthdayMilliSecond));
                         if (null != hasDecide && !hasDecide.equals(currentUser.getHasDecide())) {
                             currentUser.setHasDecide(hasDecide);
                         }
@@ -409,8 +409,8 @@ public class UserService {
         }
 
         if (!VerifyUtil.isStringEmpty(strBirthday)) {
-            long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-            if (time > 0) {
+            Long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+            if (null!=time) {
                 Date birthday = new Date(time);
                 entity.setBirthday(birthday);
                 changed = true;

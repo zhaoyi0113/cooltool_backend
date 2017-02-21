@@ -74,11 +74,8 @@ public class DoctorClinicDateManageAPI {
                                   @FormParam("number") @DefaultValue("0") int number
 
     ) {
-        long lClinicDate = NumberUtil.getTime(strClinicDate, NumberUtil.DATE_YYYY_MM_DD);
-        Date clinicDate = null;
-        if (lClinicDate>0) {
-            clinicDate = new Date(lClinicDate);
-        }
+        Long lClinicDate = NumberUtil.getTime(strClinicDate, NumberUtil.DATE_YYYY_MM_DD);
+        Date clinicDate = null==lClinicDate ? null : new Date(lClinicDate);
         DoctorClinicDateBean bean = dateHoursService.addClinicDate(doctorId, clinicDate, clinicTimeStart, clinicTimeEnd, number);
         return Response.ok(bean).build();
     }

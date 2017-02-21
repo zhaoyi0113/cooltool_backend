@@ -59,10 +59,10 @@ public class NurseSpeakService {
     public long countByContentAndTime(String speakType, String strStatus, long userId, String content, String strStartTime, String strEndTime) {
         logger.info("count user={} speak by content={} startTime={} endTime={}", userId>0?userId:"ALL", content, strStartTime, strEndTime);
         content = VerifyUtil.reconstructSQLContentLike(content);
-        long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        Date start     = startTime<0 ? new Date(0) : new Date(startTime);
-        Date end       = endTime  <0 ? new Date()  : new Date(endTime);
+        Long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date start     = null==startTime ? new Date(0) : new Date(startTime);
+        Date end       = null==endTime   ? new Date() : new Date(endTime);
 
         SpeakType speaktype = SpeakType.parseString(speakType);
         SpecificSocialAbility speakTypeAbility = speakAbilityTypeConverter.getItem(speaktype);
@@ -84,10 +84,10 @@ public class NurseSpeakService {
     public List<NurseSpeakBean> getSpeakByContentLikeAndTime(String speakType, String strStatus, long userId, String contentLike, String strStartTime, String strEndTime, int pageIndex, int sizePerPage) {
         logger.info("get user={} speak by speakType={} content={} startTime={} endTime={}", userId>0?userId:"ALL", contentLike, strStartTime, strEndTime);
         contentLike = VerifyUtil.reconstructSQLContentLike(contentLike);
-        long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        Date start     = startTime<0 ? new Date(0) : new Date(startTime);
-        Date end       = endTime  <0 ? new Date()  : new Date(endTime);
+        Long startTime = NumberUtil.getTime(strStartTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Long endTime   = NumberUtil.getTime(strEndTime,   NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date start     = null==startTime ? new Date(0) : new Date(startTime);
+        Date end       = null==endTime   ? new Date()  : new Date(endTime);
 
         SpeakType speaktype = SpeakType.parseString(speakType);
         SpecificSocialAbility speakTypeAbility = speakAbilityTypeConverter.getItem(speaktype);

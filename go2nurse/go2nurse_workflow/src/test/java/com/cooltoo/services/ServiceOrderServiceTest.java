@@ -141,14 +141,14 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         long patientId = 17;
         String address = "bei jing shi hai dian qu hua yuan qiao";
         String startTime ="2016-09-21 12:00:00";
-        long lStartTime = NumberUtil.getTime(startTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Long lStartTime = NumberUtil.getTime(startTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         int count = 15;
         String leaveMessage = "message test";
         ServiceOrderBean order = orderService.updateOrder(orderId, patientId, address, startTime, count, leaveMessage);
         Assert.assertEquals(orderId, order.getId());
         Assert.assertEquals(patientId, order.getPatientId());
         Assert.assertEquals(address, order.getAddress());
-        Assert.assertEquals(lStartTime, order.getServiceStartTime().getTime());
+        Assert.assertEquals(lStartTime.longValue(), order.getServiceStartTime().getTime());
         Assert.assertEquals(count, order.getItemCount());
         Assert.assertEquals(leaveMessage, order.getLeaveAMessage());
 
@@ -294,7 +294,7 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         long patientId = 17;
         String address = "bei jing shi hai dian qu hua yuan qiao";
         String startTime ="2016-09-21 12:00:00";
-        long lStartTime = NumberUtil.getTime(startTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Long lStartTime = NumberUtil.getTime(startTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         int count = 15;
         String leaveMessage = "message test";
         ServiceOrderBean order = orderService.addOrder(itemId, userId, patientId, address, startTime, count, leaveMessage, null);
@@ -302,7 +302,7 @@ public class ServiceOrderServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(userId, order.getUserId());
         Assert.assertEquals(patientId, order.getPatientId());
         Assert.assertEquals(address, order.getAddress());
-        Assert.assertEquals(lStartTime, order.getServiceStartTime().getTime());
+        Assert.assertEquals(lStartTime.longValue(), order.getServiceStartTime().getTime());
         Assert.assertEquals(count, order.getItemCount());
         Assert.assertEquals(leaveMessage, order.getLeaveAMessage());
     }

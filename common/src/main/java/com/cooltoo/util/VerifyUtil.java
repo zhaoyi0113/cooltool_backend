@@ -146,8 +146,8 @@ public class VerifyUtil {
         List<Date> recordDate = new ArrayList<>();
         try {
             for (String tmp : strArray) {
-                long time = NumberUtil.getTime(tmp, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-                if (time<0) {
+                Long time = NumberUtil.getTime(tmp, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+                if (null==time) {
                     recordDate.clear();
                     break;
                 }

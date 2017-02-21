@@ -52,10 +52,10 @@ public class DoctorAppointmentManageAPI {
         Long doctorId = !VerifyUtil.isIds(strDoctorId) ? null : VerifyUtil.parseLongIds(strDoctorId).get(0);
         Long clinicDateId = !VerifyUtil.isIds(strClinicDateId) ? null : VerifyUtil.parseLongIds(strClinicDateId).get(0);
         Long clinicHourId = !VerifyUtil.isIds(strClinicHourId) ? null : VerifyUtil.parseLongIds(strClinicHourId).get(0);
-        long lStartDate = NumberUtil.getTime(strStartDate, NumberUtil.DATE_YYYY_MM_DD);
-        long lEndDate = NumberUtil.getTime(strEndDate, NumberUtil.DATE_YYYY_MM_DD);
-        Date startDate = lStartDate<0 ? null : new Date(lStartDate);
-        Date endDate = lEndDate<0 ? null : new Date(lEndDate);
+        Long lStartDate = NumberUtil.getTime(strStartDate, NumberUtil.DATE_YYYY_MM_DD);
+        Long lEndDate   = NumberUtil.getTime(strEndDate, NumberUtil.DATE_YYYY_MM_DD);
+        Date startDate  = null==lStartDate ? null : new Date(lStartDate);
+        Date endDate    = null==lEndDate   ? null : new Date(lEndDate);
         long count = doctorAppointmentService.countDoctorAppointment(hospitalId, departmentId, doctorId, clinicDateId, clinicHourId, startDate, endDate);
         return Response.ok(count).build();
     }
@@ -78,10 +78,10 @@ public class DoctorAppointmentManageAPI {
         Long doctorId = !VerifyUtil.isIds(strDoctorId) ? null : VerifyUtil.parseLongIds(strDoctorId).get(0);
         Long clinicDateId = !VerifyUtil.isIds(strClinicDateId) ? null : VerifyUtil.parseLongIds(strClinicDateId).get(0);
         Long clinicHourId = !VerifyUtil.isIds(strClinicHourId) ? null : VerifyUtil.parseLongIds(strClinicHourId).get(0);
-        long lStartDate = NumberUtil.getTime(strStartDate, NumberUtil.DATE_YYYY_MM_DD);
-        long lEndDate = NumberUtil.getTime(strEndDate, NumberUtil.DATE_YYYY_MM_DD);
-        Date startDate = lStartDate<0 ? null : new Date(lStartDate);
-        Date endDate = lEndDate<0 ? null : new Date(lEndDate);
+        Long lStartDate = NumberUtil.getTime(strStartDate, NumberUtil.DATE_YYYY_MM_DD);
+        Long lEndDate   = NumberUtil.getTime(strEndDate, NumberUtil.DATE_YYYY_MM_DD);
+        Date startDate  = null==lStartDate ? null : new Date(lStartDate);
+        Date endDate    = null==lEndDate   ? null : new Date(lEndDate);
         List<DoctorAppointmentBean> appointments = doctorAppointmentService.findDoctorAppointment(hospitalId, departmentId, doctorId, clinicDateId, clinicHourId, startDate, endDate, index, number);
         return Response.ok(appointments).build();
     }

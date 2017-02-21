@@ -64,12 +64,12 @@ public class UserServiceTest extends AbstractCooltooTest {
         String address = "address testing";
         String hasDecide = "IN_HOME";
 
-        long lBirthday = NumberUtil.getTime(birthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Long lBirthday = NumberUtil.getTime(birthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
         UserBean bean = service.updateUser(userId, name, gender, birthday, authority, address, hasDecide);
         Assert.assertNotNull(bean);
         Assert.assertEquals(1, bean.getId());
         Assert.assertEquals(name, bean.getName());
-        Assert.assertEquals(lBirthday,  bean.getBirthday().getTime());
+        Assert.assertEquals(lBirthday.longValue(), bean.getBirthday().getTime());
         Assert.assertEquals(GenderType.SECRET, bean.getGender());
         Assert.assertEquals(address, bean.getAddress());
         Assert.assertEquals(hasDecide, bean.getHasDecide().name());

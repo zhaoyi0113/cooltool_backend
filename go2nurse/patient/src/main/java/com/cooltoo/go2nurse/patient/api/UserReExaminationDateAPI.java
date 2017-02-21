@@ -58,14 +58,8 @@ public class UserReExaminationDateAPI {
                                              @FormParam("has_operation") @DefaultValue("0") int iHasOperation
     ){
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        long dateTime = NumberUtil.getTime(reExamDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        Date date;
-        if (dateTime<0) {
-            date = null;
-        }
-        else {
-            date = new Date(dateTime);
-        }
+        Long dateTime = NumberUtil.getTime(reExamDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date date = null==dateTime ? null : new Date(dateTime);
         YesNoEnum hasOperation = YesNoEnum.parseInt(iHasOperation);
         UserReExaminationDateBean bean = userReExamDateService.addReExamination(userId, groupId, hospitalizedGroupId, date, YesNoEnum.NO, hasOperation);
         return Response.ok(bean).build();
@@ -82,14 +76,8 @@ public class UserReExaminationDateAPI {
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         YesNoEnum hasOperation = YesNoEnum.parseInt(iHasOperation);
-        long dateTime = NumberUtil.getTime(reExamStartDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        Date date;
-        if (dateTime<0) {
-            date = null;
-        }
-        else {
-            date = new Date(dateTime);
-        }
+        Long dateTime = NumberUtil.getTime(reExamStartDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date date = null==dateTime ? null : new Date(dateTime);
 
         List<UserReExaminationDateBean> reExamDates = userReExamDateService.addReExaminationByStartDate(userId, 0, date, hasOperation);
         return Response.ok(reExamDates).build();
@@ -107,11 +95,8 @@ public class UserReExaminationDateAPI {
     ){
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
 
-        Date date = null;
-        long dateTime = NumberUtil.getTime(reExamDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (dateTime>0) {
-            date = new Date(dateTime);
-        }
+        Long dateTime = NumberUtil.getTime(reExamDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date date = null==dateTime ? null : new Date(dateTime);
         CommonStatus ignore = CommonStatus.parseInt(iIgnore);
         CommonStatus status = CommonStatus.parseString(strStatus);
         UserReExaminationDateBean bean = userReExamDateService.updateReExamination(reExamDateId, date, ignore, status);
@@ -128,11 +113,8 @@ public class UserReExaminationDateAPI {
     ){
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
 
-        Date date = null;
-        long dateTime = NumberUtil.getTime(reExamStartDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (dateTime>0) {
-            date = new Date(dateTime);
-        }
+        Long dateTime = NumberUtil.getTime(reExamStartDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date date = null==dateTime ? null : new Date(dateTime);
         List<UserReExaminationDateBean> beans = userReExamDateService.updateReExaminationStartDate(userId, reExamGroupId, date);
         return Response.ok(beans).build();
     }

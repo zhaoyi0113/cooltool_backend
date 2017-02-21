@@ -115,8 +115,8 @@ public class NurseQualificationManageAPI {
     ) {
         Date expiryTime = null;
         if (!VerifyUtil.isStringEmpty(expiry)) {
-            long millisecond = NumberUtil.getTime(expiry, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-            expiryTime = new Date(millisecond);
+            Long millisecond = NumberUtil.getTime(expiry, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+            expiryTime = null==millisecond ? null : new Date(millisecond);
         }
         if (VerifyUtil.isStringEmpty(fileName)) {
             if (null!=disposition) {

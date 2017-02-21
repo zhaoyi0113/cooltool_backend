@@ -94,7 +94,7 @@ public class NurseMessageServiceTest extends AbstractCooltooTest {
         // thumbs up
         // <nurse_message id="7" user_type="0" user_id="1" reason_id="7" ability_id="2" ability_type="3" status="2" time_created="2016-03-18 9:11:32" />
         Assert.assertEquals(7L, messages.get(0).getId());
-        Assert.assertEquals(NumberUtil.getTime("2016-03-18 9:11:32", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS), messages.get(0).getTime().getTime());
+        Assert.assertEquals(NumberUtil.getTime("2016-03-18 9:11:32", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS).longValue(), messages.get(0).getTime().getTime());
         Assert.assertEquals(ReadingStatus.DELETED,  messages.get(0).getStatus());
         Assert.assertEquals(SocialAbilityType.COMMUNITY, messages.get(0).getAbilityType());
         Assert.assertEquals(1, messages.get(0).getAbilityId());
@@ -113,7 +113,7 @@ public class NurseMessageServiceTest extends AbstractCooltooTest {
         // comment
         // <nurse_message id="9"  user_type="0" user_id="1" reason_id="2" ability_id="1" ability_type="3" status="1" time_created="2016-02-02 00:00:00" />
         Assert.assertEquals(9L, messages.get(12).getId());
-        Assert.assertEquals(NumberUtil.getTime("2016-02-02 00:00:00", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS), messages.get(12).getTime().getTime());
+        Assert.assertEquals(NumberUtil.getTime("2016-02-02 00:00:00", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS).longValue(), messages.get(12).getTime().getTime());
         Assert.assertEquals(ReadingStatus.READ,  messages.get(12).getStatus());
         Assert.assertEquals(SocialAbilityType.COMMUNITY, messages.get(12).getAbilityType());
         Assert.assertEquals(1, messages.get(12).getAbilityId());
@@ -136,7 +136,7 @@ public class NurseMessageServiceTest extends AbstractCooltooTest {
         // thumbs up
         // <nurse_message id="7" user_type="0" user_id="1" reason_id="7" ability_id="2" ability_type="3" status="2" time_created="2016-03-18 9:11:32" />
         Assert.assertEquals(7L, messages.get(0).getId());
-        Assert.assertEquals(NumberUtil.getTime("2016-03-18 9:11:32", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS), messages.get(0).getTime().getTime());
+        Assert.assertEquals(NumberUtil.getTime("2016-03-18 9:11:32", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS).longValue(), messages.get(0).getTime().getTime());
         Assert.assertEquals(ReadingStatus.DELETED,  messages.get(0).getStatus());
         Assert.assertEquals(SocialAbilityType.COMMUNITY, messages.get(0).getAbilityType());
         Assert.assertEquals(1, messages.get(0).getAbilityId());
@@ -155,7 +155,7 @@ public class NurseMessageServiceTest extends AbstractCooltooTest {
         // comment
         // <nurse_message id="9"  user_type="0" user_id="1" reason_id="2" ability_id="1" ability_type="3" status="1" time_created="2016-02-02 00:00:00" />
         Assert.assertEquals(9L, messages.get(0).getId());
-        Assert.assertEquals(NumberUtil.getTime("2016-02-02 00:00:00", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS), messages.get(0).getTime().getTime());
+        Assert.assertEquals(NumberUtil.getTime("2016-02-02 00:00:00", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS).longValue(), messages.get(0).getTime().getTime());
         Assert.assertEquals(ReadingStatus.READ,  messages.get(0).getStatus());
         Assert.assertEquals(SocialAbilityType.COMMUNITY, messages.get(0).getAbilityType());
         Assert.assertEquals(1, messages.get(0).getAbilityId());

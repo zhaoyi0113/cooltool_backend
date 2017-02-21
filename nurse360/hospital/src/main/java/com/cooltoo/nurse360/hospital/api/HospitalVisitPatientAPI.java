@@ -191,7 +191,8 @@ public class HospitalVisitPatientAPI {
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
-        Date dVisitTime = new Date(NumberUtil.getTime(visitTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS));
+        Long lVisitTime = NumberUtil.getTime(visitTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date dVisitTime = null==lVisitTime ? null : new Date(lVisitTime);
         List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItemService.getVisitPatientServiceItem(serviceItemId);
         long visitId = visitPatientService.addVisitRecord(nurseId, userId, patientId, orderId, visitRecord, serviceItems, dVisitTime, address, patientRecordNo, note);
 
@@ -273,7 +274,8 @@ public class HospitalVisitPatientAPI {
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
-        Date dVisitTime = new Date(NumberUtil.getTime(visitTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS));
+        Long lVisitTime = NumberUtil.getTime(visitTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date dVisitTime = null==lVisitTime ? null : new Date(lVisitTime);
         List<NurseVisitPatientServiceItemBean> serviceItems = visitPatientServiceItemService.getVisitPatientServiceItem(serviceItemId);
         String serviceItemsJson = "";
         if (!VerifyUtil.isListEmpty(serviceItems)) {

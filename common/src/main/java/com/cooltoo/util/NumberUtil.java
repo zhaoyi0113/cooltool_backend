@@ -62,13 +62,13 @@ public class NumberUtil {
             return Long.MIN_VALUE;
         }
     }
-    public static long getTime(String datetime, String pattern) {
+    public static Long getTime(String datetime, String pattern) {
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         try {
             java.util.Date time = sdf.parse(datetime);
             return time.getTime();
         } catch (Exception e) {
-            return -1;
+            return null;
         }
     }
 

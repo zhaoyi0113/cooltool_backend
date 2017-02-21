@@ -234,6 +234,6 @@ public class NurseIntegrationServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(320, integration);
 
         Date date = integrationService.firstTimeFetchPoint(allIntegrations, UserType.NURSE, userId, ability.getAbilityType(), ability.getAbilityId(), 300);
-        Assert.assertEquals(NumberUtil.getTime("2016-05-01 08:00:00", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS), date.getTime());
+        Assert.assertEquals(NumberUtil.getTime("2016-05-01 08:00:00", NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS).longValue(), date.getTime());
     }
 }

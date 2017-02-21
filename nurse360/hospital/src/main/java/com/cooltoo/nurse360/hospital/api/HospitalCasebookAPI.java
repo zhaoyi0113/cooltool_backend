@@ -171,8 +171,8 @@ public class HospitalCasebookAPI {
         Integer hospitalId   = tmp[0];
         Integer departmentId = tmp[1];
         Long nurseId = userDetails.isAdmin() ? 0L : userDetails.getId();
-        long lTime = NumberUtil.getTime(time, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        Date dTime = lTime<=0 ? null : new Date(lTime);
+        Long lTime = NumberUtil.getTime(time, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date dTime = null==lTime ? null : new Date(lTime);
         long casebookId = casebookService.addCasebook(hospitalId, departmentId, nurseId, userId, patientId, description, name, YesNoEnum.parseString(hidden), dTime);
         Map<String, Long> retValue = new HashMap<>();
         retValue.put("id", casebookId);
@@ -189,8 +189,8 @@ public class HospitalCasebookAPI {
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Long nurseId = userDetails.isAdmin() ? null : userDetails.getId();
-        long lTime = NumberUtil.getTime(time, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        Date dTime = lTime<=0 ? null : new Date(lTime);
+        Long lTime = NumberUtil.getTime(time, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date dTime = null==lTime ? null : new Date(lTime);
         CasebookBean casebook = casebookService.updateCasebook(nurseId, casebookId, name, description, YesNoEnum.parseString(hidden), dTime);
         return casebook;
     }

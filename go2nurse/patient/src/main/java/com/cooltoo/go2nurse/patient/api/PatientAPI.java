@@ -84,11 +84,8 @@ public class PatientAPI {
                            @FormParam("mobile") @DefaultValue("") String mobile
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        Date date = null;
-        long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (time > 0) {
-            date = new Date(time);
-        }
+        Long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date date = null==time ? null : new Date(time);
 
         List<Long> usersPatient = userPatientRelation.getPatientByUser(userId, CommonStatus.ENABLED.name());
         PatientBean patient = service.create(name, gender, date, identityCard, mobile, VerifyUtil.isListEmpty(usersPatient) ? YesNoEnum.YES : null, null);
@@ -115,11 +112,8 @@ public class PatientAPI {
                            @FormParam("status") @DefaultValue("") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        Date birthday = null;
-        long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (time > 0) {
-            birthday = new Date(time);
-        }
+        Long time = NumberUtil.getTime(strBirthday, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date birthday = null==time ? null : new Date(time);
         YesNoEnum isDefault = YesNoEnum.parseString(strIsDefault);
         YesNoEnum isSelf = YesNoEnum.parseString(strIsSelf);
         PatientBean one = service.update(userId, patientId, name, gender, birthday, identityCard, mobile, isDefault, isSelf, status);

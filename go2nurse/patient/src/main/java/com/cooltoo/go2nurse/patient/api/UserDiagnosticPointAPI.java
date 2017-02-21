@@ -109,8 +109,8 @@ public class UserDiagnosticPointAPI {
                                    @FormParam("status") @DefaultValue("") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        long time = NumberUtil.getTime(pointTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        Date newTime = time<0 ? null : new Date(time);
+        Long time = NumberUtil.getTime(pointTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date newTime = null==time ? null : new Date(time);
         UserDiagnosticPointRelationBean relation = relationService.updateUserDiagnosticRelation(relationId, true, userId, newTime, status);
         return Response.ok(relation).build();
     }
@@ -154,8 +154,8 @@ public class UserDiagnosticPointAPI {
                                                  @FormParam("status") @DefaultValue("") String status
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        long time = NumberUtil.getTime(pointTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        Date newTime = time<0 ? null : new Date(time);
+        Long time = NumberUtil.getTime(pointTime, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        Date newTime = null==time ? null : new Date(time);
         UserDiagnosticPointRelationBean relation = relationService.updateUserDiagnosticRelation(groupId, diagnosticId, userId, newTime, status);
         return Response.ok(relation).build();
     }
@@ -206,28 +206,28 @@ public class UserDiagnosticPointAPI {
                            List<DiagnosticEnumeration> diagnosticPoints,
                            List<Date> pointTimes
     ) {
-        long timeHospitalized = NumberUtil.getTime(hospitalizedDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (timeHospitalized>0) {
+        Long timeHospitalized = NumberUtil.getTime(hospitalizedDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        if (timeHospitalized!=null) {
             diagnosticPoints.add(DiagnosticEnumeration.HOSPITALIZED_DATE);
             pointTimes.add(new Date(timeHospitalized));
         }
-        long timeExamination = NumberUtil.getTime(examinationDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (timeExamination>0) {
+        Long timeExamination = NumberUtil.getTime(examinationDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        if (timeExamination!=null) {
             diagnosticPoints.add(DiagnosticEnumeration.PHYSICAL_EXAMINATION);
             pointTimes.add(new Date(timeExamination));
         }
-        long timeOperation = NumberUtil.getTime(operationDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (timeOperation>0) {
+        Long timeOperation = NumberUtil.getTime(operationDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        if (timeOperation!=null) {
             diagnosticPoints.add(DiagnosticEnumeration.OPERATION);
             pointTimes.add(new Date(timeOperation));
         }
-//        long timeRehabilitation = NumberUtil.getTime(rehabilitationDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-//        if (timeRehabilitation>0) {
+//        Long timeRehabilitation = NumberUtil.getTime(rehabilitationDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+//        if (timeRehabilitation!=null) {
 //            diagnosticPoints.add(DiagnosticEnumeration.HOSPITALIZED_DATE);
 //            pointTimes.add(new Date(timeRehabilitation));
 //        }
-        long timeDischarged = NumberUtil.getTime(dischargedDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
-        if (timeDischarged>0) {
+        Long timeDischarged = NumberUtil.getTime(dischargedDate, NumberUtil.DATE_YYYY_MM_DD_HH_MM_SS);
+        if (timeDischarged!=null) {
             diagnosticPoints.add(DiagnosticEnumeration.DISCHARGED_FROM_THE_HOSPITAL);
             pointTimes.add(new Date(timeDischarged));
         }

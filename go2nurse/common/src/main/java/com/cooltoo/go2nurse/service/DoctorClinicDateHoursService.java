@@ -239,8 +239,8 @@ public class DoctorClinicDateHoursService {
 
         boolean changed = false;
 
-        long lClinicDate = NumberUtil.getTime(strClinicDate, NumberUtil.DATE_YYYY_MM_DD);
-        if (lClinicDate>0 && entity.getClinicDate().getTime()!=lClinicDate) {
+        Long lClinicDate = NumberUtil.getTime(strClinicDate, NumberUtil.DATE_YYYY_MM_DD);
+        if (null!=lClinicDate && entity.getClinicDate().getTime()!=lClinicDate) {
             Date clinicDate = new Date(lClinicDate);
             long count = dateRepository.countByDoctorIdAndClinicDate(entity.getDoctorId(), clinicDate);
             if (count>0) {
