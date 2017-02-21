@@ -69,6 +69,10 @@ public class NursePatientAPI {
         List<NursePatientRelationBean> returnVal = new ArrayList<>();
         for (int i=0; i<nursePatientRelations.size(); i++) {
             NursePatientRelationBean tmp  = nursePatientRelations.get(i);
+            // if patient is not enabled, do not return.
+            if (null!=tmp.getPatient() && !CommonStatus.ENABLED.equals(tmp.getPatient().getStatus())) {
+                continue;
+            }
             Long followUpId = userIdToFollowUpId.get(tmp.getId());
             tmp.setFollowUpId(null==followUpId ? 0 : followUpId);
 

@@ -150,12 +150,12 @@ public class HospitalNotificationAPI {
     // 课程为 editing 时, 向课程中添加图片，图片缓存在临时文件夹
     @RequestMapping(path = "/notification/content/add/image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
     public Response addImage2Temporary(HttpServletRequest request,
-                                       @RequestParam(defaultValue = "0", name = "course_id")  long          courseId,
-                                       @RequestParam(defaultValue = "",  name = "image_name") String        imageName,
-                                       @RequestPart(required = true,     name = "image")      MultipartFile image
+                                       @RequestParam(defaultValue = "0", name = "notification_id")  long          notificationId,
+                                       @RequestParam(defaultValue = "",  name = "image_name")       String        imageName,
+                                       @RequestPart(required = true,     name = "image")            MultipartFile image
 
     ) throws IOException {
-        String relativePath = notificationService.createTemporaryFile(courseId, imageName, image.getInputStream());
+        String relativePath = notificationService.createTemporaryFile(notificationId, imageName, image.getInputStream());
         int errorNo = 0;
         if (VerifyUtil.isStringEmpty(relativePath)) {
             errorNo = -1;
