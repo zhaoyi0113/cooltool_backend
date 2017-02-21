@@ -178,6 +178,7 @@ public class CourseHospitalRelationServiceForNurse360 {
         }
 
         if (hasCooltoo) {
+            if (null==departments) { departments = new ArrayList<>(); }
             HospitalDepartmentEntity cooltoo = new HospitalDepartmentEntity();
             cooltoo.setId(0);
             cooltoo.setHospitalId(-1);
