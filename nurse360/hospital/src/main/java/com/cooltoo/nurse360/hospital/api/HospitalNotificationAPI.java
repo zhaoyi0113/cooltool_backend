@@ -14,14 +14,19 @@ import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.nurse360.service.NotificationServiceForNurse360;
+import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
+import com.cooltoo.util.HtmlParser;
+import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +42,7 @@ public class HospitalNotificationAPI {
     @Autowired private NotificationServiceForNurse360 notificationService;
     @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
     @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private Nurse360Utility utility;
 
 
     //=============================================================
@@ -84,7 +90,7 @@ public class HospitalNotificationAPI {
     }
 
 
-    @RequestMapping(path = "/notification", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/notification/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
     public Map<String, Object> addNotification(HttpServletRequest request,
                                                @RequestParam(defaultValue = "",  name = "title")        String title,
                                                @RequestParam(defaultValue = "",  name = "introduction") String introduction,
@@ -113,7 +119,7 @@ public class HospitalNotificationAPI {
     }
 
 
-    @RequestMapping(path = "/notification", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(path = "/notification/edit", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public Nurse360NotificationBean updateNotification(HttpServletRequest request,
                                                        @RequestParam(defaultValue = "0",name = "notification_id") long notificationId,
                                                        @RequestParam(defaultValue = "", name = "title")  String title,
@@ -141,7 +147,30 @@ public class HospitalNotificationAPI {
     }
 
 
-    @RequestMapping(path = "/notification/content", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
+    // 课程为 editing 时, 向课程中添加图片，图片缓存在临时文件夹
+    @RequestMapping(path = "/notification/content/add/image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
+    public Response addImage2Temporary(HttpServletRequest request,
+                                       @RequestParam(defaultValue = "0", name = "course_id")  long          courseId,
+                                       @RequestParam(defaultValue = "",  name = "image_name") String        imageName,
+                                       @RequestPart(required = true,     name = "image")      MultipartFile image
+
+    ) throws IOException {
+        String relativePath = notificationService.createTemporaryFile(courseId, imageName, image.getInputStream());
+        int errorNo = 0;
+        if (VerifyUtil.isStringEmpty(relativePath)) {
+            errorNo = -1;
+        }
+        relativePath = HtmlParser.constructUrl(utility.getHttpPrefix(), relativePath);
+        StringBuilder retVal = new StringBuilder();
+        retVal.append("{")
+                .append("\"error\":").append(errorNo).append(",")
+                .append("\"url\":\"").append(relativePath).append("\"")
+                .append("}");
+        return Response.ok(retVal.toString()).build();
+    }
+
+
+    @RequestMapping(path = "/notification/content/edit", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
     public Nurse360NotificationBean updateNotification(HttpServletRequest request,
                                                        @RequestParam(defaultValue = "0",name = "notification_id") long notificationId,
                                                        @RequestParam(defaultValue = "", name = "content")       String content
@@ -153,9 +182,9 @@ public class HospitalNotificationAPI {
         if (canModifyNotification(userDetails)) {
             Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
             if (ServiceVendorType.HOSPITAL.equals(notification.getVendorType())
-                    && notification.getVendorId() == hospitalId
-                    && notification.getDepartId() == departmentId) {
-                notification = notificationService.updateNotification(notificationId, null, null, content, null, null, null, null, null);
+             && notification.getVendorId() == hospitalId
+             && notification.getDepartId() == departmentId) {
+                notification = notificationService.updateNotificationContent(notificationId, content);
                 return notification;
             }
             throw new BadRequestException(ErrorCode.NURSE360_NOTIFICATION_NOT_BELONG_TO_YOU);

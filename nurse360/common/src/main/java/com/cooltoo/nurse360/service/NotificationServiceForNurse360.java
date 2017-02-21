@@ -6,17 +6,23 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.beans.CourseBean;
+import com.cooltoo.go2nurse.constants.CourseStatus;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
+import com.cooltoo.go2nurse.entities.CourseEntity;
 import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.converters.Nurse360NotificationBeanConverter;
 import com.cooltoo.nurse360.entities.Nurse360NotificationEntity;
 import com.cooltoo.nurse360.repository.Nurse360NotificationRepository;
+import com.cooltoo.nurse360.service.file.AbstractFileStorageServiceForNurse360;
 import com.cooltoo.nurse360.service.file.NurseFileStorageServiceForNurse360;
 import com.cooltoo.nurse360.service.file.TemporaryFileStorageServiceForNurse360;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
+import com.cooltoo.util.FileUtil;
 import com.cooltoo.util.HtmlParser;
+import com.cooltoo.util.NetworkUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +33,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -185,6 +193,17 @@ public class NotificationServiceForNurse360 {
         return beans;
     }
 
+    private Nurse360NotificationBean entities2BeansWithContent(Nurse360NotificationEntity entity) {
+        if (null == entity) {
+            return null;
+        }
+        Nurse360NotificationBean bean = beanConverter.convert(entity);
+        List<Nurse360NotificationBean> beans = new ArrayList<>();
+        beans.add(bean);
+        fillOtherProperties(beans);
+        return bean;
+    }
+
     private void fillOtherProperties(List<Nurse360NotificationBean> beans) {
         if (VerifyUtil.isListEmpty(beans)) {
             return;
@@ -280,29 +299,105 @@ public class NotificationServiceForNurse360 {
     }
 
     @Transactional
-    public Nurse360NotificationBean updateNotification(long notificationId, String content) {
-        logger.info("update notification={} by content={}", notificationId, content);
+    public String createTemporaryFile(long notificationId, String imageName, InputStream image) {
+        logger.info("create temporary file by token={} notificationId={} imageName={} image={}",
+                notificationId, imageName, image);
         Nurse360NotificationEntity entity = repository.findOne(notificationId);
         if (null==entity) {
-            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+            logger.info("the notification do not exist");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        String relativePath = tempStorage.addFile(imageName, image);
+        return relativePath;
+    }
+
+
+    @Transactional
+    public Nurse360NotificationBean updateNotificationContent(long notificationId, String htmlContent) {
+        logger.info("update notification={} content={}", notificationId, htmlContent);
+
+        Nurse360NotificationEntity entity = repository.findOne(notificationId);
+        if (null==entity) {
+            logger.error("the course is not exist (and clean token cache)");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
         }
 
         String originalContent = entity.getContent();
         originalContent = (null==originalContent) ? "" : originalContent;
-        content         = (null==content)         ? "" : content;
-        if (originalContent.equals(content)) {
-            Nurse360NotificationBean bean = beanConverter.convert(entity);
-            logger.info("content is the same.");
-            return bean;
-        }
+        htmlContent     = (null==htmlContent)     ? "" : htmlContent;
 
+        // if original content is not empty, move the
+        // original images to temporary path
         if (!VerifyUtil.isStringEmpty(originalContent)) {
             moveOfficialFileToTemporary(originalContent);
         }
 
-        Nurse360NotificationBean bean = beanConverter.convert(entity);
-        logger.info("update content is {}", bean);
-        return bean;
+        if (VerifyUtil.isStringEmpty(htmlContent)) {
+            entity.setContent(htmlContent);
+            entity = repository.save(entity);
+            return beanConverter.convert(entity);
+        }
+
+        //===================================================
+        // parse the Html and getting image contains in Html
+        //===================================================
+        FileUtil fileUtil = FileUtil.getInstance();
+        HtmlParser htmlParser = HtmlParser.newInstance();
+        // get image tags src attribute url
+        List<String> srcUrls = htmlParser.getSrcUrls(htmlContent);
+
+        // images need to download
+        if (!VerifyUtil.isListEmpty(srcUrls)) {
+            //
+            // download all image needed download
+            // move them to temporary file storage path
+            // replace the image tag src url to temporary file storage relative path
+            //
+
+            // download the image tags src to /temp path
+            Map<String, String> srcUrlToFileInTempBasePath = NetworkUtil.newInstance().fetchAllWebFile(srcUrls, tempStorage.getStoragePath());
+
+            // move image to cooltoo file storage system
+            // move image tags file from /temp/xxxxxxx  path to temp/xx/xxxxxxxxxxxxxxxxx path
+            Map<String, String> fileInTempBaseToRelativeTempPath = new HashMap<>();
+            Map<String, String> srcUrlsToRelativeUrl = new HashMap<>();
+            Set<String> fetchUrls = srcUrlToFileInTempBasePath.keySet();
+            for (String url : fetchUrls) {
+                try {
+                    String[] relativePath = fileUtil.encodeFilePath(fileUtil.getFileName(url));
+                    String fileInTempBase = srcUrlToFileInTempBasePath.get(url);
+
+                    srcUrlsToRelativeUrl.put(url, relativePath[0] + File.separator + relativePath[1]);
+                    fileInTempBaseToRelativeTempPath.put(fileInTempBase, tempStorage.getStoragePath() + relativePath[0] + File.separator + relativePath[1]);
+                }
+                catch (Exception ex) {
+                    logger.error("move temp files to directory failed!");
+                    throw new BadRequestException(ErrorCode.DATA_ERROR);
+                }
+            }
+            fileUtil.moveFiles(fileInTempBaseToRelativeTempPath);
+
+            // change image url to cooltoo file storage system path
+            Map<String, String> imgTag2SrcValue = htmlParser.getImgTag2SrcUrlMap(htmlContent);
+            htmlContent = htmlParser.replaceImgTagSrcUrl(htmlContent, imgTag2SrcValue, srcUrlsToRelativeUrl);
+
+            String httpPrefixUrl = "";
+            // replace all temp http prefix url
+            httpPrefixUrl = utility.getHttpPrefix()+tempStorage.getNginxRelativePath();
+            htmlContent = htmlContent.replace(httpPrefixUrl, "");
+            // replace all user http prefix url
+            httpPrefixUrl = utility.getHttpPrefix()+userStorage.getNginxRelativePath();
+            htmlContent = htmlContent.replace(httpPrefixUrl, "");
+
+
+            // move temporary file to official path
+            srcUrls = htmlParser.getSrcUrls(htmlContent);
+            moveFileFromSrcToDest(srcUrls, tempStorage, userStorage);
+        }
+        entity.setContent(htmlContent);
+        entity = repository.save(entity);
+        return entities2BeansWithContent(entity);
     }
 
     private void moveOfficialFileToTemporary(String htmlContent) {
@@ -325,6 +420,38 @@ public class NotificationServiceForNurse360 {
             srcFilesInStorage.add(userStorage.getStoragePath() + relativePath);
         }
         tempStorage.moveFileToHere(srcFilesInStorage);
+    }
+
+    private List<String> moveFileFromSrcToDest(List<String> pathsInStorage,
+                                              AbstractFileStorageServiceForNurse360 src,
+                                              AbstractFileStorageServiceForNurse360 dest) {
+        if (VerifyUtil.isListEmpty(pathsInStorage)) {
+            logger.info("nothing need to move");
+            return new ArrayList<>();
+        }
+        if (null==src) {
+            logger.info("src is empty");
+            return new ArrayList<>();
+        }
+        if (null==dest) {
+            logger.info("dest is empty");
+            return new ArrayList<>();
+        }
+        logger.debug("move files to from={} to={}", src.getName(), dest.getName());
+
+        List<String> srcFilesInStorage = new ArrayList<>();
+        for (String tmp : pathsInStorage) {
+            String relativePath = src.getRelativePathInStorage(tmp);
+            if (VerifyUtil.isStringEmpty(relativePath)) {
+                continue;
+            }
+            srcFilesInStorage.add(src.getStoragePath() + relativePath);
+        }
+        if (!VerifyUtil.isListEmpty(srcFilesInStorage)) {
+            dest.moveFileToHere(srcFilesInStorage);
+        }
+
+        return srcFilesInStorage;
     }
 
     //=================================================================
