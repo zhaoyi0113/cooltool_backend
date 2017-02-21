@@ -1,10 +1,18 @@
 package com.cooltoo.nurse360.hospital.api;
 
+import com.cooltoo.beans.NurseAuthorizationBean;
+import com.cooltoo.beans.NurseBean;
+import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.exception.BadRequestException;
+import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.beans.Nurse360CourseCategoryBean;
+import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.nurse360.service.CourseCategoryServiceForNurse360;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,9 +72,13 @@ public class HospitalCourseCategoryAPI {
                                                   @RequestParam(defaultValue = "", name = "name")        String name,
                                                   @RequestParam(defaultValue = "", name = "introduction")String introduction
     ) {
-        logger.info("new category");
-        Nurse360CourseCategoryBean category = categoryService.addCategory(name, introduction, null, null);
-        return category;
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (canModifyCourseCategory(userDetails)) {
+            logger.info("new category");
+            Nurse360CourseCategoryBean category = categoryService.addCategory(name, introduction, null, null);
+            return category;
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
     @RequestMapping(path = "/nurse/course/category/edit", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
@@ -76,9 +88,13 @@ public class HospitalCourseCategoryAPI {
                                                      @RequestParam(defaultValue = "", name = "introduction")   String introduction,
                                                      @RequestParam(defaultValue = "disabled", name = "status") String status
     ) {
-        logger.info("update category");
-        Nurse360CourseCategoryBean category = categoryService.updateCategory(categoryId, name, introduction, status, null, null);
-        return category;
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (canModifyCourseCategory(userDetails)) {
+            logger.info("update category");
+            Nurse360CourseCategoryBean category = categoryService.updateCategory(categoryId, name, introduction, status, null, null);
+            return category;
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
     @RequestMapping(path = "/nurse/course/category/edit/image", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
@@ -87,8 +103,28 @@ public class HospitalCourseCategoryAPI {
                                                      @RequestParam(defaultValue = "",  name = "image_name")  String        imageName,
                                                      @RequestPart(required = true,     name = "image")       MultipartFile image
     ) throws IOException {
-        logger.info("update category front cover");
-        Nurse360CourseCategoryBean category = categoryService.updateCategory(categoryId, null, null, null, imageName, image.getInputStream());
-        return category;
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (canModifyCourseCategory(userDetails)) {
+            logger.info("update category front cover");
+            Nurse360CourseCategoryBean category = categoryService.updateCategory(categoryId, null, null, null, imageName, image.getInputStream());
+            return category;
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+    }
+
+    private boolean canModifyCourseCategory(HospitalAdminUserDetails userDetails) {
+        if (null==userDetails||userDetails.isAdmin()) { return false; }
+
+        NurseBean nurse = (NurseBean) userDetails.getUserBean();
+        NurseAuthorizationBean authorization = (NurseAuthorizationBean) nurse.getProperty(NurseBean.AUTHORIZATION);
+        if (userDetails.isNurseManager()) {
+            return true;
+        }
+        if (userDetails.isNurse()
+         && null != authorization
+         && YesNoEnum.YES.equals(authorization.getAuthNotificationHeadNurse())) {
+            return true;
+        }
+        return false;
     }
 }

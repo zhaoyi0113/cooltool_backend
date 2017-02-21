@@ -1,6 +1,7 @@
 package com.cooltoo.nurse360.nurse.api;
 
 import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.NurseHospitalRelationBean;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.nurse360.filters.Nurse360LoginAuthentication;
 import com.cooltoo.nurse360.service.NurseServiceForNurse360;
@@ -65,8 +66,15 @@ public class NurseAPIForNurse360 {
                                          @FormParam("department_id") int departmentId
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
+        NurseBean nurse = nurseServiceForNurse360.getNurseById(nurseId);
         nurseServiceForNurse360.editNurse(nurseId, realName, age, gender, null, null, null, null);
-        nurseServiceForNurse360.setHospitalDepartmentAndJobTitle(nurseId, hospitalId, departmentId, null);
+        NurseHospitalRelationBean nurseHospitalRelation = (NurseHospitalRelationBean) nurse.getProperty(NurseBean.HOSPITAL_DEPARTMENT);
+        if (null==nurseHospitalRelation
+         || (nurseHospitalRelation.getHospitalId()!=hospitalId
+           ||nurseHospitalRelation.getDepartmentId()!=departmentId)
+        ) {
+            nurseServiceForNurse360.setHospitalDepartmentAndJobTitle(nurseId, hospitalId, departmentId, null);
+        }
         NurseBean bean = nurseServiceForNurse360.getNurseById(nurseId);
         return Response.ok(bean).build();
     }

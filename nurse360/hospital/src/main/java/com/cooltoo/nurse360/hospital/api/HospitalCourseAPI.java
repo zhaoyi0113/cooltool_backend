@@ -2,7 +2,10 @@ package com.cooltoo.nurse360.hospital.api;
 
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.beans.NurseAuthorizationBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.constants.CourseStatus;
@@ -97,7 +100,7 @@ public class HospitalCourseAPI {
                                         @RequestParam(defaultValue = "0",name = "category_id")  long categoryId
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        if (!userDetails.isAdmin()) {
+        if (canModifyCourse(userDetails)) {
             Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
             Integer departmentId = null != tmp[1] ? tmp[1].intValue() : null;
             Nurse360CourseBean course = courseService.createCourse(name, introduction, link, keyword, categoryId);
@@ -120,7 +123,7 @@ public class HospitalCourseAPI {
                                         @RequestParam(defaultValue = "0",name = "category_id")  long categoryId
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        if (!userDetails.isAdmin()) {
+        if (canModifyCourse(userDetails)) {
             logger.info("update course basic information");
             Nurse360CourseBean course = courseService.updateCourseBasicInfo(courseId, name, introduction, null, null, link, keyword, categoryId);
             logger.info("course is {}", course);
@@ -136,7 +139,7 @@ public class HospitalCourseAPI {
                                                    @RequestPart(required = true,     name = "image")      MultipartFile image
     ) throws IOException {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        if (!userDetails.isAdmin()) {
+        if (canModifyCourse(userDetails)) {
             logger.info("update course front cover");
             Nurse360CourseBean course = courseService.updateCourseBasicInfo(courseId, null, null, imageName, image.getInputStream(), null, null, -1);
             logger.info("course is {}", course);
@@ -151,7 +154,7 @@ public class HospitalCourseAPI {
                                                @RequestParam(defaultValue = "disabled",  name = "status")     String status
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        if (!userDetails.isAdmin()) {
+        if (canModifyCourse(userDetails)) {
             logger.info("update course={} status={}", courseId, status);
             Nurse360CourseBean course = courseService.updateCourseStatus(courseId, status);
             logger.info("course is {}", course);
@@ -190,10 +193,14 @@ public class HospitalCourseAPI {
                                                     @RequestParam(defaultValue = "0", name = "course_id") long courseId
 
     ) {
-        logger.info("cache course={} to temporary path", courseId);
-        Nurse360CourseBean course = courseService.moveCourse2Temporary(courseId);
-        logger.info("course is {}", course);
-        return course;
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (canModifyCourse(userDetails)) {
+            logger.info("cache course={} to temporary path", courseId);
+            Nurse360CourseBean course = courseService.moveCourse2Temporary(courseId);
+            logger.info("course is {}", course);
+            return course;
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
 
@@ -205,21 +212,25 @@ public class HospitalCourseAPI {
                                      @RequestPart(required = true,     name = "image")      MultipartFile image
 
     ) throws IOException {
-        logger.info("user cache image to temporary path");
-        String relativePath = courseService.createTemporaryFile(courseId, imageName, image.getInputStream());
-        logger.info("relative path is {}", relativePath);
-        int errorNo = 0;
-        if (VerifyUtil.isStringEmpty(relativePath)) {
-            errorNo = -1;
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (canModifyCourse(userDetails)) {
+            logger.info("user cache image to temporary path");
+            String relativePath = courseService.createTemporaryFile(courseId, imageName, image.getInputStream());
+            logger.info("relative path is {}", relativePath);
+            int errorNo = 0;
+            if (VerifyUtil.isStringEmpty(relativePath)) {
+                errorNo = -1;
+            }
+            relativePath = HtmlParser.constructUrl(utility.getHttpPrefix(), relativePath);
+            StringBuilder retVal = new StringBuilder();
+            retVal.append("{")
+                  .append("\"error\":").append(errorNo).append(",")
+                  .append("\"url\":\"").append(relativePath).append("\"")
+                  .append("}");
+            logger.info("relative path is {}", relativePath);
+            return retVal.toString();
         }
-        relativePath = HtmlParser.constructUrl(utility.getHttpPrefix(), relativePath);
-        StringBuilder retVal = new StringBuilder();
-        retVal.append("{")
-              .append("\"error\":").append(errorNo).append(",")
-              .append("\"url\":\"").append(relativePath).append("\"")
-              .append("}");
-        logger.info("relative path is {}", relativePath);
-        return retVal.toString();
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
 
@@ -231,9 +242,26 @@ public class HospitalCourseAPI {
                                                   @RequestParam(defaultValue = "",  name = "content")    String content
 
     ) {
-        logger.info("submit course content");
-        Nurse360CourseBean course = courseService.updateCourseContent(courseId, content);
-        logger.info("course is {}", course);
-        return course;
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (canModifyCourse(userDetails)) {
+            logger.info("submit course content");
+            Nurse360CourseBean course = courseService.updateCourseContent(courseId, content);
+            logger.info("course is {}", course);
+            return course;
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+    }
+
+    private boolean canModifyCourse(HospitalAdminUserDetails userDetails) {
+        if (null==userDetails||userDetails.isAdmin()) { return false; }
+
+        NurseBean nurse = (NurseBean) userDetails.getUserBean();
+        NurseAuthorizationBean authorization = (NurseAuthorizationBean) nurse.getProperty(NurseBean.AUTHORIZATION);
+        if (userDetails.isNurseManager() || (userDetails.isNurse()
+                && null != authorization
+                && YesNoEnum.YES.equals(authorization.getAuthNotificationHeadNurse()))) {
+            return true;
+        }
+        return false;
     }
 }

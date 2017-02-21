@@ -11,6 +11,8 @@ import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.converters.Nurse360NotificationBeanConverter;
 import com.cooltoo.nurse360.entities.Nurse360NotificationEntity;
 import com.cooltoo.nurse360.repository.Nurse360NotificationRepository;
+import com.cooltoo.nurse360.service.file.NurseFileStorageServiceForNurse360;
+import com.cooltoo.nurse360.service.file.TemporaryFileStorageServiceForNurse360;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
@@ -44,6 +46,8 @@ public class NotificationServiceForNurse360 {
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
     @Autowired private Nurse360Utility utility;
+    @Autowired private NurseFileStorageServiceForNurse360 userStorage;
+    @Autowired private TemporaryFileStorageServiceForNurse360 tempStorage;
 
     //==============================================================
     //                  getter
@@ -271,6 +275,29 @@ public class NotificationServiceForNurse360 {
 
         Nurse360NotificationBean bean = beanConverter.convert(entity);
         logger.info("updated is {}", bean);
+        return bean;
+    }
+
+    @Transactional
+    public Nurse360NotificationBean updateNotification(long notificationId, String content) {
+        logger.info("update notification={} by content={}", notificationId, content);
+        Nurse360NotificationEntity entity = repository.findOne(notificationId);
+        if (null==entity) {
+            throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+        }
+
+        String originalContent = entity.getContent();
+        originalContent = (null==originalContent) ? "" : originalContent;
+        if (originalContent.equals(content)) {
+            Nurse360NotificationBean bean = beanConverter.convert(entity);
+            logger.info("content is the same.");
+            return bean;
+        }
+
+
+
+        Nurse360NotificationBean bean = beanConverter.convert(entity);
+        logger.info("update content is {}", bean);
         return bean;
     }
 
