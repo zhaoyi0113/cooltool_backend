@@ -7,6 +7,7 @@ import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.service.NotificationServiceForNurse360;
+import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class NotificationManageAPI {
     @Autowired private NotificationServiceForNurse360 notificationService;
     @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
     @Autowired private NotifierForAllModule notifierForAllModule;
+    @Autowired private Nurse360Utility utility;
 
     private List<CommonStatus> getStatuses(String status) {
         List<CommonStatus> statuses = new ArrayList<>();
@@ -48,7 +50,7 @@ public class NotificationManageAPI {
     public Response pushNotification(@Context HttpServletRequest request,
                                      @PathParam("notification_id") @DefaultValue("0") long notificationId
     ) {
-        Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
+        Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId, utility.getHttpPrefix());
         if (null!=notification) {
             if (ServiceVendorType.HOSPITAL.equals(notification.getVendorType())) {
                 List<Integer> departmentIds = Arrays.asList(new Integer[]{(int)notification.getDepartId()});
@@ -66,7 +68,7 @@ public class NotificationManageAPI {
                                         @PathParam("notification_id") @DefaultValue("0") long notificationId
     ) {
         logger.info("get notification by notification id");
-        Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
+        Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId, utility.getHttpPrefix());
         List<HospitalBean> hospitals = notificationService.getHospitalByNotificationId(notificationId);
         List<HospitalDepartmentBean> departments = notificationService.getDepartmentByNotificationId(notificationId);
         Map<String, Object> retVal = new HashMap<>();
