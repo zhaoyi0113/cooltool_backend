@@ -149,7 +149,7 @@ public class HospitalNotificationAPI {
 
     // 课程为 editing 时, 向课程中添加图片，图片缓存在临时文件夹
     @RequestMapping(path = "/notification/content/add/image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
-    public Response addImage2Temporary(HttpServletRequest request,
+    public String addImage2Temporary(HttpServletRequest request,
                                        @RequestParam(defaultValue = "0", name = "notification_id")  long          notificationId,
                                        @RequestParam(defaultValue = "",  name = "image_name")       String        imageName,
                                        @RequestPart(required = true,     name = "image")            MultipartFile image
@@ -166,7 +166,7 @@ public class HospitalNotificationAPI {
                 .append("\"error\":").append(errorNo).append(",")
                 .append("\"url\":\"").append(relativePath).append("\"")
                 .append("}");
-        return Response.ok(retVal.toString()).build();
+        return retVal.toString();
     }
 
 
@@ -194,7 +194,7 @@ public class HospitalNotificationAPI {
 
 
     @RequestMapping(path = "/notification/alert/{notification_id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON)
-    public Response pushNotification(HttpServletRequest request,
+    public void pushNotification(HttpServletRequest request,
                                      @PathVariable long notification_id
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
@@ -211,7 +211,7 @@ public class HospitalNotificationAPI {
                 notifierForAllModule.newNotificationAlertToNurse360(nurseIds, notification_id, "new", notification.getTitle());
             }
         }
-        return Response.ok().build();
+        return;
     }
 
     private boolean canModifyNotification(HospitalAdminUserDetails userDetails) {
