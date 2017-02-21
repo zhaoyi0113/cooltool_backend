@@ -52,7 +52,7 @@ public class HospitalNotificationAPI {
     public Map<String, Object> getNotification(HttpServletRequest request,
                                                @PathVariable long notification_id
     ) {
-        Nurse360NotificationBean notification = notificationService.getNotificationById(notification_id);
+        Nurse360NotificationBean notification = notificationService.getNotificationById(notification_id, utility.getHttpPrefix());
         List<HospitalBean> hospitals = notificationService.getHospitalByNotificationId(notification_id);
         List<HospitalDepartmentBean> departments = notificationService.getDepartmentByNotificationId(notification_id);
         Map<String, Object> retVal = new HashMap<>();
@@ -132,7 +132,7 @@ public class HospitalNotificationAPI {
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
         if (canModifyNotification(userDetails)) {
-            Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
+            Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId, "");
             if (ServiceVendorType.HOSPITAL.equals(notification.getVendorType())
                     && notification.getVendorId() == hospitalId
                     && notification.getDepartId() == departmentId) {
@@ -180,7 +180,7 @@ public class HospitalNotificationAPI {
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
         if (canModifyNotification(userDetails)) {
-            Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId);
+            Nurse360NotificationBean notification = notificationService.getNotificationById(notificationId, "");
             if (ServiceVendorType.HOSPITAL.equals(notification.getVendorType())
              && notification.getVendorId() == hospitalId
              && notification.getDepartId() == departmentId) {
@@ -202,7 +202,7 @@ public class HospitalNotificationAPI {
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
         if (canModifyNotification(userDetails)) {
-            Nurse360NotificationBean notification = notificationService.getNotificationById(notification_id);
+            Nurse360NotificationBean notification = notificationService.getNotificationById(notification_id, "");
             if (ServiceVendorType.HOSPITAL.equals(notification.getVendorType())
                     && notification.getVendorId() == hospitalId
                     && notification.getDepartId() == departmentId) {

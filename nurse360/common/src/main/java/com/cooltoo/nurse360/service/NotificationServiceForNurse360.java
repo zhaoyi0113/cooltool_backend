@@ -68,7 +68,7 @@ public class NotificationServiceForNurse360 {
         return exists;
     }
 
-    public Nurse360NotificationBean getNotificationById(long notificationId) {
+    public Nurse360NotificationBean getNotificationById(long notificationId, String nginxBaseUrl) {
         logger.info("get notification by notificationId={}", notificationId);
         Nurse360NotificationEntity notification = repository.findOne(notificationId);
         if (null==notification) {
@@ -76,6 +76,19 @@ public class NotificationServiceForNurse360 {
         }
         List<Nurse360NotificationBean> beans = entitiesToBeans(Arrays.asList(new Nurse360NotificationEntity[]{notification}), true);
         fillOtherProperties(beans);
+
+        // add the base url to notification image src
+        HtmlParser htmlParser = HtmlParser.newInstance();
+        for (Nurse360NotificationBean bean : beans) {
+            String content = bean.getContent();
+            if (null==content || content.trim().isEmpty()) {
+                continue;
+            }
+
+            Map<String, String> imgTag2Src = htmlParser.getImgTag2SrcUrlMap(content);
+            content = htmlParser.addPrefixToImgTagSrcUrl(content, imgTag2Src, nginxBaseUrl+userStorage.getNginxRelativePath());
+            bean.setContent(content);
+        }
 
         return beans.get(0);
     }
