@@ -101,7 +101,10 @@ public class HospitalNotificationAPI {
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
         if (canModifyNotification(userDetails)) {
-            Nurse360NotificationBean notification = notificationService.addNotification(title, introduction, strSignificance, ServiceVendorType.HOSPITAL, hospitalId, departmentId);
+            Nurse360NotificationBean notification = notificationService.addNotification(
+                    title, introduction, strSignificance,
+                    ServiceVendorType.HOSPITAL,
+                    hospitalId, departmentId, userDetails.getId());
             Map<String, Object> retVal = new HashMap<>();
             retVal.put("notification", notification);
             if (null!=notification) {

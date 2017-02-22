@@ -100,6 +100,13 @@ public class NurseServiceForNurse360 {
         return bean;
     }
 
+    public List<NurseBean> getNurseByIds(List<Long> nurseIds) {
+        Iterable<NurseEntity> nurses = commonNurseService.getNurseByIds(nurseIds);
+        List<NurseBean> beans = entitiesToBeans(nurses);
+        fillOtherProperties(beans);
+        return beans;
+    }
+
     public List<String> getManagerMobiles(Integer hospitalId, Integer departmentId) {
         logger.info("get nurse manager mobiles by hospital={} department={}", hospitalId, departmentId);
         Iterable<NurseEntity> nurses = commonNurseService.getNurseByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL, null, null, null, hospitalId, departmentId, null);

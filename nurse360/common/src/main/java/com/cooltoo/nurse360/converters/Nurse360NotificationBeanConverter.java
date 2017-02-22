@@ -24,6 +24,7 @@ public class Nurse360NotificationBeanConverter implements Converter<Nurse360Noti
         bean.setVendorType(source.getVendorType());
         bean.setVendorId(source.getVendorId());
         bean.setDepartId(source.getDepartId());
+        bean.setCreatorNurseId(source.getCreatorNurseId());
         return bean;
     }
 }

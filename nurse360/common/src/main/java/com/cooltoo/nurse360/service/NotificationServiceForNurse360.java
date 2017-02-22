@@ -2,6 +2,7 @@ package com.cooltoo.nurse360.service;
 
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.beans.HospitalDepartmentBean;
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
@@ -52,6 +53,7 @@ public class NotificationServiceForNurse360 {
     @Autowired private Nurse360NotificationRepository repository;
     @Autowired private Nurse360NotificationBeanConverter beanConverter;
 
+    @Autowired private NurseServiceForNurse360 nurseService;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
     @Autowired private Nurse360Utility utility;
@@ -222,19 +224,27 @@ public class NotificationServiceForNurse360 {
             return;
         }
 
-//        List<Long> imageIds = new ArrayList<>();
-//        for (Nurse360NotificationBean bean : beans) {
-//            imageIds.add(bean.getImageId());
-//        }
-//        Map<Long, String> imageId2Path = nurseStorage.getFileUrl(imageIds);
-//        for (Nurse360NotificationBean bean : beans) {
-//            long imageId = bean.getImageId();
-//            String imagePath = imageId2Path.get(imageId);
-//            if (VerifyUtil.isStringEmpty(imagePath)) {
-//                imagePath = "";
-//            }
-//            bean.setImageUrl(imagePath);
-//        }
+        List<Long> nurseIds = new ArrayList<>();
+        for (Nurse360NotificationBean tmp : beans) {
+            if (nurseIds.contains(tmp.getCreatorNurseId())) {
+                continue;
+            }
+            nurseIds.add(tmp.getCreatorNurseId());
+        }
+
+        List<NurseBean> nurses = nurseService.getNurseByIds(nurseIds);
+        Map<Long, NurseBean> nurseIdToBean = new HashMap<>();
+        for (NurseBean tmp : nurses) {
+            nurseIdToBean.put(tmp.getId(), tmp);
+        }
+
+        for (Nurse360NotificationBean bean : beans) {
+            long creatorNurseId = bean.getCreatorNurseId();
+            NurseBean nurse = nurseIdToBean.get(creatorNurseId);
+            if (null!=nurse) {
+                bean.setCreatorNurse(nurse);
+            }
+        }
     }
 
     //=================================================================
@@ -487,9 +497,15 @@ public class NotificationServiceForNurse360 {
     //         add
     //=================================================================
     @Transactional
-    public Nurse360NotificationBean addNotification(String title, String introduction, String strSignificance, ServiceVendorType vendorType, long vendorId, long departId) {
-        logger.info("add notification by title={} introduction={} significance={} vendorType={} vendorId={} departId={}",
-                title, introduction, strSignificance, vendorType, vendorId, departId);
+    public Nurse360NotificationBean addNotification(String title, String introduction,
+                                                    String strSignificance,
+                                                    ServiceVendorType vendorType,
+                                                    long vendorId,
+                                                    long departId,
+                                                    long creatorNurseId
+    ) {
+        logger.info("add notification by title={} introduction={} significance={} vendorType={} vendorId={} departId={} creatorNurseId={}",
+                title, introduction, strSignificance, vendorType, vendorId, departId, creatorNurseId);
 
         title = VerifyUtil.isStringEmpty(title) ? "" : title.trim();
         if (VerifyUtil.isStringEmpty(title)) {
@@ -514,6 +530,7 @@ public class NotificationServiceForNurse360 {
         entity.setVendorId(vendorId);
         entity.setDepartId(departId);
         entity.setTime(new Date());
+        entity.setCreatorNurseId(creatorNurseId);
         entity.setStatus(CommonStatus.DISABLED);
         entity = repository.save(entity);
 

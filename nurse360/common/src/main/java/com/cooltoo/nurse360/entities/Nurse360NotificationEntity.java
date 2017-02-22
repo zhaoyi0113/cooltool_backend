@@ -24,6 +24,7 @@ public class Nurse360NotificationEntity {
     private ServiceVendorType vendorType;
     private long vendorId;
     private long departId;
+    private long creatorNurseId;
 
     @Id
     @GeneratedValue
@@ -110,6 +111,14 @@ public class Nurse360NotificationEntity {
         this.departId = departId;
     }
 
+    @Column(name = "creator_nurse_id")
+    public long getCreatorNurseId() {
+        return creatorNurseId;
+    }
+    public void setCreatorNurseId(long creatorNurseId) {
+        this.creatorNurseId = creatorNurseId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -120,6 +129,7 @@ public class Nurse360NotificationEntity {
         msg.append(", introduction=").append(introduction);
         msg.append(", content=").append(content);
         msg.append(", significance=").append(significance);
+        msg.append(", creatorNurseId=").append(creatorNurseId);
         msg.append("]");
         return msg.toString();
     }

@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.beans;
 
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
@@ -21,6 +22,8 @@ public class Nurse360NotificationBean {
     private ServiceVendorType vendorType;
     private long vendorId;
     private long departId;
+    private long creatorNurseId;
+    private NurseBean creatorNurse;
 
     private YesNoEnum hasRead;
 
@@ -101,6 +104,20 @@ public class Nurse360NotificationBean {
         this.hasRead = hasRead;
     }
 
+    public long getCreatorNurseId() {
+        return creatorNurseId;
+    }
+    public void setCreatorNurseId(long creatorNurseId) {
+        this.creatorNurseId = creatorNurseId;
+    }
+
+    public NurseBean getCreatorNurse() {
+        return creatorNurse;
+    }
+    public void setCreatorNurse(NurseBean creatorNurse) {
+        this.creatorNurse = creatorNurse;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -112,6 +129,8 @@ public class Nurse360NotificationBean {
         msg.append(", content=").append(content);
         msg.append(", significance=").append(significance);
         msg.append(", hasRead=").append(hasRead);
+        msg.append(", creatorNurseId=").append(creatorNurseId);
+        msg.append(", creatorNurse=").append(creatorNurse);
         msg.append("]");
         return msg.toString();
     }

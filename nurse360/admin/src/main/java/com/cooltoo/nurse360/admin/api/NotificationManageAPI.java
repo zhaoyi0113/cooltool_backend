@@ -126,7 +126,10 @@ public class NotificationManageAPI {
                                     @FormParam("significance") @DefaultValue("") String strSignificance /* YES, NO */
     ) {
         logger.info("new notification");
-        Nurse360NotificationBean notification = notificationService.addNotification(title, introduction, strSignificance, ServiceVendorType.HOSPITAL, hospitalId, departmentId);
+        Nurse360NotificationBean notification = notificationService.addNotification(
+                title, introduction, strSignificance,
+                ServiceVendorType.HOSPITAL,
+                hospitalId, departmentId, 0L);
         Map<String, Object> retVal = new HashMap<>();
         retVal.put("notification", notification);
 
