@@ -1,0 +1,1 @@
+ALTER TABLE `nurse360_notification` ADD COLUMN `creator_nurse_id` BIGINT(64) NULL DEFAULT 0;
