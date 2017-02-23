@@ -17,6 +17,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -100,7 +101,9 @@ public class NurseOrderAPI {
             patientId = null==patientId ? 0 : patientId;
             nursePatientRelation.addUserPatientToNurse(nurseId, patientId, userId);
         }
-        return Response.ok().build();
+        Map<String, Long> ret = new HashMap<>();
+        ret.put("order_id", orderId);
+        return Response.ok(ret).build();
     }
 
     @Path("/cancel")
