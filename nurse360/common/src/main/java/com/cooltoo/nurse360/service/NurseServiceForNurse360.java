@@ -130,6 +130,15 @@ public class NurseServiceForNurse360 {
         return managersMobile;
     }
 
+    public List<NurseBean> getNurseInDepartment(Integer hospitalId, Integer departmentId) {
+        logger.info("get nurse manager mobiles by hospital={} department={}", hospitalId, departmentId);
+        Iterable<NurseEntity> nurses = commonNurseService.getNurseByAuthorityAndFuzzyName(UserAuthority.AGREE_ALL, null, null, null, hospitalId, departmentId, null);
+        List<NurseBean> beans = entitiesToBeans(nurses);
+        fillOtherProperties(beans);
+        logger.info("count is {}", beans.size());
+        return beans;
+    }
+
     private List<NurseBean> entitiesToBeans(Iterable<NurseEntity> entities) {
         List<NurseBean> beans = new ArrayList<>();
         if (null==entities) {

@@ -1,10 +1,8 @@
 package com.cooltoo.nurse360.hospital.api;
 
-import com.cooltoo.beans.HospitalBean;
-import com.cooltoo.beans.HospitalDepartmentBean;
-import com.cooltoo.beans.NurseAuthorizationBean;
-import com.cooltoo.beans.NurseBean;
+import com.cooltoo.beans.*;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
@@ -14,6 +12,7 @@ import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.beans.Nurse360NotificationBean;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.nurse360.service.NotificationServiceForNurse360;
+import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.HtmlParser;
@@ -39,6 +38,7 @@ import java.util.Map;
 @RequestMapping(path = "/nurse360_hospital")
 public class HospitalNotificationAPI {
 
+    @Autowired private NurseServiceForNurse360 nurseService;
     @Autowired private NotificationServiceForNurse360 notificationService;
     @Autowired private CommonNurseHospitalRelationService nurseHospitalRelationService;
     @Autowired private NotifierForAllModule notifierForAllModule;
@@ -48,6 +48,20 @@ public class HospitalNotificationAPI {
     //=============================================================
     //            Authentication of NURSE/MANAGER Role
     //=============================================================
+    @RequestMapping(path = "/notification/creators", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<NurseBean> getNotification(HttpServletRequest request) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (canModifyNotification(userDetails)) {
+            Integer[] tmp = SecurityUtil.newInstance().getHospitalDepartment("", "", userDetails);
+            Integer hospitalId   = tmp[0];
+            Integer departmentId = tmp[1];
+            List<NurseBean> nurses = nurseService.getNurseInDepartment(hospitalId, departmentId);
+            nurses = filterNurseCanModifyNotification(nurses);
+            return nurses;
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+    }
+
     @RequestMapping(path = "/notification/{notification_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public Map<String, Object> getNotification(HttpServletRequest request,
                                                @PathVariable long notification_id
@@ -224,10 +238,42 @@ public class HospitalNotificationAPI {
         NurseBean nurse = (NurseBean) userDetails.getUserBean();
         NurseAuthorizationBean authorization = (NurseAuthorizationBean) nurse.getProperty(NurseBean.AUTHORIZATION);
         if (userDetails.isNurseManager() || (userDetails.isNurse()
-                                            && null != authorization
-                                            && YesNoEnum.YES.equals(authorization.getAuthNotificationHeadNurse()))) {
+                && null != authorization
+                && YesNoEnum.YES.equals(authorization.getAuthNotificationHeadNurse()))) {
             return true;
         }
         return false;
+    }
+
+    private List<NurseBean> filterNurseCanModifyNotification(List<NurseBean> nurses) {
+        if (null==nurses) { return nurses; }
+        if (nurses.isEmpty()) { return nurses; }
+
+        for (int i = 0; i < nurses.size(); i ++) {
+            NurseBean nurse = nurses.get(i);
+
+            UserAuthority authority = nurse.getAuthority();
+            if (!UserAuthority.AGREE_ALL.equals(authority)) {
+                nurses.remove(i);
+                i--;
+                continue;
+            }
+
+            NurseExtensionBean extension = (NurseExtensionBean) nurse.getProperty(NurseBean.INFO_EXTENSION);
+            boolean isNurseManager = (null!=extension && YesNoEnum.YES.equals(extension.getIsManager()));
+            if (isNurseManager) {
+                continue;
+            }
+
+            NurseAuthorizationBean authorization = (NurseAuthorizationBean) nurse.getProperty(NurseBean.AUTHORIZATION);
+            if (null != authorization && YesNoEnum.YES.equals(authorization.getAuthNotificationHeadNurse())) {
+                continue;
+            }
+
+            nurses.remove(i);
+            i--;
+        }
+
+        return nurses;
     }
 }
