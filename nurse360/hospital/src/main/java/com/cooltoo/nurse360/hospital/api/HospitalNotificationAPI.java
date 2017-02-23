@@ -16,6 +16,7 @@ import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.services.CommonNurseHospitalRelationService;
 import com.cooltoo.util.HtmlParser;
+import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -108,17 +109,19 @@ public class HospitalNotificationAPI {
     public Map<String, Object> addNotification(HttpServletRequest request,
                                                @RequestParam(defaultValue = "",  name = "title")        String title,
                                                @RequestParam(defaultValue = "",  name = "introduction") String introduction,
-                                               @RequestParam(defaultValue = "NO",name = "significance") String strSignificance /* YES, NO */
+                                               @RequestParam(defaultValue = "NO",name = "significance") String strSignificance, /* YES, NO */
+                                               @RequestParam(defaultValue = "",  name = "creator_id")   String creatorId
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
         Long hospitalId   = tmp[0];
         Long departmentId = tmp[1];
         if (canModifyNotification(userDetails)) {
+            Long lCreatorId = VerifyUtil.isIds(creatorId) ? VerifyUtil.parseLongIds(creatorId).get(0) : userDetails.getId();
             Nurse360NotificationBean notification = notificationService.addNotification(
                     title, introduction, strSignificance,
                     ServiceVendorType.HOSPITAL,
-                    hospitalId, departmentId, userDetails.getId());
+                    hospitalId, departmentId, lCreatorId);
             Map<String, Object> retVal = new HashMap<>();
             retVal.put("notification", notification);
             if (null!=notification) {
