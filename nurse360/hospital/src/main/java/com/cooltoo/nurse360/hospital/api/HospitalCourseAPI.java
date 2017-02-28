@@ -177,7 +177,8 @@ public class HospitalCourseAPI {
         List<HospitalDepartmentBean> departments = courseHospitalRelationService.getDepartmentByCourseId(courseId, CommonStatus.ENABLED.name());
         List<HospitalBean>           hospitals   = courseHospitalRelationService.getHospitalByCourseId(courseId, CommonStatus.ENABLED.name());
         Nurse360CourseBean           course      = courseService.getCourseById(courseId, utility.getHttpPrefix());
-        Nurse360CourseCategoryBean   categories  = categoryService.getCategoryById(course.getCategoryId());
+        Nurse360CourseCategoryBean   categories  = null;
+        try { categories = categoryService.getCategoryById(course.getCategoryId()); } catch (Exception ex) {}
         Map<String, Object> retVal = new HashMap<>();
         retVal.put("course", course);
         retVal.put("hospital", hospitals);
