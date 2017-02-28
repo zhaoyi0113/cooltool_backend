@@ -483,15 +483,19 @@ public class CourseServiceForNurse360 {
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
 
-        if (!CourseStatus.EDITING.equals(entity.getStatus())) {
-            logger.error("the course is not editing");
-            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
-        }
+//        if (!CourseStatus.EDITING.equals(entity.getStatus())) {
+//            logger.error("the course is not editing");
+//            throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+//        }
 
         if (VerifyUtil.isStringEmpty(content)) {
             content = "";  // avoid NullException
         }
         else {
+            // if course content is not empty, move all images to cache
+            if (!VerifyUtil.isStringEmpty(entity.getContent())) {
+                moveTemporaryFileToOfficial(entity.getContent());
+            }
             // move temporary
             moveTemporaryFileToOfficial(content);
 
@@ -511,8 +515,10 @@ public class CourseServiceForNurse360 {
             content = htmlParser.replaceImgTagSrcUrl(content, imgTag2SrcValue, srcUrl2RelativeFilePathInStorage);
         }
 
+        if (CourseStatus.EDITING.equals(entity.getStatus())) {
+            entity.setStatus(CourseStatus.ENABLE);
+        }
         entity.setContent(content);
-        entity.setStatus(CourseStatus.ENABLE);
         entity = repository.save(entity);
         return entities2BeansWithContent(entity);
     }
