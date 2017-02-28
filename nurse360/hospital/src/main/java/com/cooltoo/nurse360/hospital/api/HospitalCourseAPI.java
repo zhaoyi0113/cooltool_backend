@@ -163,6 +163,20 @@ public class HospitalCourseAPI {
         throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
+    @RequestMapping(path = "/nurse/courses/delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+    public String deleteCourse(HttpServletRequest request,
+                               @RequestParam(defaultValue = "0", name = "course_id") String courseIds
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (canModifyCourse(userDetails)) {
+            logger.info("delete course={}", courseIds);
+            String course = courseService.deleteByIds(courseIds);
+            logger.info("course is {}", course);
+            return course;
+        }
+        throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
+    }
+
     //=============================================================
     //         edit the course content
     //=============================================================
