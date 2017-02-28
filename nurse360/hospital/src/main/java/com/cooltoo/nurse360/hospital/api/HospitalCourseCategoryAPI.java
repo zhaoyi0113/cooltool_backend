@@ -97,7 +97,7 @@ public class HospitalCourseCategoryAPI {
         throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
     }
 
-    @RequestMapping(path = "/nurse/course/category/edit/image", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
+    @RequestMapping(path = "/nurse/course/category/edit/image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.MULTIPART_FORM_DATA)
     public Nurse360CourseCategoryBean updateCategory(HttpServletRequest request,
                                                      @RequestParam(defaultValue = "0", name = "category_id") long          categoryId,
                                                      @RequestParam(defaultValue = "",  name = "image_name")  String        imageName,
