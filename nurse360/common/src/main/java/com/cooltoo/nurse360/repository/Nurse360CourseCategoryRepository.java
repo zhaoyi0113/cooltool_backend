@@ -14,8 +14,10 @@ import java.util.List;
  */
 public interface Nurse360CourseCategoryRepository extends JpaRepository<Nurse360CourseCategoryEntity, Long> {
     long countByStatus(CommonStatus status);
+    long countByStatusIn(List<CommonStatus> status);
     long countByName(String name);
     Page<Nurse360CourseCategoryEntity> findByStatus(CommonStatus status, Pageable page);
+    Page<Nurse360CourseCategoryEntity> findByStatusIn(List<CommonStatus> status, Pageable page);
     List<Nurse360CourseCategoryEntity> findByIdIn(List<Long> ids, Sort sort);
     List<Nurse360CourseCategoryEntity> findByStatusAndIdIn(CommonStatus status, List<Long> ids, Sort sort);
 }

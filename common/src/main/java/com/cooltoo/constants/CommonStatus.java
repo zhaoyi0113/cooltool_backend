@@ -44,4 +44,26 @@ public enum CommonStatus {
         all.add(CommonStatus.DELETED);
         return all;
     }
+
+    public static List<CommonStatus> parseAll(String statuses) {
+        if (null==statuses || statuses.trim().isEmpty()) {
+            return null;
+        }
+        statuses = statuses.toUpperCase().trim();
+        List<CommonStatus> all = new ArrayList<>();
+        if (statuses.contains(ENABLED.name())) {
+            all.add(ENABLED);
+        }
+        if (statuses.contains(DISABLED.name())) {
+            all.add(DISABLED);
+        }
+        if (statuses.contains(DELETED.name())) {
+            all.add(DELETED);
+        }
+        if (all.isEmpty()) {
+            all = null;
+        }
+        return all;
+
+    }
 }

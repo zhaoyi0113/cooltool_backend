@@ -75,6 +75,17 @@ public class CourseCategoryServiceForNurse360 {
         return count;
     }
 
+    public long countByStatusIn(String strStatus) {
+        logger.info("count course category by statues={}", strStatus);
+        List<CommonStatus> status = CommonStatus.parseAll(strStatus);
+        long count = 0;
+        if (null!=status) {
+            count = repository.countByStatusIn(status);
+        }
+        logger.info("course category count is {}", count);
+        return count;
+    }
+
     public List<Nurse360CourseCategoryBean> getCategoryByStatus(String strStatus, int pageIndex, int sizeOfPage) {
         logger.info("get course category by status={} at page={} size={}", strStatus, pageIndex, sizeOfPage);
         // get all category
@@ -88,6 +99,21 @@ public class CourseCategoryServiceForNurse360 {
         }
         else {
             resultSet = repository.findByStatus(status, page);
+        }
+
+        List<Nurse360CourseCategoryBean> beans = entitiesToBeans(resultSet);
+        fillOtherProperties(beans);
+        return beans;
+    }
+
+    public List<Nurse360CourseCategoryBean> getCategoryByStatusIn(String strStatus, int pageIndex, int sizeOfPage) {
+        logger.info("get course category by status={} at page={} size={}", strStatus, pageIndex, sizeOfPage);
+        // get all category
+        List<CommonStatus> status = CommonStatus.parseAll(strStatus);
+        PageRequest page = new PageRequest(pageIndex, sizeOfPage, categorySort);
+        Page<Nurse360CourseCategoryEntity> resultSet = null;
+        if (null!=status) {
+            resultSet = repository.findByStatusIn(status, page);
         }
 
         List<Nurse360CourseCategoryBean> beans = entitiesToBeans(resultSet);

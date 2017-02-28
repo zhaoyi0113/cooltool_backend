@@ -43,18 +43,18 @@ public class HospitalCourseCategoryAPI {
         return category;
     }
 
-    // status ==> all/enabled/disabled/deleted
+    // status ==> enabled/disabled/deleted
     @RequestMapping(path = "/nurse/course/category/count/{status}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countCategory(HttpServletRequest request,
                               @PathVariable String status
     ) {
         logger.info("get category count by status={}", status);
-        long count = categoryService.countByStatus(status);
+        long count = categoryService.countByStatusIn(status);
         logger.info("count = {}", count);
         return count;
     }
 
-    // status ==> all/enabled/disabled/deleted
+    // status ==> enabled/disabled/deleted
     @RequestMapping(path = "/nurse/course/category/{status}/{index}/{number}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<Nurse360CourseCategoryBean> getCategoryByStatus(HttpServletRequest request,
                                                                 @PathVariable String status,
@@ -62,7 +62,7 @@ public class HospitalCourseCategoryAPI {
                                                                 @PathVariable int number
     ) {
         logger.info("get category by status={} at page={}, {}/page", status, index, number);
-        List<Nurse360CourseCategoryBean> categories = categoryService.getCategoryByStatus(status, index, number);
+        List<Nurse360CourseCategoryBean> categories = categoryService.getCategoryByStatusIn(status, index, number);
         logger.info("count = {}", categories.size());
         return categories;
     }
