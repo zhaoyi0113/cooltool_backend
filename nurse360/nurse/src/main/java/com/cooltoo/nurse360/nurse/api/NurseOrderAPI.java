@@ -33,15 +33,29 @@ public class NurseOrderAPI {
     @Autowired private NursePatientRelationService nursePatientRelation;
     @Autowired private NurseAuthorizationJudgeService nurseAuthorizationJudgeService;
 
+    /**
+     * @param orderStatus CANCELLED,        // 取消订单
+     *                    TO_PAY,           // 下单成功，等待支付
+     *                    TO_DISPATCH,      // 支付成功，等待管理员提醒抢单或派单
+     *                    TO_SERVICE,       // 提醒抢单，等待护士抢单
+     *                    IN_PROCESS,       // 抢单成功(或派单成功), 上门服务
+     *                    COMPLETED,        // 服务完成
+     *                    CREATE_CHARGE_FAILED, //创建订单失败
+     *                    REFUND_IN_PROCESS,// 退款处理中
+     *                    REFUND_PROCESSED, // 退款管理员已处理
+     *                    REFUND_COMPLETED, // 退款完成
+     *                    REFUND_FAILED     // 退款失败
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Nurse360LoginAuthentication(requireNurseLogin = true)
     public Response getOrder(@Context HttpServletRequest request,
+                             @QueryParam("order_status") @DefaultValue("") String orderStatus,
                              @QueryParam("index") @DefaultValue("0") int pageIndex,
                              @QueryParam("number") @DefaultValue("10") int sizePerPage
     ) {
         long nurseId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
-        List<ServiceOrderBean> orders = nurseOrderService.getAllOrder(nurseId, CommonStatus.ENABLED.name(), pageIndex, sizePerPage);
+        List<ServiceOrderBean> orders = nurseOrderService.getAllOrder(nurseId, CommonStatus.ENABLED.name(), orderStatus, pageIndex, sizePerPage);
         return Response.ok(orders).build();
     }
 

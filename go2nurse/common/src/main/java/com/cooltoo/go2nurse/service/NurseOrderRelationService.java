@@ -77,10 +77,19 @@ public class NurseOrderRelationService {
         return beans;
     }
 
-    public List<ServiceOrderBean> getAllOrder(long nurseId, String strStatus, int pageIndex, int sizePerPage) {
+    public List<ServiceOrderBean> getAllOrder(long nurseId, String strStatus, String strOrderStatus, int pageIndex, int sizePerPage) {
         logger.info("get orders by nurseId={} with status={}", nurseId, strStatus);
 
         NurseBean nurse = nurseService.getNurseById(nurseId);
+
+        OrderStatus filterOrderStatus = OrderStatus.parseString(strOrderStatus);
+        List<OrderStatus> filterOrderStatuses = new ArrayList<>();
+        if (null!=filterOrderStatus) {
+            filterOrderStatuses.add(filterOrderStatus);
+        }
+        else {
+            filterOrderStatuses = orderStatuses;
+        }
 
         // get nurse extension information
         // nurse can see all order
@@ -102,7 +111,7 @@ public class NurseOrderRelationService {
         }
 
         // get orders
-        List<ServiceOrderBean> orders = orderService.getOrderByConditions(orderStatuses,
+        List<ServiceOrderBean> orders = orderService.getOrderByConditions(filterOrderStatuses,
                 vendorType,
                 hospitalId,
                 departmentId,
