@@ -346,10 +346,7 @@ public class CourseServiceForNurse360 {
 
         if (!VerifyUtil.isStringEmpty(keyword)) {
             keyword = keyword.trim();
-            if (keyword.length()>1) {
-                keyword = keyword.substring(0, 1);
-            }
-            entity.setKeyword(keyword);
+            entity.setKeyword(VerifyUtil.stringLimit(keyword, 2));
         }
 
         entity.setStatus(CourseStatus.DISABLE);
@@ -418,10 +415,7 @@ public class CourseServiceForNurse360 {
 
         if (!VerifyUtil.isStringEmpty(keyword)) {
             keyword = keyword.trim();
-            if (keyword.length()>1) {
-                keyword = keyword.substring(0, 1);
-            }
-            entity.setKeyword(keyword);
+            entity.setKeyword(VerifyUtil.stringLimit(keyword, 2));
             changed = true;
         }
 

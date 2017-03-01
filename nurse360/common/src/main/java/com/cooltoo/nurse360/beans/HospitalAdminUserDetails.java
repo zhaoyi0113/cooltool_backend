@@ -4,6 +4,7 @@ import com.cooltoo.beans.AdminUserBean;
 import com.cooltoo.beans.NurseBean;
 import com.cooltoo.beans.NurseExtensionBean;
 import com.cooltoo.constants.AdminUserType;
+import com.cooltoo.constants.RegisterFrom;
 import com.cooltoo.constants.UserAuthority;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.nurse360.constants.AdminRole;
@@ -174,10 +175,9 @@ public class HospitalAdminUserDetails implements UserDetails {
         }
         else if (userBean instanceof NurseBean) {
             UserAuthority authority = ((NurseBean) userBean).getAuthority();
-            NurseExtensionBean extension = (NurseExtensionBean) ((NurseBean) userBean).getProperty(NurseBean.INFO_EXTENSION);
+            RegisterFrom registerFrom = ((NurseBean) userBean).getRegisterFrom();
 
-            return UserAuthority.AGREE_ALL.equals(authority)
-                    && (null!=extension && YesNoEnum.YES.equals(extension.getAnswerNursingQuestion()));
+            return UserAuthority.AGREE_ALL.equals(authority) && RegisterFrom.GO2NURSE.equals(registerFrom);
         }
         return false;
     }
