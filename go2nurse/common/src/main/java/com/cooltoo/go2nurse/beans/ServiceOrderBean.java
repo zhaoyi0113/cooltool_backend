@@ -71,7 +71,7 @@ public class ServiceOrderBean {
     private YesNoEnum isNurseFetched;
     private float score;
     private float scoreStandards;
-    private float scoreInTime;
+    private float scoreOnTime;
     private String suggestions;
     private List<ServiceOrderChargeBean> pingPP;
     private Map<String, Object> properties = new HashMap<>();
@@ -260,8 +260,8 @@ public class ServiceOrderBean {
         return scoreStandards;
     }
 
-    public float getScoreInTime() {
-        return scoreInTime;
+    public float getScoreOnTime() {
+        return scoreOnTime;
     }
 
     public String getSuggestions() {
@@ -424,8 +424,8 @@ public class ServiceOrderBean {
         this.scoreStandards = scoreStandards;
     }
 
-    public void setScoreInTime(float scoreInTime) {
-        this.scoreInTime = scoreInTime;
+    public void setScoreOnTime(float scoreOnTime) {
+        this.scoreOnTime = scoreOnTime;
     }
 
     public void setSuggestions(String suggestions) {
@@ -486,7 +486,7 @@ public class ServiceOrderBean {
         msg.append(", completedTime=").append(completedTime);
         msg.append(", scoreAttitude=").append(score);
         msg.append(", scoreStandards=").append(scoreStandards);
-        msg.append(", scoreInTime=").append(scoreInTime);
+        msg.append(", scoreOnTime=").append(scoreOnTime);
         msg.append(", suggestions=").append(suggestions);
         msg.append("]");
         return msg.toString();

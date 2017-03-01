@@ -53,7 +53,7 @@ public class ServiceOrderEntity {
     private YesNoEnum needVisitPatientRecord;
     private float scoreAttitude;
     private float scoreStandards;
-    private float scoreInTime;
+    private float scoreOnTime;
     private String suggestions;
 
     @Id
@@ -244,8 +244,8 @@ public class ServiceOrderEntity {
     }
 
     @Column(name = "score_in_time")
-    public float getScoreInTime() {
-        return scoreInTime;
+    public float getScoreOnTime() {
+        return scoreOnTime;
     }
 
     @Column(name = "opinions_suggestions")
@@ -397,8 +397,8 @@ public class ServiceOrderEntity {
         this.scoreStandards = scoreStandards;
     }
 
-    public void setScoreInTime(float scoreInTime) {
-        this.scoreInTime = scoreInTime;
+    public void setScoreOnTime(float scoreOnTime) {
+        this.scoreOnTime = scoreOnTime;
     }
 
     public void setSuggestions(String suggestions) {

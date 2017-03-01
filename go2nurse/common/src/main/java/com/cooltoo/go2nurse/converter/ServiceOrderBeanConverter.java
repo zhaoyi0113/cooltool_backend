@@ -110,7 +110,7 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
         bean.setItemCount(source.getItemCount());
         bean.setScore(source.getScoreAttitude());
         bean.setScoreStandards(source.getScoreStandards());
-        bean.setScoreInTime(source.getScoreInTime());
+        bean.setScoreOnTime(source.getScoreOnTime());
         bean.setSuggestions(source.getSuggestions());
         if (null!=source.getCompletedTime()) {
             bean.setCompletedTime(source.getCompletedTime());

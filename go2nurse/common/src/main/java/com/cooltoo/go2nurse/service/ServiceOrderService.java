@@ -999,11 +999,11 @@ public class ServiceOrderService {
 
     @Transactional
     public ServiceOrderBean scoreOrder(boolean checkUser, long userId, long orderId,
-                                       float scoreAttitude, float scoreStandards, float scoreInTime,
+                                       float scoreAttitude, float scoreStandards, float scoreOnTime,
                                        String suggestions
     ) {
-        logger.info("score order={} by user={} checkFlag={} scoreAttitude={} scoreStandards={} scoreInTime={} suggestions={}",
-                orderId, userId, checkUser, scoreAttitude, scoreStandards, scoreInTime, suggestions);
+        logger.info("score order={} by user={} checkFlag={} scoreAttitude={} scoreStandards={} scoreOnTime={} suggestions={}",
+                orderId, userId, checkUser, scoreAttitude, scoreStandards, scoreOnTime, suggestions);
         ServiceOrderEntity entity = repository.findOne(orderId);
         if (null == entity) {
             throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
@@ -1017,11 +1017,11 @@ public class ServiceOrderService {
 
         scoreAttitude  = scoreAttitude  < 0 ? 0 : scoreAttitude;
         scoreStandards = scoreStandards < 0 ? 0 : scoreStandards;
-        scoreInTime    = scoreInTime    < 0 ? 0 : scoreInTime;
+        scoreOnTime    = scoreOnTime    < 0 ? 0 : scoreOnTime;
 
         entity.setScoreAttitude(scoreAttitude);
         entity.setScoreStandards(scoreStandards);
-        entity.setScoreInTime(scoreInTime);
+        entity.setScoreOnTime(scoreOnTime);
         entity.setSuggestions(VerifyUtil.stringLimit(suggestions, 150));
         entity = repository.save(entity);
         logger.info("order scored and suggestion is {}", entity);

@@ -363,11 +363,11 @@ public class UserServiceOrderAPI {
                                    @FormParam("order_id")       @DefaultValue("0") long orderId,
                                    @FormParam("score")          @DefaultValue("0") float scoreAttitude,
                                    @FormParam("score_standards") @DefaultValue("0") float scoreStandards,
-                                   @FormParam("score_in_time")  @DefaultValue("0") float scoreInTime,
+                                   @FormParam("score_on_time")  @DefaultValue("0") float scoreOnTime,
                                    @FormParam("suggestion")     @DefaultValue("") String suggestion
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
-        ServiceOrderBean order = orderService.scoreOrder(true, userId, orderId, scoreAttitude, scoreStandards, scoreInTime, suggestion);
+        ServiceOrderBean order = orderService.scoreOrder(true, userId, orderId, scoreAttitude, scoreStandards, scoreOnTime, suggestion);
         return Response.ok(order).build();
     }
 
