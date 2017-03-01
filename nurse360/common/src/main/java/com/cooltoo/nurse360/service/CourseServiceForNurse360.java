@@ -352,7 +352,7 @@ public class CourseServiceForNurse360 {
             entity.setKeyword(keyword);
         }
 
-        entity.setStatus(CourseStatus.ENABLE);
+        entity.setStatus(CourseStatus.DISABLE);
         entity.setTime(new Date());
         entity = repository.save(entity);
         logger.info("create an course id={}", entity.getId());
