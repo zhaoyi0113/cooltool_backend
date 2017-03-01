@@ -66,10 +66,13 @@ public class ServiceOrderBean {
     private String paymentAmount;
     private int paymentAmountCent;
     private String leaveAMessage;
-    private float score;
     private Date fetchTime;
     private Date completedTime;
     private YesNoEnum isNurseFetched;
+    private float score;
+    private float scoreStandards;
+    private float scoreInTime;
+    private String suggestions;
     private List<ServiceOrderChargeBean> pingPP;
     private Map<String, Object> properties = new HashMap<>();
 
@@ -230,10 +233,6 @@ public class ServiceOrderBean {
         return leaveAMessage;
     }
 
-    public float getScore() {
-        return score;
-    }
-
     public Date getCompletedTime() {
         return completedTime;
     }
@@ -251,6 +250,22 @@ public class ServiceOrderBean {
 
     public YesNoEnum getNeedVisitPatientRecord() {
         return needVisitPatientRecord;
+    }
+
+    public float getScore() {
+        return score;
+    }
+
+    public float getScoreStandards() {
+        return scoreStandards;
+    }
+
+    public float getScoreInTime() {
+        return scoreInTime;
+    }
+
+    public String getSuggestions() {
+        return suggestions;
     }
 
     public void setId(long id) {
@@ -393,16 +408,28 @@ public class ServiceOrderBean {
         this.leaveAMessage = leaveAMessage;
     }
 
-    public void setScore(float score) {
-        this.score = score;
-    }
-
     public void setCompletedTime(Date completedTime) {
         this.completedTime = completedTime;
     }
 
     public void setFetchTime(Date fetchTime) {
         this.fetchTime = fetchTime;
+    }
+
+    public void setScore(float score) {
+        this.score = score;
+    }
+
+    public void setScoreStandards(float scoreStandards) {
+        this.scoreStandards = scoreStandards;
+    }
+
+    public void setScoreInTime(float scoreInTime) {
+        this.scoreInTime = scoreInTime;
+    }
+
+    public void setSuggestions(String suggestions) {
+        this.suggestions = suggestions;
     }
 
     public List<ServiceOrderChargeBean> getPingPP() {
@@ -456,8 +483,11 @@ public class ServiceOrderBean {
         msg.append(", orderStatus=").append(orderStatus);
         msg.append(", payTime=").append(payTime);
         msg.append(", paymentAmount=").append(paymentAmount);
-        msg.append(", score=").append(score);
         msg.append(", completedTime=").append(completedTime);
+        msg.append(", scoreAttitude=").append(score);
+        msg.append(", scoreStandards=").append(scoreStandards);
+        msg.append(", scoreInTime=").append(scoreInTime);
+        msg.append(", suggestions=").append(suggestions);
         msg.append("]");
         return msg.toString();
     }

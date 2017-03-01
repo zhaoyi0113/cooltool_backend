@@ -108,7 +108,10 @@ public class ServiceOrderBeanConverter implements Converter<ServiceOrderEntity, 
         bean.setPaymentAmountCent(source.getPaymentAmountCent());
         bean.setLeaveAMessage(source.getLeaveAMessage());
         bean.setItemCount(source.getItemCount());
-        bean.setScore(source.getScore());
+        bean.setScore(source.getScoreAttitude());
+        bean.setScoreStandards(source.getScoreStandards());
+        bean.setScoreInTime(source.getScoreInTime());
+        bean.setSuggestions(source.getSuggestions());
         if (null!=source.getCompletedTime()) {
             bean.setCompletedTime(source.getCompletedTime());
         }

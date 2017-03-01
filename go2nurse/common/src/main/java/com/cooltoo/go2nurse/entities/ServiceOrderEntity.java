@@ -49,9 +49,12 @@ public class ServiceOrderEntity {
     private Date payTime;
     private int paymentAmountCent;
     private String leaveAMessage;
-    private float score;
     private Date completedTime;
     private YesNoEnum needVisitPatientRecord;
+    private float scoreAttitude;
+    private float scoreStandards;
+    private float scoreInTime;
+    private String suggestions;
 
     @Id
     @GeneratedValue
@@ -225,14 +228,29 @@ public class ServiceOrderEntity {
         return leaveAMessage;
     }
 
-    @Column(name = "score")
-    public float getScore() {
-        return score;
-    }
-
     @Column(name = "completed_time")
     public Date getCompletedTime() {
         return completedTime;
+    }
+
+    @Column(name = "score_attitude")
+    public float getScoreAttitude() {
+        return scoreAttitude;
+    }
+
+    @Column(name = "score_standard")
+    public float getScoreStandards() {
+        return scoreStandards;
+    }
+
+    @Column(name = "score_in_time")
+    public float getScoreInTime() {
+        return scoreInTime;
+    }
+
+    @Column(name = "opinions_suggestions")
+    public String getSuggestions() {
+        return suggestions;
     }
 
     public void setId(long id) {
@@ -367,12 +385,24 @@ public class ServiceOrderEntity {
         this.leaveAMessage = leaveAMessage;
     }
 
-    public void setScore(float score) {
-        this.score = score;
-    }
-
     public void setCompletedTime(Date completedTime) {
         this.completedTime = completedTime;
+    }
+
+    public void setScoreAttitude(float scoreAttitude) {
+        this.scoreAttitude = scoreAttitude;
+    }
+
+    public void setScoreStandards(float scoreStandards) {
+        this.scoreStandards = scoreStandards;
+    }
+
+    public void setScoreInTime(float scoreInTime) {
+        this.scoreInTime = scoreInTime;
+    }
+
+    public void setSuggestions(String suggestions) {
+        this.suggestions = suggestions;
     }
 
     @Override
@@ -400,7 +430,7 @@ public class ServiceOrderEntity {
         msg.append(", payTime=").append(payTime);
         msg.append(", paymentAmountCent=").append(paymentAmountCent);
         msg.append(", leaveAMessage=").append(leaveAMessage);
-        msg.append(", score=").append(score);
+        msg.append(", scoreAttitude=").append(scoreAttitude);
         msg.append(", completedTime=").append(completedTime);
         msg.append("]");
         return msg.toString();
