@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.admin.api;
 
 import com.cooltoo.constants.GenderType;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.QuestionBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireBean;
 import com.cooltoo.go2nurse.beans.QuestionnaireCategoryBean;
@@ -152,6 +153,14 @@ public class QuestionnaireManageServiceAPI {
         return Response.ok(questionnaires).build();
     }
 
+    @Path("/questionnaire/evaluate_before_order")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestionnaireOfEvaluateBeforeOrder(@Context HttpServletRequest request) {
+        List<QuestionnaireBean> questionnaires = questionnaireService.getQuestionnaireOfEvaluateBeforeOrder();
+        return Response.ok(questionnaires).build();
+    }
+
     @Path("/questionnaire/statistics")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -257,10 +266,11 @@ public class QuestionnaireManageServiceAPI {
                                         @FormParam("title") @DefaultValue("") String title,
                                         @FormParam("description") @DefaultValue("") String description,
                                         @FormParam("conclusion") @DefaultValue("") String conclusion,
-                                        @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                        @FormParam("category_id") @DefaultValue("0") long categoryId
+                                        @FormParam("hospital_id") @DefaultValue("0") int hospitalId,
+                                        @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                        @FormParam("evaluate_before_order") @DefaultValue("") String evaluateBeforeOrder
     ) {
-        QuestionnaireBean bean = questionnaireService.updateQuestionnaire(id, title, description, conclusion, hospitalId, categoryId);
+        QuestionnaireBean bean = questionnaireService.updateQuestionnaire(id, title, description, conclusion, hospitalId, categoryId, YesNoEnum.parseString(evaluateBeforeOrder));
         return Response.ok(bean).build();
     }
 
@@ -346,9 +356,10 @@ public class QuestionnaireManageServiceAPI {
                                      @FormParam("description") @DefaultValue("") String description,
                                      @FormParam("conclusion") @DefaultValue("") String conclusion,
                                      @FormParam("hospital_id") @DefaultValue("-1") int hospitalId,
-                                     @FormParam("category_id") @DefaultValue("0") long categoryId
+                                     @FormParam("category_id") @DefaultValue("0") long categoryId,
+                                     @FormParam("evaluate_before_order") @DefaultValue("NO") String evaluateBeforeOrder
     ) {
-        QuestionnaireBean bean = questionnaireService.addQuestionnaire(title, description, conclusion, hospitalId, categoryId);
+        QuestionnaireBean bean = questionnaireService.addQuestionnaire(title, description, conclusion, hospitalId, categoryId, YesNoEnum.parseString(evaluateBeforeOrder));
         return Response.ok(bean).build();
     }
 

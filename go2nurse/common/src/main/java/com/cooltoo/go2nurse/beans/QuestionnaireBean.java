@@ -2,6 +2,7 @@ package com.cooltoo.go2nurse.beans;
 
 import com.cooltoo.beans.HospitalBean;
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.util.VerifyUtil;
 
 import java.util.*;
@@ -24,6 +25,7 @@ public class QuestionnaireBean {
     private List<QuestionBean> questions;
     private Date time;
     private CommonStatus status;
+    private YesNoEnum evaluateBeforeOrder;
     private Map<String, Object> properties = new HashMap<>();
 
     //=================================
@@ -171,6 +173,14 @@ public class QuestionnaireBean {
         return from;
     }
 
+    public YesNoEnum getEvaluateBeforeOrder() {
+        return evaluateBeforeOrder;
+    }
+
+    public void setEvaluateBeforeOrder(YesNoEnum evaluateBeforeOrder) {
+        this.evaluateBeforeOrder = evaluateBeforeOrder;
+    }
+
     public QuestionnaireBean clone() {
         QuestionnaireBean bean = new QuestionnaireBean();
         bean.setId(id);
@@ -182,6 +192,7 @@ public class QuestionnaireBean {
         bean.setHospital(hospital);
         bean.setTime(time);
         bean.setStatus(status);
+        bean.setEvaluateBeforeOrder(evaluateBeforeOrder);
 
         List<QuestionBean> questions = new ArrayList<>();
         bean.setQuestions(questions);
@@ -216,6 +227,7 @@ public class QuestionnaireBean {
         msg.append(", patient=").append(patient);
         msg.append(", userScore=").append(userScore);
         msg.append(", userConclusion=").append(userConclusion);
+        msg.append(", evaluateBeforeOrder=").append(evaluateBeforeOrder);
         msg.append("]");
         return msg.toString();
     }

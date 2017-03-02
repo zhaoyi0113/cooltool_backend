@@ -1,5 +1,7 @@
 package com.cooltoo.go2nurse.repository;
 
+import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.entities.QuestionnaireEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +16,7 @@ import java.util.List;
 public interface QuestionnaireRepository extends JpaRepository<QuestionnaireEntity, Long> {
     long countByTitle(String title);
     List<QuestionnaireEntity> findByIdIn(List<Long> ids, Sort sort);
+    List<QuestionnaireEntity> findByEvaluateBeforeOrderAndStatus(YesNoEnum evaluateBeforeOrder, CommonStatus status, Sort sort);
 
     long countByHospitalId(Integer hospitalId);
     List<QuestionnaireEntity> findByHospitalId(Integer hospitalId, Sort sort);

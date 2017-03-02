@@ -4,10 +4,12 @@ import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.beans.PatientBean;
+import com.cooltoo.go2nurse.beans.PatientSymptomsBean;
 import com.cooltoo.go2nurse.beans.UserPatientRelationBean;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.service.PatientService;
+import com.cooltoo.go2nurse.service.PatientSymptomsService;
 import com.cooltoo.go2nurse.service.UserPatientRelationService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -35,13 +37,11 @@ public class PatientAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(PatientAPI.class);
 
-    @Autowired
-    private PatientService service;
-    @Autowired
-    private UserPatientRelationService userPatientRelation;
+    @Autowired private PatientService service;
+    @Autowired private UserPatientRelationService userPatientRelation;
+    @Autowired private PatientSymptomsService patientSymptomsService;
 
-    @Autowired
-    private WeChatService weChatService;
+    @Autowired private WeChatService weChatService;
 
     @Path("/get_patient")
     @GET
@@ -153,5 +153,58 @@ public class PatientAPI {
         logger.info("upload successfully");
         return Response.ok(patient).build();
     }
+
+    //====================================================================================
+    //
+    //                   symptoms
+    //
+    //====================================================================================
+    @Path("/symptoms")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response addPatientSymptoms(@Context HttpServletRequest request,
+                                       @FormParam("patient_id")           @DefaultValue("0") String strPatientId,
+                                       @FormParam("symptoms")             @DefaultValue("") String symptoms,
+                                       @FormParam("symptoms_description") @DefaultValue("") String symptomsDesc,
+                                       @FormParam("symptoms_images")      @DefaultValue("") String symptomsImages
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : 0L;
+        PatientSymptomsBean symptomsBean = patientSymptomsService.addPatientSymptoms(userId, patientId, symptoms, symptomsDesc, symptomsImages);
+        return Response.ok(symptomsBean).build();
+    }
+
+    @Path("/symptoms")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response updatePatientSymptoms(@Context HttpServletRequest request,
+                                          @FormParam("patient_symptoms_id")  @DefaultValue("0") String strSymptomsId,
+                                          @FormParam("symptoms")             @DefaultValue("") String symptoms,
+                                          @FormParam("symptoms_description") @DefaultValue("") String symptomsDesc,
+                                          @FormParam("symptoms_images")      @DefaultValue("") String symptomsImages,
+                                          @FormParam("questionnaire")        @DefaultValue("") String questionnaire
+    ) {
+        long symptomsId = VerifyUtil.isIds(strSymptomsId) ? VerifyUtil.parseLongIds(strSymptomsId).get(0) : 0L;
+        PatientSymptomsBean symptomsBean = patientSymptomsService.updatePatientSymptoms(
+                symptomsId, symptoms, symptomsDesc, symptomsImages, questionnaire);
+        return Response.ok(symptomsBean).build();
+    }
+
+    @Path("/symptoms/order")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response bindPatientSymptomsWithOrder(@Context HttpServletRequest request,
+                                                 @FormParam("patient_symptoms_id")  @DefaultValue("0") String strSymptomsId,
+                                                 @FormParam("order_id")             @DefaultValue("0") String strOrderId
+    ) {
+        long symptomsId = VerifyUtil.isIds(strSymptomsId) ? VerifyUtil.parseLongIds(strSymptomsId).get(0) : 0L;
+        long orderId    = VerifyUtil.isIds(strOrderId)    ? VerifyUtil.parseLongIds(strOrderId).get(0)    : 0L;
+        PatientSymptomsBean symptomsBean = patientSymptomsService.bindWithOrder(orderId, symptomsId);
+        return Response.ok(symptomsBean).build();
+    }
+
 
 }

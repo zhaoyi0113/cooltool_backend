@@ -294,12 +294,15 @@ public class ServiceVendorCategoryAndItemServiceTest extends AbstractCooltooTest
         ManagedBy managedBy = ManagedBy.SELF;
         ServiceVendorType vendorType = ServiceVendorType.COMPANY;
         CommonStatus status = CommonStatus.DELETED;
+        YesNoEnum needSymptoms = YesNoEnum.YES;
+        String symptomsItems = "fdsafdsafsafdsa";
+        Long questionnaireId = 10L;
         ServiceItemBean item = vendorCategoryAndItemService.updateItem(
                 itemId, name, clazz.name(), description,
                 price+"", discount+"", serverIncome+"", needVisitPatientRecord,
                 timeDuration, timeUnit.name(), grade,
                 categoryId, vendorType.name(), vendorId, 0L, managedBy,
-                status.name());
+                status.name(), needSymptoms, symptomsItems, questionnaireId);
         Assert.assertEquals(itemId, item.getId());
         Assert.assertEquals(name, item.getName());
         Assert.assertEquals(clazz, item.getClazz());
@@ -317,6 +320,9 @@ public class ServiceVendorCategoryAndItemServiceTest extends AbstractCooltooTest
         Assert.assertEquals(serverIncome*100, item.getServerIncomeCent());
         Assert.assertEquals(YesNoEnum.YES, item.getManagerApproved());
         Assert.assertEquals(managedBy, item.getManagedBy());
+        Assert.assertEquals(needSymptoms, item.getNeedSymptoms());
+        Assert.assertEquals(symptomsItems, item.getSymptomsItems());
+        Assert.assertEquals(questionnaireId.longValue(), item.getQuestionnaireId());
     }
 
     @Test
@@ -359,11 +365,14 @@ public class ServiceVendorCategoryAndItemServiceTest extends AbstractCooltooTest
         long vendorId = 30;
         ManagedBy managedBy = ManagedBy.SELF;
         ServiceVendorType vendorType = ServiceVendorType.COMPANY;
+        YesNoEnum needSymptoms = YesNoEnum.YES;
+        String symptomsItems = "fdsafdsafsafdsa";
+        Long questionnaireId = 10L;
         ServiceItemBean item = vendorCategoryAndItemService.addItem(
                 name, clazz.name(), description,
                 price+"", discount+"", serverIncome+"", needVisitPatientRecord,
                 timeDuration, timeUnit.name(), grade,
-                categoryId, vendorType.name(), vendorId, 0, managedBy);
+                categoryId, vendorType.name(), vendorId, 0, managedBy, needSymptoms, symptomsItems, questionnaireId);
         Assert.assertTrue(item.getId()>0);
         Assert.assertEquals(name, item.getName());
         Assert.assertEquals(clazz, item.getClazz());
@@ -380,5 +389,8 @@ public class ServiceVendorCategoryAndItemServiceTest extends AbstractCooltooTest
         Assert.assertEquals(serverIncome*100, item.getServerIncomeCent());
         Assert.assertEquals(YesNoEnum.NO, item.getManagerApproved());
         Assert.assertEquals(managedBy, item.getManagedBy());
+        Assert.assertEquals(needSymptoms, item.getNeedSymptoms());
+        Assert.assertEquals(symptomsItems, item.getSymptomsItems());
+        Assert.assertEquals(questionnaireId.longValue(), item.getQuestionnaireId());
     }
 }

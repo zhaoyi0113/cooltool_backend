@@ -144,6 +144,17 @@ public class QuestionnaireService {
         return beans;
     }
 
+    public List<QuestionnaireBean> getQuestionnaireOfEvaluateBeforeOrder() {
+        // get all questionnaire
+        logger.info("get questionnaire of Evaluate Before Order");
+        List<QuestionnaireEntity> resultSet = questionnaireRep.findByEvaluateBeforeOrderAndStatus(YesNoEnum.YES, CommonStatus.ENABLED, questionnaireSort);
+        List<QuestionnaireBean> beans = questionnaireEntitiesToBeans(resultSet);
+        questionnaireFillOtherProperties(beans, false, false);
+        logger.info("count is {}", beans.size());
+        return beans;
+
+    }
+
     public QuestionnaireBean getQuestionnaire(long questionnaireId) {
         logger.info("get questionnaire by id={}", questionnaireId);
         QuestionnaireEntity entity = questionnaireRep.findOne(questionnaireId);
@@ -577,7 +588,7 @@ public class QuestionnaireService {
     }
 
     @Transactional
-    public QuestionnaireBean updateQuestionnaire(long questionnaireId, String title, String description, String conclusion, int hospitalId, long categoryId) {
+    public QuestionnaireBean updateQuestionnaire(long questionnaireId, String title, String description, String conclusion, int hospitalId, long categoryId, YesNoEnum evaluateBeforeOrder) {
         logger.info("update questionnaire={} with title={} description={} conclusion={} hospitalId={}",
                 questionnaireId, title, description, conclusion, hospitalId);
         boolean changed = false;
@@ -605,6 +616,10 @@ public class QuestionnaireService {
         }
         if (categoryId>0 && categoryId!=entity.getCategoryId()) {
             entity.setCategoryId(categoryId);
+            changed = true;
+        }
+        if (null!=evaluateBeforeOrder && !evaluateBeforeOrder.equals(entity.getEvaluateBeforeOrder())) {
+            entity.setEvaluateBeforeOrder(evaluateBeforeOrder);
             changed = true;
         }
 
@@ -783,9 +798,9 @@ public class QuestionnaireService {
     }
 
     @Transactional
-    public QuestionnaireBean addQuestionnaire(String title, String description, String conclusion, int hospitalId, long categoryId) {
-        logger.info("add questionnaire : categoryId={} title={} description={} conclusion={} hospitalId={}",
-                categoryId, title, description, conclusion, hospitalId);
+    public QuestionnaireBean addQuestionnaire(String title, String description, String conclusion, int hospitalId, long categoryId, YesNoEnum evaluateBeforeOrder) {
+        logger.info("add questionnaire : categoryId={} title={} description={} conclusion={} hospitalId={} evaluateBeforeOrder={}",
+                categoryId, title, description, conclusion, hospitalId, evaluateBeforeOrder);
 
         QuestionnaireEntity entity = new QuestionnaireEntity();
         if (VerifyUtil.isStringEmpty(title)) {
@@ -805,10 +820,12 @@ public class QuestionnaireService {
         if (!VerifyUtil.isStringEmpty(conclusion)) {
             entity.setConclusion(conclusion);
         }
+
         hospitalId = hospitalId>0 ? hospitalId : (hospitalId == -1/*cooltoo's hospital*/ ? hospitalId : 0);
         categoryId = categoryId<0 ? 0 : categoryId;
         entity.setCategoryId(categoryId);
         entity.setHospitalId(hospitalId);
+        entity.setEvaluateBeforeOrder(null!=evaluateBeforeOrder ? evaluateBeforeOrder : YesNoEnum.NO);
         entity.setTime(new Date());
         entity.setStatus(CommonStatus.ENABLED);
         entity = questionnaireRep.save(entity);

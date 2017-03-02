@@ -37,6 +37,9 @@ public class ServiceItemEntity {
     private YesNoEnum needVisitPatientRecord;
     private YesNoEnum managerApproved;
     private ManagedBy managedBy;
+    private YesNoEnum needSymptoms;
+    private String symptomsItems;
+    private long questionnaireId;
 
     @Id
     @GeneratedValue
@@ -148,6 +151,21 @@ public class ServiceItemEntity {
         return managedBy;
     }
 
+    @Column(name = "need_symptoms")
+    public YesNoEnum getNeedSymptoms() {
+        return needSymptoms;
+    }
+
+    @Column(name = "symptoms_items")
+    public String getSymptomsItems() {
+        return symptomsItems;
+    }
+
+    @Column(name = "questionnaire_id")
+    public long getQuestionnaireId() {
+        return questionnaireId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -232,6 +250,18 @@ public class ServiceItemEntity {
         this.managedBy = managedBy;
     }
 
+    public void setNeedSymptoms(YesNoEnum needSymptoms) {
+        this.needSymptoms = needSymptoms;
+    }
+
+    public void setSymptomsItems(String symptomsItems) {
+        this.symptomsItems = symptomsItems;
+    }
+
+    public void setQuestionnaireId(long questionnaireId) {
+        this.questionnaireId = questionnaireId;
+    }
+
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -257,6 +287,9 @@ public class ServiceItemEntity {
         msg.append(", managerApproved=").append(managerApproved);
         msg.append(", managedBy=").append(managedBy);
         msg.append(", grade=").append(grade);
+        msg.append(", needSymptoms=").append(needSymptoms);
+        msg.append(", symptomsItems=").append(symptomsItems);
+        msg.append(", questionnaireId=").append(questionnaireId);
         msg.append("]");
         return msg.toString();
     }

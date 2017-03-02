@@ -1,6 +1,7 @@
 package com.cooltoo.go2nurse.entities;
 
 import com.cooltoo.constants.CommonStatus;
+import com.cooltoo.constants.YesNoEnum;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,6 +20,7 @@ public class QuestionnaireEntity {
     private int hospitalId;
     private Date time;
     private CommonStatus status;
+    private YesNoEnum evaluateBeforeOrder;
 
     @Id
     @GeneratedValue
@@ -62,6 +64,11 @@ public class QuestionnaireEntity {
         return status;
     }
 
+    @Column(name = "evaluate_before_order")
+    public YesNoEnum getEvaluateBeforeOrder() {
+        return evaluateBeforeOrder;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -94,6 +101,10 @@ public class QuestionnaireEntity {
         this.status = status;
     }
 
+    public void setEvaluateBeforeOrder(YesNoEnum evaluateBeforeOrder) {
+        this.evaluateBeforeOrder = evaluateBeforeOrder;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -105,6 +116,7 @@ public class QuestionnaireEntity {
         msg.append(", conclusion=").append(conclusion);
         msg.append(", status=").append(status);
         msg.append(", time=").append(time);
+        msg.append(", evaluateBeforeOrder=").append(evaluateBeforeOrder);
         msg.append("]");
         return msg.toString();
     }

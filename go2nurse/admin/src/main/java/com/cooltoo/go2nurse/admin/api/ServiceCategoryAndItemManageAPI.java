@@ -270,27 +270,33 @@ public class ServiceCategoryAndItemManageAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response addServiceItem(@Context HttpServletRequest request,
-                                   @FormParam("name") @DefaultValue("") String name,
-                                   @FormParam("clazz") @DefaultValue("") String clazz,
-                                   @FormParam("description") @DefaultValue("") String description,
-                                   @FormParam("price") @DefaultValue("") String price,
-                                   @FormParam("discount") @DefaultValue("") String discount,
-                                   @FormParam("server_income") @DefaultValue("") String serverIncome,
-                                   @FormParam("need_visit_record") @DefaultValue("") String strNeedVisitRecord,
-                                   @FormParam("time_duration") @DefaultValue("0") int timeDuration,
-                                   @FormParam("time_unit") @DefaultValue("") String timeUnit,
-                                   @FormParam("grade") @DefaultValue("0") int grade,
-                                   @FormParam("category_id") @DefaultValue("0") long categoryId,
-                                   @FormParam("vendor_type") @DefaultValue("") String vendorType,
-                                   @FormParam("vendor_id") @DefaultValue("0") long vendorId,
-                                   @FormParam("vendor_depart_id") @DefaultValue("0") long vendorDepartId,
-                                   @FormParam("managed_by") @DefaultValue("") String strManagedBy
+                                   @FormParam("name")             @DefaultValue("") String name,
+                                   @FormParam("clazz")            @DefaultValue("") String clazz,
+                                   @FormParam("description")      @DefaultValue("") String description,
+                                   @FormParam("price")            @DefaultValue("") String price,
+                                   @FormParam("discount")         @DefaultValue("") String discount,
+                                   @FormParam("server_income")    @DefaultValue("") String serverIncome,
+                                   @FormParam("need_visit_record")@DefaultValue("") String strNeedVisitRecord,
+                                   @FormParam("time_duration")    @DefaultValue("0")int    timeDuration,
+                                   @FormParam("time_unit")        @DefaultValue("") String timeUnit,
+                                   @FormParam("grade")            @DefaultValue("0")int    grade,
+                                   @FormParam("category_id")      @DefaultValue("0")long   categoryId,
+                                   @FormParam("vendor_type")      @DefaultValue("") String vendorType,
+                                   @FormParam("vendor_id")        @DefaultValue("0")long   vendorId,
+                                   @FormParam("vendor_depart_id") @DefaultValue("0")long   vendorDepartId,
+                                   @FormParam("managed_by")       @DefaultValue("") String strManagedBy,
+                                   @FormParam("need_symptoms")    @DefaultValue("") String needSymptoms,
+                                   @FormParam("symptoms_items")   @DefaultValue("") String symptomsItems,
+                                   @FormParam("questionnaire_id") @DefaultValue("") String strQuestionnaireId
     ) {
+        Long questionnaireId = !VerifyUtil.isIds(strQuestionnaireId) ? null : VerifyUtil.parseLongIds(strQuestionnaireId).get(0);
         ServiceItemBean serviceItem = vendorCategoryAndItemService.addItem(
                 name, clazz, description,
                 price, discount, serverIncome, YesNoEnum.parseString(strNeedVisitRecord),
                 timeDuration, timeUnit, grade,
-                categoryId, vendorType, vendorId, vendorDepartId, ManagedBy.parseString(strManagedBy));
+                categoryId, vendorType, vendorId, vendorDepartId, ManagedBy.parseString(strManagedBy),
+                YesNoEnum.parseString(needSymptoms), symptomsItems, questionnaireId
+                );
         return Response.ok(serviceItem).build();
     }
 
@@ -370,35 +376,40 @@ public class ServiceCategoryAndItemManageAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response editServiceItem(@Context HttpServletRequest request,
-                                    @FormParam("item_id") @DefaultValue("0") long itemId,
-                                    @FormParam("name") @DefaultValue("") String name,
-                                    @FormParam("clazz") @DefaultValue("") String clazz,
-                                    @FormParam("description") @DefaultValue("") String description,
-                                    @FormParam("price") @DefaultValue("") String price,
-                                    @FormParam("discount") @DefaultValue("") String discount,
-                                    @FormParam("server_income") @DefaultValue("") String serverIncome,
-                                    @FormParam("need_visit_record") @DefaultValue("") String strNeedVisitRecord,
-                                    @FormParam("time_duration") @DefaultValue("") String strTimeDuration,
-                                    @FormParam("time_unit") @DefaultValue("") String timeUnit,
-                                    @FormParam("grade") @DefaultValue("") String strGrade,
-                                    @FormParam("category_id") @DefaultValue("") String strCategoryId,
-                                    @FormParam("vendor_type") @DefaultValue("") String vendorType,
-                                    @FormParam("vendor_id") @DefaultValue("") String strVendorId,
+                                    @FormParam("item_id")          @DefaultValue("0")long   itemId,
+                                    @FormParam("name")             @DefaultValue("") String name,
+                                    @FormParam("clazz")            @DefaultValue("") String clazz,
+                                    @FormParam("description")      @DefaultValue("") String description,
+                                    @FormParam("price")            @DefaultValue("") String price,
+                                    @FormParam("discount")         @DefaultValue("") String discount,
+                                    @FormParam("server_income")    @DefaultValue("") String serverIncome,
+                                    @FormParam("need_visit_record")@DefaultValue("") String strNeedVisitRecord,
+                                    @FormParam("time_duration")    @DefaultValue("") String strTimeDuration,
+                                    @FormParam("time_unit")        @DefaultValue("") String timeUnit,
+                                    @FormParam("grade")            @DefaultValue("") String strGrade,
+                                    @FormParam("category_id")      @DefaultValue("") String strCategoryId,
+                                    @FormParam("vendor_type")      @DefaultValue("") String vendorType,
+                                    @FormParam("vendor_id")        @DefaultValue("") String strVendorId,
                                     @FormParam("vendor_depart_id") @DefaultValue("") String strVendorDepartId,
-                                    @FormParam("status") @DefaultValue("") String status,
-                                    @FormParam("managed_by") @DefaultValue("") String strManagedBy
+                                    @FormParam("status")           @DefaultValue("") String status,
+                                    @FormParam("managed_by")       @DefaultValue("") String strManagedBy,
+                                    @FormParam("need_symptoms")    @DefaultValue("") String needSymptoms,
+                                    @FormParam("symptoms_items")   @DefaultValue("") String symptomsItems,
+                                    @FormParam("questionnaire_id") @DefaultValue("") String strQuestionnaireId
     ) {
         Integer timeDuration = !VerifyUtil.isIds(strTimeDuration) ? null : VerifyUtil.parseIntIds(strTimeDuration).get(0);
         Integer grade = !VerifyUtil.isIds(strGrade) ? null : VerifyUtil.parseIntIds(strGrade).get(0);
         Long categoryId = !VerifyUtil.isIds(strCategoryId) ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
         Long vendorId = !VerifyUtil.isIds(strVendorId) ? null : VerifyUtil.parseLongIds(strVendorId).get(0);
         Long vendorDepartId = !VerifyUtil.isIds(strVendorDepartId) ? null : VerifyUtil.parseLongIds(strVendorDepartId).get(0);
+        Long questionnaireId = !VerifyUtil.isIds(strQuestionnaireId) ? null : VerifyUtil.parseLongIds(strQuestionnaireId).get(0);
         ManagedBy managedBy = ManagedBy.parseString(strManagedBy);
         ServiceItemBean serviceItem = vendorCategoryAndItemService.updateItem(
                 itemId, name, clazz, description,
                 price, discount, serverIncome, YesNoEnum.parseString(strNeedVisitRecord),
                 timeDuration, timeUnit, grade,
-                categoryId, vendorType, vendorId, vendorDepartId, managedBy, status);
+                categoryId, vendorType, vendorId, vendorDepartId, managedBy, status,
+                YesNoEnum.parseString(needSymptoms), symptomsItems, questionnaireId);
         return Response.ok(serviceItem).build();
     }
 

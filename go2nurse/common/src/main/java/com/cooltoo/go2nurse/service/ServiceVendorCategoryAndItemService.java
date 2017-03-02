@@ -788,17 +788,19 @@ public class ServiceVendorCategoryAndItemService {
                                       String price, String discount, String serverIncome, YesNoEnum needVisitPatientRecord,
                                       Integer timeDuration, String timeUnit, Integer grade,
                                       Long categoryId, String strVendorType, Long vendorId, Long vendorDepartId, ManagedBy managedBy,
-                                      String strStatus) {
+                                      String strStatus,
+                                      YesNoEnum needSymptoms, String symptomsItems, Long questionnaireId) {
         StringBuilder log = new StringBuilder();
         log.append("updateItem service item={} by name={} clazz={} description={} ");
         log.append("price={} discount={} serverIncome={} needVisitPatientRecord={} ");
         log.append("timeDuration={} timeUnit={} grade={} ");
         log.append("categoryId={} vendorId={} vendorType={} vendorDepartId={} ");
-        log.append("strStatus={}");
+        log.append("strStatus={} needSymptoms={} symptomsItems={} questionnaireId={}");
         logger.info(log.toString(), itemId, name, clazz, description,
                 price, discount, serverIncome, needVisitPatientRecord,
                 timeDuration, timeUnit, grade,
-                categoryId, vendorId, strVendorType, vendorDepartId, strStatus);
+                categoryId, vendorId, strVendorType, vendorDepartId, strStatus,
+                needSymptoms, symptomsItems, questionnaireId);
 
         ServiceItemEntity entity = itemRep.findOne(itemId);
         if (null==entity) {
@@ -883,6 +885,18 @@ public class ServiceVendorCategoryAndItemService {
         CommonStatus status = CommonStatus.parseString(strStatus);
         if (null!=status) {
             entity.setStatus(status);
+            changed = true;
+        }
+        if (null!=needSymptoms && !needSymptoms.equals(entity.getNeedSymptoms())) {
+            entity.setNeedSymptoms(needSymptoms);
+            changed = true;
+        }
+        if (null!=symptomsItems && !symptomsItems.equals(entity.getSymptomsItems())) {
+            entity.setSymptomsItems(symptomsItems.trim());
+            changed = true;
+        }
+        if (null!=questionnaireId && questionnaireId.equals(entity.getQuestionnaireId())) {
+            entity.setQuestionnaireId(questionnaireId);
             changed = true;
         }
 
@@ -1032,17 +1046,21 @@ public class ServiceVendorCategoryAndItemService {
     public ServiceItemBean addItem(String name, String clazz, String description,
                                    String price, String discount, String serverIncome, YesNoEnum needVisitPatientRecord,
                                    int timeDuration, String timeUnit, int grade,
-                                   long categoryId, String strVendorType, long vendorId, long vendorDepartId, ManagedBy managedBy
+                                   long categoryId, String strVendorType, long vendorId, long vendorDepartId, ManagedBy managedBy,
+                                   YesNoEnum needSymptoms, String symptomsItems, Long questionnaireId
     ) {
         StringBuilder log = new StringBuilder();
         log.append("add service item by name={} clazz={} description={} ");
         log.append("price={} discount={} serverIncome={} needVisitPatientRecord={} ");
         log.append("timeDuration={} timeUnit={} grade={} ");
         log.append("categoryId={} vendorId={} vendorType={} vendorDepartId={}");
+        log.append("needSymptoms={} symptomsItems={} questionnaireId={}");
+
         logger.info(log.toString(), name, clazz, description,
                 price, discount, serverIncome, needVisitPatientRecord,
                 timeDuration, timeUnit, grade,
-                categoryId, vendorId, strVendorType, vendorDepartId);
+                categoryId, vendorId, strVendorType, vendorDepartId,
+                needSymptoms, symptomsItems, questionnaireId);
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -1069,6 +1087,8 @@ public class ServiceVendorCategoryAndItemService {
         servicePriceCent    = null==servicePriceCent    ? 0 : servicePriceCent;
         serviceDiscountCent = null==serviceDiscountCent ? 0 : serviceDiscountCent;
         serverIncomeCent    = null==serverIncomeCent    ? 0 : serverIncomeCent;
+        needSymptoms        = null==needSymptoms        ? YesNoEnum.NO : needSymptoms;
+        questionnaireId     = null==questionnaireId     ? 0 : questionnaireId;
 
         YesNoEnum managerApproved = (servicePriceCent-serviceDiscountCent-serverIncomeCent)>=0 ? YesNoEnum.YES : YesNoEnum.NO;
         entity.setManagerApproved(managerApproved);
@@ -1080,6 +1100,9 @@ public class ServiceVendorCategoryAndItemService {
         entity.setVendorId(vendorId<0 ? 0 : vendorId);
         entity.setVendorDepartId(vendorDepartId<0 ? 0 : vendorDepartId);
         entity.setVendorType(null==vendorType ? ServiceVendorType.NONE : vendorType);
+        entity.setNeedSymptoms(needSymptoms);
+        entity.setSymptomsItems(symptomsItems);
+        entity.setQuestionnaireId(questionnaireId);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = itemRep.save(entity);

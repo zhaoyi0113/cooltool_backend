@@ -46,6 +46,9 @@ public class ServiceItemBean {
     private YesNoEnum needVisitPatientRecord;
     private YesNoEnum managerApproved;
     private ManagedBy managedBy;
+    private YesNoEnum needSymptoms;
+    private String symptomsItems;
+    private long questionnaireId;
 
     public long getId() {
         return id;
@@ -269,6 +272,27 @@ public class ServiceItemBean {
     }
     public void setManagedBy(ManagedBy managedBy) {
         this.managedBy = managedBy;
+    }
+
+    public YesNoEnum getNeedSymptoms() {
+        return needSymptoms;
+    }
+    public void setNeedSymptoms(YesNoEnum needSymptoms) {
+        this.needSymptoms = needSymptoms;
+    }
+
+    public String getSymptomsItems() {
+        return symptomsItems;
+    }
+    public void setSymptomsItems(String symptomsItems) {
+        this.symptomsItems = symptomsItems;
+    }
+
+    public long getQuestionnaireId() {
+        return questionnaireId;
+    }
+    public void setQuestionnaireId(long questionnaireId) {
+        this.questionnaireId = questionnaireId;
     }
 
     @Override

@@ -21,6 +21,7 @@ public class QuestionnaireBeanConverter implements Converter<QuestionnaireEntity
         bean.setHospitalId(source.getHospitalId());
         bean.setTime(source.getTime());
         bean.setStatus(source.getStatus());
+        bean.setEvaluateBeforeOrder(source.getEvaluateBeforeOrder());
         return bean;
     }
 }
