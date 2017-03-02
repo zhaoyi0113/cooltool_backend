@@ -40,6 +40,7 @@ public class ServiceItemEntity {
     private YesNoEnum needSymptoms;
     private String symptomsItems;
     private long questionnaireId;
+    private YesNoEnum needSymptomsDetail;
 
     @Id
     @GeneratedValue
@@ -166,6 +167,11 @@ public class ServiceItemEntity {
         return questionnaireId;
     }
 
+    @Column(name = "need_symptoms_detail")
+    public YesNoEnum getNeedSymptomsDetail() {
+        return needSymptomsDetail;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -260,6 +266,10 @@ public class ServiceItemEntity {
 
     public void setQuestionnaireId(long questionnaireId) {
         this.questionnaireId = questionnaireId;
+    }
+
+    public void setNeedSymptomsDetail(YesNoEnum needSymptomsDetail) {
+        this.needSymptomsDetail = needSymptomsDetail;
     }
 
     @Override

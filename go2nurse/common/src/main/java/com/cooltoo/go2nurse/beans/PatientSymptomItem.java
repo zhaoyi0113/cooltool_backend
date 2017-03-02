@@ -11,8 +11,7 @@ public class PatientSymptomItem {
     public static final String DATA_TYPE_INT    = "int";
     public static final String DATA_TYPE_FLOAT  = "float";
 
-    private int id;
-    private String dataType = "";
+    private int symptomsId;
     private String name  = "";
     private String value = null;
     private String unit  = "";
@@ -27,11 +26,11 @@ public class PatientSymptomItem {
         return dataType;
     }
 
-    public int getId() {
-        return id;
+    public int getSymptomsId() {
+        return symptomsId;
     }
-    public void setId(int id) {
-        this.id = id;
+    public void setSymptomsId(int symptomsId) {
+        this.symptomsId = symptomsId;
     }
 
     public String getName() {
@@ -67,12 +66,5 @@ public class PatientSymptomItem {
     }
     public void setMinNum(String minNum) {
         this.minNum = minNum;
-    }
-
-    public String getDataType() {
-        return dataType;
-    }
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
     }
 }

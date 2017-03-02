@@ -8,6 +8,7 @@ import com.cooltoo.go2nurse.converter.PatientSymptomsBeanConverter;
 import com.cooltoo.go2nurse.entities.PatientSymptomsEntity;
 import com.cooltoo.go2nurse.repository.PatientSymptomsRepository;
 import com.cooltoo.go2nurse.service.file.UserGo2NurseFileStorageService;
+import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.util.JSONUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ public class PatientSymptomsService {
     @Autowired private PatientSymptomsRepository repository;
 
     @Autowired private UserGo2NurseFileStorageService userFileStorageService;
+    @Autowired private Go2NurseUtility go2NurseUtility;
 
 
     //======================================================================
@@ -53,6 +55,7 @@ public class PatientSymptomsService {
 
         List<PatientSymptomsEntity> entities = repository.findByOrderIdIn(orderIds);
         List<PatientSymptomsBean> beans = entitiesToBeans(entities);
+        fillOtherProperties(beans);
         if (VerifyUtil.isListEmpty(beans)) {
             return returnVal;
         }
@@ -74,6 +77,7 @@ public class PatientSymptomsService {
 
         PatientSymptomsEntity entity = entities.get(0);
         PatientSymptomsBean bean = beanConverter.convert(entity);
+        fillOtherProperties(bean);
         logger.info("last patient symptoms is {}", bean);
         return bean;
     }
@@ -90,7 +94,56 @@ public class PatientSymptomsService {
         return beans;
     }
 
+    private void fillOtherProperties(PatientSymptomsBean bean) {
+        if (null==bean) {
+            return;
+        }
+
+
+        JSONUtil jsonUtil = JSONUtil.newInstance();
+        String imagesUrls = bean.getSymptomsImages();
+        List<String> listImages;
+        if (null==imagesUrls || imagesUrls.trim().isEmpty()) {
+            listImages = new ArrayList<>();
+        }
+        else {
+            listImages = jsonUtil.parseJsonList(imagesUrls, String.class);
+        }
+
+
+        List<String> tmpListImages = new ArrayList<>();
+        for (String imageUrl : listImages) {
+            tmpListImages.add(go2NurseUtility.getHttpPrefix() + userFileStorageService.getNginxRelativePath() + imageUrl);
+        }
+        bean.setSymptomsImages(jsonUtil.toJsonString(tmpListImages));
+    }
+
     private void fillOtherProperties(List<PatientSymptomsBean> beans) {
+        if (null==beans || beans.isEmpty()) {
+            return;
+        }
+        JSONUtil jsonUtil = JSONUtil.newInstance();
+
+        List<String> tmpListImages = new ArrayList<>();
+        for (PatientSymptomsBean tmp : beans) {
+            tmpListImages.clear();
+
+            String imagesUrls = tmp.getSymptomsImages();
+
+            List<String> listImages;
+            if (null==imagesUrls || imagesUrls.trim().isEmpty()) {
+                listImages = new ArrayList<>();
+            }
+            else {
+                listImages = jsonUtil.parseJsonList(imagesUrls, String.class);
+            }
+
+            for (String imageUrl : listImages) {
+                tmpListImages.add(go2NurseUtility.getHttpPrefix() + userFileStorageService.getNginxRelativePath() + imageUrl);
+            }
+
+            tmp.setSymptomsImages(jsonUtil.toJsonString(tmpListImages));
+        }
     }
 
     //======================================================================

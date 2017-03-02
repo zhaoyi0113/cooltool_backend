@@ -10,6 +10,7 @@ import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
 import com.cooltoo.util.VerifyUtil;
 
+import javax.persistence.Column;
 import java.util.Date;
 
 /**
@@ -49,6 +50,7 @@ public class ServiceItemBean {
     private YesNoEnum needSymptoms;
     private String symptomsItems;
     private long questionnaireId;
+    private YesNoEnum needSymptomsDetail;
 
     public long getId() {
         return id;
@@ -293,6 +295,13 @@ public class ServiceItemBean {
     }
     public void setQuestionnaireId(long questionnaireId) {
         this.questionnaireId = questionnaireId;
+    }
+
+    public YesNoEnum getNeedSymptomsDetail() {
+        return needSymptomsDetail;
+    }
+    public void setNeedSymptomsDetail(YesNoEnum needSymptomsDetail) {
+        this.needSymptomsDetail = needSymptomsDetail;
     }
 
     @Override

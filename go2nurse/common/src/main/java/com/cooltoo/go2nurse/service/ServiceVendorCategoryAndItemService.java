@@ -789,18 +789,18 @@ public class ServiceVendorCategoryAndItemService {
                                       Integer timeDuration, String timeUnit, Integer grade,
                                       Long categoryId, String strVendorType, Long vendorId, Long vendorDepartId, ManagedBy managedBy,
                                       String strStatus,
-                                      YesNoEnum needSymptoms, String symptomsItems, Long questionnaireId) {
+                                      YesNoEnum needSymptoms, String symptomsItems, Long questionnaireId, YesNoEnum needSymptomsDetail) {
         StringBuilder log = new StringBuilder();
         log.append("updateItem service item={} by name={} clazz={} description={} ");
         log.append("price={} discount={} serverIncome={} needVisitPatientRecord={} ");
         log.append("timeDuration={} timeUnit={} grade={} ");
         log.append("categoryId={} vendorId={} vendorType={} vendorDepartId={} ");
-        log.append("strStatus={} needSymptoms={} symptomsItems={} questionnaireId={}");
+        log.append("strStatus={} needSymptoms={} symptomsItems={} questionnaireId={} needSymptomsDetail={}");
         logger.info(log.toString(), itemId, name, clazz, description,
                 price, discount, serverIncome, needVisitPatientRecord,
                 timeDuration, timeUnit, grade,
                 categoryId, vendorId, strVendorType, vendorDepartId, strStatus,
-                needSymptoms, symptomsItems, questionnaireId);
+                needSymptoms, symptomsItems, questionnaireId, needSymptomsDetail);
 
         ServiceItemEntity entity = itemRep.findOne(itemId);
         if (null==entity) {
@@ -897,6 +897,10 @@ public class ServiceVendorCategoryAndItemService {
         }
         if (null!=questionnaireId && !questionnaireId.equals(entity.getQuestionnaireId())) {
             entity.setQuestionnaireId(questionnaireId);
+            changed = true;
+        }
+        if (null!=needSymptomsDetail && !needSymptomsDetail.equals(entity.getNeedSymptomsDetail())) {
+            entity.setNeedSymptomsDetail(needSymptomsDetail);
             changed = true;
         }
 
@@ -1047,20 +1051,20 @@ public class ServiceVendorCategoryAndItemService {
                                    String price, String discount, String serverIncome, YesNoEnum needVisitPatientRecord,
                                    int timeDuration, String timeUnit, int grade,
                                    long categoryId, String strVendorType, long vendorId, long vendorDepartId, ManagedBy managedBy,
-                                   YesNoEnum needSymptoms, String symptomsItems, Long questionnaireId
+                                   YesNoEnum needSymptoms, String symptomsItems, Long questionnaireId, YesNoEnum needSymptomsDetail
     ) {
         StringBuilder log = new StringBuilder();
         log.append("add service item by name={} clazz={} description={} ");
         log.append("price={} discount={} serverIncome={} needVisitPatientRecord={} ");
         log.append("timeDuration={} timeUnit={} grade={} ");
         log.append("categoryId={} vendorId={} vendorType={} vendorDepartId={}");
-        log.append("needSymptoms={} symptomsItems={} questionnaireId={}");
-
+        log.append("needSymptoms={} symptomsItems={} questionnaireId={} needSymptomsDetail={}");
         logger.info(log.toString(), name, clazz, description,
                 price, discount, serverIncome, needVisitPatientRecord,
                 timeDuration, timeUnit, grade,
                 categoryId, vendorId, strVendorType, vendorDepartId,
-                needSymptoms, symptomsItems, questionnaireId);
+                needSymptoms, symptomsItems, questionnaireId, needSymptomsDetail);
+
         if (VerifyUtil.isStringEmpty(name)) {
             logger.error("name is empty");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -1089,6 +1093,7 @@ public class ServiceVendorCategoryAndItemService {
         serverIncomeCent    = null==serverIncomeCent    ? 0 : serverIncomeCent;
         needSymptoms        = null==needSymptoms        ? YesNoEnum.NO : needSymptoms;
         questionnaireId     = null==questionnaireId     ? 0 : questionnaireId;
+        needSymptomsDetail  = null==needSymptomsDetail  ? YesNoEnum.NO : needSymptomsDetail;
 
         YesNoEnum managerApproved = (servicePriceCent-serviceDiscountCent-serverIncomeCent)>=0 ? YesNoEnum.YES : YesNoEnum.NO;
         entity.setManagerApproved(managerApproved);
@@ -1103,6 +1108,7 @@ public class ServiceVendorCategoryAndItemService {
         entity.setNeedSymptoms(needSymptoms);
         entity.setSymptomsItems(symptomsItems);
         entity.setQuestionnaireId(questionnaireId);
+        entity.setNeedSymptomsDetail(needSymptomsDetail);
         entity.setStatus(CommonStatus.ENABLED);
         entity.setTime(new Date());
         entity = itemRep.save(entity);

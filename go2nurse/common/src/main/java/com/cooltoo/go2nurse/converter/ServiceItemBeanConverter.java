@@ -37,6 +37,7 @@ public class ServiceItemBeanConverter implements Converter<ServiceItemEntity, Se
         bean.setNeedSymptoms(source.getNeedSymptoms());
         bean.setSymptomsItems(source.getSymptomsItems());
         bean.setQuestionnaireId(source.getQuestionnaireId());
+        bean.setNeedSymptomsDetail(source.getNeedSymptomsDetail());
         return bean;
     }
 }
