@@ -97,17 +97,23 @@ public class PatientSymptomsService {
     //                   update
     //======================================================================
     @Transactional
-    public PatientSymptomsBean updatePatientSymptoms(long symptomsId,
+    public PatientSymptomsBean updatePatientSymptoms(boolean checkUser, long userId,
+                                                     long symptomsId,
                                                      String symptoms,
                                                      String symptomsDescription,
-                                                     String symptomsImages,
                                                      String questionnaire
     ) {
         logger.info("update patient symptoms by symptomsId={} symptoms={} symDesc={} symImgs={} quest={}",
-                symptomsId, symptoms, symptomsDescription, symptomsImages, questionnaire);
+                symptomsId, symptoms, symptomsDescription, questionnaire);
         PatientSymptomsEntity entity = repository.findOne(symptomsId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+        }
+        if (checkUser) {
+            if (userId!=entity.getUserId()) {
+                logger.error("patient symptoms not belong to user");
+                throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
+            }
         }
 
         boolean change = false;
@@ -117,10 +123,6 @@ public class PatientSymptomsService {
         }
         if (!VerifyUtil.isStringEmpty(symptomsDescription)) {
             entity.setSymptomsDescription(symptomsDescription);
-            change = true;
-        }
-        if (!VerifyUtil.isStringEmpty(symptomsImages)) {
-            entity.setSymptomsImages(symptomsImages);
             change = true;
         }
         if (!VerifyUtil.isStringEmpty(questionnaire)) {
@@ -137,11 +139,17 @@ public class PatientSymptomsService {
     }
 
     @Transactional
-    public PatientSymptomsBean bindWithOrder(long orderId, long symptomsId) {
+    public PatientSymptomsBean bindWithOrder(boolean checkUser, long userId, long orderId, long symptomsId) {
         logger.info("bind patient symptoms with order by symptomsId={} orderId={}", symptomsId, orderId);
         PatientSymptomsEntity entity = repository.findOne(symptomsId);
         if (null==entity) {
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
+        }
+        if (checkUser) {
+            if (userId!=entity.getUserId()) {
+                logger.error("patient symptoms not belong to user");
+                throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
+            }
         }
 
         entity.setOrderId(orderId);
@@ -156,13 +164,51 @@ public class PatientSymptomsService {
     //                   add
     //======================================================================
     @Transactional
+    public PatientSymptomsBean addSymptomsImage(boolean checkUser, long userId, long symptomsId, InputStream image) {
+        logger.info("add image to symptoms={}", symptomsId);
+        if (null==image) {
+            logger.error("image is null");
+            throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
+        }
+        if (!repository.exists(symptomsId)) {
+            logger.error("patient symptoms is not found");
+        }
+        PatientSymptomsEntity entity = repository.getOne(symptomsId);
+        if (checkUser) {
+            if (userId!=entity.getUserId()) {
+                logger.error("patient symptoms not belong to user");
+                throw new BadRequestException(ErrorCode.NURSE360_PARAMETER_NOT_EXPECTED);
+            }
+        }
+
+        JSONUtil jsonUtil = JSONUtil.newInstance();
+        String imagesUrls = entity.getSymptomsImages();
+        List<String> listImages = null;
+        if (null==imagesUrls || imagesUrls.trim().isEmpty()) {
+            listImages = new ArrayList<>();
+        }
+        else {
+            listImages = jsonUtil.parseJsonList(imagesUrls, String.class);
+        }
+        String newImagePath = (String) userFileStorageService.addFile(0, "imageInPatientSymptoms", image, false);
+        listImages.add(newImagePath);
+
+        entity.setSymptomsImages(jsonUtil.toJsonString(listImages));
+        entity = repository.save(entity);
+
+
+        PatientSymptomsBean bean = beanConverter.convert(entity);
+        logger.info("patient symptoms is {}", bean);
+        return bean;
+    }
+
+    @Transactional
     public PatientSymptomsBean addPatientSymptoms(long userId, long patientId,
                                                   String symptoms,
-                                                  String symptomsDescription,
-                                                  String symptomsImages
+                                                  String symptomsDescription
     ) {
-        logger.info("add patient symptoms by userId={} patientId={} symptoms={} symDesc={} symImgs={}",
-                userId, patientId, symptoms, symptomsDescription, symptomsImages);
+        logger.info("add patient symptoms by userId={} patientId={} symptoms={} symDesc={}",
+                userId, patientId, symptoms, symptomsDescription);
         if (!userService.existUser(userId)) {
             throw new BadRequestException(ErrorCode.NURSE360_RECORD_NOT_FOUND);
         }
@@ -185,8 +231,8 @@ public class PatientSymptomsService {
 
         PatientSymptomsEntity entity = new PatientSymptomsEntity();
         if (!unused.isEmpty()) {
-            entity = unused.remove(0);
             deleteSymptomsImages(unused);
+            entity = unused.remove(0);
             repository.delete(unused);
         }
         entity.setTime(new Date());
@@ -195,7 +241,7 @@ public class PatientSymptomsService {
         entity.setPatientId(patientId);
         entity.setSymptoms(symptoms);
         entity.setSymptomsDescription(null==symptomsDescription ? "" : symptomsDescription);
-        entity.setSymptomsImages(null==symptomsImages ? "" : symptomsImages);
+        entity.setSymptomsImages(null);
 
         entity = repository.save(entity);
 

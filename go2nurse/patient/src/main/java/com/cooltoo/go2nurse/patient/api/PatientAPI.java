@@ -166,12 +166,11 @@ public class PatientAPI {
     public Response addPatientSymptoms(@Context HttpServletRequest request,
                                        @FormParam("patient_id")           @DefaultValue("0") String strPatientId,
                                        @FormParam("symptoms")             @DefaultValue("") String symptoms,
-                                       @FormParam("symptoms_description") @DefaultValue("") String symptomsDesc,
-                                       @FormParam("symptoms_images")      @DefaultValue("") String symptomsImages
+                                       @FormParam("symptoms_description") @DefaultValue("") String symptomsDesc
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long patientId = VerifyUtil.isIds(strPatientId) ? VerifyUtil.parseLongIds(strPatientId).get(0) : 0L;
-        PatientSymptomsBean symptomsBean = patientSymptomsService.addPatientSymptoms(userId, patientId, symptoms, symptomsDesc, symptomsImages);
+        PatientSymptomsBean symptomsBean = patientSymptomsService.addPatientSymptoms(userId, patientId, symptoms, symptomsDesc);
         return Response.ok(symptomsBean).build();
     }
 
@@ -183,12 +182,27 @@ public class PatientAPI {
                                           @FormParam("patient_symptoms_id")  @DefaultValue("0") String strSymptomsId,
                                           @FormParam("symptoms")             @DefaultValue("") String symptoms,
                                           @FormParam("symptoms_description") @DefaultValue("") String symptomsDesc,
-                                          @FormParam("symptoms_images")      @DefaultValue("") String symptomsImages,
                                           @FormParam("questionnaire")        @DefaultValue("") String questionnaire
     ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long symptomsId = VerifyUtil.isIds(strSymptomsId) ? VerifyUtil.parseLongIds(strSymptomsId).get(0) : 0L;
         PatientSymptomsBean symptomsBean = patientSymptomsService.updatePatientSymptoms(
-                symptomsId, symptoms, symptomsDesc, symptomsImages, questionnaire);
+                true, userId, symptomsId, symptoms, symptomsDesc, questionnaire);
+        return Response.ok(symptomsBean).build();
+    }
+
+    @Path("/symptoms/image")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response addPatientSymptoms(@Context HttpServletRequest request,
+                                       @FormDataParam("patient_symptoms_id")  @DefaultValue("0") String strSymptomsId,
+                                       @FormDataParam("image") InputStream inputStream
+    ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
+        long symptomsId = VerifyUtil.isIds(strSymptomsId) ? VerifyUtil.parseLongIds(strSymptomsId).get(0) : 0L;
+        PatientSymptomsBean symptomsBean = patientSymptomsService.addSymptomsImage(true, userId, symptomsId, inputStream);
         return Response.ok(symptomsBean).build();
     }
 
@@ -200,9 +214,10 @@ public class PatientAPI {
                                                  @FormParam("patient_symptoms_id")  @DefaultValue("0") String strSymptomsId,
                                                  @FormParam("order_id")             @DefaultValue("0") String strOrderId
     ) {
+        long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long symptomsId = VerifyUtil.isIds(strSymptomsId) ? VerifyUtil.parseLongIds(strSymptomsId).get(0) : 0L;
         long orderId    = VerifyUtil.isIds(strOrderId)    ? VerifyUtil.parseLongIds(strOrderId).get(0)    : 0L;
-        PatientSymptomsBean symptomsBean = patientSymptomsService.bindWithOrder(orderId, symptomsId);
+        PatientSymptomsBean symptomsBean = patientSymptomsService.bindWithOrder(true, userId, orderId, symptomsId);
         return Response.ok(symptomsBean).build();
     }
 
