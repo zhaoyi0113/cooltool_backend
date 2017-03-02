@@ -242,6 +242,7 @@ public class PatientSymptomsService {
         entity.setSymptoms(symptoms);
         entity.setSymptomsDescription(null==symptomsDescription ? "" : symptomsDescription);
         entity.setSymptomsImages(null);
+        entity.setQuestionnaire(null);
 
         entity = repository.save(entity);
 

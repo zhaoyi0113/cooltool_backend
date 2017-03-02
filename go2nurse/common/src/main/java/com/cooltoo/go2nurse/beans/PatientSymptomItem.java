@@ -14,7 +14,7 @@ public class PatientSymptomItem {
     private int id;
     private String dataType = "";
     private String name  = "";
-    private Object value = null;
+    private String value = null;
     private String unit  = "";
     private String maxNum;
     private String minNum;
@@ -41,10 +41,10 @@ public class PatientSymptomItem {
         this.name = name;
     }
 
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
-    public void setValue(Object value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
