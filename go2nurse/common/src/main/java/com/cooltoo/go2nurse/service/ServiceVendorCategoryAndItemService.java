@@ -895,7 +895,7 @@ public class ServiceVendorCategoryAndItemService {
             entity.setSymptomsItems(symptomsItems.trim());
             changed = true;
         }
-        if (null!=questionnaireId && questionnaireId.equals(entity.getQuestionnaireId())) {
+        if (null!=questionnaireId && !questionnaireId.equals(entity.getQuestionnaireId())) {
             entity.setQuestionnaireId(questionnaireId);
             changed = true;
         }
