@@ -62,6 +62,7 @@ public class ServiceOrderService {
     @Autowired private ServiceOrderChargeService orderChargeService;
     @Autowired private WeChatService weChatService;
     @Autowired private NurseVisitPatientService nurseVisitPatientService;
+    @Autowired private PatientSymptomsService patientSymptomsService;
 
     @Autowired private NurseOrderRelationRepository nurseOrderRelationRepository;
 
@@ -258,6 +259,7 @@ public class ServiceOrderService {
 
         // set pingpp charge
         Map<Long, List<ServiceOrderChargeBean>> orderId2Charge = orderChargeService.getOrderPingPPResult(AppType.GO_2_NURSE, orderIds);
+        Map<Long, PatientSymptomsBean> orderIdToPatientSymptoms = patientSymptomsService.getPatientsSymptomsByOrderIds(orderIds);
 
         // set fetch time
         final Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "id"));
@@ -283,6 +285,9 @@ public class ServiceOrderService {
 
             Long visitRecordId = orderIdToVisitRecordId.get(tmp.getId());
             tmp.setProperty(ServiceOrderBean.ORDER_VISIT_RECORD_ID, null==visitRecordId ? 0L : visitRecordId);
+
+            PatientSymptomsBean symptoms = orderIdToPatientSymptoms.get(tmp.getId());
+            tmp.setProperty(ServiceOrderBean.PATIENT_SYMPTOMS, symptoms);
         }
     }
 
