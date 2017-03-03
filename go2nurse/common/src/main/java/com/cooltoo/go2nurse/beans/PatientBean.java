@@ -3,6 +3,7 @@ package com.cooltoo.go2nurse.beans;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.GenderType;
 import com.cooltoo.constants.YesNoEnum;
+import com.cooltoo.util.NumberUtil;
 
 import java.util.Date;
 
@@ -50,6 +51,7 @@ public class PatientBean {
     public void setBirthday(Date birthday) { this.birthday = birthday; }
 
     public long getAge() {
+        age = NumberUtil.getAge(birthday);
         return age;
     }
 

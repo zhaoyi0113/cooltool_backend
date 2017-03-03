@@ -245,6 +245,24 @@ public class QuestionnaireService {
         return categoryId;
     }
 
+    public long getQuestionnaireIdByQuestionId(long questionId) {
+        logger.info("get questionnaire by questionId={}", questionId);
+        if (!questionRep.exists(questionId)) {
+            logger.error("question is not existed");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+        QuestionEntity question     = questionRep.findOne(questionId);
+        QuestionBean   questionBean = questionConverter.convert(question);
+
+        if (!questionnaireRep.exists(questionBean.getQuestionnaireId())) {
+            logger.error("questionnaire is not existed");
+            throw new BadRequestException(ErrorCode.RECORD_NOT_EXIST);
+        }
+
+        logger.info("questionnaireId is {}", question.getQuestionnaireId());
+        return question.getQuestionnaireId();
+    }
+
     public QuestionnaireBean getQuestionnaireWithQuestions(long questionnaireId) {
         logger.info("get questionnaire with question by id={}", questionnaireId);
         List<QuestionnaireBean> questionnaire = getQuestionnaireWithQuestionsByIds(questionnaireId+"");

@@ -3,14 +3,14 @@ package com.cooltoo.go2nurse.patient.api;
 import com.cooltoo.constants.CommonStatus;
 import com.cooltoo.constants.ContextKeys;
 import com.cooltoo.constants.YesNoEnum;
-import com.cooltoo.go2nurse.beans.PatientBean;
-import com.cooltoo.go2nurse.beans.PatientSymptomsBean;
-import com.cooltoo.go2nurse.beans.UserPatientRelationBean;
+import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.filters.LoginAuthentication;
 import com.cooltoo.go2nurse.openapp.WeChatService;
 import com.cooltoo.go2nurse.service.PatientService;
 import com.cooltoo.go2nurse.service.PatientSymptomsService;
+import com.cooltoo.go2nurse.service.QuestionnaireService;
 import com.cooltoo.go2nurse.service.UserPatientRelationService;
+import com.cooltoo.util.JSONUtil;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -25,9 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by yzzhao on 2/29/16.
@@ -40,6 +38,7 @@ public class PatientAPI {
     @Autowired private PatientService service;
     @Autowired private UserPatientRelationService userPatientRelation;
     @Autowired private PatientSymptomsService patientSymptomsService;
+    @Autowired private QuestionnaireService questionnaireService;
 
     @Autowired private WeChatService weChatService;
 
@@ -186,6 +185,12 @@ public class PatientAPI {
     ) {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long symptomsId = VerifyUtil.isIds(strSymptomsId) ? VerifyUtil.parseLongIds(strSymptomsId).get(0) : 0L;
+
+        JSONUtil jsonUtil = JSONUtil.newInstance();
+        List<ADLSubmitBean> adlSubmits = jsonUtil.parseJsonList(questionnaire, ADLSubmitBean.class);
+        fillADLSubmit(adlSubmits);
+        questionnaire = jsonUtil.toJsonString(adlSubmits);
+
         PatientSymptomsBean symptomsBean = patientSymptomsService.updatePatientSymptoms(
                 true, userId, symptomsId, symptoms, symptomsDesc, questionnaire);
         return Response.ok(symptomsBean).build();
@@ -222,4 +227,45 @@ public class PatientAPI {
     }
 
 
+    private void fillADLSubmit(List<ADLSubmitBean> adlSubmits) {
+        if (VerifyUtil.isListEmpty(adlSubmits)) {
+            return;
+        }
+        JSONUtil jsonUtil = JSONUtil.newInstance();
+
+        long questionnaireId = questionnaireService.getQuestionnaireIdByQuestionId(adlSubmits.get(0).getQuestionId());
+        QuestionnaireBean questionnaire = questionnaireService.getQuestionnaireWithQuestions(questionnaireId);
+        List<QuestionnaireConclusionBean> conclusions = jsonUtil.parseJsonList(questionnaire.getConclusion(), QuestionnaireConclusionBean.class);
+
+        Map<Long, QuestionBean> questionIdToBean = new HashMap<>();
+        List<QuestionBean> questions = questionnaire.getQuestions();
+        for (QuestionBean tmp : questions) {
+            questionIdToBean.put(tmp.getId(), tmp);
+        }
+
+
+        int score = 0;
+        for (ADLSubmitBean tmp : adlSubmits) {
+            score += tmp.getScore();
+        }
+
+        QuestionnaireConclusionBean adlConclusion = null;
+        for (QuestionnaireConclusionBean conclusion : conclusions) {
+            if (conclusion.isThisConclusion(score)) {
+                adlConclusion = conclusion;
+                break;
+            }
+        }
+
+
+        for (ADLSubmitBean tmp : adlSubmits) {
+            tmp.setQuestionnaireId(questionnaireId);
+            tmp.setQuestionnaireTitle(questionnaire.getTitle());
+            tmp.setConclusionItem(adlConclusion.getItem());
+            tmp.setConclusionInterval(adlConclusion.getInterval());
+            tmp.setConclusionScore(score);
+            QuestionBean question = questionIdToBean.get(tmp.getQuestionId());
+            tmp.setQuestionContent(null==question ? "" : question.getContent());
+        }
+    }
 }

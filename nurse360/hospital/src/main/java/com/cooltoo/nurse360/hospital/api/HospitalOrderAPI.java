@@ -15,6 +15,7 @@ import com.cooltoo.go2nurse.service.*;
 import com.cooltoo.go2nurse.service.notification.NotifierForAllModule;
 import com.cooltoo.nurse360.beans.HospitalAdminUserDetails;
 import com.cooltoo.nurse360.hospital.util.SecurityUtil;
+import com.cooltoo.nurse360.service.PatientSymptomsPdfService;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
@@ -44,6 +45,7 @@ public class HospitalOrderAPI {
     @Autowired private NotifierForAllModule notifierForAllModule;
     @Autowired private NurseWalletService nurseWalletService;
     @Autowired private DenyPatientService denyPatientService;
+    @Autowired private PatientSymptomsPdfService patientSymptomsPdfService;
 
 
     //=============================================================
@@ -390,6 +392,17 @@ public class HospitalOrderAPI {
                     index, number);
             setOrderWaitStaff(orders);
             return orders;
+        }
+        return new ArrayList<>();
+    }
+
+    @RequestMapping(path = "/order/adl", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<String> getOrderADL(HttpServletRequest request,
+                                    @RequestParam(defaultValue = "",  name = "order_id") long orderId
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (userDetails.isNurse() || userDetails.isNurseManager()) {
+            return patientSymptomsPdfService.createOrderADLEvaluate(orderId);
         }
         return new ArrayList<>();
     }
