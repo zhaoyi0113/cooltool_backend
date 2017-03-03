@@ -288,7 +288,7 @@ public class ServiceCategoryAndItemManageAPI {
                                    @FormParam("need_symptoms")    @DefaultValue("") String needSymptoms,
                                    @FormParam("symptoms_items")   @DefaultValue("") String symptomsItems,
                                    @FormParam("questionnaire_id") @DefaultValue("") String strQuestionnaireId,
-                                   @FormParam("need_symptoms")    @DefaultValue("") String needSymptomsDetail
+                                   @FormParam("need_symptoms_detail") @DefaultValue("") String needSymptomsDetail
     ) {
         Long questionnaireId = !VerifyUtil.isIds(strQuestionnaireId) ? null : VerifyUtil.parseLongIds(strQuestionnaireId).get(0);
         ServiceItemBean serviceItem = vendorCategoryAndItemService.addItem(
@@ -397,7 +397,7 @@ public class ServiceCategoryAndItemManageAPI {
                                     @FormParam("need_symptoms")    @DefaultValue("") String needSymptoms,
                                     @FormParam("symptoms_items")   @DefaultValue("") String symptomsItems,
                                     @FormParam("questionnaire_id") @DefaultValue("") String strQuestionnaireId,
-                                    @FormParam("need_symptoms")    @DefaultValue("") String needSymptomsDetail
+                                    @FormParam("need_symptoms_detail") @DefaultValue("") String needSymptomsDetail
     ) {
         Integer timeDuration = !VerifyUtil.isIds(strTimeDuration) ? null : VerifyUtil.parseIntIds(strTimeDuration).get(0);
         Integer grade = !VerifyUtil.isIds(strGrade) ? null : VerifyUtil.parseIntIds(strGrade).get(0);
