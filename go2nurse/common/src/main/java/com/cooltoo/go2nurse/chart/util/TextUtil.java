@@ -49,6 +49,9 @@ public class TextUtil {
 
     /**  */
     public String[] getLines(String content, int maxCharSizeInCell) {
+        if (null==content) {
+            return new String[]{};
+        }
         String[] lines = content.split("\n");
         if (lines.length == 0) {
             return new String[]{};

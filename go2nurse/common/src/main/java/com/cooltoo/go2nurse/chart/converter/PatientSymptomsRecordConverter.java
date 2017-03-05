@@ -3,7 +3,6 @@ package com.cooltoo.go2nurse.chart.converter;
 import com.cooltoo.go2nurse.beans.ADLSubmitBean;
 import com.cooltoo.go2nurse.chart.generator.PatientSymptomsPagePrinter;
 import com.cooltoo.go2nurse.chart.util.TextUtil;
-import com.cooltoo.util.NumberUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -66,7 +65,7 @@ public class PatientSymptomsRecordConverter implements Converter<ADLSubmitBean, 
         ADLSubmitBean tmp = sources.get(0);
 
         PatientSymptomsPagePrinter.Record record = new PatientSymptomsPagePrinter.Record();
-        record.setItem("总结").userSelected(tmp.getConclusionItem()).textUtil(textUtil);
+        record.setItem(tmp.getConclusionItem()).textUtil(textUtil).isConclusion(true);
         record.id(i);
         returnVal.add(record);
 

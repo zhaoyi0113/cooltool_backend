@@ -353,7 +353,7 @@ public class PatientSymptomsPagePrinter {
 
                 // 序号
                 font = fontUtil.getFont(fontName, Font.PLAIN, fontUtil.poundToMm(9), dpi);
-                string = needDrawNum ? record.id()+"" : "";
+                string = needDrawNum ? (record.isConclusion() ? "结论" : record.id()+"") : "";
                 text = new CellText(string, null, Align.ALIGN_CENTER | Align.ALIGN_MIDDLE, false);
                 text.font(font);
                 cell = new Cell(19f);
@@ -364,31 +364,47 @@ public class PatientSymptomsPagePrinter {
                 cell.text(text);
                 row.addCell(cell);
 
-                // 评估项目
-                font = fontUtil.getFont(fontName, Font.PLAIN, fontUtil.poundToMm(9), dpi);
-                string = itemLineIndex>=itemLineSize ? "" : itemLines[itemLineIndex];
-                text = new CellText(string, null, Align.ALIGN_MIDDLE, false);
-                text.font(font);
-                cell = new Cell(75f);
-                cell.border(RectRegion.TOP | RectRegion.RIGHT);
-                cell.mmPaddingLeft(1.5f);
-                cell.mmPaddingRight(1.5f);
-                cell.maxCharInCell(46);
-                cell.text(text);
-                row.addCell(cell);
+                if (record.isConclusion()) {
+                    // 评估项目结论
+                    font = fontUtil.getFont(fontName, Font.PLAIN, fontUtil.poundToMm(9), dpi);
+                    string = itemLineIndex >= itemLineSize ? "" : itemLines[itemLineIndex];
+                    text = new CellText(string, null, Align.ALIGN_MIDDLE, false);
+                    text.font(font);
+                    cell = new Cell(169f);
+                    cell.border(RectRegion.TOP | RectRegion.RIGHT);
+                    cell.mmPaddingLeft(1.5f);
+                    cell.mmPaddingRight(1.5f);
+                    cell.maxCharInCell(100);
+                    cell.text(text);
+                    row.addCell(cell);
+                }
+                else {
+                    // 评估项目
+                    font = fontUtil.getFont(fontName, Font.PLAIN, fontUtil.poundToMm(9), dpi);
+                    string = itemLineIndex >= itemLineSize ? "" : itemLines[itemLineIndex];
+                    text = new CellText(string, null, Align.ALIGN_MIDDLE, false);
+                    text.font(font);
+                    cell = new Cell(75f);
+                    cell.border(RectRegion.TOP | RectRegion.RIGHT);
+                    cell.mmPaddingLeft(1.5f);
+                    cell.mmPaddingRight(1.5f);
+                    cell.maxCharInCell(46);
+                    cell.text(text);
+                    row.addCell(cell);
 
-                // 用户选项
-                font = fontUtil.getFont(fontName, Font.PLAIN, fontUtil.poundToMm(9), dpi);
-                string = userSelectedLineIndex>=userSelectedLineSize ? "" : userSelectedLines[userSelectedLineIndex];
-                text = new CellText(string, null, Align.ALIGN_MIDDLE, false);
-                text.font(font);
-                cell = new Cell(94f);
-                cell.border(RectRegion.TOP | RectRegion.RIGHT);
-                cell.mmPaddingLeft(1.5f);
-                cell.mmPaddingRight(1.5f);
-                cell.maxCharInCell(56);
-                cell.text(text);
-                row.addCell(cell);
+                    // 用户选项
+                    font = fontUtil.getFont(fontName, Font.PLAIN, fontUtil.poundToMm(9), dpi);
+                    string = userSelectedLineIndex >= userSelectedLineSize ? "" : userSelectedLines[userSelectedLineIndex];
+                    text = new CellText(string, null, Align.ALIGN_MIDDLE, false);
+                    text.font(font);
+                    cell = new Cell(94f);
+                    cell.border(RectRegion.TOP | RectRegion.RIGHT);
+                    cell.mmPaddingLeft(1.5f);
+                    cell.mmPaddingRight(1.5f);
+                    cell.maxCharInCell(56);
+                    cell.text(text);
+                    row.addCell(cell);
+                }
 
                 // 添加到页面中
                 page.addRow(row);
@@ -432,6 +448,7 @@ public class PatientSymptomsPagePrinter {
         long id;
         String item;
         String userSelected;
+        boolean isConclusion;
 
         TextUtil textUtil = null;
         String[] itemLines = null;
@@ -463,6 +480,13 @@ public class PatientSymptomsPagePrinter {
         public Record userSelected(String userSelected) {
             this.userSelected = userSelected;
             return this;
+        }
+
+        public boolean isConclusion() {
+            return this.isConclusion;
+        }
+        public void isConclusion(boolean isConclusion) {
+            this.isConclusion = isConclusion;
         }
 
         public TextUtil textUtil() {
