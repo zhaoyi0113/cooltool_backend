@@ -56,6 +56,58 @@ public class HospitalCourseAPI {
     //=============================================================
     //            Authentication of NURSE/MANAGER Role
     //=============================================================
+    @RequestMapping(path = "/nurse/courses/conditions/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public int countCourseFilteredByCondition(HttpServletRequest request,
+                                              @RequestParam(defaultValue = "", name = "category_id")  String strCategoryId,
+                                              @RequestParam(defaultValue = "", name = "publisher_id") String strPublisherId,
+                                              @RequestParam(defaultValue = "", name = "course_name")  String strName
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (!userDetails.isAdmin()) {
+            Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+            Integer hospitalId   = null != tmp[0] ? tmp[0].intValue() : null;
+            Integer departmentId = null != tmp[1] ? tmp[1].intValue() : null;
+            List<Long> courseIds = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
+            Long categoryId  = !VerifyUtil.isIds(strCategoryId)  ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
+            Long publisherId = !VerifyUtil.isIds(strPublisherId) ? null : VerifyUtil.parseLongIds(strPublisherId).get(0);
+            String nameLike  = VerifyUtil.isStringEmpty(strName) ? null : VerifyUtil.reconstructSQLContentLike(strName);
+            courseIds = courseService.getCourseIdByStatusesIdsCategoryPublisherName(
+                    getCourseStatuses(), courseIds, categoryId, publisherId, nameLike
+            );
+            int count = VerifyUtil.isListEmpty(courseIds) ? 0 : courseIds.size();
+            logger.info("count = {}", count);
+            return count;
+        }
+        return 0;
+    }
+
+    @RequestMapping(path = "/nurse/courses/conditions", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    public List<Nurse360CourseBean> getCourseFilteredByCondition(HttpServletRequest request,
+                                                                 @RequestParam(defaultValue = "", name = "category_id")  String strCategoryId,
+                                                                 @RequestParam(defaultValue = "", name = "publisher_id") String strPublisherId,
+                                                                 @RequestParam(defaultValue = "", name = "course_name")  String strName,
+                                                                 @RequestParam(defaultValue = "0",  name = "index")  int index,
+                                                                 @RequestParam(defaultValue = "10", name = "number") int number
+    ) {
+        HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        if (!userDetails.isAdmin()) {
+            Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+            Integer hospitalId = null != tmp[0] ? tmp[0].intValue() : null;
+            Integer departmentId = null != tmp[1] ? tmp[1].intValue() : null;
+            List<Long> courseIds = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
+            Long categoryId  = !VerifyUtil.isIds(strCategoryId)  ? null : VerifyUtil.parseLongIds(strCategoryId).get(0);
+            Long publisherId = !VerifyUtil.isIds(strPublisherId) ? null : VerifyUtil.parseLongIds(strPublisherId).get(0);
+            String nameLike  = VerifyUtil.isStringEmpty(strName) ? null : VerifyUtil.reconstructSQLContentLike(strName);
+            courseIds = courseService.getCourseIdByStatusesIdsCategoryPublisherName(
+                    getCourseStatuses(), courseIds, categoryId, publisherId, nameLike
+            );
+            List<Nurse360CourseBean> courses = courseService.getCourseByIds(courseIds, index, number);
+            logger.info("courses's count = {}", courses.size());
+            return courses;
+        }
+        return new ArrayList<>();
+    }
+
     @RequestMapping(path = "/nurse/courses/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public int countCourse(HttpServletRequest request) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
@@ -156,7 +208,7 @@ public class HospitalCourseAPI {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         if (canModifyCourse(userDetails)) {
             logger.info("update course={} status={}", courseId, status);
-            Nurse360CourseBean course = courseService.updateCourseStatus(courseId, status);
+            Nurse360CourseBean course = courseService.updateCourseStatus(courseId, userDetails.getId(), status);
             logger.info("course is {}", course);
             return course;
         }
@@ -260,7 +312,7 @@ public class HospitalCourseAPI {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         if (canModifyCourse(userDetails)) {
             logger.info("submit course content");
-            Nurse360CourseBean course = courseService.updateCourseContent(courseId, content);
+            Nurse360CourseBean course = courseService.updateCourseContent(courseId, userDetails.getId(), content);
             logger.info("course is {}", course);
             return course;
         }

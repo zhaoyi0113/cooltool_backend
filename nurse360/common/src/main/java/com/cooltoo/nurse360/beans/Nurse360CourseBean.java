@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.beans;
 
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.go2nurse.constants.CourseStatus;
 
@@ -23,6 +24,8 @@ public class Nurse360CourseBean {
     private String keyword;
     private long categoryId;
     private YesNoEnum hasRead;
+    private long publisherId;
+    private NurseBean publisher;
 
     public long getId() {
         return id;
@@ -74,6 +77,14 @@ public class Nurse360CourseBean {
 
     public YesNoEnum getHasRead() {
         return hasRead;
+    }
+
+    public long getPublisherId() {
+        return publisherId;
+    }
+
+    public NurseBean getPublisher() {
+        return publisher;
     }
 
     public void setId(long id) {
@@ -128,6 +139,14 @@ public class Nurse360CourseBean {
         this.hasRead = hasRead;
     }
 
+    public void setPublisherId(long publisherId) {
+        this.publisherId = publisherId;
+    }
+
+    public void setPublisher(NurseBean publisher) {
+        this.publisher = publisher;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -143,6 +162,8 @@ public class Nurse360CourseBean {
         msg.append(", keyword=").append(keyword);
         msg.append(", categoryId=").append(categoryId);
         msg.append(", hasRead=").append(hasRead);
+        msg.append(", publisherId=").append(publisherId);
+        msg.append(", publisher=").append(null!=publisher ? publisher.getName() : null);
         msg.append("]");
         return msg.toString();
     }

@@ -23,6 +23,7 @@ public class Nurse360CourseEntity {
     private String uniqueId;
     private String keyword;
     private long categoryId;
+    private long publisherId;
 
     @Id
     @GeneratedValue
@@ -82,6 +83,11 @@ public class Nurse360CourseEntity {
         return categoryId;
     }
 
+    @Column(name = "publisher_id")
+    public long getPublisherId() {
+        return publisherId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -126,6 +132,10 @@ public class Nurse360CourseEntity {
         this.categoryId = categoryId;
     }
 
+    public void setPublisherId(long publisherId) {
+        this.publisherId = publisherId;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(getClass()).append("@").append(hashCode()).append("[");
@@ -140,6 +150,7 @@ public class Nurse360CourseEntity {
         msg.append(", uniqueId=").append(uniqueId);
         msg.append(", keyword=").append(keyword);
         msg.append(", categoryId=").append(categoryId);
+        msg.append(", publisherId=").append(publisherId);
         msg.append("]");
         return msg.toString();
     }

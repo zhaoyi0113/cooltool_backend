@@ -224,7 +224,7 @@ public class CourseManageAPI {
 
     ) {
         logger.info("update course={} status={}", courseId, status);
-        Nurse360CourseBean bean = courseService.updateCourseStatus(courseId, status);
+        Nurse360CourseBean bean = courseService.updateCourseStatus(courseId, -1, status);
         logger.info("course is {}", bean);
         return Response.ok(bean).build();
     }
@@ -312,7 +312,7 @@ public class CourseManageAPI {
 
     ) {
         logger.info("submit course content");
-        Nurse360CourseBean course = courseService.updateCourseContent(courseId, content);
+        Nurse360CourseBean course = courseService.updateCourseContent(courseId, -1, content);
 
         logger.info("course is {}", course);
         return Response.ok(course).build();

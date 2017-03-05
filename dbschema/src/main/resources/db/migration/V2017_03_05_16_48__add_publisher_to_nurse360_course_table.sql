@@ -1,0 +1,1 @@
+ALTER TABLE `nurse360_course` ADD COLUMN `publisher_id` BIGINT(64) NULL DEFAULT 0;

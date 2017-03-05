@@ -1,5 +1,6 @@
 package com.cooltoo.nurse360.service;
 
+import com.cooltoo.beans.NurseBean;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
 import com.cooltoo.go2nurse.constants.CourseStatus;
@@ -23,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hp on 2016/6/8.
@@ -45,6 +43,7 @@ public class CourseServiceForNurse360 {
     @Autowired private NurseFileStorageServiceForNurse360 userStorage;
     @Autowired private TemporaryFileStorageServiceForNurse360 tempStorage;
     @Autowired private CourseHospitalRelationServiceForNurse360 courseHospitalRelationService;
+    @Autowired private NurseServiceForNurse360 nurseService;
 
     //===========================================================
     //                    get
@@ -106,6 +105,26 @@ public class CourseServiceForNurse360 {
         }
 
         resultSet = repository.findCourseIdByStatusInAndIdIn(statuses, courseIds, sort);
+        logger.info("count is {}", resultSet.size());
+        return resultSet;
+    }
+
+    public List<Long> getCourseIdByStatusesIdsCategoryPublisherName(List<CourseStatus> statuses,
+                                                                    List<Long> courseIds,
+                                                                    Long categoryId,
+                                                                    Long publisherId,
+                                                                    String nameLike
+    ) {
+        logger.info("get courseId by statuses={} ids={} categoryId={} publisherId={} nameLike={}",
+                statuses, courseIds, categoryId, publisherId, nameLike);
+        List<Long> resultSet = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(statuses) || VerifyUtil.isListEmpty(courseIds)) {
+            return resultSet;
+        }
+
+        resultSet = repository.findCourseIdByStatusIdInAndCategoryPublisherName(
+                statuses, courseIds, categoryId, publisherId, nameLike, sort
+        );
         logger.info("count is {}", resultSet.size());
         return resultSet;
     }
@@ -199,22 +218,35 @@ public class CourseServiceForNurse360 {
             return;
         }
 
+        List<Long> publisherIds = new ArrayList<>();
         List<Long> imageIds = new ArrayList<>();
         for (Nurse360CourseBean tmp : courses) {
-            if (tmp.getFrontCover()<=0) {
-                continue;
+            if (!imageIds.contains(tmp.getFrontCover())) {
+                imageIds.add(tmp.getFrontCover());
             }
-            imageIds.add(tmp.getFrontCover());
+            if (!publisherIds.contains(tmp.getPublisherId())) {
+                publisherIds.add(tmp.getPublisherId());
+            }
+        }
+
+        Map<Long, NurseBean> nurseIdToBean = new HashMap<>();
+        List<NurseBean> nurses =nurseService.getNurseByIds(publisherIds);
+        for (NurseBean tmp : nurses) {
+            nurseIdToBean.put(tmp.getId(), tmp);
         }
 
         Map<Long, String> imageId2Url = userStorage.getFileUrl(imageIds);
         for (Nurse360CourseBean tmp : courses) {
-            if (tmp.getFrontCover()<=0) {
-                continue;
+            if (tmp.getFrontCover()>0) {
+                long   imgId  = tmp.getFrontCover();
+                String imgUrl = imageId2Url.get(imgId);
+                tmp.setFrontCoverUrl(imgUrl);
             }
-            long   imgId  = tmp.getFrontCover();
-            String imgUrl = imageId2Url.get(imgId);
-            tmp.setFrontCoverUrl(imgUrl);
+
+            NurseBean publisher = nurseIdToBean.get(tmp.getPublisherId());
+            if (null!=publisher) {
+                tmp.setPublisher(publisher);
+            }
         }
     }
 
@@ -430,7 +462,7 @@ public class CourseServiceForNurse360 {
     }
 
     @Transactional
-    public Nurse360CourseBean updateCourseStatus(long courseId, String strStatus) {
+    public Nurse360CourseBean updateCourseStatus(long courseId, long nurseIdPublishCourse, String strStatus) {
         logger.info("update course {} status to {}", courseId, strStatus);
 
         Nurse360CourseEntity entity = repository.findOne(courseId);
@@ -451,6 +483,9 @@ public class CourseServiceForNurse360 {
                 throw new BadRequestException(ErrorCode.NURSE360_NOT_PERMITTED);
             }
             entity.setStatus(status);
+            if (CourseStatus.ENABLE.equals(status)) {
+                entity.setPublisherId(nurseIdPublishCourse);
+            }
             changed = true;
         }
 
@@ -468,7 +503,7 @@ public class CourseServiceForNurse360 {
     //===========================================================
 
     @Transactional
-    public Nurse360CourseBean updateCourseContent(long courseId, String content) {
+    public Nurse360CourseBean updateCourseContent(long courseId, long nurseIdPublishCourse, String content) {
         logger.info("update course {} token={} content={}", courseId, content);
 
         Nurse360CourseEntity entity = repository.findOne(courseId);
@@ -511,6 +546,7 @@ public class CourseServiceForNurse360 {
 
         if (CourseStatus.EDITING.equals(entity.getStatus())) {
             entity.setStatus(CourseStatus.ENABLE);
+            entity.setPublisherId(nurseIdPublishCourse);
         }
         entity.setContent(content);
         entity = repository.save(entity);

@@ -41,4 +41,14 @@ public interface Nurse360CourseRepository extends JpaRepository<Nurse360CourseEn
             " WHERE course.status IN (?1)" +
             " AND   course.id     IN (?2)")
     List<Long> findCourseIdByStatusInAndIdIn(List<CourseStatus> status, List<Long> ids, Sort sort);
+
+
+
+    @Query("SELECT course.id FROM Nurse360CourseEntity course" +
+            " WHERE course.status IN (?1)" +
+            " AND   course.id     IN (?2)" +
+            " AND   (?3 IS NULL OR ?3=course.categoryId)" +
+            " AND   (?4 IS NULL OR ?4=course.publisherId)" +
+            " AND   (?5 IS NULL OR course.name LIKE %?5)")
+    List<Long> findCourseIdByStatusIdInAndCategoryPublisherName(List<CourseStatus> status, List<Long> ids, Long categoryId, Long publisherId, String nameLike, Sort sort);
 }
