@@ -7,6 +7,7 @@ import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
+import com.cooltoo.go2nurse.beans.QuestionnaireBean;
 import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
 import com.cooltoo.go2nurse.beans.ServiceItemBean;
 import com.cooltoo.go2nurse.beans.ServiceVendorBean;
@@ -71,6 +72,7 @@ public class ServiceVendorCategoryAndItemService {
     @Autowired private ServiceVendorBeanConverter vendorBeanConverter;
     @Autowired private CommonHospitalService hospitalService;
     @Autowired private CommonDepartmentService departmentService;
+    @Autowired private QuestionnaireService questionnaireService;
 
     @Autowired private Go2NurseUtility utility;
 
@@ -421,6 +423,7 @@ public class ServiceVendorCategoryAndItemService {
         List<Integer> hospitalsId = new ArrayList<>();
         List<Integer> hospitalDepartmentsId = new ArrayList<>();
         List<Long> categoryIds = new ArrayList<>();
+        List<Long> questionnaireIds = new ArrayList<>();
         for (ServiceItemBean item : items) {
             if (!categoryIds.contains(item.getCategoryId())) {
                 categoryIds.add(item.getCategoryId());
@@ -430,6 +433,9 @@ public class ServiceVendorCategoryAndItemService {
             }
             if (!imagesId.contains(item.getDetailImageId())) {
                 imagesId.add(item.getDetailImageId());
+            }
+            if (!questionnaireIds.contains(item.getQuestionnaireId())) {
+                questionnaireIds.add(item.getQuestionnaireId());
             }
             if (ServiceVendorType.COMPANY.equals(item.getVendorType()) && !companyId.contains(item.getVendorId())) {
                 companyId.add(item.getVendorId());
@@ -445,6 +451,7 @@ public class ServiceVendorCategoryAndItemService {
 
         }
 
+        Map<Long, QuestionnaireBean> questionnaireIdToBean = questionnaireService.getQuestionnaireIdToBeanMapByIds(questionnaireIds);
         Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
         Map<Long, ServiceVendorBean> vendorIdToBean = getVendorIdToBeanMapByIds(companyId);
         Map<Integer, HospitalBean> hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalsId);
@@ -478,6 +485,10 @@ public class ServiceVendorCategoryAndItemService {
                 if (null!=department) {
                     item.setHospitalDepartment(department);
                 }
+            }
+            QuestionnaireBean questionnaire = questionnaireIdToBean.get(item.getQuestionnaireId());
+            if (null!=questionnaire) {
+                item.setQuestionnaire(questionnaire);
             }
         }
     }

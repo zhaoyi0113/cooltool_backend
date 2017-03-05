@@ -50,6 +50,7 @@ public class ServiceItemBean {
     private YesNoEnum needSymptoms;
     private String symptomsItems;
     private long questionnaireId;
+    private QuestionnaireBean questionnaire;
     private YesNoEnum needSymptomsDetail;
 
     public long getId() {
@@ -295,6 +296,13 @@ public class ServiceItemBean {
     }
     public void setQuestionnaireId(long questionnaireId) {
         this.questionnaireId = questionnaireId;
+    }
+
+    public QuestionnaireBean getQuestionnaire() {
+        return questionnaire;
+    }
+    public void setQuestionnaire(QuestionnaireBean questionnaire) {
+        this.questionnaire = questionnaire;
     }
 
     public YesNoEnum getNeedSymptomsDetail() {
