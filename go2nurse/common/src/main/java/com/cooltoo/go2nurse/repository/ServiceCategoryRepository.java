@@ -18,24 +18,24 @@ public interface ServiceCategoryRepository extends JpaRepository<ServiceCategory
 
     @Query("SELECT count(sct.id) FROM ServiceCategoryEntity sct" +
             " WHERE (?1 IS NULL OR ?1=sct.parentId)" +
-            " AND   (sct.status IN ?2)")
+            " AND   (sct.status IN (?2))")
     long countByParentIdAndStatusIn(Long parentId, List<CommonStatus> statuses);
     @Query("FROM ServiceCategoryEntity sct" +
             " WHERE (?1 IS NULL OR ?1=sct.parentId)" +
-            " AND   (sct.status IN ?2)")
+            " AND   (sct.status IN (?2))")
     List<ServiceCategoryEntity> findByParentIdAndStatusIn(Long parentId, List<CommonStatus> statuses, Sort sort);
     @Query("FROM ServiceCategoryEntity sct" +
             " WHERE (?1 IS NULL OR ?1=sct.parentId)" +
-            " AND   (sct.status IN ?2)")
+            " AND   (sct.status IN (?2))")
     Page<ServiceCategoryEntity> findByParentIdAndStatusIn(Long parentId, List<CommonStatus> statuses, Pageable sort);
 
     @Query("SELECT count(sct.id) FROM ServiceCategoryEntity sct" +
             " WHERE (sct.parentId>0)" +
-            " AND   (sct.status IN ?1)")
+            " AND   (sct.status IN (?1))")
     long countBySubCategoryAndStatusIn(List<CommonStatus> statuses);
     @Query("FROM ServiceCategoryEntity sct" +
             " WHERE (sct.parentId>0)" +
-            " AND   (sct.status IN ?1)")
+            " AND   (sct.status IN (?1))")
     Page<ServiceCategoryEntity> findBySubCategoryAndStatusIn(List<CommonStatus> statuses, Pageable sort);
 
     List<ServiceCategoryEntity> findByIdIn(List<Long> ids);
