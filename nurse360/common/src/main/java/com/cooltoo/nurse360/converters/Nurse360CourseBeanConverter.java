@@ -24,6 +24,7 @@ public class Nurse360CourseBeanConverter implements Converter<Nurse360CourseEnti
         bean.setUniqueId(source.getUniqueId());
         bean.setKeyword(source.getKeyword());
         bean.setCategoryId(source.getCategoryId());
+        bean.setPublisherId(source.getPublisherId());
         return bean;
     }
 }
