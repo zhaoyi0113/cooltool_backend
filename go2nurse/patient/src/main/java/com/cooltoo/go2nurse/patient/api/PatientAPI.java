@@ -186,12 +186,18 @@ public class PatientAPI {
         long userId = (Long) request.getAttribute(ContextKeys.USER_LOGIN_USER_ID);
         long symptomsId = VerifyUtil.isIds(strSymptomsId) ? VerifyUtil.parseLongIds(strSymptomsId).get(0) : 0L;
 
-        JSONUtil jsonUtil = JSONUtil.newInstance();
-        List<ADLSubmitBean> adlSubmits = jsonUtil.parseJsonList(questionnaire, ADLSubmitBean.class);
-        fillADLSubmit(adlSubmits);
-        questionnaire = jsonUtil.toJsonString(adlSubmits);
 
-        PatientSymptomsBean symptomsBean = patientSymptomsService.updatePatientSymptoms(
+        symptoms     = VerifyUtil.isStringEmpty(symptoms)     ? null : symptoms;
+        symptomsDesc = VerifyUtil.isStringEmpty(symptomsDesc) ? null : symptomsDesc;
+        questionnaire= VerifyUtil.isStringEmpty(questionnaire)? null : questionnaire;
+        if (null!=questionnaire) {
+            JSONUtil jsonUtil = JSONUtil.newInstance();
+            List<ADLSubmitBean> adlSubmits = jsonUtil.parseJsonList(questionnaire, ADLSubmitBean.class);
+            fillADLSubmit(adlSubmits);
+            questionnaire = jsonUtil.toJsonString(adlSubmits);
+        }
+
+                PatientSymptomsBean symptomsBean = patientSymptomsService.updatePatientSymptoms(
                 true, userId, symptomsId, symptoms, symptomsDesc, questionnaire);
         return Response.ok(symptomsBean).build();
     }
