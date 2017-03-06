@@ -73,24 +73,32 @@ public class HospitalServiceCategoryItemAPI {
         }
     }
 
-    @RequestMapping(path = "/manager/category/top/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    /**
+     * @param strLevel all/1/2
+     **/
+    @RequestMapping(path = "/manager/category/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public long countTopServiceCategory(HttpServletRequest request,
-                                            @RequestParam(defaultValue = "all", name = "status") String strStatus
+                                        @RequestParam(defaultValue = "all", name = "status") String strStatus,
+                                        @RequestParam(defaultValue = "all", name = "level")  String strLevel
     ) {
         List<CommonStatus> statuses = getCommonStatus(strStatus);
 
-        long topServiceCategoryCount = vendorCategoryAndItemService.countTopCategory(statuses);
+        long topServiceCategoryCount = vendorCategoryAndItemService.countCategory(strLevel, statuses);
         return topServiceCategoryCount;
     }
 
-    @RequestMapping(path = "/manager/category/top", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    /**
+     * @param strLevel all/1/2
+     **/
+    @RequestMapping(path = "/manager/category", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public List<ServiceCategoryBean> getTopServiceCategory(HttpServletRequest request,
                                                            @RequestParam(defaultValue = "all",name = "status") String strStatus,
+                                                           @RequestParam(defaultValue = "all", name = "level")  String strLevel,
                                                            @RequestParam(defaultValue = "0",  name = "index")  int pageIndex,
                                                            @RequestParam(defaultValue = "10", name = "number") int sizePerPage
     ) {
         List<CommonStatus> statuses = getCommonStatus(strStatus);
-        List<ServiceCategoryBean> topServiceCategories = vendorCategoryAndItemService.getTopCategory(statuses, pageIndex, sizePerPage);
+        List<ServiceCategoryBean> topServiceCategories = vendorCategoryAndItemService.getCategory(strLevel, statuses, pageIndex, sizePerPage);
         return topServiceCategories;
     }
 

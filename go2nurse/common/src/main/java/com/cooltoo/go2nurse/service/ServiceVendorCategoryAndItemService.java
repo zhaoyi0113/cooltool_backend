@@ -150,6 +150,63 @@ public class ServiceVendorCategoryAndItemService {
         return categoryRep.exists(categoryId);
     }
 
+    public long countCategory(String search, List<CommonStatus> statuses) {
+        if ("all".equalsIgnoreCase(search)) {
+            return countCategoryByParentId(null, statuses);
+        }
+        else if ("1".equalsIgnoreCase(search)) {
+            return countCategoryByParentId(0L, statuses);
+        }
+        else if ("2".equalsIgnoreCase(search)) {
+            return countSubCategory(statuses);
+        }
+        return 0;
+    }
+
+    public List<ServiceCategoryBean> getCategory(String search, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+        if ("all".equalsIgnoreCase(search)) {
+            return getCategoryByParentId(null, statuses, pageIndex, sizePerPage);
+        }
+        else if ("1".equalsIgnoreCase(search)) {
+            return getCategoryByParentId(0L, statuses, pageIndex, sizePerPage);
+        }
+        else if ("2".equalsIgnoreCase(search)) {
+            return getSubCategory(statuses, pageIndex, sizePerPage);
+        }
+        return new ArrayList<>();
+    }
+
+    public long countSubCategory(List<CommonStatus> statuses) {
+        logger.info("get service all sub category by status={}", statuses);
+        long count = 0;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            count = categoryRep.countBySubCategoryAndStatusIn(statuses);
+        }
+        else {
+            logger.warn("statuses is empty");
+            count = 0;
+        }
+        logger.info("count is ={}", count);
+        return count;
+    }
+
+    public List<ServiceCategoryBean> getSubCategory(List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+        logger.info("get service all sub category by status={}", statuses);
+        List<ServiceCategoryBean> beans;
+        if (!VerifyUtil.isListEmpty(statuses)) {
+            PageRequest pageRequest = new PageRequest(pageIndex, sizePerPage, categorySort);
+            Page<ServiceCategoryEntity> entities = categoryRep.findBySubCategoryAndStatusIn(statuses, pageRequest);
+            beans = serviceCategoryEntitiesToBeans(entities);
+            fillCategoryOtherProperties(beans);
+        }
+        else {
+            logger.warn("statuses is empty");
+            beans = new ArrayList<>();
+        }
+        logger.info("count is ={}", beans.size());
+        return beans;
+    }
+
     public long countTopCategory(List<CommonStatus> statuses) {
         return countCategoryByParentId(0L, statuses);
     }
@@ -158,7 +215,7 @@ public class ServiceVendorCategoryAndItemService {
         return getCategoryByParentId(0L, statuses, pageIndex, sizePerPage);
     }
 
-    public long countCategoryByParentId(long categoryParentId, List<CommonStatus> statuses) {
+    public long countCategoryByParentId(Long categoryParentId, List<CommonStatus> statuses) {
         long count = 0;
         if (!VerifyUtil.isListEmpty(statuses)) {
             count = categoryRep.countByParentIdAndStatusIn(categoryParentId, statuses);
@@ -167,7 +224,7 @@ public class ServiceVendorCategoryAndItemService {
         return count;
     }
 
-    public List<ServiceCategoryBean> getCategoryByParentId(long categoryParentId, List<CommonStatus> statuses) {
+    public List<ServiceCategoryBean> getCategoryByParentId(Long categoryParentId, List<CommonStatus> statuses) {
         logger.info("get service category by parentId={} status={}", categoryParentId, statuses);
         List<ServiceCategoryBean> beans;
         if (!VerifyUtil.isListEmpty(statuses)) {
@@ -183,7 +240,7 @@ public class ServiceVendorCategoryAndItemService {
         return beans;
     }
 
-    public List<ServiceCategoryBean> getCategoryByParentId(long categoryParentId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+    public List<ServiceCategoryBean> getCategoryByParentId(Long categoryParentId, List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
         logger.info("get service category by parentId={} status={}, at page={} size={}", categoryParentId, statuses, pageIndex, sizePerPage);
         List<ServiceCategoryBean> beans;
         if (!VerifyUtil.isListEmpty(statuses)) {
