@@ -27,7 +27,9 @@ public class ServiceItemBean {
     private HospitalBean hospital;
     private HospitalDepartmentBean hospitalDepartment;
     private long topCategoryId;
+    private ServiceCategoryBean topCategory;
     private long categoryId;
+    private ServiceCategoryBean category;
     private String name;
     private ServiceClass clazz;
     private String description;
@@ -95,6 +97,14 @@ public class ServiceItemBean {
 
     public long getCategoryId() {
         return categoryId;
+    }
+
+    public ServiceCategoryBean getTopCategory() {
+        return topCategory;
+    }
+
+    public ServiceCategoryBean getCategory() {
+        return category;
     }
 
     public String getName() {
@@ -179,6 +189,14 @@ public class ServiceItemBean {
 
     public void setCategoryId(long categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public void setTopCategory(ServiceCategoryBean topCategory) {
+        this.topCategory = topCategory;
+    }
+
+    public void setCategory(ServiceCategoryBean category) {
+        this.category = category;
     }
 
     public void setName(String name) {
