@@ -591,26 +591,33 @@ public class ServiceVendorCategoryAndItemService {
         }
     }
 
-    private void fillCategoryOtherProperties(List<ServiceCategoryBean> items) {
-        if (VerifyUtil.isListEmpty(items)) {
+    private void fillCategoryOtherProperties(List<ServiceCategoryBean> beans) {
+        if (VerifyUtil.isListEmpty(beans)) {
             return;
         }
 
         List<Long> imagesId = new ArrayList<>();
-        for (ServiceCategoryBean item : items) {
-            if (imagesId.contains(item.getImageId())) {
-                continue;
+        List<Long> parentsId = new ArrayList<>();
+        for (ServiceCategoryBean tmp : beans) {
+            if (!imagesId.contains(tmp.getImageId())) {
+                imagesId.add(tmp.getImageId());
             }
-            imagesId.add(item.getImageId());
+            if (!parentsId.contains(tmp.getParentId())) {
+                parentsId.add(tmp.getParentId());
+            }
         }
 
         Map<Long, String> imageIdToUrl = userFileStorage.getFileUrl(imagesId);
-        for (ServiceCategoryBean item : items) {
-            String imageUrl = imageIdToUrl.get(item.getImageId());
-            if (VerifyUtil.isStringEmpty(imageUrl)) {
-                continue;
+        Map<Long, ServiceCategoryBean> categoryIdToBean = getCategoryIdToBean(parentsId);
+        for (ServiceCategoryBean tmp : beans) {
+            String imageUrl = imageIdToUrl.get(tmp.getImageId());
+            if (!VerifyUtil.isStringEmpty(imageUrl)) {
+                tmp.setImageUrl(imageUrl);
             }
-            item.setImageUrl(imageUrl);
+            ServiceCategoryBean parent = categoryIdToBean.get(tmp.getParentId());
+            if (null!=parent) {
+                tmp.setParent(parent);
+            }
         }
     }
 
