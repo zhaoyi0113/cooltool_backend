@@ -57,8 +57,8 @@ public class NurseQualificationAPIForNurse360 {
                                      @FormDataParam("name")      String name,
                                      @FormDataParam("type")      String type,
                                      @FormDataParam("file_name") String fileName,
-                                     @FormDataParam("file") InputStream fileInputStream,
-                                     @FormDataParam("file") FormDataContentDisposition disposition
+                                     @FormDataParam("image") InputStream fileInputStream,
+                                     @FormDataParam("image") FormDataContentDisposition disposition
     ) {
         long userId = (Long)request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         logger.info("add qualification name={} type={}, file_name={}, fileDisp={}, file={}", name, type, fileName, disposition, Boolean.valueOf(fileInputStream!=null));
