@@ -196,8 +196,10 @@ public class WeChatAccountService {
 
         if (null!=hospitalId && null!=departmentId) {
             int oldHospitalId = entity.getHospitalId();
+            int oldDepartId = entity.getDepartmentId();
             if (hospitalId==-1 || hospitalService.existHospital(hospitalId)) {
                 entity.setHospitalId(hospitalId);
+                entity.setDepartmentId(0);
                 changed = true;
             }
             if (departmentRepository.exists(departmentId)) {
@@ -209,6 +211,7 @@ public class WeChatAccountService {
                 }
                 else {
                     entity.setHospitalId(oldHospitalId);
+                    entity.setDepartmentId(oldDepartId);
                     changed = false;
                 }
             }
