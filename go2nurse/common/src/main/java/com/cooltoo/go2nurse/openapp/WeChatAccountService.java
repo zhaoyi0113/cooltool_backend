@@ -195,11 +195,22 @@ public class WeChatAccountService {
         }
 
         if (null!=hospitalId && null!=departmentId) {
-            HospitalDepartmentEntity department = departmentRepository.findOne(departmentId);
-            if (hospitalId==department.getHospitalId()) {
+            int oldHospitalId = entity.getHospitalId();
+            if (hospitalId==-1 || hospitalService.existHospital(hospitalId)) {
                 entity.setHospitalId(hospitalId);
-                entity.setDepartmentId(departmentId);
                 changed = true;
+            }
+            if (departmentRepository.exists(departmentId)) {
+                HospitalDepartmentEntity department = departmentRepository.findOne(departmentId);
+                if (hospitalId == department.getHospitalId()) {
+                    entity.setHospitalId(hospitalId);
+                    entity.setDepartmentId(departmentId);
+                    changed = true;
+                }
+                else {
+                    entity.setHospitalId(oldHospitalId);
+                    changed = false;
+                }
             }
         }
 
