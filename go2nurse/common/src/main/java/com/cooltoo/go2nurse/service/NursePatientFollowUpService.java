@@ -88,6 +88,21 @@ public class NursePatientFollowUpService {
         return beans;
     }
 
+    public List<Long> getPatientFollowUpIds(Integer hospitalId, Integer departId) {
+        logger.info("get patient follow-up ids by hospitalId={} departId={}", hospitalId, departId);
+        List<Long> followUpIds = new ArrayList<>();
+        if (null==hospitalId && null==departId) {
+        }
+        else {
+            List<NursePatientFollowUpEntity> resultSet = repository.findByConditionsAndStatusNot(hospitalId, departId, null, null, null, CommonStatus.DELETED, sort);
+            for (NursePatientFollowUpEntity tmp : resultSet) {
+                followUpIds.add(tmp.getId());
+            }
+        }
+        logger.warn("patient follow-up count={}", followUpIds.size());
+        return followUpIds;
+    }
+
 
     //==================================================================
     //                   getter for nurse/patient

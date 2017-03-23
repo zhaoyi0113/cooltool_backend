@@ -63,7 +63,7 @@ public class NursePatientFollowUpRecordService {
         return beanConverter.convert(one);
     }
 
-    public long countPatientFollowUpRecordByFollowUpIds(CommonStatus status,
+    public long countPatientFollowUpRecordByFollowUpIds(CommonStatus statusNot,
                                                         PatientFollowUpType followUpType,
                                                         YesNoEnum patientRelpied,
                                                         YesNoEnum nurseRead,
@@ -72,10 +72,10 @@ public class NursePatientFollowUpRecordService {
     {
         long count = 0;
         if (!VerifyUtil.isListEmpty(followUpIds)) {
-            count = repository.countByConditionsByFollowUpIds(status, followUpType, patientRelpied, nurseRead, followUpIds);
+            count = repository.countByConditionsByFollowUpIds(statusNot, followUpType, patientRelpied, nurseRead, followUpIds);
         }
         logger.info("count patient follow-up record by statusNot={} followUpType={} patientRelpied={} nurseRead={} followUpIds={}, count={}",
-                status, followUpType, patientRelpied, nurseRead, followUpIds, count);
+                statusNot, followUpType, patientRelpied, nurseRead, followUpIds, count);
         return count;
     }
 
