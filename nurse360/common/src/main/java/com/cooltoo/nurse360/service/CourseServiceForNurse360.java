@@ -13,7 +13,6 @@ import com.cooltoo.nurse360.service.file.TemporaryFileStorageServiceForNurse360;
 import com.cooltoo.util.HtmlParser;
 import com.cooltoo.util.NumberUtil;
 import com.cooltoo.util.VerifyUtil;
-import com.google.common.base.Verify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,22 +108,38 @@ public class CourseServiceForNurse360 {
         return resultSet;
     }
 
-    public List<Long> getCourseIdByStatusesIdsCategoryPublisherName(List<CourseStatus> statuses,
-                                                                    List<Long> courseIds,
-                                                                    Long categoryId,
-                                                                    Long publisherId,
-                                                                    String nameLike
-    ) {
-        logger.info("get courseId by statuses={} ids={} categoryId={} publisherId={} nameLike={}",
-                statuses, courseIds, categoryId, publisherId, nameLike);
+    public List<Long> getCourseIdByStatusesIdsName(List<CourseStatus> statuses, List<Long> courseIds, String nameLike) {
+        logger.info("get courseId by statuses={} ids={} nameLike={}", statuses, courseIds, nameLike);
         List<Long> resultSet = new ArrayList<>();
         if (VerifyUtil.isListEmpty(statuses) || VerifyUtil.isListEmpty(courseIds)) {
             return resultSet;
         }
 
-        resultSet = repository.findCourseIdByStatusIdInAndCategoryPublisherName(
-                statuses, courseIds, categoryId, publisherId, nameLike, sort
-        );
+        resultSet = repository.findCourseIdByStatusIdInName(statuses, courseIds, nameLike, sort);
+        logger.info("count is {}", resultSet.size());
+        return resultSet;
+    }
+
+    public List<Long> getCourseIdByIdsAndCategoryIds(List<Long> courseIds, List<Long> categoryIds) {
+        logger.info("get courseId by ids={} categoryIds={}", courseIds, categoryIds);
+        List<Long> resultSet = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(courseIds) || VerifyUtil.isListEmpty(categoryIds)) {
+            return resultSet;
+        }
+
+        resultSet = repository.findCourseIdByIdsAndCategoryIds(courseIds, categoryIds, sort);
+        logger.info("count is {}", resultSet.size());
+        return resultSet;
+    }
+
+    public List<Long> getCourseIdByIdsAndPublisherIds(List<Long> courseIds, List<Long> publisherIds) {
+        logger.info("get courseId by ids={} publisherIds={}", courseIds, publisherIds);
+        List<Long> resultSet = new ArrayList<>();
+        if (VerifyUtil.isListEmpty(courseIds) || VerifyUtil.isListEmpty(publisherIds)) {
+            return resultSet;
+        }
+
+        resultSet = repository.findCourseIdByIdsAndPublisherIds(courseIds, publisherIds, sort);
         logger.info("count is {}", resultSet.size());
         return resultSet;
     }

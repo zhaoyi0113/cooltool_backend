@@ -16,8 +16,10 @@ import com.cooltoo.nurse360.hospital.util.SecurityUtil;
 import com.cooltoo.nurse360.service.CourseCategoryServiceForNurse360;
 import com.cooltoo.nurse360.service.CourseHospitalRelationServiceForNurse360;
 import com.cooltoo.nurse360.service.CourseServiceForNurse360;
+import com.cooltoo.nurse360.service.NurseServiceForNurse360;
 import com.cooltoo.nurse360.util.Nurse360Utility;
 import com.cooltoo.util.HtmlParser;
+import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,7 @@ public class HospitalCourseAPI {
 
     @Autowired private CourseHospitalRelationServiceForNurse360 courseHospitalRelationService;
     @Autowired private CourseCategoryServiceForNurse360 categoryService;
+    @Autowired private NurseServiceForNurse360 nurseService;
     @Autowired private CourseServiceForNurse360 courseService;
     @Autowired private Nurse360Utility utility;
 
@@ -62,15 +65,22 @@ public class HospitalCourseAPI {
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         if (!userDetails.isAdmin()) {
-            Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
-            Integer hospitalId   = null != tmp[0] ? tmp[0].intValue() : null;
-            Integer departmentId = null != tmp[1] ? tmp[1].intValue() : null;
-            List<Long> courseIds = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
-            String nameLike  = VerifyUtil.isStringEmpty(strName) ? null : VerifyUtil.reconstructSQLContentLike(strName);
-            courseIds = courseService.getCourseIdByStatusesIdsCategoryPublisherName(
-                    getCourseStatuses(), courseIds, null, null, nameLike
-            );
-            int count = VerifyUtil.isListEmpty(courseIds) ? 0 : courseIds.size();
+            String     nameLike    = VerifyUtil.isStringEmpty(strName) ? null : VerifyUtil.reconstructSQLContentLike(strName);
+            Long[]     tmp         = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+            Integer    hospitalId  = null != tmp[0] ? tmp[0].intValue() : null;
+            Integer    departmentId= null != tmp[1] ? tmp[1].intValue() : null;
+            List<Long> courseIds   = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
+            List<Long> categoryIds = categoryService.getCategoryIdByName(nameLike);
+            List<Long> nurseIds    = nurseService.getNurseIdByName(nameLike);
+            List<Long> courseIdsHasName    = courseService.getCourseIdByStatusesIdsName(getCourseStatuses(), courseIds, nameLike);
+            List<Long> courseIdsInCategory = courseService.getCourseIdByIdsAndCategoryIds(courseIds, categoryIds);
+            List<Long> courseIdsByPublisher= courseService.getCourseIdByIdsAndPublisherIds(courseIds, nurseIds);
+
+            SetUtil setUtil = SetUtil.newInstance();
+            setUtil.mergeListValue(courseIdsInCategory, courseIdsHasName);
+            setUtil.mergeListValue(courseIdsByPublisher, courseIdsHasName);
+
+            int count = VerifyUtil.isListEmpty(courseIdsHasName) ? 0 : courseIdsHasName.size();
             logger.info("count = {}", count);
             return count;
         }
@@ -85,15 +95,22 @@ public class HospitalCourseAPI {
     ) {
         HospitalAdminUserDetails userDetails = SecurityUtil.newInstance().getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         if (!userDetails.isAdmin()) {
-            Long[] tmp = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
-            Integer hospitalId = null != tmp[0] ? tmp[0].intValue() : null;
-            Integer departmentId = null != tmp[1] ? tmp[1].intValue() : null;
-            List<Long> courseIds = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
-            String nameLike  = VerifyUtil.isStringEmpty(strName) ? null : VerifyUtil.reconstructSQLContentLike(strName);
-            courseIds = courseService.getCourseIdByStatusesIdsCategoryPublisherName(
-                    getCourseStatuses(), courseIds, null, null, nameLike
-            );
-            List<Nurse360CourseBean> courses = courseService.getCourseByIds(courseIds, index, number);
+            String     nameLike    = VerifyUtil.isStringEmpty(strName) ? null : VerifyUtil.reconstructSQLContentLike(strName);
+            Long[]     tmp         = SecurityUtil.newInstance().getHospitalDepartmentLongId("", "", userDetails);
+            Integer    hospitalId  = null != tmp[0] ? tmp[0].intValue() : null;
+            Integer    departmentId= null != tmp[1] ? tmp[1].intValue() : null;
+            List<Long> courseIds   = courseHospitalRelationService.getCourseInHospitalAndDepartment(hospitalId, departmentId, "ALL");
+            List<Long> categoryIds = categoryService.getCategoryIdByName(nameLike);
+            List<Long> nurseIds    = nurseService.getNurseIdByName(nameLike);
+            List<Long> courseIdsHasName    = courseService.getCourseIdByStatusesIdsName(getCourseStatuses(), courseIds, nameLike);
+            List<Long> courseIdsInCategory = courseService.getCourseIdByIdsAndCategoryIds(courseIds, categoryIds);
+            List<Long> courseIdsByPublisher= courseService.getCourseIdByIdsAndPublisherIds(courseIds, nurseIds);
+
+            SetUtil setUtil = SetUtil.newInstance();
+            setUtil.mergeListValue(courseIdsInCategory, courseIdsHasName);
+            setUtil.mergeListValue(courseIdsByPublisher, courseIdsHasName);
+
+            List<Nurse360CourseBean> courses = courseService.getCourseByIds(courseIdsHasName, index, number);
             logger.info("courses's count = {}", courses.size());
             return courses;
         }

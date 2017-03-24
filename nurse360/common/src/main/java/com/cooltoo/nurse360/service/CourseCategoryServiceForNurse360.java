@@ -140,6 +140,17 @@ public class CourseCategoryServiceForNurse360 {
         return beans;
     }
 
+    public List<Long> getCategoryIdByName(String categoryName) {
+        logger.info("get course category id by categoryName={}", categoryName);
+        if (VerifyUtil.isStringEmpty(categoryName)) {
+            return new ArrayList<>();
+        }
+
+        List<Long> categoriesId = repository.findByName(categoryName, CommonStatus.ENABLED);
+        logger.info("get course category id by categoryName={}, size={}", categoryName, categoriesId.size());
+        return categoriesId;
+    }
+
     private List<Nurse360CourseCategoryBean> entitiesToBeans(Iterable<Nurse360CourseCategoryEntity> entities) {
         List<Nurse360CourseCategoryBean> beans = new ArrayList<>();
         if (null!=entities) {

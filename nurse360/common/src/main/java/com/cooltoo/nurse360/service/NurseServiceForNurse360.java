@@ -62,6 +62,19 @@ public class NurseServiceForNurse360 {
         return commonNurseService.existNurse(nurseId);
     }
 
+    public List<Long> getNurseIdByName(String nurseName) {
+        logger.info("get nurse id by nurseName={}", nurseName);
+        if (VerifyUtil.isStringEmpty(nurseName)) {
+            return new ArrayList<>();
+        }
+        long count = commonNurseService.countNurseIdsByName(nurseName);
+        if (0==count) {
+            return new ArrayList<>();
+        }
+        List<Long> nurseIds = commonNurseService.getNurseIdsByName(nurseName, 0, ((Long)count).intValue());
+        logger.info("get nurse id by nurseName={}, size={}", nurseName, nurseIds.size());
+        return nurseIds;
+    }
 
     public NurseBean getNurseById(long nurseId) {
         logger.info("get nurse by nurseId={}", nurseId);

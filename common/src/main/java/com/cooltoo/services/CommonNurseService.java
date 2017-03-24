@@ -120,6 +120,20 @@ public class CommonNurseService {
         return entities;
     }
 
+    public long countNurseIdsByName(String fuzzyQueryName) {
+        if (VerifyUtil.isStringEmpty(fuzzyQueryName)) {
+            logger.info("the name for fuzzily querying is empty");
+            return 0;
+        }
+        fuzzyQueryName = VerifyUtil.reconstructSQLContentLike(fuzzyQueryName);
+        long nurseSize = nurseRepository.countByFuzzyName(fuzzyQueryName);
+        if (0==nurseSize) {
+            logger.info("find result set is empty");
+        }
+        logger.info("find result set size is {}", nurseSize);
+        return nurseSize;
+    }
+
     public List<Long> getNurseIdsByName(String fuzzyQueryName, int pageIndex, int sizePerPage) {
         logger.info("get nurseIds by fuzzily name={}", fuzzyQueryName);
         if (VerifyUtil.isStringEmpty(fuzzyQueryName)) {
