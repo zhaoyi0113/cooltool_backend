@@ -11,6 +11,9 @@ public enum PlatformType {
     ,NURSE360_IOS
     ,NURSE360_ANDROID
     ,NURSE360_BACKEND_SERVICE
+    ,PATIENT_DB_IOS
+    ,PATIENT_DB_ANDROID
+    ,PATIENT_DB_BACKEND_SERVICE
     ;
 
     public static PlatformType parseString(String type) {
@@ -44,6 +47,15 @@ public enum PlatformType {
         }
         else if (NURSE360_BACKEND_SERVICE.name().equalsIgnoreCase(type)) {
             retVal = NURSE360_BACKEND_SERVICE;
+        }
+        else if (PATIENT_DB_IOS.name().equalsIgnoreCase(type)) {
+            retVal = PATIENT_DB_IOS;
+        }
+        else if (PATIENT_DB_ANDROID.name().equalsIgnoreCase(type)) {
+            retVal = PATIENT_DB_ANDROID;
+        }
+        else if (PATIENT_DB_BACKEND_SERVICE.name().equalsIgnoreCase(type)) {
+            retVal = PATIENT_DB_BACKEND_SERVICE;
         }
         return retVal;
     }
@@ -79,6 +91,15 @@ public enum PlatformType {
         }
         else if (NURSE360_BACKEND_SERVICE.ordinal()==(type)) {
             retVal = NURSE360_BACKEND_SERVICE;
+        }
+        else if (PATIENT_DB_IOS.ordinal()==(type)) {
+            retVal = PATIENT_DB_IOS;
+        }
+        else if (PATIENT_DB_ANDROID.ordinal()==(type)) {
+            retVal = PATIENT_DB_ANDROID;
+        }
+        else if (PATIENT_DB_BACKEND_SERVICE.ordinal()==(type)) {
+            retVal = PATIENT_DB_BACKEND_SERVICE;
         }
         return retVal;
     }
