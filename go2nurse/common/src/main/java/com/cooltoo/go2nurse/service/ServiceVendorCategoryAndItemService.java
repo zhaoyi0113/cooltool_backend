@@ -7,10 +7,7 @@ import com.cooltoo.constants.ManagedBy;
 import com.cooltoo.constants.YesNoEnum;
 import com.cooltoo.exception.BadRequestException;
 import com.cooltoo.exception.ErrorCode;
-import com.cooltoo.go2nurse.beans.QuestionnaireBean;
-import com.cooltoo.go2nurse.beans.ServiceCategoryBean;
-import com.cooltoo.go2nurse.beans.ServiceItemBean;
-import com.cooltoo.go2nurse.beans.ServiceVendorBean;
+import com.cooltoo.go2nurse.beans.*;
 import com.cooltoo.go2nurse.constants.ServiceClass;
 import com.cooltoo.go2nurse.constants.ServiceVendorType;
 import com.cooltoo.go2nurse.constants.TimeUnit;
@@ -28,6 +25,7 @@ import com.cooltoo.go2nurse.util.Go2NurseUtility;
 import com.cooltoo.services.CommonDepartmentService;
 import com.cooltoo.services.CommonHospitalService;
 import com.cooltoo.util.NumberUtil;
+import com.cooltoo.util.SetUtil;
 import com.cooltoo.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +104,32 @@ public class ServiceVendorCategoryAndItemService {
         }
         logger.info("count service vendor by status={}, size is {}", statuses, count);
         return count;
+    }
+
+    public List<ServiceItemVendorBean> getVendorIdHasItem(List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
+        logger.info("get service vendor by status={} at page={} size={}", statuses);
+        if (VerifyUtil.isListEmpty(statuses)) {
+            return new ArrayList<>();
+        }
+
+        List<Object[]> vendors = itemRep.findVendorIdByStatus(statuses);
+        if (VerifyUtil.isListEmpty(vendors)) {
+            return new ArrayList<>();
+        }
+        List<ServiceItemVendorBean> res = new ArrayList<>();
+        for (Object[] tmp : vendors) {
+            ServiceItemVendorBean ven = new ServiceItemVendorBean();
+            ven.setVendorId(null==tmp[0] ? 0 : (long)tmp[0]);
+            ven.setDepartId(null==tmp[1] ? 0 : (long)tmp[1]);
+            ven.setVendorType(null==tmp[2] ? null : (ServiceVendorType)tmp[2]);
+            if (!res.contains(ven)) {
+                res.add(ven);
+            }
+        }
+        res = SetUtil.newInstance().getSetByPage(res, pageIndex, sizePerPage, null);
+        fillVendorHasItemOtherProperties(res);
+
+        return res;
     }
 
     public List<ServiceVendorBean> getVendor(List<CommonStatus> statuses, int pageIndex, int sizePerPage) {
@@ -641,6 +665,45 @@ public class ServiceVendorCategoryAndItemService {
                 continue;
             }
             item.setLogoUrl(imageUrl);
+        }
+    }
+
+    private void fillVendorHasItemOtherProperties(List<ServiceItemVendorBean> items) {
+        if (VerifyUtil.isListEmpty(items)) {
+            return;
+        }
+
+        List<Long>    vendorId   = new ArrayList<>();
+        List<Integer> hospitalId = new ArrayList<>();
+        List<Integer> departId   = new ArrayList<>();
+        for (ServiceItemVendorBean item : items) {
+            if (ServiceVendorType.COMPANY.equals(item.getVendorType())) {
+                if (!vendorId.contains(item.getVendorId())) {
+                    vendorId.add(item.getVendorId());
+                }
+            }
+            if (ServiceVendorType.HOSPITAL.equals(item.getVendorType())) {
+                Integer hosId = ((Long)item.getVendorId()).intValue();
+                Integer depId = ((Long)item.getDepartId()).intValue();
+                if (!hospitalId.contains(hosId)) {
+                    hospitalId.add(hosId);
+                }
+                if (!departId.contains(depId)) {
+                    departId.add(depId);
+                }
+            }
+        }
+
+        Map<Integer, HospitalBean>           hospitalIdToBean = hospitalService.getHospitalIdToBeanMapByIds(hospitalId);
+        Map<Integer, HospitalDepartmentBean> departIdToBean = departmentService.getDepartmentIdToBean(departId, utility.getHttpPrefixForNurseGo());
+        Map<Long, ServiceVendorBean>         vendorIdToBean = getVendorIdToBeanMapByIds(vendorId);
+        for (ServiceItemVendorBean item : items) {
+            ServiceVendorBean      vendor   = vendorIdToBean.get(item.getVendorId());
+            HospitalBean           hospital = hospitalIdToBean.get(item.getVendorId());
+            HospitalDepartmentBean depart   = departIdToBean.get(item.getDepartId());
+            item.setVendor(vendor);
+            item.setHospital(hospital);
+            item.setDepart(depart);
         }
     }
 

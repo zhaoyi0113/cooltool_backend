@@ -47,6 +47,23 @@ public class UserServiceOrderAPI {
     //=========================================================================================
     //                                    Category Service
     //=========================================================================================
+    @Path("/vendor/{index}/{number}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @LoginAuthentication(requireUserLogin = true)
+    public Response getServiceVendor(@Context HttpServletRequest request,
+                                     @PathParam("index") int index,
+                                     @PathParam("number") int number
+    ) {
+        List<CommonStatus> statuses = new ArrayList<>();
+        statuses.add(CommonStatus.ENABLED);
+        List<ServiceItemVendorBean> res = serviceCategoryItemService.getVendorIdHasItem(statuses, index, number);
+        return Response.ok(res).build();
+    }
+
+    //=========================================================================================
+    //                                    Category Service
+    //=========================================================================================
     @Path("/category/top")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

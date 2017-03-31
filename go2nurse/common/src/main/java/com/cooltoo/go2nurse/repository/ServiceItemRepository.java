@@ -43,6 +43,14 @@ public interface ServiceItemRepository extends JpaRepository<ServiceItemEntity, 
 
 
     //========================================================================
+    //                   get vendor has item
+    //========================================================================
+    @Query("SELECT item.vendorId, item.vendorDepartId, item.vendorType FROM ServiceItemEntity item" +
+            " WHERE (item.status IN (?1))")
+    List<Object[]> findVendorIdByStatus(List<CommonStatus> statuses);
+
+
+    //========================================================================
     //                   get by conditions 1
     //========================================================================
     @Query("SELECT count(item.id) FROM ServiceItemEntity item" +
