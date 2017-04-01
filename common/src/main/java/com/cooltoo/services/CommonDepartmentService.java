@@ -214,6 +214,17 @@ public class CommonDepartmentService {
         return allTopLevelEnable;
     }
 
+    public List<HospitalDepartmentBean> getAllSecondLevelDepartmentEnable(int hospitalId, String nginxPrefix) {
+        List<HospitalDepartmentBean> allDepartments = getByHospitalId(hospitalId, nginxPrefix);
+        List<HospitalDepartmentBean> allSecondLevelEnable   = new ArrayList<>();
+        for(HospitalDepartmentBean department : allDepartments) {
+            if (department.getEnable() > 0 && department.getParentId() > 0) {
+                allSecondLevelEnable.add(department);
+            }
+        }
+        return allSecondLevelEnable;
+    }
+
     public List<HospitalDepartmentBean> getSecondLevelDepartmentEnable(int hospitalId, int parentId, String nginxPrefix) {
         List<HospitalDepartmentBean> allSecondLevelDepartment = getByParentId(hospitalId, parentId, false, 0, nginxPrefix);
         List<HospitalDepartmentBean> allSecondLevelEnable     = new ArrayList<>();
