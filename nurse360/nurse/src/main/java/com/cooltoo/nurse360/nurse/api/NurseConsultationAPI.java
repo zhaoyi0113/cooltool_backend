@@ -194,7 +194,7 @@ public class NurseConsultationAPI {
     public Response addConsultationImage(@Context HttpServletRequest request,
                                          @FormDataParam("consultation_id") @DefaultValue("0") long consultationId,
                                          @FormDataParam("image_name") @DefaultValue("") String imageName,
-                                         @FormDataParam("file") InputStream image
+                                         @FormDataParam("image") InputStream image
     ) {
         long nurseId = (Long) request.getAttribute(ContextKeys.NURSE_LOGIN_USER_ID);
         if (!nurseCanAnswerConsultation(nurseId, consultationId)) {
