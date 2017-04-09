@@ -1,0 +1,1 @@
+ALTER TABLE `cooltoo_hospital_department` ADD COLUMN `logo` BIGINT(64) NULL DEFAULT 0;

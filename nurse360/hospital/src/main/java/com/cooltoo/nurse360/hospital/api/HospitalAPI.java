@@ -97,9 +97,9 @@ public class HospitalAPI {
         }
 
         // create parent depart
-        int id = departmentService.createHospitalDepartment(hospitalId, name, description, 1, 0, null, null, "", null, null, null, null, address, outpatientAddress, null);
+        int id = departmentService.createHospitalDepartment(hospitalId, name, description, 1, 0, null, null, "", null, null, null, null, address, outpatientAddress, null, null);
         // create depart
-        id = departmentService.createHospitalDepartment(hospitalId, name, description, 1, id, null, null, "", null, null, null, null, address, outpatientAddress, null);
+        id = departmentService.createHospitalDepartment(hospitalId, name, description, 1, id, null, null, "", null, null, null, null, address, outpatientAddress, null, null);
 
         res = departmentService.getById(id, null);
         return res;

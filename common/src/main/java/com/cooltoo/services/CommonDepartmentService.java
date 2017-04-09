@@ -174,19 +174,30 @@ public class CommonDepartmentService {
 
         List<Long> imageIds = new ArrayList<>();
         for (HospitalDepartmentBean bean : beans) {
-            imageIds.add(bean.getImageId());
-            imageIds.add(bean.getDisableImageId());
-            imageIds.add(bean.getAddressImageId());
+            if (!imageIds.contains(bean.getImageId())) {
+                imageIds.add(bean.getImageId());
+            }
+            if (!imageIds.contains(bean.getDisableImageId())) {
+                imageIds.add(bean.getDisableImageId());
+            }
+            if (!imageIds.contains(bean.getAddressImageId())) {
+                imageIds.add(bean.getAddressImageId());
+            }
+            if (!imageIds.contains(bean.getLogo())) {
+                imageIds.add(bean.getLogo());
+            }
         }
         Map<Long,String> idToPathMap = officialStorage.getFilePath(imageIds);
 
         String path1;
         String path2;
         String path3;
+        String path4;
         for (HospitalDepartmentBean bean : beans) {
             path1 = idToPathMap.get(bean.getImageId());
             path2 = idToPathMap.get(bean.getDisableImageId());
             path3 = idToPathMap.get(bean.getAddressImageId());
+            path4 = idToPathMap.get(bean.getLogo());
             if (!VerifyUtil.isStringEmpty(path1)) {
                 bean.setImageUrl(nginxPrefix+path1);
             }
@@ -195,6 +206,9 @@ public class CommonDepartmentService {
             }
             if (!VerifyUtil.isStringEmpty(path3)) {
                 bean.setAddressImageUrl(nginxPrefix+path3);
+            }
+            if (!VerifyUtil.isStringEmpty(path4)) {
+                bean.setLogoUrl(nginxPrefix+path4);
             }
         }
     }
@@ -298,7 +312,7 @@ public class CommonDepartmentService {
     //        update
     //=======================================================
     @Transactional
-    public HospitalDepartmentBean update(HospitalDepartmentBean bean, InputStream image, InputStream disableImage, InputStream addressImage, String nginxPrefix) {
+    public HospitalDepartmentBean update(HospitalDepartmentBean bean, InputStream image, InputStream disableImage, InputStream addressImage, InputStream logo, String nginxPrefix) {
         if (!repository.exists(bean.getId())) {
             throw new BadRequestException(ErrorCode.HOSPITAL_DEPARTMENT_NOT_EXIST);
         }
@@ -357,6 +371,16 @@ public class CommonDepartmentService {
             }
         }
 
+        // logoImage
+        String logoImageUrl = null;
+        if (null!=logo) {
+            long fileId = officialStorage.addFile(/*entity.getAddressImageId()*/ 0, entity.getName()+"_logo", logo);
+            if (fileId>0) {
+                entity.setLogo(fileId);
+                logoImageUrl = officialStorage.getFilePath(fileId);
+            }
+        }
+
         // enable
         int enable = bean.getEnable();
         enable = enable<0 ? enable : (enable>1 ? 1 : enable);
@@ -411,6 +435,7 @@ public class CommonDepartmentService {
         bean.setImageUrl(nginxPrefix+imageUrl);
         bean.setDisableImageUrl(nginxPrefix+disableImageUrl);
         bean.setAddressImageUrl(nginxPrefix+addressImageUrl);
+        bean.setLogoUrl(nginxPrefix+logoImageUrl);
         return bean;
     }
 
@@ -420,6 +445,7 @@ public class CommonDepartmentService {
                                          String phoneNumber, Double longitude, Double latitude,
                                          String addressLink, InputStream addressImage, String address, String outpatientAddress,
                                          String transportation,
+                                         InputStream logo,
                                          String nginxPrefix) {
         HospitalDepartmentBean bean = new HospitalDepartmentBean();
         bean.setId(id);
@@ -434,7 +460,7 @@ public class CommonDepartmentService {
         bean.setAddress(address);
         bean.setOutpatientAddress(outpatientAddress);
         bean.setTransportation(transportation);
-        return update(bean, image, disableImage, addressImage, nginxPrefix);
+        return update(bean, image, disableImage, addressImage, logo, nginxPrefix);
     }
 
 
@@ -446,7 +472,8 @@ public class CommonDepartmentService {
                                             InputStream image, InputStream disableImage,
                                             String phoneNumber, Double longitude, Double latitude,
                                             String addressLink, InputStream addressImage, String address, String outpatientAddress,
-                                            String transportation) {
+                                            String transportation,
+                                            InputStream logo) {
         if (!hospitalRepository.exists(hospitalId)) {
             logger.error("hospital is not exist");
             throw new BadRequestException(ErrorCode.DATA_ERROR);
@@ -521,6 +548,15 @@ public class CommonDepartmentService {
             try {
                 long fileId = officialStorage.addFile(entity.getAddressImageId(), entity.getName()+"_address", addressImage);
                 entity.setAddressImageId(fileId);
+            }
+            catch (Exception ex) {
+                // do nothing
+            }
+        }
+        if (null!=logo) {
+            try {
+                long fileId = officialStorage.addFile(entity.getLogo(), entity.getName()+"_logo", logo);
+                entity.setLogo(fileId);
             }
             catch (Exception ex) {
                 // do nothing

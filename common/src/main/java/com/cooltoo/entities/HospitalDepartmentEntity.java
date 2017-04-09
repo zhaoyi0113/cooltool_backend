@@ -25,6 +25,7 @@ public class HospitalDepartmentEntity {
     private String address;// 科室地址
     private String outpatientAddress;//门诊地址
     private String transportation;//乘车方式
+    private long   logo;
 
     @Id
     @GeneratedValue
@@ -179,6 +180,15 @@ public class HospitalDepartmentEntity {
 
     public void setTransportation(String transportation) {
         this.transportation = transportation;
+    }
+
+    @Column(name = "logo")
+    public long getLogo() {
+        return logo;
+    }
+
+    public void setLogo(long logo) {
+        this.logo = logo;
     }
 
     public String toString() {

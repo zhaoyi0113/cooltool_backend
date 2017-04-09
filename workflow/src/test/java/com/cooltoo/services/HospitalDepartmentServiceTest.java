@@ -31,7 +31,7 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
 
     @Test
     public void testNew1() {
-        int id = service.createHospitalDepartment(11, "name111", "department111", -1, -1, null, null, null, null, null, null, null, null, null, null);
+        int id = service.createHospitalDepartment(11, "name111", "department111", -1, -1, null, null, null, null, null, null, null, null, null, null, null);
         Assert.assertTrue(id>0);
         List<HospitalDepartmentBean> all = service.getByIds(Arrays.asList(new Integer[]{id}), "");
         Assert.assertEquals(1, all.size());
@@ -74,7 +74,9 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
         HospitalDepartmentBean bean = service.update(id, name, desc, enable, parentId,
                                                      new ByteArrayInputStream(desc.getBytes()),
                                                      new ByteArrayInputStream(desc.getBytes()),
-                                                     null, null, null, addressLink, null, address, outpatientAddress, transportation, "");
+                                                     null, null, null, addressLink, null, address, outpatientAddress, transportation,
+                                                     new ByteArrayInputStream(desc.getBytes()),
+                                                     "");
         Assert.assertEquals(id, bean.getId());
         Assert.assertEquals(name, bean.getName());
         Assert.assertEquals(parentId, bean.getParentId());
@@ -86,15 +88,18 @@ public class HospitalDepartmentServiceTest extends AbstractCooltooTest {
         Assert.assertEquals(transportation, bean.getTransportation());
         Assert.assertTrue(officialStorage.fileExist(bean.getImageId()));
         Assert.assertTrue(officialStorage.fileExist(bean.getDisableImageId()));
+        Assert.assertTrue(officialStorage.fileExist(bean.getLogo()));
         officialStorage.deleteFile(bean.getImageId());
         officialStorage.deleteFile(bean.getDisableImageId());
+        officialStorage.deleteFile(bean.getLogo());
         Assert.assertFalse(officialStorage.fileExist(bean.getImageUrl()));
         Assert.assertFalse(officialStorage.fileExist(bean.getDisableImageUrl()));
+        Assert.assertFalse(officialStorage.fileExist(bean.getLogoUrl()));
 
 
         name = "name789";
         bean.setName(name);
-        bean =  service.update(bean, null, null, null, "");
+        bean =  service.update(bean, null, null, null, null, "");
         Assert.assertEquals(22, bean.getId());
         Assert.assertEquals(name, bean.getName());
     }

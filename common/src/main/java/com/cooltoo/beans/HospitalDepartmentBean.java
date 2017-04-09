@@ -29,6 +29,8 @@ public class HospitalDepartmentBean {
     private String address;// 科室地址
     private String outpatientAddress;//门诊地址
     private String transportation;//乘车方式
+    private long   logo;
+    private String logoUrl;
 
     public int getId() {
         return id;
@@ -206,6 +208,22 @@ public class HospitalDepartmentBean {
         this.transportation = transportation;
     }
 
+    public long getLogo() {
+        return logo;
+    }
+
+    public void setLogo(long logo) {
+        this.logo = logo;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
+    }
+
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append(this.getClass()).append("@").append(hashCode()).append("[");
@@ -229,6 +247,8 @@ public class HospitalDepartmentBean {
         msg.append(", address=").append(address);
         msg.append(", outpatientAddress=").append(outpatientAddress);
         msg.append(", transportation=").append(transportation);
+        msg.append(", logo=").append(logo);
+        msg.append(", logoUrl=").append(logoUrl);
         msg.append("]");
         return msg.toString();
     }
