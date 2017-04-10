@@ -155,7 +155,7 @@ public class HospitalDepartmentAPI {
     @AdminUserLoginAuthentication(requireUserLogin = true)
     public Response updateLogoImage(@FormDataParam("id")       int                        id,
                                     @FormDataParam("file")     InputStream                file) {
-        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, null, null, null, null, null, file, null, null, null, file, "");
+        HospitalDepartmentBean one = service.update(id, null, null, -1, -1, null, null, null, null, null, null, null, null, null, null, file, "");
         logger.info("update hospital department is " + one);
         return Response.ok(one).build();
     }
